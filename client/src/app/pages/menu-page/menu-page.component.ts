@@ -7,13 +7,12 @@ import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
-    selector: 'app-main-page',
-    templateUrl: './main-page.component.html',
-    styleUrls: ['./main-page.component.scss'],
+    selector: 'app-menu-page',
+    templateUrl: './menu-page.component.html',
+    styleUrls: ['./menu-page.component.scss'],
     imports: [RouterLink],
 })
-export class MainPageComponent {
-    readonly title: string = 'LOG2990';
+export class MenuPageComponent {
     message: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
     constructor(private readonly communicationService: CommunicationService) {}
