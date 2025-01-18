@@ -1,3 +1,14 @@
-<div>
-    <h2>Board component</h2>
+<div class="board-wrapper" [style.--size]="size">
+    <div class="board-container">
+        <div class="board-grid">
+
+            @for (rows of images; track $index; let row = $index) {
+                @for (image of rows; track $index; let col = $index) {
+                    <div class="board-cell" [attr.row]=row [attr.col]=col [style.backgroundImage]="'url(' + image + ')'"></div>
+                }
+            }
+            
+        </div>
+        <div class="board-grid"></div>
+    </div>
 </div>

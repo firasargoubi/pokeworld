@@ -7,4 +7,10 @@ import { BoardComponent } from '@app/components/board/board.component';
     styleUrls: ['./edit-page.component.scss'],
     imports: [BoardComponent],
 })
-export class EditPageComponent {}
+export class EditPageComponent {
+    cells: string[][] = [
+        ['water', 'water', 'water'],
+        ['grass', 'path', 'grass'],
+        ['path', 'path', 'grass'],
+    ];
+}
