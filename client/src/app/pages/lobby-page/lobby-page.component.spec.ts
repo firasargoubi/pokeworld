@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LobbyPageComponent } from './lobby-page.component';
+import { RouterModule } from '@angular/router';
 
 describe('LobbyPageComponent', () => {
     let component: LobbyPageComponent;
@@ -7,7 +8,7 @@ describe('LobbyPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [LobbyPageComponent],
+            imports: [LobbyPageComponent, RouterModule.forRoot([])],
         }).compileComponents();
     });
 
