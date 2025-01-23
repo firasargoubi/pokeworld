@@ -74,7 +74,7 @@ $green-active-inner-border-color: rgb(122, 151, 101) rgb(179, 246, 168) rgb(179,
 }
 
 .container .body {
-    background-image: url('../../../assets/ui/Container/Blue/BlueScrareBody.png');
+    background-image: url('/assets/ui/container/blue/blueScrareBody.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -92,7 +92,7 @@ $green-active-inner-border-color: rgb(122, 151, 101) rgb(179, 246, 168) rgb(179,
 }
 
 .orange-container .body {
-    background-image: url('../../../assets/ui/Container/Orange/OrangeScrareBody.png');
+    background-image: url('/assets/ui/container/orange/orangeScrareBody.png');
     border-color: $orange-inner-border-color;
 }
 
@@ -101,7 +101,7 @@ $green-active-inner-border-color: rgb(122, 151, 101) rgb(179, 246, 168) rgb(179,
 }
 
 .green-container .body {
-    background-image: url('../../../assets/ui/Container/Green/GreenScrareBody.png');
+    background-image: url('/assets/ui/container/green/greenScrareBody.png');
     border-color: $green-inner-border-color;
 }
 

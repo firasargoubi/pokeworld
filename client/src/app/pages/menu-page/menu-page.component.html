@@ -1,16 +1,7 @@
 <div id="menu-page">
     <div class="glass-container">
-        <!-- <h1>Menu page</h1>
-        <br />
-        <button routerLink="/lobby">Rejoindre une partie</button><br />
-        <button routerLink="/lobby">Créer une partie</button><br />
-        <button routerLink="/admin">Modifier une carte</button><br />
-        <br />
-        <button (click)="getMessagesFromServer()">Récupérer un message du serveur</button><br />
-        <button (click)="sendTimeToServer()">Envoyer un message au serveur</button><br /> -->
-
         <div id="logo-container">
-            <img id="logo" src="../../../assets/ui/Logo/tempLogo.png" />
+            <img id="logo" src="assets/ui/logo/tempLogo.png" />
             <p id="team-number">Equipe #204</p>
         </div>
 
@@ -26,7 +17,7 @@
         <div id="link-container">
             <app-menu-button
                 [containerClass]="'blue-container'"
-                [spriteImage]="'../../../assets/ui/pokemon/normal-sprite/Blastoise.png'"
+                [spriteImage]="'assets/ui/pokemon/normal-sprite/Blastoise.png'"
                 [textContent]="'Joindre<br/>Partie'"
                 [routePath]="'/lobby'"
             >
@@ -43,7 +34,7 @@
 
             <app-menu-button
                 [containerClass]="'green-container'"
-                [spriteImage]="'../../../assets/ui/pokemon/normal-sprite/Venusaur.png'"
+                [spriteImage]="'assets/ui/pokemon/normal-sprite/Venusaur.png'"
                 [textContent]="'Administrer<br/>Partie'"
                 [routePath]="'/admin'"
             >
