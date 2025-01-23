@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { MenuButtonComponent } from '@app/components/menu-button/menu-button.component';
 import { CommunicationService } from '@app/services/communication.service';
 import { Message } from '@common/message';
 import { BehaviorSubject } from 'rxjs';
@@ -10,7 +10,7 @@ import { map } from 'rxjs/operators';
     selector: 'app-menu-page',
     templateUrl: './menu-page.component.html',
     styleUrls: ['./menu-page.component.scss'],
-    imports: [RouterLink],
+    imports: [MenuButtonComponent],
 })
 export class MenuPageComponent {
     message: BehaviorSubject<string> = new BehaviorSubject<string>('');

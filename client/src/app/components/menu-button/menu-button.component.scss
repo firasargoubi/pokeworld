@@ -1,0 +1,178 @@
+$border-width: 7px;
+
+$blue-border-color: rgb(246, 119, 56);
+$blue-inner-border-color: rgb(170, 231, 247) rgb(75, 166, 198) rgb(75, 166, 198) rgb(170, 231, 247);
+$blue-active-inner-border-color: rgb(75, 166, 198) rgb(170, 231, 247) rgb(170, 231, 247) rgb(75, 166, 198);
+
+$orange-border-color: rgb(72, 72, 95);
+$orange-inner-border-color: rgb(208, 162, 54) rgb(159, 76, 15) rgb(159, 76, 15) rgb(208, 162, 54);
+$orange-active-inner-border-color: rgb(159, 76, 15) rgb(208, 162, 54) rgb(208, 162, 54) rgb(159, 76, 15);
+
+$green-border-color: rgb(249, 248, 128);
+$green-inner-border-color: rgb(179, 246, 168) rgb(122, 151, 101) rgb(122, 151, 101) rgb(179, 246, 168);
+$green-active-inner-border-color: rgb(122, 151, 101) rgb(179, 246, 168) rgb(179, 246, 168) rgb(122, 151, 101);
+
+.container {
+    width: 100%;
+    aspect-ratio: 1;
+    margin: 0px;
+    position: relative;
+    overflow: visible;
+    display: flex;
+    cursor: pointer;
+}
+
+.container * {
+    user-select: none;
+}
+
+.container:hover {
+    filter: brightness(1.1);
+}
+
+.container .border {
+    position: absolute;
+    background-color: $blue-border-color;
+}
+
+.orange-container .border {
+    background-color: $orange-border-color;
+}
+
+.green-container .border {
+    background-color: $green-border-color;
+}
+
+.top-border,
+.bottom-border {
+    width: calc(100% - #{$border-width * 2});
+    height: calc($border-width + 10px);
+    right: $border-width;
+}
+
+.left-border,
+.right-border {
+    height: calc(100% - #{$border-width * 2});
+    width: calc($border-width + 10px);
+    top: $border-width;
+}
+
+.bottom-border {
+    bottom: 0;
+}
+
+.top-border {
+    top: 0;
+}
+
+.left-border {
+    left: 0;
+}
+
+.right-border {
+    right: 0;
+}
+
+.container .body {
+    background-image: url('../../../assets/ui/Container/Blue/BlueScrareBody.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    width: calc(100% - #{$border-width * 2});
+    height: calc(100% - #{$border-width * 2});
+    margin: $border-width;
+    border-style: solid;
+    border-width: 16px;
+    border-color: $blue-inner-border-color;
+}
+
+.container:active .body {
+    border-color: $blue-active-inner-border-color;
+}
+
+.orange-container .body {
+    background-image: url('../../../assets/ui/Container/Orange/OrangeScrareBody.png');
+    border-color: $orange-inner-border-color;
+}
+
+.orange-container:active .body {
+    border-color: $orange-active-inner-border-color;
+}
+
+.green-container .body {
+    background-image: url('../../../assets/ui/Container/Green/GreenScrareBody.png');
+    border-color: $green-inner-border-color;
+}
+
+.green-container:active .body {
+    border-color: $green-active-inner-border-color;
+}
+
+.container p {
+    font-family: 'pokemon-em-small', sans-serif;
+    text-shadow: 6px 0 0 rgba(0, 0, 0, 0.5);
+    font-size: 5vw;
+    line-height: 80%;
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    overflow: visible;
+}
+
+.container img {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
+}
+
+.container .pokemon-img {
+    position: absolute;
+    bottom: -2vw;
+    right: -4vw;
+    height: 25vw;
+    width: auto;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.container .pokeball-img {
+    position: absolute;
+    bottom: 1vw;
+    left: 2vw;
+    height: 15vw;
+    width: auto;
+    z-index: 0;
+}
+
+.container .pokeball-open {
+    opacity: 0;
+}
+
+.container:hover .pokeball-img {
+    animation: wobbling 450ms infinite alternate;
+}
+
+@keyframes wobbling {
+    0% {
+        transform: rotate(0deg);
+    }
+    13% {
+        transform: rotate(10deg);
+    }
+    26% {
+        transform: rotate(-10deg);
+    }
+    39% {
+        transform: rotate(0deg);
+    }
+}
+
+.container:active .pokeball-open {
+    opacity: 1;
+    animation: none;
+}
+
+.container:active .pokeball-close {
+    opacity: 0;
+}

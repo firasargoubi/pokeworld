@@ -1,9 +1,53 @@
-<div>
-    <h1>Menu page</h1><br>
-    <button routerLink="/lobby">Rejoindre une partie</button><br>
-    <button routerLink="/lobby">Créer une partie</button><br>
-    <button routerLink="/admin">Modifier une carte</button><br>
-    <br>
-    <button (click)="getMessagesFromServer()">Récupérer un message du serveur</button><br>
-    <button (click)="sendTimeToServer()">Envoyer un message au serveur</button><br>
+<div id="menu-page">
+    <div class="glass-container">
+        <!-- <h1>Menu page</h1>
+        <br />
+        <button routerLink="/lobby">Rejoindre une partie</button><br />
+        <button routerLink="/lobby">Créer une partie</button><br />
+        <button routerLink="/admin">Modifier une carte</button><br />
+        <br />
+        <button (click)="getMessagesFromServer()">Récupérer un message du serveur</button><br />
+        <button (click)="sendTimeToServer()">Envoyer un message au serveur</button><br /> -->
+
+        <div id="logo-container">
+            <img id="logo" src="../../../assets/ui/Logo/tempLogo.png" />
+            <p id="team-number">Equipe #204</p>
+        </div>
+
+        <div id="credit-container">
+            <span>Mohamed Omar Zedek <img src="../../../assets/ui/pokemon/chibi/magikarp.png" class="pokemon-icon" /></span>
+            <span>Mathieu Lambert <img src="../../../assets/ui/pokemon/chibi/pikachu.png" class="pokemon-icon" /></span>
+            <span>Souhayl Sejjari <img src="../../../assets/ui/pokemon/chibi/mew.png" class="pokemon-icon" /></span>
+            <span>Selim Mahjoub <img src="../../../assets/ui/pokemon/chibi/psyduck.png" class="pokemon-icon" /></span>
+            <span>Samer Salman<img src="../../../assets/ui/pokemon/chibi/eevee.png" class="pokemon-icon" /></span>
+            <span>Aziz Maaref <img src="../../../assets/ui/pokemon/chibi/vulpix.png" class="pokemon-icon" /></span>
+        </div>
+
+        <div id="link-container">
+            <app-menu-button
+                [containerClass]="'blue-container'"
+                [spriteImage]="'../../../assets/ui/pokemon/normal-sprite/Blastoise.png'"
+                [textContent]="'Joindre<br/>Partie'"
+                [routePath]="'/lobby'"
+            >
+            </app-menu-button>
+
+            <app-menu-button
+                [containerClass]="'orange-container'"
+                [spriteImage]="'assets/ui/pokemon/normal-sprite/Charizard.png'"
+                [textContent]="'Créer<br/>Partie'"
+                [routePath]="'/lobby'"
+                [routePath]="'/lobby'"
+            >
+            </app-menu-button>
+
+            <app-menu-button
+                [containerClass]="'green-container'"
+                [spriteImage]="'../../../assets/ui/pokemon/normal-sprite/Venusaur.png'"
+                [textContent]="'Administrer<br/>Partie'"
+                [routePath]="'/admin'"
+            >
+            </app-menu-button>
+        </div>
+    </div>
 </div>
