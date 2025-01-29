@@ -1,0 +1,163 @@
+// Variables
+$gray-border-color: #636776;
+$wheat-border-color: #E9F6F7;
+$stripes-color1: #BFEDD9;
+$stripes-color2: #B2E5D1;
+$text-shadow-color: rgb(112, 112, 112);
+
+$padding-gray-border: 0.8vw;
+$padding-wheat-border: 0.7vw;
+$stripes-size: 1vw;
+$font-size-title: 2.5vw;
+$text-shadow-size: 0.3vw;
+$header-title-left: 2vw;
+$corner-square-size: 0.4vw;
+
+$font-family-title: 'pokemon-em-small';
+
+.admin-page-container {
+    height: 100vh;
+    border-radius: .7vw;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  #admin-page-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+  
+    #header-image {
+      width: 100%;
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      -ms-interpolation-mode: nearest-neighbor;
+    }
+  
+    #header-title {
+      font-family: $font-family-title;
+      font-size: $font-size-title;
+      text-shadow: $text-shadow-size 0 0 $text-shadow-color;
+      position: absolute;
+      left: $header-title-left;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+  
+  #admin-page-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      $stripes-color1,
+      $stripes-color1 $stripes-size,
+      $stripes-color2 $stripes-size,
+      $stripes-color2 $stripes-size * 2
+    );
+    background-size: 100% ($stripes-size * 2);
+    animation: fall 2s linear infinite;
+    box-sizing: border-box;
+  }
+  
+  @keyframes fall {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: 0 $stripes-size * 2;
+    }
+  }
+  
+  #gray-border {
+    background-color: $gray-border-color;
+    padding: $padding-gray-border;
+    flex: 1;
+    height: 100%;
+    box-sizing: border-box;
+  }
+  
+  #wheat-border {
+    background-color: $wheat-border-color;
+    padding: $padding-wheat-border;
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+.game-list {
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 1rem;
+
+  // Pour Firefox
+  scrollbar-width: thin;
+  scrollbar-color: #cebe64 #8b8241; // Couleurs du pouce et de la piste
+
+  // Styles pour les navigateurs basés sur WebKit (Chrome, Safari, Edge)
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #8b8241;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cebe64;
+    border-radius: 4px;
+    border: 3px solid #e1d7a0;
+  }
+
+}
+
+#body-header {
+  background: $gray-border-color;
+  width: 100%;
+  height: auto;
+  padding: 0.5em 0;
+  text-align: center;
+  vertical-align: middle;
+  border: 0.4vw solid #575b68;
+  font-family: $font-family-title;
+  font-size: $font-size-title;
+  text-shadow: $text-shadow-size 0 0 $text-shadow-color;
+  line-height: 33%;
+  box-sizing: border-box;
+}
+
+
+#game-description{
+  width: 24.5vw;
+  height: auto;
+  position: absolute;
+  top:8vw;
+  left: 73vw;
+
+  img{
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  p{
+    background-image: url('/assets/ui/description-backgrounds/BOD.png');
+    background-size:contain;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+
+    color: #575b68;
+    text-align: center;
+    font-size: 2vw;
+  }
+}
+
+app-pokeball-button{
+  position: relative;
+  left : 5vw;
+  top: 1.3vw;
+}

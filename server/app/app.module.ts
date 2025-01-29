@@ -9,6 +9,9 @@ import { DateService } from '@app/services/date/date.service';
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { ExampleService } from '@app/services/example/example.service';
 import { ExampleController } from '@app/controllers/example/example.controller';
+import { GameController } from './controllers/game/game.controller';
+import { GameService } from './services/game/game.service';
+import { Game, gameSchema } from './model/schema/game.schema';
 
 @Module({
     imports: [
@@ -17,12 +20,15 @@ import { ExampleController } from '@app/controllers/example/example.controller';
             imports: [ConfigModule],
             inject: [ConfigService],
             useFactory: async (config: ConfigService) => ({
-                uri: config.get<string>('DATABASE_CONNECTION_STRING'), // Loaded from .env
+                uri: config.get<string>('DATABASE_CONNECTION_STRING'),
             }),
         }),
-        MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
+        MongooseModule.forFeature([
+            { name: Course.name, schema: courseSchema },
+            { name: Game.name, schema: gameSchema },
+        ]),
     ],
-    controllers: [CourseController, DateController, ExampleController],
-    providers: [ChatGateway, CourseService, DateService, ExampleService, Logger],
+    controllers: [CourseController, DateController, ExampleController, GameController],
+    providers: [ChatGateway, CourseService, DateService, ExampleService, Logger, GameService],
 })
 export class AppModule {}

@@ -1,0 +1,40 @@
+<div class="game-card">
+  <div id="game-details" [ngClass]="cardIndex">
+    <div id="game-info">
+      <h2 id="game-name">{{ game.name }}</h2>
+      <div id="game-mode">
+        <p id="mode-name" [ngClass]="game.mapData.gameMode">{{ game.mapData.gameMode }}</p>
+        <div id="mode-background"></div>
+        <img id="flag" src="assets/ui/icons/flag.png" *ngIf="game.mapData.gameMode === 'CTF'">
+      </div>
+    </div>
+    <div id="game-interaction">
+        @if(isAdminView) {
+          <div id="edition-icons">
+            <img
+              [src]="game.isVisible ? 'assets/ui/icons/view1.png' : 'assets/ui/icons/hide1.png'"
+              (click)="onToggleVisibility()"
+              class="icons">
+            <img
+              src="assets/ui/icons/pencil.png"
+              (click)="onEdit()"
+              class="icons">
+            <img
+              src="assets/ui/icons/recycle-bin.png"
+              (click)="onDelete()"
+              class="icons">
+          </div>
+        }
+        @else {
+          <button (click)="onJoin()">Play</button> 
+        }
+      <p id="last-edited">{{ formatDate(game.lastEdited) }}</p>
+
+    </div>
+  </div>
+  <!-- use canva library for screenshot -->
+  <div id="game-thumbnail" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+    <p id="size-info">{{ game.mapData.size }} x {{ game.mapData.size }} </p>
+    <img [src]="game.thumbnail" alt="Game Thumbnail"> 
+  </div>
+</div>
