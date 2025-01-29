@@ -1,5 +1,37 @@
-<div>
-    <h1>Admin page</h1><br>
-    <button routerLink="/edit">Modifier la carte #1</button><br>
-    <button routerLink="/edit">Modifier la carte #2</button><br>
+<div class="admin-page-container">
+    <div id="admin-page-header">
+        <p id="header-title"> Admin page </p>
+        <img id="header-image" src="assets/ui/headers/admin-header.png" alt="Page header" title="Header3">
+    </div>
+    <div id="gray-border">
+        <div id="wheat-border">
+            <app-pokeball-button [buttonContent]="'CREER JEU'" [delay]="400"></app-pokeball-button>
+            <div id="admin-page-body">
+                <div id="body-header">JEUX SAUVEGARDÉS</div>
+                <div id="body-body">
+                    <div class="game-list"> 
+                        @for(game of games; let i = $index; track game._id) {
+                            <app-game-card
+                            [game]="game"
+                            [isAdminView]="true"
+                            [cardIndex] = "getBackgroundClass(i)"
+                            (edit)="editGame($event)"
+                            (delete)="deleteGame($event)"
+                            (toggleVisibility)="toggleVisibility($event)"
+                            (thumbnailHover)="thumbnailDescription($event, game.description)">
+                        </app-game-card>
+                    }
+                    </div>
+                    <div id="game-description">
+                        @if(showDescription){
+                            <img src="assets/ui/description-backgrounds/TOP.png">
+                            <p>{{lastDescription}}</p>
+                            <img src="assets/ui/description-backgrounds/BOT.png">
+                        }</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- <app-pokeball-button [buttonContent]="'C'"></app-pokeball-button> -->

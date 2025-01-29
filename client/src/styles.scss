@@ -1,9 +1,4 @@
 @font-face {
-    font-family: 'roboto';
-    src: url('/assets/fonts/roboto.woff2') format('woff2');
-}
-
-@font-face {
     font-family: 'pokemon-em-small';
     src: url('/assets/fonts/Pokemon-Em-Small.ttf') format('truetype');
 }
@@ -29,7 +24,7 @@ body {
     height: 100vh;
     width: 100vw;
     background: rgb(31, 32, 35);
-    font-family: 'roboto';
+    font-family: 'pokemon-em-small';
 }
 
 img {

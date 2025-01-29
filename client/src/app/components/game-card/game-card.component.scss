@@ -1,0 +1,198 @@
+$corner-square-size: 0.3vw;
+$big-stripe-size: 64%;
+$medium-stripe-size: 20%;
+$small-stripe-size: 8%;
+$mode-corner-square-size: 0.25vw;
+$mode-background-width: 6vw;
+$mode-background-height: 2vw;
+$stripes-color1: #95cde5;
+$stripes-color2: #bce5f5;
+$stripes1-color1: #98d589;
+$stripes1-color2: #c7f5a9;
+$stripes2-color1: #eeba96;
+$stripes2-color2: #f2d1d8;
+
+* {
+    font-family: 'pokemon-em-small';
+}
+
+.game-card {
+    background-color: #e47742;
+    height: 8vw;
+    width: 40vw;
+    border: $corner-square-size solid #e47742;
+    padding: $corner-square-size;
+    margin: $corner-square-size;
+
+    display: flex;
+    gap: $corner-square-size * 2;
+
+    clip-path: polygon(
+        $corner-square-size 0%,
+        calc(100% - #{$corner-square-size}) 0%,
+
+        calc(100% - #{$corner-square-size}) $corner-square-size,
+        100% $corner-square-size,
+
+        100% calc(100% - #{$corner-square-size}),
+        calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
+        calc(100% - #{$corner-square-size}) 100%,
+        $corner-square-size 100%,
+
+        $corner-square-size calc(100% - #{$corner-square-size}),
+        0% calc(100% - #{$corner-square-size}),
+        0% $corner-square-size,
+        $corner-square-size $corner-square-size
+    );
+
+    img {
+        width: 100%;
+        display: block;
+    }
+}
+
+.background-class-1 {
+    background-image: url('/assets/ui/container/blue/blueScrareBody.png');
+}
+
+.background-class-2 {
+    background-image: url('/assets/ui/container/green/greenScrareBody.png');
+}
+
+.background-class-3 {
+    background-image: url('/assets/ui/container/orange/orangeScrareBody.png');
+}
+
+#game-details {
+    flex-grow: 3;
+    flex-basis: 0;
+    background-size: contain;
+    box-sizing: border-box;
+}
+
+#game-info {
+    height: $big-stripe-size;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 1.5vw;
+}
+
+#game-name {
+    font-size: 2vw;
+    text-shadow: 0.25vw 0 0 rgb(112, 112, 112);
+}
+
+#game-mode {
+    position: relative;
+    height: $mode-background-height;
+    width: $mode-background-width;
+}
+
+#mode-name {
+    position: absolute;
+    font-size: $mode-background-height;
+    left: 2%;
+    top: 0;
+    text-align: center;
+    width: $mode-background-width;
+    z-index: 1;
+    -webkit-text-stroke: 0.4vw #636776;
+    paint-order: stroke fill;
+}
+
+#mode-name.FFA {
+    color: rgb(252, 252, 67);
+}
+
+#mode-name.CTF {
+    color: rgb(255, 87, 87);
+}
+
+#mode-background {
+    position: absolute;
+    top: 33%;
+    height: 50%;
+    width: $mode-background-width;
+
+    background-color: #636776;
+
+    clip-path: polygon(
+        $mode-corner-square-size 0%,
+        calc($mode-background-width - #{$mode-corner-square-size}) 0%,
+
+        calc($mode-background-width - #{$mode-corner-square-size}) $mode-corner-square-size,
+        $mode-background-width $mode-corner-square-size,
+
+        $mode-background-width calc(100% - #{$mode-corner-square-size}),
+        calc($mode-background-width - #{$mode-corner-square-size}) calc(100% - #{$mode-corner-square-size}),
+        calc($mode-background-width - #{$mode-corner-square-size}) 100%,
+        $mode-corner-square-size 100%,
+
+        $mode-corner-square-size calc(100% - #{$mode-corner-square-size}),
+        0% calc(100% - #{$mode-corner-square-size}),
+        0% $mode-corner-square-size,
+        $mode-corner-square-size $mode-corner-square-size
+    );
+}
+
+#flag {
+    position: absolute;
+    width: 1.3vw;
+    top: 0.2vw;
+    left: 4.2vw;
+    rotate: 20deg;
+    object-fit: contain;
+}
+
+#game-interaction {
+    margin-top: 0.3vw;
+    display: flex;
+    flex-direction: row;
+    gap: 5vw;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#game-thumbnail {
+    position: relative;
+    height: 8vw;
+    width: 8vw;
+}
+
+#size-info {
+    position: absolute;
+    top: 6.3vw;
+    left: 3.4vw;
+    font-size: 1.5vw;
+    width: 4.6vw;
+    text-shadow: 0.2vw 0 0 rgb(112, 112, 112);
+}
+
+#last-edited {
+    margin-top: 0.7vw;
+    font-size: 1.6vw;
+    text-align: end;
+    align-items: end;
+    width: 14vw;
+    text-shadow: 0.15vw 0 0 rgb(112, 112, 112);
+}
+
+#edition-icons {
+    height: 1.5vw;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 1vw;
+    img {
+        width: 1.5vw;
+        object-fit: contain;
+        &:hover {
+            filter: brightness(0.95);
+        }
+    }
+}
+
+.game-card:hover {
+    filter: brightness(1.1);
+}

@@ -1,7 +1,7 @@
-import { MapData } from './MapData';
+import { MapData } from './map-data';
 
 export interface GameData {
-    id: string;
+    _id: string;
     name: string;
     description: string;
     lastEdited: Date;
