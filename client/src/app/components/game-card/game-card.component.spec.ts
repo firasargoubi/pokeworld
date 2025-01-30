@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { GameMode } from '@common/game-mode.enum';
-import { MapSize } from '@common/map-size.enum';
 import { ItemType } from '@common/item-type.enum';
+import { MapSize } from '@common/map-size.enum';
 import { GameCardComponent } from './game-card.component';
 
 describe('GameCardComponent', () => {
@@ -53,25 +53,25 @@ describe('GameCardComponent', () => {
     it('should emit edit event when onEdit is called', () => {
         spyOn(component.edit, 'emit');
         component.onEdit();
-        expect(component.edit.emit).toHaveBeenCalledWith('1');
+        expect(component.edit.emit).toHaveBeenCalledWith(component.game._id);
     });
 
     it('should emit delete event when onDelete is called', () => {
         spyOn(component.delete, 'emit');
         component.onDelete();
-        expect(component.delete.emit).toHaveBeenCalledWith('1');
+        expect(component.delete.emit).toHaveBeenCalledWith(component.game._id);
     });
 
     it('should emit toggleVisibility event when onToggleVisibility is called', () => {
         spyOn(component.toggleVisibility, 'emit');
         component.onToggleVisibility();
-        expect(component.toggleVisibility.emit).toHaveBeenCalledWith({ id: '1', isVisible: true });
+        expect(component.toggleVisibility.emit).toHaveBeenCalledWith({ id: component.game._id, isVisible: true });
     });
 
     it('should emit join event when onJoin is called', () => {
         spyOn(component.join, 'emit');
         component.onJoin();
-        expect(component.join.emit).toHaveBeenCalledWith('1');
+        expect(component.join.emit).toHaveBeenCalledWith(component.game._id);
     });
 
     it('should show admin controls when isAdminView is true', () => {
@@ -93,5 +93,17 @@ describe('GameCardComponent', () => {
 
         const playButton = fixture.debugElement.query(By.css('button')).nativeElement;
         expect(playButton.textContent).toContain('Play');
+    });
+
+    it('should emit true when mouse is hovering the component', () => {
+        const thumbnailHoverSpy = spyOn(component.thumbnailHover, 'emit');
+        component.onMouseEnter();
+        expect(thumbnailHoverSpy).toHaveBeenCalledWith(true);
+    });
+
+    it('should emit false when mouse is not hovering the component', () => {
+        const thumbnailHoverSpy = spyOn(component.thumbnailHover, 'emit');
+        component.onMouseLeave();
+        expect(thumbnailHoverSpy).toHaveBeenCalledWith(false);
     });
 });
