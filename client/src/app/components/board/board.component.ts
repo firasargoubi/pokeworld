@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { BoardVisualService } from '@app/services/board-visual.service';
+import { BoardVisualService } from '@app/services/board-visual/board-visual.service';
 
 @Component({
     selector: 'app-board',

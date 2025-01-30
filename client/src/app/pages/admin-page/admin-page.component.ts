@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
-import { GameService } from '@app/services/game.service';
+import { GameService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
 
 @Component({

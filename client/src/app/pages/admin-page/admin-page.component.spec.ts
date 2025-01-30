@@ -1,14 +1,14 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
-import { AdminPageComponent } from './admin-page.component';
-import { GameService } from '@app/services/game.service';
+import { GameService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
 import { MapSize } from '@common/map-size.enum';
 import { Position } from '@common/position';
+import { of, throwError } from 'rxjs';
+import { AdminPageComponent } from './admin-page.component';
 
 describe('AdminPageComponent', () => {
     let component: AdminPageComponent;

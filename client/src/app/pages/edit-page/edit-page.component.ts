@@ -2,16 +2,16 @@ import { Component } from '@angular/core';
 import { BoardComponent } from '@app/components/board/board.component';
 import { ConfigPanelComponent } from '@app/components/config-panel/config-panel.component';
 import { ToolBoxComponent } from '@app/components/tool-box/tool-box.component';
-import { MapData } from '@common/map-data';
-import { GameMode } from '@common/game-mode.enum';
 import { multiItemCount } from '@app/interfaces/item-metadata';
-import { ItemType } from '@common/item-type.enum';
-import { MapSize } from '@common/map-size.enum';
 import { ToolBoxSet } from '@app/interfaces/tool-box-element';
-import { TileType } from '@common/tile-type.enum';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameData } from '@common/game-data';
+import { GameMode } from '@common/game-mode.enum';
+import { ItemType } from '@common/item-type.enum';
+import { MapData } from '@common/map-data';
+import { MapSize } from '@common/map-size.enum';
 import { Position } from '@common/position';
-import { GameDataService } from '@app/services/game-data.service';
+import { TileType } from '@common/tile-type.enum';
 
 @Component({
     selector: 'app-edit-page',
