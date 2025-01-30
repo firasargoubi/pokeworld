@@ -1,13 +1,14 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, RouterModule } from '@angular/router';
 import { GameService } from '@app/services/game.service';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
-import { MapSize } from '@common/map-size.enum';
-import { of } from 'rxjs';
-import { AdminPageComponent } from './admin-page.component';
 import { ItemType } from '@common/item-type.enum';
+import { MapSize } from '@common/map-size.enum';
 import { Position } from '@common/position';
+import { of, throwError } from 'rxjs';
+import { AdminPageComponent } from './admin-page.component';
 
 describe('AdminPageComponent', () => {
     let component: AdminPageComponent;
@@ -45,11 +46,11 @@ describe('AdminPageComponent', () => {
             {
                 _id: '1',
                 name: 'Game 1',
-                isVisible: true,
                 description: 'Description 1',
                 lastEdited: new Date(),
+                isVisible: true,
                 mapData: {
-                    tiles: [[]],
+                    tiles: [],
                     items: {} as Record<ItemType, Position[]>,
                     size: MapSize.Medium,
                     gameMode: GameMode.CTF,
@@ -63,7 +64,7 @@ describe('AdminPageComponent', () => {
                 description: 'Description 2',
                 lastEdited: new Date(),
                 mapData: {
-                    tiles: [[]],
+                    tiles: [],
                     items: {} as Record<ItemType, Position[]>,
                     size: MapSize.Large,
                     gameMode: GameMode.CTF,
@@ -77,7 +78,7 @@ describe('AdminPageComponent', () => {
                 description: 'Description 3',
                 lastEdited: new Date(),
                 mapData: {
-                    tiles: [[]],
+                    tiles: [],
                     items: {} as Record<ItemType, Position[]>,
                     size: MapSize.Small,
                     gameMode: GameMode.FFA,
@@ -124,7 +125,7 @@ describe('AdminPageComponent', () => {
                 description: 'Description 1',
                 lastEdited: new Date(),
                 mapData: {
-                    tiles: [[]],
+                    tiles: [],
                     items: {} as Record<ItemType, Position[]>,
                     size: MapSize.Medium,
                     gameMode: GameMode.CTF,
@@ -138,7 +139,7 @@ describe('AdminPageComponent', () => {
                 description: 'Description 2',
                 lastEdited: new Date(),
                 mapData: {
-                    tiles: [[]],
+                    tiles: [],
                     items: {} as Record<ItemType, Position[]>,
                     size: MapSize.Large,
                     gameMode: GameMode.CTF,
@@ -188,5 +189,39 @@ describe('AdminPageComponent', () => {
         expect(class2).toBe('background-class-2');
         expect(class3).toBe('background-class-3');
         expect(class4).toBe('background-class-1');
+    });
+
+    interface HandleError {
+        handleError(message: string, error: HttpErrorResponse): void;
+    }
+
+    it('should call handleError when toggleVisibility, loadGames or delete fails', () => {
+        const toggleError = new HttpErrorResponse({ error: 'Toggle failed', status: 500 });
+        const loadError = new HttpErrorResponse({ error: 'Load failed', status: 500 });
+        const deleteError = new HttpErrorResponse({ error: 'Delete failed', status: 500 });
+
+        gameServiceSpy.toggleVisibility.and.returnValue(throwError(() => toggleError));
+        gameServiceSpy.getAllGames.and.returnValue(throwError(() => loadError));
+        gameServiceSpy.deleteGame.and.returnValue(throwError(() => deleteError));
+
+        const handleErrorSpy = spyOn(component as unknown as HandleError, 'handleError');
+
+        component.toggleVisibility({ id: '123', isVisible: true });
+        component.loadGames();
+        component.deleteGame('1234');
+
+        expect(handleErrorSpy).toHaveBeenCalledWith('Failed to toggle game visibility. Please try again later.', toggleError);
+        expect(handleErrorSpy).toHaveBeenCalledWith('Failed to load games. Please try again later.', loadError);
+        expect(handleErrorSpy).toHaveBeenCalledWith('Failed to delete game. Please try again later.', deleteError);
+    });
+
+    it('should call snackBar open when handleError is called', () => {
+        const snackBarOpenSpy = spyOn(component['snackBar'], 'open');
+
+        const error = new HttpErrorResponse({ error: 'Test error', status: 500 });
+
+        component['handleError']('Test error message', error);
+
+        expect(snackBarOpenSpy).toHaveBeenCalledWith('Test error message: ' + error.message, 'Close', { duration: 5000 });
     });
 });

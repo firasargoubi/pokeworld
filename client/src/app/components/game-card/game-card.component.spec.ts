@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { GameMode } from '@common/game-mode.enum';
-import { MapSize } from '@common/map-size.enum';
 import { ItemType } from '@common/item-type.enum';
+import { MapSize } from '@common/map-size.enum';
 import { GameCardComponent } from './game-card.component';
 
 describe('GameCardComponent', () => {
@@ -93,5 +93,17 @@ describe('GameCardComponent', () => {
 
         const playButton = fixture.debugElement.query(By.css('button')).nativeElement;
         expect(playButton.textContent).toContain('Play');
+    });
+
+    it('should emit true when mouse is hovering the component', () => {
+        const thumbnailHoverSpy = spyOn(component.thumbnailHover, 'emit');
+        component.onMouseEnter();
+        expect(thumbnailHoverSpy).toHaveBeenCalledWith(true);
+    });
+
+    it('should emit false when mouse is not hovering the component', () => {
+        const thumbnailHoverSpy = spyOn(component.thumbnailHover, 'emit');
+        component.onMouseLeave();
+        expect(thumbnailHoverSpy).toHaveBeenCalledWith(false);
     });
 });

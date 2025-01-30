@@ -75,7 +75,6 @@ export class AdminPageComponent implements OnInit {
     }
 
     private handleError(message: string, error: HttpErrorResponse) {
-        const errorMessage = error?.message || 'An unknown error occurred';
-        this.snackBar.open(`${message}: ${errorMessage}`, 'Close', { duration: 5000 });
+        this.snackBar.open(`${message}: ${error.message}`, 'Close', { duration: 5000 });
     }
 }
