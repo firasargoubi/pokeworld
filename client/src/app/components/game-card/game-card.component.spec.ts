@@ -53,25 +53,25 @@ describe('GameCardComponent', () => {
     it('should emit edit event when onEdit is called', () => {
         spyOn(component.edit, 'emit');
         component.onEdit();
-        expect(component.edit.emit).toHaveBeenCalledWith('1');
+        expect(component.edit.emit).toHaveBeenCalledWith(component.game._id);
     });
 
     it('should emit delete event when onDelete is called', () => {
         spyOn(component.delete, 'emit');
         component.onDelete();
-        expect(component.delete.emit).toHaveBeenCalledWith('1');
+        expect(component.delete.emit).toHaveBeenCalledWith(component.game._id);
     });
 
     it('should emit toggleVisibility event when onToggleVisibility is called', () => {
         spyOn(component.toggleVisibility, 'emit');
         component.onToggleVisibility();
-        expect(component.toggleVisibility.emit).toHaveBeenCalledWith({ id: '1', isVisible: true });
+        expect(component.toggleVisibility.emit).toHaveBeenCalledWith({ id: component.game._id, isVisible: true });
     });
 
     it('should emit join event when onJoin is called', () => {
         spyOn(component.join, 'emit');
         component.onJoin();
-        expect(component.join.emit).toHaveBeenCalledWith('1');
+        expect(component.join.emit).toHaveBeenCalledWith(component.game._id);
     });
 
     it('should show admin controls when isAdminView is true', () => {
