@@ -15,7 +15,30 @@ export class GameService {
     getAllGames(): Observable<GameData[]> {
         return this.http.get<GameData[]>(`${this.baseUrl}/games`);
     }
-    // .pipe(catchError(this.handleError<GameData[]>('getAllGames'))); // check if this is needed
+    // .pipe(catchError(this.handleError<GameData[]>('getAllGames'))); // CHECK if this is needed
+
+    getGame(gameId: string): Observable<GameData> {
+        return this.http.get<GameData>(`${this.baseUrl}/games/${gameId}`);
+    }
+    // .pipe(catchError(this.handleError<GameData>('getGame')));
+
+    saveGame(gameData: GameData): Observable<GameData> {
+        if (gameData._id) {
+            return this.updateGame(gameData._id, gameData);
+        } else {
+            return this.addGame(gameData);
+        }
+    }
+
+    addGame(gameData: GameData): Observable<GameData> {
+        return this.http.post<GameData>(`${this.baseUrl}/games`, gameData);
+    }
+    // .pipe(catchError(this.handleError<GameData>('createGame')));
+
+    updateGame(gameId: string, gameData: GameData): Observable<GameData> {
+        return this.http.put<GameData>(`${this.baseUrl}/games/${gameId}`, gameData);
+    }
+    // .pipe(catchError(this.handleError<GameData>('updateGame')));
 
     toggleVisibility(gameId: string): Observable<GameData> {
         return this.http.patch<GameData>(`${this.baseUrl}/games/${gameId}/toggle`, {});
