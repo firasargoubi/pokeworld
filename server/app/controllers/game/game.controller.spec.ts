@@ -62,6 +62,185 @@ describe('GameController', () => {
         await controller.allGames(res);
     });
 
+    it('getGame() should return a game by ID', async () => {
+        const fakeGame = new Game();
+        gameService.getGame.resolves(fakeGame);
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.OK);
+            return res;
+        };
+        res.json = (game) => {
+            expect(game).toEqual(fakeGame);
+            return res;
+        };
+
+        await controller.getGame('valid_id', res);
+    });
+
+    it('getGame() should return BAD_REQUEST when ID is invalid', async () => {
+        gameService.getGame.rejects(new BadRequestException('Invalid ID format'));
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.BAD_REQUEST);
+            return res;
+        };
+        res.send = (message) => {
+            expect(message).toEqual('Invalid ID format');
+            return res;
+        };
+
+        await controller.getGame('invalid_id', res);
+    });
+
+    it('getGame() should return NOT_FOUND when game not found', async () => {
+        gameService.getGame.rejects(new NotFoundException('Game not found'));
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.NOT_FOUND);
+            return res;
+        };
+        res.send = (message) => {
+            expect(message).toEqual('Game not found');
+            return res;
+        };
+
+        await controller.getGame('nonexistent_id', res);
+    });
+
+    it('getGame() should return INTERNAL_SERVER_ERROR when service fails', async () => {
+        gameService.getGame.rejects(new Error('Service error'));
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
+            return res;
+        };
+        res.send = (message) => {
+            expect(message).toEqual('Service error');
+            return res;
+        };
+
+        await controller.getGame('valid_id', res);
+    });
+
+    it('addGame() should create a new game', async () => {
+        const fakeGame = new Game();
+        gameService.addGame.resolves(fakeGame);
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.CREATED);
+            return res;
+        };
+        res.json = (game) => {
+            expect(game).toEqual(fakeGame);
+            return res;
+        };
+
+        await controller.addGame({} as Game, res);
+    });
+
+    it('addGame() should return BAD_REQUEST when game name already exists', async () => {
+        gameService.addGame.rejects(new BadRequestException('Game with name already exists'));
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.BAD_REQUEST);
+            return res;
+        };
+        res.send = (message) => {
+            expect(message).toEqual('Game with name already exists');
+            return res;
+        };
+
+        await controller.addGame({} as Game, res);
+    });
+
+    it('addGame() should return INTERNAL_SERVER_ERROR when service fails', async () => {
+        gameService.addGame.rejects(new Error('Service error'));
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
+            return res;
+        };
+        res.send = (message) => {
+            expect(message).toEqual('Service error');
+            return res;
+        };
+
+        await controller.addGame({} as Game, res);
+    });
+
+    it('updateGame() should update a game', async () => {
+        const fakeGame = new Game();
+        gameService.updateGame.resolves(fakeGame);
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.OK);
+            return res;
+        };
+        res.json = (game) => {
+            expect(game).toEqual(fakeGame);
+            return res;
+        };
+
+        await controller.updateGame('valid_id', {} as Game, res);
+    });
+
+    it('updateGame() should return BAD_REQUEST when ID is invalid', async () => {
+        gameService.updateGame.rejects(new BadRequestException('Invalid ID format'));
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.BAD_REQUEST);
+            return res;
+        };
+        res.send = (message) => {
+            expect(message).toEqual('Invalid ID format');
+            return res;
+        };
+
+        await controller.updateGame('invalid_id', {} as Game, res);
+    });
+
+    it('updateGame() should return NOT_FOUND when game not found', async () => {
+        gameService.updateGame.rejects(new NotFoundException('Game not found'));
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.NOT_FOUND);
+            return res;
+        };
+        res.send = (message) => {
+            expect(message).toEqual('Game not found');
+            return res;
+        };
+
+        await controller.updateGame('nonexistent_id', {} as Game, res);
+    });
+
+    it('updateGame() should return InternalServerError when service fails', async () => {
+        gameService.updateGame.rejects(new Error('Service error'));
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
+            return res;
+        };
+        res.send = (message) => {
+            expect(message).toEqual('Service error');
+            return res;
+        };
+
+        await controller.updateGame('valid_id', {} as Game, res);
+    });
+
     it('toggleVisibility() should toggle visibility of a game', async () => {
         const fakeGame = new Game();
         gameService.toggleVisibility.resolves(fakeGame);

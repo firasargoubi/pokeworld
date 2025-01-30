@@ -7,6 +7,7 @@ import { MapSize } from '@common/map-size.enum';
 import { GameMode } from '@common/game-mode.enum';
 import { Game, GameDocument, gameSchema } from '@app/model/schema/game.schema';
 import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ItemType } from '@common/item-type.enum';
 
 describe('GameService', () => {
@@ -54,6 +55,71 @@ describe('GameService', () => {
         expect((await service.getAllGames()).length).toBeGreaterThan(0);
     });
 
+    it('getGame() should return a game by ID', async () => {
+        const game = getFakeGame();
+        const createdGame = await gameModel.create(game);
+        const foundGame = await service.getGame(createdGame._id);
+        expect(foundGame).toBeDefined();
+        expect(foundGame._id.toString()).toEqual(createdGame._id.toString());
+    });
+
+    it('getGame() should throw BadRequestException for invalid ID format', async () => {
+        await expect(service.getGame('invalid_id')).rejects.toThrow(BadRequestException);
+    });
+
+    it('getGame() should throw NotFoundException if game not found', async () => {
+        const validObjectId = new gameModel()._id;
+        await expect(service.getGame(validObjectId)).rejects.toThrow(NotFoundException);
+    });
+
+    it('addGame() should create a new game', async () => {
+        const game = getFakeGame();
+        const createdGame = await service.addGame(game);
+        expect(createdGame).toBeDefined();
+        expect(createdGame.name).toEqual(game.name);
+    });
+
+    it('addGame() should throw BadRequestException if name already exists', async () => {
+        const game = getFakeGame();
+        await gameModel.create(game);
+        await expect(service.addGame(game)).rejects.toThrow(BadRequestException);
+    });
+
+    it('addGame() should throw BadRequestException if the database create() fails', async () => {
+        const game = getFakeGame();
+        jest.spyOn(gameModel, 'create').mockRejectedValueOnce(new Error('Database error'));
+        await expect(service.addGame(game)).rejects.toThrow(BadRequestException);
+    });
+
+    it('updateGame() should update an existing game', async () => {
+        const game = getFakeGame();
+        const createdGame = await gameModel.create(game);
+        const updateData = { name: 'Updated Game' };
+        const updatedGame = await service.updateGame(createdGame._id, updateData);
+        expect(updatedGame).toBeDefined();
+        expect(updatedGame.name).toEqual(updateData.name);
+    });
+
+    it('updateGame() should throw BadRequestException for invalid ID format', async () => {
+        const updateData = { name: 'Updated Game' };
+        await expect(service.updateGame('invalid_id', updateData)).rejects.toThrow(BadRequestException);
+    });
+
+    it('updateGame() should throw BadRequestException if the new name already exists', async () => {
+        const game1 = getFakeGame();
+        const game2 = { ...getFakeGame(), name: 'Another Game' };
+        await gameModel.create(game1);
+        const createdGame2 = await gameModel.create(game2);
+
+        await expect(service.updateGame(createdGame2._id, { name: game1.name })).rejects.toThrow(BadRequestException);
+    });
+
+    it('updateGame() should throw NotFoundException if findByIdAndUpdate returns null', async () => {
+        const nonExistentId = (await gameModel.create(getFakeGame()))._id.toString();
+        await gameModel.deleteMany({});
+        await expect(service.updateGame(nonExistentId, { name: 'New Name' })).rejects.toThrow(NotFoundException);
+    });
+
     it('toggleVisibility() should toggle the visibility of a game', async () => {
         const game = getFakeGame();
         const createdGame = await gameModel.create(game);
@@ -62,9 +128,9 @@ describe('GameService', () => {
         expect(updatedGame.isVisible).toBe(!createdGame.isVisible);
     });
 
-    it('toggleVisibility() should fail if the game does not exist', async () => {
-        const game = getFakeGame();
-        await expect(service.toggleVisibility(game._id)).rejects.toBeTruthy();
+    it('toggleVisibility() should throw NotFoundException if game not found', async () => {
+        const nonExistentId = new gameModel()._id.toString();
+        await expect(service.toggleVisibility(nonExistentId)).rejects.toThrow(NotFoundException);
     });
 
     it('toggleVisibility() should fail if mongo query failed', async () => {
@@ -81,8 +147,8 @@ describe('GameService', () => {
     });
 
     it('deleteGame() should fail if the game does not exist', async () => {
-        const game = getFakeGame();
-        await expect(service.deleteGame(game._id)).rejects.toBeTruthy();
+        const nonExistentId = new gameModel()._id.toString();
+        await expect(service.deleteGame(nonExistentId)).rejects.toThrow(NotFoundException);
     });
 
     it('deleteGame() should fail if mongo query failed', async () => {

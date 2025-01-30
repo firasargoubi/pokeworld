@@ -4,6 +4,7 @@ import { Model, isValidObjectId } from 'mongoose';
 
 import { Game } from '@app/model/schema/game.schema';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
+import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { MapSize } from '@common/map-size.enum'; // DELETE LATER
 import { GameMode } from '@common/game-mode.enum'; // DELETE LATER
 import { ItemType } from '@common/item-type.enum'; // DELETE LATER
@@ -18,12 +19,51 @@ export class GameService {
         return this.gameModel.find().exec();
     }
 
+    async getGame(id: string): Promise<Game> {
+        if (!isValidObjectId(id)) {
+            throw new BadRequestException(`Invalid ID format: ${id}`);
+        }
+        const game = await this.gameModel.findById(id).exec();
+        if (!game) {
+            throw new NotFoundException(`Game with ID ${id} not found.`);
+        }
+        return game;
+    }
+
+    async addGame(createGameDto: CreateGameDto): Promise<Game> {
+        // CHECK VALIDATION HERE
+        if (!(await this.isNameUnique(createGameDto.name))) {
+            throw new BadRequestException(`Game with name ${createGameDto.name} already exists.`);
+        }
+        try {
+            return await this.gameModel.create(createGameDto);
+        } catch (error) {
+            throw new BadRequestException(`Failed to insert game: ${error.message}`);
+        }
+    }
+
+    async updateGame(id: string, updateGameDto: UpdateGameDto): Promise<Game> {
+        if (!isValidObjectId(id)) {
+            throw new BadRequestException(`Invalid ID format: ${id}`);
+        }
+        if (updateGameDto.name && !(await this.isNameUnique(updateGameDto.name))) {
+            throw new BadRequestException(`Game with name ${updateGameDto.name} already exists.`);
+        }
+        const updatedGame = await this.gameModel.findByIdAndUpdate(id, updateGameDto, { new: true }).exec();
+        if (!updatedGame) {
+            throw new NotFoundException(`Game with ID ${id} not found.`);
+        }
+        return updatedGame;
+    }
+
     async toggleVisibility(id: string): Promise<Game> {
         if (!isValidObjectId(id)) {
             throw new BadRequestException(`Invalid ID format: ${id}`);
         }
         const game = await this.gameModel.findById(id).exec();
-        if (!game) throw new NotFoundException(`Game with ID ${id} not found.`);
+        if (!game) {
+            throw new NotFoundException(`Game with ID ${id} not found.`);
+        }
         game.isVisible = !game.isVisible;
         return game.save();
     }
@@ -33,7 +73,13 @@ export class GameService {
             throw new BadRequestException(`Invalid ID format: ${id}`);
         }
         const result = await this.gameModel.findByIdAndDelete(id).exec();
-        if (!result) throw new NotFoundException(`Game with ID ${id} not found.`);
+        if (!result) {
+            throw new NotFoundException(`Game with ID ${id} not found.`);
+        }
+    }
+
+    async isNameUnique(name: string): Promise<boolean> {
+        return (await this.gameModel.find({ name }).exec()).length === 0;
     }
 
     async populateDB(): Promise<void> {
