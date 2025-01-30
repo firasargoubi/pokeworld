@@ -1,6 +1,10 @@
-<div class="page-root">
-    <h1>Edit page</h1>
-    <div class="board-container">
-        <app-board></app-board>
-    </div>
+<div class="page-root" (dragover)="allowDrop($event)" (drop)="handleItemDrop($event)">
+    <h1 id="page-title">Edit page</h1>
+    <main>
+        <app-config-panel [gameData]="gameData"></app-config-panel>
+        <div class="board-container" (click)="handleTileDrop($event)" (contextmenu)="removeTile($event)">
+            <app-board></app-board>
+        </div>
+        <app-tool-box [(activeToolSet)]="activeToolSet" [itemCount]="itemCount"></app-tool-box>
+    </main>
 </div>

@@ -25,15 +25,15 @@ export class GameDataService {
             isVisible: true,
             mapData: {
                 items: {
-                    [ItemType.Item1]: [{ x: 9, y: 0 }],
-                    [ItemType.Item2]: [{ x: 9, y: 1 }],
-                    [ItemType.Item3]: [{ x: 9, y: 2 }],
-                    [ItemType.Item4]: [{ x: 9, y: 3 }],
-                    [ItemType.Item5]: [{ x: 9, y: 4 }],
-                    [ItemType.Item6]: [{ x: 9, y: 5 }],
-                    [ItemType.Random]: [{ x: 9, y: 6 }],
-                    [ItemType.Spawn]: [{ x: 9, y: 7 }],
-                    [ItemType.Flag]: [{ x: 9, y: 8 }],
+                    [ItemType.Item1]: [],
+                    [ItemType.Item2]: [],
+                    [ItemType.Item3]: [],
+                    [ItemType.Item4]: [],
+                    [ItemType.Item5]: [],
+                    [ItemType.Item6]: [],
+                    [ItemType.Random]: [],
+                    [ItemType.Spawn]: [],
+                    [ItemType.Flag]: [],
                 },
                 tiles: [
                     [
