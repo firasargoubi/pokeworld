@@ -1,12 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, RouterModule } from '@angular/router';
 import { GameService } from '@app/services/game.service';
-import { GameData } from '@common/interfaces/game-data';
-import { GameMode } from '@common/interfaces/game-mode.enum';
-import { ItemData } from '@common/interfaces/item-data';
-import { MapSize } from '@common/interfaces/map-size.enum';
+import { GameData } from '@common/game-data';
+import { GameMode } from '@common/game-mode.enum';
+import { MapSize } from '@common/map-size.enum';
 import { of } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
+import { ItemType } from '@common/item-type.enum';
+import { Position } from '@common/position';
 
 describe('AdminPageComponent', () => {
     let component: AdminPageComponent;
@@ -48,8 +49,8 @@ describe('AdminPageComponent', () => {
                 description: 'Description 1',
                 lastEdited: new Date(),
                 mapData: {
-                    tiles: [],
-                    itemData: {} as ItemData,
+                    tiles: [[]],
+                    items: {} as Record<ItemType, Position[]>,
                     size: MapSize.Medium,
                     gameMode: GameMode.CTF,
                 },
@@ -62,8 +63,8 @@ describe('AdminPageComponent', () => {
                 description: 'Description 2',
                 lastEdited: new Date(),
                 mapData: {
-                    tiles: [],
-                    itemData: {} as ItemData,
+                    tiles: [[]],
+                    items: {} as Record<ItemType, Position[]>,
                     size: MapSize.Large,
                     gameMode: GameMode.CTF,
                 },
@@ -76,8 +77,8 @@ describe('AdminPageComponent', () => {
                 description: 'Description 3',
                 lastEdited: new Date(),
                 mapData: {
-                    tiles: [],
-                    itemData: {} as ItemData,
+                    tiles: [[]],
+                    items: {} as Record<ItemType, Position[]>,
                     size: MapSize.Small,
                     gameMode: GameMode.FFA,
                 },
@@ -123,8 +124,8 @@ describe('AdminPageComponent', () => {
                 description: 'Description 1',
                 lastEdited: new Date(),
                 mapData: {
-                    tiles: [],
-                    itemData: {} as ItemData,
+                    tiles: [[]],
+                    items: {} as Record<ItemType, Position[]>,
                     size: MapSize.Medium,
                     gameMode: GameMode.CTF,
                 },
@@ -137,8 +138,8 @@ describe('AdminPageComponent', () => {
                 description: 'Description 2',
                 lastEdited: new Date(),
                 mapData: {
-                    tiles: [],
-                    itemData: {} as ItemData,
+                    tiles: [[]],
+                    items: {} as Record<ItemType, Position[]>,
                     size: MapSize.Large,
                     gameMode: GameMode.CTF,
                 },

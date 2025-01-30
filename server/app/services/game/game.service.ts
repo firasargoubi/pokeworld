@@ -4,10 +4,9 @@ import { Model, isValidObjectId } from 'mongoose';
 
 import { Game } from '@app/model/schema/game.schema';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
-import { MapSize } from '@common/interfaces/map-size.enum'; // DELETE LATER
-import { GameMode } from '@common/interfaces/game-mode.enum'; // DELETE LATER
-import { ItemData } from '@common/interfaces/item-data'; // DELETE LATER
-import { ItemType } from '@common/interfaces/item-type.enum'; // DELETE LATER
+import { MapSize } from '@common/map-size.enum'; // DELETE LATER
+import { GameMode } from '@common/game-mode.enum'; // DELETE LATER
+import { ItemType } from '@common/item-type.enum'; // DELETE LATER
 
 @Injectable()
 export class GameService {
@@ -44,19 +43,19 @@ export class GameService {
                 description: 'Description of Game 1',
                 lastEdited: new Date(),
                 isVisible: true,
-                thumbnail: 'assets/tileset/grass.png',
+                thumbnail: '/assets/images/game/tiles/grass.png',
                 mapData: {
-                    tiles: [],
-                    itemData: {
-                        [ItemType.Item1]: [{ x: 1, y: 1 }],
-                        [ItemType.Item2]: [{ x: 2, y: 2 }],
-                        [ItemType.Item3]: [{ x: 3, y: 3 }],
-                        [ItemType.Item4]: [{ x: 4, y: 4 }],
-                        [ItemType.Item5]: [{ x: 5, y: 5 }],
-                        [ItemType.Item6]: [{ x: 6, y: 6 }],
-                        [ItemType.Random]: [{ x: 7, y: 7 }],
-                        [ItemType.SpawnPoint]: [{ x: 8, y: 8 }],
-                        [ItemType.Flag]: [{ x: 9, y: 9 }],
+                    tiles: [[]],
+                    items: {
+                        [ItemType.Item1]: [],
+                        [ItemType.Item2]: [],
+                        [ItemType.Item3]: [],
+                        [ItemType.Item4]: [],
+                        [ItemType.Item5]: [],
+                        [ItemType.Item6]: [],
+                        [ItemType.Random]: [],
+                        [ItemType.Spawn]: [],
+                        [ItemType.Flag]: [],
                     },
                     size: MapSize.Small,
                     gameMode: GameMode.FFA,
@@ -67,10 +66,20 @@ export class GameService {
                 description: 'Description of Game 2',
                 lastEdited: new Date(),
                 isVisible: true,
-                thumbnail: 'assets/tileset/water.png',
+                thumbnail: '/assets/images/game/tiles/water.png',
                 mapData: {
-                    tiles: [],
-                    itemData: {} as ItemData,
+                    tiles: [[]],
+                    items: {
+                        [ItemType.Item1]: [],
+                        [ItemType.Item2]: [],
+                        [ItemType.Item3]: [],
+                        [ItemType.Item4]: [],
+                        [ItemType.Item5]: [],
+                        [ItemType.Item6]: [],
+                        [ItemType.Random]: [],
+                        [ItemType.Spawn]: [],
+                        [ItemType.Flag]: [],
+                    },
                     size: MapSize.Medium,
                     gameMode: GameMode.CTF,
                 },
@@ -80,10 +89,20 @@ export class GameService {
                 description: 'Description of Game 3',
                 lastEdited: new Date(),
                 isVisible: true,
-                thumbnail: 'assets/tileset/path.png',
+                thumbnail: '/assets/images/game/tiles/path.png',
                 mapData: {
-                    tiles: [],
-                    itemData: {} as ItemData,
+                    tiles: [[]],
+                    items: {
+                        [ItemType.Item1]: [],
+                        [ItemType.Item2]: [],
+                        [ItemType.Item3]: [],
+                        [ItemType.Item4]: [],
+                        [ItemType.Item5]: [],
+                        [ItemType.Item6]: [],
+                        [ItemType.Random]: [],
+                        [ItemType.Spawn]: [],
+                        [ItemType.Flag]: [],
+                    },
                     size: MapSize.Large,
                     gameMode: GameMode.FFA,
                 },
@@ -93,10 +112,20 @@ export class GameService {
                 description: 'Description of Game 4',
                 lastEdited: new Date(),
                 isVisible: true,
-                thumbnail: 'assets/tileset/water.png',
+                thumbnail: '/assets/images/game/tiles/water.png',
                 mapData: {
-                    tiles: [],
-                    itemData: {} as ItemData,
+                    tiles: [[]],
+                    items: {
+                        [ItemType.Item1]: [],
+                        [ItemType.Item2]: [],
+                        [ItemType.Item3]: [],
+                        [ItemType.Item4]: [],
+                        [ItemType.Item5]: [],
+                        [ItemType.Item6]: [],
+                        [ItemType.Random]: [],
+                        [ItemType.Spawn]: [],
+                        [ItemType.Flag]: [],
+                    },
                     size: MapSize.Small,
                     gameMode: GameMode.CTF,
                 },
@@ -106,10 +135,20 @@ export class GameService {
                 description: 'Description of Game 5',
                 lastEdited: new Date(),
                 isVisible: true,
-                thumbnail: 'assets/tileset/grass.png',
+                thumbnail: '/assets/images/game/tiles/grass.png',
                 mapData: {
-                    tiles: [],
-                    itemData: {} as ItemData,
+                    tiles: [[]],
+                    items: {
+                        [ItemType.Item1]: [],
+                        [ItemType.Item2]: [],
+                        [ItemType.Item3]: [],
+                        [ItemType.Item4]: [],
+                        [ItemType.Item5]: [],
+                        [ItemType.Item6]: [],
+                        [ItemType.Random]: [],
+                        [ItemType.Spawn]: [],
+                        [ItemType.Flag]: [],
+                    },
                     size: MapSize.Medium,
                     gameMode: GameMode.FFA,
                 },
@@ -119,10 +158,20 @@ export class GameService {
                 description: 'Description of Game 6',
                 lastEdited: new Date(),
                 isVisible: true,
-                thumbnail: 'assets/tileset/path.png',
+                thumbnail: '/assets/images/game/tiles/path.png',
                 mapData: {
-                    tiles: [],
-                    itemData: {} as ItemData,
+                    tiles: [[]],
+                    items: {
+                        [ItemType.Item1]: [],
+                        [ItemType.Item2]: [],
+                        [ItemType.Item3]: [],
+                        [ItemType.Item4]: [],
+                        [ItemType.Item5]: [],
+                        [ItemType.Item6]: [],
+                        [ItemType.Random]: [],
+                        [ItemType.Spawn]: [],
+                        [ItemType.Flag]: [],
+                    },
                     size: MapSize.Large,
                     gameMode: GameMode.CTF,
                 },

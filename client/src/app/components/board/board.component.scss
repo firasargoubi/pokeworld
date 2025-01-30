@@ -1,3 +1,5 @@
+// TODO review CSS and place colors into SCSS variables
+
 .board-wrapper {
     display: flex;
     justify-content: center;
@@ -6,25 +8,49 @@
     height: 100%;
 }
 
+.board-wrapper * {
+    user-select: none;
+}
+
 .board-container {
-    position: relative;
+    display: grid;
     height: 100%;
     aspect-ratio: 1;
-}
-
-.board-grid {
-    position: absolute;
-    display: grid;
-    width: 100%;
-    height: 100%;
     grid-template-columns: repeat(var(--size), 1fr);
     grid-template-rows: repeat(var(--size), 1fr);
+    border: 1px solid rgba(180, 180, 180, 1);
+    background-color: #72C37A;
 }
 
-.board-cell {
+.board-tile {
+    position: relative;
     width: 100%;
-    padding-top: 100%;
+    height: 100%;
+}
+
+.tile-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
+
+.tile-water {
+    background-color: #6AB7D7;
+}
+
+.tile-border {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+}
+
+.tile-border:hover {
+    background-color: rgba(255, 255, 255, 0.11);
+    border: 1px solid rgba(255, 255, 255, 0.30);
+}
+

@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 })
 export class MenuButtonComponent {
     @Input() containerClass: string = 'container orange-container';
-    @Input() spriteImage: string = '../../../assets/ui/pokemon/normal-sprite/Charizard.png';
+    @Input() spriteImage: string = '/assets/images/menu/pokemon/normal/charizard.png';
     @Input() textContent: string = '';
     @Input() routePath!: string;
 

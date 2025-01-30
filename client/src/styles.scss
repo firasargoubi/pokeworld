@@ -1,11 +1,18 @@
+// TODO put colors in SCSS variables
+
 @font-face {
-    font-family: 'pokemon-em-small';
-    src: url('/assets/fonts/Pokemon-Em-Small.ttf') format('truetype');
+    font-family: 'pokemon-small';
+    src: url('/assets/fonts/pokemon-small.woff2') format('woff2');
 }
 
 @font-face {
-    font-family: 'pokemon-em-narrow';
-    src: url('/assets/fonts/Pokemon-Em-Narrow.ttf') format('truetype');
+    font-family: 'pokemon-narrow';
+    src: url('/assets/fonts/pokemon-narrow.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'roboto';
+    src: url('/assets/fonts/roboto.woff2') format('woff2');
 }
 
 :root {
@@ -17,6 +24,16 @@
     padding: 0;
     white-space: nowrap;
     overflow: hidden;
+    box-sizing: border-box;
+    -ms-interpolation-mode: nearest-neighbor;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    text-transform: none;
+    image-rendering: pixelated;
 }
 
 html,
@@ -24,9 +41,5 @@ body {
     height: 100vh;
     width: 100vw;
     background: rgb(31, 32, 35);
-    font-family: 'pokemon-em-small';
-}
-
-img {
-    user-select: none;
+    font-family: 'pokemon-small';
 }

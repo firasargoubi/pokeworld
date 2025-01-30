@@ -3,11 +3,11 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 import { GameService } from '@app/services/game/game.service';
 
-import { MapSize } from '@common/interfaces/map-size.enum';
-import { GameMode } from '@common/interfaces/game-mode.enum';
-import { ItemData } from '@common/interfaces/item-data';
+import { MapSize } from '@common/map-size.enum';
+import { GameMode } from '@common/game-mode.enum';
 import { Game, GameDocument, gameSchema } from '@app/model/schema/game.schema';
 import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { ItemType } from '@common/item-type.enum';
 
 describe('GameService', () => {
     let service: GameService;
@@ -97,10 +97,20 @@ const getFakeGame = (): Game => ({
     description: 'Test Description',
     lastEdited: new Date(),
     isVisible: true,
-    thumbnail: 'assets/tileset/grass.png',
+    thumbnail: '/assets/images/game/tiles/grass.png',
     mapData: {
-        tiles: [],
-        itemData: {} as ItemData,
+        tiles: [[]],
+        items: {
+            [ItemType.Item1]: [],
+            [ItemType.Item2]: [],
+            [ItemType.Item3]: [],
+            [ItemType.Item4]: [],
+            [ItemType.Item5]: [],
+            [ItemType.Item6]: [],
+            [ItemType.Random]: [],
+            [ItemType.Spawn]: [],
+            [ItemType.Flag]: [],
+        },
         size: MapSize.Small,
         gameMode: GameMode.FFA,
     },
