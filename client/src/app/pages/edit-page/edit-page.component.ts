@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { BoardComponent } from '@app/components/board/board.component';
+import { GameDataService } from '@app/services/game-data.service';
 
 @Component({
     selector: 'app-edit-page',
@@ -8,9 +9,5 @@ import { BoardComponent } from '@app/components/board/board.component';
     imports: [BoardComponent],
 })
 export class EditPageComponent {
-    cells: string[][] = [
-        ['water', 'water', 'water'],
-        ['grass', 'path', 'grass'],
-        ['path', 'path', 'grass'],
-    ];
+    constructor(public gameDataService: GameDataService) {}
 }

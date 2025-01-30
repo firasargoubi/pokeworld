@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
-import { GameMode } from '@common/interfaces/game-mode.enum';
-import { ItemData } from '@common/interfaces/item-data';
-import { MapSize } from '@common/interfaces/map-size.enum';
+import { GameMode } from '@common/game-mode.enum';
+import { MapSize } from '@common/map-size.enum';
+import { ItemType } from '@common/item-type.enum';
 import { GameCardComponent } from './game-card.component';
 
 describe('GameCardComponent', () => {
@@ -27,7 +27,17 @@ describe('GameCardComponent', () => {
             isVisible: true,
             mapData: {
                 tiles: [],
-                itemData: {} as ItemData,
+                items: {
+                    [ItemType.Item1]: [],
+                    [ItemType.Item2]: [],
+                    [ItemType.Item3]: [],
+                    [ItemType.Item4]: [],
+                    [ItemType.Item5]: [],
+                    [ItemType.Item6]: [],
+                    [ItemType.Random]: [],
+                    [ItemType.Spawn]: [],
+                    [ItemType.Flag]: [],
+                },
                 size: MapSize.Small,
                 gameMode: GameMode.FFA,
             },

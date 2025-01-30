@@ -13,7 +13,7 @@ $stripes2-color1: #eeba96;
 $stripes2-color2: #f2d1d8;
 
 * {
-    font-family: 'pokemon-em-small';
+    font-family: 'pokemon-small';
 }
 
 .game-card {
@@ -52,15 +52,15 @@ $stripes2-color2: #f2d1d8;
 }
 
 .background-class-1 {
-    background-image: url('/assets/ui/container/blue/blueScrareBody.png');
+    background-image: url('/assets/images/menu/containers/blue/blue-scrare-body.png');
 }
 
 .background-class-2 {
-    background-image: url('/assets/ui/container/green/greenScrareBody.png');
+    background-image: url('/assets/images/menu/containers/green/green-scrare-body.png');
 }
 
 .background-class-3 {
-    background-image: url('/assets/ui/container/orange/orangeScrareBody.png');
+    background-image: url('/assets/images/menu/containers/orange/orange-scrare-body.png');
 }
 
 #game-details {

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
-import { MapData } from '@common/interfaces/map-data';
+import { MapData } from '@common/map-data';
 
 export type GameDocument = Game & Document;
 

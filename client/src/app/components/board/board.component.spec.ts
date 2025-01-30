@@ -1,3 +1,5 @@
+// TODO add tests for board component
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BoardComponent } from '@app/components/board/board.component';
 
