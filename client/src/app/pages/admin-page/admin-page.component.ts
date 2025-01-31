@@ -63,11 +63,6 @@ export class AdminPageComponent implements OnInit {
         });
     }
 
-    thumbnailDescription(isMouseOver: boolean, description: string) {
-        this.showDescription = isMouseOver;
-        this.lastDescription = description;
-    }
-
     getBackgroundClass(index: number): string {
         const classes = ['background-class-1', 'background-class-2', 'background-class-3'];
         const classIndex = index % classes.length;

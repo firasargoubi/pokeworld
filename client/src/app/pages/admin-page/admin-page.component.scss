@@ -4,15 +4,14 @@ $stripes-color1: #9be6d2;
 $stripes-color2: #abeeda;
 $text-shadow-color: rgb(112, 112, 112);
 
-$padding-gray-border: 0.8vw;
+$page-border-width: 10px;
 $padding-wheat-border: 0.7vw;
 $stripes-size: 0.7vw;
-$font-size-title: 2.5vw;
-$text-shadow-size: 0.3vw;
-$header-title-left: 2vw;
-$corner-square-size: 0.4vw;
+$font-size-header: 6.5vh;
 
 $font-family-title: 'pokemon-small';
+
+$card-width: 26vw;
 
 .admin-page-container {
     border-radius: 0.7vw;
@@ -22,32 +21,33 @@ $font-family-title: 'pokemon-small';
     position: relative;
     display: flex;
     align-items: center;
-    height: 10vh;
+    height: 7vh;
     overflow: hidden;
+    justify-content: center;
+}
 
-    #header-image {
-        height: 100%;
-        width: 100%;
-        display: block;
-        image-rendering: pixelated;
-        image-rendering: crisp-edges;
-        -ms-interpolation-mode: nearest-neighbor;
-    }
+#header-image {
+    height: 100%;
+    width: auto;
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
+}
 
-    #header-title {
-        font-family: $font-family-title;
-        font-size: $font-size-title;
-        text-shadow: $text-shadow-size 0 0 $text-shadow-color;
-        position: absolute;
-        left: $header-title-left;
-        top: 50%;
-        transform: translateY(-50%);
-    }
+#admin-page-header #header-title {
+    font-family: $font-family-title;
+    font-size: $font-size-header;
+    text-shadow: 0.3vw 0 0 $text-shadow-color;
+    position: absolute;
+    left: 2vw;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 #admin-page-body {
     position: relative;
-    height: calc(100vh - 10vh);
+    height: calc(100vh - 7vh);
     overflow-y: scroll;
     background: repeating-linear-gradient(
         0deg,
@@ -60,10 +60,10 @@ $font-family-title: 'pokemon-small';
     animation: fall 2s linear infinite;
     box-sizing: border-box;
 
-    border: 5px solid $gray-border-color;
-    outline: 5px solid $wheat-border-color;
-    outline-offset: -10px;
-    padding: 10px 10px;
+    border: $page-border-width solid $gray-border-color;
+    outline: $page-border-width solid $wheat-border-color;
+    outline-offset: calc($page-border-width * -2);
+    padding: $page-border-width $page-border-width;
 }
 
 @keyframes fall {
@@ -79,46 +79,16 @@ $font-family-title: 'pokemon-small';
 .game-grid {
     display: grid;
     width: max-content;
-    margin: 15px auto;
-    grid-template-columns: repeat(3, 26vw);
+    margin: 15px auto 20vh;
+    grid-template-columns: repeat(3, $card-width);
     gap: 30px;
     place-items: center;
-    overflow: visible;
-}
-
-// @media screen (){
-
-// }
-
-#game-description {
-    width: 24.5vw;
-    position: absolute;
-    top: 8vw;
-    left: 73vw;
-
-    img {
-        display: block;
-        max-width: 100%;
-        height: auto;
-    }
-
-    p {
-        background-image: url('/assets/images/menu/backgrounds/description-bod.png');
-        background-size: contain;
-        white-space: normal;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-
-        color: #575b68;
-        text-align: center;
-        font-size: 2vw;
-    }
 }
 
 .poke-button {
     position: absolute;
-    right: 5vw;
-    bottom: 1.3vw;
-    width: 30vw;
-    height: 100px;
+    right: 5%;
+    bottom: 7%;
+    width: 20.5vw;
+    height: 4.5vw;
 }

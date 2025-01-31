@@ -17,14 +17,19 @@ export class GameCardComponent {
     @Output() delete = new EventEmitter<string>();
     @Output() toggleVisibility = new EventEmitter<{ id: string; isVisible: boolean }>();
     @Output() join = new EventEmitter<string>();
-    @Output() thumbnailHover = new EventEmitter<boolean>();
+
+    isHovered: boolean = false;
 
     onEdit() {
         this.edit.emit(this.game._id);
     }
 
     onDelete() {
-        this.delete.emit(this.game._id);
+        const confirmation = window.confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');
+
+        if (confirmation) {
+            this.delete.emit(this.game._id);
+        }
     }
 
     onToggleVisibility() {
@@ -37,11 +42,11 @@ export class GameCardComponent {
     }
 
     onMouseEnter() {
-        this.thumbnailHover.emit(true);
+        this.isHovered = true;
     }
 
     onMouseLeave() {
-        this.thumbnailHover.emit(false);
+        this.isHovered = false;
     }
 
     formatDate(dateString: string | Date): string {

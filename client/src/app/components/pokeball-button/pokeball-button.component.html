@@ -1,7 +1,15 @@
 <div class="pokeball-button" (mousedown)="onMouseDown()">
-    <img [src]="imageSrc" class="pokeball-button-icon" />
-    <div class="pokeball-button-content">
-        {{ buttonContent }}
+    <div class="pokeball-button-start">
+        <img [src]="pokeballImageSrc" class="pokeball-button-icon" />
+        <img [src]="borderImageSrc" class="button-border-start" />
     </div>
-    <img src="/assets/images/menu/buttons/button-border.png" class="pokeball-button-end" />
+    <div class="pokeball-button-spacer" style="background-image: url('{{ contentImageSrc }}')"></div>
+
+    <div class="pokeball-button-content" style="background-image: url('{{ contentImageSrc }}')">
+        <p>
+            {{ buttonContent }}
+        </p>
+    </div>
+
+    <img [src]="borderImageSrc" class="pokeball-button-end" />
 </div>

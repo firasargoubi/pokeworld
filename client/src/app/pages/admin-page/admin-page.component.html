@@ -1,6 +1,6 @@
 <div class="admin-page-container">
     <div id="admin-page-header">
-        <p id="header-title">Admin page</p>
+        <p id="header-title" >< PAGE ADMIN</p>
         <img id="header-image" src="/assets/images/menu/headers/admin-header.png" alt="Page header" title="Header3" />
     </div>
     <div id="admin-page-body">
@@ -13,7 +13,6 @@
                 (edit)="editGame($event)"
                 (delete)="deleteGame($event)"
                 (toggleVisibility)="toggleVisibility($event)"
-                (thumbnailHover)="thumbnailDescription($event, game.description)"
             >
             </app-game-card>
             }
@@ -27,8 +26,6 @@
         </div> -->
     </div>
     <div class="poke-button">
-        <app-pokeball-button [buttonContent]="'CREER JEU'" [delay]="400"></app-pokeball-button>
+        <app-pokeball-button [buttonContent]="'NOUVEAU JEU'" [delay]="200"></app-pokeball-button>
     </div>
 </div>
-
-<!-- <app-pokeball-button [buttonContent]="'C'"></app-pokeball-button> -->

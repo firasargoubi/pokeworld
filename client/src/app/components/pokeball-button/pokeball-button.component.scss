@@ -1,9 +1,10 @@
 .pokeball-button {
     display: inline-flex;
     position: absolute;
-    height: 5vw;
-    left: 50%;
+    width: 100%;
+    height: 100%;
     align-items: center;
+    justify-content: flex-start;
 }
 
 .pokeball-button:hover {
@@ -12,30 +13,58 @@
 }
 
 .pokeball-button-icon {
-    position: relative;
+    position: absolute;
     z-index: 1;
-    height: 100%;
+    height: 190%;
+    flex: 1;
+    top: 50%;
+    left: -10%;
+    transform: translateY(-50%);
     object-fit: contain;
+}
+
+.pokeball-button-spacer {
+    width: 40%;
+    height: 100%;
+    background-image: url('/assets/images/menu/buttons/button-container-borderless.png');
+    background-repeat: repeat-x;
+    background-size: auto 100%;
+    background-position: center;
 }
 
 .pokeball-button-content {
     position: relative;
-    height: 60%;
-    flex-basis: 100%;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: fit-content;
     background-image: url('/assets/images/menu/buttons/button-container-borderless.png');
     background-repeat: repeat-x;
-    background-size: contain;
-    text-align: center;
-    padding-left: 10%;
-    margin-left: -13%;
-    font-size: 2vw;
-    vertical-align: middle;
-    line-height: 1.55;
+    background-size: auto 100%;
+    background-position: center;
+}
+
+.pokeball-button-content p {
+    font-size: 3vw;
+    width: auto;
+    text-align: end;
 }
 
 .pokeball-button-end {
     position: relative;
-    left: -1.3%;
-    height: 85%;
+    height: 100%;
     object-fit: contain;
+}
+
+.pokeball-button-start {
+    height: 100%;
+    display: inline-flex;
+}
+
+.button-border-start {
+    position: relative;
+    height: 100%;
+    object-fit: contain;
+    left: 1px;
+    transform: scaleX(-1);
 }
