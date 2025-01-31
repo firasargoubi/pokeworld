@@ -1,12 +1,12 @@
 $gray-border-color: #636776;
-$wheat-border-color: #E9F6F7;
-$stripes-color1: #BFEDD9;
-$stripes-color2: #B2E5D1;
+$wheat-border-color: #e9f6f7;
+$stripes-color1: #9be6d2;
+$stripes-color2: #abeeda;
 $text-shadow-color: rgb(112, 112, 112);
 
 $padding-gray-border: 0.8vw;
 $padding-wheat-border: 0.7vw;
-$stripes-size: 1vw;
+$stripes-size: 0.7vw;
 $font-size-title: 2.5vw;
 $text-shadow-size: 0.3vw;
 $header-title-left: 2vw;
@@ -15,18 +15,18 @@ $corner-square-size: 0.4vw;
 $font-family-title: 'pokemon-small';
 
 .admin-page-container {
-    height: 100vh;
-    border-radius: .7vw;
-    display: flex;
-    flex-direction: column;
+    border-radius: 0.7vw;
 }
 
 #admin-page-header {
     position: relative;
     display: flex;
     align-items: center;
+    height: 10vh;
+    overflow: hidden;
 
     #header-image {
+        height: 100%;
         width: 100%;
         display: block;
         image-rendering: pixelated;
@@ -46,18 +46,24 @@ $font-family-title: 'pokemon-small';
 }
 
 #admin-page-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100%;
-    background: repeating-linear-gradient(0deg,
-            $stripes-color1,
-            $stripes-color1 $stripes-size,
-            $stripes-color2 $stripes-size,
-            $stripes-color2 $stripes-size * 2);
+    position: relative;
+    height: calc(100vh - 10vh);
+    overflow-y: scroll;
+    background: repeating-linear-gradient(
+        0deg,
+        $stripes-color1,
+        $stripes-color1 $stripes-size,
+        $stripes-color2 $stripes-size,
+        $stripes-color2 $stripes-size * 2
+    );
     background-size: 100% ($stripes-size * 2);
     animation: fall 2s linear infinite;
     box-sizing: border-box;
+
+    border: 5px solid $gray-border-color;
+    outline: 5px solid $wheat-border-color;
+    outline-offset: -10px;
+    padding: 10px 10px;
 }
 
 @keyframes fall {
@@ -70,67 +76,22 @@ $font-family-title: 'pokemon-small';
     }
 }
 
-#gray-border {
-    background-color: $gray-border-color;
-    padding: $padding-gray-border;
-    flex: 1;
-    height: 100%;
-    box-sizing: border-box;
+.game-grid {
+    display: grid;
+    width: max-content;
+    margin: 15px auto;
+    grid-template-columns: repeat(3, 26vw);
+    gap: 30px;
+    place-items: center;
+    overflow: visible;
 }
 
-#wheat-border {
-    background-color: $wheat-border-color;
-    padding: $padding-wheat-border;
-    height: 100%;
-    box-sizing: border-box;
-}
+// @media screen (){
 
-.game-list {
-    height: 100%;
-    overflow-y: auto;
-    padding-right: 1rem;
-
-    // Pour Firefox
-    scrollbar-width: thin;
-    scrollbar-color: #cebe64 #8b8241; // Couleurs du pouce et de la piste
-
-    // Styles pour les navigateurs basés sur WebKit (Chrome, Safari, Edge)
-    &::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: #8b8241;
-        border-radius: 4px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: #cebe64;
-        border-radius: 4px;
-        border: 3px solid #e1d7a0;
-    }
-
-}
-
-#body-header {
-    background: $gray-border-color;
-    width: 100%;
-    height: auto;
-    padding: 0.5em 0;
-    text-align: center;
-    vertical-align: middle;
-    border: 0.4vw solid #575b68;
-    font-family: $font-family-title;
-    font-size: $font-size-title;
-    text-shadow: $text-shadow-size 0 0 $text-shadow-color;
-    line-height: 33%;
-    box-sizing: border-box;
-}
-
+// }
 
 #game-description {
     width: 24.5vw;
-    height: auto;
     position: absolute;
     top: 8vw;
     left: 73vw;
@@ -154,8 +115,10 @@ $font-family-title: 'pokemon-small';
     }
 }
 
-app-pokeball-button {
-    position: relative;
-    left: 5vw;
-    top: 1.3vw;
+.poke-button {
+    position: absolute;
+    right: 5vw;
+    bottom: 1.3vw;
+    width: 30vw;
+    height: 100px;
 }

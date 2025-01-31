@@ -1,10 +1,12 @@
-$corner-square-size: 0.3vw;
+$corner-square-size: 0.5vw;
 $big-stripe-size: 64%;
 $medium-stripe-size: 20%;
 $small-stripe-size: 8%;
+
 $mode-corner-square-size: 0.25vw;
-$mode-background-width: 6vw;
+$mode-background-width: 4vw;
 $mode-background-height: 2vw;
+
 $stripes-color1: #95cde5;
 $stripes-color2: #bce5f5;
 $stripes1-color1: #98d589;
@@ -12,62 +14,140 @@ $stripes1-color2: #c7f5a9;
 $stripes2-color1: #eeba96;
 $stripes2-color2: #f2d1d8;
 
+$blue-main-color: rgb(123, 206, 230);
+$blue-sub-color: rgb(170, 231, 247);
+$blue-inner-border-color: rgb(170, 231, 247) rgb(75, 166, 198) rgb(75, 166, 198) rgb(170, 231, 247);
+$blue-active-inner-border-color: rgb(75, 166, 198) rgb(170, 231, 247) rgb(170, 231, 247) rgb(75, 166, 198);
+
+$green-main-color: rgb(125, 214, 136);
+$green-sub-color: rgb(179, 246, 168);
+$green-border-color: rgb(249, 248, 128);
+$green-inner-border-color: rgb(179, 246, 168) rgb(122, 151, 101) rgb(122, 151, 101) rgb(179, 246, 168);
+$green-active-inner-border-color: rgb(122, 151, 101) rgb(179, 246, 168) rgb(179, 246, 168) rgb(122, 151, 101);
+
+$pink-main-color: rgb(247, 186, 147);
+$pink-sub-color: rgb(247, 209, 216);
+$pink-border-color: rgb(249, 248, 128);
+$pink-inner-border-color: rgb(247, 209, 216) rgb(231, 163, 131) rgb(231, 163, 131) rgb(247, 209, 216);
+$pink-active-inner-border-color: rgb(231, 163, 131) rgb(247, 209, 216) rgb(247, 209, 216) rgb(231, 163, 131);
+
+$clip-path: polygon(
+    $corner-square-size 0%,
+    calc(100% - #{$corner-square-size}) 0%,
+
+    calc(100% - #{$corner-square-size}) $corner-square-size,
+    100% $corner-square-size,
+
+    100% calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) 100%,
+    $corner-square-size 100%,
+
+    $corner-square-size calc(100% - #{$corner-square-size}),
+    0% calc(100% - #{$corner-square-size}),
+    0% $corner-square-size,
+    $corner-square-size $corner-square-size
+);
+
 * {
     font-family: 'pokemon-small';
 }
 
 .game-card {
-    background-color: #e47742;
-    height: 8vw;
-    width: 40vw;
-    border: $corner-square-size solid #e47742;
-    padding: $corner-square-size;
-    margin: $corner-square-size;
-
-    display: flex;
-    gap: $corner-square-size * 2;
-
-    clip-path: polygon(
-        $corner-square-size 0%,
-        calc(100% - #{$corner-square-size}) 0%,
-
-        calc(100% - #{$corner-square-size}) $corner-square-size,
-        100% $corner-square-size,
-
-        100% calc(100% - #{$corner-square-size}),
-        calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
-        calc(100% - #{$corner-square-size}) 100%,
-        $corner-square-size 100%,
-
-        $corner-square-size calc(100% - #{$corner-square-size}),
-        0% calc(100% - #{$corner-square-size}),
-        0% $corner-square-size,
-        $corner-square-size $corner-square-size
-    );
-
-    img {
-        width: 100%;
-        display: block;
-    }
+    position: relative;
+    width: 26vw;
+    height: auto;
+    aspect-ratio: 26 / 30;
+    border: calc($corner-square-size * 2) solid rgb(246, 119, 56);
+    clip-path: $clip-path;
+    justify-self: center;
+    overflow: visible;
 }
 
-.background-class-1 {
-    background-image: url('/assets/images/menu/containers/blue/blue-scrare-body.png');
+.card-body {
+    width: 100%;
+    height: 100%;
+    border: 0.7vw solid;
+    display: grid;
+    grid-template-rows: 65% 35%;
 }
 
-.background-class-2 {
-    background-image: url('/assets/images/menu/containers/green/green-scrare-body.png');
+.background-class-1 .card-body {
+    border-color: $blue-inner-border-color;
 }
 
-.background-class-3 {
-    background-image: url('/assets/images/menu/containers/orange/orange-scrare-body.png');
+.background-class-2 .card-body {
+    border-color: $green-inner-border-color;
+}
+
+.background-class-3 .card-body {
+    border-color: $pink-inner-border-color;
+}
+
+#game-thumbnail {
+    position: relative;
+    height: 100%;
+    width: auto;
+    // border-style: solid;
+    // border-color: $blue-main-color;
+    // border-width: 0px 7px;
+}
+
+#game-thumbnail img {
+    width: 100%;
+    object-fit: cover;
+}
+
+.game-name {
+    position: absolute;
+    font-size: 3vw;
+    text-shadow: 0.25vw 0 0 rgb(112, 112, 112);
+    letter-spacing: 0.2vw;
+    left: 6px;
+    top: 4px;
+}
+
+.size-info {
+    position: absolute;
+    bottom: 2px;
+    right: 7px;
+    font-size: 3vw;
+    text-shadow: 0.3vw 0 0 rgb(112, 112, 112);
+    letter-spacing: 0.1vw;
+    overflow: visible;
 }
 
 #game-details {
+    position: relative;
     flex-grow: 3;
     flex-basis: 0;
     background-size: contain;
     box-sizing: border-box;
+    background-color: $blue-sub-color;
+}
+
+.background-class-2 #game-details {
+    background-color: $green-sub-color;
+}
+
+.background-class-3 #game-details {
+    background-color: $pink-sub-color;
+}
+
+.card-separator {
+    position: absolute;
+    width: 100%;
+    height: 0.7vw;
+    background-color: $blue-main-color;
+    top: 0.7vw;
+}
+
+.background-class-2 .card-separator {
+    background-color: $green-main-color;
+}
+
+.background-class-3 .card-separator {
+    background-color: $pink-main-color;
 }
 
 #game-info {
@@ -78,62 +158,48 @@ $stripes2-color2: #f2d1d8;
     padding-left: 1.5vw;
 }
 
-#game-name {
-    font-size: 2vw;
-    text-shadow: 0.25vw 0 0 rgb(112, 112, 112);
-}
-
 #game-mode {
-    position: relative;
-    height: $mode-background-height;
-    width: $mode-background-width;
+    position: absolute;
+    height: 2vw;
+    width: 5.3vw;
+    overflow: visible;
+    left: 10px;
+    top: 1.7vw;
 }
 
 #mode-name {
     position: absolute;
-    font-size: $mode-background-height;
-    left: 2%;
-    top: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-46%, -52%);
+    font-size: 2.3vw;
     text-align: center;
-    width: $mode-background-width;
-    z-index: 1;
+    z-index: 2;
     -webkit-text-stroke: 0.4vw #636776;
     paint-order: stroke fill;
+    overflow: visible;
+    color: rgb(255, 255, 255);
 }
 
-#mode-name.FFA {
-    color: rgb(252, 252, 67);
-}
-
-#mode-name.CTF {
-    color: rgb(255, 87, 87);
-}
-
-#mode-background {
+.mode-main-background {
     position: absolute;
-    top: 33%;
-    height: 50%;
-    width: $mode-background-width;
-
+    top: 50%;
+    transform: translateY(-50%);
+    height: 40%;
+    width: 100%;
     background-color: #636776;
+    z-index: 0;
+}
 
-    clip-path: polygon(
-        $mode-corner-square-size 0%,
-        calc($mode-background-width - #{$mode-corner-square-size}) 0%,
-
-        calc($mode-background-width - #{$mode-corner-square-size}) $mode-corner-square-size,
-        $mode-background-width $mode-corner-square-size,
-
-        $mode-background-width calc(100% - #{$mode-corner-square-size}),
-        calc($mode-background-width - #{$mode-corner-square-size}) calc(100% - #{$mode-corner-square-size}),
-        calc($mode-background-width - #{$mode-corner-square-size}) 100%,
-        $mode-corner-square-size 100%,
-
-        $mode-corner-square-size calc(100% - #{$mode-corner-square-size}),
-        0% calc(100% - #{$mode-corner-square-size}),
-        0% $mode-corner-square-size,
-        $mode-corner-square-size $mode-corner-square-size
-    );
+.mode-sub-background {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 73%;
+    width: 85%;
+    background-color: #636776;
+    z-index: 0;
 }
 
 #flag {
@@ -143,10 +209,19 @@ $stripes2-color2: #f2d1d8;
     left: 4.2vw;
     rotate: 20deg;
     object-fit: contain;
+    z-index: 1;
+}
+
+#last-edited {
+    position: absolute;
+    right: 10px;
+    top: 1.9vw;
+    font-size: 1.6vw;
+    letter-spacing: 0.2;
+    text-shadow: 0.15vw 0 0 rgb(112, 112, 112);
 }
 
 #game-interaction {
-    margin-top: 0.3vw;
     display: flex;
     flex-direction: row;
     gap: 5vw;
@@ -154,45 +229,25 @@ $stripes2-color2: #f2d1d8;
     align-items: center;
 }
 
-#game-thumbnail {
-    position: relative;
-    height: 8vw;
-    width: 8vw;
-}
-
-#size-info {
-    position: absolute;
-    top: 6.3vw;
-    left: 3.4vw;
-    font-size: 1.5vw;
-    width: 4.6vw;
-    text-shadow: 0.2vw 0 0 rgb(112, 112, 112);
-}
-
-#last-edited {
-    margin-top: 0.7vw;
-    font-size: 1.6vw;
-    text-align: end;
-    align-items: end;
-    width: 14vw;
-    text-shadow: 0.15vw 0 0 rgb(112, 112, 112);
-}
-
 #edition-icons {
-    height: 1.5vw;
+    height: 2.4vw;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     gap: 1vw;
-    img {
-        width: 1.5vw;
-        object-fit: contain;
-        &:hover {
-            filter: brightness(0.95);
-        }
-    }
+}
+
+#edition-icons img {
+    object-fit: contain;
+    filter: grayscale(30%);
+    cursor: pointer;
+}
+
+#edition-icons img:hover {
+    filter: brightness(1.15);
 }
 
 .game-card:hover {
     filter: brightness(1.1);
 }
+
