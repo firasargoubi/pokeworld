@@ -28,7 +28,7 @@ describe('I-GameValidationService', () => {
             expect(service['getRequiredSpawnPoints'](MapSize.Large)).toBe(REQUIRED_SPAWN_POINTS[MapSize.Large]);
         });
 
-        it('areSpawnPointsValid should set spawnPoint.isValid to false if placedSpawnPoints is less or greater than required', () => {
+        it('validateSpawnPoints should set spawnPoint.isValid to false if placedSpawnPoints is less or greater than required', () => {
             const REQUIRED_SPAWN_POINTS_MEDIUM = 4;
             const PLACED_SPAWN_POINTS_TOO_FEW = 2;
             const PLACED_SPAWN_POINTS_TOO_MANY = 6;
@@ -40,7 +40,7 @@ describe('I-GameValidationService', () => {
             );
 
             spyOn(
-                service as unknown as { canTraverseTile: (tileType: TileType, shouldCountBridge: boolean) => boolean },
+                service as unknown as { canTraverseTile: (tileType: TileType, isBridgeTraversable: boolean) => boolean },
                 'canTraverseTile',
             ).and.returnValue(true);
 
@@ -55,7 +55,7 @@ describe('I-GameValidationService', () => {
                 tiles: [[TileType.Grass, TileType.Bush]],
             } as MapData;
 
-            service['areSpawnPointsValid'](map);
+            service['validateSpawnPoints'](map);
             expect(service['validationErrors'].spawnPoint.isValid).toBeFalse();
             expect(service['validationErrors'].spawnPoint.spawnPointMissing).toBe(SPAWN_POINT_DEFICIT);
             expect(service['getRequiredSpawnPoints']).toHaveBeenCalledWith(MapSize.Medium);
@@ -82,7 +82,7 @@ describe('I-GameValidationService', () => {
                 ],
             } as MapData;
 
-            service['areSpawnPointsValid'](map);
+            service['validateSpawnPoints'](map);
             expect(service['validationErrors'].spawnPoint.isValid).toBeFalse();
             expect(service['validationErrors'].spawnPoint.spawnPointMissing).toBe(-SPAWN_POINT_EXCESS);
             expect(service['getRequiredSpawnPoints']).toHaveBeenCalledWith(MapSize.Medium);
@@ -92,14 +92,14 @@ describe('I-GameValidationService', () => {
             expect(service['canTraverseTile']).toHaveBeenCalledWith(TileType.Bush, false);
         });
 
-        it('areSpawnPointsValid should set spawnPoint.isValid to true if placedSpawnPoints is equal to required', () => {
+        it('validateSpawnPoints should set spawnPoint.isValid to true if placedSpawnPoints is equal to required', () => {
             const REQUIRED_SPAWN_POINTS_MEDIUM = 4;
             spyOn(service as unknown as { getRequiredSpawnPoints: (map: MapData) => number }, 'getRequiredSpawnPoints').and.returnValue(
                 REQUIRED_SPAWN_POINTS_MEDIUM,
             );
 
             spyOn(
-                service as unknown as { canTraverseTile: (tileType: TileType, shouldCountBridge: boolean) => boolean },
+                service as unknown as { canTraverseTile: (tileType: TileType, isBridgeTraversable: boolean) => boolean },
                 'canTraverseTile',
             ).and.returnValue(true);
 
@@ -119,7 +119,7 @@ describe('I-GameValidationService', () => {
                 ],
             } as MapData;
 
-            service['areSpawnPointsValid'](map);
+            service['validateSpawnPoints'](map);
             expect(service['validationErrors'].spawnPoint.isValid).toBeTrue();
             expect(service['validationErrors'].spawnPoint.spawnPointMissing).toBe(0);
             expect(service['getRequiredSpawnPoints']).toHaveBeenCalledWith(MapSize.Medium);
@@ -129,14 +129,14 @@ describe('I-GameValidationService', () => {
             expect(service['canTraverseTile']).toHaveBeenCalledWith(TileType.Bush, false);
         });
 
-        it('areSpawnPointsValid should set spawnPoint.isValid to false if a placedSpawnPoint is placed on a non-traversable tile.', () => {
+        it('validateSpawnPoints should set spawnPoint.isValid to false if a placedSpawnPoint is placed on a non-traversable tile.', () => {
             const REQUIRED_SPAWN_POINTS_MEDIUM = 4;
             spyOn(service as unknown as { getRequiredSpawnPoints: (map: MapData) => number }, 'getRequiredSpawnPoints').and.returnValue(
                 REQUIRED_SPAWN_POINTS_MEDIUM,
             );
 
             spyOn(
-                service as unknown as { canTraverseTile: (tileType: TileType, shouldCountBridge: boolean) => boolean },
+                service as unknown as { canTraverseTile: (tileType: TileType, isBridgeTraversable: boolean) => boolean },
                 'canTraverseTile',
             ).and.returnValue(false);
 
@@ -156,7 +156,7 @@ describe('I-GameValidationService', () => {
                 ],
             } as MapData;
 
-            service['areSpawnPointsValid'](map);
+            service['validateSpawnPoints'](map);
             expect(service['validationErrors'].spawnPoint.isValid).toBeFalse();
             expect(service['validationErrors'].spawnPoint.spawnPointMissing).toBe(0);
             expect(service['validationErrors'].spawnPoint.nonAccessibleSpawnPoint.length).toBe(REQUIRED_SPAWN_POINTS_MEDIUM);
@@ -171,30 +171,20 @@ describe('I-GameValidationService', () => {
     });
 
     describe('canTraverseTile', () => {
-        it('canTraverseTile should return true for tiles that are not water when shouldCountBridge is true', () => {
+        it('canTraverseTile should return true when traversable', () => {
             const tiles = [TileType.Bush, TileType.Grass, TileType.Path];
 
             tiles.forEach((tile) => {
                 expect(service['canTraverseTile'](tile, true)).toBeTrue();
-            });
-        });
-
-        it('canTraverseTile should return false for water tiles when shouldCountBridge is true', () => {
-            const tileType = TileType.Water;
-            expect(service['canTraverseTile'](tileType, true)).toBeFalse();
-        });
-
-        it('canTraverseTile should return true for tiles of type Bush, Grass, or Path when shouldCountBridge is false', () => {
-            const tiles = [TileType.Bush, TileType.Grass, TileType.Path];
-
-            tiles.forEach((tile) => {
                 expect(service['canTraverseTile'](tile, false)).toBeTrue();
             });
         });
 
-        it('canTraverseTile should return false for tiles that are not Bush, Grass, or Path when shouldCountBridge is false', () => {
-            const tiles = [TileType.Water, TileType.Bridge, TileType.BrokenBridge];
+        it('canTraverseTile should return false for water tiles when isBridgeTraversable or not', () => {
+            const tileType = TileType.Water;
+            expect(service['canTraverseTile'](tileType, true)).toBeFalse();
 
+            const tiles = [TileType.Water, TileType.Bridge, TileType.BrokenBridge];
             tiles.forEach((tile) => {
                 expect(service['canTraverseTile'](tile, false)).toBeFalse();
             });
