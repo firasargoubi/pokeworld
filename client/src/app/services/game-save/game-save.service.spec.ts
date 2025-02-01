@@ -142,7 +142,7 @@ describe('Service: Game', () => {
         });
 
         const req = httpMock.expectOne(`${baseUrl}/games/${updatedGame._id}`);
-        expect(req.request.method).toBe('PUT');
+        expect(req.request.method).toBe('PATCH');
         expect(req.request.body).toEqual(updatedGame);
         req.flush(updatedGame);
     });
