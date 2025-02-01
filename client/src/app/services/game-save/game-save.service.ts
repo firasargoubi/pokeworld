@@ -33,7 +33,7 @@ export class GameService {
     }
 
     updateGame(gameId: string, gameData: GameData): Observable<GameData> {
-        return this.http.put<GameData>(`${this.baseUrl}/games/${gameId}`, gameData);
+        return this.http.patch<GameData>(`${this.baseUrl}/games/${gameId}`, gameData);
     }
 
     toggleVisibility(gameId: string): Observable<GameData> {

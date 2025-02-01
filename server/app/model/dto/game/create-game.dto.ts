@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsDate, IsEnum, IsObject, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
+import { IsBoolean, IsEnum, IsObject, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { MapSize } from '@common/map-size.enum';
 import { GameMode } from '@common/game-mode.enum';
 import { TileType } from '@common/tile-type.enum';
@@ -37,7 +37,7 @@ export class CreateGameDto {
     description: string;
 
     @ApiProperty()
-    @IsDate()
+    @IsString()
     lastEdited: Date;
 
     @ApiProperty()
