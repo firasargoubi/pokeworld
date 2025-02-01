@@ -1,13 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsDate, IsEnum, IsObject, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
 import { MapSize } from '@common/map-size.enum';
 import { GameMode } from '@common/game-mode.enum';
 import { TileType } from '@common/tile-type.enum';
 import { ItemType } from '@common/item-type.enum';
 import { Position } from '@common/position';
 import { GAME_NAME_MAX_LENGTH, GAME_DESCRIPTION_MAX_LENGTH } from './game.dto.constants';
-// CHECK
+
 export class MapData {
     @ApiProperty()
     @ValidateNested({ each: true })
@@ -50,7 +49,7 @@ export class CreateGameDto {
     thumbnail: string;
 
     @ApiProperty()
-    @Type(() => MapData)
+    @IsObject()
     mapData: MapData;
 
     @ApiProperty({ required: false })

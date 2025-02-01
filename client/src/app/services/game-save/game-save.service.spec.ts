@@ -175,5 +175,5 @@ describe('Service: Game', () => {
         req.flush(null);
     });
 
-    // CHECK error handling tests are needed and mocking is correct
+    // CHECK : test quality overall / error handling tests are needed or not / and is mocking correct
 });
