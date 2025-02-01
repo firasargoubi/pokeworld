@@ -1,0 +1,36 @@
+<div class="browser-page-container">
+    <div id="browser-page-header">
+        <p id="header-title">CREER UNE PARTIE</p>
+        <img id="header-image" src="/assets/images/menu/headers/admin-header.png" alt="Page header" title="Header3" />
+    </div>
+    <div id="gray-border">
+        <div id="wheat-border">
+            <div id="browser-page-body">
+                <div id="body-header">LISTE DES JEUX</div>
+                <div id="body-body">
+                    <div class="game-list">
+                        @if(gameList$ | async ; as gameList){
+                             @for(game of gameList; track game._id; let index = $index){ 
+                            @if(game.isVisible){
+                        <app-game-card
+                            [game]="game"
+                            [cardIndex]="getBackgroundClass(index)"
+                            (thumbnailHover)="thumbnailDescription($event, game.description)"
+                            (join)="onJoin($event)"
+                        >
+                            ></app-game-card
+                        >
+                        } } }
+                    </div>
+                    <div id="game-description">
+                        @if(showDescription){
+                        <img src="/assets/images/menu/backgrounds/description-top.png" />
+                        <p>{{ lastDescription }}</p>
+                        <img src="/assets/images/menu/backgrounds/description-bot.png" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
