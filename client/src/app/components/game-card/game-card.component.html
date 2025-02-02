@@ -1,4 +1,4 @@
-<div [ngClass]="['card-global-container', cardIndex]">
+<div [ngClass]="['card-global-container', cardColor]">
     <div class="card-description" [ngClass]="{ hovered: isHovered }" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
         <div class="card-description-body">
             <img src="/assets/images/menu/containers/description/battlePlayerSafari.png" />
@@ -22,7 +22,6 @@
                         <p class="mode-name" [ngClass]="game.mapData.gameMode">{{ game.mapData.gameMode }}</p>
                         <div class="mode-main-background"></div>
                         <div class="mode-sub-background"></div>
-                        <!-- <img class="flag" src="/assets/images/menu/icons/flag.png" *ngIf="game.mapData.gameMode === 'CTF'" /> -->
                     </div>
                     <p class="last-edited">{{ formatDate(game.lastEdited) }}</p>
                 </div>

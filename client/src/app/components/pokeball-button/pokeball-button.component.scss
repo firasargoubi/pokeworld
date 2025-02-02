@@ -21,6 +21,8 @@
     left: -10%;
     transform: translateY(-50%);
     object-fit: contain;
+    pointer-events: none;
+    user-select: none;
 }
 
 .pokeball-button-spacer {
@@ -48,12 +50,15 @@
     font-size: 3vw;
     width: auto;
     text-align: end;
+    user-select: none;
 }
 
 .pokeball-button-end {
     position: relative;
     height: 100%;
     object-fit: contain;
+    pointer-events: none;
+    user-select: none;
 }
 
 .pokeball-button-start {
@@ -67,4 +72,5 @@
     object-fit: contain;
     left: 1px;
     transform: scaleX(-1);
+    user-select: none;
 }

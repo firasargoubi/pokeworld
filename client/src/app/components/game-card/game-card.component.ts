@@ -8,11 +8,12 @@ import { GameData } from '@common/game-data';
     templateUrl: './game-card.component.html',
     styleUrls: ['./game-card.component.scss'],
     imports: [FormsModule, CommonModule],
+    standalone: true,
 })
 export class GameCardComponent {
     @Input() game!: GameData;
     @Input() isAdminView: boolean = false;
-    @Input() cardIndex: string;
+    @Input() cardColor: string = 'blue-card';
     @Output() edit = new EventEmitter<string>();
     @Output() delete = new EventEmitter<string>();
     @Output() toggleVisibility = new EventEmitter<{ id: string; isVisible: boolean }>();
