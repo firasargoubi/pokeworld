@@ -1,0 +1,75 @@
+<div id="page-root">
+    <header class="flex-container">
+        <h1 id="page-title">SELECTION D'AVATARS</h1>
+    </header>
+    <main class="flex-container">
+        <section id="avatar-info-container" class="flex-container">
+            <div id="player-name-avatar">
+                <img src="assets/images/game/avatars/suo.jpg" id="selected-avatar" />
+                <span id="name-form">
+                    <label for="name"> Name </label>
+                    <input id="name-input" type="text" [formControl]="name" />
+                </span>
+            </div>
+            <label id="stats-title"> Statistiques </label>
+            <div id="player-stats">
+                <li id="stat-labels">
+                    <ul class="stat-name">
+                        Vie
+                    </ul>
+                    <ul class="stat-name">
+                        Rapidite
+                    </ul>
+                    <ul class="stat-name">
+                        Attaque
+                    </ul>
+                    <ul class="stat-name">
+                        Defense
+                    </ul>
+                </li>
+                <li id="stat-values">
+                    <ul>
+                        <div class="stat-bar"></div>
+                        <div class="stat-bonus"></div>
+                        <div class="stat-point">{{ defaultStatPoint }} pts</div>
+                    </ul>
+                    <ul>
+                        <div class="stat-bar"></div>
+                        <div class="stat-bonus"></div>
+                        <div class="stat-point">{{ defaultStatPoint }} pts</div>
+                    </ul>
+                    <ul>
+                        <div class="stat-bar"></div>
+                    </ul>
+                    <ul>
+                        <div class="stat-bar"></div>
+                    </ul>
+                </li>
+                <li id="stat-modifiers">
+                    <ul>
+                        <button id="bonus-btn"> BONUS : ATK </button>
+                    </ul>
+                    <ul>
+                        <button id="dice-btn">  DICE : D6 </button>
+                    </ul>
+                </li>
+            </div>
+        </section>
+        <section id="avatar-selection-container">
+            <h2 class="flex-container"> SELECTIONNE TON AVATAR </h2>
+            <div id="avatar-list">
+                @for(avatar of avatarList ; track avatarData[avatar].name ; ){
+                <div class="avatar-container">
+                    <div>{{ avatarData[avatar].name }}</div>
+                    <img src="{{ avatarData[avatar].image }}" class="avatar-option" />
+                </div>
+                }
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="flex-container">
+            <button type="button" id="start-btn">START GAME</button>
+        </div>
+    </footer>
+</div>

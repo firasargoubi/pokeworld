@@ -1,7 +1,7 @@
 <div class="admin-page-container">
     <div id="admin-page-header">
         <p id="header-title">Admin page</p>
-        <img id="header-image" src="/assets/images/menu/headers/admin-header.png" alt="Page header" title="Header3">
+        <img id="header-image" src="/assets/images/menu/headers/admin-header.png" alt="Page header" title="Header3" />
     </div>
     <div id="gray-border">
         <div id="wheat-border">
@@ -11,18 +11,23 @@
                 <div id="body-body">
                     <div class="game-list">
                         @for(game of games; let i = $index; track game._id) {
-                            <app-game-card [game]="game" [isAdminView]="true" [cardIndex]="getBackgroundClass(i)"
-                                (edit)="editGame($event)" (delete)="deleteGame($event)"
-                                (toggleVisibility)="toggleVisibility($event)"
-                                (thumbnailHover)="thumbnailDescription($event, game.description)">
-                            </app-game-card>
+                        <app-game-card
+                            [game]="game"
+                            [isAdminView]="true"
+                            [cardIndex]="getBackgroundClass(i)"
+                            (edit)="editGame($event)"
+                            (delete)="deleteGame($event)"
+                            (toggleVisibility)="toggleVisibility($event)"
+                            (thumbnailHover)="thumbnailDescription($event, game.description)"
+                        >
+                        </app-game-card>
                         }
                     </div>
                     <div id="game-description">
                         @if(showDescription){
-                            <img src="/assets/images/menu/backgrounds/description-top.png">
-                            <p>{{lastDescription}}</p>
-                            <img src="/assets/images/menu/backgrounds/description-bot.png">
+                        <img src="/assets/images/menu/backgrounds/description-top.png" />
+                        <p>{{ lastDescription }}</p>
+                        <img src="/assets/images/menu/backgrounds/description-bot.png" />
                         }
                     </div>
                 </div>
