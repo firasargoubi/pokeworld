@@ -99,24 +99,13 @@ $base-size: 0.5vw; // Taille de base pour les dimensions
 app-pokeball-button {
     position: absolute;
     top: $base-size * 50; // 30vw
-    left: $base-size * 41.6667; // 25vw
+    left: $base-size * 40; // 25vw
 }
 
-/* Styles pour les images des Pokémon */
-img {
+#moltres {
     position: absolute;
     z-index: 1;
     width: $base-size * 55; // 33vw
-}
-
-/* Position de Moltres */
-#moltres {
-    left: $base-size * -3.3333; // -2vw
-    top: $base-size * 28.3333; // 17vw
-}
-
-/* Position de Charizard */
-#charizard {
     left: $base-size * 60; // 36vw
     top: $base-size * 16.6667; // 10vw
 }
