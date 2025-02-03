@@ -1,0 +1,82 @@
+$corner-square-size: 0.6vw;
+$big-stripe-size: 64%;
+$medium-stripe-size: 20%;
+$small-stripe-size: 8%;
+$mode-corner-square-size: 0.25vw;
+$mode-background-width: 6vw;
+$mode-background-height: 2vw;
+$stripes-color1: #95cde5;
+$stripes-color2: #bce5f5;
+$stripes1-color1: #98d589;
+$stripes1-color2: #c7f5a9;
+$stripes2-color1: #eeba96;
+$stripes2-color2: #f2d1d8;
+
+* {
+    font-family: 'pokemon-small';
+    font-size: 3vw;
+}
+
+#pop-up {
+    background-image: url('/assets/images/menu/containers/orange/orange-scrare-body.png');
+    background-repeat: repeat-x;
+    background-size: contain;
+    height: 40vw;
+    width: 60vw;
+    border: ($corner-square-size * 1.4) solid #49485e;
+    margin: $corner-square-size;
+
+    clip-path: polygon(
+        $corner-square-size 0%,
+        calc(100% - #{$corner-square-size}) 0%,
+
+        calc(100% - #{$corner-square-size}) $corner-square-size,
+        100% $corner-square-size,
+
+        100% calc(100% - #{$corner-square-size}),
+        calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
+        calc(100% - #{$corner-square-size}) 100%,
+        $corner-square-size 100%,
+
+        $corner-square-size calc(100% - #{$corner-square-size}),
+        0% calc(100% - #{$corner-square-size}),
+        0% $corner-square-size,
+        $corner-square-size $corner-square-size
+    );
+}
+
+#details {
+    font-size: 4.5vw;
+    margin-left: 1vw;
+}
+
+.check-box {
+    width: 3vw;
+    height: 3vw;
+    border: 0.8vw solid white;
+    box-shadow: 0.4vw 0.4vw 0 rgba(0, 0, 0, 0.6);
+    &:hover {
+        background-color: white;
+    }
+}
+
+#infos {
+    display: flex;
+    flex-direction: row;
+    gap: 7vw;
+    margin-top: 1vw;
+}
+
+.option {
+    display: flex;
+    flex-direction: row;
+    gap: 1vw;
+    align-items: center;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3vw;
+}
