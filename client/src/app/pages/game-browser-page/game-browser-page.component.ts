@@ -25,8 +25,11 @@ export class GameBrowserPageComponent implements OnInit {
         private router: Router,
     ) {}
 
-    ngOnInit(): void {
+    fetchGames() {
         this.gameList$ = this.gameService.getAllGames();
+    }
+    ngOnInit(): void {
+        this.fetchGames();
     }
 
     onJoin(gameId: string) {
@@ -54,7 +57,7 @@ export class GameBrowserPageComponent implements OnInit {
             .pipe(
                 finalize(() => {
                     if (isPageReload) {
-                        window.location.reload();
+                        this.fetchGames();
                     }
                 }),
             )
