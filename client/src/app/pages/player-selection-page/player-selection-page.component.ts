@@ -23,10 +23,11 @@ export class PlayerSelectionPageComponent {
         defense: 'defense',
     };
     statList = Object.keys(this.statFrench) as (keyof typeof this.statFrench)[];
-    currentBonusStat: PointStat | null = null;
 
     avatarData = AVATAR_DATA;
     avatarList = Object.keys(AVATAR_DATA).slice(1) as Avatars[];
+
+    currentBonusStat: PointStat | null = null;
 
     constructor(gameDataService: GameDataService) {
         this.player = DEFAULT_PLAYER;
@@ -44,5 +45,9 @@ export class PlayerSelectionPageComponent {
             this.player[statCategory] += BONUS_POINTS;
             this.currentBonusStat = statCategory;
         }
+    }
+
+    swapDice() {
+        [this.player.bonusDice.attack, this.player.bonusDice.defense] = [this.player.bonusDice.defense, this.player.bonusDice.attack];
     }
 }

@@ -85,12 +85,13 @@ main {
                     'swap .'
                     '. def';
                 button {
-                    padding: 5px;
+                    padding: 10px;
                     border-radius: 80%;
                     border: 2px solid transparent;
                     height: 40px;
                     width: fit-content;
-                    font-size: 20px;
+                    font-family:inherit;
+                    font-size: 30px;
                 }
                 #bonus-label {
                     grid-area: pts;
