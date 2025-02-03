@@ -35,7 +35,6 @@ main {
             }
         }
         #player-stats {
-            border: 2px solid;
             width: 90%;
             display: grid;
             grid-template-rows: repeat(4, 100px);
@@ -60,7 +59,7 @@ main {
                 }
                 .bonus-bar {
                     grid-area: bonus;
-                    background-color: skyblue;
+                    background-color: purple;
                 }
             }
             .stat-label {
@@ -75,7 +74,7 @@ main {
                 height: 100%;
 
                 display: grid;
-                grid-template-rows: repeat(3,50px) 30px repeat(3,60px);
+                grid-template-rows: repeat(3, 50px) 30px repeat(3, 60px);
                 grid-template-columns: 3fr 1fr;
                 grid-template-areas:
                     '. life'
@@ -84,7 +83,7 @@ main {
                     '. .'
                     'dice atk '
                     'swap .'
-                    '. def' ;
+                    '. def';
                 button {
                     padding: 5px;
                     border-radius: 80%;
@@ -119,6 +118,9 @@ main {
                     justify-self: start;
                     margin-top: 10px;
                     grid-area: dice;
+                }
+                .currentBonus{
+                    background-color: purple;
                 }
             }
         }

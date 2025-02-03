@@ -14,17 +14,19 @@
             <label id="stats-title"> Statistiques </label>
             <div id="player-stats">
                 @for(category of statList ; track i; let i = $index){
-                <div class="stat-label">{{ statFrench[category] }}</div>
-                <div class="stat-visual">
-                    <div class="stat-bar"></div>
-                    <div class="bonus-bar"></div>
-                    <div class="stat-points">10 pts</div>
-                </div>
+                    <div class="stat-label">{{ statFrench[category] }}</div>
+                    <div class="stat-visual">
+                        <div class="stat-bar"></div>
+                        @if(isBonusPoint(category)){
+                            <div class="bonus-bar"></div>
+                        }
+                        <div class="stat-points"> {{player[category]}} PTS </div>
+                    </div>
                 }
                 <div class="bonus">
                     <div id="bonus-label"> PTS BONUS </div>
-                    <button id="life-bonus">PV</button>
-                    <button id="speed-bonus">VIT</button>
+                    <button id="life-bonus" (click)="addBonus('life')" [class.currentBonus]="isBonusPoint('life')" >PV</button>
+                    <button id="speed-bonus" (click)="addBonus('speed')" [class.currentBonus]="isBonusPoint('speed')">VIT</button>
                     <div id="atk-dice"> D4 </div>
                     <img src="assets/images/swap.jpg" height="50px" width="50px" id="swap">
                     <div id="def-dice"> D6</div>
