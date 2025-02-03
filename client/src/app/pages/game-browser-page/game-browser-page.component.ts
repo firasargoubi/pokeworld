@@ -25,29 +25,30 @@ export class GameBrowserPageComponent implements OnInit {
         private router: Router,
     ) {}
 
-    fetchGames() {
-        this.gameList$ = this.gameService.getAllGames();
-    }
     ngOnInit(): void {
         this.fetchGames();
     }
 
+    fetchGames() {
+        this.gameList$ = this.gameService.getAllGames();
+    }
+
     onJoin(gameId: string) {
-        let isPageReload = false;
+        let fetchGames = false;
         const gameGetter = {
             next: (game: GameData) => {
                 if (game.isVisible) {
                     this.gameDataService.setGameData(game);
                     this.router.navigate(['/player-selection']);
                 } else {
-                    isPageReload = true;
+                    fetchGames = true;
                     alert("Ce jeu n'est plus VISIBLE !");
                 }
             },
             error: (error: HttpErrorResponse) => {
                 if (error.status === HttpStatusCode.NotFound) {
                     alert("Ce jeu n'existe plus !");
-                    isPageReload = true;
+                    fetchGames = true;
                 }
             },
         };
@@ -56,7 +57,7 @@ export class GameBrowserPageComponent implements OnInit {
             .getGame(gameId)
             .pipe(
                 finalize(() => {
-                    if (isPageReload) {
+                    if (fetchGames) {
                         this.fetchGames();
                     }
                 }),

@@ -81,8 +81,8 @@ main {
                     'pts .'
                     '. speed'
                     '. .'
-                    'dice atk '
-                    'swap .'
+                    '. atk '
+                    'dice swap'
                     '. def';
                 button {
                     padding: 10px;
@@ -143,6 +143,9 @@ main {
                 *{
                     font-size: 20px;
                 }
+                .avatar-name{
+                    font-size: 30px;
+                }
                 button{
                     padding: 0;
                 }
@@ -164,13 +167,14 @@ main {
     width: 200px;
 }
 
-.avatar-option {
-    height: 140px;
+.avatar-select     {
+    height: 130px;
     width: 140px;
 }
+
 
 #start-btn {
     border: 2px solid;
     border-radius: 10px;
-    background-color: rgb(17, 142, 17);
+    background-color: blueviolet
 }
