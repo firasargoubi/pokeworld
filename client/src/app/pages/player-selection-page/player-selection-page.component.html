@@ -2,35 +2,35 @@
     <header class="flex-container">
         <h1 id="page-title">SELECTION D'AVATARS</h1>
     </header>
-    <main class="flex-container" >
+    <main class="flex-container">
         <section id="avatar-info-container" class="flex-container">
             <div id="player-name-avatar">
                 <img src="{{ avatarData[player.avatar].image }}" id="selected-avatar" />
                 <span id="name-form">
-                    <label for="name"> Name </label>
+                    <label for="name"> Pseudo </label>
                     <input id="name-input" type="text" [formControl]="name" />
                 </span>
             </div>
             <label id="stats-title"> Statistiques </label>
             <div id="player-stats">
                 @for(category of statList ; track i; let i = $index){
-                    <div class="stat-label">{{ statFrench[category] }}</div>
-                    <div class="stat-visual">
-                        <div class="stat-bar"></div>
-                        @if(isBonusPoint(category)){
-                            <div class="bonus-bar"></div>
-                        }
-                        <div class="stat-points"> {{player[category]}} PTS </div>
-                    </div>
+                <div class="stat-label">{{ statFrench[category] }}</div>
+                <div class="stat-visual">
+                    <div class="stat-bar"></div>
+                    @if(isBonusPoint(category)){
+                    <div class="bonus-bar"></div>
+                    }
+                    <div class="stat-points">{{ player[category] }} PTS</div>
+                </div>
                 }
                 <div class="bonus">
-                    <div id="bonus-label"> PTS BONUS </div>
-                    <button id="life-bonus" (click)="addBonus('life')" [class.currentBonus]="isBonusPoint('life')" >PV</button>
+                    <div id="bonus-label">PTS BONUS</div>
+                    <button id="life-bonus" (click)="addBonus('life')" [class.currentBonus]="isBonusPoint('life')">PV</button>
                     <button id="speed-bonus" (click)="addBonus('speed')" [class.currentBonus]="isBonusPoint('speed')">VIT</button>
-                    <div id="atk-dice"> {{player.bonusDice.attack}} </div>
-                    <img src="assets/images/swap.jpg" height="50px" width="50px" id="swap" (click)="swapDice()">
-                    <div id="def-dice"> {{player.bonusDice.defense}} </div>
-                    <div id="dice-label"> DÉ BONUS </div>
+                    <div id="atk-dice">{{ player.bonusDice.attack }}</div>
+                    <img src="assets/images/swap.jpg" height="50px" width="50px" id="swap" (click)="swapDice()" />
+                    <div id="def-dice">{{ player.bonusDice.defense }}</div>
+                    <div id="dice-label">DÉ BONUS</div>
                 </div>
             </div>
         </section>
@@ -38,9 +38,10 @@
             <h2 class="flex-container">SELECTIONNE TON AVATAR</h2>
             <div id="avatar-list">
                 @for(avatar of avatarList ; track avatarData[avatar].name ; ){
-                <div class="avatar-container">
-                    <div>{{ avatarData[avatar].name }}</div>
+                <div class="avatar-container" (click)="handleSelection($event)">
+                    <div class="avatar-name">{{ avatarData[avatar].name }}</div>
                     <img src="{{ avatarData[avatar].image }}" class="avatar-option" />
+                    <button type="button" [ngStyle]="{'background-color' : getSelectBtnStyle(avatar).background}"  [attr.avatar]="avatar"> {{getSelectBtnStyle(avatar).text}} </button>
                 </div>
                 }
             </div>
