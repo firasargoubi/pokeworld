@@ -6,8 +6,7 @@
 #page-root {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    height: 100vh;
+    height: 100%;
 }
 
 #page-title {
@@ -36,46 +35,91 @@ main {
             }
         }
         #player-stats {
-            display: flex;
-            height: 500px;
-            row-gap: 80px;
             border: 2px solid;
-            li {
-                display: flex;
-                justify-content: flex-start;
-                overflow: visible;
-                flex-direction: column;
-                row-gap: 60px;
-            }
-            #stat-values ul{
-                display: flex;
-                border: 2px solid;
-                height: 50px;
-                width: 500px;
-                .stat-bar{
-                    width: 60%;
+            width: 90%;
+            display: grid;
+            grid-template-rows: repeat(4, 100px);
+            grid-template-columns: 1fr 3fr 2fr;
+            column-gap: 10px;
+            align-items: start;
+            .stat-visual {
+                display: grid;
+                align-items: center;
+                grid-template-rows: 1fr 1fr;
+                grid-template-columns: 3fr 1fr;
+                grid-template-areas:
+                    'main-bar bonus'
+                    'points .';
+                .stat-bar {
+                    grid-area: main-bar;
                     background-color: green;
                 }
-                .stat-bonus{
-                    width: 20%;
-                    background-color: skyblue;
-                }
-                .stat-point{
-                    padding: 0;
-                    margin-left: 10px;
-                    overflow: visible;
+                .stat-points {
+                    grid-area: points;
                     font-size: 30px;
                 }
+                .bonus-bar {
+                    grid-area: bonus;
+                    background-color: skyblue;
+                }
             }
-            #stat-modifiers ul{
-                display: flex;
+            .stat-label {
+                font-size: 38px;
+            }
+            * {
+                font-size: 30px;
+            }
+            .bonus {
+                grid-column: 3/-1;
+                grid-row: 1/-1;
                 height: 100%;
-                align-items:center ;
-                border: 2px solid;
-            }
-            #stat-modifiers button{
-                font-size: 20px;
-                width: 150px;
+
+                display: grid;
+                grid-template-rows: repeat(3,50px) 30px repeat(3,60px);
+                grid-template-columns: 3fr 1fr;
+                grid-template-areas:
+                    '. life'
+                    'pts .'
+                    '. speed'
+                    '. .'
+                    'dice atk '
+                    'swap .'
+                    '. def' ;
+                button {
+                    padding: 5px;
+                    border-radius: 80%;
+                    border: 2px solid transparent;
+                    height: 40px;
+                    width: fit-content;
+                    font-size: 20px;
+                }
+                #bonus-label {
+                    grid-area: pts;
+                }
+                #life-bonus {
+                    grid-area: life;
+                }
+                #speed-bonus {
+                    align-self: center;
+                    grid-area: speed;
+                }
+                #atk-dice {
+                    align-self: end;
+                    grid-area: atk;
+                }
+                #def-dice {
+                    grid-area: def;
+                }
+                #swap {
+                    height: 70px;
+                    width: 70px;
+                    grid-area: swap;
+                }
+                #dice-label {
+                    justify-self: start;
+                    margin-top: 10px;
+                    grid-area: dice;
+                }
             }
         }
     }

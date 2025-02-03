@@ -2,10 +2,10 @@
     <header class="flex-container">
         <h1 id="page-title">SELECTION D'AVATARS</h1>
     </header>
-    <main class="flex-container">
+    <main class="flex-container" >
         <section id="avatar-info-container" class="flex-container">
             <div id="player-name-avatar">
-                <img src="assets/images/game/avatars/suo.jpg" id="selected-avatar" />
+                <img src="{{ avatarData[player.avatar].image }}" id="selected-avatar" />
                 <span id="name-form">
                     <label for="name"> Name </label>
                     <input id="name-input" type="text" [formControl]="name" />
@@ -13,50 +13,27 @@
             </div>
             <label id="stats-title"> Statistiques </label>
             <div id="player-stats">
-                <li id="stat-labels">
-                    <ul class="stat-name">
-                        Vie
-                    </ul>
-                    <ul class="stat-name">
-                        Rapidite
-                    </ul>
-                    <ul class="stat-name">
-                        Attaque
-                    </ul>
-                    <ul class="stat-name">
-                        Defense
-                    </ul>
-                </li>
-                <li id="stat-values">
-                    <ul>
-                        <div class="stat-bar"></div>
-                        <div class="stat-bonus"></div>
-                        <div class="stat-point">{{ defaultStatPoint }} pts</div>
-                    </ul>
-                    <ul>
-                        <div class="stat-bar"></div>
-                        <div class="stat-bonus"></div>
-                        <div class="stat-point">{{ defaultStatPoint }} pts</div>
-                    </ul>
-                    <ul>
-                        <div class="stat-bar"></div>
-                    </ul>
-                    <ul>
-                        <div class="stat-bar"></div>
-                    </ul>
-                </li>
-                <li id="stat-modifiers">
-                    <ul>
-                        <button id="bonus-btn"> BONUS : ATK </button>
-                    </ul>
-                    <ul>
-                        <button id="dice-btn">  DICE : D6 </button>
-                    </ul>
-                </li>
+                @for(category of statList ; track i; let i = $index){
+                <div class="stat-label">{{ statFrench[category] }}</div>
+                <div class="stat-visual">
+                    <div class="stat-bar"></div>
+                    <div class="bonus-bar"></div>
+                    <div class="stat-points">10 pts</div>
+                </div>
+                }
+                <div class="bonus">
+                    <div id="bonus-label"> PTS BONUS </div>
+                    <button id="life-bonus">PV</button>
+                    <button id="speed-bonus">VIT</button>
+                    <div id="atk-dice"> D4 </div>
+                    <img src="assets/images/swap.jpg" height="50px" width="50px" id="swap">
+                    <div id="def-dice"> D6</div>
+                    <div id="dice-label"> DÉ BONUS </div>
+                </div>
             </div>
         </section>
         <section id="avatar-selection-container">
-            <h2 class="flex-container"> SELECTIONNE TON AVATAR </h2>
+            <h2 class="flex-container">SELECTIONNE TON AVATAR</h2>
             <div id="avatar-list">
                 @for(avatar of avatarList ; track avatarData[avatar].name ; ){
                 <div class="avatar-container">

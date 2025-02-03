@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AVATAR_DATA } from '@app/interfaces/avatars';
 import { Avatars } from '@app/interfaces/avatars.enum';
-import { DEFAULT_STAT_POINTS } from '@app/interfaces/player';
+import { Player, DEFAULT_PLAYER, BONUS_POINTS } from '@app/interfaces/player';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 
 @Component({
@@ -13,13 +13,23 @@ import { GameDataService } from '@app/services/game-data/game-data.service';
 })
 export class PlayerSelectionPageComponent {
     gameDataService: GameDataService;
+    player: Player;
     name = new FormControl('', [Validators.required]);
-    defaultStatPoint = DEFAULT_STAT_POINTS;
+    statFrench = {
+        life: 'vie',
+        speed: 'vitesse',
+        attack: 'attaque',
+        defense: 'defense',
+    };
+    statList = Object.keys(this.statFrench) as (keyof typeof this.statFrench)[];
+
+    bonusPoint = BONUS_POINTS;
+    defaultStatPoint = 4; // temp
 
     avatarData = AVATAR_DATA;
-    avatarList = Object.keys(AVATAR_DATA) as Avatars[];
+    avatarList = Object.keys(AVATAR_DATA).slice(1) as Avatars[];
 
     constructor(gameDataService: GameDataService) {
-        this.gameDataService = gameDataService;
+        this.player = DEFAULT_PLAYER;
     }
 }
