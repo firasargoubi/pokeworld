@@ -1,119 +1,230 @@
-$corner-square-size: 0.6vw;
-$big-stripe-size: 64%;
-$medium-stripe-size: 20%;
-$small-stripe-size: 8%;
-$mode-corner-square-size: 0.25vw;
-$mode-background-width: 6vw;
-$mode-background-height: 2vw;
-$stripes-color1: #95cde5;
-$stripes-color2: #bce5f5;
-$stripes1-color1: #98d589;
-$stripes1-color2: #c7f5a9;
-$stripes2-color1: #eeba96;
-$stripes2-color2: #f2d1d8;
+/* Variable de base */
+$base-size: 0.5vw; // Taille de base pour les dimensions
 
+/* Styles globaux */
 * {
     font-family: 'pokemon-small';
-    font-size: 3vw;
+    font-size: $base-size * 5; // 3vw
 }
 
+/* Conteneur du pop-up */
 #pop-up {
-    position: relative;
-    height: 40vw;
-    width: 60vw;
-    margin: $corner-square-size;
+    position: absolute;
+    left: 10vw;
+    height: $base-size * 66.6667; // 40vw
+    width: $base-size * 100; // 60vw
+    margin: $base-size; // 0.6vw
     overflow: visible;
 }
 
+/* Arrière-plan et bordure du pop-up */
 #pop-up::before {
-    padding-left: 1vw;
-    font-size: 4.5vw;
     content: 'Détails du jeu';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    padding-left: $base-size * 1.6667; // 1vw
+    font-size: $base-size * 7.5; // 4.5vw
     background-image: url('/assets/images/menu/containers/orange/orange-scrare-body.png');
     background-repeat: repeat-x;
     background-size: contain;
-    border: ($corner-square-size * 1.4) solid #49485e;
+    border: ($base-size * 1.4) solid #49485e; // 0.84vw
     clip-path: polygon(
-        $corner-square-size 0%,
-        calc(100% - #{$corner-square-size}) 0%,
+        $base-size 0%,
+        calc(100% - #{$base-size}) 0%,
 
-        calc(100% - #{$corner-square-size}) $corner-square-size,
-        100% $corner-square-size,
+        calc(100% - #{$base-size}) $base-size,
+        100% $base-size,
 
-        100% calc(100% - #{$corner-square-size}),
-        calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
-        calc(100% - #{$corner-square-size}) 100%,
-        $corner-square-size 100%,
+        100% calc(100% - #{$base-size}),
+        calc(100% - #{$base-size}) calc(100% - #{$base-size}),
+        calc(100% - #{$base-size}) 100%,
+        $base-size 100%,
 
-        $corner-square-size calc(100% - #{$corner-square-size}),
-        0% calc(100% - #{$corner-square-size}),
-        0% $corner-square-size,
-        $corner-square-size $corner-square-size
+        $base-size calc(100% - #{$base-size}),
+        0% calc(100% - #{$base-size}),
+        0% $base-size,
+        $base-size $base-size
     );
     z-index: 0;
 }
 
+/* Section des détails */
 #details {
-    font-size: 4.5vw;
     position: absolute;
-    top: 6vw;
-    left: 1vw;
+    top: $base-size * 10; // 6vw
+    left: $base-size * 1.6667; // 1vw
+    font-size: $base-size * 7.5; // 4.5vw
 }
 
+/* Styles pour les cases à cocher */
 .check-box {
-    width: 3vw;
-    height: 3vw;
-    border: 0.8vw solid white;
-    box-shadow: 0.4vw 0.4vw 0 rgba(0, 0, 0, 0.6);
+    width: $base-size * 5; // 3vw
+    height: $base-size * 5; // 3vw
+    border: $base-size * 1.3333 solid white; // 0.8vw
+    box-shadow: $base-size * 0.6667 $base-size * 0.6667 0 rgba(0, 0, 0, 0.6); // 0.4vw 0.4vw 0
     &:hover {
         background-color: white;
     }
 }
 
+/* Section des informations */
 #infos {
     display: flex;
     flex-direction: row;
-    gap: 7vw;
-    margin: 1vw;
+    gap: $base-size * 11.6667; // 7vw
+    margin: $base-size * 1.6667; // 1vw
 }
 
+/* Styles pour les options */
 .option {
     display: flex;
     flex-direction: row;
-    gap: 1vw;
+    gap: $base-size * 1.6667; // 1vw
     align-items: center;
 }
 
+/* Conteneur des options */
 .options {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.3vw;
+    gap: $base-size * 0.5; // 0.3vw
     z-index: 2;
 }
+
+/* Positionnement du bouton Pokéball */
 app-pokeball-button {
     position: absolute;
-    top: 30vw;
-    left: 25vw;
+    top: $base-size * 50; // 30vw
+    left: $base-size * 41.6667; // 25vw
 }
 
+/* Styles pour les images des Pokémon */
 img {
     position: absolute;
     z-index: 1;
-    width: 33vw;
+    width: $base-size * 55; // 33vw
 }
 
+/* Position de Moltres */
 #moltres {
-    left: -2vw;
-    top: 17vw;
+    left: $base-size * -3.3333; // -2vw
+    top: $base-size * 28.3333; // 17vw
 }
 
+/* Position de Charizard */
 #charizard {
-    left: 36vw;
-    top: 10vw;
+    left: $base-size * 60; // 36vw
+    top: $base-size * 16.6667; // 10vw
 }
+
+// $corner-square-size: 0.6vw;
+
+// * {
+//     font-family: 'pokemon-small';
+//     font-size: 3vw;
+// }
+
+// #pop-up {
+//     position: relative;
+//     height: 40vw;
+//     width: 60vw;
+//     margin: $corner-square-size;
+//     overflow: visible;
+// }
+
+// #pop-up::before {
+//     padding-left: 1vw;
+//     font-size: 4.5vw;
+//     content: 'Détails du jeu';
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     width: 100%;
+//     height: 100%;
+//     background-image: url('/assets/images/menu/containers/orange/orange-scrare-body.png');
+//     background-repeat: repeat-x;
+//     background-size: contain;
+//     border: ($corner-square-size * 1.4) solid #49485e;
+//     clip-path: polygon(
+//         $corner-square-size 0%,
+//         calc(100% - #{$corner-square-size}) 0%,
+
+//         calc(100% - #{$corner-square-size}) $corner-square-size,
+//         100% $corner-square-size,
+
+//         100% calc(100% - #{$corner-square-size}),
+//         calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
+//         calc(100% - #{$corner-square-size}) 100%,
+//         $corner-square-size 100%,
+
+//         $corner-square-size calc(100% - #{$corner-square-size}),
+//         0% calc(100% - #{$corner-square-size}),
+//         0% $corner-square-size,
+//         $corner-square-size $corner-square-size
+//     );
+//     z-index: 0;
+// }
+
+// #details {
+//     font-size: 4.5vw;
+//     position: absolute;
+//     top: 6vw;
+//     left: 1vw;
+// }
+
+// .check-box {
+//     width: 3vw;
+//     height: 3vw;
+//     border: 0.8vw solid white;
+//     box-shadow: 0.4vw 0.4vw 0 rgba(0, 0, 0, 0.6);
+//     &:hover {
+//         background-color: white;
+//     }
+// }
+
+// #infos {
+//     display: flex;
+//     flex-direction: row;
+//     gap: 7vw;
+//     margin: 1vw;
+// }
+
+// .option {
+//     display: flex;
+//     flex-direction: row;
+//     gap: 1vw;
+//     align-items: center;
+// }
+
+// .options {
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     gap: 0.3vw;
+//     z-index: 2;
+// }
+// app-pokeball-button {
+//     position: absolute;
+//     top: 30vw;
+//     left: 25vw;
+// }
+
+// img {
+//     position: absolute;
+//     z-index: 1;
+//     width: 33vw;
+// }
+
+// #moltres {
+//     left: -2vw;
+//     top: 17vw;
+// }
+
+// #charizard {
+//     left: 36vw;
+//     top: 10vw;
+// }
