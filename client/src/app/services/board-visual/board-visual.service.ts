@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MapVisualData } from '@app/interfaces/map-visual-data';
 import { TileVisualData } from '@app/interfaces/tile-visual-data';
-import { GameDataService } from '@app/services/game-data.service';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 import { ItemType } from '@common/item-type.enum';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';

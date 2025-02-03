@@ -3,11 +3,11 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
-import { MapSize } from '@common/map-size.enum';
-import { GameService } from './game.service';
-import { of } from 'rxjs';
 import { ItemType } from '@common/item-type.enum';
+import { MapSize } from '@common/map-size.enum';
 import { Position } from '@common/position';
+import { of } from 'rxjs';
+import { GameService } from './game-save.service';
 
 describe('Service: Game', () => {
     let httpMock: HttpTestingController;
@@ -142,7 +142,7 @@ describe('Service: Game', () => {
         });
 
         const req = httpMock.expectOne(`${baseUrl}/games/${updatedGame._id}`);
-        expect(req.request.method).toBe('PUT');
+        expect(req.request.method).toBe('PATCH');
         expect(req.request.body).toEqual(updatedGame);
         req.flush(updatedGame);
     });
@@ -175,5 +175,5 @@ describe('Service: Game', () => {
         req.flush(null);
     });
 
-    // CHECK error handling tests are needed and mocking is correct
+    // CHECK : test quality overall / error handling tests are needed or not / and is mocking correct
 });

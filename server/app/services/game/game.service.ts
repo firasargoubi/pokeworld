@@ -30,7 +30,6 @@ export class GameService {
     }
 
     async addGame(createGameDto: CreateGameDto): Promise<Game> {
-        // CHECK VALIDATION HERE
         if (!(await this.isNameUnique(createGameDto.name))) {
             throw new BadRequestException(`Game with name ${createGameDto.name} already exists.`);
         }
@@ -45,7 +44,7 @@ export class GameService {
         if (!isValidObjectId(id)) {
             throw new BadRequestException(`Invalid ID format: ${id}`);
         }
-        if (updateGameDto.name && !(await this.isNameUnique(updateGameDto.name))) {
+        if (!(await this.isNameUnique(updateGameDto.name, id))) {
             throw new BadRequestException(`Game with name ${updateGameDto.name} already exists.`);
         }
         const updatedGame = await this.gameModel.findByIdAndUpdate(id, updateGameDto, { new: true }).exec();
@@ -77,8 +76,12 @@ export class GameService {
         }
     }
 
-    async isNameUnique(name: string): Promise<boolean> {
-        return (await this.gameModel.find({ name }).exec()).length === 0;
+    async isNameUnique(name: string, exceptId?: string): Promise<boolean> {
+        if (exceptId) {
+            return (await this.gameModel.find({ name, _id: { $ne: exceptId } }).exec()).length === 0;
+        } else {
+            return (await this.gameModel.find({ name }).exec()).length === 0;
+        }
     }
 
     async populateDB(): Promise<void> {
