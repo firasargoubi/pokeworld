@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
+import { MainHeaderComponent } from '@app/components/main-header/main-header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { GameService } from '@app/services/game.service';
 import { GameData } from '@common/game-data';
@@ -11,7 +12,7 @@ import { GameData } from '@common/game-data';
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
     styleUrls: ['./admin-page.component.scss'],
-    imports: [GameCardComponent, PokeballButtonComponent, RouterLink],
+    imports: [GameCardComponent, PokeballButtonComponent, RouterLink, MainHeaderComponent],
 })
 export class AdminPageComponent implements OnInit {
     games: GameData[] = [];

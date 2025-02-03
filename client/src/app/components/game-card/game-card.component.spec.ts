@@ -91,17 +91,17 @@ describe('GameCardComponent', () => {
         expect(modeElement.nativeElement.textContent.trim()).toBe(GameMode.FFA);
     });
 
-    it('should display edition-icons only when isAdminView is true', () => {
+    it('should display edition-buttons only when isAdminView is true', () => {
         component.isAdminView = true;
         fixture.detectChanges();
 
-        let editionIcons = fixture.debugElement.query(By.css('.edition-icons'));
+        let editionIcons = fixture.debugElement.query(By.css('.edition-buttons'));
         expect(editionIcons).toBeTruthy();
 
         component.isAdminView = false;
         fixture.detectChanges();
 
-        editionIcons = fixture.debugElement.query(By.css('.edition-icons'));
+        editionIcons = fixture.debugElement.query(By.css('.edition-buttons'));
         expect(editionIcons).toBeFalsy();
     });
 });

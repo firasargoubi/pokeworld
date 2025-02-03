@@ -27,7 +27,7 @@
                 </div>
                 <div class="game-interaction">
                     @if(isAdminView) {
-                    <div class="edition-icons">
+                    <div class="edition-buttons">
                         <div class="card-button" (click)="onToggleVisibility()">
                             <img
                                 [src]="
@@ -50,7 +50,10 @@
                         </div>
                     </div>
                     } @else {
-                    <button (click)="onJoin()">Play</button>
+                    <div class="card-singel-button" (click)="onJoin()">
+                        <p>JOUER</p>
+                        <div class="button-container"></div>
+                    </div>
                     }
                 </div>
             </div>

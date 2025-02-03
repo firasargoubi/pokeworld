@@ -2,51 +2,19 @@ $gray-border-color: #636776;
 $wheat-border-color: #e9f6f7;
 $stripes-color1: #9be6d2;
 $stripes-color2: #abeeda;
-$text-shadow-color: rgb(112, 112, 112);
 
 $page-border-width: 10px;
 $padding-wheat-border: 0.7vw;
 $stripes-size: 0.7vw;
-$font-size-header: 6.5vh;
-
-$font-family-title: 'pokemon-small';
 
 $card-width: 26vw;
 
-.admin-page-container {
+#admin-page-container {
     border-radius: 0.7vw;
 }
 
 #admin-page-header {
-    position: relative;
-    display: flex;
-    align-items: center;
     height: 7vh;
-    overflow: hidden;
-    justify-content: center;
-    user-select: none;
-}
-
-#header-image {
-    height: 100%;
-    width: auto;
-    display: block;
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    -ms-interpolation-mode: nearest-neighbor;
-    user-select: none;
-    pointer-events: none;
-}
-
-#admin-page-header #header-title {
-    font-family: $font-family-title;
-    font-size: $font-size-header;
-    text-shadow: 0.3vw 0 0 $text-shadow-color;
-    position: absolute;
-    left: 2vw;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
 }
 
 #admin-page-border {
