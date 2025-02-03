@@ -16,6 +16,39 @@ describe('AdminPageComponent', () => {
     let router: Router;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
 
+    const getMockGames = () => {
+        return [
+            {
+                _id: '123',
+                name: 'Game 1',
+                isVisible: true,
+                description: 'Description 1',
+                lastEdited: new Date(),
+                mapData: {
+                    tiles: [],
+                    items: {} as Record<ItemType, Position[]>,
+                    size: MapSize.Medium,
+                    gameMode: GameMode.CTF,
+                },
+                thumbnail: 'path',
+            },
+            {
+                _id: '456',
+                name: 'Game 2',
+                isVisible: true,
+                description: 'Description 2',
+                lastEdited: new Date(),
+                mapData: {
+                    tiles: [],
+                    items: {} as Record<ItemType, Position[]>,
+                    size: MapSize.Large,
+                    gameMode: GameMode.CTF,
+                },
+                thumbnail: 'path',
+            },
+        ];
+    };
+
     beforeEach(async () => {
         const spy = jasmine.createSpyObj('GameService', ['getAllGames', 'toggleVisibility', 'deleteGame']);
         spy.getAllGames.and.returnValue(of([]));
@@ -96,29 +129,15 @@ describe('AdminPageComponent', () => {
         expect(component.games[0]._id).toBe(mockGames[1]._id);
     });
 
-    it('should update showDescription and lastDescription when thumbnailDescription is called', () => {
-        const description = 'Test Description';
-
-        component.thumbnailDescription(true, description);
-
-        expect(component.showDescription).toBeTrue();
-        expect(component.lastDescription).toBe(description);
-
-        component.thumbnailDescription(false, description);
-
-        expect(component.showDescription).toBeFalse();
-        expect(component.lastDescription).toBe(description);
-    });
-
     it('should return the correct background class based on index', () => {
         const testCases = [
-            { index: 0, expected: 'background-class-1' },
-            { index: 1, expected: 'background-class-2' },
-            { index: 2, expected: 'background-class-3' },
+            { index: 0, expected: 'blue-card' },
+            { index: 1, expected: 'green-card' },
+            { index: 2, expected: 'pink-card' },
         ];
 
         testCases.forEach(({ index, expected }) => {
-            expect(component.getBackgroundClass(index)).toBe(expected);
+            expect(component.getCardColor(index)).toBe(expected);
         });
     });
 
@@ -153,36 +172,3 @@ describe('AdminPageComponent', () => {
         expect(snackBarOpenSpy).toHaveBeenCalledWith('Test error message: ' + error.message, 'Close', { duration: 5000 });
     });
 });
-
-const getMockGames = () => {
-    return [
-        {
-            _id: '123',
-            name: 'Game 1',
-            isVisible: true,
-            description: 'Description 1',
-            lastEdited: new Date(),
-            mapData: {
-                tiles: [],
-                items: {} as Record<ItemType, Position[]>,
-                size: MapSize.Medium,
-                gameMode: GameMode.CTF,
-            },
-            thumbnail: 'path',
-        },
-        {
-            _id: '456',
-            name: 'Game 2',
-            isVisible: true,
-            description: 'Description 2',
-            lastEdited: new Date(),
-            mapData: {
-                tiles: [],
-                items: {} as Record<ItemType, Position[]>,
-                size: MapSize.Large,
-                gameMode: GameMode.CTF,
-            },
-            thumbnail: 'path',
-        },
-    ];
-};
