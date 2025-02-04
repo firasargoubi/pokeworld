@@ -1,9 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
-import { CreateGamePopupComponent } from '@app/components/create-game-popup/create-game-popup.component';
+import { Router, RouterLink } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
+import { MainHeaderComponent } from '@app/components/main-header/main-header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { GameService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
@@ -12,7 +12,7 @@ import { GameData } from '@common/game-data';
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
     styleUrls: ['./admin-page.component.scss'],
-    imports: [GameCardComponent, PokeballButtonComponent, CreateGamePopupComponent],
+    imports: [GameCardComponent, PokeballButtonComponent, RouterLink, MainHeaderComponent],
 })
 export class AdminPageComponent implements OnInit {
     games: GameData[] = [];
@@ -64,13 +64,8 @@ export class AdminPageComponent implements OnInit {
         });
     }
 
-    thumbnailDescription(isMouseOver: boolean, description: string) {
-        this.showDescription = isMouseOver;
-        this.lastDescription = description;
-    }
-
-    getBackgroundClass(index: number): string {
-        const classes = ['background-class-1', 'background-class-2', 'background-class-3'];
+    getCardColor(index: number): string {
+        const classes = ['blue-card', 'green-card', 'pink-card'];
         const classIndex = index % classes.length;
         return classes[classIndex];
     }
