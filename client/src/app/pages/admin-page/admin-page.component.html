@@ -1,34 +1,25 @@
-<div class="admin-page-container">
+<div id="admin-page-container">
     <div id="admin-page-header">
-        <p id="header-title">Admin page</p>
-        <img id="header-image" src="/assets/images/menu/headers/admin-header.png" alt="Page header" title="Header3">
+        <app-main-header [routerLink]="'/'" [imgSrc]="'/assets/images/menu/headers/header-3.png'" [title]="'< PAGE ADMIN'"> </app-main-header>
     </div>
-    <div id="gray-border">
-        <div id="wheat-border">
-            <app-pokeball-button [buttonContent]="'CREER JEU'" [delay]="400"></app-pokeball-button>
-            <div id="admin-page-body">
-                <div id="body-header">JEUX SAUVEGARDÉS</div>
-                <div id="body-body">
-                    <div class="game-list">
-                        @for(game of games; let i = $index; track game._id) {
-                            <app-game-card [game]="game" [isAdminView]="true" [cardIndex]="getBackgroundClass(i)"
-                                (edit)="editGame($event)" (delete)="deleteGame($event)"
-                                (toggleVisibility)="toggleVisibility($event)"
-                                (thumbnailHover)="thumbnailDescription($event, game.description)">
-                            </app-game-card>
-                        }
-                    </div>
-                    <div id="game-description">
-                        @if(showDescription){
-                            <img src="/assets/images/menu/backgrounds/description-top.png">
-                            <p>{{lastDescription}}</p>
-                            <img src="/assets/images/menu/backgrounds/description-bot.png">
-                        }
-                    </div>
-                </div>
+    <div id="admin-page-border">
+        <div id="admin-page-body">
+            <div id="game-grid">
+                @for(game of games; let i = $index; track game._id) {
+                <app-game-card
+                    [game]="game"
+                    [isAdminView]="true"
+                    [cardColor]="getCardColor(i)"
+                    (edit)="editGame($event)"
+                    (delete)="deleteGame($event)"
+                    (toggleVisibility)="toggleVisibility($event)"
+                >
+                </app-game-card>
+                }
             </div>
         </div>
     </div>
+    <div id="poke-button">
+        <app-pokeball-button [buttonContent]="'NOUVEAU JEU'" [delay]="200"></app-pokeball-button>
+    </div>
 </div>
-
-<!-- <app-pokeball-button [buttonContent]="'C'"></app-pokeball-button> -->
