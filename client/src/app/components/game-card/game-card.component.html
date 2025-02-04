@@ -1,32 +1,62 @@
-<div class="game-card">
-    <div id="game-details" [ngClass]="cardIndex">
-        <div id="game-info">
-            <h2 id="game-name">{{ game.name }}</h2>
-            <div id="game-mode">
-                <p id="mode-name" [ngClass]="game.mapData.gameMode">{{ game.mapData.gameMode }}</p>
-                <div id="mode-background"></div>
-                <img id="flag" src="/assets/images/menu/icons/flag.png" *ngIf="game.mapData.gameMode === 'CTF'" />
-            </div>
-        </div>
-        <div id="game-interaction">
-            @if(isAdminView) {
-                <div id="edition-icons">
-                    <img
-                        [src]="game.isVisible ? '/assets/images/menu/icons/view-1.png' : '/assets/images/menu/icons/hide-1.png'"
-                        (click)="onToggleVisibility()"
-                        class="icons"
-                    />
-                    <img src="/assets/images/menu/icons/pencil.png" (click)="onEdit()" class="icons" />
-                    <img src="/assets/images/menu/icons/recycle-bin.png" (click)="onDelete()" class="icons" />
-                </div>
-            } @else {
-                <button (click)="onJoin()">Play</button>
-            }
-            <p id="last-edited">{{ formatDate(game.lastEdited) }}</p>
+<div [ngClass]="['card-global-container', cardColor]">
+    <div class="card-description" [ngClass]="{ hovered: isHovered }" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+        <div class="card-description-body">
+            <img src="/assets/images/menu/containers/description/battlePlayerSafari.png" />
+            <p class="description">
+                {{ game.description }}
+            </p>
         </div>
     </div>
-    <div id="game-thumbnail" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
-        <p id="size-info">{{ game.mapData.size }} x {{ game.mapData.size }}</p>
-        <img [src]="game.thumbnail" alt="Game Thumbnail" />
+
+    <div class="game-card">
+        <div class="card-body">
+            <div class="game-thumbnail" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+                <h2 class="game-name">{{ game.name }}</h2>
+                <p class="size-info">{{ game.mapData.size }}x{{ game.mapData.size }}</p>
+                <img [src]="game.thumbnail" alt="Game Thumbnail" />
+            </div>
+            <div class="game-details">
+                <div class="card-separator"></div>
+                <div class="game-info">
+                    <div class="game-mode">
+                        <p class="mode-name" [ngClass]="game.mapData.gameMode">{{ game.mapData.gameMode }}</p>
+                        <div class="mode-main-background"></div>
+                        <div class="mode-sub-background"></div>
+                    </div>
+                    <p class="last-edited">{{ formatDate(game.lastEdited) }}</p>
+                </div>
+                <div class="game-interaction">
+                    @if(isAdminView) {
+                    <div class="edition-buttons">
+                        <div class="card-button" (click)="onToggleVisibility()">
+                            <img
+                                [src]="
+                                    game.isVisible
+                                        ? '/assets/images/menu/buttons/admin-button/eye.png'
+                                        : '/assets/images/menu/buttons/admin-button/closedEye.png'
+                                "
+                                class="button-icon"
+                            />
+                            <img src="/assets/images/menu/buttons/admin-button/greenBackgroundHighlight.png" class="button-container" />
+                        </div>
+                        <div class="card-button" (click)="onEdit()">
+                            <img src="/assets/images/menu/buttons/admin-button/pen.png" class="button-icon" />
+                            <img src="/assets/images/menu/buttons/admin-button/blueBackgroundHighlight.png" class="button-container" />
+                        </div>
+
+                        <div class="card-button" (click)="onDelete()">
+                            <img src="/assets/images/menu/buttons/admin-button/bin.png" class="button-icon" />
+                            <img src="/assets/images/menu/buttons/admin-button/redBackgroundHighlight.png" class="button-container" />
+                        </div>
+                    </div>
+                    } @else {
+                    <div class="card-singel-button" (click)="onJoin()">
+                        <p>JOUER</p>
+                        <div class="button-container"></div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 </div>

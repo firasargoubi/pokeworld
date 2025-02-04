@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { PokeballButtonComponent } from './pokeball-button.component';
 
@@ -38,18 +38,51 @@ describe('PokeballButtonComponent', () => {
     });
 
     it('should have the default image source', () => {
-        expect(component.imageSrc).toBe(component.defaultImageSrc);
+        expect(component.pokeballImageSrc).toBe(component.defaultPokeballImageSrc);
+        expect(component.borderImageSrc).toBe(component.defaultBorderImageSrc);
+        expect(component.contentImageSrc).toBe(component.defaultContentImageSrc);
     });
 
     it('should change imageSrc to pressedImageSrc on onMouseDown', () => {
         component.onMouseDown();
-        expect(component.imageSrc).toBe(component.pressedImageSrc);
+        expect(component.pokeballImageSrc).toBe(component.pressedPokeballImageSrc);
+        expect(component.borderImageSrc).toBe(component.pressedBorderImageSrc);
+        expect(component.contentImageSrc).toBe(component.pressedContentImageSrc);
     });
 
-    it('should keep imageSrc as pressedImageSrc before the delay', fakeAsync(() => {
-        component.delay = 300;
-        component.onMouseDown();
-        tick(component.delay / 2);
-        expect(component.imageSrc).toBe(component.pressedImageSrc);
-    }));
+    it('should restore images after the specified delay', (done) => {
+        const verificationTimeout = 150;
+        component.delay = 100;
+        component.onMouseUp();
+
+        setTimeout(() => {
+            expect(component.pokeballImageSrc).toBe(component.defaultPokeballImageSrc);
+            expect(component.borderImageSrc).toBe(component.defaultBorderImageSrc);
+            expect(component.contentImageSrc).toBe(component.defaultContentImageSrc);
+            done();
+        }, verificationTimeout);
+    });
+
+    it('should call onClickAction if defined when mouse is released', (done) => {
+        const verificationTimeout = 50;
+        component.delay = 100;
+        component.onClickAction = jasmine.createSpy('onClickAction');
+
+        component.onMouseUp();
+
+        setTimeout(() => {
+            expect(component.onClickAction).toHaveBeenCalled();
+            done();
+        }, component.delay + verificationTimeout);
+    });
+
+    it('should not throw an error if onClickAction is undefined', (done) => {
+        const verificationTimeout = 50;
+        component.delay = 100;
+        component.onClickAction = undefined;
+        expect(() => component.onMouseUp()).not.toThrow();
+        setTimeout(() => {
+            done();
+        }, component.delay + verificationTimeout);
+    });
 });
