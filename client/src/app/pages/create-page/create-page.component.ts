@@ -4,17 +4,17 @@ import { Component, OnInit } from '@angular/core';
 import { GameService } from '@app/services/game-save/game-save.service';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { GameData } from '@common/game-data';
-import { finalize, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 
 @Component({
-    selector: 'app-game-browser-page',
+    selector: 'app-create-page',
     imports: [AsyncPipe, GameCardComponent],
-    templateUrl: './game-browser-page.component.html',
-    styleUrl: './game-browser-page.component.scss',
+    templateUrl: './create-page.component.html',
+    styleUrl: './create-page.component.scss',
 })
-export class GameBrowserPageComponent implements OnInit {
+export class CreatePageComponent implements OnInit {
     showDescription: boolean = false;
     lastDescription: string = '';
     gameList$: Observable<GameData[]>;
@@ -34,35 +34,25 @@ export class GameBrowserPageComponent implements OnInit {
     }
 
     onJoin(gameId: string) {
-        let fetchGames = false;
         const gameGetter = {
             next: (game: GameData) => {
                 if (game.isVisible) {
                     this.gameDataService.setGameData(game);
                     this.router.navigate(['/player-selection']);
                 } else {
-                    fetchGames = true;
-                    alert("Ce jeu n'est plus VISIBLE !");
+                    this.fetchGames();
+                    alert("Ce jeu n'est plus visible !");
                 }
             },
             error: (error: HttpErrorResponse) => {
                 if (error.status === HttpStatusCode.NotFound) {
                     alert("Ce jeu n'existe plus !");
-                    fetchGames = true;
+                    this.fetchGames();
                 }
             },
         };
 
-        this.gameService
-            .getGame(gameId)
-            .pipe(
-                finalize(() => {
-                    if (fetchGames) {
-                        this.fetchGames();
-                    }
-                }),
-            )
-            .subscribe(gameGetter);
+        this.gameService.getGame(gameId).subscribe(gameGetter);
     }
 
     thumbnailDescription(isMouseOver: boolean, description: string) {

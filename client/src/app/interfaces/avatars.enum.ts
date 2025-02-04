@@ -1,4 +1,5 @@
 export enum Avatars {
+    Default = 'default',
     Avatar1 = 'avatar1',
     Avatar2 = 'avatar2',
     Avatar3 = 'avatar3',

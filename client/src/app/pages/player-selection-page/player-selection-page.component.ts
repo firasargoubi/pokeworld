@@ -17,11 +17,7 @@ export class PlayerSelectionPageComponent {
     router: Router;
     gameDataService: GameDataService;
     player: Player;
-    // eslint-disable-next-line no-magic-numbers
-    MIN_LENGTH = 3;
-    // eslint-disable-next-line no-magic-numbers
-    MAX_LENGTH = 20;
-    nameForm = new FormControl('', [Validators.required, Validators.minLength(this.MIN_LENGTH), Validators.maxLength(this.MAX_LENGTH)]);
+    nameForm: FormControl;
 
     statFrench = {
         life: 'vie',
@@ -39,6 +35,13 @@ export class PlayerSelectionPageComponent {
     constructor(gameDataService: GameDataService, router: Router) {
         this.router = router;
         this.player = DEFAULT_PLAYER;
+        this.initializeForm();
+    }
+
+    initializeForm() {
+        const MIN_LENGTH = 3;
+        const MAX_LENGTH = 20;
+        this.nameForm = new FormControl('', [Validators.required, Validators.minLength(MIN_LENGTH), Validators.maxLength(MAX_LENGTH)]);
     }
 
     isBonusPoint(statCategory: PointStat) {

@@ -1,12 +1,16 @@
 import { Avatars } from './avatars.enum';
 
 export const AVATAR_DATA = {
+    [Avatars.Default]: {
+        name: 'Default',
+        image: 'assets/images/game/avatars/default.jpg',
+    },
     [Avatars.Avatar1]: {
-        name: 'Name 1',
-        image: 'assets/images/game/avatars/suo.jpg',
+        name: 'Amemiya',
+        image: 'assets/images/game/avatars/amemiya.jpg',
     },
     [Avatars.Avatar2]: {
-        name: 'Name 2',
+        name: 'Suo',
         image: 'assets/images/game/avatars/suo.jpg',
     },
     [Avatars.Avatar3]: {

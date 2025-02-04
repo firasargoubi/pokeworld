@@ -10,6 +10,8 @@ import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
 import { AdminPageComponent } from '@app/pages/admin-page/admin-page.component';
 import { EditPageComponent } from '@app/pages/edit-page/edit-page.component';
+import { CreatePageComponent } from './app/pages/create-page/create-page.component';
+import { PlayerSelectionPageComponent } from '@app/pages/player-selection-page/player-selection-page.component';
 
 if (environment.production) {
     enableProdMode();
@@ -21,6 +23,8 @@ const routes: Routes = [
     { path: 'play', component: PlayPageComponent },
     { path: 'admin', component: AdminPageComponent },
     { path: 'edit', component: EditPageComponent },
+    { path: 'create', component: CreatePageComponent },
+    { path: 'player-selection', component: PlayerSelectionPageComponent },
     { path: '**', redirectTo: '' },
 ];
 
