@@ -24,4 +24,6 @@ export class CreateGamePopupComponent {
     onModeSelection(mode: string) {
         this.gameMode = mode;
     }
+
+    onValiderSelection() {}
 }

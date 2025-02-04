@@ -63,12 +63,20 @@ $base-size: 0.5vw; // Taille de base pour les dimensions
 .check-box {
     width: $base-size * 5; // 3vw
     height: $base-size * 5; // 3vw
-    border: $base-size * 1.3333 solid white; // 0.8vw
-    box-shadow: $base-size * 0.6667 $base-size * 0.6667 0 rgba(0, 0, 0, 0.6); // 0.4vw 0.4vw 0
-    &:hover {
-        background-color: white;
-    }
+    border: $base-size * 0.7 solid white; // Bordure extérieure blanche
+    padding: $base-size * 0.5; // Espace transparent entre le carré blanc et la bordure extérieure
+    background-color: transparent; // Fond transparent par défaut
+    box-shadow: $base-size * 0.6667 $base-size * 0.6667 0 rgba(0, 0, 0, 0.6); // Ombre
     cursor: pointer;
+
+    &:hover {
+        background-color: white; // Remplit uniquement le centre au survol
+    }
+}
+
+.selected {
+    background-color: white; // Remplit uniquement le centre lorsqu'il est sélectionné
+    background-clip: content-box; // Limite le fond à la zone de contenu (sans le padding)
 }
 
 /* Section des informations */
@@ -109,10 +117,6 @@ app-pokeball-button {
     width: $base-size * 55; // 33vw
     left: $base-size * 60; // 36vw
     top: $base-size * 28; // 10vw
-}
-
-.selected {
-    background-color: white;
 }
 
 // $corner-square-size: 0.6vw;
