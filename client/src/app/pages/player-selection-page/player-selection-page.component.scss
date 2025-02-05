@@ -35,11 +35,11 @@ main {
             }
         }
         #player-stats {
-            width: 90%;
+            width: 100%;
             display: grid;
             overflow: visible;
             grid-template-rows: repeat(4, 100px);
-            grid-template-columns: 1.5fr 3fr 2fr;
+            grid-template-columns: 1fr 1.5fr 3fr;
             column-gap: 10px;
             align-items: start;
             .stat-visual {
@@ -48,18 +48,23 @@ main {
                 grid-template-rows: 1fr 1fr;
                 grid-template-columns: 3fr 1fr;
                 grid-template-areas:
-                    'main-bar bonus'
+                    'main-bar bonus-bar'
                     'points .';
                 .stat-bar {
                     grid-area: main-bar;
                     background-color: green;
                 }
-                .stat-points {
+                .stat-bonus {
                     grid-area: points;
                     font-size: 30px;
                 }
+
+                .dice{
+                    color : red;
+                }
+
                 .bonus-bar {
-                    grid-area: bonus;
+                    grid-area: bonus-bar;
                     background-color: purple;
                 }
             }
@@ -73,18 +78,6 @@ main {
                 grid-column: 3/-1;
                 grid-row: 1/-1;
                 height: 100%;
-
-                display: grid;
-                grid-template-rows: repeat(3, 50px) 30px repeat(3, 60px);
-                grid-template-columns: 3fr 1fr;
-                grid-template-areas:
-                    '. life'
-                    'pts .'
-                    '. speed'
-                    '. .'
-                    '. atk '
-                    'dice swap'
-                    '. def';
                 button {
                     padding: 10px;
                     border-radius: 80%;
@@ -94,33 +87,7 @@ main {
                     font-family:inherit;
                     font-size: 30px;
                 }
-                #bonus-label {
-                    grid-area: pts;
-                }
-                #life-bonus {
-                    grid-area: life;
-                }
-                #speed-bonus {
-                    align-self: center;
-                    grid-area: speed;
-                }
-                #atk-dice {
-                    align-self: end;
-                    grid-area: atk;
-                }
-                #def-dice {
-                    grid-area: def;
-                }
-                #swap {
-                    height: 70px;
-                    width: 70px;
-                    grid-area: swap;
-                }
-                #dice-label {
-                    justify-self: start;
-                    margin-top: 10px;
-                    grid-area: dice;
-                }
+
                 .currentBonus{
                     background-color: purple;
                 }
@@ -177,4 +144,9 @@ main {
     border: 2px solid;
     border-radius: 10px;
     background-color: blueviolet
+}
+
+.warning {
+    font-size: small;
+    color : red;
 }

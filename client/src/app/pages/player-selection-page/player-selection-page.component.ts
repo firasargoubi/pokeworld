@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AVATAR_DATA } from '@app/interfaces/avatars';
 import { Avatars } from '@app/interfaces/avatars.enum';
-import { Player, DEFAULT_PLAYER, BONUS_POINTS, DEFAULT_STAT_POINTS, PointStat } from '@app/interfaces/player';
+import { Player, DEFAULT_PLAYER, BONUS_POINTS, DEFAULT_STAT_POINTS, PointStat, Dice } from '@app/interfaces/player';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { NgStyle } from '@angular/common';
 import { Router } from '@angular/router';
@@ -18,6 +18,7 @@ export class PlayerSelectionPageComponent {
     gameDataService: GameDataService;
     player: Player;
     nameForm: FormControl;
+    bonusForm: FormGroup;
 
     statFrench = {
         life: 'vie',
@@ -26,11 +27,13 @@ export class PlayerSelectionPageComponent {
         defense: 'defense',
     };
     statList = Object.keys(this.statFrench) as (keyof typeof this.statFrench)[];
+    dice = Dice;
 
     avatarData = AVATAR_DATA;
     avatarList = Object.keys(AVATAR_DATA).slice(1) as Avatars[];
 
     selectedBonusPoint: PointStat | null = null;
+    isStartClicked: boolean = false;
 
     constructor(gameDataService: GameDataService, router: Router) {
         this.router = router;
@@ -39,28 +42,34 @@ export class PlayerSelectionPageComponent {
     }
 
     initializeForm() {
+        /* name form */
         const MIN_LENGTH = 3;
         const MAX_LENGTH = 20;
         this.nameForm = new FormControl('', [Validators.required, Validators.minLength(MIN_LENGTH), Validators.maxLength(MAX_LENGTH)]);
+
+        /* bonus form */
+        this.bonusForm = new FormGroup({
+            points: new FormControl('', [Validators.required]),
+            attackDice: new FormControl('', [Validators.required]),
+            defenseDice: new FormControl('', [Validators.required]),
+        });
     }
 
     isBonusPoint(statCategory: PointStat) {
-        return this.player[statCategory] > DEFAULT_STAT_POINTS;
+        return this.bonusForm.get('points')?.value === statCategory;
     }
 
-    addBonus(statCategory: PointStat) {
-        if (!this.selectedBonusPoint) {
-            this.selectedBonusPoint = statCategory;
-            this.player[statCategory] += BONUS_POINTS;
-        } else if (statCategory !== this.selectedBonusPoint) {
-            this.player[statCategory] += BONUS_POINTS;
-            this.player[this.selectedBonusPoint] -= BONUS_POINTS;
-            this.selectedBonusPoint = statCategory;
+    getScore(statCategory: PointStat) {
+        return this.isBonusPoint(statCategory) ? DEFAULT_STAT_POINTS + BONUS_POINTS : DEFAULT_STAT_POINTS;
+    }
+
+    getBonusDice(statCategory: PointStat) {
+        if (statCategory === 'attack') {
+            return this.bonusForm.get('attackDice')?.value;
+        } else if (statCategory === 'defense') {
+            return this.bonusForm.get('defenseDice')?.value;
         }
-    }
-
-    swapDice() {
-        [this.player.bonusDice.attack, this.player.bonusDice.defense] = [this.player.bonusDice.defense, this.player.bonusDice.attack];
+        return null;
     }
 
     getSelectBtnStyle(avatar: Avatars) {
@@ -82,6 +91,10 @@ export class PlayerSelectionPageComponent {
         }
     }
 
+    getSelectedAvatar() {
+        return this.player.avatar;
+    }
+
     isAvatarLocked(avatar: Avatars) {
         const excludedAvatars = [Avatars.Avatar5, Avatars.Avatar6]; // temp
         return excludedAvatars.includes(avatar);
@@ -97,11 +110,30 @@ export class PlayerSelectionPageComponent {
         }
     }
 
-    canGoToLobby() {
-        return this.nameForm.valid && this.selectedBonusPoint !== null && this.player.avatar !== Avatars.Default;
+    isWarning(form: FormControl | FormGroup, errorType: string) {
+        return form.hasError(errorType) && this.isStartClicked;
     }
+
+    isValidAvatarChoice() {
+        return this.getSelectedAvatar() !== Avatars.Default;
+    }
+
+    isValidDiceChoice() {
+        return this.bonusForm.get('attackDice')?.touched && this.bonusForm.get('attackDice')?.value !== this.bonusForm.get('defenseDice')?.value;
+    }
+
+    isAvatarWarning() {
+        return !this.isValidAvatarChoice() && this.isStartClicked;
+    }
+
+    isFormValid() {
+        return this.nameForm.valid && this.bonusForm.valid && this.isValidDiceChoice() && this.isValidAvatarChoice();
+    }
+
     goToLobby() {
-        if (this.canGoToLobby() && confirm('Es-tu sur de tes choix ?')) {
+        this.isStartClicked = true;
+        if (this.isFormValid() && confirm('Es-tu sur de tes choix ?')) {
+            // save data in player
             this.router.navigate(['/']); // temp
         }
     }

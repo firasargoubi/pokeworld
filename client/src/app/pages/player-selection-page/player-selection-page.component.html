@@ -5,10 +5,19 @@
     <main class="flex-container">
         <section id="avatar-info-container" class="flex-container">
             <div id="player-name-avatar">
-                <img src="{{ avatarData[player.avatar].image }}" id="selected-avatar" />
+                <img src="{{avatarData[this.player.avatar].image}}" id="selected-avatar" />
+                @if(isAvatarWarning()){
+                    <div class="warning"> Veuillez choisir une AVATAR ! </div>
+                }
                 <span id="name-form">
                     <label for="name"> Pseudo </label>
                     <input id="name-input" type="text" [formControl]="nameForm" />
+                    @if(isWarning(nameForm ,'required')){
+                        <div class="warning"> Vous devez entrer un pseudo !</div>
+                    }
+                    @if(isWarning(nameForm,'minlength') || isWarning(nameForm,'maxlength')){
+                        <div class="warning"> La longueur du pseudo est entre 3 et 20 characteres  !</div>
+                    }
                 </span>
             </div>
             <label id="stats-title"> Statistiques </label>
@@ -20,17 +29,53 @@
                     @if(isBonusPoint(category)){
                     <div class="bonus-bar"></div>
                     }
-                    <div class="stat-points">{{ player[category] }} PTS</div>
+                    <div class="stat-bonus">
+                        <span class="hp-points"> {{ getScore(category) }} PV </span>
+                        <span class="dice"> {{ getBonusDice(category) }}</span>
+                    </div>
                 </div>
                 }
                 <div class="bonus">
-                    <div id="bonus-label">PTS BONUS</div>
-                    <button id="life-bonus" (click)="addBonus('life')" [class.currentBonus]="isBonusPoint('life')">PV</button>
-                    <button id="speed-bonus" (click)="addBonus('speed')" [class.currentBonus]="isBonusPoint('speed')">VIT</button>
-                    <div id="atk-dice">{{ player.bonusDice.attack }}</div>
-                    <img src="assets/images/swap.jpg" height="50px" width="50px" id="swap" (click)="swapDice()" />
-                    <div id="def-dice">{{ player.bonusDice.defense }}</div>
-                    <div id="dice-label">DÉ BONUS</div>
+                    <form [formGroup]="bonusForm">
+                        <h2>CHOIX DES BONUS</h2>
+                        <div id="point-bonus">
+                            <h3>+2PTS BONUS</h3>
+                            <label>
+                                Vie
+                                <input type="radio" formControlName="points" value="life" />
+                            </label>
+                            <label>
+                                Attaque
+                                <input type="radio" formControlName="points" value="speed" />
+                            </label>
+                            <div id="dice-bonus">
+                                <h3>DÉ BONUS POUR L'ATTAQUE</h3>
+                                <label>
+                                    ⚃
+                                    <input type="radio" formControlName="attackDice" value="{{ dice.D4 }}" />
+                                </label>
+                                <label>
+                                    ⚅
+                                    <input type="radio" formControlName="attackDice" value="{{ dice.D6 }}" />
+                                </label>
+                                <h3>DÉ BONUS POUR LA DEFENSE</h3>
+                                <label>
+                                    ⚃
+                                    <input type="radio" formControlName="defenseDice" value="{{ dice.D4 }}" />
+                                </label>
+                                <label>
+                                    ⚅
+                                    <input type="radio" formControlName="defenseDice" value="{{ dice.D6 }}" />
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                    @if(isWarning(bonusForm,'required')){
+                        <div class="warning"> Veuillez remplir tous les champs ! </div>
+                    }
+                    @if(!isValidDiceChoice()){
+                        <div class="warning"> Veuillez choisir un DÉ different pour l'attaque et la defense ! </div>
+                    }
                 </div>
             </div>
         </section>
@@ -41,7 +86,9 @@
                 <div class="avatar-container" (click)="handleSelection($event)">
                     <div class="avatar-name">{{ avatarData[avatar].name }}</div>
                     <img src="{{ avatarData[avatar].image }}" class="avatar-select" />
-                    <button type="button" [ngStyle]="{'background-color' : getSelectBtnStyle(avatar).background}"  [attr.avatar]="avatar"> {{getSelectBtnStyle(avatar).text}} </button>
+                    <button type="button" [ngStyle]="{ 'background-color': getSelectBtnStyle(avatar).background }" [attr.avatar]="avatar">
+                        {{ getSelectBtnStyle(avatar).text }}
+                    </button>
                 </div>
                 }
             </div>
@@ -49,7 +96,9 @@
     </main>
     <footer>
         <div class="flex-container">
-            <button type="button" id="start-btn" [ngStyle]="{background : canGoToLobby() ? 'purple' : 'gray'}" (click)="goToLobby()">START GAME</button>
+            <button type="button" id="start-btn" [ngStyle]="{ background: isFormValid() ? 'purple' : 'gray' }" (click)="goToLobby()">
+                START GAME
+            </button>
         </div>
     </footer>
 </div>
