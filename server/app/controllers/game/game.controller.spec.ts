@@ -115,6 +115,23 @@ describe('GameController', () => {
     //     await controller.getGame('valid_id', res);
     // });
 
+    it('saveGame() should create or update a game', async () => {
+        const fakeGame = new Game();
+        gameService.saveGame.resolves(fakeGame);
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.OK);
+            return res;
+        };
+        res.json = (game) => {
+            expect(game).toEqual(fakeGame);
+            return res;
+        };
+
+        await controller.saveGame({} as Game, res);
+    });
+
     it('addGame() should create a new game', async () => {
         const fakeGame = new Game();
         gameService.addGame.resolves(fakeGame);

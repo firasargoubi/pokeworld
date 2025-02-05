@@ -6,7 +6,6 @@ import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
 import { MapSize } from '@common/map-size.enum';
 import { Position } from '@common/position';
-import { of } from 'rxjs';
 import { GameService } from './game-save.service';
 
 describe('Service: Game', () => {
@@ -67,7 +66,7 @@ describe('Service: Game', () => {
 
         service.getAllGames().subscribe({
             next: (response: GameData[]) => {
-                expect(response.length).toBe(2);
+                expect(response.length).toBe(mockGames.length);
                 expect(response).toEqual(expectedGames);
             },
             error: fail,
@@ -95,24 +94,26 @@ describe('Service: Game', () => {
 
     it('should update the game if _id exists', () => {
         const updatedGame = { ...mockGames[0], name: 'Updated Name' };
-        const updateSpy = spyOn(service, 'updateGame').and.callFake(() => of(updatedGame));
 
         service.saveGame(updatedGame).subscribe((game) => {
             expect(game.name).toBe('Updated Name');
         });
 
-        expect(updateSpy).toHaveBeenCalledWith(updatedGame._id, updatedGame);
+        const req = httpMock.expectOne(`${baseUrl}/games`);
+        expect(req.request.method).toBe('PUT');
+        req.flush(updatedGame);
     });
 
     it('should add a new game if _id does not exist', () => {
         const newGame: GameData = { ...mockGames[0], _id: '' };
-        const addSpy = spyOn(service, 'addGame').and.callFake(() => of(newGame));
 
         service.saveGame(newGame).subscribe((game) => {
             expect(game).toEqual(newGame);
         });
 
-        expect(addSpy).toHaveBeenCalledWith(newGame);
+        const req = httpMock.expectOne(`${baseUrl}/games`);
+        expect(req.request.method).toBe('PUT');
+        req.flush(newGame);
     });
 
     it('should create a new game', () => {

@@ -303,6 +303,7 @@ $clip-path: polygon(
 }
 
 .card-description {
+    font-size: 1.4vw;
     width: 0;
     height: calc(100% - $corner-square-size * 2);
     position: absolute;
