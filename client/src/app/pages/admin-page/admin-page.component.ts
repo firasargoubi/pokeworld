@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
@@ -34,21 +34,28 @@ export class AdminPageComponent implements OnInit {
             next: (games) => {
                 this.games = games;
             },
-            error: (err: HttpErrorResponse) => {
-                this.handleError('Failed to load games. Please try again later.', err);
+            error: (error: HttpErrorResponse) => {
+                this.handleError(error);
             },
         });
     }
 
     editGame(id: string) {
-        sessionStorage.setItem('editGameId', id);
-        this.router.navigate(['/edit']);
+        this.gameService.getGame(id).subscribe({
+            next: () => {
+                sessionStorage.setItem('editGameId', id); // change to game-Data.service
+                this.router.navigate(['/edit']);
+            },
+            error: (error: HttpErrorResponse) => {
+                this.handleNotFoundError(error);
+            },
+        });
     }
 
     toggleVisibility(event: { id: string; isVisible: boolean }) {
         this.gameService.toggleVisibility(event.id).subscribe({
-            error: (err) => {
-                this.handleError('Failed to toggle game visibility. Please try again later.', err);
+            error: (error: HttpErrorResponse) => {
+                this.handleNotFoundError(error);
             },
         });
     }
@@ -58,8 +65,8 @@ export class AdminPageComponent implements OnInit {
             next: () => {
                 this.games = this.games.filter((game) => game._id !== id);
             },
-            error: (err) => {
-                this.handleError('Failed to delete game. Please try again later.', err);
+            error: (error: HttpErrorResponse) => {
+                this.handleNotFoundError(error);
             },
         });
     }
@@ -70,7 +77,16 @@ export class AdminPageComponent implements OnInit {
         return classes[classIndex];
     }
 
-    private handleError(message: string, error: HttpErrorResponse) {
-        this.snackBar.open(`${message}: ${error.message}`, 'Close', { duration: 5000 });
+    private handleNotFoundError(error: HttpErrorResponse) {
+        if (error.status === HttpStatusCode.NotFound) {
+            alert("Ce jeu n'existe plus !"); // CHECK and Change to popup component
+            this.loadGames();
+        } else {
+            this.handleError(error);
+        }
+    }
+
+    private handleError(error: HttpErrorResponse) {
+        this.snackBar.open(`${error.message}`, 'Close', { duration: 5000 }); // Doesnt work
     }
 }
