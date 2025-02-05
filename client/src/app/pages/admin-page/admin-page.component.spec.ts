@@ -50,8 +50,9 @@ describe('AdminPageComponent', () => {
     };
 
     beforeEach(async () => {
-        const spy = jasmine.createSpyObj('GameService', ['getAllGames', 'toggleVisibility', 'deleteGame']);
+        const spy = jasmine.createSpyObj('GameService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
         spy.getAllGames.and.returnValue(of([]));
+        spy.getGame.and.returnValue(of({} as GameData));
         spy.toggleVisibility.and.returnValue(of({} as GameData));
         spy.deleteGame.and.returnValue(of(undefined));
 
@@ -97,8 +98,8 @@ describe('AdminPageComponent', () => {
         const setItemSpy = spyOn(sessionStorage, 'setItem');
         const gameId = '123';
 
+        gameServiceSpy.getGame.and.returnValue(of({} as GameData));
         component.editGame(gameId);
-        gameServiceSpy.deleteGame.and.returnValue(of(undefined));
 
         expect(setItemSpy).toHaveBeenCalledWith('editGameId', gameId);
         expect(navigateSpy).toHaveBeenCalledWith(['/edit']);
@@ -141,14 +142,41 @@ describe('AdminPageComponent', () => {
         });
     });
 
-    it('should call handleError when toggleVisibility, loadGames or delete fails', () => {
-        const toggleError = new HttpErrorResponse({ error: 'Toggle failed', status: 500 });
-        const loadError = new HttpErrorResponse({ error: 'Load failed', status: 500 });
-        const deleteError = new HttpErrorResponse({ error: 'Delete failed', status: 500 });
+    it('should handle not found error when editGame, toggleVisibility or deleteGame fails', () => {
+        const notFoundError = new HttpErrorResponse({ error: 'Game not found', status: 404 });
 
-        gameServiceSpy.toggleVisibility.and.returnValue(throwError(() => toggleError));
-        gameServiceSpy.getAllGames.and.returnValue(throwError(() => loadError));
-        gameServiceSpy.deleteGame.and.returnValue(throwError(() => deleteError));
+        gameServiceSpy.getGame.and.returnValue(throwError(() => notFoundError));
+        gameServiceSpy.toggleVisibility.and.returnValue(throwError(() => notFoundError));
+        gameServiceSpy.deleteGame.and.returnValue(throwError(() => notFoundError));
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        const handleNotFoundErrorSpy = spyOn<any>(component, 'handleNotFoundError');
+
+        component.editGame('123');
+        component.toggleVisibility({ id: '123', isVisible: true });
+        component.deleteGame('123');
+
+        expect(handleNotFoundErrorSpy).toHaveBeenCalledWith(notFoundError);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- 3 calls
+        expect(handleNotFoundErrorSpy).toHaveBeenCalledTimes(3); // CHECK
+    });
+
+    it('should call loadGames when handleNotFoundError is called', () => {
+        const loadGamesSpy = spyOn(component, 'loadGames');
+
+        const error = new HttpErrorResponse({ error: 'Game not found', status: 404 });
+
+        component['handleNotFoundError'](error);
+
+        expect(loadGamesSpy).toHaveBeenCalled();
+    });
+
+    it('should call handleError when loadGames, toggleVisibility or delete fails', () => {
+        const error = new HttpErrorResponse({ error: 'Action failed', status: 500 });
+
+        gameServiceSpy.getAllGames.and.returnValue(throwError(() => error));
+        gameServiceSpy.toggleVisibility.and.returnValue(throwError(() => error));
+        gameServiceSpy.deleteGame.and.returnValue(throwError(() => error));
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const handleErrorSpy = spyOn<any>(component, 'handleError');
@@ -157,9 +185,9 @@ describe('AdminPageComponent', () => {
         component.loadGames();
         component.deleteGame('1234');
 
-        expect(handleErrorSpy).toHaveBeenCalledWith('Failed to toggle game visibility. Please try again later.', toggleError);
-        expect(handleErrorSpy).toHaveBeenCalledWith('Failed to load games. Please try again later.', loadError);
-        expect(handleErrorSpy).toHaveBeenCalledWith('Failed to delete game. Please try again later.', deleteError);
+        expect(handleErrorSpy).toHaveBeenCalledWith(error);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- 3 calls
+        expect(handleErrorSpy).toHaveBeenCalledTimes(3);
     });
 
     it('should call snackBar open when handleError is called', () => {
@@ -167,8 +195,8 @@ describe('AdminPageComponent', () => {
 
         const error = new HttpErrorResponse({ error: 'Test error', status: 500 });
 
-        component['handleError']('Test error message', error);
+        component['handleError'](error);
 
-        expect(snackBarOpenSpy).toHaveBeenCalledWith('Test error message: ' + error.message, 'Close', { duration: 5000 });
+        expect(snackBarOpenSpy).toHaveBeenCalledWith(error.message, 'Close', { duration: 5000 });
     });
 });
