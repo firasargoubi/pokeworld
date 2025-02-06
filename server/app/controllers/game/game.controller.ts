@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Delete, Patch, Post, Res, HttpStatus, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Body, Controller, Get, Param, Delete, Patch, Post, Put, Res, HttpStatus } from '@nestjs/common';
 import { GameService } from '@app/services/game/game.service';
 import { Response } from 'express';
 import {
@@ -29,12 +29,8 @@ export class GameController {
     })
     @Get('/')
     async allGames(@Res() response: Response) {
-        try {
-            const allGames = await this.gameService.getAllGames();
-            response.status(HttpStatus.OK).json(allGames);
-        } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
-        }
+        const allGames = await this.gameService.getAllGames();
+        response.status(HttpStatus.OK).json(allGames);
     }
 
     @ApiOkResponse({
@@ -52,18 +48,24 @@ export class GameController {
     })
     @Get('/:id')
     async getGame(@Param('id') id: string, @Res() response: Response) {
-        try {
-            const game = await this.gameService.getGame(id);
-            response.status(HttpStatus.OK).json(game);
-        } catch (error) {
-            if (error instanceof BadRequestException) {
-                response.status(HttpStatus.BAD_REQUEST).send(error.message);
-            } else if (error instanceof NotFoundException) {
-                response.status(HttpStatus.NOT_FOUND).send(error.message);
-            } else {
-                response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
-            }
-        }
+        const game = await this.gameService.getGame(id);
+        response.status(HttpStatus.OK).json(game);
+    }
+
+    @ApiOkResponse({
+        description: 'Creates or updates a game',
+        type: Game,
+    })
+    @ApiBadRequestResponse({
+        description: 'Returns BAD_REQUEST http status when game name already exists or _id is Invalid',
+    })
+    @ApiInternalServerErrorResponse({
+        description: 'Returns INTERNAL_SERVER_ERROR http status when request fails',
+    })
+    @Put('/')
+    async saveGame(@Body() gameDto: CreateGameDto, @Res() response: Response) {
+        const savedGame = await this.gameService.saveGame(gameDto);
+        response.status(HttpStatus.OK).json(savedGame);
     }
 
     @ApiCreatedResponse({
@@ -78,16 +80,9 @@ export class GameController {
     })
     @Post('/')
     async addGame(@Body() gameDto: CreateGameDto, @Res() response: Response) {
-        try {
-            const newGame = await this.gameService.addGame(gameDto);
-            response.status(HttpStatus.CREATED).json(newGame);
-        } catch (error) {
-            if (error instanceof BadRequestException) {
-                response.status(HttpStatus.BAD_REQUEST).send(error.message);
-            } else {
-                response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
-            }
-        }
+        delete gameDto._id;
+        const newGame = await this.gameService.addGame(gameDto);
+        response.status(HttpStatus.CREATED).json(newGame);
     }
 
     @ApiOkResponse({
@@ -105,18 +100,8 @@ export class GameController {
     })
     @Patch('/:id')
     async updateGame(@Param('id') id: string, @Body() updateGameDto: UpdateGameDto, @Res() response: Response) {
-        try {
-            const updatedGame = await this.gameService.updateGame(id, updateGameDto);
-            response.status(HttpStatus.OK).json(updatedGame);
-        } catch (error) {
-            if (error instanceof BadRequestException) {
-                response.status(HttpStatus.BAD_REQUEST).send(error.message);
-            } else if (error instanceof NotFoundException) {
-                response.status(HttpStatus.NOT_FOUND).send(error.message);
-            } else {
-                response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
-            }
-        }
+        const updatedGame = await this.gameService.updateGame(id, updateGameDto);
+        response.status(HttpStatus.OK).json(updatedGame);
     }
 
     @ApiOkResponse({
@@ -134,18 +119,8 @@ export class GameController {
     })
     @Patch('/:id/toggle')
     async toggleVisibility(@Param('id') id: string, @Res() response: Response) {
-        try {
-            const updatedGame = await this.gameService.toggleVisibility(id);
-            response.status(HttpStatus.OK).json(updatedGame);
-        } catch (error) {
-            if (error instanceof BadRequestException) {
-                response.status(HttpStatus.BAD_REQUEST).send(error.message);
-            } else if (error instanceof NotFoundException) {
-                response.status(HttpStatus.NOT_FOUND).send(error.message);
-            } else {
-                response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
-            }
-        }
+        const updatedGame = await this.gameService.toggleVisibility(id);
+        response.status(HttpStatus.OK).json(updatedGame);
     }
 
     @ApiNoContentResponse({
@@ -162,17 +137,7 @@ export class GameController {
     })
     @Delete('/:id')
     async deleteGame(@Param('id') id: string, @Res() response: Response) {
-        try {
-            await this.gameService.deleteGame(id);
-            response.status(HttpStatus.NO_CONTENT).send();
-        } catch (error) {
-            if (error instanceof BadRequestException) {
-                response.status(HttpStatus.BAD_REQUEST).send(error.message);
-            } else if (error instanceof NotFoundException) {
-                response.status(HttpStatus.NOT_FOUND).send(error.message);
-            } else {
-                response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
-            }
-        }
+        await this.gameService.deleteGame(id);
+        response.status(HttpStatus.NO_CONTENT).send();
     }
 }

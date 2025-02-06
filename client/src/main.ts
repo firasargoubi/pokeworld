@@ -10,6 +10,7 @@ import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
 import { AdminPageComponent } from '@app/pages/admin-page/admin-page.component';
 import { EditPageComponent } from '@app/pages/edit-page/edit-page.component';
+import { CreatePageComponent } from '@app/pages/create-page/create-page.component';
 
 if (environment.production) {
     enableProdMode();
@@ -20,6 +21,7 @@ const routes: Routes = [
     { path: 'lobby', component: LobbyPageComponent },
     { path: 'play', component: PlayPageComponent },
     { path: 'admin', component: AdminPageComponent },
+    { path: 'create', component: CreatePageComponent },
     { path: 'edit', component: EditPageComponent },
     { path: '**', redirectTo: '' },
 ];

@@ -1,20 +1,19 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
 
-import { Game } from '@app/model/schema/game.schema';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
-import { MapSize } from '@common/map-size.enum'; // DELETE LATER
+import { Game } from '@app/model/schema/game.schema';
 import { GameMode } from '@common/game-mode.enum'; // DELETE LATER
 import { ItemType } from '@common/item-type.enum'; // DELETE LATER
+import { MapSize } from '@common/map-size.enum'; // DELETE LATER
 
 @Injectable()
 export class GameService {
     constructor(@InjectModel(Game.name) private gameModel: Model<Game>) {
         // this.resetDB(); // UNCOMMENT WHEN YOU WANT TO RESET AND REPOPULATE THE DB
     }
-
     async getAllGames(): Promise<Game[]> {
         return this.gameModel.find().exec();
     }
@@ -30,8 +29,18 @@ export class GameService {
         return game;
     }
 
+    async saveGame(gameDto: CreateGameDto): Promise<Game> {
+        if (gameDto._id) {
+            const existingGame = await this.gameModel.findById(gameDto._id).exec();
+            if (existingGame) {
+                return this.updateGame(gameDto._id, gameDto);
+            }
+        }
+        delete gameDto._id;
+        return this.addGame(gameDto);
+    }
+
     async addGame(createGameDto: CreateGameDto): Promise<Game> {
-        // CHECK VALIDATION HERE
         if (!(await this.isNameUnique(createGameDto.name))) {
             throw new BadRequestException(`Game with name ${createGameDto.name} already exists.`);
         }
@@ -46,7 +55,7 @@ export class GameService {
         if (!isValidObjectId(id)) {
             throw new BadRequestException(`Invalid ID format: ${id}`);
         }
-        if (updateGameDto.name && !(await this.isNameUnique(updateGameDto.name))) {
+        if (!(await this.isNameUnique(updateGameDto.name, id))) {
             throw new BadRequestException(`Game with name ${updateGameDto.name} already exists.`);
         }
         const updatedGame = await this.gameModel.findByIdAndUpdate(id, updateGameDto, { new: true }).exec();
@@ -78,10 +87,15 @@ export class GameService {
         }
     }
 
-    async isNameUnique(name: string): Promise<boolean> {
-        return (await this.gameModel.find({ name }).exec()).length === 0;
+    async isNameUnique(name: string, exceptId?: string): Promise<boolean> {
+        if (exceptId) {
+            return (await this.gameModel.find({ name, _id: { $ne: exceptId } }).exec()).length === 0;
+        } else {
+            return (await this.gameModel.find({ name }).exec()).length === 0;
+        }
     }
 
+    // DELETE LATER
     async populateDB(): Promise<void> {
         const games: CreateGameDto[] = [
             {

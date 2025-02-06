@@ -1,0 +1,49 @@
+$font-family-title: 'pixel';
+$font-size-header: 6.5vh;
+$text-shadow-color: rgb(112, 112, 112);
+
+#main-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    justify-content: center;
+    user-select: none;
+    display: flex;
+}
+
+#header-image {
+    height: 100%;
+    width: auto;
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
+    user-select: none;
+    pointer-events: none;
+}
+
+#left-header-spacer {
+    height: 100%;
+    flex: 1;
+    background-color: rgb(224, 216, 157);
+}
+
+#right-header-spacer {
+    height: 100%;
+    flex: 1;
+    background-color: rgb(2, 118, 188);
+}
+
+#header-title {
+    font-family: $font-family-title;
+    font-size: $font-size-header;
+    text-shadow: 0.3vw 0 0 $text-shadow-color;
+    position: absolute;
+    left: 2vw;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}

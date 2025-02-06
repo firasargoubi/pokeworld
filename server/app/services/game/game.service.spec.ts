@@ -16,6 +16,30 @@ describe('GameService', () => {
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
 
+    const fakeGame: Game = {
+        name: 'Test Game',
+        description: 'Test Description',
+        lastEdited: new Date(),
+        isVisible: true,
+        thumbnail: '/assets/images/game/tiles/grass.png',
+        mapData: {
+            tiles: [[]],
+            items: {
+                [ItemType.Item1]: [],
+                [ItemType.Item2]: [],
+                [ItemType.Item3]: [],
+                [ItemType.Item4]: [],
+                [ItemType.Item5]: [],
+                [ItemType.Item6]: [],
+                [ItemType.Random]: [],
+                [ItemType.Spawn]: [],
+                [ItemType.Flag]: [],
+            },
+            size: MapSize.Small,
+            gameMode: GameMode.FFA,
+        },
+    };
+
     beforeAll(async () => {
         mongoServer = await MongoMemoryServer.create();
         const module: TestingModule = await Test.createTestingModule({
@@ -50,14 +74,12 @@ describe('GameService', () => {
     });
 
     it('getAllGames() should return all games in the database', async () => {
-        const game = getFakeGame();
-        await gameModel.create(game);
+        await gameModel.create(fakeGame);
         expect((await service.getAllGames()).length).toBeGreaterThan(0);
     });
 
     it('getGame() should return a game by ID', async () => {
-        const game = getFakeGame();
-        const createdGame = await gameModel.create(game);
+        const createdGame = await gameModel.create(fakeGame);
         const foundGame = await service.getGame(createdGame._id);
         expect(foundGame).toBeDefined();
         expect(foundGame._id.toString()).toEqual(createdGame._id.toString());
@@ -72,28 +94,43 @@ describe('GameService', () => {
         await expect(service.getGame(validObjectId)).rejects.toThrow(NotFoundException);
     });
 
+    it('should create a new game if _id is empty', async () => {
+        const newGame = { ...fakeGame, _id: '' };
+        const addSpy = jest.spyOn(service, 'addGame');
+        const updateSpy = jest.spyOn(service, 'updateGame');
+        const savedGame = await service.saveGame(newGame);
+        expect(savedGame).toBeDefined();
+        expect(addSpy).toHaveBeenCalled();
+        expect(updateSpy).not.toHaveBeenCalled();
+    });
+
+    it('should update an existing game if _id is not empty and exists', async () => {
+        const existingGame = await gameModel.create(fakeGame);
+        const updatedGame = { ...existingGame.toObject(), name: 'Updated Game' };
+        const updateSpy = jest.spyOn(service, 'updateGame');
+        const savedGame = await service.saveGame(updatedGame);
+        expect(savedGame).toBeDefined();
+        expect(updateSpy).toHaveBeenCalled();
+    });
+
     it('addGame() should create a new game', async () => {
-        const game = getFakeGame();
-        const createdGame = await service.addGame(game);
+        const createdGame = await service.addGame(fakeGame);
         expect(createdGame).toBeDefined();
-        expect(createdGame.name).toEqual(game.name);
+        expect(createdGame.name).toEqual(fakeGame.name);
     });
 
     it('addGame() should throw BadRequestException if name already exists', async () => {
-        const game = getFakeGame();
-        await gameModel.create(game);
-        await expect(service.addGame(game)).rejects.toThrow(BadRequestException);
+        await gameModel.create(fakeGame);
+        await expect(service.addGame(fakeGame)).rejects.toThrow(BadRequestException);
     });
 
     it('addGame() should throw BadRequestException if the database create() fails', async () => {
-        const game = getFakeGame();
         jest.spyOn(gameModel, 'create').mockRejectedValueOnce(new Error('Database error'));
-        await expect(service.addGame(game)).rejects.toThrow(BadRequestException);
+        await expect(service.addGame(fakeGame)).rejects.toThrow(BadRequestException);
     });
 
     it('updateGame() should update an existing game', async () => {
-        const game = getFakeGame();
-        const createdGame = await gameModel.create(game);
+        const createdGame = await gameModel.create(fakeGame);
         const updateData = { name: 'Updated Game' };
         const updatedGame = await service.updateGame(createdGame._id, updateData);
         expect(updatedGame).toBeDefined();
@@ -106,8 +143,8 @@ describe('GameService', () => {
     });
 
     it('updateGame() should throw BadRequestException if the new name already exists', async () => {
-        const game1 = getFakeGame();
-        const game2 = { ...getFakeGame(), name: 'Another Game' };
+        const game1 = fakeGame;
+        const game2 = { ...fakeGame, name: 'Another Game' };
         await gameModel.create(game1);
         const createdGame2 = await gameModel.create(game2);
 
@@ -115,14 +152,13 @@ describe('GameService', () => {
     });
 
     it('updateGame() should throw NotFoundException if findByIdAndUpdate returns null', async () => {
-        const nonExistentId = (await gameModel.create(getFakeGame()))._id.toString();
+        const nonExistentId = (await gameModel.create(fakeGame))._id.toString();
         await gameModel.deleteMany({});
         await expect(service.updateGame(nonExistentId, { name: 'New Name' })).rejects.toThrow(NotFoundException);
     });
 
     it('toggleVisibility() should toggle the visibility of a game', async () => {
-        const game = getFakeGame();
-        const createdGame = await gameModel.create(game);
+        const createdGame = await gameModel.create(fakeGame);
         await service.toggleVisibility(createdGame._id);
         const updatedGame = await gameModel.findById(createdGame._id);
         expect(updatedGame.isVisible).toBe(!createdGame.isVisible);
@@ -135,13 +171,11 @@ describe('GameService', () => {
 
     it('toggleVisibility() should fail if mongo query failed', async () => {
         jest.spyOn(gameModel, 'findById').mockResolvedValueOnce(null);
-        const game = getFakeGame();
-        await expect(service.toggleVisibility(game._id)).rejects.toBeTruthy();
+        await expect(service.toggleVisibility(fakeGame._id)).rejects.toBeTruthy();
     });
 
     it('deleteGame() should delete the game', async () => {
-        const game = getFakeGame();
-        const createdGame = await gameModel.create(game);
+        const createdGame = await gameModel.create(fakeGame);
         await service.deleteGame(createdGame._id);
         expect(await gameModel.countDocuments()).toEqual(0);
     });
@@ -153,31 +187,6 @@ describe('GameService', () => {
 
     it('deleteGame() should fail if mongo query failed', async () => {
         jest.spyOn(gameModel, 'findByIdAndDelete').mockResolvedValueOnce(null);
-        const game = getFakeGame();
-        await expect(service.deleteGame(game._id)).rejects.toBeTruthy();
+        await expect(service.deleteGame(fakeGame._id)).rejects.toBeTruthy();
     });
-});
-
-const getFakeGame = (): Game => ({
-    name: 'Test Game',
-    description: 'Test Description',
-    lastEdited: new Date(),
-    isVisible: true,
-    thumbnail: '/assets/images/game/tiles/grass.png',
-    mapData: {
-        tiles: [[]],
-        items: {
-            [ItemType.Item1]: [],
-            [ItemType.Item2]: [],
-            [ItemType.Item3]: [],
-            [ItemType.Item4]: [],
-            [ItemType.Item5]: [],
-            [ItemType.Item6]: [],
-            [ItemType.Random]: [],
-            [ItemType.Spawn]: [],
-            [ItemType.Flag]: [],
-        },
-        size: MapSize.Small,
-        gameMode: GameMode.FFA,
-    },
 });
