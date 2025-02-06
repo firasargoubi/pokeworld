@@ -95,6 +95,7 @@ export class GameService {
         }
     }
 
+    // DELETE LATER
     async populateDB(): Promise<void> {
         const games: CreateGameDto[] = [
             {

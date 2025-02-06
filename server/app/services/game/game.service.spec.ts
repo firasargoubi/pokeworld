@@ -16,6 +16,8 @@ describe('GameService', () => {
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
 
+    // EDIT OBJECT MOCKGAME
+
     beforeAll(async () => {
         mongoServer = await MongoMemoryServer.create();
         const module: TestingModule = await Test.createTestingModule({
@@ -48,7 +50,7 @@ describe('GameService', () => {
         expect(service).toBeDefined();
         expect(gameModel).toBeDefined();
     });
-
+    // CHECK mongodb-service test format
     it('getAllGames() should return all games in the database', async () => {
         const game = getFakeGame();
         await gameModel.create(game);
