@@ -1,20 +1,19 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
 
-import { Game } from '@app/model/schema/game.schema';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
-import { MapSize } from '@common/map-size.enum'; // DELETE LATER
+import { Game } from '@app/model/schema/game.schema';
 import { GameMode } from '@common/game-mode.enum'; // DELETE LATER
 import { ItemType } from '@common/item-type.enum'; // DELETE LATER
+import { MapSize } from '@common/map-size.enum'; // DELETE LATER
 
 @Injectable()
 export class GameService {
     constructor(@InjectModel(Game.name) private gameModel: Model<Game>) {
         // this.resetDB(); // UNCOMMENT WHEN YOU WANT TO RESET AND REPOPULATE THE DB
     }
-
     async getAllGames(): Promise<Game[]> {
         return this.gameModel.find().exec();
     }
@@ -28,6 +27,17 @@ export class GameService {
             throw new NotFoundException(`Game with ID ${id} not found.`);
         }
         return game;
+    }
+
+    async saveGame(gameDto: CreateGameDto): Promise<Game> {
+        if (gameDto._id) {
+            const existingGame = await this.gameModel.findById(gameDto._id).exec();
+            if (existingGame) {
+                return this.updateGame(gameDto._id, gameDto);
+            }
+        }
+        delete gameDto._id;
+        return this.addGame(gameDto);
     }
 
     async addGame(createGameDto: CreateGameDto): Promise<Game> {

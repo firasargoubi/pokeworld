@@ -1,76 +1,151 @@
-$corner-square-size: 0.3vw;
+$corner-square-size: 0.5vw;
 $big-stripe-size: 64%;
-$medium-stripe-size: 20%;
-$small-stripe-size: 8%;
-$mode-corner-square-size: 0.25vw;
-$mode-background-width: 6vw;
-$mode-background-height: 2vw;
-$stripes-color1: #95cde5;
-$stripes-color2: #bce5f5;
-$stripes1-color1: #98d589;
-$stripes1-color2: #c7f5a9;
-$stripes2-color1: #eeba96;
-$stripes2-color2: #f2d1d8;
+
+$blue-main-color: rgb(123, 206, 230);
+$blue-sub-color: rgb(170, 231, 247);
+$blue-inner-border-color: rgb(170, 231, 247) rgb(75, 166, 198) rgb(75, 166, 198) rgb(170, 231, 247);
+
+$green-main-color: rgb(125, 214, 136);
+$green-sub-color: rgb(179, 246, 168);
+$green-border-color: rgb(249, 248, 128);
+$green-inner-border-color: rgb(179, 246, 168) rgb(122, 151, 101) rgb(122, 151, 101) rgb(179, 246, 168);
+
+$pink-main-color: rgb(247, 186, 147);
+$pink-sub-color: rgb(247, 209, 216);
+$pink-border-color: rgb(249, 248, 128);
+$pink-inner-border-color: rgb(247, 209, 216) rgb(231, 163, 131) rgb(231, 163, 131) rgb(247, 209, 216);
+
+$card-width: 100%;
+$card-border-color: rgb(246, 119, 56);
+$card-body-border-width: 0.7vw;
+$description-width: 15vw;
+
+$text-shadow-color: rgb(112, 112, 112);
+
+$clip-path: polygon(
+    $corner-square-size 0%,
+    calc(100% - #{$corner-square-size}) 0%,
+
+    calc(100% - #{$corner-square-size}) $corner-square-size,
+    100% $corner-square-size,
+
+    100% calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) 100%,
+    $corner-square-size 100%,
+
+    $corner-square-size calc(100% - #{$corner-square-size}),
+    0% calc(100% - #{$corner-square-size}),
+    0% $corner-square-size,
+    $corner-square-size $corner-square-size
+);
 
 * {
     font-family: 'pokemon-small';
+    user-select: none;
+}
+
+.card-global-container {
+    position: relative;
+    overflow: visible;
 }
 
 .game-card {
-    background-color: #e47742;
-    height: 8vw;
-    width: 40vw;
-    border: $corner-square-size solid #e47742;
-    padding: $corner-square-size;
-    margin: $corner-square-size;
-
-    display: flex;
-    gap: $corner-square-size * 2;
-
-    clip-path: polygon(
-        $corner-square-size 0%,
-        calc(100% - #{$corner-square-size}) 0%,
-
-        calc(100% - #{$corner-square-size}) $corner-square-size,
-        100% $corner-square-size,
-
-        100% calc(100% - #{$corner-square-size}),
-        calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
-        calc(100% - #{$corner-square-size}) 100%,
-        $corner-square-size 100%,
-
-        $corner-square-size calc(100% - #{$corner-square-size}),
-        0% calc(100% - #{$corner-square-size}),
-        0% $corner-square-size,
-        $corner-square-size $corner-square-size
-    );
-
-    img {
-        width: 100%;
-        display: block;
-    }
+    position: relative;
+    width: 100%;
+    aspect-ratio: 26 / 30;
+    border: calc($corner-square-size * 2) solid $card-border-color;
+    clip-path: $clip-path;
+    justify-self: center;
+    overflow: visible;
 }
 
-.background-class-1 {
-    background-image: url('/assets/images/menu/containers/blue/blue-scrare-body.png');
+.card-body {
+    width: 100%;
+    height: 100%;
+    border: $card-body-border-width solid;
+    display: grid;
+    grid-template-rows: 65% 35%;
+    border-color: $blue-inner-border-color;
 }
 
-.background-class-2 {
-    background-image: url('/assets/images/menu/containers/green/green-scrare-body.png');
+.green-card .card-body {
+    border-color: $green-inner-border-color;
 }
 
-.background-class-3 {
-    background-image: url('/assets/images/menu/containers/orange/orange-scrare-body.png');
+.pink-card .card-body {
+    border-color: $pink-inner-border-color;
 }
 
-#game-details {
+.game-thumbnail {
+    position: relative;
+    height: 100%;
+    width: auto;
+}
+
+.game-thumbnail img {
+    width: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+.game-thumbnail:hover {
+    filter: brightness(1.1);
+}
+
+.game-name {
+    position: absolute;
+    font-size: 3vw;
+    text-shadow: 0.25vw 0 0 $text-shadow-color;
+    letter-spacing: 0.2vw;
+    left: 6px;
+    top: 4px;
+}
+
+.size-info {
+    position: absolute;
+    bottom: 2px;
+    right: 7px;
+    font-size: 3vw;
+    text-shadow: 0.3vw 0 0 $text-shadow-color;
+    letter-spacing: 0.1vw;
+    overflow: visible;
+}
+
+.game-details {
+    position: relative;
     flex-grow: 3;
     flex-basis: 0;
     background-size: contain;
     box-sizing: border-box;
+    background-color: $blue-sub-color;
 }
 
-#game-info {
+.green-card .game-details {
+    background-color: $green-sub-color;
+}
+
+.pink-card .game-details {
+    background-color: $pink-sub-color;
+}
+
+.card-separator {
+    position: absolute;
+    width: 100%;
+    height: $card-body-border-width;
+    background-color: $blue-main-color;
+    top: $card-body-border-width;
+}
+
+.green-card .card-separator {
+    background-color: $green-main-color;
+}
+
+.pink-card .card-separator {
+    background-color: $pink-main-color;
+}
+
+.game-info {
     height: $big-stripe-size;
     display: flex;
     flex-direction: column;
@@ -78,75 +153,60 @@ $stripes2-color2: #f2d1d8;
     padding-left: 1.5vw;
 }
 
-#game-name {
-    font-size: 2vw;
-    text-shadow: 0.25vw 0 0 rgb(112, 112, 112);
-}
-
-#game-mode {
-    position: relative;
-    height: $mode-background-height;
-    width: $mode-background-width;
-}
-
-#mode-name {
+.game-mode {
     position: absolute;
-    font-size: $mode-background-height;
-    left: 2%;
-    top: 0;
+    height: 2vw;
+    width: 5.3vw;
+    overflow: visible;
+    left: 10px;
+    top: 1.7vw;
+}
+
+.mode-name {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-46%, -52%);
+    font-size: 2.3vw;
     text-align: center;
-    width: $mode-background-width;
-    z-index: 1;
+    z-index: 2;
     -webkit-text-stroke: 0.4vw #636776;
     paint-order: stroke fill;
+    overflow: visible;
+    color: rgb(255, 255, 255);
 }
 
-#mode-name.FFA {
-    color: rgb(252, 252, 67);
-}
-
-#mode-name.CTF {
-    color: rgb(255, 87, 87);
-}
-
-#mode-background {
+.mode-main-background {
     position: absolute;
-    top: 33%;
-    height: 50%;
-    width: $mode-background-width;
-
+    top: 50%;
+    transform: translateY(-50%);
+    height: 40%;
+    width: 100%;
     background-color: #636776;
-
-    clip-path: polygon(
-        $mode-corner-square-size 0%,
-        calc($mode-background-width - #{$mode-corner-square-size}) 0%,
-
-        calc($mode-background-width - #{$mode-corner-square-size}) $mode-corner-square-size,
-        $mode-background-width $mode-corner-square-size,
-
-        $mode-background-width calc(100% - #{$mode-corner-square-size}),
-        calc($mode-background-width - #{$mode-corner-square-size}) calc(100% - #{$mode-corner-square-size}),
-        calc($mode-background-width - #{$mode-corner-square-size}) 100%,
-        $mode-corner-square-size 100%,
-
-        $mode-corner-square-size calc(100% - #{$mode-corner-square-size}),
-        0% calc(100% - #{$mode-corner-square-size}),
-        0% $mode-corner-square-size,
-        $mode-corner-square-size $mode-corner-square-size
-    );
+    z-index: 0;
 }
 
-#flag {
+.mode-sub-background {
     position: absolute;
-    width: 1.3vw;
-    top: 0.2vw;
-    left: 4.2vw;
-    rotate: 20deg;
-    object-fit: contain;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 73%;
+    width: 85%;
+    background-color: #636776;
+    z-index: 0;
 }
 
-#game-interaction {
-    margin-top: 0.3vw;
+.last-edited {
+    position: absolute;
+    right: 10px;
+    top: 1.9vw;
+    font-size: 1.6vw;
+    letter-spacing: 0.2;
+    text-shadow: 0.15vw 0 0 $text-shadow-color;
+}
+
+.game-interaction {
     display: flex;
     flex-direction: row;
     gap: 5vw;
@@ -154,47 +214,169 @@ $stripes2-color2: #f2d1d8;
     align-items: center;
 }
 
-#game-thumbnail {
-    position: relative;
-    height: 8vw;
-    width: 8vw;
-}
-
-#size-info {
-    position: absolute;
-    top: 6.3vw;
-    left: 3.4vw;
-    font-size: 1.5vw;
-    width: 4.6vw;
-    text-shadow: 0.2vw 0 0 rgb(112, 112, 112);
-}
-
-#last-edited {
-    margin-top: 0.7vw;
-    font-size: 1.6vw;
-    text-align: end;
-    align-items: end;
-    width: 14vw;
-    text-shadow: 0.15vw 0 0 rgb(112, 112, 112);
-}
-
-#edition-icons {
-    height: 1.5vw;
+.edition-buttons {
+    height: 2.4vw;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     gap: 1vw;
-    img {
-        width: 1.5vw;
-        object-fit: contain;
-        &:hover {
-            filter: brightness(0.95);
-        }
+}
+
+.card-button {
+    width: 4.7vw;
+    height: 2.5vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.card-button .button-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    user-select: none;
+}
+
+.card-button:active .button-container,
+.card-singel-button:active .button-container {
+    rotate: 180deg;
+}
+
+.card-button:hover .button-container,
+.card-singel-button:hover .button-container {
+    filter: brightness(1.15);
+}
+
+.card-button .button-icon {
+    height: 65%;
+    width: auto;
+    z-index: 1;
+    opacity: 0.8;
+    filter: invert(1);
+    pointer-events: none;
+    user-select: none;
+}
+
+.card-singel-button {
+    position: absolute;
+    bottom: 10%;
+    display: flex;
+    justify-content: center;
+    height: 40%;
+    width: 50%;
+    cursor: pointer;
+}
+
+.card-singel-button .button-container {
+    height: 100%;
+    width: 100%;
+    background-image: url('/assets/images/menu/buttons/admin-button/blueBackgroundHighlight.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.green-card .card-singel-button .button-container {
+    background-image: url('/assets/images/menu/buttons/admin-button/greenBackgroundHighlight.png');
+}
+
+.pink-card .card-singel-button .button-container {
+    background-image: url('/assets/images/menu/buttons/admin-button/redBackgroundHighlight.png');
+}
+
+.card-singel-button p {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.4vw;
+    z-index: 1;
+}
+
+.card-description {
+    font-size: 1.4vw;
+    width: 0;
+    height: calc(100% - $corner-square-size * 2);
+    position: absolute;
+    z-index: 1;
+    right: -$description-width;
+    top: $corner-square-size;
+    opacity: 1;
+    overflow: hidden;
+}
+
+.card-description-body {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: left 0.1s ease-in-out;
+}
+
+.card-description-body img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.card-description p {
+    position: absolute;
+    width: 73%;
+    height: 80%;
+    top: 12%;
+    left: 20%;
+    color: black;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    overflow: hidden;
+    user-select: text;
+}
+
+.card-description * {
+    left: -$description-width;
+}
+
+.hovered {
+    width: $description-width;
+}
+
+.card-description:not(.hovered) {
+    transition: width 0.1s ease-in-out 0.1s;
+}
+
+.pink-card .card-description {
+    left: -$description-width;
+
+    .card-description-body {
+        left: $description-width;
     }
 }
 
-.game-card:hover {
-    filter: brightness(1.1);
+.pink-card .card-description img {
+    transform: scaleX(-1);
+}
+
+.pink-card .card-description p {
+    left: 10%;
+}
+
+.pink-card .hovered .card-description-body {
+    left: 0 !important;
+}
+
+.card-global-container .hovered .card-description-body {
+    left: 0;
 }
 
 button{
