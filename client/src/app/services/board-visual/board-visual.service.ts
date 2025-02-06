@@ -6,6 +6,8 @@ import { ItemType } from '@common/item-type.enum';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 
+// TODO refactor board visual service
+
 @Injectable({
     providedIn: 'root',
 })
@@ -66,7 +68,18 @@ export class BoardVisualService {
             return;
         }
 
-        this.visualMapData.tiles[pos.x][pos.y] = this.getTileVisualData(tiles, pos);
+        const newTileVisualData = this.getTileVisualData(tiles, pos);
+        const oldTileVisualData = this.visualMapData.tiles[pos.x][pos.y];
+
+        const isTileEqual = oldTileVisualData.tile === newTileVisualData.tile;
+        const isUnderlayEqual = oldTileVisualData.underlay === newTileVisualData.underlay;
+        const isItemEqual = oldTileVisualData.item === newTileVisualData.item;
+
+        if (isTileEqual && isUnderlayEqual && isItemEqual) {
+            return;
+        }
+
+        this.visualMapData.tiles[pos.x][pos.y] = newTileVisualData;
     }
 
     private isOutOfBound(tiles: TileType[][], pos: Position): boolean {
@@ -186,7 +199,7 @@ export class BoardVisualService {
             { x: 1, y: 0 },
         ];
 
-        const similarTiles = [TileType.Water, TileType.None, TileType.Bridge, TileType.BrokenBridge];
+        const similarTiles = [TileType.Water];
         const surroundingTiles = this.compareTiles(tiles, pos, deltaPositions, similarTiles);
 
         if (surroundingTiles.toString() === [false, true, true, false].toString()) {
