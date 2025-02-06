@@ -1,16 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ToolBoxComponent } from './tool-box.component';
+import { HeaderComponent } from './header.component';
 
-describe('ToolBoxComponent', () => {
-    let component: ToolBoxComponent;
-    let fixture: ComponentFixture<ToolBoxComponent>;
+describe('HeaderComponent', () => {
+    let component: HeaderComponent;
+    let fixture: ComponentFixture<HeaderComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [ToolBoxComponent],
+            imports: [HeaderComponent],
         }).compileComponents();
+    });
 
-        fixture = TestBed.createComponent(ToolBoxComponent);
+    beforeEach(() => {
+        fixture = TestBed.createComponent(HeaderComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
