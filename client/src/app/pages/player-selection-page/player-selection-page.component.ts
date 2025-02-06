@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, signal, WritableSignal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AVATAR_DATA } from '@app/interfaces/avatars';
 import { Avatars } from '@app/interfaces/avatars.enum';
-import { Player, DEFAULT_PLAYER, BONUS_POINTS, DEFAULT_STAT_POINTS, PointStat, Dice, PlayerFormError } from '@app/interfaces/player';
-import { GameDataService } from '@app/services/game-data/game-data.service';
+import { BONUS_POINTS, DEFAULT_STAT_POINTS, PointStat, Dice } from '@app/interfaces/player';
+import { dicePair, DiceOption } from '@app/interfaces/dice';
 import { NgStyle } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -14,12 +14,6 @@ import { Router } from '@angular/router';
     styleUrl: './player-selection-page.component.scss',
 })
 export class PlayerSelectionPageComponent {
-    router: Router;
-    gameDataService: GameDataService;
-    player: Player;
-    nameForm: FormControl;
-    bonusForm: FormGroup;
-
     statFrench = {
         life: 'vie',
         speed: 'vitesse',
@@ -27,40 +21,43 @@ export class PlayerSelectionPageComponent {
         defense: 'defense',
     };
     statList = Object.keys(this.statFrench) as (keyof typeof this.statFrench)[];
+
     dice = Dice;
-    formError = PlayerFormError;
+    diceOptions = DiceOption;
 
     avatarData = AVATAR_DATA;
     avatarList = Object.keys(AVATAR_DATA).slice(1) as Avatars[];
+    selectedAvatar: Avatars = Avatars.Default;
 
-    selectedBonusPoint: PointStat | null = null;
-    isStartClicked: boolean = false;
+    nameForm: FormControl;
+    bonusForm: FormGroup;
 
-    constructor(gameDataService: GameDataService, router: Router) {
+    private isStartClicked: WritableSignal<boolean> = signal(false);
+    private router: Router;
+
+    constructor(router: Router) {
         this.router = router;
-        this.player = DEFAULT_PLAYER;
         this.initializeForms();
-    }
-
-    isBonusPoint(statCategory: PointStat) {
-        return this.bonusForm.get('points')?.value === statCategory;
     }
 
     getScore(statCategory: PointStat) {
         return this.isBonusPoint(statCategory) ? DEFAULT_STAT_POINTS + BONUS_POINTS : DEFAULT_STAT_POINTS;
     }
 
-    getBonusDice(statCategory: PointStat) {
-        if (statCategory === 'attack') {
-            return this.bonusForm.get('attackDice')?.value;
-        } else if (statCategory === 'defense') {
-            return this.bonusForm.get('defenseDice')?.value;
+    isBonusPoint(statCategory: PointStat) {
+        return this.bonusForm.get('points')?.value === statCategory;
+    }
+
+    getBonusDice(statCategory: PointStat): Dice | null {
+        if (statCategory === 'attack' || statCategory === 'defense') {
+            const diceOption = this.bonusForm.get('bonusDice')?.value;
+            return dicePair[diceOption][statCategory];
         }
         return null;
     }
 
     getAvatarBtnStyle(avatar: Avatars) {
-        if (avatar === this.player.avatar) {
+        if (avatar === this.selectedAvatar) {
             return {
                 background: 'blue',
                 text: 'CHOISI',
@@ -74,46 +71,33 @@ export class PlayerSelectionPageComponent {
     }
 
     handleAvatarSelection(event: MouseEvent) {
-        const btn = event.target as HTMLElement;
-        if (btn.tagName === 'BUTTON') {
-            const selectedAvatar: Avatars = btn.getAttribute('avatar') as Avatars;
-            this.player.avatar = selectedAvatar;
+        const target = event.target as HTMLElement;
+        const isSelectButton = target.tagName === 'BUTTON';
+        if (isSelectButton) {
+            const newAvatar: Avatars = target.getAttribute('avatar') as Avatars;
+            this.selectedAvatar = newAvatar;
         }
     }
 
-    isWarning(formError: PlayerFormError) {
-        let isValidField: boolean;
-        switch (formError) {
-            case PlayerFormError.Name: {
-                isValidField = this.nameForm.valid;
-                break;
-            }
-            case PlayerFormError.BonusDice: {
-                isValidField = this.isValidDiceChoice();
-                break;
-            }
-            case PlayerFormError.Avatar: {
-                isValidField = this.isValidAvatarChoice();
-                break;
-            }
-            default: {
-                isValidField = false;
-            }
+    isWarning(formField: string) {
+        if (formField === 'name') {
+            return !this.nameForm.valid && this.isStartClicked();
+        } else if (formField === 'avatar') {
+            return !this.isValidAvatarChoice() && this.isStartClicked();
         }
-        return !isValidField && this.isStartClicked;
+        return false;
     }
 
     goToLobby() {
-        this.isStartClicked = true;
+        this.isStartClicked.set(true);
         if (this.isFormValid()) {
-            // save data in player
             confirm('Es-tu sur de tes choix ?');
             this.router.navigate(['/']); // temp
         }
     }
 
     isFormValid() {
-        return this.nameForm.valid && this.isValidSelections();
+        return this.nameForm.valid && this.isValidAvatarChoice();
     }
 
     private initializeForms() {
@@ -123,20 +107,11 @@ export class PlayerSelectionPageComponent {
 
         this.bonusForm = new FormGroup({
             points: new FormControl('life', [Validators.required]),
-            attackDice: new FormControl(Dice.D4, [Validators.required]),
-            defenseDice: new FormControl(Dice.D6, [Validators.required]),
+            bonusDice: new FormControl(DiceOption.Option1.toString(), [Validators.required]),
         });
     }
 
-    private isValidSelections() {
-        return this.isValidAvatarChoice() && this.isValidDiceChoice();
-    }
-
     private isValidAvatarChoice() {
-        return this.player.avatar !== Avatars.Default;
-    }
-
-    private isValidDiceChoice() {
-        return this.bonusForm.get('attackDice')?.value !== this.bonusForm.get('defenseDice')?.value;
+        return this.selectedAvatar !== Avatars.Default;
     }
 }
