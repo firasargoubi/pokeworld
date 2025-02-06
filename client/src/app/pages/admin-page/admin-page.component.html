@@ -1,9 +1,10 @@
-<div id="admin-page-container">
+<!-- <div id="admin-page-container">
     <div id="admin-page-header">
         <app-main-header [routerLink]="'/'" [imgSrc]="'/assets/images/menu/headers/header-3.png'" [title]="'< PAGE ADMIN'"> </app-main-header>
     </div>
     <div id="admin-page-border">
         <div id="admin-page-body">
+            @if(!isCreationMode){
             <div id="game-grid">
                 @for(game of games; let i = $index; track game._id) {
                 <app-game-card
@@ -17,9 +18,15 @@
                 </app-game-card>
                 }
             </div>
+            } @else {
+            <app-create-game-popup></app-create-game-popup>
+            }
+            <p>{{ isCreationMode }}</p>
         </div>
     </div>
     <div id="poke-button">
-        <app-pokeball-button [buttonContent]="'NOUVEAU JEU'" [delay]="200"></app-pokeball-button>
+        <app-pokeball-button [buttonContent]="'NOUVEAU JEU'" [delay]="200" [onClickAction]="onCreateGame"></app-pokeball-button>
     </div>
-</div>
+</div> -->
+
+<app-create-game-popup></app-create-game-popup>

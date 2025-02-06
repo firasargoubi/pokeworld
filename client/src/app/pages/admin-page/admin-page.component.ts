@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
+import { CreateGamePopupComponent } from '@app/components/create-game-popup/create-game-popup.component';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { MainHeaderComponent } from '@app/components/main-header/main-header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
@@ -12,12 +13,13 @@ import { GameData } from '@common/game-data';
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
     styleUrls: ['./admin-page.component.scss'],
-    imports: [GameCardComponent, PokeballButtonComponent, RouterLink, MainHeaderComponent],
+    imports: [GameCardComponent, PokeballButtonComponent, RouterLink, MainHeaderComponent, CreateGamePopupComponent],
 })
 export class AdminPageComponent implements OnInit {
     games: GameData[] = [];
     showDescription: boolean = false;
     lastDescription: string = '';
+    isCreationMode: boolean = false;
 
     constructor(
         private router: Router,
@@ -68,6 +70,10 @@ export class AdminPageComponent implements OnInit {
         const classes = ['blue-card', 'green-card', 'pink-card'];
         const classIndex = index % classes.length;
         return classes[classIndex];
+    }
+
+    onCreateGame(): void {
+        this.isCreationMode = !this.isCreationMode;
     }
 
     private handleError(message: string, error: HttpErrorResponse) {
