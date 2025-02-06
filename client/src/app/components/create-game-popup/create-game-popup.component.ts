@@ -1,5 +1,6 @@
 import { NgClass } from '@angular/common';
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { GameMode } from '@common/game-mode.enum';
 import { MapSize } from '@common/map-size.enum';
@@ -17,6 +18,8 @@ export class CreateGamePopupComponent {
     possibleModes = Object.keys(GameMode);
     possibleSizes = Object.keys(MapSize).filter((key) => Number(key));
 
+    constructor(private router: Router) {}
+
     onSizeSelection(taille: string) {
         this.mapSize = taille;
     }
@@ -25,5 +28,7 @@ export class CreateGamePopupComponent {
         this.gameMode = mode;
     }
 
-    onValiderSelection() {}
+    onValiderSelection() {
+        this.router.navigate(['/edit']);
+    }
 }
