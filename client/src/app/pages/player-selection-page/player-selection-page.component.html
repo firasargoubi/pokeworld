@@ -5,18 +5,15 @@
     <main class="flex-container">
         <section id="avatar-info-container" class="flex-container">
             <div id="player-name-avatar">
-                <img src="{{avatarData[this.player.avatar].image}}" id="selected-avatar" />
-                @if(isAvatarWarning()){
-                    <div class="warning"> Veuillez choisir une AVATAR ! </div>
+                <img src="{{ avatarData[this.player.avatar].image }}" id="selected-avatar" />
+                @if(isWarning(formError.Avatar)){
+                <div class="warning">Veuillez choisir une AVATAR !</div>
                 }
                 <span id="name-form">
                     <label for="name"> Pseudo </label>
                     <input id="name-input" type="text" [formControl]="nameForm" />
-                    @if(isWarning(nameForm ,'required')){
-                        <div class="warning"> Vous devez entrer un pseudo !</div>
-                    }
-                    @if(isWarning(nameForm,'minlength') || isWarning(nameForm,'maxlength')){
-                        <div class="warning"> La longueur du pseudo est entre 3 et 20 characteres  !</div>
+                    @if(isWarning(formError.Name)){
+                    <div class="warning">Vous devez entrer un pseudo 3 et 20 characteres !</div>
                     }
                 </span>
             </div>
@@ -35,59 +32,60 @@
                     </div>
                 </div>
                 }
-                <div class="bonus">
-                    <form [formGroup]="bonusForm">
-                        <h2>CHOIX DES BONUS</h2>
-                        <div id="point-bonus">
-                            <h3>+2PTS BONUS</h3>
+                <form [formGroup]="bonusForm" id="bonus-form">
+                    <div class="flex-container">
+                        CHOIX DES BONUS
+                    </div>
+                    <div>
+                        <legend>+2PTS BONUS</legend>
+                        <label>
+                            <input type="radio" formControlName="points" value="life" />
+                            Vie
+                        </label>
+                        <label>
+                            <input type="radio" formControlName="points" value="speed" />
+                            Attaque
+                        </label>
+                    </div>
+                    <div id="dice-form">
+                        <div>
+                            <legend>DÉ ATTAQUE</legend>
                             <label>
-                                Vie
-                                <input type="radio" formControlName="points" value="life" />
+                                <input type="radio" formControlName="attackDice" value="{{ dice.D4 }}" />
+                                ⚃
                             </label>
                             <label>
-                                Attaque
-                                <input type="radio" formControlName="points" value="speed" />
+                                <input type="radio" formControlName="attackDice" value="{{ dice.D6 }}" />
+                                ⚅
                             </label>
-                            <div id="dice-bonus">
-                                <h3>DÉ BONUS POUR L'ATTAQUE</h3>
-                                <label>
-                                    ⚃
-                                    <input type="radio" formControlName="attackDice" value="{{ dice.D4 }}" />
-                                </label>
-                                <label>
-                                    ⚅
-                                    <input type="radio" formControlName="attackDice" value="{{ dice.D6 }}" />
-                                </label>
-                                <h3>DÉ BONUS POUR LA DEFENSE</h3>
-                                <label>
-                                    ⚃
-                                    <input type="radio" formControlName="defenseDice" value="{{ dice.D4 }}" />
-                                </label>
-                                <label>
-                                    ⚅
-                                    <input type="radio" formControlName="defenseDice" value="{{ dice.D6 }}" />
-                                </label>
-                            </div>
                         </div>
-                    </form>
-                    @if(isWarning(bonusForm,'required')){
-                        <div class="warning"> Veuillez remplir tous les champs ! </div>
-                    }
-                    @if(!isValidDiceChoice()){
-                        <div class="warning"> Veuillez choisir un DÉ different pour l'attaque et la defense ! </div>
-                    }
-                </div>
+                        <div>
+                            <legend>DÉ DEFENSE</legend>
+                            <label>
+                                <input type="radio" formControlName="defenseDice" value="{{ dice.D4 }}" />
+                                ⚃
+                            </label>
+                            <label>
+                                <input type="radio" formControlName="defenseDice" value="{{ dice.D6 }}" />
+                                ⚅
+                            </label>
+                        </div>
+                    </div>
+                </form>
+                @if(isWarning(formError.BonusDice)){
+                <div class="warning">Veuillez choisir un DÉ different pour l'attaque et la defense !</div>
+                }
             </div>
         </section>
         <section id="avatar-selection-container">
             <h2 class="flex-container">SELECTIONNE TON AVATAR</h2>
             <div id="avatar-list">
                 @for(avatar of avatarList ; track avatarData[avatar].name ; ){
-                <div class="avatar-container" (click)="handleSelection($event)">
+                <div class="avatar-container" (click)="handleAvatarSelection($event)">
                     <div class="avatar-name">{{ avatarData[avatar].name }}</div>
                     <img src="{{ avatarData[avatar].image }}" class="avatar-select" />
-                    <button type="button" [ngStyle]="{ 'background-color': getSelectBtnStyle(avatar).background }" [attr.avatar]="avatar">
-                        {{ getSelectBtnStyle(avatar).text }}
+                    <button type="button" [ngStyle]="{ 'background-color': getAvatarBtnStyle(avatar).background }" [attr.avatar]="avatar">
+                        {{ getAvatarBtnStyle(avatar).text }}
                     </button>
                 </div>
                 }
@@ -96,7 +94,7 @@
     </main>
     <footer>
         <div class="flex-container">
-            <button type="button" id="start-btn" [ngStyle]="{ background: isFormValid() ? 'purple' : 'gray' }" (click)="goToLobby()">
+            <button type="button" id="start-btn" [ngStyle]="{ background: isFormValid() ? 'green' : 'red' }" (click)="goToLobby()">
                 START GAME
             </button>
         </div>

@@ -7,6 +7,12 @@ enum Dice {
     D4 = '⚃',
 }
 
+enum PlayerFormError {
+    Name,
+    BonusDice,
+    Avatar,
+}
+
 interface Player {
     name: string;
     avatar: Avatars;
@@ -33,4 +39,4 @@ const DEFAULT_PLAYER: Player = {
 
 type PointStat = 'life' | 'speed' | 'attack' | 'defense';
 
-export { BONUS_POINTS, Dice, Player, DEFAULT_PLAYER, DEFAULT_STAT_POINTS, PointStat };
+export { BONUS_POINTS, Dice, Player, DEFAULT_PLAYER, DEFAULT_STAT_POINTS, PointStat, PlayerFormError };

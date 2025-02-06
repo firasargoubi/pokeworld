@@ -9,6 +9,7 @@
     height: 100%;
 }
 
+
 #page-title {
     background-color: purple;
     font-size: 50px;
@@ -20,7 +21,6 @@ main {
         display: flex;
         flex-direction: column;
         justify-content: start;
-        row-gap: 40px;
         flex: 1;
         #player-name-avatar {
             display: flex;
@@ -71,25 +71,24 @@ main {
             .stat-label {
                 font-size: 38px;
             }
-            * {
+            #bonus-form {
+                *{
                 font-size: 30px;
-            }
-            .bonus {
+                }
                 grid-column: 3/-1;
                 grid-row: 1/-1;
                 height: 100%;
-                button {
-                    padding: 10px;
-                    border-radius: 80%;
-                    border: 2px solid transparent;
-                    height: 40px;
-                    width: fit-content;
-                    font-family:inherit;
-                    font-size: 30px;
+                color : black;
+                background-color: white;
+                label{
+                    display: block;
                 }
-
-                .currentBonus{
-                    background-color: purple;
+                legend{
+                    color : rgb(50, 84, 205);
+                }
+                #dice-form{
+                    display : flex;
+                    justify-content: space-between;
                 }
             }
         }
@@ -143,7 +142,6 @@ main {
 #start-btn {
     border: 2px solid;
     border-radius: 10px;
-    background-color: blueviolet
 }
 
 .warning {
