@@ -73,6 +73,10 @@ export class AdminPageComponent implements OnInit {
         });
     }
 
+    onCreateGame(): void {
+        this.isCreationMode = !this.isCreationMode;
+    }
+
     getCardColor(index: number): string {
         const classes = ['blue-card', 'green-card', 'pink-card'];
         const classIndex = index % classes.length;
