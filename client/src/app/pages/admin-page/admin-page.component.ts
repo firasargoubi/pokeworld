@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -13,7 +14,7 @@ import { GameData } from '@common/game-data';
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
     styleUrls: ['./admin-page.component.scss'],
-    imports: [GameCardComponent, PokeballButtonComponent, RouterLink, MainHeaderComponent, CreateGamePopupComponent],
+    imports: [GameCardComponent, PokeballButtonComponent, RouterLink, MainHeaderComponent, CreateGamePopupComponent, CommonModule],
 })
 export class AdminPageComponent implements OnInit {
     games: GameData[] = [];

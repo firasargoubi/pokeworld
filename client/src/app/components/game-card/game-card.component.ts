@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameData } from '@common/game-data';
 
 @Component({
@@ -21,7 +22,10 @@ export class GameCardComponent {
 
     isHovered: boolean = false;
 
+    constructor(private gameDataService: GameDataService) {}
+
     onEdit() {
+        this.gameDataService.setGameData(this.game);
         this.edit.emit(this.game._id);
     }
 

@@ -1,19 +1,22 @@
 /* tslint:disable:no-unused-variable */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { Router } from '@angular/router';
+import { GameMode } from '@common/game-mode.enum';
 import { CreateGamePopupComponent } from './create-game-popup.component';
 
 describe('CreateGamePopupComponent', () => {
     let component: CreateGamePopupComponent;
     let fixture: ComponentFixture<CreateGamePopupComponent>;
+    let routerSpy: jasmine.SpyObj<Router>;
 
     beforeEach(async () => {
-        TestBed.configureTestingModule({
-            declarations: [CreateGamePopupComponent],
-        }).compileComponents();
-    });
+        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
-    beforeEach(() => {
+        await TestBed.configureTestingModule({
+            imports: [CreateGamePopupComponent],
+            providers: [{ provide: Router, useValue: routerSpy }],
+        }).compileComponents();
+
         fixture = TestBed.createComponent(CreateGamePopupComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
@@ -21,5 +24,25 @@ describe('CreateGamePopupComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should initialize gameMode to FFA and mapSize to 10', () => {
+        expect(component.gameMode).toBe('FFA');
+        expect(component.mapSize).toBe('10');
+    });
+
+    it('should update mapSize on onSizeSelection', () => {
+        component.onSizeSelection('20');
+        expect(component.mapSize).toBe('20');
+    });
+
+    it('should update gameMode on onModeSelection', () => {
+        component.onModeSelection(GameMode.CTF);
+        expect(component.gameMode).toBe(GameMode.CTF);
+    });
+
+    it('should navigate to /edit on onValiderSelection', () => {
+        component.onValiderSelection();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/edit']);
     });
 });

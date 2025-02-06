@@ -116,6 +116,7 @@ app-pokeball-button {
 #moltres {
     position: absolute;
     z-index: 1;
+    pointer-events: none;
     width: $base-size * 55; // 33vw
     left: $base-size * 60; // 36vw
     top: $base-size * 28; // 10vw
