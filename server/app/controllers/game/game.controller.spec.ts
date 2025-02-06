@@ -29,6 +29,7 @@ describe('GameController', () => {
         expect(controller).toBeDefined();
     });
 
+    // CHECK TEST FORMAT FOR CONTROLLER
     it('allGames() should return all games', async () => {
         const fakeGames = [new Game(), new Game()];
         gameService.getAllGames.resolves(fakeGames);
@@ -46,6 +47,7 @@ describe('GameController', () => {
         await controller.allGames(res);
     });
 
+    // CHECK DELETE SPECIFIC ERRORS TESTS
     // it('allGames() should return INTERNAL_SERVER_ERROR when service fails', async () => {
     //     gameService.getAllGames.rejects();
 
@@ -86,7 +88,7 @@ describe('GameController', () => {
     //     };
     //     res.send = () => res;
 
-    //     await controller.getGame('Baddd requesttttttttt', res);
+    //     await controller.getGame('Bad request', res);
     // });
 
     // it('getGame() should return NOT_FOUND when game not found', async () => {
@@ -114,6 +116,23 @@ describe('GameController', () => {
 
     //     await controller.getGame('valid_id', res);
     // });
+
+    it('saveGame() should create or update a game', async () => {
+        const fakeGame = new Game();
+        gameService.saveGame.resolves(fakeGame);
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.OK);
+            return res;
+        };
+        res.json = (game) => {
+            expect(game).toEqual(fakeGame);
+            return res;
+        };
+
+        await controller.saveGame({} as Game, res);
+    });
 
     it('addGame() should create a new game', async () => {
         const fakeGame = new Game();

@@ -21,11 +21,7 @@ export class GameService {
     }
 
     saveGame(gameData: GameData): Observable<GameData> {
-        if (gameData._id) {
-            return this.updateGame(gameData._id, gameData);
-        } else {
-            return this.addGame(gameData);
-        }
+        return this.http.put<GameData>(`${this.baseUrl}/games`, gameData);
     }
 
     addGame(gameData: GameData): Observable<GameData> {

@@ -16,6 +16,8 @@ describe('GameService', () => {
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
 
+    // EDIT OBJECT MOCKGAME
+
     beforeAll(async () => {
         mongoServer = await MongoMemoryServer.create();
         const module: TestingModule = await Test.createTestingModule({
@@ -48,7 +50,7 @@ describe('GameService', () => {
         expect(service).toBeDefined();
         expect(gameModel).toBeDefined();
     });
-
+    // CHECK mongodb-service test format
     it('getAllGames() should return all games in the database', async () => {
         const game = getFakeGame();
         await gameModel.create(game);
@@ -70,6 +72,25 @@ describe('GameService', () => {
     it('getGame() should throw NotFoundException if game not found', async () => {
         const validObjectId = new gameModel()._id;
         await expect(service.getGame(validObjectId)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should create a new game if _id is empty', async () => {
+        const newGame = { ...getFakeGame(), _id: '' };
+        const addSpy = jest.spyOn(service, 'addGame');
+        const updateSpy = jest.spyOn(service, 'updateGame');
+        const savedGame = await service.saveGame(newGame);
+        expect(savedGame).toBeDefined();
+        expect(addSpy).toHaveBeenCalled();
+        expect(updateSpy).not.toHaveBeenCalled();
+    });
+
+    it('should update an existing game if _id is not empty and exists', async () => {
+        const existingGame = await gameModel.create(getFakeGame());
+        const updatedGame = { ...existingGame.toObject(), name: 'Updated Game' };
+        const updateSpy = jest.spyOn(service, 'updateGame');
+        const savedGame = await service.saveGame(updatedGame);
+        expect(savedGame).toBeDefined();
+        expect(updateSpy).toHaveBeenCalled();
     });
 
     it('addGame() should create a new game', async () => {

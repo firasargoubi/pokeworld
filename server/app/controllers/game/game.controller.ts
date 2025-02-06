@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Delete, Patch, Post, Res, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Get, Param, Delete, Patch, Post, Put, Res, HttpStatus } from '@nestjs/common';
 import { GameService } from '@app/services/game/game.service';
 import { Response } from 'express';
 import {
@@ -50,6 +50,22 @@ export class GameController {
     async getGame(@Param('id') id: string, @Res() response: Response) {
         const game = await this.gameService.getGame(id);
         response.status(HttpStatus.OK).json(game);
+    }
+
+    @ApiOkResponse({
+        description: 'Creates or updates a game',
+        type: Game,
+    })
+    @ApiBadRequestResponse({
+        description: 'Returns BAD_REQUEST http status when game name already exists or _id is Invalid',
+    })
+    @ApiInternalServerErrorResponse({
+        description: 'Returns INTERNAL_SERVER_ERROR http status when request fails',
+    })
+    @Put('/')
+    async saveGame(@Body() gameDto: CreateGameDto, @Res() response: Response) {
+        const savedGame = await this.gameService.saveGame(gameDto);
+        response.status(HttpStatus.OK).json(savedGame);
     }
 
     @ApiCreatedResponse({
