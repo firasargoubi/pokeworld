@@ -22,7 +22,7 @@ export class GameCardComponent {
 
     isHovered: boolean = false;
 
-    constructor(private gameDataService: GameDataService) {}
+    constructor() {}
 
     onEdit() {
         this.gameDataService.setGameData(this.game);

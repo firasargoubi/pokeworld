@@ -2,47 +2,13 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { GameData } from '@common/game-data';
-import { GameMode } from '@common/game-mode.enum';
-import { ItemType } from '@common/item-type.enum';
-import { MapSize } from '@common/map-size.enum';
-import { Position } from '@common/position';
 import { GameService } from './game-save.service';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 
 describe('Service: Game', () => {
     let httpMock: HttpTestingController;
     let service: GameService;
     let baseUrl: string;
-
-    const mockGames: GameData[] = [
-        {
-            _id: '1',
-            name: 'Game 1',
-            description: 'Description of Game 1',
-            lastEdited: new Date('2023-01-01T00:00:00.000Z'),
-            isVisible: true,
-            mapData: {
-                tiles: [],
-                items: {} as Record<ItemType, Position[]>,
-                size: MapSize.Small,
-                gameMode: GameMode.CTF,
-            },
-            thumbnail: 'assets/tileset/grass.png',
-        },
-        {
-            _id: '',
-            name: 'Game 2',
-            description: 'Description of Game 2',
-            lastEdited: new Date('2023-01-02T00:00:00.000Z'),
-            isVisible: false,
-            mapData: {
-                tiles: [],
-                items: {} as Record<ItemType, Position[]>,
-                size: MapSize.Large,
-                gameMode: GameMode.FFA,
-            },
-            thumbnail: 'assets/tileset/water.png',
-        },
-    ];
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -62,11 +28,11 @@ describe('Service: Game', () => {
     });
 
     it('should return all games', () => {
-        const expectedGames: GameData[] = mockGames;
+        const expectedGames: GameData[] = MOCK_GAMES;
 
         service.getAllGames().subscribe({
             next: (response: GameData[]) => {
-                expect(response.length).toBe(mockGames.length);
+                expect(response.length).toBe(MOCK_GAMES.length);
                 expect(response).toEqual(expectedGames);
             },
             error: fail,
@@ -78,7 +44,7 @@ describe('Service: Game', () => {
     });
 
     it('should return a game by ID', () => {
-        const mockGame: GameData = mockGames[0];
+        const mockGame: GameData = MOCK_GAMES[0];
 
         service.getGame(mockGame._id).subscribe({
             next: (response: GameData) => {
@@ -93,7 +59,7 @@ describe('Service: Game', () => {
     });
 
     it('should update the game if _id exists', () => {
-        const updatedGame = { ...mockGames[0], name: 'Updated Name' };
+        const updatedGame = { ...MOCK_GAMES[0], name: 'Updated Name' };
 
         service.saveGame(updatedGame).subscribe((game) => {
             expect(game.name).toBe('Updated Name');
@@ -105,7 +71,7 @@ describe('Service: Game', () => {
     });
 
     it('should add a new game if _id does not exist', () => {
-        const newGame: GameData = { ...mockGames[0], _id: '' };
+        const newGame: GameData = { ...MOCK_GAMES[0], _id: '' };
 
         service.saveGame(newGame).subscribe((game) => {
             expect(game).toEqual(newGame);
@@ -117,7 +83,7 @@ describe('Service: Game', () => {
     });
 
     it('should create a new game', () => {
-        const newGame: GameData = mockGames[0];
+        const newGame: GameData = MOCK_GAMES[0];
 
         service.addGame(newGame).subscribe({
             next: (response: GameData) => {
@@ -133,7 +99,7 @@ describe('Service: Game', () => {
     });
 
     it('should update an existing game', () => {
-        const updatedGame: GameData = mockGames[0];
+        const updatedGame: GameData = MOCK_GAMES[0];
 
         service.updateGame(updatedGame._id, updatedGame).subscribe({
             next: (response: GameData) => {
@@ -149,11 +115,11 @@ describe('Service: Game', () => {
     });
 
     it('should toggle visibility of a game', () => {
-        const toggledGame = { ...mockGames[0], isVisible: !mockGames[0].isVisible };
+        const toggledGame = { ...MOCK_GAMES[0], isVisible: !MOCK_GAMES[0].isVisible };
 
         service.toggleVisibility(toggledGame._id).subscribe({
             next: (response: GameData) => {
-                expect(response.isVisible).toBe(!mockGames[0].isVisible);
+                expect(response.isVisible).toBe(!MOCK_GAMES[0].isVisible);
             },
             error: fail,
         });
@@ -164,7 +130,7 @@ describe('Service: Game', () => {
     });
 
     it('should delete a game', () => {
-        const gameId = mockGames[0]._id;
+        const gameId = MOCK_GAMES[0]._id;
 
         service.deleteGame(gameId).subscribe({
             next: (response) => expect(response).toBeNull(),
@@ -175,6 +141,4 @@ describe('Service: Game', () => {
         expect(req.request.method).toBe('DELETE');
         req.flush(null);
     });
-
-    // CHECK : test quality overall / error handling tests are needed or not / and is mocking correct (EDIT)
 });
