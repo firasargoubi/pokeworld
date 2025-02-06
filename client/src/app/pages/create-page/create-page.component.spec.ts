@@ -1,38 +1,39 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { Router, RouterModule } from '@angular/router';
 import { CreatePageComponent } from './create-page.component';
 import { GameService } from '@app/services/game-save/game-save.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameData } from '@common/game-data';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
     let fixture: ComponentFixture<CreatePageComponent>;
-    let gameServiceMock: jasmine.SpyObj<GameService>;
-    let snackBarMock: jasmine.SpyObj<MatSnackBar>;
+    let gameServiceSpy: jasmine.SpyObj<GameService>;
     let gameDataServiceMock: jasmine.SpyObj<GameDataService>;
-    let routerMock: jasmine.SpyObj<Router>;
+    let router: Router;
 
     beforeEach(async () => {
-        gameServiceMock = jasmine.createSpyObj('GameService', ['getAllGames', 'getGame']);
-        snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['getAllGames', 'getGame']);
+        gameServiceSpy.getAllGames.and.returnValue(of([]));
+        gameServiceSpy.getGame.and.returnValue(of({} as GameData));
         gameDataServiceMock = jasmine.createSpyObj('GameDataService', ['setGameData']);
-        routerMock = jasmine.createSpyObj('Router', ['navigate']);
 
         await TestBed.configureTestingModule({
-            declarations: [CreatePageComponent],
+            imports: [RouterModule.forRoot([]), CreatePageComponent],
             providers: [
-                { provide: GameService, useValue: gameServiceMock },
-                { provide: MatSnackBar, useValue: snackBarMock },
+                { provide: GameService, useValue: gameServiceSpy },
                 { provide: GameDataService, useValue: gameDataServiceMock },
-                { provide: Router, useValue: routerMock },
             ],
         }).compileComponents();
 
+        gameDataServiceMock = TestBed.inject(GameDataService) as jasmine.SpyObj<GameDataService>;
+        gameServiceSpy = TestBed.inject(GameService) as jasmine.SpyObj<GameService>;
+        router = TestBed.inject(Router);
         fixture = TestBed.createComponent(CreatePageComponent);
+
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -42,21 +43,19 @@ describe('CreatePageComponent', () => {
     });
 
     it('should load games on init', () => {
-        const games: GameData[] = [{ id: '1', isVisible: true } as GameData];
-        gameServiceMock.getAllGames.and.returnValue(of(games));
+        gameServiceSpy.getAllGames.and.returnValue(of(MOCK_GAMES));
 
         component.ngOnInit();
 
-        expect(component.games).toEqual(games);
+        expect(component.games).toEqual(MOCK_GAMES);
     });
 
-    it('should handle error when loading games', () => {
-        const errorResponse = new HttpErrorResponse({ error: 'test 404 error', status: 404 });
-        gameServiceMock.getAllGames.and.returnValue(throwError(() => errorResponse));
+    it('should call loadGames when handleNotFoundError is called', () => {
+        const loadGamesSpy = spyOn(component, 'loadGames');
+        const error = new HttpErrorResponse({ error: 'Game not found', status: 404 });
+        component['handleNotFoundError'](error);
 
-        component.loadGames();
-
-        expect(snackBarMock.open).toHaveBeenCalledWith('test 404 error', 'Close', { duration: 5000 });
+        expect(loadGamesSpy).toHaveBeenCalled();
     });
 
     it('should return correct card color', () => {
@@ -66,42 +65,44 @@ describe('CreatePageComponent', () => {
     });
 
     it('should handle game visibility on join', () => {
-        const game: GameData = { id: '1', isVisible: true } as GameData;
-        gameServiceMock.getGame.and.returnValue(of(game));
+        const navigateSpy = spyOn(router, 'navigate');
+        gameServiceSpy.getGame.and.returnValue(of(MOCK_GAMES[0]));
 
-        component.onJoin('1');
+        component.onJoin(MOCK_GAMES[0]._id);
 
-        expect(gameDataServiceMock.setGameData).toHaveBeenCalledWith(game);
-        expect(routerMock.navigate).toHaveBeenCalledWith(['/player-selection']);
+        expect(gameDataServiceMock.setGameData).toHaveBeenCalledWith(MOCK_GAMES[0]);
+        expect(navigateSpy).toHaveBeenCalledWith(['/player-selection']);
     });
 
     it('should handle not found error on join', () => {
         const errorResponse = new HttpErrorResponse({ error: 'test 404 error', status: HttpStatusCode.NotFound });
-        gameServiceMock.getGame.and.returnValue(throwError(() => errorResponse));
+        gameServiceSpy.getGame.and.returnValue(throwError(() => errorResponse));
 
         spyOn(window, 'alert');
-        component.onJoin('1');
+        component.onJoin(MOCK_GAMES[0]._id);
 
         expect(window.alert).toHaveBeenCalledWith("Ce jeu n'existe plus !");
-        expect(gameServiceMock.getAllGames).toHaveBeenCalled();
+        expect(gameServiceSpy.getAllGames).toHaveBeenCalled();
     });
 
     it('should handle game not visible on join', () => {
-        const game: GameData = { id: '1', isVisible: false } as GameData;
-        gameServiceMock.getGame.and.returnValue(of(game));
+        const invisibleGame = { ...MOCK_GAMES[0], isVisible: false };
+        gameServiceSpy.getGame.and.returnValue(of(invisibleGame));
 
         spyOn(window, 'alert');
-        component.onJoin('1');
+        component.onJoin(invisibleGame._id);
 
         expect(window.alert).toHaveBeenCalledWith("Ce jeu n'est plus visible !");
-        expect(gameServiceMock.getAllGames).toHaveBeenCalled();
+        expect(gameServiceSpy.getAllGames).toHaveBeenCalled();
     });
 
-    it('should handle error correctly', () => {
-        const errorResponse = new HttpErrorResponse({ error: 'test error', status: 500 });
+    it('should call snackBar open when handleError is called', () => {
+        const snackBarOpenSpy = spyOn(component['snackBar'], 'open');
 
-        component['handleError'](errorResponse);
+        const error = new HttpErrorResponse({ error: 'Test error', status: 500 });
 
-        expect(snackBarMock.open).toHaveBeenCalledWith('test error', 'Close', { duration: 5000 });
+        component['handleError'](error);
+
+        expect(snackBarOpenSpy).toHaveBeenCalledWith(error.message, 'Close', { duration: 5000 });
     });
 });

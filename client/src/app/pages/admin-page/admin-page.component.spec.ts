@@ -26,9 +26,7 @@ describe('AdminPageComponent', () => {
         }).compileComponents();
 
         gameServiceSpy = TestBed.inject(GameService) as jasmine.SpyObj<GameService>;
-    });
 
-    beforeEach(() => {
         fixture = TestBed.createComponent(AdminPageComponent);
         component = fixture.componentInstance;
         router = TestBed.inject(Router);

@@ -46,16 +46,14 @@ export class CreatePageComponent implements OnInit {
     }
 
     onJoin(gameId: string) {
-        const gameGetter = {
+        this.gameService.getGame(gameId).subscribe({
             next: (game: GameData) => {
                 this.handleGameVisibility(game);
             },
             error: (error: HttpErrorResponse) => {
                 this.handleNotFoundError(error);
             },
-        };
-
-        this.gameService.getGame(gameId).subscribe(gameGetter);
+        });
     }
 
     handleNotFoundError(error: HttpErrorResponse) {
