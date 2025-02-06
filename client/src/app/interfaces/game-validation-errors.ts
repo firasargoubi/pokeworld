@@ -20,8 +20,7 @@ export interface ValidationErrors {
     };
     spawnPoint: {
         isValid: boolean;
-        spawnPointMissing: number;
-        nonAccessibleSpawnPoint: Position[];
+        errorCode: ErrorCode | null;
     };
     tilesAccessibility: {
         isValid: boolean;
@@ -30,6 +29,10 @@ export interface ValidationErrors {
     mode: {
         isValid: boolean;
         errorCode: ErrorCode | null;
+    };
+    items: {
+        isValid: boolean;
+        misplacedItems: Position[];
     };
 }
 
