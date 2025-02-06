@@ -15,7 +15,7 @@ describe('AdminPageComponent', () => {
     let fixture: ComponentFixture<AdminPageComponent>;
     let router: Router;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
-
+    // EDIT dans plusieurs tests mock constante pour sercvice et components.
     const getMockGames = () => {
         return [
             {
@@ -55,6 +55,7 @@ describe('AdminPageComponent', () => {
         spy.getGame.and.returnValue(of({} as GameData));
         spy.toggleVisibility.and.returnValue(of({} as GameData));
         spy.deleteGame.and.returnValue(of(undefined));
+        // CHECK
 
         await TestBed.configureTestingModule({
             imports: [RouterModule.forRoot([]), AdminPageComponent],
@@ -142,7 +143,7 @@ describe('AdminPageComponent', () => {
         });
     });
 
-    it('should handle not found error when editGame, toggleVisibility or deleteGame fails', () => {
+    it('should handle not found error when editGame, toggleVisibility or deleteGame fails (NOT_FOUND)', () => {
         const notFoundError = new HttpErrorResponse({ error: 'Game not found', status: 404 });
 
         gameServiceSpy.getGame.and.returnValue(throwError(() => notFoundError));
@@ -171,7 +172,7 @@ describe('AdminPageComponent', () => {
         expect(loadGamesSpy).toHaveBeenCalled();
     });
 
-    it('should call handleError when loadGames, toggleVisibility or delete fails', () => {
+    it('should call handleError when loadGames, toggleVisibility or delete fails (INTERNAL_ERROR)', () => {
         const error = new HttpErrorResponse({ error: 'Action failed', status: 500 });
 
         gameServiceSpy.getAllGames.and.returnValue(throwError(() => error));

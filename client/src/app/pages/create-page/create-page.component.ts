@@ -7,12 +7,12 @@ import { GameService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
 
 @Component({
-    selector: 'app-creation-page',
-    templateUrl: './creation-page.component.html',
-    styleUrls: ['./creation-page.component.scss'],
+    selector: 'app-create-page',
+    templateUrl: './create-page.component.html',
+    styleUrls: ['./create-page.component.scss'],
     imports: [GameCardComponent, MainHeaderComponent],
 })
-export class CreationPageComponent implements OnInit {
+export class CreatePageComponent implements OnInit {
     games: GameData[] = [];
 
     constructor(
