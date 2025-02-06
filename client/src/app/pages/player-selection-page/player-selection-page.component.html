@@ -8,7 +8,7 @@
                 <img src="{{ avatarData[selectedAvatar].image }}" id="selected-avatar" />
                 <span id="name-form">
                     <label for="name"> Pseudo </label>
-                    <input id="name-input" type="text" [formControl]="nameForm" />
+                    <input id="name-input" type="text" [formControl]="nameForm" id="name" autofocus />
                 </span>
             </div>
             @if(isWarning('name')){
@@ -16,7 +16,7 @@
             } @if(isWarning('avatar')){
             <div class="warning">Veuillez choisir une AVATAR !</div>
             }
-            <label id="stats-title"> Statistiques </label>
+            <div id="stats-title">Statistiques</div>
             <div id="player-stats">
                 @for(category of statList ; track i; let i = $index){
                 <div class="stat-label">{{ statFrench[category] }}</div>
