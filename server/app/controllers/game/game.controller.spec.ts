@@ -29,6 +29,7 @@ describe('GameController', () => {
         expect(controller).toBeDefined();
     });
 
+    // CHECK TEST FORMAT FOR CONTROLLER
     it('allGames() should return all games', async () => {
         const fakeGames = [new Game(), new Game()];
         gameService.getAllGames.resolves(fakeGames);
@@ -46,6 +47,7 @@ describe('GameController', () => {
         await controller.allGames(res);
     });
 
+    // CHECK DELETE SPECIFIC ERRORS TESTS
     // it('allGames() should return INTERNAL_SERVER_ERROR when service fails', async () => {
     //     gameService.getAllGames.rejects();
 
@@ -86,7 +88,7 @@ describe('GameController', () => {
     //     };
     //     res.send = () => res;
 
-    //     await controller.getGame('Baddd requesttttttttt', res);
+    //     await controller.getGame('Bad request', res);
     // });
 
     // it('getGame() should return NOT_FOUND when game not found', async () => {

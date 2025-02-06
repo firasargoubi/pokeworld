@@ -1,11 +1,11 @@
+import { NgStyle } from '@angular/common';
 import { Component, signal, WritableSignal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/interfaces/avatars';
 import { Avatars } from '@app/interfaces/avatars.enum';
-import { BONUS_POINTS, DEFAULT_STAT_POINTS, PointStat, Dice } from '@app/interfaces/player';
-import { dicePair, DiceOption } from '@app/interfaces/dice';
-import { NgStyle } from '@angular/common';
-import { Router } from '@angular/router';
+import { DiceOption, dicePair } from '@app/interfaces/dice';
+import { BONUS_POINTS, DEFAULT_STAT_POINTS, Dice, PointStat } from '@app/interfaces/player';
 
 @Component({
     selector: 'app-player-selection-page',
@@ -70,13 +70,8 @@ export class PlayerSelectionPageComponent {
         }
     }
 
-    handleAvatarSelection(event: MouseEvent) {
-        const target = event.target as HTMLElement;
-        const isSelectButton = target.tagName === 'BUTTON';
-        if (isSelectButton) {
-            const newAvatar: Avatars = target.getAttribute('avatar') as Avatars;
-            this.selectedAvatar = newAvatar;
-        }
+    handleAvatarSelection(avatar: Avatars) {
+        this.selectedAvatar = avatar;
     }
 
     isWarning(formField: string) {
@@ -91,7 +86,6 @@ export class PlayerSelectionPageComponent {
     goToLobby() {
         this.isStartClicked.set(true);
         if (this.isFormValid()) {
-            confirm('Es-tu sur de tes choix ?');
             this.router.navigate(['/']); // temp
         }
     }

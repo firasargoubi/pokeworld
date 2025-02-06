@@ -1,68 +1,83 @@
-import { AsyncPipe } from '@angular/common';
-import { Router } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
-import { GameService } from '@app/services/game-save/game-save.service';
-import { GameCardComponent } from '@app/components/game-card/game-card.component';
-import { GameData } from '@common/game-data';
-import { Observable } from 'rxjs';
-import { GameDataService } from '@app/services/game-data/game-data.service';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { GameCardComponent } from '@app/components/game-card/game-card.component';
+import { MainHeaderComponent } from '@app/components/main-header/main-header.component';
+import { GameService } from '@app/services/game-save/game-save.service';
+import { GameData } from '@common/game-data';
+import { GameDataService } from '@app/services/game-data/game-data.service';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-create-page',
-    imports: [AsyncPipe, GameCardComponent],
     templateUrl: './create-page.component.html',
-    styleUrl: './create-page.component.scss',
+    styleUrls: ['./create-page.component.scss'],
+    imports: [GameCardComponent, MainHeaderComponent],
 })
 export class CreatePageComponent implements OnInit {
-    showDescription: boolean = false;
-    lastDescription: string = '';
-    gameList$: Observable<GameData[]>;
+    games: GameData[] = [];
 
     constructor(
         private gameService: GameService,
+        private snackBar: MatSnackBar,
         private gameDataService: GameDataService,
         private router: Router,
     ) {}
 
-    ngOnInit(): void {
-        this.fetchGames();
+    ngOnInit() {
+        this.loadGames();
     }
 
-    fetchGames() {
-        this.gameList$ = this.gameService.getAllGames();
+    loadGames() {
+        this.gameService.getAllGames().subscribe({
+            next: (games) => {
+                this.games = games.filter((game) => game.isVisible);
+            },
+            error: (error: HttpErrorResponse) => {
+                this.handleError(error);
+            },
+        });
+    }
+
+    getCardColor(index: number): string {
+        const classes = ['blue-card', 'green-card', 'pink-card'];
+        const classIndex = index % classes.length;
+        return classes[classIndex];
     }
 
     onJoin(gameId: string) {
         const gameGetter = {
             next: (game: GameData) => {
-                if (game.isVisible) {
-                    this.gameDataService.setGameData(game);
-                    this.router.navigate(['/player-selection']);
-                } else {
-                    this.fetchGames();
-                    alert("Ce jeu n'est plus visible !");
-                }
+                this.handleGameVisibility(game);
             },
             error: (error: HttpErrorResponse) => {
-                if (error.status === HttpStatusCode.NotFound) {
-                    alert("Ce jeu n'existe plus !");
-                    this.fetchGames();
-                }
+                this.handleNotFoundError(error);
             },
         };
 
         this.gameService.getGame(gameId).subscribe(gameGetter);
     }
 
-    thumbnailDescription(isMouseOver: boolean, description: string) {
-        this.showDescription = isMouseOver;
-        this.lastDescription = description;
+    handleNotFoundError(error: HttpErrorResponse) {
+        if (error.status === HttpStatusCode.NotFound) {
+            alert("Ce jeu n'existe plus !");
+            this.loadGames();
+        } else {
+            this.handleError(error);
+        }
     }
 
-    getBackgroundClass(index: number): string {
-        const classes = ['background-class-1', 'background-class-2', 'background-class-3'];
-        const classIndex = index % classes.length;
-        return classes[classIndex];
+    handleGameVisibility(game: GameData) {
+        if (game.isVisible) {
+            this.gameDataService.setGameData(game);
+            this.router.navigate(['/player-selection']);
+        } else {
+            this.loadGames();
+            alert("Ce jeu n'est plus visible !");
+        }
+    }
+
+    private handleError(error: HttpErrorResponse) {
+        this.snackBar.open(`${error.message}`, 'Close', { duration: 5000 }); // Doesnt work
     }
 }

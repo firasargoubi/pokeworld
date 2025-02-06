@@ -1,35 +1,13 @@
-<div class="browser-page-container">
-    <div id="browser-page-header">
-        <p id="header-title">CREER UNE PARTIE</p>
-        <img id="header-image" src="/assets/images/menu/headers/admin-header.png" alt="Page header" title="Header3" />
+<div id="create-page-container">
+    <div id="create-page-header">
+        <app-main-header [routerLink]="'/'" [imgSrc]="'/assets/images/menu/headers/header-2.png'" [title]="'< PAGE CREATION'"> </app-main-header>
     </div>
-    <div id="gray-border">
-        <div id="wheat-border">
-            <div id="browser-page-body">
-                <div id="body-header">LISTE DES JEUX</div>
-                <div id="body-body">
-                    <div class="game-list">
-                        @if(gameList$ | async ; as gameList){
-                             @for(game of gameList; track game._id; let index = $index){ 
-                            @if(game.isVisible){
-                        <app-game-card
-                            [game]="game"
-                            [cardIndex]="getBackgroundClass(index)"
-                            (thumbnailHover)="thumbnailDescription($event, game.description)"
-                            (join)="onJoin($event)"
-                        >
-                            ></app-game-card
-                        >
-                        } } }
-                    </div>
-                    <div id="game-description">
-                        @if(showDescription){
-                        <img src="/assets/images/menu/backgrounds/description-top.png" />
-                        <p>{{ lastDescription }}</p>
-                        <img src="/assets/images/menu/backgrounds/description-bot.png" />
-                        }
-                    </div>
-                </div>
+    <div id="admin-page-border">
+        <div id="admin-page-body">
+            <div id="game-grid">
+                @for(game of games; let i = $index; track game._id) {
+                <app-game-card [game]="game" [isAdminView]="false" [cardColor]="getCardColor(i)" (join)="onJoin(game._id)"> </app-game-card>
+                }
             </div>
         </div>
     </div>

@@ -22,7 +22,7 @@ const routes: Routes = [
     { path: 'lobby', component: LobbyPageComponent },
     { path: 'play', component: PlayPageComponent },
     { path: 'admin', component: AdminPageComponent },
-    { path: 'creation', component: CreationPageComponent },
+    { path: 'create', component: CreatePageComponent },
     { path: 'edit', component: EditPageComponent },
     { path: 'create', component: CreatePageComponent },
     { path: 'player-selection', component: PlayerSelectionPageComponent },
