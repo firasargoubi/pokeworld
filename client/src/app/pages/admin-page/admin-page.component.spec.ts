@@ -3,10 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, RouterModule } from '@angular/router';
 import { GameService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
-import { GameMode } from '@common/game-mode.enum';
-import { ItemType } from '@common/item-type.enum';
-import { MapSize } from '@common/map-size.enum';
-import { Position } from '@common/position';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { of, throwError } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
 
@@ -15,39 +12,6 @@ describe('AdminPageComponent', () => {
     let fixture: ComponentFixture<AdminPageComponent>;
     let router: Router;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
-    // EDIT dans plusieurs tests mock constante pour sercvice et components.
-    const getMockGames = () => {
-        return [
-            {
-                _id: '123',
-                name: 'Game 1',
-                isVisible: true,
-                description: 'Description 1',
-                lastEdited: new Date(),
-                mapData: {
-                    tiles: [],
-                    items: {} as Record<ItemType, Position[]>,
-                    size: MapSize.Medium,
-                    gameMode: GameMode.CTF,
-                },
-                thumbnail: 'path',
-            },
-            {
-                _id: '456',
-                name: 'Game 2',
-                isVisible: true,
-                description: 'Description 2',
-                lastEdited: new Date(),
-                mapData: {
-                    tiles: [],
-                    items: {} as Record<ItemType, Position[]>,
-                    size: MapSize.Large,
-                    gameMode: GameMode.CTF,
-                },
-                thumbnail: 'path',
-            },
-        ];
-    };
 
     beforeEach(async () => {
         const spy = jasmine.createSpyObj('GameService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
@@ -55,7 +19,6 @@ describe('AdminPageComponent', () => {
         spy.getGame.and.returnValue(of({} as GameData));
         spy.toggleVisibility.and.returnValue(of({} as GameData));
         spy.deleteGame.and.returnValue(of(undefined));
-        // CHECK
 
         await TestBed.configureTestingModule({
             imports: [RouterModule.forRoot([]), AdminPageComponent],
@@ -85,13 +48,12 @@ describe('AdminPageComponent', () => {
     });
 
     it('should load games when loadGames is called', () => {
-        const mockGames: GameData[] = getMockGames();
-        gameServiceSpy.getAllGames.and.returnValue(of(mockGames));
+        gameServiceSpy.getAllGames.and.returnValue(of(MOCK_GAMES));
 
         component.loadGames();
 
         expect(gameServiceSpy.getAllGames).toHaveBeenCalled();
-        expect(component.games).toEqual(mockGames);
+        expect(component.games).toEqual(MOCK_GAMES);
     });
 
     it('should navigate to edit page and store game id in sessionStorage when editGame is called', () => {
@@ -116,19 +78,17 @@ describe('AdminPageComponent', () => {
     });
 
     it('should delete game when deleteGame is called', () => {
-        const mockGames: GameData[] = getMockGames();
-
-        gameServiceSpy.getAllGames.and.returnValue(of(mockGames));
+        gameServiceSpy.getAllGames.and.returnValue(of(MOCK_GAMES));
         gameServiceSpy.deleteGame.and.returnValue(of(undefined));
 
         component.ngOnInit();
 
-        component.deleteGame(mockGames[0]._id);
+        component.deleteGame(MOCK_GAMES[0]._id);
 
-        expect(gameServiceSpy.deleteGame).toHaveBeenCalledWith(mockGames[0]._id);
+        expect(gameServiceSpy.deleteGame).toHaveBeenCalledWith(MOCK_GAMES[0]._id);
 
         expect(component.games.length).toBe(1);
-        expect(component.games[0]._id).toBe(mockGames[1]._id);
+        expect(component.games[0]._id).toBe(MOCK_GAMES[1]._id);
     });
 
     it('should return the correct background class based on index', () => {
