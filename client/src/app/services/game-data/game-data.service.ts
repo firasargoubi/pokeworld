@@ -12,9 +12,10 @@ import { Subject } from 'rxjs';
 })
 export class GameDataService {
     gameData: GameData;
-    mapUpdate: Subject<Position | null> = new Subject();
+    mapUpdate: Subject<Position | null>;
 
     constructor() {
+        this.mapUpdate = new Subject();
         // TODO TEMP
 
         this.gameData = {
@@ -25,8 +26,8 @@ export class GameDataService {
             isVisible: true,
             mapData: {
                 items: {
-                    [ItemType.Item1]: [],
-                    [ItemType.Item2]: [],
+                    [ItemType.Item1]: [{ x: 5, y: 5 }],
+                    [ItemType.Item2]: [{ x: 6, y: 6 }],
                     [ItemType.Item3]: [],
                     [ItemType.Item4]: [],
                     [ItemType.Item5]: [],
@@ -37,10 +38,10 @@ export class GameDataService {
                 },
                 tiles: [
                     [
-                        TileType.Grass,
                         TileType.Water,
-                        TileType.Grass,
-                        TileType.Grass,
+                        TileType.Water,
+                        TileType.Water,
+                        TileType.Water,
                         TileType.Bush,
                         TileType.Grass,
                         TileType.Grass,
@@ -195,6 +196,7 @@ export class GameDataService {
     }
 
     addItem(item: ItemType, pos: Position) {
+        this.removeItem(pos);
         this.gameData.mapData.items[item].push(pos);
         this.mapUpdate.next(pos);
     }
@@ -202,10 +204,56 @@ export class GameDataService {
     removeItem(pos: Position) {
         for (const item of Object.values(ItemType)) {
             this.gameData.mapData.items[item] = this.gameData.mapData.items[item].filter((itemPos) => {
-                return itemPos.x !== pos.x && itemPos.y !== pos.y;
+                return itemPos.x !== pos.x || itemPos.y !== pos.y;
             });
         }
 
         this.mapUpdate.next(pos);
+    }
+
+    getItemCount(item: ItemType): number {
+        return this.gameData.mapData.items[item].length;
+    }
+
+    getName(): string {
+        return this.gameData.name;
+    }
+
+    getDescription(): string {
+        return this.gameData.description;
+    }
+
+    getMapSize(): MapSize {
+        return this.gameData.mapData.size;
+    }
+
+    getMapSizeString(): string {
+        const mapSize = this.gameData.mapData.size;
+        return `${mapSize} x ${mapSize}`;
+    }
+
+    getGameMode(): GameMode {
+        return this.gameData.mapData.gameMode;
+    }
+
+    getGameModeString(): string {
+        return this.gameData.mapData.gameMode;
+    }
+
+    getItem(targetPos: Position): ItemType | null {
+        for (const item of Object.values(ItemType)) {
+            for (const pos of this.gameData.mapData.items[item]) {
+                if (targetPos.x === pos.x && targetPos.y === pos.y) {
+                    return item;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // TODO handle case where pos is out of bound
+    getTile(pos: Position) {
+        return this.gameData.mapData.tiles[pos.x][pos.y];
     }
 }
