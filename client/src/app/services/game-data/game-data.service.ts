@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { EMPTY_GAME_DATA } from '@app/consts/default-game';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
@@ -16,173 +17,21 @@ export class GameDataService {
 
     constructor() {
         this.mapUpdate = new Subject();
-        // TODO TEMP
+        this.gameData = structuredClone(EMPTY_GAME_DATA);
+    }
 
-        this.gameData = {
-            _id: 'GameId',
-            name: 'GameTitle',
-            description: 'GameDescription',
-            lastEdited: new Date(),
-            isVisible: true,
-            mapData: {
-                items: {
-                    [ItemType.Item1]: [{ x: 5, y: 5 }],
-                    [ItemType.Item2]: [{ x: 6, y: 6 }],
-                    [ItemType.Item3]: [],
-                    [ItemType.Item4]: [],
-                    [ItemType.Item5]: [],
-                    [ItemType.Item6]: [],
-                    [ItemType.Random]: [],
-                    [ItemType.Spawn]: [],
-                    [ItemType.Flag]: [],
-                },
-                tiles: [
-                    [
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Bush,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Path,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Grass,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.BrokenBridge,
-                        TileType.Water,
-                        TileType.Bridge,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Water,
-                    ],
-                    [
-                        TileType.Grass,
-                        TileType.Water,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Bush,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Path,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Grass,
-                        TileType.Bridge,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Bush,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Path,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Grass,
-                        TileType.Water,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Bush,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Path,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Grass,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Grass,
-                        TileType.Bush,
-                        TileType.Bush,
-                        TileType.Grass,
-                        TileType.Path,
-                        TileType.Path,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.BrokenBridge,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Bush,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Path,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Grass,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Grass,
-                        TileType.Bush,
-                        TileType.Bush,
-                        TileType.Grass,
-                        TileType.Path,
-                        TileType.Path,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Bush,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Path,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Bush,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Path,
-                        TileType.Bridge,
-                        TileType.BrokenBridge,
-                        TileType.Grass,
-                        TileType.Grass,
-                    ],
-                ],
-                size: MapSize.Small,
-                gameMode: GameMode.FFA,
-            },
-            thumbnail: 'thumbnail.png',
-        };
+    resetGameData() {
+        this.gameData = structuredClone(EMPTY_GAME_DATA);
+
+        const gridSize = this.gameData.mapData.size as number;
+        this.gameData.mapData.tiles = Array.from({ length: gridSize }, () => Array(gridSize).fill(TileType.Grass));
+
+        this.mapUpdate.next(null);
+    }
+
+    createGameData(size: MapSize, mode: GameMode) {
+        this.gameData.mapData.size = size;
+        this.gameData.mapData.gameMode = mode;
     }
 
     setGameData(gameData: GameData) {

@@ -4,16 +4,16 @@
             <div class="options">
                 Taille de la grille : @for (size of possibleSizes; track $index) {
                 <div class="option">
-                    <div class="check-box" (click)="onSizeSelection(size)" [ngClass]="size === mapSize ? 'selected' : ''"></div>
-                    <p>{{ size }}x{{ size }}</p>
+                    <div class="check-box" (click)="onSizeSelection(size.key)" [ngClass]="size.key === mapSize ? 'selected' : ''"></div>
+                    <p>{{ size.value }}x{{ size.value }}</p>
                 </div>
                 }
             </div>
             <div class="options">
                 Mode de jeu : @for (mode of possibleModes; track $index) {
                 <div class="option">
-                    <div class="check-box" (click)="onModeSelection(mode)" [ngClass]="mode === gameMode ? 'selected' : ''"></div>
-                    <p>{{ mode }}</p>
+                    <div class="check-box" (click)="onModeSelection(mode.key)" [ngClass]="mode.key === gameMode ? 'selected' : ''"></div>
+                    <p>{{ mode.key }}</p>
                 </div>
                 }
             </div>

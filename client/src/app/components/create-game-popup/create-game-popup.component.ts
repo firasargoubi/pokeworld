@@ -1,7 +1,8 @@
 import { NgClass } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameMode } from '@common/game-mode.enum';
 import { MapSize } from '@common/map-size.enum';
 
@@ -12,39 +13,28 @@ import { MapSize } from '@common/map-size.enum';
     imports: [PokeballButtonComponent, NgClass],
 })
 export class CreateGamePopupComponent {
-    gameMode: string = 'FFA';
-    mapSize: string = '10';
+    gameMode: keyof typeof GameMode = 'FFA';
+    mapSize: keyof typeof MapSize = 'Small';
 
-    possibleModes = Object.keys(GameMode);
-    possibleSizes = Object.keys(MapSize).filter((key) => Number(key));
+    gameDataService: GameDataService = inject(GameDataService);
 
-    constructor(
-        private router: Router, // private gameDataService: GameDataService,
-    ) {}
+    possibleModes = Object.entries(GameMode).map(([key, value]) => ({ key, value }));
+    possibleSizes = Object.entries(MapSize)
+        .filter(([, value]) => typeof value === 'number')
+        .map(([key, value]) => ({ key, value: value as number }));
 
-    onSizeSelection(taille: string) {
-        this.mapSize = taille;
+    constructor(private router: Router) {}
+
+    onSizeSelection(sizeKey: string) {
+        this.mapSize = sizeKey as keyof typeof MapSize;
     }
 
-    onModeSelection(mode: string) {
-        this.gameMode = mode;
+    onModeSelection(modeKey: string) {
+        this.gameMode = modeKey as keyof typeof GameMode;
     }
 
     onValiderSelection() {
+        this.gameDataService.createGameData(MapSize[this.mapSize], GameMode[this.gameMode]);
         this.router.navigate(['/edit']);
-        // const game = {
-        //     _id: '456',
-        //     name: 'Game 2',
-        //     isVisible: true,
-        //     description: 'Description 2',
-        //     lastEdited: new Date(),
-        //     mapData: {
-        //         tiles: [],
-        //         items: {} as Record<ItemType, Position[]>,
-        //         size: MapSize.Large,
-        //         gameMode: GameMode.CTF,
-        //     },
-        //     thumbnail: 'path',
-        // };
     }
 }

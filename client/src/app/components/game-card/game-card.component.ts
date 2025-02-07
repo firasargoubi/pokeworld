@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameData } from '@common/game-data';
@@ -21,8 +21,7 @@ export class GameCardComponent {
     @Output() join = new EventEmitter<string>();
 
     isHovered: boolean = false;
-
-    constructor() {}
+    gameDataService: GameDataService = inject(GameDataService);
 
     onEdit() {
         this.gameDataService.setGameData(this.game);
