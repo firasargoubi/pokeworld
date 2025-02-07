@@ -1,7 +1,8 @@
 <div id="create-page-container">
     <div id="create-page-header">
-        <app-main-header [routerLink]="'/'" [imgSrc]="'/assets/images/menu/headers/header-2.png'" [title]="'< PAGE CREATION'"> </app-main-header>
-    </div>
+        <app-header [onClick]="navigateToMenu.bind(this)"
+        [stepNumber]="'2'" [title]="'PAGE CREATION'"></app-header>
+            </div>    
     <div id="admin-page-border">
         <div id="admin-page-body">
             <div id="game-grid">
