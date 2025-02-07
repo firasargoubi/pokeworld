@@ -5,11 +5,11 @@ export interface ValidationResult {
     name: ValidationStatus;
     description: ValidationStatus;
     terrainCoverage: { isValid: boolean; coveragePercentage: number };
+    tilesAccessibility: { isValid: boolean; nonAccessibleTileCount: number };
+    items: { isValid: boolean; misplacedItems: Position[] };
     bridge: { isValid: boolean; errors: BridgeValidationError[] };
     spawnPoint: ValidationStatus;
-    tilesAccessibility: { isValid: boolean; nonAccessibleTileCount: number };
     mode: ValidationStatus;
-    items: { isValid: boolean; misplacedItems: Position[] };
 }
 
 export interface BridgeValidationError {

@@ -33,6 +33,19 @@ export class GameValidationService {
         return this.validateField(gameDescription, MAX_DESCRIPTION_LENGTH);
     }
 
+    private validateField(value: string, maxLength: number): ValidationStatus {
+        const validationStatus: ValidationStatus = { isValid: true, errorCode: null };
+
+        if (!value || value.trim() === '') {
+            validationStatus.isValid = false;
+            validationStatus.errorCode = ErrorCode.Empty;
+        } else if (value.length > maxLength) {
+            validationStatus.isValid = false;
+            validationStatus.errorCode = ErrorCode.TooLong;
+        }
+        return validationStatus;
+    }
+
     private validateMap(map: MapData): ValidationResult {
         const bridgeStatus = { isValid: true, errors: [] };
         const tilesCount: TilesCount = {
@@ -53,14 +66,37 @@ export class GameValidationService {
             name: { isValid: true, errorCode: null },
             description: { isValid: true, errorCode: null },
             terrainCoverage: this.validateTerrainCoverage(tilesCount),
-            bridge: bridgeStatus,
-            spawnPoint: this.validateSpawnPoints(map),
             tilesAccessibility: this.validateTilesAccessibility(map, tilesCount),
-            mode: map.gameMode === GameMode.CTF ? this.validateFlags(map) : { isValid: true, errorCode: null },
+            spawnPoint: this.validateSpawnPoints(map),
             items: this.validateItemPlacement(map),
+            mode: map.gameMode === GameMode.CTF ? this.validateFlags(map) : { isValid: true, errorCode: null },
+            bridge: bridgeStatus,
         };
 
         return mapValidationResult;
+    }
+
+    private handleTile(
+        position: Position,
+        map: MapData,
+        tilesCount: TilesCount,
+        bridgeStatus: { isValid: boolean; errors: BridgeValidationError[] },
+    ): void {
+        const tileType = map.tiles[position.x][position.y];
+        tilesCount.nbTilesTotal++;
+
+        if (tileType === TileType.Water) {
+            tilesCount.nbWater++;
+        } else if (BRIDGE_TYPES.has(tileType)) {
+            const result = this.validateBridge(position, map);
+            if (result) {
+                bridgeStatus.isValid = false;
+                bridgeStatus.errors.push(result);
+            }
+            tilesCount.nbBridge++;
+        } else if (tileType === TileType.Grass || tileType === TileType.Path || tileType === TileType.Bush) {
+            tilesCount.nbTerrain++;
+        }
     }
 
     private validateBridge(position: Position, map: MapData): BridgeValidationError | null {
@@ -74,26 +110,23 @@ export class GameValidationService {
         return error;
     }
 
-    private validateSpawnPoints(map: MapData): ValidationStatus {
-        return this.validateItemCount(map, ItemType.Spawn, REQUIRED_SPAWN_POINTS[map.size]);
+    private isOnMapEdge(position: Position, map: MapData): boolean {
+        return position.x === 0 || position.x === map.tiles.length - 1 || position.y === 0 || position.y === map.tiles.length - 1;
     }
 
-    private validateFlags(map: MapData): ValidationStatus {
-        return this.validateItemCount(map, ItemType.Flag, 1);
-    }
+    private isCorrectlyPlacedBridge(position: Position, map: MapData): boolean {
+        const x = position.x;
+        const y = position.y;
 
-    private validateItemPlacement(map: MapData): { isValid: boolean; misplacedItems: Position[] } {
-        const validationStatus = { isValid: true, misplacedItems: [] as Position[] };
+        const hasWaterAboveAndBelow = map.tiles[x]?.[y - 1] === TileType.Water && map.tiles[x]?.[y + 1] === TileType.Water;
+        const hasTraversableSides = this.canTraverseTile(map.tiles[x - 1]?.[y], false) && this.canTraverseTile(map.tiles[x + 1]?.[y], false);
+        const isBetweenHorizontalWater = hasWaterAboveAndBelow && hasTraversableSides;
 
-        for (const [, positions] of Object.entries(map.items)) {
-            for (const position of positions) {
-                if (!this.canTraverseTile(map.tiles[position.x][position.y], false)) {
-                    validationStatus.misplacedItems.push(position);
-                }
-            }
-        }
-        validationStatus.isValid = validationStatus.misplacedItems.length === 0;
-        return validationStatus;
+        const hasWaterLeftAndRight = map.tiles[x - 1]?.[y] === TileType.Water && map.tiles[x + 1]?.[y] === TileType.Water;
+        const hasTraversableAboveBelow = this.canTraverseTile(map.tiles[x]?.[y - 1], false) && this.canTraverseTile(map.tiles[x]?.[y + 1], false);
+        const isBetweenVerticalWater = hasWaterLeftAndRight && hasTraversableAboveBelow;
+
+        return isBetweenHorizontalWater || isBetweenVerticalWater;
     }
 
     private validateTerrainCoverage(tilesCount: TilesCount): { isValid: boolean; coveragePercentage: number } {
@@ -138,55 +171,6 @@ export class GameValidationService {
         return validationStatus;
     }
 
-    private validateField(value: string, maxLength: number): ValidationStatus {
-        const validationStatus: ValidationStatus = { isValid: true, errorCode: null };
-
-        if (!value || value.trim() === '') {
-            validationStatus.isValid = false;
-            validationStatus.errorCode = ErrorCode.Empty;
-        } else if (value.length > maxLength) {
-            validationStatus.isValid = false;
-            validationStatus.errorCode = ErrorCode.TooLong;
-        }
-        return validationStatus;
-    }
-
-    private validateItemCount(map: MapData, itemType: ItemType, requiredCount: number): ValidationStatus {
-        const validationStatus: ValidationStatus = { isValid: true, errorCode: null };
-
-        const placedCount = map.items[itemType]?.length || 0;
-
-        validationStatus.isValid = placedCount === requiredCount;
-        if (!validationStatus.isValid) {
-            validationStatus.errorCode = placedCount > requiredCount ? ErrorCode.TooManyItems : ErrorCode.MissingRequiredItems;
-        }
-
-        return validationStatus;
-    }
-
-    private handleTile(
-        position: Position,
-        map: MapData,
-        tilesCount: TilesCount,
-        bridgeStatus: { isValid: boolean; errors: BridgeValidationError[] },
-    ): void {
-        const tileType = map.tiles[position.x][position.y];
-        tilesCount.nbTilesTotal++;
-
-        if (tileType === TileType.Water) {
-            tilesCount.nbWater++;
-        } else if (BRIDGE_TYPES.has(tileType)) {
-            const result = this.validateBridge(position, map);
-            if (result) {
-                bridgeStatus.isValid = false;
-                bridgeStatus.errors.push(result);
-            }
-            tilesCount.nbBridge++;
-        } else if (tileType === TileType.Grass || tileType === TileType.Path || tileType === TileType.Bush) {
-            tilesCount.nbTerrain++;
-        }
-    }
-
     private dfs(map: MapData, x: number, y: number, visited: boolean[][]): void {
         const xOutOfBounds = x < 0 || x >= map.tiles.length;
         const yOutOfBounds = y < 0 || y >= map.tiles[0].length;
@@ -208,30 +192,46 @@ export class GameValidationService {
         this.dfs(map, x, y - 1, visited);
     }
 
-    private isOnMapEdge(position: Position, map: MapData): boolean {
-        return position.x === 0 || position.x === map.tiles.length - 1 || position.y === 0 || position.y === map.tiles.length - 1;
-    }
-
-    private isCorrectlyPlacedBridge(position: Position, map: MapData): boolean {
-        const x = position.x;
-        const y = position.y;
-
-        const hasWaterAboveAndBelow = map.tiles[x]?.[y - 1] === TileType.Water && map.tiles[x]?.[y + 1] === TileType.Water;
-        const hasTraversableSides = this.canTraverseTile(map.tiles[x - 1]?.[y], false) && this.canTraverseTile(map.tiles[x + 1]?.[y], false);
-        const isBetweenHorizontalWater = hasWaterAboveAndBelow && hasTraversableSides;
-
-        const hasWaterLeftAndRight = map.tiles[x - 1]?.[y] === TileType.Water && map.tiles[x + 1]?.[y] === TileType.Water;
-        const hasTraversableAboveBelow = this.canTraverseTile(map.tiles[x]?.[y - 1], false) && this.canTraverseTile(map.tiles[x]?.[y + 1], false);
-        const isBetweenVerticalWater = hasWaterLeftAndRight && hasTraversableAboveBelow;
-
-        return isBetweenHorizontalWater || isBetweenVerticalWater;
-    }
-
     private canTraverseTile(tileType: TileType, isBridgeTraversable: boolean): boolean {
         if (isBridgeTraversable) {
             return tileType !== TileType.Water;
         } else {
             return tileType !== TileType.Water && !BRIDGE_TYPES.has(tileType);
         }
+    }
+
+    private validateItemPlacement(map: MapData): { isValid: boolean; misplacedItems: Position[] } {
+        const validationStatus = { isValid: true, misplacedItems: [] as Position[] };
+
+        for (const [, positions] of Object.entries(map.items)) {
+            for (const position of positions) {
+                if (!this.canTraverseTile(map.tiles[position.x][position.y], false)) {
+                    validationStatus.misplacedItems.push(position);
+                }
+            }
+        }
+        validationStatus.isValid = validationStatus.misplacedItems.length === 0;
+        return validationStatus;
+    }
+
+    private validateSpawnPoints(map: MapData): ValidationStatus {
+        return this.validateItemCount(map, ItemType.Spawn, REQUIRED_SPAWN_POINTS[map.size]);
+    }
+
+    private validateFlags(map: MapData): ValidationStatus {
+        return this.validateItemCount(map, ItemType.Flag, 1);
+    }
+
+    private validateItemCount(map: MapData, itemType: ItemType, requiredCount: number): ValidationStatus {
+        const validationStatus: ValidationStatus = { isValid: true, errorCode: null };
+
+        const placedCount = map.items[itemType]?.length || 0;
+
+        validationStatus.isValid = placedCount === requiredCount;
+        if (!validationStatus.isValid) {
+            validationStatus.errorCode = placedCount > requiredCount ? ErrorCode.TooManyItems : ErrorCode.MissingRequiredItems;
+        }
+
+        return validationStatus;
     }
 }
