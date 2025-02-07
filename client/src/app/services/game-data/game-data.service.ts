@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { EMPTY_GAME_DATA } from '@app/consts/default-game';
+import { DEFAULT_GAME } from '@app/consts/default-game';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
@@ -17,21 +17,22 @@ export class GameDataService {
 
     constructor() {
         this.mapUpdate = new Subject();
-        this.gameData = structuredClone(EMPTY_GAME_DATA);
+        this.gameData = DEFAULT_GAME;
     }
 
-    resetGameData() {
-        this.gameData = structuredClone(EMPTY_GAME_DATA);
-
-        const gridSize = this.gameData.mapData.size as number;
-        this.gameData.mapData.tiles = Array.from({ length: gridSize }, () => Array(gridSize).fill(TileType.Grass));
-
+    resetMap() {
+        this.gameData.mapData.tiles = Array.from({ length: this.gameData.mapData.size }, () =>
+            Array(this.gameData.mapData.size).fill(TileType.Grass),
+        );
         this.mapUpdate.next(null);
     }
 
     createGameData(size: MapSize, mode: GameMode) {
+        this.gameData = DEFAULT_GAME;
         this.gameData.mapData.size = size;
         this.gameData.mapData.gameMode = mode;
+        this.resetMap();
+        this.mapUpdate.next(null);
     }
 
     setGameData(gameData: GameData) {

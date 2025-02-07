@@ -3,10 +3,10 @@ import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
 import { MapSize } from '@common/map-size.enum';
 
-export const EMPTY_GAME_DATA: GameData = {
+export const DEFAULT_GAME: GameData = {
     _id: '',
-    name: '',
-    description: '',
+    name: 'Jeu par defaut',
+    description: 'Description par defaut',
     lastEdited: new Date(),
     isVisible: false,
     mapData: {
