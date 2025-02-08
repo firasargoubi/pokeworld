@@ -35,7 +35,7 @@ export class GameCardComponent {
 
     onToggleVisibility() {
         this.toggleVisibility.emit({ id: this.game._id, isVisible: this.game.isVisible });
-        this.game.isVisible = !this.game.isVisible;
+        this.game.isVisible = !this.game.isVisible; // CHECK if needed
     }
 
     onJoin() {
