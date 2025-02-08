@@ -19,6 +19,23 @@ export class BoardVisualService {
         this.updateAllTiles();
     }
 
+    getTileImage(tiles: TileType[][], pos: Position): string {
+        switch (this.getTile(tiles, pos)) {
+            case TileType.Water:
+                return `/assets/images/game/tiles/water/water-${this.getWaterImage(tiles, pos)}.png`;
+            case TileType.Bush:
+                return '/assets/images/game/tiles/bush.png';
+            case TileType.Path:
+                return `/assets/images/game/tiles/path/path-${this.getPathImage(tiles, pos)}.png`;
+            case TileType.Bridge:
+                return `/assets/images/game/tiles/bridge/bridge-${this.getBridgeImage(tiles, pos)}.png`;
+            case TileType.BrokenBridge:
+                return `/assets/images/game/tiles/broken-bridge/bridge-${this.getBridgeImage(tiles, pos)}.png`;
+            default:
+                return `/assets/images/game/tiles/grass/grass-${this.getGrassImage(pos)}.png`;
+        }
+    }
+
     private onMapUpdate(pos: Position | null) {
         if (pos === null) {
             this.updateAllTiles();
@@ -114,23 +131,6 @@ export class BoardVisualService {
         }
 
         return '';
-    }
-
-    private getTileImage(tiles: TileType[][], pos: Position): string {
-        switch (this.getTile(tiles, pos)) {
-            case TileType.Water:
-                return `/assets/images/game/tiles/water/water-${this.getWaterImage(tiles, pos)}.png`;
-            case TileType.Bush:
-                return '/assets/images/game/tiles/bush.png';
-            case TileType.Path:
-                return `/assets/images/game/tiles/path/path-${this.getPathImage(tiles, pos)}.png`;
-            case TileType.Bridge:
-                return `/assets/images/game/tiles/bridge/bridge-${this.getBridgeImage(tiles, pos)}.png`;
-            case TileType.BrokenBridge:
-                return `/assets/images/game/tiles/broken-bridge/bridge-${this.getBridgeImage(tiles, pos)}.png`;
-            default:
-                return `/assets/images/game/tiles/grass/grass-${this.getGrassImage(pos)}.png`;
-        }
     }
 
     private getUnderlayImage(tiles: TileType[][], pos: Position): string {

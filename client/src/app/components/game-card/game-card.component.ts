@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ThumbnailService } from '@app/services/thumbnail/thumbnail-service';
 import { GameData } from '@common/game-data';
 
 @Component({
@@ -11,7 +12,7 @@ import { GameData } from '@common/game-data';
     standalone: true,
 })
 export class GameCardComponent {
-    @Input() game!: GameData;
+    @Input() game: GameData;
     @Input() isAdminView: boolean = false;
     @Input() cardColor: string = 'blue-card';
     @Output() edit = new EventEmitter<string>();
@@ -19,10 +20,18 @@ export class GameCardComponent {
     @Output() toggleVisibility = new EventEmitter<{ id: string; isVisible: boolean }>();
     @Output() join = new EventEmitter<string>();
 
+    thumbnailService: ThumbnailService = inject(ThumbnailService);
     isHovered: boolean = false;
+    thumbnailUrl: string;
 
     onEdit() {
         this.edit.emit(this.game._id);
+    }
+
+    ngOnInit() {
+        this.thumbnailService.getThumbnail(this.game.mapData).then((url) => {
+            this.thumbnailUrl = url;
+        });
     }
 
     onDelete() {

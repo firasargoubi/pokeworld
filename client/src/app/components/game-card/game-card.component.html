@@ -13,7 +13,7 @@
             <div class="game-thumbnail" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
                 <h2 class="game-name">{{ game.name }}</h2>
                 <p class="size-info">{{ game.mapData.size }}x{{ game.mapData.size }}</p>
-                <img [src]="game.thumbnail" alt="Game Thumbnail" />
+                <img *ngIf="thumbnailUrl" [src]="thumbnailUrl" alt="Thumbnail" class="thumbnail" />
             </div>
             <div class="game-details">
                 <div class="card-separator"></div>
