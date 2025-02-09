@@ -5,7 +5,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { CreateGamePopupComponent } from '@app/components/create-game-popup/create-game-popup.component';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
-import { MainHeaderComponent } from '@app/components/main-header/main-header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { GameService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
@@ -27,6 +26,10 @@ export class AdminPageComponent implements OnInit {
         private gameService: GameService,
         private snackBar: MatSnackBar,
     ) {}
+
+    navigateToMenu() {
+        this.router.navigate(['/']);
+    }
 
     ngOnInit() {
         this.loadGames();

@@ -1,9 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, RouterModule } from '@angular/router';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { GameService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { of, throwError } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
 
@@ -167,5 +167,11 @@ describe('AdminPageComponent', () => {
         component['handleError'](error);
 
         expect(snackBarOpenSpy).toHaveBeenCalledWith(error.message, 'Close', { duration: 5000 });
+    });
+
+    it('should navigate to menu', () => {
+        const navigateSpy = spyOn(router, 'navigate');
+        component.navigateToMenu();
+        expect(navigateSpy).toHaveBeenCalledWith(['/']);
     });
 });
