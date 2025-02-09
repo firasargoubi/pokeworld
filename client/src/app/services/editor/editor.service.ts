@@ -46,7 +46,7 @@ export class EditorService {
                     window.console.log('Le nom est déjà utilisé. Veuillez en choisir un autre.');
                     return;
                 }
-
+                this.gameDataService.gameData.lastEdited = new Date();
                 this.gameService.saveGame(this.gameDataService.gameData).subscribe(
                     () => {
                         window.console.log(`Le jeu "${this.gameDataService.gameData.name}" a été sauvegardé avec succès.`);
