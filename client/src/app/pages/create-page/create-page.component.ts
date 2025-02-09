@@ -32,17 +32,6 @@ export class CreatePageComponent implements OnInit {
         this.loadGames();
     }
 
-    loadGames() {
-        this.gameService.getAllGames().subscribe({
-            next: (games) => {
-                this.games = games.filter((game) => game.isVisible);
-            },
-            error: (error: HttpErrorResponse) => {
-                this.handleError(error);
-            },
-        });
-    }
-
     getCardColor(index: number): string {
         const classes = ['blue-card', 'green-card', 'pink-card'];
         const classIndex = index % classes.length;
@@ -60,7 +49,17 @@ export class CreatePageComponent implements OnInit {
         });
     }
 
-    handleNotFoundError(error: HttpErrorResponse) {
+    private handleGameVisibility(game: GameData) {
+        if (game.isVisible) {
+            this.gameDataService.setGameData(game);
+            this.router.navigate(['/player-selection']);
+        } else {
+            this.loadGames();
+            alert("Ce jeu n'est plus visible !");
+        }
+    }
+
+    private handleNotFoundError(error: HttpErrorResponse) {
         if (error.status === HttpStatusCode.NotFound) {
             alert("Ce jeu n'existe plus !");
             this.loadGames();
@@ -69,14 +68,15 @@ export class CreatePageComponent implements OnInit {
         }
     }
 
-    handleGameVisibility(game: GameData) {
-        if (game.isVisible) {
-            this.gameDataService.setGameData(game);
-            this.router.navigate(['/player-selection']);
-        } else {
-            this.loadGames();
-            alert("Ce jeu n'est plus visible !");
-        }
+    private loadGames() {
+        this.gameService.getAllGames().subscribe({
+            next: (games) => {
+                this.games = games.filter((game) => game.isVisible);
+            },
+            error: (error: HttpErrorResponse) => {
+                this.handleError(error);
+            },
+        });
     }
 
     private handleError(error: HttpErrorResponse) {

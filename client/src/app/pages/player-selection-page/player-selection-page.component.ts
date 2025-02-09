@@ -1,5 +1,5 @@
 import { NgStyle } from '@angular/common';
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/interfaces/avatars';
@@ -14,6 +14,14 @@ import { BONUS_POINTS, DEFAULT_STAT_POINTS, Dice, PointStat } from '@app/interfa
     styleUrl: './player-selection-page.component.scss',
 })
 export class PlayerSelectionPageComponent {
+    readonly minLength = 3;
+    readonly maxLength = 20;
+    nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(this.minLength), Validators.maxLength(this.maxLength)]);
+    bonusForm: FormGroup = new FormGroup({
+        points: new FormControl('life', [Validators.required]),
+        bonusDice: new FormControl(DiceOption.Option1.toString(), [Validators.required]),
+    });
+
     statFrench = {
         life: 'vie',
         speed: 'vitesse',
@@ -29,16 +37,8 @@ export class PlayerSelectionPageComponent {
     avatarList = Object.keys(AVATAR_DATA).slice(1) as Avatars[];
     selectedAvatar: Avatars = Avatars.Default;
 
-    nameForm: FormControl;
-    bonusForm: FormGroup;
-
     private isStartClicked: WritableSignal<boolean> = signal(false);
-    private router: Router;
-
-    constructor(router: Router) {
-        this.router = router;
-        this.initializeForms();
-    }
+    private router: Router = inject(Router);
 
     getScore(statCategory: PointStat) {
         return this.isBonusPoint(statCategory) ? DEFAULT_STAT_POINTS + BONUS_POINTS : DEFAULT_STAT_POINTS;
@@ -86,23 +86,12 @@ export class PlayerSelectionPageComponent {
     goToLobby() {
         this.isStartClicked.set(true);
         if (this.isFormValid()) {
-            this.router.navigate(['/']); // temp
+            this.router.navigate(['/lobby']);
         }
     }
 
     isFormValid() {
         return this.nameForm.valid && this.isValidAvatarChoice();
-    }
-
-    private initializeForms() {
-        const MIN_LENGTH = 3;
-        const MAX_LENGTH = 20;
-        this.nameForm = new FormControl('', [Validators.required, Validators.minLength(MIN_LENGTH), Validators.maxLength(MAX_LENGTH)]);
-
-        this.bonusForm = new FormGroup({
-            points: new FormControl('life', [Validators.required]),
-            bonusDice: new FormControl(DiceOption.Option1.toString(), [Validators.required]),
-        });
     }
 
     private isValidAvatarChoice() {

@@ -89,7 +89,7 @@ describe('PlayerSelectionPageComponent', () => {
         component.selectedAvatar = component.avatarList[0];
         component.goToLobby();
 
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/lobby']);
     });
 
     it('should not navigate to lobby on invalid form submission', () => {

@@ -50,8 +50,17 @@ describe('CreatePageComponent', () => {
         expect(component.games).toEqual(MOCK_GAMES);
     });
 
+    it('should navigate to menu when navigateToMenu is called', () => {
+        const navigateSpy = spyOn(router, 'navigate');
+
+        component.navigateToMenu();
+
+        expect(navigateSpy).toHaveBeenCalledWith(['/']);
+    });
+
     it('should call loadGames when handleNotFoundError is called', () => {
-        const loadGamesSpy = spyOn(component, 'loadGames');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const loadGamesSpy = spyOn(component as any, 'loadGames');
         const error = new HttpErrorResponse({ error: 'Game not found', status: 404 });
         component['handleNotFoundError'](error);
 
@@ -91,7 +100,6 @@ describe('CreatePageComponent', () => {
 
         spyOn(window, 'alert');
         component.onJoin(invisibleGame._id);
-
         expect(window.alert).toHaveBeenCalledWith("Ce jeu n'est plus visible !");
         expect(gameServiceSpy.getAllGames).toHaveBeenCalled();
     });
@@ -111,8 +119,7 @@ describe('CreatePageComponent', () => {
         gameServiceSpy.getAllGames.and.returnValue(throwError(() => errorResponse));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleErrorSpy = spyOn<any>(component, 'handleError');
-
-        component.loadGames();
+        component['loadGames']();
 
         expect(handleErrorSpy).toHaveBeenCalledWith(errorResponse);
     });
@@ -124,7 +131,7 @@ describe('CreatePageComponent', () => {
         ];
         gameServiceSpy.getAllGames.and.returnValue(of(mockGames));
 
-        component.loadGames();
+        component['loadGames']();
 
         expect(component.games).toEqual([mockGames[0]]);
     });
