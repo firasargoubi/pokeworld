@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
+import { BoardVisualService } from '@app/services/board-visual/board-visual.service';
 import { MapData } from '@common/map-data';
-import { BoardVisualService } from '../board-visual/board-visual.service';
 
 const TILE_SIZE = 32;
 const BACKGROUND_COLOR = 'rgb(106, 183, 215)';
@@ -20,7 +20,7 @@ export class ThumbnailService {
         context.fillStyle = BACKGROUND_COLOR;
         context.fillRect(0, 0, canvas.width, canvas.height);
 
-        const loadImage = (src: string): Promise<HTMLImageElement> => {
+        const loadImage = async (src: string): Promise<HTMLImageElement> => {
             return new Promise((resolve, reject) => {
                 const img = new Image();
                 img.src = src;
@@ -35,7 +35,9 @@ export class ThumbnailService {
                 try {
                     const img = await loadImage(imagePath);
                     context.drawImage(img, y * TILE_SIZE, x * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                } catch (error) {}
+                } catch (error) {
+                    continue;
+                }
             }
         }
 

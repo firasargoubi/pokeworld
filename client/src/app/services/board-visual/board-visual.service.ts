@@ -101,10 +101,9 @@ export class BoardVisualService {
 
     private isOutOfBound(tiles: TileType[][], pos: Position): boolean {
         const isSmallerThanZero = pos.x < 0 || pos.y < 0;
-        const isHigherThanSize = pos.x >= this.visualMapData.size || pos.y >= this.visualMapData.size;
         const isHigherThanLength = pos.x >= tiles.length || pos.x < 0 || pos.y >= tiles[pos.x].length;
 
-        return isSmallerThanZero || isHigherThanSize || isHigherThanLength;
+        return isSmallerThanZero || isHigherThanLength;
     }
 
     private getTileVisualData(tiles: TileType[][], pos: Position): TileVisualData {

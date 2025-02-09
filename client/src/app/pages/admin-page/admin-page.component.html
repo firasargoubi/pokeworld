@@ -1,6 +1,6 @@
 <div id="admin-page-container">
     <div id="admin-page-header">
-        <app-main-header [routerLink]="'/'" [imgSrc]="'/assets/images/menu/headers/header-3.png'" [title]="'< PAGE ADMIN'"> </app-main-header>
+        <app-header [onClick]="this.navigateToMenu.bind(this)" [stepNumber]="'3'" [title]="'PAGE ADMIN'"></app-header>
     </div>
     <div id="admin-page-border">
         <div id="admin-page-body">
