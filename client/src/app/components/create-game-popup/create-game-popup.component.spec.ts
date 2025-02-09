@@ -26,9 +26,9 @@ describe('CreateGamePopupComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should initialize gameMode to FFA and mapSize to 10', () => {
+    it('should initialize gameMode to FFA and mapSize to Small', () => {
         expect(component.gameMode).toBe('FFA');
-        expect(component.mapSize).toBe('10');
+        expect(component.mapSize).toBe('Small');
     });
 
     it('should update mapSize on onSizeSelection', () => {
