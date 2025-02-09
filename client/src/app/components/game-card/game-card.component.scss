@@ -1,6 +1,8 @@
 $corner-square-size: 0.5vw;
 $big-stripe-size: 64%;
 
+$blue-backround-color: rgb(106, 183, 215);
+
 $blue-main-color: rgb(123, 206, 230);
 $blue-sub-color: rgb(170, 231, 247);
 $blue-inner-border-color: rgb(170, 231, 247) rgb(75, 166, 198) rgb(75, 166, 198) rgb(170, 231, 247);
@@ -43,7 +45,6 @@ $clip-path: polygon(
 * {
     font-family: 'pixel';
     user-select: none;
-    overflow: visible;
 }
 
 .card-global-container {
@@ -83,12 +84,24 @@ $clip-path: polygon(
     height: 100%;
     width: auto;
     overflow: visible;
+    background-color: $blue-backround-color;
 }
 
 .game-thumbnail img {
     width: 100%;
     object-fit: cover;
     pointer-events: none;
+    opacity: 0;
+    animation: fadeIn 0.8s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .game-thumbnail:hover {
@@ -106,6 +119,7 @@ $clip-path: polygon(
     height: auto;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    z-index: 1;
 }
 
 .size-info {
@@ -116,6 +130,7 @@ $clip-path: polygon(
     text-shadow: 0.3vw 0 0 $text-shadow-color;
     letter-spacing: 0.1vw;
     overflow: visible;
+    z-index: 1;
 }
 
 .thumbnail-separator {
@@ -242,7 +257,6 @@ $clip-path: polygon(
 
 .card-button {
     width: 4.7vw;
-    height: 2.5vw;
     display: flex;
     justify-content: center;
     align-items: center;
