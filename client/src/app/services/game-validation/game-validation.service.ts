@@ -16,13 +16,15 @@ const PERCENTAGE_FACTOR = 100;
     providedIn: 'root',
 })
 export class GameValidationService {
-    validateGame(game: GameData): ValidationResult {
+    validateGame(game: GameData): ValidationResult | null {
         const validationResult = this.validateMap(game.mapData);
 
         validationResult.name = this.validateName(game.name);
         validationResult.description = this.validateDescription(game.description);
 
-        return validationResult;
+        const hasInvalidField = Object.values(validationResult).some((field) => field?.isValid === false);
+
+        return hasInvalidField ? validationResult : null;
     }
 
     private validateName(gameName: string): ValidationStatus {
@@ -161,7 +163,7 @@ export class GameValidationService {
         }
 
         this.dfs(map, startX, startY, visited);
-        const visitedCount = visited.flat().reduce((count, tile) => count + (tile ? 1 : 0), 0);
+        const visitedCount = ([] as boolean[]).concat(...visited).reduce((count, tile) => count + (tile ? 1 : 0), 0);
 
         if (visitedCount < tilesCount.nbTerrain + tilesCount.nbBridge) {
             validationStatus.isValid = false;

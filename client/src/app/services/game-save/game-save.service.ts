@@ -39,4 +39,9 @@ export class GameService {
     deleteGame(gameId: string): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/games/${gameId}`);
     }
+
+    isNameUnique(name: string, id?: string): Observable<{ isUnique: boolean }> {
+        const url = id ? `${this.baseUrl}/games/isNameUnique/${name}/${id}` : `${this.baseUrl}/games/isNameUnique/${name}`;
+        return this.http.get<{ isUnique: boolean }>(url);
+    }
 }
