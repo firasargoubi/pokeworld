@@ -1,14 +1,21 @@
 <div class="board-wrapper" [style.--size]="boardVisualService.visualMapData.size">
     <div class="board-container">
-        @for (tileRow of boardVisualService.visualMapData.tiles; track tileRow; let x = $index) {
-            @for (tile of tileRow; track tile; let y = $index) {
-                <div class="board-tile" [attr.x]="x" [attr.y]="y">
-                    <div class="tile-image" [style.backgroundImage]="'url(' + tile.underlay + ')'"></div>
-                    <div class="tile-image" [style.backgroundImage]="'url(' + tile.tile + ')'"></div>
-                    <div class="tile-image" [style.backgroundImage]="'url(' + tile.item + ')'"></div>
-                    <div class="tile-border"></div>
-                </div>
+        <div class="board">
+            @for (tileRow of boardVisualService.visualMapData.tiles; track tileRow; let x = $index) {
+                @for (tile of tileRow; track tile; let y = $index) {
+                    <div class="tile" [attr.x]="x" [attr.y]="y">
+                        @if (tile.underlay !== '') {
+                            <div class="tile-image" [style.backgroundImage]="'url(' + tile.underlay + ')'"></div>
+                        }
+                        <div class="tile-image" [style.backgroundImage]="'url(' + tile.tile + ')'"></div>
+                        @if (tile.item !== '') {
+                            <div class="tile-image item" [style.backgroundImage]="'url(' + tile.item + ')'"></div>
+                        }
+                        <div class="tile-border"></div>
+                    </div>
+                }
             }
-        }
+        </div>
+        <div class="overlay"></div>
     </div>
 </div>

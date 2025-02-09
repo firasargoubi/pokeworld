@@ -29,6 +29,17 @@ export class GameService {
         return game;
     }
 
+    async saveGame(gameDto: CreateGameDto): Promise<Game> {
+        if (gameDto._id) {
+            const existingGame = await this.gameModel.findById(gameDto._id).exec();
+            if (existingGame) {
+                return this.updateGame(gameDto._id, gameDto);
+            }
+        }
+        delete gameDto._id;
+        return this.addGame(gameDto);
+    }
+
     async addGame(createGameDto: CreateGameDto): Promise<Game> {
         if (!(await this.isNameUnique(createGameDto.name))) {
             throw new BadRequestException(`Game with name ${createGameDto.name} already exists.`);
@@ -84,6 +95,7 @@ export class GameService {
         }
     }
 
+    // DELETE LATER
     async populateDB(): Promise<void> {
         const games: CreateGameDto[] = [
             {

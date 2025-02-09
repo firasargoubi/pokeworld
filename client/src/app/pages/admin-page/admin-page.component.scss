@@ -9,10 +9,6 @@ $stripes-size: 0.7vw;
 
 $card-width: 26vw;
 
-#admin-page-container {
-    border-radius: 0.7vw;
-}
-
 #admin-page-header {
     height: 7vh;
 }
@@ -66,12 +62,14 @@ $card-width: 26vw;
 
 #game-grid * {
     width: 100%;
+    overflow: visible;
 }
 
 #poke-button {
     position: absolute;
     right: 5%;
     bottom: 7%;
-    width: 20.5vw;
+    width: 22.5vw;
     height: 4.5vw;
+    overflow: visible;
 }

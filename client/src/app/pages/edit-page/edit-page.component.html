@@ -1,10 +1,55 @@
-<div class="page-root" (dragover)="allowDrop($event)" (drop)="handleItemDrop($event)">
-    <h1 id="page-title">Edit page</h1>
+<div class="editor-page" (mousedown)="editorService.onMouseDown($event)"
+    (contextmenu)="editorService.onRightClick($event)" (mouseup)="editorService.onMouseUp($event)"
+    (mousemove)="editorService.onMouseMove($event)" (mouseover)="editorService.onMouseOver($event)">
+
+    <app-header [onClick]="editorService.redirectToAdminPage.bind(editorService)"
+        [stepNumber]="'2'" [title]="'Modifier le jeu'"></app-header>
+        
     <main>
-        <app-config-panel [gameData]="gameData"></app-config-panel>
-        <div class="board-container" (click)="handleTileDrop($event)" (contextmenu)="removeTile($event)">
-            <app-board></app-board>
+        <div class="editor-left">
+            <div class="left-label">Nom</div>
+            <input class="input-name" type="text" maxlength="32" spellcheck="false"
+                value="{{ editorService.gameDataService.getName() }}">
+            <div class="left-label-small">Description</div>
+            <div class="input-description" contenteditable="true" spellcheck="false">{{
+                editorService.gameDataService.getDescription() }}
+            </div>
+            <div class="left-label-medium">Taille : {{ editorService.gameDataService.getMapSizeString() }}</div>
+            <div class="left-label-medium">Mode : {{ editorService.gameDataService.getGameModeString() }}</div>
+            <!-- TODO changer pour pokemon button  -->
+            <button (click)="editorService.saveButton()" class="save-button">Sauvegarder</button>
+            <button (click)="editorService.resetButton()" class="reset-button">Réinitialiser</button>
         </div>
-        <app-tool-box [(activeToolSet)]="activeToolSet" [itemCount]="itemCount"></app-tool-box>
+        <div class="editor-center">
+            <app-board></app-board>
+            <div class="error-message">{{ editorService.editorData.errorMessage }}</div>
+        </div>
+        <div class="editor-right">
+            <div class="tool-square">
+                <div class="tile-grid">
+                    @for (tileData of editorService.editorData.tiles; track tileData) {
+                    <div class="grid-square" [attr.tile]="tileData.tile" [class.active]="tileData.isActive">
+                        <div class="tool">
+                            <div class="tool-image" [style.backgroundImage]="'url(' + tileData.image + ')'"></div>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+            <div class="tool-square">
+                <div class="item-grid">
+                    @for (itemData of editorService.editorData.items; track itemData) {
+                    <div class="grid-square" [attr.item]="itemData.item" [class.grayed]="itemData.count === 0">
+                        <div class="tool">
+                            <div class="tool-image" [style.backgroundImage]="'url(' + itemData.image + ')'"></div>
+                            @if (itemData.count > 0) {
+                            <div class="tool-count">{{ itemData.count }}</div>
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
     </main>
 </div>
