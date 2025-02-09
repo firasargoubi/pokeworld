@@ -1,7 +1,6 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { GameService } from '@app/services/game-save/game-save.service';
@@ -19,7 +18,6 @@ export class CreatePageComponent implements OnInit {
     games: GameData[] = [];
 
     constructor(
-        private router: Router,
         private gameService: GameService,
         private snackBar: MatSnackBar,
         private gameDataService: GameDataService,
