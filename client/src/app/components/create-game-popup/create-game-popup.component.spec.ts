@@ -1,7 +1,7 @@
 /* tslint:disable:no-unused-variable */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-// PAS POUR LE SPRINT 1, À DÉCOMMENTER ENSUITE (FONCTIONNEL)
+// NOT FOR SPRINT 1, TO BE UNCOMMENTED LATER (FUNCTIONAL)
 // import { GameMode } from '@common/game-mode.enum';
 import { CreateGamePopupComponent } from './create-game-popup.component';
 
@@ -37,7 +37,7 @@ describe('CreateGamePopupComponent', () => {
         expect(component.mapSize).toBe('20');
     });
 
-    // PAS POUR LE SPRINT 1, À DÉCOMMENTER ENSUITE (FONCTIONNEL)
+    // NOT FOR SPRINT 1, TO BE UNCOMMENTED LATER (FUNCTIONAL)
     // it('should update gameMode on onModeSelection', () => {
     //     component.onModeSelection(GameMode.CTF);
     //     expect(component.gameMode).toBe(GameMode.CTF);
