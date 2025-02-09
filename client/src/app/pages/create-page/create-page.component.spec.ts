@@ -105,4 +105,37 @@ describe('CreatePageComponent', () => {
 
         expect(snackBarOpenSpy).toHaveBeenCalledWith(error.message, 'Close', { duration: 5000 });
     });
+
+    it('should handle error when loadGames fails', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Test error', status: 500 });
+        gameServiceSpy.getAllGames.and.returnValue(throwError(() => errorResponse));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handleErrorSpy = spyOn<any>(component, 'handleError');
+
+        component.loadGames();
+
+        expect(handleErrorSpy).toHaveBeenCalledWith(errorResponse);
+    });
+
+    it('should filter visible games when loadGames is called', () => {
+        const mockGames = [
+            { ...MOCK_GAMES[0], isVisible: true },
+            { ...MOCK_GAMES[1], isVisible: false },
+        ];
+        gameServiceSpy.getAllGames.and.returnValue(of(mockGames));
+
+        component.loadGames();
+
+        expect(component.games).toEqual([mockGames[0]]);
+    });
+
+    it('should call handleError when handleNotFoundError is called with non-NotFound error', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Test error', status: HttpStatusCode.InternalServerError });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handleErrorSpy = spyOn<any>(component, 'handleError');
+
+        component['handleNotFoundError'](errorResponse);
+
+        expect(handleErrorSpy).toHaveBeenCalledWith(errorResponse);
+    });
 });
