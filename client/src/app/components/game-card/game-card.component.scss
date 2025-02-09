@@ -45,7 +45,6 @@ $clip-path: polygon(
 * {
     font-family: 'pixel';
     user-select: none;
-    overflow: visible;
 }
 
 .card-global-container {
@@ -258,7 +257,6 @@ $clip-path: polygon(
 
 .card-button {
     width: 4.7vw;
-    height: 2.5vw;
     display: flex;
     justify-content: center;
     align-items: center;
