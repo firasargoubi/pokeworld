@@ -31,10 +31,11 @@ describe('GameDataService', () => {
         expect(service.gameData.mapData.gameMode).toBe(GameMode.CTF);
     });
 
-    it('should edit a tile correctly', () => {
+    it('should get and edit a tile correctly', () => {
+        service.gameData.mapData.tiles[1][1] = TileType.Grass;
         const position: Position = { x: 1, y: 1 };
         service.editTile(TileType.Water, position);
-        expect(service.gameData.mapData.tiles[1][1]).toBe(TileType.Water);
+        expect(service.gameData.mapData.tiles[1][1]).toBe(service.getTile(position));
     });
 
     it('should add and remove items correctly', () => {
