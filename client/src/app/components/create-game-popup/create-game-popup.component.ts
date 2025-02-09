@@ -29,9 +29,10 @@ export class CreateGamePopupComponent {
         this.mapSize = sizeKey as keyof typeof MapSize;
     }
 
-    onModeSelection(modeKey: string) {
-        this.gameMode = modeKey as keyof typeof GameMode;
-    }
+    // PAS POUR LE SPRINT 1, À DÉCOMMENTER ENSUITE (FONCTIONNEL)
+    // onModeSelection(modeKey: string) {
+    //     this.gameMode = modeKey as keyof typeof GameMode;
+    // }
 
     onValiderSelection() {
         this.gameDataService.createGameData(MapSize[this.mapSize], GameMode[this.gameMode]);

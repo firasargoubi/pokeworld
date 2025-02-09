@@ -12,7 +12,11 @@
             <div class="options">
                 Mode de jeu : @for (mode of possibleModes; track $index) {
                 <div class="option">
-                    <div class="check-box" (click)="onModeSelection(mode.key)" [ngClass]="mode.key === gameMode ? 'selected' : ''"></div>
+                    <div class="check-box" [ngClass]="mode.key === gameMode ? 'selected' : ''"></div>
+
+                    <!-- PAS POUR LE SPRINT 1, À DÉCOMMENTER ENSUITE (FONCTIONNEL)
+                    <div class="check-box" (click)="onModeSelection(mode.key)" [ngClass]="mode.key === gameMode ? 'selected' : ''"></div> -->
+
                     <p>{{ mode.key }}</p>
                 </div>
                 }

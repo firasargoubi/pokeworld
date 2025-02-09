@@ -1,7 +1,8 @@
 /* tslint:disable:no-unused-variable */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { GameMode } from '@common/game-mode.enum';
+// PAS POUR LE SPRINT 1, À DÉCOMMENTER ENSUITE (FONCTIONNEL)
+// import { GameMode } from '@common/game-mode.enum';
 import { CreateGamePopupComponent } from './create-game-popup.component';
 
 describe('CreateGamePopupComponent', () => {
@@ -36,10 +37,11 @@ describe('CreateGamePopupComponent', () => {
         expect(component.mapSize).toBe('20');
     });
 
-    it('should update gameMode on onModeSelection', () => {
-        component.onModeSelection(GameMode.CTF);
-        expect(component.gameMode).toBe(GameMode.CTF);
-    });
+    // PAS POUR LE SPRINT 1, À DÉCOMMENTER ENSUITE (FONCTIONNEL)
+    // it('should update gameMode on onModeSelection', () => {
+    //     component.onModeSelection(GameMode.CTF);
+    //     expect(component.gameMode).toBe(GameMode.CTF);
+    // });
 
     it('should navigate to /edit on onValiderSelection', () => {
         component.onValiderSelection();
