@@ -43,6 +43,7 @@ $clip-path: polygon(
 * {
     font-family: 'pixel';
     user-select: none;
+    overflow: visible;
 }
 
 .card-global-container {
@@ -81,6 +82,7 @@ $clip-path: polygon(
     position: relative;
     height: 100%;
     width: auto;
+    overflow: visible;
 }
 
 .game-thumbnail img {
@@ -98,8 +100,12 @@ $clip-path: polygon(
     font-size: 3vw;
     text-shadow: 0.25vw 0 0 $text-shadow-color;
     letter-spacing: 0.2vw;
-    left: 6px;
+    left: 10px;
     top: 4px;
+    width: 90%;
+    height: auto;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .size-info {
@@ -110,6 +116,18 @@ $clip-path: polygon(
     text-shadow: 0.3vw 0 0 $text-shadow-color;
     letter-spacing: 0.1vw;
     overflow: visible;
+}
+
+.thumbnail-separator {
+    position: absolute;
+    height: 100%;
+    width: 2vw;
+    right: -2vw;
+    top: 0;
+}
+
+.pink-card .thumbnail-separator {
+    left: -2vw;
 }
 
 .game-details {
@@ -240,6 +258,7 @@ $clip-path: polygon(
     height: 100%;
     pointer-events: none;
     user-select: none;
+    overflow: visible;
 }
 
 .card-button:active .button-container,
@@ -307,7 +326,7 @@ $clip-path: polygon(
     width: 0;
     height: calc(100% - $corner-square-size * 2);
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     right: -$description-width;
     top: $corner-square-size;
     opacity: 1;
