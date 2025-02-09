@@ -1,4 +1,21 @@
-<div>
-    <h1>Lobby page</h1><br>
-    <button routerLink="/play">Lancer la partie</button><br>
+<div id="lobby-container">
+    <div id="lobby-header">
+        <app-header [onClick]="this.leaveLobby.bind(this)" [stepNumber]="'1'" [title]="'Page d`attente'"></app-header>
+    </div>
+
+    <div id="lobby-border">
+        <div id="lobby-body">
+            <p class="access-code-title">Votre code d'acces</p>
+            <p class="access-code">{{ accessCode }}</p>
+            <p class="instructions">Partagez ce code avec les autres joueurs pour jouer</p>
+
+            <div id="players-list">
+                <p class="player-title">Liste des joueurs:</p>
+            </div>
+
+            <div id="poke-button">
+                <app-pokeball-button [buttonContent]="'LANCER PARTIE'"  [onClickAction]="startGame.bind(this)"> </app-pokeball-button>
+            </div>
+        </div>
+    </div>
 </div>
