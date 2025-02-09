@@ -1,9 +1,9 @@
 <div id="admin-page-container">
     <div id="admin-page-header">
-        <app-main-header [routerLink]="'/'" [imgSrc]="'/assets/images/menu/headers/header-3.png'" [title]="'< PAGE ADMIN'"> </app-main-header>
+        <app-header [onClick]="this.navigateToMenu.bind(this)" [stepNumber]="'3'" [title]="'PAGE ADMIN'"></app-header>
     </div>
     <div id="admin-page-border">
-        <div id="admin-page-body">
+        <div id="admin-page-body" [ngStyle]="{ 'overflow-y': isCreationMode ? 'hidden' : 'auto' }">
             <div id="game-grid">
                 @for(game of games; let i = $index; track game._id) {
                 <app-game-card
@@ -17,9 +17,16 @@
                 </app-game-card>
                 }
             </div>
+            @if(isCreationMode) {
+            <div id="creation-game-popup" (click)="onCreateGame()">
+                <div (click)="$event.stopPropagation()">
+                    <app-create-game-popup></app-create-game-popup>
+                </div>
+            </div>
+            }
         </div>
     </div>
     <div id="poke-button">
-        <app-pokeball-button [buttonContent]="'NOUVEAU JEU'" [delay]="200"></app-pokeball-button>
+        <app-pokeball-button [buttonContent]="'NOUVEAU JEU'" [delay]="200" [onClickAction]="onCreateGame.bind(this)"></app-pokeball-button>
     </div>
 </div>

@@ -9,10 +9,6 @@ $stripes-size: 0.7vw;
 
 $card-width: 26vw;
 
-#admin-page-container {
-    border-radius: 0.7vw;
-}
-
 #admin-page-header {
     height: 7vh;
 }
@@ -25,7 +21,7 @@ $card-width: 26vw;
 #admin-page-body {
     position: relative;
     height: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
     background: repeating-linear-gradient(
         0deg,
         $stripes-color1,
@@ -66,12 +62,26 @@ $card-width: 26vw;
 
 #game-grid * {
     width: 100%;
+    overflow: visible;
 }
 
 #poke-button {
+    z-index: 0;
     position: absolute;
     right: 5%;
     bottom: 7%;
-    width: 20.5vw;
+    width: 22.5vw;
     height: 4.5vw;
+    overflow: visible;
+}
+
+#creation-game-popup {
+    z-index: 1;
+    position: fixed;
+    padding-top: 5%;
+    top: 0%;
+    left: 0%;
+    background-color: rgba($color: #000000, $alpha: 0.5);
+    height: 100%;
+    width: 100%;
 }
