@@ -39,7 +39,7 @@ export class AdminPageComponent implements OnInit {
     loadGames() {
         this.gameService.getAllGames().subscribe({
             next: (games) => {
-                this.games = games.sort((a, b) => new Date(b.lastEdited).getTime() - new Date(a.lastEdited).getTime());
+                this.games = games.sort((a, b) => new Date(a.lastEdited).getTime() - new Date(b.lastEdited).getTime());
             },
             error: (error: HttpErrorResponse) => {
                 this.handleError(error);
