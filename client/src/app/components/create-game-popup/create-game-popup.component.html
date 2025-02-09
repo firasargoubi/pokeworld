@@ -1,0 +1,28 @@
+<div id="pop-up">
+    <div id="details">
+        <div id="infos">
+            <div class="options">
+                Taille de la grille : @for (size of possibleSizes; track $index) {
+                <div class="option">
+                    <div class="check-box" (click)="onSizeSelection(size.key)" [ngClass]="size.key === mapSize ? 'selected' : ''"></div>
+                    <p>{{ size.value }}x{{ size.value }}</p>
+                </div>
+                }
+            </div>
+            <div class="options">
+                Mode de jeu : @for (mode of possibleModes; track $index) {
+                <div class="option">
+                    <div class="check-box" [ngClass]="mode.key === gameMode ? 'selected' : ''"></div>
+
+                    <!-- PAS POUR LE SPRINT 1, À DÉCOMMENTER ENSUITE (FONCTIONNEL)
+                    <div class="check-box" (click)="onModeSelection(mode.key)" [ngClass]="mode.key === gameMode ? 'selected' : ''"></div> -->
+
+                    <p>{{ mode.key }}</p>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+    <app-pokeball-button [buttonContent]="'Valider'" [delay]="0" [onClickAction]="onValiderSelection.bind(this)"></app-pokeball-button>
+    <img id="moltres" src="assets/images/menu/pokemons/normal/moltres.png" />
+</div>

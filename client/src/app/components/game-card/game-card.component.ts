@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail-service';
 import { GameData } from '@common/game-data';
 
@@ -23,8 +25,10 @@ export class GameCardComponent implements OnInit {
     thumbnailService: ThumbnailService = inject(ThumbnailService);
     isHovered: boolean = false;
     thumbnailUrl: string;
+    gameDataService: GameDataService = inject(GameDataService);
 
     onEdit() {
+        this.gameDataService.setGameData(this.game);
         this.edit.emit(this.game._id);
     }
 

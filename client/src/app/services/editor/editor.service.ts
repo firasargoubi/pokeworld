@@ -1,10 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { GameDataService } from '@app/services/game-data/game-data.service';
-import { ImageService } from '@app/services/image/image.service';
 import { EditorData } from '@app/interfaces/editor/editor-data';
 import { EditorItem } from '@app/interfaces/editor/editor-item';
 import { EditorTile } from '@app/interfaces/editor/editor-tile';
+import { GameDataService } from '@app/services/game-data/game-data.service';
+import { ImageService } from '@app/services/image/image.service';
 import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
 import { MapSize } from '@common/map-size.enum';
@@ -34,8 +34,8 @@ export class EditorService {
     }
 
     resetButton(): void {
-        // TODO
-        window.console.log('resetButton()');
+        this.gameDataService.resetMap();
+        // window.console.log('resetButton()');
     }
 
     onMouseDown(event: MouseEvent): void {

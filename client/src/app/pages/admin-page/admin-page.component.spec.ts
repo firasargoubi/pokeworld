@@ -132,6 +132,14 @@ describe('AdminPageComponent', () => {
         expect(loadGamesSpy).toHaveBeenCalled();
     });
 
+    it('should toggle isCreationMode on onCreateGame', () => {
+        expect(component.isCreationMode).toBeFalse();
+        component.onCreateGame();
+        expect(component.isCreationMode).toBeTrue();
+        component.onCreateGame();
+        expect(component.isCreationMode).toBeFalse();
+    });
+
     it('should call handleError when loadGames, toggleVisibility or delete fails (INTERNAL_ERROR)', () => {
         const error = new HttpErrorResponse({ error: 'Action failed', status: 500 });
 
