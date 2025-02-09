@@ -10,6 +10,7 @@ $base-size: 0.5vw; // Taille de base pour les dimensions
 /* Conteneur du pop-up */
 #pop-up {
     position: absolute;
+    top: 15vh;
     left: $base-size * 44.4;
     height: $base-size * 66.6667; // 40vw
     width: $base-size * 100; // 60vw
@@ -109,8 +110,9 @@ app-pokeball-button {
     position: absolute;
     top: $base-size * 50; // 30vw
     left: $base-size * 20; // 25vw
-    width: 16vw;
+    width: 24vw;
     height: 4.5vw;
+    overflow: visible;
 }
 
 #moltres {
