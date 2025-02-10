@@ -4,8 +4,9 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/interfaces/avatars';
 import { Avatars } from '@app/interfaces/avatars.enum';
-import { DiceOption, dicePair } from '@app/interfaces/dice';
-import { BONUS_POINTS, DEFAULT_STAT_POINTS, Dice, PointStat } from '@app/interfaces/player';
+import { DiceOption, DICE_PAIR, Dice } from '@app/interfaces/dice';
+import { PointStat, statFrench } from '@app/interfaces/player';
+import { BONUS_POINTS, DEFAULT_STAT_POINTS, MIN_NAME_LENGTH, MAX_NAME_LENGTH } from '@app/consts/default-player';
 
 @Component({
     selector: 'app-player-selection-page',
@@ -14,20 +15,13 @@ import { BONUS_POINTS, DEFAULT_STAT_POINTS, Dice, PointStat } from '@app/interfa
     styleUrl: './player-selection-page.component.scss',
 })
 export class PlayerSelectionPageComponent {
-    readonly minLength = 3;
-    readonly maxLength = 20;
-    nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(this.minLength), Validators.maxLength(this.maxLength)]);
+    nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
     bonusForm: FormGroup = new FormGroup({
         points: new FormControl('life', [Validators.required]),
         bonusDice: new FormControl(DiceOption.Option1.toString(), [Validators.required]),
     });
 
-    statFrench = {
-        life: 'vie',
-        speed: 'vitesse',
-        attack: 'attaque',
-        defense: 'defense',
-    };
+    statFrench = statFrench;
     statList = Object.keys(this.statFrench) as (keyof typeof this.statFrench)[];
 
     dice = Dice;
@@ -51,7 +45,7 @@ export class PlayerSelectionPageComponent {
     getBonusDice(statCategory: PointStat): Dice | null {
         if (statCategory === 'attack' || statCategory === 'defense') {
             const diceOption = this.bonusForm.get('bonusDice')?.value;
-            return dicePair[diceOption][statCategory];
+            return DICE_PAIR[diceOption][statCategory];
         }
         return null;
     }
@@ -74,7 +68,7 @@ export class PlayerSelectionPageComponent {
         this.selectedAvatar = avatar;
     }
 
-    isWarning(formField: string) {
+    needsWarning(formField: string) {
         if (formField === 'name') {
             return !this.nameForm.valid && this.isStartClicked();
         } else if (formField === 'avatar') {

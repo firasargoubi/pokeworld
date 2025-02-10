@@ -11,9 +11,9 @@
                     <input id="name-input" type="text" [formControl]="nameForm" id="name" autofocus />
                 </span>
             </div>
-            @if(isWarning('name')){
+            @if(needsWarning('name')){
             <div class="warning">Vous devez entrer un pseudo entre 3 et 20 characteres !</div>
-            } @if(isWarning('avatar')){
+            } @if(needsWarning('avatar')){
             <div class="warning">Veuillez choisir une AVATAR !</div>
             }
             <div id="stats-title">Statistiques</div>

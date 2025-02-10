@@ -59,6 +59,7 @@ describe('CreatePageComponent', () => {
     });
 
     it('should call loadGames when handleNotFoundError is called', () => {
+        // private method
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const loadGamesSpy = spyOn(component as any, 'loadGames');
         const error = new HttpErrorResponse({ error: 'Game not found', status: 404 });
@@ -117,6 +118,7 @@ describe('CreatePageComponent', () => {
     it('should handle error when loadGames fails', () => {
         const errorResponse = new HttpErrorResponse({ error: 'Test error', status: 500 });
         gameServiceSpy.getAllGames.and.returnValue(throwError(() => errorResponse));
+        // private method
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleErrorSpy = spyOn<any>(component, 'handleError');
         component['loadGames']();
@@ -138,6 +140,7 @@ describe('CreatePageComponent', () => {
 
     it('should call handleError when handleNotFoundError is called with non-NotFound error', () => {
         const errorResponse = new HttpErrorResponse({ error: 'Test error', status: HttpStatusCode.InternalServerError });
+        // private method
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleErrorSpy = spyOn<any>(component, 'handleError');
 

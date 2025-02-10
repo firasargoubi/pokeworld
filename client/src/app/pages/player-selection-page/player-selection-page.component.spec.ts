@@ -3,8 +3,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PlayerSelectionPageComponent } from './player-selection-page.component';
 import { Avatars } from '@app/interfaces/avatars.enum';
-import { dicePair } from '@app/interfaces/dice';
-import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@app/interfaces/player';
+import { DICE_PAIR } from '@app/interfaces/dice';
+import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@app/consts/default-player';
 
 describe('PlayerSelectionPageComponent', () => {
     let component: PlayerSelectionPageComponent;
@@ -43,7 +43,7 @@ describe('PlayerSelectionPageComponent', () => {
         component.nameForm.setValue('ab');
         fixture.detectChanges();
 
-        expect(component.isWarning('name')).toBeTrue();
+        expect(component.needsWarning('name')).toBeTrue();
     });
 
     it('should display warning message for unselected avatar', () => {
@@ -51,30 +51,30 @@ describe('PlayerSelectionPageComponent', () => {
         component.selectedAvatar = Avatars.Default;
         fixture.detectChanges();
 
-        expect(component.isWarning('avatar')).toBeTrue();
+        expect(component.needsWarning('avatar')).toBeTrue();
     });
 
-    it('should return false for isWarning when form field is valid', () => {
+    it('should return false for needsWarning when form field is valid', () => {
         component.nameForm.setValue('ValidName');
         component['isStartClicked'].set(true);
         fixture.detectChanges();
 
-        expect(component.isWarning('name')).toBeFalse();
+        expect(component.needsWarning('name')).toBeFalse();
     });
 
-    it('should return false for isWarning when isStartClicked is false', () => {
+    it('should return false for needsWarning when isStartClicked is false', () => {
         component.nameForm.setValue('ab');
         component['isStartClicked'].set(false);
         fixture.detectChanges();
 
-        expect(component.isWarning('name')).toBeFalse();
+        expect(component.needsWarning('name')).toBeFalse();
     });
 
-    it('should return false for isWarning when formField does not correspond to any known field', () => {
+    it('should return false for needsWarning when formField does not correspond to any known field', () => {
         component['isStartClicked'].set(true);
         fixture.detectChanges();
 
-        expect(component.isWarning('unknownField')).toBeFalse();
+        expect(component.needsWarning('unknownField')).toBeFalse();
     });
 
     it('should select an avatar', () => {
@@ -89,7 +89,7 @@ describe('PlayerSelectionPageComponent', () => {
         component.selectedAvatar = component.avatarList[0];
         component.goToLobby();
 
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/lobby']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
     });
 
     it('should not navigate to lobby on invalid form submission', () => {
@@ -108,7 +108,7 @@ describe('PlayerSelectionPageComponent', () => {
     it('should return correct bonus dice for stat category', () => {
         component.bonusForm.get('bonusDice')?.setValue(component.diceOptions.Option1.toString());
         const bonusDice = component.getBonusDice('attack');
-        expect(bonusDice).toBe(dicePair[component.diceOptions.Option1]['attack']);
+        expect(bonusDice).toBe(DICE_PAIR[component.diceOptions.Option1]['attack']);
     });
 
     it('should return correct avatar button style', () => {

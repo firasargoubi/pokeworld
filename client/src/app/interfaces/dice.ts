@@ -8,14 +8,14 @@ enum DiceOption {
     Option2,
 }
 
-interface BonusDice {
+export interface BonusDice {
     attack: Dice;
     defense: Dice;
 }
 
-const dicePair: BonusDice[] = [
+const DICE_PAIR: BonusDice[] = [
     { attack: Dice.D4, defense: Dice.D6 },
     { attack: Dice.D6, defense: Dice.D4 },
 ];
 
-export { Dice, BonusDice, dicePair, DiceOption };
+export { Dice, DICE_PAIR, DiceOption };
