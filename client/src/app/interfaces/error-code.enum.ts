@@ -5,4 +5,5 @@ export enum ErrorCode {
     BridgeNotBetweenWalls = 'Bridge must be placed between two water tiles',
     MissingRequiredItems = 'Not enough required items placed on the map',
     TooManyItems = 'Too many items of this type placed on the map',
+    DuplicatedName = 'Name already exists',
 }

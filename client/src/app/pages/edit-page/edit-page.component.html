@@ -1,19 +1,19 @@
-<div class="editor-page" (mousedown)="editorService.onMouseDown($event)"
-    (contextmenu)="editorService.onRightClick($event)" (mouseup)="editorService.onMouseUp($event)"
-    (mousemove)="editorService.onMouseMove($event)" (mouseover)="editorService.onMouseOver($event)">
+<div
+    class="editor-page"
+    (mousedown)="editorService.onMouseDown($event)"
+    (contextmenu)="editorService.onRightClick($event)"
+    (mouseup)="editorService.onMouseUp($event)"
+    (mousemove)="editorService.onMouseMove($event)"
+    (mouseover)="editorService.onMouseOver($event)"
+>
+    <app-header [onClick]="editorService.redirectToAdminPage.bind(editorService)" [stepNumber]="'2'" [title]="'Modifier le jeu'"></app-header>
 
-    <app-header [onClick]="editorService.redirectToAdminPage.bind(editorService)"
-        [stepNumber]="'2'" [title]="'Modifier le jeu'"></app-header>
-        
     <main>
         <div class="editor-left">
             <div class="left-label">Nom</div>
-            <input class="input-name" type="text" maxlength="32" spellcheck="false"
-                value="{{ editorService.gameDataService.getName() }}">
+            <input class="input-name" type="text" maxlength="32" spellcheck="false" [(ngModel)]="editorService.gameDataService.gameData.name" />
             <div class="left-label-small">Description</div>
-            <div class="input-description" contenteditable="true" spellcheck="false">{{
-                editorService.gameDataService.getDescription() }}
-            </div>
+            <div class="input-description" contenteditable="true" spellcheck="false">{{ editorService.gameDataService.getDescription() }}</div>
             <div class="left-label-medium">Taille : {{ editorService.gameDataService.getMapSizeString() }}</div>
             <div class="left-label-medium">Mode : {{ editorService.gameDataService.getGameModeString() }}</div>
             <!-- TODO changer pour pokemon button  -->

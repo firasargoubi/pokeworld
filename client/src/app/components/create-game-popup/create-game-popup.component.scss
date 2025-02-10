@@ -1,24 +1,20 @@
-/* Variable de base */
-$base-size: 0.5vw; // Taille de base pour les dimensions
+$base-size: 0.5vw;
 
-/* Styles globaux */
 * {
     font-family: 'pixel';
-    font-size: $base-size * 5; // 3vw
+    font-size: $base-size * 5;
 }
 
-/* Conteneur du pop-up */
 #pop-up {
     position: absolute;
     top: 15vh;
     left: $base-size * 44.4;
-    height: $base-size * 66.6667; // 40vw
-    width: $base-size * 100; // 60vw
-    margin: $base-size; // 0.6vw
+    height: $base-size * 66.6667;
+    width: $base-size * 100;
+    margin: $base-size;
     overflow: visible;
 }
 
-/* Arrière-plan et bordure du pop-up */
 #pop-up::before {
     content: 'Détails du jeu';
     position: absolute;
@@ -26,12 +22,12 @@ $base-size: 0.5vw; // Taille de base pour les dimensions
     left: 0;
     width: 100%;
     height: 100%;
-    padding-left: $base-size * 1.6667; // 1vw
-    font-size: $base-size * 7.5; // 4.5vw
+    padding-left: $base-size * 1.6667;
+    font-size: $base-size * 7.5;
     background-image: url('/assets/images/menu/containers/orange/orange-scrare-body.png');
     background-repeat: repeat-x;
     background-size: contain;
-    border: ($base-size * 1.4) solid #49485e; // 0.84vw
+    border: ($base-size * 2.3) solid #49485e;
     clip-path: polygon(
         $base-size 0%,
         calc(100% - #{$base-size}) 0%,
@@ -52,64 +48,58 @@ $base-size: 0.5vw; // Taille de base pour les dimensions
     z-index: 0;
 }
 
-/* Section des détails */
 #details {
     position: absolute;
-    top: $base-size * 10; // 6vw
-    left: $base-size * 1.6667; // 1vw
-    font-size: $base-size * 7.5; // 4.5vw
+    top: $base-size * 10;
+    left: $base-size * 1.6667;
+    font-size: $base-size * 7.5;
 }
 
-/* Styles pour les cases à cocher */
 .check-box {
-    width: $base-size * 5; // 3vw
-    height: $base-size * 5; // 3vw
-    border: $base-size * 0.7 solid white; // Bordure extérieure blanche
-    padding: $base-size * 0.5; // Espace transparent entre le carré blanc et la bordure extérieure
-    background-color: transparent; // Fond transparent par défaut
-    box-shadow: $base-size * 0.6667 $base-size * 0.6667 0 rgba(0, 0, 0, 0.6); // Ombre
+    width: $base-size * 5;
+    height: $base-size * 5;
+    border: $base-size * 0.7 solid white;
+    padding: $base-size * 0.5;
+    background-color: transparent;
+    box-shadow: $base-size * 0.6667 $base-size * 0.6667 0 rgba(0, 0, 0, 0.6);
     cursor: pointer;
 
     &:hover {
-        background-color: white; // Remplit uniquement le centre au survol
+        background-color: white;
     }
 }
 
 .selected {
-    background-color: white; // Remplit uniquement le centre lorsqu'il est sélectionné
-    background-clip: content-box; // Limite le fond à la zone de contenu (sans le padding)
+    background-color: white;
+    background-clip: content-box;
 }
 
-/* Section des informations */
 #infos {
     display: flex;
     flex-direction: row;
-    gap: $base-size * 11.6667; // 7vw
-    margin: $base-size * 1.6667; // 1vw
+    gap: $base-size * 11.6667;
+    margin: $base-size * 1.6667;
 }
 
-/* Styles pour les options */
 .option {
     display: flex;
     flex-direction: row;
-    gap: $base-size * 1.6667; // 1vw
+    gap: $base-size * 1.6667;
     align-items: center;
 }
 
-/* Conteneur des options */
 .options {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: $base-size * 0.5; // 0.3vw
+    gap: $base-size * 0.5;
     z-index: 2;
 }
 
-/* Positionnement du bouton Pokéball */
 app-pokeball-button {
     position: absolute;
-    top: $base-size * 50; // 30vw
-    left: $base-size * 20; // 25vw
+    top: $base-size * 50;
+    left: $base-size * 20;
     width: 24vw;
     height: 4.5vw;
     overflow: visible;
@@ -119,7 +109,7 @@ app-pokeball-button {
     position: absolute;
     z-index: 1;
     pointer-events: none;
-    width: $base-size * 55; // 33vw
-    left: $base-size * 60; // 36vw
-    top: $base-size * 28; // 10vw
+    width: $base-size * 55;
+    left: $base-size * 60;
+    top: $base-size * 28;
 }

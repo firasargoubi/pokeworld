@@ -27,11 +27,27 @@ export class GameDataService {
         this.mapUpdate.next(null);
     }
 
+    cleanMap() {
+        this.gameData.mapData.tiles = Array.from({ length: this.gameData.mapData.size }, () =>
+            Array(this.gameData.mapData.size).fill(TileType.Grass),
+        );
+
+        this.gameData.mapData.items = Object.keys(ItemType).reduce(
+            (acc, key) => {
+                acc[key as ItemType] = [];
+                return acc;
+            },
+            {} as Record<ItemType, Position[]>,
+        );
+
+        this.mapUpdate.next(null);
+    }
+
     createGameData(size: MapSize, mode: GameMode) {
         this.gameData = DEFAULT_GAME;
         this.gameData.mapData.size = size;
         this.gameData.mapData.gameMode = mode;
-        this.resetMap();
+        this.cleanMap();
         this.mapUpdate.next(null);
     }
 

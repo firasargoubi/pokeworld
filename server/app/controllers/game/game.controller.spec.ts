@@ -1,10 +1,10 @@
+import { Game } from '@app/model/schema/game.schema';
+import { GameService } from '@app/services/game/game.service';
+import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Response } from 'express';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { GameController } from './game.controller';
-import { GameService } from '@app/services/game/game.service';
-import { Game } from '@app/model/schema/game.schema';
-import { Response } from 'express';
-import { HttpStatus } from '@nestjs/common';
 
 describe('GameController', () => {
     let controller: GameController;
@@ -139,5 +139,51 @@ describe('GameController', () => {
         res.send = () => res;
 
         await controller.deleteGame('valid_id', res);
+    });
+
+    it('isNameUnique() should return the correct uniqueness status without an ID', async () => {
+        const cases = [
+            { name: 'UniqueName', expected: true },
+            { name: 'ExistingName', expected: false },
+        ];
+
+        for (const testCase of cases) {
+            gameService.isNameUnique.resolves(testCase.expected);
+
+            const res = {} as unknown as Response;
+            res.status = (code) => {
+                expect(code).toEqual(HttpStatus.OK);
+                return res;
+            };
+            res.json = (data) => {
+                expect(data).toEqual({ isUnique: testCase.expected });
+                return res;
+            };
+
+            await controller.isNameUnique(testCase.name, undefined, res);
+        }
+    });
+
+    it('isNameUnique() should return the correct uniqueness status with an ID', async () => {
+        const cases = [
+            { name: 'ExistingName', id: '123', expected: true }, // Appartient à l'ID donné
+            { name: 'ExistingName', id: '456', expected: false }, // Appartient à un autre ID
+        ];
+
+        for (const testCase of cases) {
+            gameService.isNameUnique.resolves(testCase.expected);
+
+            const res = {} as unknown as Response;
+            res.status = (code) => {
+                expect(code).toEqual(HttpStatus.OK);
+                return res;
+            };
+            res.json = (data) => {
+                expect(data).toEqual({ isUnique: testCase.expected });
+                return res;
+            };
+
+            await controller.isNameUnique(testCase.name, testCase.id, res);
+        }
     });
 });

@@ -29,7 +29,7 @@ export class CreateGamePopupComponent {
         this.mapSize = sizeKey as keyof typeof MapSize;
     }
 
-    // PAS POUR LE SPRINT 1, À DÉCOMMENTER ENSUITE (FONCTIONNEL)
+    // NOT FOR SPRINT 1, TO BE UNCOMMENTED LATER (FUNCTIONAL)
     // onModeSelection(modeKey: string) {
     //     this.gameMode = modeKey as keyof typeof GameMode;
     // }
