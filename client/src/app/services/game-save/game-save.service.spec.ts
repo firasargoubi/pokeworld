@@ -3,18 +3,18 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { GameData } from '@common/game-data';
-import { GameService } from './game-save.service';
+import { GameSaveService } from './game-save.service';
 
 describe('GameSave', () => {
     let httpMock: HttpTestingController;
-    let service: GameService;
+    let service: GameSaveService;
     let baseUrl: string;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()],
         });
-        service = TestBed.inject(GameService);
+        service = TestBed.inject(GameSaveService);
         httpMock = TestBed.inject(HttpTestingController);
         baseUrl = service['baseUrl'];
     });

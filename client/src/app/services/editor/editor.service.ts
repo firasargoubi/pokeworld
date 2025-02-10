@@ -4,7 +4,7 @@ import { EditorData } from '@app/interfaces/editor/editor-data';
 import { EditorItem } from '@app/interfaces/editor/editor-item';
 import { EditorTile } from '@app/interfaces/editor/editor-tile';
 import { GameDataService } from '@app/services/game-data/game-data.service';
-import { GameService } from '@app/services/game-save/game-save.service';
+import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
 import { ImageService } from '@app/services/image/image.service';
 import { GameMode } from '@common/game-mode.enum';
@@ -26,7 +26,7 @@ export class EditorService {
     private lastPosition: Position = { x: -1, y: -1 };
     private router: Router = inject(Router);
     private gameValidationService: GameValidationService = inject(GameValidationService);
-    private gameService: GameService = inject(GameService);
+    private gameSaveService: GameSaveService = inject(GameSaveService);
 
     redirectToAdminPage(): void {
         this.router.navigate(['/admin']);
@@ -40,13 +40,13 @@ export class EditorService {
             return;
         }
 
-        this.gameService.isNameUnique(this.gameDataService.gameData.name, this.gameDataService.gameData._id).subscribe(
+        this.gameSaveService.isNameUnique(this.gameDataService.gameData.name, this.gameDataService.gameData._id).subscribe(
             (response) => {
                 if (!response.isUnique) {
                     window.console.log('Le nom est déjà utilisé. Veuillez en choisir un autre.');
                     return;
                 }
-                this.gameService.saveGame(this.gameDataService.gameData).subscribe(
+                this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe(
                     () => {
                         window.console.log(`Le jeu "${this.gameDataService.gameData.name}" a été sauvegardé avec succès.`);
                     },
