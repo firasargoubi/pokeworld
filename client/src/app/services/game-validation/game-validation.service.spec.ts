@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ErrorCode } from '@app/interfaces/error-code.enum';
-import { BridgeValidationError, ValidationResult, ValidationStatus } from '@app/interfaces/game-validation-result';
+import { BridgeValidationError, ValidationResult } from '@app/interfaces/game-validation-result';
 import { TilesCount } from '@app/interfaces/tiles-count';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
@@ -35,24 +35,37 @@ describe('GameValidationService', () => {
         service = TestBed.inject(GameValidationService);
     });
 
-    it('validateGame should invoke validateName, validateDescription, and validateMap with the correct parameters', () => {
+    it('should invoke validateName, validateDescription, and validateMap with the correct parameters', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(service, 'validateMap').and.returnValue({ name: {} as ValidationStatus, description: {} as ValidationStatus } as ValidationResult);
+        spyOn<any>(service, 'validateMap').and.returnValue({
+            name: { isValid: true, errorCode: null },
+            description: { isValid: true, errorCode: null },
+        } as Partial<ValidationResult>);
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(service, 'validateName').and.stub();
+        spyOn<any>(service, 'validateName').and.returnValue({ isValid: true, errorCode: null });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(service, 'validateDescription').and.stub();
+        spyOn<any>(service, 'validateDescription').and.returnValue({ isValid: true, errorCode: null });
 
-        service.validateGame(game);
+        const result = service.validateGame(game);
 
-        expect(service['validateName']).toHaveBeenCalledTimes(1);
-        expect(service['validateName']).toHaveBeenCalledWith(game.name);
+        expect(service['validateName']).toHaveBeenCalledOnceWith(game.name);
+        expect(service['validateDescription']).toHaveBeenCalledOnceWith(game.description);
+        expect(service['validateMap']).toHaveBeenCalledOnceWith(game.mapData);
+        expect(result).toBeNull();
+    });
 
-        expect(service['validateDescription']).toHaveBeenCalledTimes(1);
-        expect(service['validateDescription']).toHaveBeenCalledWith(game.description);
+    it('should return an error when validateMap detects an invalid description', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'validateMap').and.returnValue({
+            name: { isValid: true, errorCode: null },
+            spawnPoint: { isValid: false, errorCode: ErrorCode.Empty },
+        } as Partial<ValidationResult>);
 
-        expect(service['validateMap']).toHaveBeenCalledTimes(1);
-        expect(service['validateMap']).toHaveBeenCalledWith(game.mapData);
+        const result = service.validateGame(game);
+
+        expect(result).not.toBeNull();
+        // expect(result?.description.isValid).toBeFalse();
     });
 
     it('validateName should validate a correct game name', () => {

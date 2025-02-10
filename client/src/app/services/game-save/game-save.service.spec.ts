@@ -1,11 +1,11 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { GameData } from '@common/game-data';
 import { GameService } from './game-save.service';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 
-describe('Service: Game', () => {
+describe('GameSave', () => {
     let httpMock: HttpTestingController;
     let service: GameService;
     let baseUrl: string;
@@ -140,5 +140,30 @@ describe('Service: Game', () => {
         const req = httpMock.expectOne(`${baseUrl}/games/${gameId}`);
         expect(req.request.method).toBe('DELETE');
         req.flush(null);
+    });
+
+    it('should check if name is unique without an ID', () => {
+        const gameName = 'UniqueGame';
+
+        service.isNameUnique(gameName).subscribe((response) => {
+            expect(response.isUnique).toBe(true);
+        });
+
+        const req = httpMock.expectOne(`${baseUrl}/games/isNameUnique/${gameName}`);
+        expect(req.request.method).toBe('GET');
+        req.flush({ isUnique: true }); // Simule une réponse JSON avec isUnique: true
+    });
+
+    it('should check if name is unique with an ID', () => {
+        const gameName = 'ExistingGame';
+        const gameId = '123';
+
+        service.isNameUnique(gameName, gameId).subscribe((response) => {
+            expect(response.isUnique).toBe(false);
+        });
+
+        const req = httpMock.expectOne(`${baseUrl}/games/isNameUnique/${gameName}/${gameId}`);
+        expect(req.request.method).toBe('GET');
+        req.flush({ isUnique: false }); // Simule une réponse JSON avec isUnique: false
     });
 });
