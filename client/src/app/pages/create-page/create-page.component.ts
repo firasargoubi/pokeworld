@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { GameService } from '@app/services/game-save/game-save.service';
+import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
 
 @Component({
@@ -18,7 +18,7 @@ export class CreatePageComponent implements OnInit {
 
     constructor(
         private router: Router,
-        private gameService: GameService,
+        private gameSaveService: GameSaveService,
         private snackBar: MatSnackBar,
     ) {}
 
@@ -31,7 +31,7 @@ export class CreatePageComponent implements OnInit {
     }
 
     loadGames() {
-        this.gameService.getAllGames().subscribe({
+        this.gameSaveService.getAllGames().subscribe({
             next: (games) => {
                 this.games = games.filter((game) => game.isVisible);
             },

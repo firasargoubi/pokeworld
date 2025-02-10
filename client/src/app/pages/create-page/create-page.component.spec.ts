@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, RouterModule } from '@angular/router';
 import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
-import { GameService } from '@app/services/game-save/game-save.service';
+import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
 import { of, throwError } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
@@ -11,10 +11,10 @@ describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
     let fixture: ComponentFixture<CreatePageComponent>;
     let router: Router;
-    let gameServiceSpy: jasmine.SpyObj<GameService>;
+    let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
 
     beforeEach(async () => {
-        const spy = jasmine.createSpyObj('GameService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
+        const spy = jasmine.createSpyObj('GameSaveService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
         spy.getAllGames.and.returnValue(of([]));
         spy.getGame.and.returnValue(of({} as GameData));
         spy.toggleVisibility.and.returnValue(of({} as GameData));
@@ -22,10 +22,10 @@ describe('CreatePageComponent', () => {
 
         await TestBed.configureTestingModule({
             imports: [RouterModule.forRoot([]), CreatePageComponent],
-            providers: [{ provide: GameService, useValue: spy }],
+            providers: [{ provide: GameSaveService, useValue: spy }],
         }).compileComponents();
 
-        gameServiceSpy = TestBed.inject(GameService) as jasmine.SpyObj<GameService>;
+        gameSaveServiceSpy = TestBed.inject(GameSaveService) as jasmine.SpyObj<GameSaveService>;
     });
 
     beforeEach(() => {
@@ -47,10 +47,10 @@ describe('CreatePageComponent', () => {
     });
 
     it('should load games when loadGames is called', () => {
-        gameServiceSpy.getAllGames.and.returnValue(of(MOCK_GAMES));
+        gameSaveServiceSpy.getAllGames.and.returnValue(of(MOCK_GAMES));
 
         component.loadGames();
-        expect(gameServiceSpy.getAllGames).toHaveBeenCalled();
+        expect(gameSaveServiceSpy.getAllGames).toHaveBeenCalled();
         expect(component.games).toEqual(MOCK_GAMES);
     });
 
@@ -68,7 +68,7 @@ describe('CreatePageComponent', () => {
 
     it('should call handleError when loadGames fails (INTERNAL_ERROR)', () => {
         const error = new HttpErrorResponse({ error: 'Action failed', status: 500 });
-        gameServiceSpy.getAllGames.and.returnValue(throwError(() => error));
+        gameSaveServiceSpy.getAllGames.and.returnValue(throwError(() => error));
         const expectedMessage = 'Failed to load games. Please try again later.';
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
