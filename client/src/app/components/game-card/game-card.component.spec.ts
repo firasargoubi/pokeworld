@@ -20,7 +20,7 @@ describe('GameCardComponent', () => {
 
         fixture = TestBed.createComponent(GameCardComponent);
         component = fixture.componentInstance;
-        component.game = MOCK_GAMES[0];
+        component.game = structuredClone(MOCK_GAMES[0]);
         thumbnailServiceSpy = TestBed.inject(ThumbnailService) as jasmine.SpyObj<ThumbnailService>;
         fixture.detectChanges();
     });
