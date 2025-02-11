@@ -111,14 +111,17 @@ $clip-path: polygon(
 .game-name {
     position: absolute;
     font-size: 3vw;
+    font-weight: bolder;
     text-shadow: 0.25vw 0 0 $text-shadow-color;
     letter-spacing: 0.2vw;
     left: 10px;
     top: 4px;
-    width: 90%;
-    height: auto;
+    width: 94%;
+    height: 40%;
+    white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    display: block;
     z-index: 1;
 }
 
@@ -412,7 +415,7 @@ $clip-path: polygon(
     left: 0;
 }
 
-button{
+button {
     font-size: 20px;
     padding: 10px;
 }

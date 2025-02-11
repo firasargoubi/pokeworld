@@ -66,6 +66,7 @@ $card-width: 26vw;
 
 #game-grid * {
     width: 100%;
+    overflow: visible;
 }
 
 #poke-button {
