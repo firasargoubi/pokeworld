@@ -5,15 +5,10 @@ import { Model, isValidObjectId } from 'mongoose';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { Game } from '@app/model/schema/game.schema';
-import { GameMode } from '@common/game-mode.enum'; // DELETE LATER
-import { ItemType } from '@common/item-type.enum'; // DELETE LATER
-import { MapSize } from '@common/map-size.enum'; // DELETE LATER
 
 @Injectable()
 export class GameService {
-    constructor(@InjectModel(Game.name) private gameModel: Model<Game>) {
-        // this.resetDB(); // UNCOMMENT WHEN YOU WANT TO RESET AND REPOPULATE THE DB.
-    }
+    constructor(@InjectModel(Game.name) private gameModel: Model<Game>) {}
     async getAllGames(): Promise<Game[]> {
         return this.gameModel.find().exec();
     }
@@ -88,165 +83,13 @@ export class GameService {
     }
 
     async isNameUnique(name: string, exceptId?: string): Promise<boolean> {
+        if (!name) {
+            throw new BadRequestException('Name is required.');
+        }
         if (exceptId) {
             return (await this.gameModel.find({ name, _id: { $ne: exceptId } }).exec()).length === 0;
         } else {
             return (await this.gameModel.find({ name }).exec()).length === 0;
         }
-    }
-
-    // DELETE LATER
-    async populateDB(): Promise<void> {
-        const games: CreateGameDto[] = [
-            {
-                name: 'Game 1',
-                description: 'Description of Game 1',
-                lastEdited: new Date(),
-                isVisible: true,
-                thumbnail: '/assets/images/game/tiles/grass.png',
-                mapData: {
-                    tiles: [[]],
-                    items: {
-                        [ItemType.Item1]: [],
-                        [ItemType.Item2]: [],
-                        [ItemType.Item3]: [],
-                        [ItemType.Item4]: [],
-                        [ItemType.Item5]: [],
-                        [ItemType.Item6]: [],
-                        [ItemType.Random]: [],
-                        [ItemType.Spawn]: [],
-                        [ItemType.Flag]: [],
-                    },
-                    size: MapSize.Small,
-                    gameMode: GameMode.FFA,
-                },
-            },
-            {
-                name: 'Game 2',
-                description: 'Description of Game 2',
-                lastEdited: new Date(),
-                isVisible: true,
-                thumbnail: '/assets/images/game/tiles/water.png',
-                mapData: {
-                    tiles: [[]],
-                    items: {
-                        [ItemType.Item1]: [],
-                        [ItemType.Item2]: [],
-                        [ItemType.Item3]: [],
-                        [ItemType.Item4]: [],
-                        [ItemType.Item5]: [],
-                        [ItemType.Item6]: [],
-                        [ItemType.Random]: [],
-                        [ItemType.Spawn]: [],
-                        [ItemType.Flag]: [],
-                    },
-                    size: MapSize.Medium,
-                    gameMode: GameMode.CTF,
-                },
-            },
-            {
-                name: 'Game 3',
-                description: 'Description of Game 3',
-                lastEdited: new Date(),
-                isVisible: true,
-                thumbnail: '/assets/images/game/tiles/path.png',
-                mapData: {
-                    tiles: [[]],
-                    items: {
-                        [ItemType.Item1]: [],
-                        [ItemType.Item2]: [],
-                        [ItemType.Item3]: [],
-                        [ItemType.Item4]: [],
-                        [ItemType.Item5]: [],
-                        [ItemType.Item6]: [],
-                        [ItemType.Random]: [],
-                        [ItemType.Spawn]: [],
-                        [ItemType.Flag]: [],
-                    },
-                    size: MapSize.Large,
-                    gameMode: GameMode.FFA,
-                },
-            },
-            {
-                name: 'Game 4',
-                description: 'Description of Game 4',
-                lastEdited: new Date(),
-                isVisible: true,
-                thumbnail: '/assets/images/game/tiles/water.png',
-                mapData: {
-                    tiles: [[]],
-                    items: {
-                        [ItemType.Item1]: [],
-                        [ItemType.Item2]: [],
-                        [ItemType.Item3]: [],
-                        [ItemType.Item4]: [],
-                        [ItemType.Item5]: [],
-                        [ItemType.Item6]: [],
-                        [ItemType.Random]: [],
-                        [ItemType.Spawn]: [],
-                        [ItemType.Flag]: [],
-                    },
-                    size: MapSize.Small,
-                    gameMode: GameMode.CTF,
-                },
-            },
-            {
-                name: 'Game 5',
-                description: 'Description of Game 5',
-                lastEdited: new Date(),
-                isVisible: true,
-                thumbnail: '/assets/images/game/tiles/grass.png',
-                mapData: {
-                    tiles: [[]],
-                    items: {
-                        [ItemType.Item1]: [],
-                        [ItemType.Item2]: [],
-                        [ItemType.Item3]: [],
-                        [ItemType.Item4]: [],
-                        [ItemType.Item5]: [],
-                        [ItemType.Item6]: [],
-                        [ItemType.Random]: [],
-                        [ItemType.Spawn]: [],
-                        [ItemType.Flag]: [],
-                    },
-                    size: MapSize.Medium,
-                    gameMode: GameMode.FFA,
-                },
-            },
-            {
-                name: 'Game 6',
-                description: 'Description of Game 6',
-                lastEdited: new Date(),
-                isVisible: true,
-                thumbnail: '/assets/images/game/tiles/path.png',
-                mapData: {
-                    tiles: [[]],
-                    items: {
-                        [ItemType.Item1]: [],
-                        [ItemType.Item2]: [],
-                        [ItemType.Item3]: [],
-                        [ItemType.Item4]: [],
-                        [ItemType.Item5]: [],
-                        [ItemType.Item6]: [],
-                        [ItemType.Random]: [],
-                        [ItemType.Spawn]: [],
-                        [ItemType.Flag]: [],
-                    },
-                    size: MapSize.Large,
-                    gameMode: GameMode.CTF,
-                },
-            },
-        ];
-
-        await this.gameModel.insertMany(games);
-    }
-
-    async deleteAllGames(): Promise<void> {
-        await this.gameModel.deleteMany({}).exec();
-    }
-
-    async resetDB(): Promise<void> {
-        await this.deleteAllGames();
-        await this.populateDB();
     }
 }

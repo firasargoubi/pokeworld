@@ -32,6 +32,35 @@ export class EditorService {
         this.router.navigate(['/admin']);
     }
 
+    // saveButton(): void {
+    //     const validationResult = this.gameValidationService.validateGame(this.gameDataService.gameData);
+
+    //     if (validationResult !== null) {
+    //         window.console.log('Erreur de validation du jeu:', validationResult);
+    //         return;
+    //     }
+
+    //     this.gameSaveService.isNameUnique(this.gameDataService.gameData.name, this.gameDataService.gameData._id).subscribe(
+    //         (response) => {
+    //             if (response) {
+    //                 window.console.log('Le nom est déjà utilisé. Veuillez en choisir un autre.');
+    //                 return;
+    //             }
+    //             this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe(
+    //                 () => {
+    //                     window.console.log(`Le jeu "${this.gameDataService.gameData.name}" a été sauvegardé avec succès.`);
+    //                 },
+    //                 (error) => {
+    //                     window.console.error('Erreur lors de la sauvegarde du jeu:', error);
+    //                 },
+    //             );
+    //         },
+    //         (error) => {
+    //             window.console.error('Erreur lors de la vérification du nom du jeu:', error);
+    //         },
+    //     );
+    // }
+
     saveButton(): void {
         const validationResult = this.gameValidationService.validateGame(this.gameDataService.gameData);
 
@@ -40,25 +69,13 @@ export class EditorService {
             return;
         }
 
-        this.gameSaveService.isNameUnique(this.gameDataService.gameData.name, this.gameDataService.gameData._id).subscribe(
-            (response) => {
-                if (!response.isUnique) {
-                    window.console.log('Le nom est déjà utilisé. Veuillez en choisir un autre.');
-                    return;
-                }
-                this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe(
-                    () => {
-                        window.console.log(`Le jeu "${this.gameDataService.gameData.name}" a été sauvegardé avec succès.`);
-                    },
-                    (error) => {
-                        window.console.error('Erreur lors de la sauvegarde du jeu:', error);
-                    },
-                );
-            },
-            (error) => {
-                window.console.error('Erreur lors de la vérification du nom du jeu:', error);
-            },
-        );
+        this.gameSaveService.isNameUnique(this.gameDataService.gameData.name, this.gameDataService.gameData._id).subscribe((isUnique) => {
+            if (!isUnique) {
+                window.console.log('Le nom est déjà utilisé. Veuillez en choisir un autre.');
+                return;
+            }
+            this.saveGame();
+        });
     }
 
     resetButton(): void {
@@ -110,6 +127,17 @@ export class EditorService {
 
         const position = { x: Number(xPos), y: Number(yPos) };
         this.paintTile(position);
+    }
+
+    private saveGame(): void {
+        this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe({
+            next: () => {
+                window.console.log(`Le jeu "${this.gameDataService.gameData.name}" a été sauvegardé avec succès.`);
+            },
+            error: (error) => {
+                window.console.error('Erreur lors de la sauvegarde du jeu:', error);
+            },
+        });
     }
 
     // TODO

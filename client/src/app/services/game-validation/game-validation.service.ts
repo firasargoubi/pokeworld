@@ -10,8 +10,6 @@ import { MapData } from '@common/map-data';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 
-const PERCENTAGE_FACTOR = 100;
-
 @Injectable({
     providedIn: 'root',
 })
@@ -38,7 +36,7 @@ export class GameValidationService {
     private validateField(value: string, maxLength: number): ValidationStatus {
         const validationStatus: ValidationStatus = { isValid: true, errorCode: null };
 
-        if (!value || value.trim() === '') {
+        if (!value || !value.trim()) {
             validationStatus.isValid = false;
             validationStatus.errorCode = ErrorCode.Empty;
         } else if (value.length > maxLength) {
@@ -132,11 +130,12 @@ export class GameValidationService {
     }
 
     private validateTerrainCoverage(tilesCount: TilesCount): { isValid: boolean; coveragePercentage: number } {
+        const PERCENTAGE_MULTIPLIER = 100;
         const currentTerrainRatio = tilesCount.nbTerrain / tilesCount.nbTilesTotal;
 
         const validationStatus = {
             isValid: currentTerrainRatio > MIN_TERRAIN_RATIO,
-            coveragePercentage: currentTerrainRatio * PERCENTAGE_FACTOR,
+            coveragePercentage: currentTerrainRatio * PERCENTAGE_MULTIPLIER,
         };
 
         return validationStatus;

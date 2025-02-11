@@ -10,7 +10,8 @@ import { PokeballButtonComponent } from './pokeball-button.component';
 })
 class TestHostComponent {
     testContent = 'Test Button';
-    delay = '300';
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    delay = 300;
 }
 
 describe('PokeballButtonComponent', () => {
@@ -37,30 +38,20 @@ describe('PokeballButtonComponent', () => {
         expect(component.buttonContent).toBe('Test Button');
     });
 
-    it('should have the default image source', () => {
-        expect(component.pokeballImageSrc).toBe(component.defaultPokeballImageSrc);
-        expect(component.borderImageSrc).toBe(component.defaultBorderImageSrc);
-        expect(component.contentImageSrc).toBe(component.defaultContentImageSrc);
-    });
-
-    it('should change imageSrc to pressedImageSrc on onMouseDown', () => {
+    it('should set isActive to true on mouse down', () => {
         component.onMouseDown();
-        expect(component.pokeballImageSrc).toBe(component.pressedPokeballImageSrc);
-        expect(component.borderImageSrc).toBe(component.pressedBorderImageSrc);
-        expect(component.contentImageSrc).toBe(component.pressedContentImageSrc);
+        expect(component.isActive).toBeTrue();
     });
 
-    it('should restore images after the specified delay', (done) => {
-        const verificationTimeout = 150;
+    it('should reset isActive to false after delay on mouse up', (done) => {
         component.delay = 100;
+        component.onMouseDown();
+        expect(component.isActive).toBeTrue();
         component.onMouseUp();
-
         setTimeout(() => {
-            expect(component.pokeballImageSrc).toBe(component.defaultPokeballImageSrc);
-            expect(component.borderImageSrc).toBe(component.defaultBorderImageSrc);
-            expect(component.contentImageSrc).toBe(component.defaultContentImageSrc);
+            expect(component.isActive).toBeFalse();
             done();
-        }, verificationTimeout);
+        }, component.delay);
     });
 
     it('should call onClickAction if defined when mouse is released', (done) => {

@@ -25,7 +25,6 @@ describe('GameValidationService', () => {
         mapData: map,
         lastEdited: new Date(),
         isVisible: true,
-        thumbnail: 'assets/tileset/grass.png',
     };
 
     beforeEach(() => {
@@ -36,17 +35,15 @@ describe('GameValidationService', () => {
     });
 
     it('should invoke validateName, validateDescription, and validateMap with the correct parameters', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        // private methods
         spyOn<any>(service, 'validateMap').and.returnValue({
             name: { isValid: true, errorCode: null },
             description: { isValid: true, errorCode: null },
         } as Partial<ValidationResult>);
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'validateName').and.returnValue({ isValid: true, errorCode: null });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'validateDescription').and.returnValue({ isValid: true, errorCode: null });
-
+        /* eslint-enable @typescript-eslint/no-explicit-any */
         const result = service.validateGame(game);
 
         expect(service['validateName']).toHaveBeenCalledOnceWith(game.name);
@@ -56,7 +53,7 @@ describe('GameValidationService', () => {
     });
 
     it('should return an error when validateMap detects an invalid description', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'validateMap').and.returnValue({
             name: { isValid: true, errorCode: null },
             spawnPoint: { isValid: false, errorCode: ErrorCode.Empty },
@@ -101,18 +98,15 @@ describe('GameValidationService', () => {
     });
 
     it('validateMap should process tiles and validate terrain, spawn points, items, and flags', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        // private methods
         spyOn<any>(service, 'handleTile').and.stub();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'validateTilesAccessibility').and.stub();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'validateTerrainCoverage').and.stub();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'validateSpawnPoints').and.stub();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'validateItemPlacement').and.stub();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'validateFlags').and.stub();
+        /* eslint-enable @typescript-eslint/no-explicit-any */
         service['validateMap'](game.mapData);
 
         expect(service['handleTile']).toHaveBeenCalledTimes(game.mapData.size * game.mapData.size);
@@ -259,7 +253,7 @@ describe('GameValidationService', () => {
     });
 
     it('handleTile should correctly increment tile counters based on tile type', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'validateBridge').and.returnValue({ x: 0, y: 0, errorCode: ErrorCode.BridgeAtEdge });
 
         let testCases = VALIDATION_TESTS_CASES.handleTileNoBridgeCases;

@@ -45,10 +45,6 @@ export class CreateGameDto {
     isVisible: boolean;
 
     @ApiProperty()
-    @IsString()
-    thumbnail: string;
-
-    @ApiProperty()
     @IsObject()
     mapData: MapData;
 
