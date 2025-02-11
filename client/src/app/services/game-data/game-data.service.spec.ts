@@ -31,30 +31,6 @@ describe('GameDataService', () => {
         expect(service).toBeTruthy();
     });
 
-    // it('should reset the map correctly', () => {
-    //     service.resetMap();
-    //     expect(service.gameData.mapData.tiles.length).toBe(service.gameData.mapData.size);
-    //     expect(service.gameData.mapData.tiles.every((row) => row.every((tile) => tile === TileType.Grass))).toBeTrue();
-    // });
-
-    // it('should create game data with correct size and mode', () => {
-    //     service.createGameData(MapSize.Large, GameMode.CTF);
-    //     expect(service.gameData.mapData.size).toBe(MapSize.Large);
-    //     expect(service.gameData.mapData.gameMode).toBe(GameMode.CTF);
-    // });
-
-    // it('should get and edit a tile correctly', () => {
-    //     for (let i = 0; i < service.gameData.mapData.size; i++) {
-    //         for (let j = 0; j < service.gameData.mapData.size; j++) {
-    //             service.gameData.mapData.tiles[i][j] = TileType.Water;
-    //         }
-    //     }
-    //     service.gameData.mapData.tiles[1][1] = TileType.Grass;
-    //     const position: Position = { x: 1, y: 1 };
-    //     service.editTile(TileType.Water, position);
-    //     expect(service.gameData.mapData.tiles[1][1]).toBe(service.getTile(position));
-    // });
-
     it('should add and remove items correctly', () => {
         const position: Position = { x: 2, y: 2 };
         service.addItem(ItemType.Item1, position);
@@ -69,21 +45,6 @@ describe('GameDataService', () => {
         expect(service.getMapSize()).toBe(DEFAULT_GAME.mapData.size);
         expect(service.getGameMode()).toBe(DEFAULT_GAME.mapData.gameMode);
     });
-
-    // it('should clean the map correctly using cleanMap', () => {
-    //     const mapUpdateSpy = spyOn(service.mapUpdate, 'next');
-
-    //     service.cleanMap();
-
-    //     expect(service.gameData.mapData.tiles.length).toBe(service.gameData.mapData.size);
-    //     expect(service.gameData.mapData.tiles.every((row) => row.every((tile) => tile === TileType.Grass))).toBeTrue();
-
-    //     Object.keys(ItemType).forEach((key) => {
-    //         expect(service.gameData.mapData.items[key as ItemType]).toEqual([]);
-    //     });
-
-    //     expect(mapUpdateSpy).toHaveBeenCalledWith(null);
-    // });
 
     it('should return the correct map size string', () => {
         service.gameData.mapData.size = MapSize.Small;
