@@ -4,7 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/interfaces/avatars';
 import { Avatars } from '@app/interfaces/avatars.enum';
-import { DiceOption, DICE_PAIR, Dice } from '@app/interfaces/dice';
+import { DiceType, BonusDice, DICE_PAIR } from '@app/consts/dice';
 import { PointStat, statFrench } from '@app/interfaces/player';
 import { BONUS_POINTS, DEFAULT_STAT_POINTS, MIN_NAME_LENGTH, MAX_NAME_LENGTH } from '@app/consts/default-player';
 
@@ -18,14 +18,14 @@ export class PlayerSelectionPageComponent {
     nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
     bonusForm: FormGroup = new FormGroup({
         points: new FormControl('life', [Validators.required]),
-        bonusDice: new FormControl(DiceOption.Option1.toString(), [Validators.required]),
+        bonusDice: new FormControl(BonusDice.Option1, [Validators.required]),
     });
 
     statFrench = statFrench;
     statList = Object.keys(this.statFrench) as (keyof typeof this.statFrench)[];
 
-    dice = Dice;
-    diceOptions = DiceOption;
+    diceType = DiceType;
+    bonusDice = BonusDice;
 
     avatarData = AVATAR_DATA;
     avatarList = Object.keys(AVATAR_DATA).slice(1) as Avatars[];
@@ -42,7 +42,7 @@ export class PlayerSelectionPageComponent {
         return this.bonusForm.get('points')?.value === statCategory;
     }
 
-    getBonusDice(statCategory: PointStat): Dice | null {
+    getBonusDice(statCategory: PointStat): DiceType | null {
         if (statCategory === 'attack' || statCategory === 'defense') {
             const diceOption = this.bonusForm.get('bonusDice')?.value;
             return DICE_PAIR[diceOption][statCategory];

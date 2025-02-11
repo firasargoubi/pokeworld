@@ -44,12 +44,12 @@
                         <legend>DE BONUS</legend>
                         <legend>Attaque</legend>
                         <legend>Defense</legend>
-                        <input type="radio" formControlName="bonusDice" value="{{ diceOptions.Option1 }}" id="option1" />
-                        <label for="option1"> {{ dice.D4 }} </label>
-                        <label for="option1"> {{ dice.D6 }} </label>
-                        <input type="radio" formControlName="bonusDice" value="{{ diceOptions.Option2 }}" id="option2" />
-                        <label for="option2"> {{ dice.D6 }} </label>
-                        <label for="option2"> {{ dice.D4 }} </label>
+                        <input type="radio" formControlName="bonusDice" value="{{ bonusDice.Option1 }}" id="option1" />
+                        <label for="option1"> {{ diceType.D4 }} </label>
+                        <label for="option1"> {{ diceType.D6 }} </label>
+                        <input type="radio" formControlName="bonusDice" value="{{ bonusDice.Option2 }}" id="option2" />
+                        <label for="option2"> {{ diceType.D6 }} </label>
+                        <label for="option2"> {{ diceType.D4 }} </label>
                     </div>
                 </form>
             </div>

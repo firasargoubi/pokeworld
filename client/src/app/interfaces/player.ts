@@ -1,5 +1,4 @@
 import { Avatars } from './avatars.enum';
-import { BonusDice } from './dice';
 
 interface Player {
     name: string;
@@ -8,7 +7,7 @@ interface Player {
     speed: number;
     attack: number;
     defense: number;
-    bonusDice: BonusDice;
+    bonusDice: { attack: string; defense: string };
     movement: number;
     action: number;
 }

@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { PlayerSelectionPageComponent } from './player-selection-page.component';
-import { Avatars } from '@app/interfaces/avatars.enum';
-import { DICE_PAIR } from '@app/interfaces/dice';
 import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@app/consts/default-player';
+import { DICE_PAIR } from '@app/consts/dice';
+import { Avatars } from '@app/interfaces/avatars.enum';
+import { PlayerSelectionPageComponent } from './player-selection-page.component';
 
 describe('PlayerSelectionPageComponent', () => {
     let component: PlayerSelectionPageComponent;
@@ -35,7 +35,7 @@ describe('PlayerSelectionPageComponent', () => {
         expect(nameInput.value).toBe('');
         expect(nameInput.valid).toBeFalse();
         expect(bonusForm.get('points')?.value).toBe('life');
-        expect(bonusForm.get('bonusDice')?.value).toBe(component.diceOptions.Option1.toString());
+        expect(bonusForm.get('bonusDice')?.value).toBe(component.bonusDice.Option1);
     });
 
     it('should display warning message for invalid name', () => {
@@ -106,9 +106,9 @@ describe('PlayerSelectionPageComponent', () => {
     });
 
     it('should return correct bonus dice for stat category', () => {
-        component.bonusForm.get('bonusDice')?.setValue(component.diceOptions.Option1.toString());
+        component.bonusForm.get('bonusDice')?.setValue(component.bonusDice.Option1);
         const bonusDice = component.getBonusDice('attack');
-        expect(bonusDice).toBe(DICE_PAIR[component.diceOptions.Option1]['attack']);
+        expect(bonusDice).toBe(DICE_PAIR[component.bonusDice.Option1]['attack']);
     });
 
     it('should return correct avatar button style', () => {
