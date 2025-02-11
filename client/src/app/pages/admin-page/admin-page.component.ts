@@ -41,8 +41,8 @@ export class AdminPageComponent implements OnInit {
             next: (games) => {
                 this.games = games;
             },
-            error: (error: HttpErrorResponse) => {
-                this.handleError(error);
+            error: () => {
+                this.handleError(new Error('Échec lors du chargement des jeux'));
             },
         });
     }
@@ -92,13 +92,13 @@ export class AdminPageComponent implements OnInit {
         this.errors.splice(index, 1);
     }
 
-    private handleError(error: HttpErrorResponse) {
+    private handleError(error: Error) {
         this.errors.push(error);
     }
 
     private handleNotFoundError(error: HttpErrorResponse) {
         if (error.status === HttpStatusCode.NotFound) {
-            this.errors.push(new Error("Ce jeu n'existe plus !"));
+            this.handleError(new Error("Ce jeu n'existe plus !"));
             this.loadGames();
         } else {
             this.handleError(error);

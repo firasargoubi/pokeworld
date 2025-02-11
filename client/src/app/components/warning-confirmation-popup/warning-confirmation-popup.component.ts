@@ -7,9 +7,14 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class WarningConfirmationPopupComponent {
     @Input() message: string = '';
-    @Output() closed = new EventEmitter<void>();
+    @Input() isConfirmation: boolean = false;
+    @Output() closed = new EventEmitter<boolean>();
 
-    onClose() {
-        this.closed.emit();
+    onConfirm() {
+        this.closed.emit(true);
+    }
+
+    onCancel() {
+        this.closed.emit(false);
     }
 }

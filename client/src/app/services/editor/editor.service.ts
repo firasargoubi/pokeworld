@@ -46,14 +46,14 @@ export class EditorService {
                     window.console.log('Le nom est déjà utilisé. Veuillez en choisir un autre.');
                     return;
                 }
-                this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe(
-                    () => {
+                this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe({
+                    next: () => {
                         window.console.log(`Le jeu "${this.gameDataService.gameData.name}" a été sauvegardé avec succès.`);
                     },
-                    (error) => {
+                    error: (error) => {
                         window.console.error('Erreur lors de la sauvegarde du jeu:', error);
                     },
-                );
+                });
             },
             (error) => {
                 window.console.error('Erreur lors de la vérification du nom du jeu:', error);

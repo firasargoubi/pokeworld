@@ -1,9 +1,17 @@
 <div id="warning-popup">
     <div id="warning-details">
         <p>Erreur : {{ message }}</p>
-        <div class="card-button" (click)="onClose()">
-            <p class="button-cross">X</p>
-            <img src="/assets/images/menu/buttons/admin-button/redBackgroundHighlight.png" class="button-container" />
+        <div id="buttons">
+            @if(isConfirmation){
+            <div class="card-button" (click)="onConfirm()">
+                <p class="button-confirm">&#2714;</p>
+                <img src="/assets/images/menu/buttons/admin-button/greenBackgroundHighlight.png" class="button-container" />
+            </div>
+            }
+            <div class="card-button" (click)="onCancel()">
+                <p class="button-cross">X</p>
+                <img src="/assets/images/menu/buttons/admin-button/redBackgroundHighlight.png" class="button-container" />
+            </div>
         </div>
     </div>
 </div>

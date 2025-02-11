@@ -4,7 +4,7 @@ $base-size: 0.2vw;
     position: relative;
     min-height: $base-size * 10;
     min-width: $base-size * 30;
-    max-width: $base-size * 70;
+    max-width: $base-size * 170;
     overflow: visible;
     display: flex;
     justify-content: center;
@@ -48,20 +48,27 @@ $base-size: 0.2vw;
     position: relative;
     top: $base-size * 2;
     left: $base-size * 2;
-    padding: $base-size * 2;
+    padding: $base-size * 2 $base-size * 5;
     flex-direction: column;
     align-items: center;
-    gap: 0.5vw;
+    gap: 1vw;
     color: white;
     text-align: center;
     p {
         position: relative;
-        font-size: $base-size * 5;
+        font-size: $base-size * 8;
         text-wrap: wrap;
     }
 }
+
+#buttons {
+    display: flex;
+    width: 50%;
+    justify-content: space-around;
+}
+
 .card-button {
-    width: 2vw;
+    width: 3vw;
     display: flex;
     flex-direction: column;
     align-items: center;

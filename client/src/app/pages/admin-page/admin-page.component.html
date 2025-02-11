@@ -30,7 +30,8 @@
     @if(errors.length > 0){
     <div id="error-container">
         @for(error of errors; track $index) {
-        <app-warning-confirmation-popup [message]="error.message" (closed)="removeError($index)"> </app-warning-confirmation-popup>
+        <app-warning-confirmation-popup [message]="error.message" (closed)="removeError($index)" [isConfirmation]="false">
+        </app-warning-confirmation-popup>
         }
     </div>
     }

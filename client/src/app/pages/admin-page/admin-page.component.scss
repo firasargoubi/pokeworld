@@ -111,8 +111,9 @@ $card-width: 26vw;
 
 #error-container {
     position: fixed;
-    top: 2vw;
-    right: 2vw;
+    top: 11vh;
+    left: 50%;
+    transform: translateX(-50%);
     max-height: 80vh;
     overflow-y: auto;
     display: flex;
