@@ -1,6 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { ItemComponent } from '@app/components/item/item.component';
+import { MapComponent } from '@app/components/map/map.component';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
 import { EditorService } from '@app/services/editor/editor.service';
 

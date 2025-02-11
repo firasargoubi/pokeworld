@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
 import { ITEM_DESCRIPTION, MAX_ITEM_COUNT } from '@app/consts/items.const';
 import { EditorData, EditorItem } from '@app/interfaces/editor-data';
+import { EventProperty } from '@app/interfaces/event-property';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
@@ -11,7 +12,6 @@ import { ItemType } from '@common/item-type.enum';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import { DEFAULT_EDITOR_TILES, EDITOR_ERASE_TILE, ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from './editor.service.const';
-import { EventProperty } from '@app/interfaces/event-property';
 
 @Injectable({
     providedIn: 'root',
@@ -35,7 +35,6 @@ export class EditorService {
             return;
         }
 
-<<<<<<< HEAD
         this.gameSaveService.isNameUnique(this.gameDataService.gameData.name, this.gameDataService.gameData._id).subscribe(
             (response) => {
                 if (!response.isUnique) {
@@ -56,7 +55,6 @@ export class EditorService {
                 window.console.error('Erreur lors de la vérification du nom du jeu:', error);
             },
         );
-=======
         this.gameSaveService.isNameUnique(this.gameDataService.gameData.name, this.gameDataService.gameData._id).subscribe((isUnique) => {
             if (!isUnique) {
                 window.console.log('Le nom est déjà utilisé. Veuillez en choisir un autre.');
@@ -64,7 +62,6 @@ export class EditorService {
             }
             this.saveGame();
         });
->>>>>>> origin/dev
     }
 
     resetButton(): void {
