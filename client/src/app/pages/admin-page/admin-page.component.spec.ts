@@ -103,25 +103,6 @@ describe('AdminPageComponent', () => {
         });
     });
 
-    it('should handle not found error when editGame, toggleVisibility or deleteGame fails (NOT_FOUND)', () => {
-        const notFoundError = new HttpErrorResponse({ error: 'Game not found', status: 404 });
-
-        gameSaveServiceSpy.getGame.and.returnValue(throwError(() => notFoundError));
-        gameSaveServiceSpy.toggleVisibility.and.returnValue(throwError(() => notFoundError));
-        gameSaveServiceSpy.deleteGame.and.returnValue(throwError(() => notFoundError));
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        const handleNotFoundErrorSpy = spyOn<any>(component, 'handleNotFoundError');
-
-        component.editGame('123');
-        component.toggleVisibility({ id: '123', isVisible: true });
-        component.deleteGame('123');
-
-        expect(handleNotFoundErrorSpy).toHaveBeenCalledWith(notFoundError);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- 3 calls
-        expect(handleNotFoundErrorSpy).toHaveBeenCalledTimes(3); // CHECK
-    });
-
     it('should call loadGames when handleNotFoundError is called', () => {
         const loadGamesSpy = spyOn(component, 'loadGames');
 
@@ -140,38 +121,76 @@ describe('AdminPageComponent', () => {
         expect(component.isCreationMode).toBeFalse();
     });
 
-    it('should call handleError when loadGames, toggleVisibility or delete fails (INTERNAL_ERROR)', () => {
-        const error = new HttpErrorResponse({ error: 'Action failed', status: 500 });
-
-        gameSaveServiceSpy.getAllGames.and.returnValue(throwError(() => error));
-        gameSaveServiceSpy.toggleVisibility.and.returnValue(throwError(() => error));
-        gameSaveServiceSpy.deleteGame.and.returnValue(throwError(() => error));
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        const handleErrorSpy = spyOn<any>(component, 'handleError');
-
-        component.toggleVisibility({ id: '123', isVisible: true });
-        component.loadGames();
-        component.deleteGame('1234');
-
-        expect(handleErrorSpy).toHaveBeenCalledWith(error);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- 3 calls
-        expect(handleErrorSpy).toHaveBeenCalledTimes(3);
+    it('should add error to errors array on handleError', () => {
+        component.errors = [];
+        const error = new HttpErrorResponse({ error: 'Test error', status: 500 });
+        component['handleError'](error);
+        expect(component.errors.length).toBe(1);
     });
 
-    it('should call snackBar open when handleError is called', () => {
-        const snackBarOpenSpy = spyOn(component['snackBar'], 'open');
+    it('should remove error from array on popup close', () => {
+        component.errors = [new Error('Error 1'), new Error('Error 2')];
+        component.removeError(0);
+        expect(component.errors.length).toBe(1);
+        expect(component.errors[0].message).toBe('Error 2');
+    });
 
-        const error = new HttpErrorResponse({ error: 'Test error', status: 500 });
+    it('should display multiple popups for multiple errors', () => {
+        component.errors = [new Error('Error 1'), new Error('Error 2')];
+        fixture.detectChanges();
 
-        component['handleError'](error);
-
-        expect(snackBarOpenSpy).toHaveBeenCalledWith(error.message, 'Close', { duration: 5000 });
+        const popups = fixture.nativeElement.querySelectorAll('app-warning-confirmation-popup');
+        expect(popups.length).toBe(2);
     });
 
     it('should navigate to menu', () => {
         const navigateSpy = spyOn(router, 'navigate');
         component.navigateToMenu();
         expect(navigateSpy).toHaveBeenCalledWith(['/']);
+    });
+
+    it('should close popup when X is clicked', () => {
+        component.errors = [new Error('Test error')];
+        fixture.detectChanges();
+
+        spyOn(component, 'removeError');
+        const button = fixture.nativeElement.querySelector('.card-button');
+        button.click();
+
+        expect(component.removeError).toHaveBeenCalledWith(0);
+    });
+
+    it('should add error when loadGames fails', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Server error', status: 500 });
+        gameSaveServiceSpy.getAllGames.and.returnValue(throwError(() => errorResponse));
+
+        component.loadGames();
+
+        expect(component.errors.length).toBe(1);
+    });
+    it('should add error when editGame fails', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Not Found', status: 404 });
+        gameSaveServiceSpy.getGame.and.returnValue(throwError(() => errorResponse));
+
+        component.editGame('invalid-id');
+
+        expect(component.errors.length).toBe(1);
+        expect(component.errors[0].message).toBe("Ce jeu n'existe plus !");
+    });
+    it('should add error when toggleVisibility fails', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Server error', status: 500 });
+        gameSaveServiceSpy.toggleVisibility.and.returnValue(throwError(() => errorResponse));
+
+        component.toggleVisibility({ id: '123', isVisible: true });
+
+        expect(component.errors.length).toBe(1);
+    });
+    it('should add error when deleteGame fails', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Delete failed', status: 500 });
+        gameSaveServiceSpy.deleteGame.and.returnValue(throwError(() => errorResponse));
+
+        component.deleteGame('123');
+
+        expect(component.errors.length).toBe(1);
     });
 });

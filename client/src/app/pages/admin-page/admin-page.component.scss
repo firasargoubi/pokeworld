@@ -108,3 +108,19 @@ $card-width: 26vw;
         transform: scale(1);
     }
 }
+
+#error-container {
+    position: fixed;
+    top: 2vw;
+    right: 2vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1vw;
+    align-items: flex-start;
+}
+
+app-warning-confirmation-popup {
+    flex-shrink: 0;
+}

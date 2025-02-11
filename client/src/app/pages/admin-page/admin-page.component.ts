@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { CreateGamePopupComponent } from '@app/components/create-game-popup/create-game-popup.component';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
+import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
 
@@ -14,10 +14,11 @@ import { GameData } from '@common/game-data';
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
     styleUrls: ['./admin-page.component.scss'],
-    imports: [GameCardComponent, PokeballButtonComponent, CreateGamePopupComponent, CommonModule, HeaderComponent],
+    imports: [GameCardComponent, PokeballButtonComponent, CreateGamePopupComponent, CommonModule, HeaderComponent, WarningConfirmationPopupComponent],
 })
 export class AdminPageComponent implements OnInit {
     games: GameData[] = [];
+    errors: Error[] = [];
     showDescription: boolean = false;
     lastDescription: string = '';
     isCreationMode: boolean = false;
@@ -25,7 +26,6 @@ export class AdminPageComponent implements OnInit {
     constructor(
         private router: Router,
         private gameSaveService: GameSaveService,
-        private snackBar: MatSnackBar,
     ) {}
 
     navigateToMenu() {
@@ -88,16 +88,20 @@ export class AdminPageComponent implements OnInit {
         return classes[classIndex];
     }
 
+    removeError(index: number) {
+        this.errors.splice(index, 1);
+    }
+
+    private handleError(error: HttpErrorResponse) {
+        this.errors.push(error);
+    }
+
     private handleNotFoundError(error: HttpErrorResponse) {
         if (error.status === HttpStatusCode.NotFound) {
-            alert("Ce jeu n'existe plus !"); // CHECK and Change to popup component
+            this.errors.push(new Error("Ce jeu n'existe plus !"));
             this.loadGames();
         } else {
             this.handleError(error);
         }
-    }
-
-    private handleError(error: HttpErrorResponse) {
-        this.snackBar.open(`${error.message}`, 'Close', { duration: 5000 }); // Doesnt work
     }
 }

@@ -15,10 +15,10 @@ $final-margin-bot: calc($main-height - $final-board-size - $final-margin-top);
 $final-side-width: calc(($final-board-size - $margin-top) * 0.5);
 $final-side-height: min($final-side-width * 2 + $margin-top);
 $final-margin-side: calc(($main-width - $final-board-size - $final-side-width - $final-side-width) * 0.25);
-$final-margin-right: min(calc((($final-margin-side - $margin-top) * 0.60 + $margin-top) * 0.90), calc($margin-top * 4));
+$final-margin-right: min(calc((($final-margin-side - $margin-top) * 0.6 + $margin-top) * 0.9), calc($margin-top * 4));
 $final-margin-left: calc($final-margin-side * 2 - $final-margin-right);
 
-$tile-padding: calc($final-side-width * 0.10);
+$tile-padding: calc($final-side-width * 0.1);
 $item-padding: calc($final-side-width * 0.06);
 $stripes-size: 3vh;
 $stripes-animation-duration: 4s;
@@ -28,9 +28,9 @@ $stripes-color2: hsl(225, 6%, 13%);
 $error-message-color: hsl(0, 69%, 59%);
 $tool-active-color: rgba(255, 255, 255, 0.6);
 $tile-border-color: rgba(255, 255, 255, 0.5);
-$tool-normal-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0.0);
+$tool-normal-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0);
 $tool-hover-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0.7);
-$tool-active-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0.0);
+$tool-active-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0);
 
 $gray-box-square: '/assets/images/menu/containers/gray/square.png';
 $gray-box-rectangle: '/assets/images/menu/containers/gray/rectangle.png';
@@ -47,11 +47,13 @@ $gray-box-rectangle: '/assets/images/menu/containers/gray/rectangle.png';
 main {
     height: $main-height;
     width: $main-width;
-    background: repeating-linear-gradient(0deg,
-            $stripes-color1,
-            $stripes-color1 $stripes-size,
-            $stripes-color2 $stripes-size,
-            $stripes-color2 $stripes-size * 2);
+    background: repeating-linear-gradient(
+        0deg,
+        $stripes-color1,
+        $stripes-color1 $stripes-size,
+        $stripes-color2 $stripes-size,
+        $stripes-color2 $stripes-size * 2
+    );
     background-size: 100% ($stripes-size * 2);
     animation: fall $stripes-animation-duration linear infinite;
     color: rgb(255, 255, 255);
@@ -108,11 +110,11 @@ app-board {
 
 .error-message {
     display: flex;
-    height: min(calc($final-margin-bot * 0.60), calc($board-size * 0.10));
+    height: min(calc($final-margin-bot * 0.6), calc($board-size * 0.1));
     width: $final-board-size;
     align-items: center;
     justify-content: center;
-    line-height: min(calc($final-margin-bot * 0.60), calc($board-size * 0.10));
+    line-height: min(calc($final-margin-bot * 0.6), calc($board-size * 0.1));
     text-align: center;
     color: $error-message-color;
     font-size: calc($final-board-size * 0.045);
@@ -204,7 +206,7 @@ app-board {
 }
 
 .tile-grid .grid-square:active .tool,
-.tile-grid .active .tool  {
+.tile-grid .active .tool {
     border: $tool-active-border;
     background-color: $tool-active-color;
 }
@@ -242,7 +244,7 @@ app-board {
     margin-top: calc($final-side-width * 0.01);
     border-radius: calc($final-side-width * 0.015);
     padding-top: calc($final-side-width * 0.029);
-    padding-bottom: calc($final-side-width * 0.030);
+    padding-bottom: calc($final-side-width * 0.03);
     padding-left: calc($final-side-width * 0.04);
     padding-right: calc($final-side-width * 0.04);
 
@@ -268,7 +270,7 @@ app-board {
 }
 
 .input-description {
-    height: calc($final-side-width * 0.70);
+    height: calc($final-side-width * 0.7);
     padding-top: calc($final-side-width * 0.029);
     padding-bottom: calc($final-side-width * 0.029);
     padding-left: calc($final-side-width * 0.029);
@@ -337,4 +339,19 @@ app-board {
 
 .save-button:active {
     background: hsl(203, 100%, 42%);
+}
+
+#error-container {
+    position: fixed;
+    top: 2vw;
+    right: 2vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1vw;
+}
+
+app-warning-confirmation-popup {
+    flex-shrink: 0;
 }
