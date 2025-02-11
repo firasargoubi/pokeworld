@@ -35,7 +35,7 @@ export class CreateGamePopupComponent {
     // }
 
     onValiderSelection() {
-        this.gameDataService.createGameData(MapSize[this.mapSize], GameMode[this.gameMode]);
+        this.gameDataService.createNewGame(MapSize[this.mapSize], GameMode[this.gameMode]);
         this.router.navigate(['/edit']);
     }
 }
