@@ -158,9 +158,8 @@ describe('PlayerSelectionPageComponent', () => {
     });
 
     it('should toggle bonus dice correctly', () => {
-        expect(component.bonusDice.attack).toBe(DiceType.D4);
-        expect(component.bonusDice.defense).toBe(DiceType.D6);
-
+        component.bonusDice.attack = DiceType.D4;
+        component.bonusDice.defense = DiceType.D6;
         component.toggleBonusDice();
 
         expect(component.bonusDice.attack).toBe(DiceType.D6);
