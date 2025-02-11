@@ -88,6 +88,9 @@ export class GameService {
     }
 
     async isNameUnique(name: string, exceptId?: string): Promise<boolean> {
+        if (!name) {
+            throw new BadRequestException('Name is required.');
+        }
         if (exceptId) {
             return (await this.gameModel.find({ name, _id: { $ne: exceptId } }).exec()).length === 0;
         } else {

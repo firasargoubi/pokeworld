@@ -156,7 +156,7 @@ describe('GameController', () => {
                 return res;
             };
             res.json = (data) => {
-                expect(data).toEqual({ isUnique: testCase.expected });
+                expect(data).toEqual(testCase.expected);
                 return res;
             };
 
@@ -179,7 +179,7 @@ describe('GameController', () => {
                 return res;
             };
             res.json = (data) => {
-                expect(data).toEqual({ isUnique: testCase.expected });
+                expect(data).toEqual(testCase.expected);
                 return res;
             };
 

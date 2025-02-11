@@ -42,10 +42,6 @@ export class GameController {
     })
     @Get('/is-name-unique')
     async isNameUnique(@Query('name') name: string, @Query('id') id: string, @Res() response: Response) {
-        if (!name) {
-            response.status(HttpStatus.BAD_REQUEST).json({ message: 'Name is required' });
-            return;
-        }
         const isUnique = await this.gameService.isNameUnique(name, id);
         response.status(HttpStatus.OK).json(isUnique);
     }
