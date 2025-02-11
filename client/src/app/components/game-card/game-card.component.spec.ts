@@ -88,11 +88,11 @@ describe('GameCardComponent', () => {
         expect(component.isHovered).toBeFalse();
     });
 
-    // TODO:Corriger ce TEST
     it('should format date correctly', () => {
-        // const testDate = '2023-06-15T14:30:00Z';
-        // const formattedDate = component.formatDate(testDate);
-        // expect(formattedDate).toBe('15/06/2023 10:30');
+        const testDate = new Date('2023-06-15T14:30:00Z');
+        const resultDate = component.formatDate(testDate);
+        const expectedDate = testDate.toLocaleDateString() + ' ' + testDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        expect(resultDate).toBe(expectedDate);
     });
 
     it('should apply correct class for game mode', () => {
