@@ -46,10 +46,6 @@ export class Game {
     isVisible: boolean;
 
     @ApiProperty()
-    @Prop({ required: true })
-    thumbnail: string;
-
-    @ApiProperty()
     @Prop({ required: true, type: Object })
     mapData: MapData;
 

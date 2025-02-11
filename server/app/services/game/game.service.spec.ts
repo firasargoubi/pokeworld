@@ -21,7 +21,6 @@ describe('GameService', () => {
         description: 'Test Description',
         lastEdited: new Date(),
         isVisible: true,
-        thumbnail: '/assets/images/game/tiles/grass.png',
         mapData: {
             tiles: [[]],
             items: {
