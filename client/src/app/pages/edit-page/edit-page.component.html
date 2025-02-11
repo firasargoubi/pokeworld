@@ -11,7 +11,7 @@
     <main>
         <div class="editor-left">
             <div class="left-label">Nom</div>
-            <input class="input-name" type="text" maxlength="32" spellcheck="false" [(ngModel)]="editorService.gameDataService.gameData.name" />
+            <input class="input-name" type="text" maxlength="32" [(ngModel)]="editorService.gameDataService.gameData.name" />
             <div class="left-label-small">Description</div>
             <div class="input-description" contenteditable="true" spellcheck="false">{{ editorService.gameDataService.getDescription() }}</div>
             <div class="left-label-medium">Taille : {{ editorService.gameDataService.getMapSizeString() }}</div>

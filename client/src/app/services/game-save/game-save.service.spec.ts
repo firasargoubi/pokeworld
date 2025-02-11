@@ -146,24 +146,22 @@ describe('GameSave', () => {
         const gameName = 'UniqueGame';
 
         service.isNameUnique(gameName).subscribe((response) => {
-            expect(response.isUnique).toBe(true);
+            expect(response).toBe(true);
         });
 
-        const req = httpMock.expectOne(`${baseUrl}/games/isNameUnique/${gameName}`);
+        const req = httpMock.expectOne(`${baseUrl}/games/is-name-unique?name=${gameName}&id=`);
         expect(req.request.method).toBe('GET');
-        req.flush({ isUnique: true }); // Simule une réponse JSON avec isUnique: true
+        req.flush(true);
     });
 
     it('should check if name is unique with an ID', () => {
-        const gameName = 'ExistingGame';
-        const gameId = '123';
-
-        service.isNameUnique(gameName, gameId).subscribe((response) => {
-            expect(response.isUnique).toBe(false);
+        service.isNameUnique(MOCK_GAMES[0].name, MOCK_GAMES[0]._id).subscribe((response) => {
+            expect(response).toBe(false);
         });
 
-        const req = httpMock.expectOne(`${baseUrl}/games/isNameUnique/${gameName}/${gameId}`);
+        const encodedGameName = encodeURIComponent(MOCK_GAMES[0].name);
+        const req = httpMock.expectOne(`${baseUrl}/games/is-name-unique?name=${encodedGameName}&id=${MOCK_GAMES[0]._id}`);
         expect(req.request.method).toBe('GET');
-        req.flush({ isUnique: false }); // Simule une réponse JSON avec isUnique: false
+        req.flush(false);
     });
 });

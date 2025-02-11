@@ -189,4 +189,19 @@ describe('GameService', () => {
         jest.spyOn(gameModel, 'findByIdAndDelete').mockResolvedValueOnce(null);
         await expect(service.deleteGame(fakeGame._id)).rejects.toBeTruthy();
     });
+
+    it('isNameUnique() should return true if name is unique', async () => {
+        const name = 'Unique Name';
+        expect(await service.isNameUnique(name)).toBeTruthy();
+    });
+
+    it('isNameUnique() should return false if name is not unique', async () => {
+        const name = 'Not Unique Name';
+        await gameModel.create({ ...fakeGame, name });
+        expect(await service.isNameUnique(name)).toBeFalsy();
+    });
+
+    it('isNameUnique() should throw BadRequestException if name is empty', async () => {
+        await expect(service.isNameUnique('')).rejects.toThrow(BadRequestException);
+    });
 });

@@ -1,9 +1,9 @@
 export enum ErrorCode {
-    Empty = 'Field cannot be empty',
-    TooLong = 'Value exceeds the maximum allowed length',
-    BridgeAtEdge = 'Bridge cannot be placed at the edge of the map',
-    BridgeNotBetweenWalls = 'Bridge must be placed between two water tiles',
-    MissingRequiredItems = 'Not enough required items placed on the map',
-    TooManyItems = 'Too many items of this type placed on the map',
-    DuplicatedName = 'Name already exists',
+    Empty = 'Le champ ne peut pas être vide',
+    TooLong = 'La valeur dépasse la longueur maximale autorisée',
+    BridgeAtEdge = 'Le pont ne peut pas être placé au bord de la carte',
+    BridgeNotBetweenWalls = "Le pont doit être placé entre deux tuiles d'eau",
+    MissingRequiredItems = "Pas assez d'éléments requis placés sur la carte",
+    TooManyItems = "Trop d'éléments de ce type placés sur la carte",
+    DuplicatedName = 'Le nom du jeu existe déjà',
 }
