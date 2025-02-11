@@ -92,7 +92,7 @@ $clip-path: polygon(
     object-fit: cover;
     pointer-events: none;
     opacity: 0;
-    animation: fadeIn 0.8s ease-in-out forwards;
+    animation: fadeIn 0.3s ease-in-out forwards;
 }
 
 @keyframes fadeIn {
@@ -410,4 +410,9 @@ $clip-path: polygon(
 
 .card-global-container .hovered .card-description-body {
     left: 0;
+}
+
+button{
+    font-size: 20px;
+    padding: 10px;
 }

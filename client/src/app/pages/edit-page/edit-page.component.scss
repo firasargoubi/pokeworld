@@ -1,33 +1,43 @@
 $header-height: 7vh;
 $main-height: calc(100vh - $header-height);
 $main-width: 100vw;
-$margin-top: calc($header-height * 0.3);
-$margin-bot: calc($header-height * 1.1);
-$board-size: calc($main-height - $margin-top - $margin-bot);
-$side-width-1: calc(($main-width - $board-size) * 0.5 - $margin-top * 1.6);
-$side-width-2: calc(($board-size - $margin-top) * 0.5);
+$margin-top: calc($header-height * 0.6);
+$margin-bot: calc($header-height * 0.9);
+$map-size: calc($main-height - $margin-top - $margin-bot);
+$side-width-1: calc(($main-width - $map-size) * 0.5 - $margin-top * 1.6);
+$side-width-2: calc(($map-size - $margin-top) * 0.5);
 $side-width: min($side-width-1, $side-width-2);
 $side-height: min($side-width * 2 + $margin-top);
 
-$final-board-size: calc($board-size * 0.5 + $side-height * 0.5);
-$final-margin-top: calc($margin-top + ($main-height - $final-board-size - $margin-top - $margin-bot) * 0.45);
-$final-margin-bot: calc($main-height - $final-board-size - $final-margin-top);
-$final-side-width: calc(($final-board-size - $margin-top) * 0.5);
+$final-map-size: calc($map-size * 0.5 + $side-height * 0.5);
+$final-margin-top: calc($margin-top + ($main-height - $final-map-size - $margin-top - $margin-bot) * 0.45);
+$final-margin-bot: calc($main-height - $final-map-size - $final-margin-top);
+$final-side-width: calc(($final-map-size - $margin-top) * 0.5);
 $final-side-height: min($final-side-width * 2 + $margin-top);
-$final-margin-side: calc(($main-width - $final-board-size - $final-side-width - $final-side-width) * 0.25);
+$final-margin-side: calc(($main-width - $final-map-size - $final-side-width - $final-side-width) * 0.25);
 $final-margin-right: min(calc((($final-margin-side - $margin-top) * 0.6 + $margin-top) * 0.9), calc($margin-top * 4));
 $final-margin-left: calc($final-margin-side * 2 - $final-margin-right);
 
 $tile-padding: calc($final-side-width * 0.1);
 $item-padding: calc($final-side-width * 0.06);
-$stripes-size: 3vh;
+$item-size: calc(($final-side-width - $item-padding - $item-padding) * 0.333333);
+$stripes-size: 2.5vh;
 $stripes-animation-duration: 4s;
+$size-effectivness: 0.78;
+$hover-item-size: calc($item-size * 7.1 / ((var(--size) - 10) * $size-effectivness + 10));
 
-$stripes-color1: hsl(225, 6%, 15%);
-$stripes-color2: hsl(225, 6%, 13%);
-$error-message-color: hsl(0, 69%, 59%);
+$text-color: rgb(255, 255, 255);
+$main-border-color1: #636776;
+$main-border-color2: #e9f6f7;
+$main-border-width: calc($map-size * 0.01);
+$stripes-color1: #9be6d2;
+$stripes-color2: #abeeda;
 $tool-active-color: rgba(255, 255, 255, 0.6);
 $tile-border-color: rgba(255, 255, 255, 0.5);
+$input-border-color: rgba(255, 255, 255, 0.82);
+$input-bg-normal: hsla(231, 12%, 45%, 0.7);
+$input-bg-active: hsla(231, 12%, 45%, 0.6);
+$item-count-bg-color: hsla(231, 12%, 45%, 0.7);
 $tool-normal-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0);
 $tool-hover-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0.7);
 $tool-active-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0);
@@ -45,6 +55,7 @@ $gray-box-rectangle: '/assets/images/menu/containers/gray/rectangle.png';
 }
 
 main {
+    overflow: visible;
     height: $main-height;
     width: $main-width;
     background: repeating-linear-gradient(
@@ -56,7 +67,21 @@ main {
     );
     background-size: 100% ($stripes-size * 2);
     animation: fall $stripes-animation-duration linear infinite;
-    color: rgb(255, 255, 255);
+    color: $text-color;
+    position: relative;
+}
+
+main::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    border: calc($main-border-width * 2) solid $main-border-color2;
+    outline: $main-border-width solid $main-border-color1;
+    outline-offset: calc($main-border-width * -1);
 }
 
 @keyframes fall {
@@ -73,13 +98,13 @@ main {
     display: inline-block;
     margin-top: $final-margin-top;
     height: calc($main-height - $final-margin-top);
-    width: $final-board-size;
+    width: $final-map-size;
 }
 
-app-board {
+app-map {
     display: block;
-    height: $final-board-size;
-    width: $final-board-size;
+    height: $final-map-size;
+    width: $final-map-size;
 }
 
 .editor-left {
@@ -106,19 +131,6 @@ app-board {
     margin-bottom: $final-margin-bot;
     margin-left: $final-margin-right;
     margin-right: $final-margin-left;
-}
-
-.error-message {
-    display: flex;
-    height: min(calc($final-margin-bot * 0.6), calc($board-size * 0.1));
-    width: $final-board-size;
-    align-items: center;
-    justify-content: center;
-    line-height: min(calc($final-margin-bot * 0.6), calc($board-size * 0.1));
-    text-align: center;
-    color: $error-message-color;
-    font-size: calc($final-board-size * 0.045);
-    text-shadow: calc($final-board-size * 0.0045) calc($final-board-size * 0.0015) 0px rgba(0, 0, 0, 0.3);
 }
 
 .tool-square {
@@ -153,8 +165,8 @@ app-board {
 }
 
 .item-grid .grid-square {
-    height: calc(($final-side-width - $item-padding - $item-padding) * 0.333333);
-    width: calc(($final-side-width - $item-padding - $item-padding) * 0.333333);
+    height: $item-size;
+    width: $item-size;
     cursor: grab;
 }
 
@@ -172,6 +184,54 @@ app-board {
     pointer-events: none;
 }
 
+.item-grid .tool {
+    pointer-events: all;
+}
+
+.tool-description {
+    display: none;
+    position: absolute;
+    z-index: 999;
+    grid-row: 1;
+    grid-column: 1;
+    pointer-events: none;
+    width: calc($final-map-size * 0.16 * 1.815);
+    height: calc($final-map-size * 0.16);
+    margin-top: calc($final-map-size * -0.3473);
+    margin-left: calc($final-map-size * 0.16 * 1.815 * -0.19);
+    font-size: calc($final-map-size * 0.035);
+    padding: calc($final-map-size * 0.014);
+    background: url('/assets/images/menu/containers/description-container.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    text-align: center;
+    color: black;
+    text-transform: none;
+    white-space: normal;
+}
+
+::ng-deep b {
+    display: block;
+    margin-bottom: calc($final-map-size * 0.008);
+}
+
+.grid-square:hover .tool-description {
+    display: block;
+}
+
+.grab .grid-square:hover .tool-description {
+    display: none;
+}
+
+app-item {
+    pointer-events: all;
+    grid-row: 1;
+    grid-column: 1;
+    width: 100%;
+    height: 100%;
+}
+
 .tool-count {
     grid-row: 1;
     grid-column: 1;
@@ -184,7 +244,7 @@ app-board {
     font-size: calc($final-side-width * 0.08);
     text-align: center;
     border-radius: 300%;
-    background: rgba(0, 0, 0, 0.4);
+    background: $item-count-bg-color;
 }
 
 .tile-grid .tool {
@@ -224,10 +284,6 @@ app-board {
     pointer-events: none;
 }
 
-.grayed .tool-image {
-    filter: grayscale(1);
-}
-
 .tile-grid .tool-image {
     box-shadow: 0 0 0 calc($final-side-width * 0.005) $tile-border-color;
 }
@@ -238,6 +294,7 @@ app-board {
 
 .input-name,
 .input-description {
+    resize: none;
     display: block;
     width: 100%;
     height: calc($final-side-width * 0.13);
@@ -254,19 +311,20 @@ app-board {
     appearance: none;
     -webkit-appearance: none;
     font-size: calc($final-side-width * 0.07);
-    background: rgba(0, 0, 0, 0.4);
+    background: $input-bg-normal;
     font-family: 'pixel';
     border: calc($final-side-width * 0.0085) solid transparent;
+    cursor: pointer;
 }
 
 .input-name:hover,
 .input-description:hover {
-    border-color: rgba(255, 255, 255, 0.82);
+    border-color: $input-border-color;
 }
 
 .input-name:active,
 .input-description:active {
-    background: rgba(0, 0, 0, 0.3);
+    background: $input-bg-active;
 }
 
 .input-description {
@@ -315,7 +373,7 @@ app-board {
     outline: none;
     appearance: none;
     -webkit-appearance: none;
-    background: rgba(0, 0, 0, 0.4);
+    background: $input-bg-normal;
     font-family: 'pixel';
     border: calc($final-side-width * 0.0085) solid transparent;
     cursor: pointer;
@@ -325,33 +383,53 @@ app-board {
 
 .save-button:hover,
 .reset-button:hover {
-    border-color: rgba(255, 255, 255, 0.82);
+    border-color: $input-border-color;
 }
 
 .reset-button:active {
-    background: rgba(0, 0, 0, 0.3);
+    background: $input-bg-active;
 }
 
 .save-button {
     background: hsl(203, 100%, 38%);
-    margin-top: calc($final-side-width * 0.19);
+    margin-top: calc($final-side-width * 0.21);
 }
 
 .save-button:active {
     background: hsl(203, 100%, 42%);
 }
 
-#error-container {
-    position: fixed;
-    top: 2vw;
-    right: 2vw;
-    max-height: 80vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1vw;
+.overlay {
+    position: absolute;
+    pointer-events: none;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 
-app-warning-confirmation-popup {
-    flex-shrink: 0;
+.grab-item {
+    position: absolute;
+    pointer-events: none;
+    width: $hover-item-size;
+    height: $hover-item-size;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    transform: translateX(calc($hover-item-size * -0.5)) translateY(calc($hover-item-size * -0.5));
+    display: none;
+}
+
+.grab .grab-item {
+    display: block;
+}
+
+app-map {
+    cursor: pointer;
+}
+
+.grab * {
+    cursor: grabbing;
 }

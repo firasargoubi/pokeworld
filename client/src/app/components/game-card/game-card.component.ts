@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GameDataService } from '@app/services/game-data/game-data.service';
-import { ThumbnailService } from '@app/services/thumbnail/thumbnail-service';
+import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { GameData } from '@common/game-data';
 
 @Component({
@@ -43,7 +43,7 @@ export class GameCardComponent implements OnInit {
 
     onToggleVisibility() {
         this.toggleVisibility.emit({ id: this.game._id, isVisible: this.game.isVisible });
-        this.game.isVisible = !this.game.isVisible; // CHECK if needed
+        this.game.isVisible = !this.game.isVisible;
     }
 
     onJoin() {

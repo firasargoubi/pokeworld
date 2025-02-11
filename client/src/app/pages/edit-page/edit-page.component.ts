@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BoardComponent } from '@app/components/board/board.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
 import { EditorService } from '@app/services/editor/editor.service';
@@ -9,7 +8,7 @@ import { EditorService } from '@app/services/editor/editor.service';
     selector: 'app-edit-page',
     templateUrl: './edit-page.component.html',
     styleUrls: ['./edit-page.component.scss'],
-    imports: [HeaderComponent, BoardComponent, FormsModule, WarningConfirmationPopupComponent],
+    imports: [HeaderComponent, MapComponent, FormsModule, ItemComponent, WarningConfirmationPopupComponent],
 })
 export class EditPageComponent {
     editorService: EditorService = inject(EditorService);

@@ -1,10 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { ThumbnailService } from '@app/services/thumbnail/thumbnail-service';
+import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
 import { MapSize } from '@common/map-size.enum';
 import { GameCardComponent } from './game-card.component';
+import { ItemType } from '@common/item-type.enum';
+import { Position } from '@common/position';
 
 describe('GameCardComponent', () => {
     let component: GameCardComponent;
@@ -33,7 +35,12 @@ describe('GameCardComponent', () => {
             _id: '1',
             name: 'Test Game',
             description: 'A test game description',
-            mapData: { size: MapSize.Medium, gameMode: GameMode.FFA },
+            mapData: {
+                tiles: [],
+                items: {} as Record<ItemType, Position[]>,
+                size: MapSize.Medium,
+                gameMode: GameMode.FFA,
+            },
             thumbnail: 'test-thumbnail.jpg',
             lastEdited: new Date(),
             isVisible: true,

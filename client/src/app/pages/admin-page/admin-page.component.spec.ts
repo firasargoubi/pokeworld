@@ -26,6 +26,8 @@ describe('AdminPageComponent', () => {
             imports: [RouterModule.forRoot([]), CommonModule, AdminPageComponent],
             providers: [{ provide: GameSaveService, useValue: gameSaveServiceSpy }],
         }).compileComponents();
+
+        gameSaveServiceSpy = TestBed.inject(GameSaveService) as jasmine.SpyObj<GameSaveService>;
     });
 
     beforeEach(() => {

@@ -1,11 +1,12 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
+import { GameDataService } from '@app/services/game-data/game-data.service';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-create-page',
@@ -20,6 +21,7 @@ export class CreatePageComponent implements OnInit {
         private router: Router,
         private gameSaveService: GameSaveService,
         private snackBar: MatSnackBar,
+        private gameDataService: GameDataService,
     ) {}
 
     navigateToMenu() {
@@ -30,24 +32,54 @@ export class CreatePageComponent implements OnInit {
         this.loadGames();
     }
 
-    loadGames() {
-        this.gameSaveService.getAllGames().subscribe({
-            next: (games) => {
-                this.games = games.filter((game) => game.isVisible);
-            },
-            error: (err: HttpErrorResponse) => {
-                this.handleError('Failed to load games. Please try again later.', err);
-            },
-        });
-    }
-
     getCardColor(index: number): string {
         const classes = ['blue-card', 'green-card', 'pink-card'];
         const classIndex = index % classes.length;
         return classes[classIndex];
     }
 
-    private handleError(message: string, error: HttpErrorResponse) {
-        this.snackBar.open(`${message}: ${error.message}`, 'Close', { duration: 5000 });
+    onJoin(gameId: string) {
+        this.gameSaveService.getGame(gameId).subscribe({
+            next: (game: GameData) => {
+                this.handleGameVisibility(game);
+            },
+            error: (error: HttpErrorResponse) => {
+                this.handleNotFoundError(error);
+            },
+        });
+    }
+
+    private loadGames() {
+        this.gameSaveService.getAllGames().subscribe({
+            next: (games) => {
+                this.games = games.filter((game) => game.isVisible);
+            },
+            error: (error: HttpErrorResponse) => {
+                this.handleError(error);
+            },
+        });
+    }
+
+    private handleGameVisibility(game: GameData) {
+        if (game.isVisible) {
+            this.gameDataService.setGameData(game);
+            this.router.navigate(['/player-selection']);
+        } else {
+            this.loadGames();
+            alert("Ce jeu n'est plus visible !");
+        }
+    }
+
+    private handleNotFoundError(error: HttpErrorResponse) {
+        if (error.status === HttpStatusCode.NotFound) {
+            alert("Ce jeu n'existe plus !");
+            this.loadGames();
+        } else {
+            this.handleError(error);
+        }
+    }
+
+    private handleError(error: HttpErrorResponse) {
+        this.snackBar.open(`${error.message}`, 'Close', { duration: 5000 }); // Doesnt work
     }
 }

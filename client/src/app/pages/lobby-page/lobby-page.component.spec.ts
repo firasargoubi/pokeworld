@@ -1,15 +1,24 @@
+import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
+import { HeaderComponent } from '@app/components/header/header.component';
+import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { LobbyPageComponent } from './lobby-page.component';
-import { RouterModule } from '@angular/router';
 
 describe('LobbyPageComponent', () => {
     let component: LobbyPageComponent;
     let fixture: ComponentFixture<LobbyPageComponent>;
+    let routerSpy: jasmine.SpyObj<Router>;
 
     beforeEach(async () => {
+        const routerMock = jasmine.createSpyObj('Router', ['navigate']);
+
         await TestBed.configureTestingModule({
-            imports: [LobbyPageComponent, RouterModule.forRoot([])],
+            imports: [CommonModule, HeaderComponent, PokeballButtonComponent, LobbyPageComponent],
+            providers: [{ provide: Router, useValue: routerMock }],
         }).compileComponents();
+
+        routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     });
 
     beforeEach(() => {
@@ -20,5 +29,33 @@ describe('LobbyPageComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should generate a 4-digit access code on init', () => {
+        component.ngOnInit();
+        expect(component.accessCode).toMatch(/^\d{4}$/);
+    });
+
+    it('should generate a random code', () => {
+        const oldCode = component.accessCode;
+        component.generateAccessCode();
+        expect(component.accessCode).not.toBe(oldCode);
+    });
+
+    it('should navigate to game page when startGame is called', () => {
+        component.startGame();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+    });
+
+    it('should navigate to home page when leaveLobby is called', () => {
+        component.leaveLobby();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+    });
+
+    it('should display the access code in the template', () => {
+        component.generateAccessCode();
+        fixture.detectChanges();
+        const compiled = fixture.nativeElement;
+        expect(compiled.querySelector('.access-code').textContent).toContain(component.accessCode);
     });
 });

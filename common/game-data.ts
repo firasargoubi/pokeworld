@@ -7,5 +7,4 @@ export interface GameData {
     lastEdited: Date;
     isVisible: boolean;
     mapData: MapData;
-    thumbnail: string;
 }
