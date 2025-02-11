@@ -2,7 +2,7 @@ import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { Game } from '@app/model/schema/game.schema';
 import { GameService } from '@app/services/game/game.service';
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res, Query } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
     ApiCreatedResponse,
@@ -31,6 +31,23 @@ export class GameController {
     async allGames(@Res() response: Response) {
         const allGames = await this.gameService.getAllGames();
         response.status(HttpStatus.OK).json(allGames);
+    }
+
+    @ApiOkResponse({
+        description: 'Checks if the game name is unique',
+        type: Boolean,
+    })
+    @ApiBadRequestResponse({
+        description: 'Returns BAD_REQUEST http status when name is not provided',
+    })
+    @Get('/is-name-unique')
+    async isNameUnique(@Query('name') name: string, @Query('id') id: string, @Res() response: Response) {
+        if (!name) {
+            response.status(HttpStatus.BAD_REQUEST).json({ message: 'Name is required' });
+            return;
+        }
+        const isUnique = await this.gameService.isNameUnique(name, id);
+        response.status(HttpStatus.OK).json(isUnique);
     }
 
     @ApiOkResponse({
@@ -139,18 +156,5 @@ export class GameController {
     async deleteGame(@Param('id') id: string, @Res() response: Response) {
         await this.gameService.deleteGame(id);
         response.status(HttpStatus.NO_CONTENT).send();
-    }
-
-    @ApiOkResponse({
-        description: 'Checks if a game name is unique, optionally excluding a given game ID',
-        type: Boolean,
-    })
-    @ApiInternalServerErrorResponse({
-        description: 'Returns INTERNAL_SERVER_ERROR http status when request fails',
-    })
-    @Get('/isNameUnique/:name/:id?')
-    async isNameUnique(@Param('name') name: string, @Param('id') id: string | undefined, @Res() response: Response) {
-        const isUnique = await this.gameService.isNameUnique(name, id);
-        response.status(HttpStatus.OK).json({ isUnique });
     }
 }

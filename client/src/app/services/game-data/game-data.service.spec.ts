@@ -44,15 +44,13 @@ describe('GameDataService', () => {
     });
 
     it('should get and edit a tile correctly', () => {
-        for (let i = 0; i < service.gameData.mapData.size; i++) {
-            for (let j = 0; j < service.gameData.mapData.size; j++) {
-                service.gameData.mapData.tiles[i][j] = TileType.Water;
-            }
-        }
-        service.gameData.mapData.tiles[1][1] = TileType.Grass;
         const position: Position = { x: 1, y: 1 };
-        service.editTile(TileType.Water, position);
-        expect(service.gameData.mapData.tiles[1][1]).toBe(service.getTile(position));
+
+        service.editTile(TileType.Grass, position);
+        expect(service.gameData.mapData.tiles[1][1]).toBe(TileType.Grass);
+
+        const tile = service.getTile(position);
+        expect(tile).toBe(TileType.Grass);
     });
 
     it('should add and remove items correctly', () => {
@@ -86,7 +84,7 @@ describe('GameDataService', () => {
     });
 
     it('should return the correct map size string', () => {
-        service.gameData.mapData.size = 10;
+        service.gameData.mapData.size = MapSize.Small;
         expect(service.getMapSizeString()).toBe('10 x 10');
     });
 
