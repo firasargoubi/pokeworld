@@ -24,38 +24,48 @@
                 } @if(needsWarning('avatar')){
                 <div class="warning">Veuillez choisir une AVATAR !</div>
                 }
-                <div class="stat-container">
-                    <span class="stat-bar-container">
-                        <img src="\assets\images\menu\stat-bar\hp-bar.png" class="bar-icon" />
-                        <div class="stat-bar"></div>
-                        <div class="bonus-bar" [ngClass]="{ 'bonus-active': isBonusPoint(statType.Life) }"></div>
-                    </span>
-                    <input type="radio" [formControl]= "bonusPointsForm" value="life" id="life" class="bonus-button" />
-                </div>
+                <div id="player-stats">
+                    <div class="stat-container">
+                        <span class="stat-bar-container">
+                            <img src="\assets\images\menu\stat-bar\hp-bar.png" class="bar-icon" />
+                            <div class="stat-bar"></div>
+                            <div class="bonus-bar" [ngClass]="{ 'bonus-active': isBonusPoint(statType.Life) }">
+                                <span class="point-value">4 HP</span>
+                                <span class="point-value bonus-value">6 HP</span>
+                            </div>
+                        </span>
+                        <input type="radio" [formControl]="bonusPointsForm" value="life" id="life" class="bonus-button" />
+                    </div>
 
-                <div class="stat-container">
-                    <span class="stat-bar-container">
-                        <img src="\assets\images\menu\stat-bar\vit-bar.png" class="bar-icon" />
-                        <div class="stat-bar"></div>
-                        <div class="bonus-bar" [ngClass]="{ 'bonus-active': isBonusPoint(statType.Speed) }"></div>
-                    </span>
-                    <input type="radio" [formControl]= "bonusPointsForm" value="speed" id="speed" class="bonus-button" />
-                </div>
+                    <div class="stat-container">
+                        <span class="stat-bar-container">
+                            <img src="\assets\images\menu\stat-bar\vit-bar.png" class="bar-icon" />
+                            <div class="stat-bar"></div>
+                            <div class="bonus-bar" [ngClass]="{ 'bonus-active': isBonusPoint(statType.Speed) }">
+                                <span class="point-value">4 HP</span>
+                                <span class="point-value bonus-value">6 HP</span>
+                            </div>
+                        </span>
+                        <input type="radio" [formControl]="bonusPointsForm" value="speed" id="speed" class="bonus-button" />
+                    </div>
 
-                <div class="stat-container">
-                    <span class="stat-bar-container">
-                        <img src="\assets\images\menu\stat-bar\atq-bar.png" class="bar-icon" />
-                        <div class="stat-bar"></div>
-                    </span>
-                    <span class="{{ bonusDice[statType.Attack] }}" (click)="toggleBonusDice()"></span>
-                </div>
+                    <div class="stat-container">
+                        <span class="stat-bar-container">
+                            <img src="\assets\images\menu\stat-bar\atq-bar.png" class="bar-icon" />
+                            <div class="stat-bar"></div>
+                            <div class="bonus-bar"></div>
+                        </span>
+                        <span class="{{ bonusDice[statType.Attack] }}" (click)="toggleBonusDice()"></span>
+                    </div>
 
-                <div class="stat-container">
-                    <span class="stat-bar-container">
-                        <img src="\assets\images\menu\stat-bar\def-bar.png" class="bar-icon" />
-                        <div class="stat-bar"></div>
-                    </span>
-                    <span class="{{ bonusDice[statType.Defense] }}" (click)="toggleBonusDice()"></span>
+                    <div class="stat-container">
+                        <span class="stat-bar-container">
+                            <img src="\assets\images\menu\stat-bar\def-bar.png" class="bar-icon" />
+                            <div class="stat-bar"></div>
+                            <div class="bonus-bar"></div>
+                        </span>
+                        <span class="{{ bonusDice[statType.Defense] }}" (click)="toggleBonusDice()"></span>
+                    </div>
                 </div>
             </section>
             <section id="avatar-selection-container">

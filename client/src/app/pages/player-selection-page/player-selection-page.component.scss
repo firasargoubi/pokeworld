@@ -137,7 +137,8 @@ main {
     height: 100%;
     width: 70%;
     display: flex;
-    padding: 0 10px;
+    padding: 0 15px;
+    overflow: visible;
 }
 
 .bar-icon {
@@ -159,7 +160,7 @@ main {
     height: 100%;
     flex: 2;
     background-color: gray;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .bonus-bar::before {
@@ -171,6 +172,30 @@ main {
     height: 100%;
     background-color: gold;
     transition: width 0.5s ease-in-out;
+}
+
+.point-value {
+    position: absolute;
+    bottom: -5vh;
+    right: 0;
+    font-size: 3em;
+    font-weight: bolder;
+    color: rgb(255, 255, 255);
+    text-shadow: 4px 0 0 $text-shadow-color;
+    z-index: 2;
+    opacity: 1;
+}
+
+.bonus-value {
+    opacity: 0;
+}
+
+.bonus-active .point-value {
+    opacity: 0;
+}
+
+.bonus-active .bonus-value {
+    opacity: 1;
 }
 
 .bonus-bar.bonus-active::before {
