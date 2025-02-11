@@ -12,7 +12,7 @@ import { MapSize } from '@common/map-size.enum'; // DELETE LATER
 @Injectable()
 export class GameService {
     constructor(@InjectModel(Game.name) private gameModel: Model<Game>) {
-        // this.resetDB(); // UNCOMMENT WHEN YOU WANT TO RESET AND REPOPULATE THE DB.
+        this.resetDB(); // UNCOMMENT WHEN YOU WANT TO RESET AND REPOPULATE THE DB.
     }
     async getAllGames(): Promise<Game[]> {
         return this.gameModel.find().exec();

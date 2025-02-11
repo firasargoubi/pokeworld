@@ -61,7 +61,7 @@
                 <div class="avatar-container" (click)="handleAvatarSelection(avatar)">
                     <div class="avatar-name">{{ avatarData[avatar].name }}</div>
                     <img src="{{ avatarData[avatar].image }}" class="avatar-select" />
-                    <button type="button" [ngStyle]="{ 'background-color': getAvatarBtnStyle(avatar).background }" [attr.avatar]="avatar">
+                    <button type="button" class="{{ getAvatarBtnStyle(avatar).background }}" [attr.avatar]="avatar">
                         {{ getAvatarBtnStyle(avatar).text }}
                     </button>
                 </div>

@@ -53,12 +53,12 @@ export class PlayerSelectionPageComponent {
     getAvatarBtnStyle(avatar: Avatars) {
         if (avatar === this.selectedAvatar) {
             return {
-                background: 'blue',
+                background: 'avatar-selected',
                 text: 'CHOISI',
             };
         } else {
             return {
-                background: 'green',
+                background: 'avatar-unselected',
                 text: 'CHOISIR',
             };
         }

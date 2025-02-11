@@ -115,7 +115,7 @@ describe('PlayerSelectionPageComponent', () => {
         const avatar = component.avatarList[0];
         component.selectedAvatar = avatar;
         const style = component.getAvatarBtnStyle(avatar);
-        expect(style.background).toBe('blue');
+        expect(style.background).toBe('avatar-selected');
         expect(style.text).toBe('CHOISI');
     });
 
@@ -123,7 +123,7 @@ describe('PlayerSelectionPageComponent', () => {
         const avatar = component.avatarList[0];
         component.selectedAvatar = Avatars.Default;
         const style = component.getAvatarBtnStyle(avatar);
-        expect(style.background).toBe('green');
+        expect(style.background).toBe('avatar-unselected');
         expect(style.text).toBe('CHOISIR');
     });
 

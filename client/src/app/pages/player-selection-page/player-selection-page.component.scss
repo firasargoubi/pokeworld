@@ -118,6 +118,12 @@ main {
             flex-wrap: wrap;
             flex: 1;
             column-gap: 20px;
+            .avatar-selected{
+                background-color: blue;
+            }
+            .avatar-unselected{
+                background-color: green;
+            }
             .avatar-container {
                 display: flex;
                 flex-direction: column;
