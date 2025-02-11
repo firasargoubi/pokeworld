@@ -2,11 +2,11 @@ import { NgStyle } from '@angular/common';
 import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { BONUS_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player';
+import { BonusDice, DICE_PAIR, DiceType } from '@app/consts/dice';
 import { AVATAR_DATA } from '@app/interfaces/avatars';
 import { Avatars } from '@app/interfaces/avatars.enum';
-import { DiceType, BonusDice, DICE_PAIR } from '@app/consts/dice';
 import { PointStat, statFrench } from '@app/interfaces/player';
-import { BONUS_POINTS, DEFAULT_STAT_POINTS, MIN_NAME_LENGTH, MAX_NAME_LENGTH } from '@app/consts/default-player';
 
 @Component({
     selector: 'app-player-selection-page',

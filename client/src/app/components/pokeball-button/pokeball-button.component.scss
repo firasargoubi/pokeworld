@@ -13,6 +13,7 @@
     cursor: pointer;
 }
 
+.pokeball-active-button-icon,
 .pokeball-button-icon {
     position: absolute;
     z-index: 1;
@@ -26,13 +27,29 @@
     user-select: none;
 }
 
+.pokeball-active-button-icon {
+    opacity: 0;
+}
+
+.active-pokeball-button .pokeball-button-icon {
+    opacity: 0;
+}
+
+.active-pokeball-button .pokeball-active-button-icon {
+    opacity: 1;
+}
+
 .pokeball-button-spacer {
     width: 15%;
     height: 100%;
-    background-image: url('/assets/images/menu/buttons/button-container-borderless.png');
+    background-image: url('/assets/images/menu/buttons/poke-button/button-container-borderless.png');
     background-repeat: repeat-x;
     background-size: auto 100%;
     background-position: center;
+}
+
+.active-pokeball-button .pokeball-button-spacer {
+    background-image: url('/assets/images/menu/buttons/poke-button/button-container-borderless-active.png') !important;
 }
 
 .pokeball-button-content {
@@ -41,10 +58,14 @@
     align-items: center;
     height: 100%;
     width: fit-content;
-    background-image: url('/assets/images/menu/buttons/button-container-borderless.png');
+    background-image: url('/assets/images/menu/buttons/poke-button/button-container-borderless.png');
     background-repeat: repeat-x;
     background-size: auto 100%;
     background-position: center;
+}
+
+.active-pokeball-button .pokeball-button-content {
+    background-image: url('/assets/images/menu/buttons/poke-button/button-container-borderless-active.png') !important;
 }
 
 .pokeball-button-content p {
@@ -55,11 +76,19 @@
 }
 
 .pokeball-button-end {
+    background-image: url('/assets/images/menu/buttons/poke-button/button-border.png');
+    background-size: 100% 100%;
+    background-position: center;
     position: relative;
     height: 100%;
-    object-fit: contain;
+    aspect-ratio: 10/32;
+    object-fit: fill;
     pointer-events: none;
     user-select: none;
+}
+
+.active-pokeball-button .pokeball-button-end {
+    background-image: url('/assets/images/menu/buttons/poke-button/button-border-active.png');
 }
 
 .pokeball-button-start {
@@ -67,11 +96,23 @@
     display: inline-flex;
 }
 
-.button-border-start {
+.pokeball-border-start {
+    background-image: url('/assets/images/menu/buttons/poke-button/button-border.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-origin: border-box;
+    transform: scaleX(-1);
     position: relative;
     height: 100%;
-    object-fit: contain;
-    left: 1px;
-    transform: scaleX(-1);
+    width: auto;
+    aspect-ratio: 10/32;
+    object-fit: fill;
+    pointer-events: none;
     user-select: none;
+    right: -1px;
+}
+
+.active-pokeball-button .pokeball-border-start {
+    background-image: url('/assets/images/menu/buttons/poke-button/button-border-active.png');
 }

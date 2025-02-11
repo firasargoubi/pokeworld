@@ -143,6 +143,7 @@ $green-active-inner-border-color: rgb(122, 151, 101) rgb(179, 246, 168) rgb(179,
     height: 15vw;
     width: auto;
     z-index: 0;
+    pointer-events: none;
 }
 
 .container .pokeball-open {
@@ -168,11 +169,13 @@ $green-active-inner-border-color: rgb(122, 151, 101) rgb(179, 246, 168) rgb(179,
     }
 }
 
-.container:active .pokeball-open {
+.container:active .pokeball-open,
+.container .active-pokeball .pokeball-open {
     opacity: 1;
-    animation: none;
+    animation: none !important;
 }
 
-.container:active .pokeball-close {
+.container:active .pokeball-close,
+.container .active-pokeball .pokeball-close {
     opacity: 0;
 }
