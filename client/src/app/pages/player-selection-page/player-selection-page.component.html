@@ -1,6 +1,6 @@
 <div>
     <div id="page-header">
-        <app-header [onClick]="this.goToLobby.bind(this)" [stepNumber]="'2'" [title]="'SELECTION DE PERSONNAGE'"></app-header>
+        <app-header [onClick]="this.goToCreatPage.bind(this)" [stepNumber]="'2'" [title]="'SELECTION DE PERSONNAGE'"></app-header>
     </div>
     <div id="ps-page-body">
         <main class="flex-container">
@@ -8,39 +8,87 @@
                 <div id="player-name-avatar">
                     <img src="{{ avatarData[selectedAvatar].image }}" id="selected-avatar" />
                     <span id="name-form">
-                        <label for="name"> Pseudo </label>
-                        <div class="input-wrapper">
-                            <input
-                                id="name-input"
-                                [formControl]="nameForm"
-                                type="text"
-                                value="Entrer "
-                                maxlength="{{ this.maxLength }}"
-                                placeholder="tets"
-                            />
-                        </div>
+                        <input
+                            id="name-input"
+                            type="text"
+                            [formControl]="nameForm"
+                            maxlength="{{ this.maxNameLength }}"
+                            placeholder="Entrez votre pseudo"
+                            autofocus
+                        />
+                        <p id="input-border">--------------------</p>
                     </span>
                 </div>
-                @if(isWarning('name')){
+                @if(needsWarning('name')){
                 <div class="warning">Vous devez entrer un pseudo entre 3 et 20 characteres !</div>
-                } @if(isWarning('avatar')){
+                } @if(needsWarning('avatar')){
                 <div class="warning">Veuillez choisir une AVATAR !</div>
                 }
-                <div id="stats-title">Statistiques</div>
-                <div id="player-stats">
-                    @for(category of statList ; track i; let i = $index){
-                    <div class="stat-label">{{ statFrench[category] }}</div>
-                    <div class="stat-visual">
-                        <div class="stat-bar"></div>
-                        @if(isBonusPoint(category)){
-                        <div class="bonus-bar"></div>
-                        }
-                        <div class="stat-bonus">
-                            <span class="hp-points"> {{ getScore(category) }} PV </span>
-                            <span class="dice"> {{ getBonusDice(category) }}</span>
+                <form [formGroup]="bonusForm" id="player-stats">
+                    <div class="stat-container">
+                        <span class="stat-bar-container">
+                            <img src="\assets\images\menu\stat-bar\hp-bar.png" class="bar-icon" />
+                            <div class="stat-bar"></div>
+                            <div class="bonus-bar" [ngClass]="{ 'bonus-active': isBonusPoint(statList[0]) }"></div>
+                        </span>
+                        <input type="radio" formControlName="points" value="life" id="life" class="bonus-button" />
+                    </div>
+
+                    <div class="stat-container">
+                        <span class="stat-bar-container">
+                            <img src="\assets\images\menu\stat-bar\vit-bar.png" class="bar-icon" />
+                            <div class="stat-bar"></div>
+                            <div class="bonus-bar" [ngClass]="{ 'bonus-active': isBonusPoint(statList[1]) }"></div>
+                        </span>
+                        <input type="radio" formControlName="points" value="speed" id="speed" class="bonus-button" />
+                    </div>
+
+                    <div class="stat-container">
+                        <span class="stat-bar-container">
+                            <img src="\assets\images\menu\stat-bar\atq-bar.png" class="bar-icon" />
+                            <div class="stat-bar"></div>
+                        </span>
+                        <input
+                            type="radio"
+                            formControlName="bonusDice"
+                            value="{{ bonusDice.Option2 }}"
+                            class="dice-icon-4"
+                            [ngClass]="{ 'dice-icon-6': isBonus6Dice(statList[2]) }"
+                        />
+                    </div>
+
+                    <div class="stat-container">
+                        <span class="stat-bar-container">
+                            <img src="\assets\images\menu\stat-bar\def-bar.png" class="bar-icon" />
+                            <div class="stat-bar"></div>
+                        </span>
+                        <input
+                            type="radio"
+                            formControlName="bonusDice"
+                            value="{{ bonusDice.Option1 }}"
+                            class="dice-icon-4"
+                            [ngClass]="{ 'dice-icon-6': isBonus6Dice(statList[3]) }"
+                        />
+                    </div>
+
+                    <!-- @for(category of statList ; track i; let i = $index){
+                    <div class="stat-container">
+                        <div class="stat-label">{{ statFrench[category] }}</div>
+                        <span class="stat-bar-container">
+                            <div class="stat-bar"></div>
+                            @if(isBonusPoint(category)){
+                            <div class="bonus-bar"></div>
+                            }
+                        </span>
+                        <div class="stat-visual">
+                            <div class="stat-bonus">
+                                <span class="hp-points"> {{ getScore(category) }} PV </span>
+                                <span class="dice"> {{ getBonusDice(category) }}</span>
+                            </div>
                         </div>
                     </div>
-                    }
+                    } -->
+                    <!-- 
                     <form [formGroup]="bonusForm" id="bonus-form">
                         <div class="flex-container">CHOIX DES BONUS</div>
                         <legend>+2PTS BONUS</legend>
@@ -54,15 +102,15 @@
                             <legend>DE BONUS</legend>
                             <legend>Attaque</legend>
                             <legend>Defense</legend>
-                            <input type="radio" formControlName="bonusDice" value="{{ diceOptions.Option1 }}" id="option1" />
-                            <label for="option1"> {{ dice.D4 }} </label>
-                            <label for="option1"> {{ dice.D6 }} </label>
-                            <input type="radio" formControlName="bonusDice" value="{{ diceOptions.Option2 }}" id="option2" />
-                            <label for="option2"> {{ dice.D6 }} </label>
-                            <label for="option2"> {{ dice.D4 }} </label>
+                            <input type="radio" formControlName="bonusDice" value="{{ bonusDice.Option1 }}" id="option1" />
+                            <label for="option1"> {{ diceType.D4 }} </label>
+                            <label for="option1"> {{ diceType.D6 }} </label>
+                            <input type="radio" formControlName="bonusDice" value="{{ bonusDice.Option2 }}" id="option2" />
+                            <label for="option2"> {{ diceType.D6 }} </label>
+                            <label for="option2"> {{ diceType.D4 }} </label>
                         </div>
-                    </form>
-                </div>
+                    </form> -->
+                </form>
             </section>
             <section id="avatar-selection-container">
                 <div id="avatar-list">

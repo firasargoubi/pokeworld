@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { GameService } from '@app/services/game-save/game-save.service';
+import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { Router } from '@angular/router';
@@ -18,10 +18,10 @@ export class CreatePageComponent implements OnInit {
     games: GameData[] = [];
 
     constructor(
-        private gameService: GameService,
+        private router: Router,
+        private gameSaveService: GameSaveService,
         private snackBar: MatSnackBar,
         private gameDataService: GameDataService,
-        private router: Router,
     ) {}
 
     navigateToMenu() {
@@ -39,12 +39,23 @@ export class CreatePageComponent implements OnInit {
     }
 
     onJoin(gameId: string) {
-        this.gameService.getGame(gameId).subscribe({
+        this.gameSaveService.getGame(gameId).subscribe({
             next: (game: GameData) => {
                 this.handleGameVisibility(game);
             },
             error: (error: HttpErrorResponse) => {
                 this.handleNotFoundError(error);
+            },
+        });
+    }
+
+    private loadGames() {
+        this.gameSaveService.getAllGames().subscribe({
+            next: (games) => {
+                this.games = games.filter((game) => game.isVisible);
+            },
+            error: (error: HttpErrorResponse) => {
+                this.handleError(error);
             },
         });
     }
@@ -66,17 +77,6 @@ export class CreatePageComponent implements OnInit {
         } else {
             this.handleError(error);
         }
-    }
-
-    private loadGames() {
-        this.gameService.getAllGames().subscribe({
-            next: (games) => {
-                this.games = games.filter((game) => game.isVisible);
-            },
-            error: (error: HttpErrorResponse) => {
-                this.handleError(error);
-            },
-        });
     }
 
     private handleError(error: HttpErrorResponse) {

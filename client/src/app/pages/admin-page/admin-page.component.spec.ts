@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, RouterModule } from '@angular/router';
 import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
-import { GameService } from '@app/services/game-save/game-save.service';
+import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
 import { of, throwError } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
@@ -11,10 +11,10 @@ describe('AdminPageComponent', () => {
     let component: AdminPageComponent;
     let fixture: ComponentFixture<AdminPageComponent>;
     let router: Router;
-    let gameServiceSpy: jasmine.SpyObj<GameService>;
+    let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
 
     beforeEach(async () => {
-        const spy = jasmine.createSpyObj('GameService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
+        const spy = jasmine.createSpyObj('GameSaveService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
         spy.getAllGames.and.returnValue(of([]));
         spy.getGame.and.returnValue(of({} as GameData));
         spy.toggleVisibility.and.returnValue(of({} as GameData));
@@ -22,11 +22,10 @@ describe('AdminPageComponent', () => {
 
         await TestBed.configureTestingModule({
             imports: [RouterModule.forRoot([]), AdminPageComponent],
-            providers: [{ provide: GameService, useValue: spy }],
+            providers: [{ provide: GameSaveService, useValue: spy }],
         }).compileComponents();
 
-        gameServiceSpy = TestBed.inject(GameService) as jasmine.SpyObj<GameService>;
-
+        gameSaveServiceSpy = TestBed.inject(GameSaveService) as jasmine.SpyObj<GameSaveService>;
         fixture = TestBed.createComponent(AdminPageComponent);
         component = fixture.componentInstance;
         router = TestBed.inject(Router);
@@ -46,11 +45,11 @@ describe('AdminPageComponent', () => {
     });
 
     it('should load games when loadGames is called', () => {
-        gameServiceSpy.getAllGames.and.returnValue(of(MOCK_GAMES));
+        gameSaveServiceSpy.getAllGames.and.returnValue(of(MOCK_GAMES));
 
         component.loadGames();
 
-        expect(gameServiceSpy.getAllGames).toHaveBeenCalled();
+        expect(gameSaveServiceSpy.getAllGames).toHaveBeenCalled();
         expect(component.games).toEqual(MOCK_GAMES);
     });
 
@@ -59,7 +58,7 @@ describe('AdminPageComponent', () => {
         const setItemSpy = spyOn(sessionStorage, 'setItem');
         const gameId = '123';
 
-        gameServiceSpy.getGame.and.returnValue(of({} as GameData));
+        gameSaveServiceSpy.getGame.and.returnValue(of({} as GameData));
         component.editGame(gameId);
 
         expect(setItemSpy).toHaveBeenCalledWith('editGameId', gameId);
@@ -67,7 +66,7 @@ describe('AdminPageComponent', () => {
     });
 
     it('should toggle visibility when toggleVisibility is called', () => {
-        const toggleVisibilitySpy = gameServiceSpy.toggleVisibility;
+        const toggleVisibilitySpy = gameSaveServiceSpy.toggleVisibility;
         const event = { id: '123', isVisible: true };
 
         component.toggleVisibility(event);
@@ -76,14 +75,14 @@ describe('AdminPageComponent', () => {
     });
 
     it('should delete game when deleteGame is called', () => {
-        gameServiceSpy.getAllGames.and.returnValue(of(MOCK_GAMES));
-        gameServiceSpy.deleteGame.and.returnValue(of(undefined));
+        gameSaveServiceSpy.getAllGames.and.returnValue(of(MOCK_GAMES));
+        gameSaveServiceSpy.deleteGame.and.returnValue(of(undefined));
 
         component.ngOnInit();
 
         component.deleteGame(MOCK_GAMES[0]._id);
 
-        expect(gameServiceSpy.deleteGame).toHaveBeenCalledWith(MOCK_GAMES[0]._id);
+        expect(gameSaveServiceSpy.deleteGame).toHaveBeenCalledWith(MOCK_GAMES[0]._id);
 
         expect(component.games.length).toBe(1);
         expect(component.games[0]._id).toBe(MOCK_GAMES[1]._id);
@@ -104,9 +103,9 @@ describe('AdminPageComponent', () => {
     it('should handle not found error when editGame, toggleVisibility or deleteGame fails (NOT_FOUND)', () => {
         const notFoundError = new HttpErrorResponse({ error: 'Game not found', status: 404 });
 
-        gameServiceSpy.getGame.and.returnValue(throwError(() => notFoundError));
-        gameServiceSpy.toggleVisibility.and.returnValue(throwError(() => notFoundError));
-        gameServiceSpy.deleteGame.and.returnValue(throwError(() => notFoundError));
+        gameSaveServiceSpy.getGame.and.returnValue(throwError(() => notFoundError));
+        gameSaveServiceSpy.toggleVisibility.and.returnValue(throwError(() => notFoundError));
+        gameSaveServiceSpy.deleteGame.and.returnValue(throwError(() => notFoundError));
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const handleNotFoundErrorSpy = spyOn<any>(component, 'handleNotFoundError');
@@ -141,9 +140,9 @@ describe('AdminPageComponent', () => {
     it('should call handleError when loadGames, toggleVisibility or delete fails (INTERNAL_ERROR)', () => {
         const error = new HttpErrorResponse({ error: 'Action failed', status: 500 });
 
-        gameServiceSpy.getAllGames.and.returnValue(throwError(() => error));
-        gameServiceSpy.toggleVisibility.and.returnValue(throwError(() => error));
-        gameServiceSpy.deleteGame.and.returnValue(throwError(() => error));
+        gameSaveServiceSpy.getAllGames.and.returnValue(throwError(() => error));
+        gameSaveServiceSpy.toggleVisibility.and.returnValue(throwError(() => error));
+        gameSaveServiceSpy.deleteGame.and.returnValue(throwError(() => error));
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const handleErrorSpy = spyOn<any>(component, 'handleError');

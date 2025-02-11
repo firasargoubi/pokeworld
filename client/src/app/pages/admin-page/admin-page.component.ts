@@ -7,7 +7,7 @@ import { CreateGamePopupComponent } from '@app/components/create-game-popup/crea
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
-import { GameService } from '@app/services/game-save/game-save.service';
+import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
 
 @Component({
@@ -24,7 +24,7 @@ export class AdminPageComponent implements OnInit {
 
     constructor(
         private router: Router,
-        private gameService: GameService,
+        private gameSaveService: GameSaveService,
         private snackBar: MatSnackBar,
     ) {}
 
@@ -37,7 +37,7 @@ export class AdminPageComponent implements OnInit {
     }
 
     loadGames() {
-        this.gameService.getAllGames().subscribe({
+        this.gameSaveService.getAllGames().subscribe({
             next: (games) => {
                 this.games = games;
             },
@@ -48,9 +48,9 @@ export class AdminPageComponent implements OnInit {
     }
 
     editGame(id: string) {
-        this.gameService.getGame(id).subscribe({
+        this.gameSaveService.getGame(id).subscribe({
             next: () => {
-                sessionStorage.setItem('editGameId', id); // change to game-Data.service
+                sessionStorage.setItem('editGameId', id);
                 this.router.navigate(['/edit']);
             },
             error: (error: HttpErrorResponse) => {
@@ -60,7 +60,7 @@ export class AdminPageComponent implements OnInit {
     }
 
     toggleVisibility(event: { id: string; isVisible: boolean }) {
-        this.gameService.toggleVisibility(event.id).subscribe({
+        this.gameSaveService.toggleVisibility(event.id).subscribe({
             error: (error: HttpErrorResponse) => {
                 this.handleNotFoundError(error);
             },
@@ -68,7 +68,7 @@ export class AdminPageComponent implements OnInit {
     }
 
     deleteGame(id: string) {
-        this.gameService.deleteGame(id).subscribe({
+        this.gameSaveService.deleteGame(id).subscribe({
             next: () => {
                 this.games = this.games.filter((game) => game._id !== id);
             },

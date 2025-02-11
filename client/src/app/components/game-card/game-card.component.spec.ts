@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { ThumbnailService } from '@app/services/thumbnail/thumbnail-service';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
 import { MapSize } from '@common/map-size.enum';
@@ -8,11 +9,20 @@ import { GameCardComponent } from './game-card.component';
 describe('GameCardComponent', () => {
     let component: GameCardComponent;
     let fixture: ComponentFixture<GameCardComponent>;
+    let thumbnailServiceSpy: jasmine.SpyObj<ThumbnailService>;
 
     beforeEach(async () => {
+        const thumbnailSpy = jasmine.createSpyObj('ThumbnailService', ['getThumbnail']);
+        thumbnailSpy.getThumbnail.and.returnValue(Promise.resolve('data:image/png;base64,mockthumbnail'));
+
         await TestBed.configureTestingModule({
             imports: [GameCardComponent],
+            providers: [{ provide: ThumbnailService, useValue: thumbnailSpy }],
         }).compileComponents();
+
+        fixture = TestBed.createComponent(GameCardComponent);
+        component = fixture.componentInstance;
+        thumbnailServiceSpy = TestBed.inject(ThumbnailService) as jasmine.SpyObj<ThumbnailService>;
     });
 
     beforeEach(() => {
@@ -104,5 +114,16 @@ describe('GameCardComponent', () => {
 
         editionIcons = fixture.debugElement.query(By.css('.edition-buttons'));
         expect(editionIcons).toBeFalsy();
+    });
+
+    it('should set thumbnailUrl on ngOnInit', async () => {
+        const mockThumbnailUrl = 'data:image/png;base64,mockthumbnail';
+        thumbnailServiceSpy.getThumbnail.and.returnValue(Promise.resolve(mockThumbnailUrl));
+
+        await component.ngOnInit();
+        fixture.detectChanges();
+
+        expect(thumbnailServiceSpy.getThumbnail).toHaveBeenCalledWith(component.game.mapData);
+        expect(component.thumbnailUrl).toBe(mockThumbnailUrl);
     });
 });

@@ -17,13 +17,11 @@
                 </app-game-card>
                 }
             </div>
-            @if(isCreationMode) {
-            <div id="creation-game-popup" (click)="onCreateGame()">
+            <div id="creation-game-popup" (click)="onCreateGame()" [ngStyle]="{ display: isCreationMode ? 'block' : 'none' }">
                 <div (click)="$event.stopPropagation()">
                     <app-create-game-popup></app-create-game-popup>
                 </div>
             </div>
-            }
         </div>
     </div>
     <div id="poke-button">

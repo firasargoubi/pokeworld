@@ -1,8 +1,4 @@
 import { Avatars } from './avatars.enum';
-import { Dice, BonusDice } from './dice';
-
-const DEFAULT_STAT_POINTS = 4;
-const BONUS_POINTS = 2;
 
 interface Player {
     name: string;
@@ -11,23 +7,18 @@ interface Player {
     speed: number;
     attack: number;
     defense: number;
-    bonusDice: BonusDice;
+    bonusDice: { attack: string; defense: string };
     movement: number;
     action: number;
 }
 
-const DEFAULT_PLAYER: Player = {
-    name: '',
-    avatar: Avatars.Default,
-    life: DEFAULT_STAT_POINTS,
-    speed: DEFAULT_STAT_POINTS,
-    attack: DEFAULT_STAT_POINTS,
-    defense: DEFAULT_STAT_POINTS,
-    bonusDice: { attack: Dice.D4, defense: Dice.D6 },
-    movement: 0,
-    action: 0,
-};
-
 type PointStat = 'life' | 'speed' | 'attack' | 'defense';
 
-export { BONUS_POINTS, Dice, Player, DEFAULT_PLAYER, DEFAULT_STAT_POINTS, PointStat, BonusDice };
+const statFrench = {
+    life: 'vie',
+    speed: 'vitesse',
+    attack: 'attaque',
+    defense: 'defense',
+};
+
+export { Player, PointStat, statFrench };

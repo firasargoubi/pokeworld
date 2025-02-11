@@ -3,10 +3,11 @@ import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { BONUS_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player';
+import { BonusDice, DICE_PAIR, DiceType } from '@app/consts/dice';
 import { AVATAR_DATA } from '@app/interfaces/avatars';
 import { Avatars } from '@app/interfaces/avatars.enum';
-import { DiceOption, dicePair } from '@app/interfaces/dice';
-import { BONUS_POINTS, DEFAULT_STAT_POINTS, Dice, PointStat } from '@app/interfaces/player';
+import { PointStat, statFrench } from '@app/interfaces/player';
 
 @Component({
     selector: 'app-player-selection-page',
@@ -15,24 +16,18 @@ import { BONUS_POINTS, DEFAULT_STAT_POINTS, Dice, PointStat } from '@app/interfa
     styleUrl: './player-selection-page.component.scss',
 })
 export class PlayerSelectionPageComponent {
-    readonly minLength = 3;
-    readonly maxLength = 20;
-    nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(this.minLength), Validators.maxLength(this.maxLength)]);
+    nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
     bonusForm: FormGroup = new FormGroup({
         points: new FormControl('life', [Validators.required]),
-        bonusDice: new FormControl(DiceOption.Option1.toString(), [Validators.required]),
+        bonusDice: new FormControl(BonusDice.Option1, [Validators.required]),
     });
+    maxNameLength = MAX_NAME_LENGTH;
 
-    statFrench = {
-        life: 'vie',
-        speed: 'vitesse',
-        attack: 'attaque',
-        defense: 'defense',
-    };
+    statFrench = statFrench;
     statList = Object.keys(this.statFrench) as (keyof typeof this.statFrench)[];
 
-    dice = Dice;
-    diceOptions = DiceOption;
+    diceType = DiceType;
+    bonusDice = BonusDice;
 
     avatarData = AVATAR_DATA;
     avatarList = Object.keys(AVATAR_DATA).slice(1) as Avatars[];
@@ -49,24 +44,24 @@ export class PlayerSelectionPageComponent {
         return this.bonusForm.get('points')?.value === statCategory;
     }
 
-    getBonusDice(statCategory: PointStat): Dice | null {
+    isBonus6Dice(statCategory: PointStat): boolean {
         if (statCategory === 'attack' || statCategory === 'defense') {
             const diceOption = this.bonusForm.get('bonusDice')?.value;
-            return dicePair[diceOption][statCategory];
+            return DICE_PAIR[diceOption][statCategory] === DiceType.D6;
         }
-        return null;
+        return false;
     }
 
     getAvatarBtnStyle(avatar: Avatars) {
         if (avatar === this.selectedAvatar) {
             return {
-                background: 'blue',
+                background: 'avatar-selected',
                 text: 'CHOISI',
                 class: 'selected',
             };
         } else {
             return {
-                background: 'green',
+                background: 'avatar-unselected',
                 text: 'CHOISIR',
                 class: 'unselected',
             };
@@ -77,7 +72,7 @@ export class PlayerSelectionPageComponent {
         this.selectedAvatar = avatar;
     }
 
-    isWarning(formField: string) {
+    needsWarning(formField: string) {
         if (formField === 'name') {
             return !this.nameForm.valid && this.isStartClicked();
         } else if (formField === 'avatar') {
@@ -91,6 +86,10 @@ export class PlayerSelectionPageComponent {
         if (this.isFormValid()) {
             this.router.navigate(['/lobby']);
         }
+    }
+
+    goToCreatPage() {
+        this.router.navigate(['/create']);
     }
 
     isFormValid() {

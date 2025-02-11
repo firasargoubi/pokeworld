@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment';
 @Injectable({
     providedIn: 'root',
 })
-export class GameService {
+export class GameSaveService {
     private readonly baseUrl: string = environment.serverUrl;
 
     constructor(private readonly http: HttpClient) {}
@@ -38,5 +38,10 @@ export class GameService {
 
     deleteGame(gameId: string): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/games/${gameId}`);
+    }
+
+    isNameUnique(name: string, id?: string): Observable<{ isUnique: boolean }> {
+        const url = id ? `${this.baseUrl}/games/isNameUnique/${name}/${id}` : `${this.baseUrl}/games/isNameUnique/${name}`;
+        return this.http.get<{ isUnique: boolean }>(url);
     }
 }

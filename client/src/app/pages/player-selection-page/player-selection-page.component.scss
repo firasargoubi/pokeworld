@@ -60,11 +60,14 @@ main {
     background-color: turquoise;
     border: $page-border-width solid $wheat-border-color;
     box-shadow: 0 0 0 $page-border-width $gray-border-color;
+    height: 20vh;
 }
 
 #selected-avatar {
-    height: 200px;
-    width: 200px;
+    height: 100%;
+    width: auto;
+    aspect-ratio: 1/1;
+    object-fit: cover;
 }
 
 #name-form {
@@ -72,126 +75,163 @@ main {
     flex-direction: column;
     row-gap: 10px;
     align-self: center;
-    width: 50%;
-    height: 40%;
+    width: 80%;
+    height: 15vh;
+    justify-content: center;
 }
 
-#name-form {
-    .input-wrapper {
-        width: auto;
-    }
+#name-input {
+    font-family: $font-family-title;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    height: 5vh;
+    width: 29ch;
+    font-size: 5vh;
+    letter-spacing: 1vh;
+    font-family: 'pixel', sans-serif;
+    text-shadow: 3px 0 0 rgba(0, 0, 0, 0.5);
+    outline: none;
+}
+#name-input::placeholder {
+    color: rgb(0, 0, 0);
+    text-shadow: 0px 0 0 rgba(0, 0, 0, 0.5);
+}
 
-    input[type='text'] {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        border: 0;
-        outline: 0;
-        background: transparent;
-        width: 100%;
-        font-size: 1em;
-    }
-
-    .input-wrapper,
-    input[type='text'] {
-        font-family: monospace;
-        font-weight: bold;
-        letter-spacing: 0.3em;
-    }
-
-    .input-wrapper {
-        display: inline-block;
-        position: relative;
-        overflow: hidden;
-        padding-bottom: 0.2em;
-        font-size: 200%;
-    }
-
-    .input-wrapper:after {
-        content: '——————————————————————————';
-        line-height: 0.3em;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        z-index: 1;
-    }
+#input-border {
+    font-family: $font-family-title;
+    height: 0.3vh;
+    font-size: 5vh;
+    letter-spacing: 1vh;
+    color: white;
+    line-height: 0;
+    width: 29ch;
 }
 
 #player-stats {
-    width: 100%;
-    display: grid;
-    overflow: visible;
-    grid-template-rows: repeat(4, 100px);
-    grid-template-columns: 1fr 1.5fr 3fr;
-    column-gap: 10px;
-    align-items: start;
-    * {
-        font-size: 35px;
-    }
-}
-
-.stat-visual {
-    display: grid;
-    align-items: center;
-    grid-template-rows: 1fr 1fr;
-    grid-template-columns: 3fr 1fr;
-    grid-template-areas:
-        'main-bar bonus-bar'
-        'points .';
-    .stat-bar {
-        grid-area: main-bar;
-        background-color: green;
-    }
-    .stat-bonus {
-        grid-area: points;
-    }
-
-    .dice {
-        color: rgb(255, 0, 200);
-    }
-
-    .bonus-bar {
-        grid-area: bonus-bar;
-        background-color: purple;
-    }
-}
-
-#bonus-form {
-    grid-column: 3/-1;
-    grid-row: 1/-1;
+    width: calc(100% - $page-border-width);
     height: 100%;
-    color: black;
+    padding: 2vw;
+    display: flex;
+    overflow: visible;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    border: $wheat-border-color solid $page-border-width;
+}
+
+.stat-container {
+    width: 100%;
+    height: 7vh;
+    margin: 10px 0;
+    align-items: start;
+    overflow: visible;
+    position: relative;
+    display: flex;
+    justify-content: start;
+}
+
+.stat-bar-container {
+    position: relative;
+    height: 100%;
+    width: 70%;
+    display: flex;
+    padding: 0 10px;
+}
+
+.bar-icon {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+.stat-bar {
+    height: 100%;
+    background-color: green;
+    flex: 4;
+}
+
+.bonus-bar {
+    position: relative;
+    height: 100%;
+    flex: 2;
+    background-color: gray;
+    overflow: hidden;
+}
+
+.bonus-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background-color: gold;
+    transition: width 0.5s ease-in-out;
+}
+
+.bonus-bar.bonus-active::before {
+    width: 100%;
+}
+
+.bonus-button {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    height: 100%;
+    width: auto;
+    aspect-ratio: 1/1;
+    margin: 0 0 0 30px;
+    border: 2px solid black;
     background-color: white;
-    * {
-        font-size: 30px;
-    }
-    label {
-        display: block;
-    }
-    legend {
-        color: rgb(50, 84, 205);
-    }
-    input {
-        margin: none;
-        padding: none;
-        border: none;
-        font-size: 0;
-        height: 20px;
-    }
-    #point-form {
-        display: grid;
-        grid-template-columns: 0.5fr 1fr;
-        grid-template-rows: 1fr 1fr;
-    }
-    #dice-form {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: repeat(3, 1fr);
-    }
-    input {
-        align-self: center;
-        height: 20px;
-    }
+    display: inline-block;
+    cursor: pointer;
+}
+
+.bonus-button:checked {
+    background-color: red;
+    border: 2px solid black;
+}
+
+.dice-icon-4,
+.dice-icon-6 {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    height: 100%;
+    width: auto;
+    aspect-ratio: 1/1;
+    z-index: 2;
+    margin: 0 0 0 30px;
+    background-color: 0;
+    background-size: cover;
+    transition:
+        rotate 0.5s ease-in-out,
+        background-image 0.5s ease-in-out;
+}
+
+.dice-icon-4 {
+    background-image: url('/assets/images/menu/stat-bar/inverted-dice-4.png');
+    rotate: 0deg;
+    cursor: pointer;
+}
+
+.dice-icon-6 {
+    background-image: url('/assets/images/menu/stat-bar/dice-six-faces-six.png');
+    rotate: 45deg;
+    cursor: auto;
+}
+
+.hp-points {
+    position: absolute;
+    color: red;
+    bottom: 0px;
+    right: 0px;
+    z-index: 10;
 }
 
 #avatar-selection-container {
@@ -250,9 +290,10 @@ main {
 }
 
 .avatar-select {
-    width: 90%;
-    height: 90%;
+    width: 150%;
+    height: 150%;
     aspect-ratio: 1/1;
+    object-fit: cover;
 }
 
 #start-btn {

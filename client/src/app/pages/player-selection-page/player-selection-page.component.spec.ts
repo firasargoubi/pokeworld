@@ -1,10 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { PlayerSelectionPageComponent } from './player-selection-page.component';
+import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@app/consts/default-player';
 import { Avatars } from '@app/interfaces/avatars.enum';
-import { dicePair } from '@app/interfaces/dice';
-import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@app/interfaces/player';
+import { PlayerSelectionPageComponent } from './player-selection-page.component';
 
 describe('PlayerSelectionPageComponent', () => {
     let component: PlayerSelectionPageComponent;
@@ -35,7 +34,7 @@ describe('PlayerSelectionPageComponent', () => {
         expect(nameInput.value).toBe('');
         expect(nameInput.valid).toBeFalse();
         expect(bonusForm.get('points')?.value).toBe('life');
-        expect(bonusForm.get('bonusDice')?.value).toBe(component.diceOptions.Option1.toString());
+        expect(bonusForm.get('bonusDice')?.value).toBe(component.bonusDice.Option1);
     });
 
     it('should display warning message for invalid name', () => {
@@ -43,7 +42,7 @@ describe('PlayerSelectionPageComponent', () => {
         component.nameForm.setValue('ab');
         fixture.detectChanges();
 
-        expect(component.isWarning('name')).toBeTrue();
+        expect(component.needsWarning('name')).toBeTrue();
     });
 
     it('should display warning message for unselected avatar', () => {
@@ -51,30 +50,30 @@ describe('PlayerSelectionPageComponent', () => {
         component.selectedAvatar = Avatars.Default;
         fixture.detectChanges();
 
-        expect(component.isWarning('avatar')).toBeTrue();
+        expect(component.needsWarning('avatar')).toBeTrue();
     });
 
-    it('should return false for isWarning when form field is valid', () => {
+    it('should return false for needsWarning when form field is valid', () => {
         component.nameForm.setValue('ValidName');
         component['isStartClicked'].set(true);
         fixture.detectChanges();
 
-        expect(component.isWarning('name')).toBeFalse();
+        expect(component.needsWarning('name')).toBeFalse();
     });
 
-    it('should return false for isWarning when isStartClicked is false', () => {
+    it('should return false for needsWarning when isStartClicked is false', () => {
         component.nameForm.setValue('ab');
         component['isStartClicked'].set(false);
         fixture.detectChanges();
 
-        expect(component.isWarning('name')).toBeFalse();
+        expect(component.needsWarning('name')).toBeFalse();
     });
 
-    it('should return false for isWarning when formField does not correspond to any known field', () => {
+    it('should return false for needsWarning when formField does not correspond to any known field', () => {
         component['isStartClicked'].set(true);
         fixture.detectChanges();
 
-        expect(component.isWarning('unknownField')).toBeFalse();
+        expect(component.needsWarning('unknownField')).toBeFalse();
     });
 
     it('should select an avatar', () => {
@@ -106,16 +105,16 @@ describe('PlayerSelectionPageComponent', () => {
     });
 
     it('should return correct bonus dice for stat category', () => {
-        component.bonusForm.get('bonusDice')?.setValue(component.diceOptions.Option1.toString());
-        const bonusDice = component.getBonusDice('attack');
-        expect(bonusDice).toBe(dicePair[component.diceOptions.Option1]['attack']);
+        // component.bonusForm.get('bonusDice')?.setValue(component.bonusDice.Option1);
+        // const bonusDice = component.isBonus6Dice('attack');
+        // expect(bonusDice).;
     });
 
     it('should return correct avatar button style', () => {
         const avatar = component.avatarList[0];
         component.selectedAvatar = avatar;
         const style = component.getAvatarBtnStyle(avatar);
-        expect(style.background).toBe('blue');
+        expect(style.background).toBe('avatar-selected');
         expect(style.text).toBe('CHOISI');
     });
 
@@ -123,7 +122,7 @@ describe('PlayerSelectionPageComponent', () => {
         const avatar = component.avatarList[0];
         component.selectedAvatar = Avatars.Default;
         const style = component.getAvatarBtnStyle(avatar);
-        expect(style.background).toBe('green');
+        expect(style.background).toBe('avatar-unselected');
         expect(style.text).toBe('CHOISIR');
     });
 

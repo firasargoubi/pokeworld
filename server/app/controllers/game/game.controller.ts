@@ -1,18 +1,18 @@
-import { Body, Controller, Get, Param, Delete, Patch, Post, Put, Res, HttpStatus } from '@nestjs/common';
-import { GameService } from '@app/services/game/game.service';
-import { Response } from 'express';
-import {
-    ApiTags,
-    ApiOkResponse,
-    ApiNotFoundResponse,
-    ApiNoContentResponse,
-    ApiInternalServerErrorResponse,
-    ApiBadRequestResponse,
-    ApiCreatedResponse,
-} from '@nestjs/swagger';
-import { Game } from '@app/model/schema/game.schema';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
+import { Game } from '@app/model/schema/game.schema';
+import { GameService } from '@app/services/game/game.service';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
+import {
+    ApiBadRequestResponse,
+    ApiCreatedResponse,
+    ApiInternalServerErrorResponse,
+    ApiNoContentResponse,
+    ApiNotFoundResponse,
+    ApiOkResponse,
+    ApiTags,
+} from '@nestjs/swagger';
+import { Response } from 'express';
 
 @ApiTags('Games')
 @Controller('games')
@@ -139,5 +139,18 @@ export class GameController {
     async deleteGame(@Param('id') id: string, @Res() response: Response) {
         await this.gameService.deleteGame(id);
         response.status(HttpStatus.NO_CONTENT).send();
+    }
+
+    @ApiOkResponse({
+        description: 'Checks if a game name is unique, optionally excluding a given game ID',
+        type: Boolean,
+    })
+    @ApiInternalServerErrorResponse({
+        description: 'Returns INTERNAL_SERVER_ERROR http status when request fails',
+    })
+    @Get('/isNameUnique/:name/:id?')
+    async isNameUnique(@Param('name') name: string, @Param('id') id: string | undefined, @Res() response: Response) {
+        const isUnique = await this.gameService.isNameUnique(name, id);
+        response.status(HttpStatus.OK).json({ isUnique });
     }
 }
