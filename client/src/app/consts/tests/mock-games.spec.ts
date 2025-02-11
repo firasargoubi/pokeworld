@@ -17,7 +17,6 @@ export const MOCK_GAMES: GameData[] = [
             size: MapSize.Medium,
             gameMode: GameMode.CTF,
         },
-        thumbnail: 'path',
     },
     {
         _id: '456',
@@ -31,6 +30,5 @@ export const MOCK_GAMES: GameData[] = [
             size: MapSize.Large,
             gameMode: GameMode.CTF,
         },
-        thumbnail: 'path',
     },
 ];

@@ -25,5 +25,4 @@ export const DEFAULT_GAME: GameData = {
         size: MapSize.Small,
         gameMode: GameMode.FFA,
     },
-    thumbnail: '_',
 };

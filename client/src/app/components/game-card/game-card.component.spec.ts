@@ -34,7 +34,6 @@ describe('GameCardComponent', () => {
             name: 'Test Game',
             description: 'A test game description',
             mapData: { size: MapSize.Medium, gameMode: GameMode.FFA },
-            thumbnail: 'test-thumbnail.jpg',
             lastEdited: new Date(),
             isVisible: true,
         } as GameData;

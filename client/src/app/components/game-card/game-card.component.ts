@@ -47,7 +47,7 @@ export class GameCardComponent implements OnInit {
 
     onToggleVisibility() {
         this.toggleVisibility.emit({ id: this.game._id, isVisible: this.game.isVisible });
-        this.game.isVisible = !this.game.isVisible; // CHECK if needed
+        this.game.isVisible = !this.game.isVisible;
     }
 
     onJoin() {
