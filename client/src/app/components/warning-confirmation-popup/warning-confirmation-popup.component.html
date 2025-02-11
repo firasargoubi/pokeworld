@@ -1,6 +1,6 @@
 <div id="warning-popup">
     <div id="warning-details">
-        <p>{{ message }}</p>
+        <p id="content">{{ message }}</p>
         <div id="buttons">
             @if(isConfirmation){
             <div class="card-button" id="confirm" (click)="onConfirm()">

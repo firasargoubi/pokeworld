@@ -61,6 +61,11 @@ $base-size: 0.2vw;
         text-wrap: wrap;
     }
 }
+#content {
+    white-space: pre;
+    text-align: left;
+    line-height: $base-size * 12;
+}
 
 #buttons {
     display: flex;

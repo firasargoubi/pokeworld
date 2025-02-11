@@ -4,6 +4,7 @@ import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
 import { ITEM_DESCRIPTION, MAX_ITEM_COUNT } from '@app/consts/items.const';
 import { EditorData, EditorItem } from '@app/interfaces/editor-data';
 import { EventProperty } from '@app/interfaces/event-property';
+import { BridgeValidationError, ValidationResult, ValidationStatus } from '@app/interfaces/game-validation-result';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
@@ -50,7 +51,8 @@ export class EditorService {
         const validationResult = this.gameValidationService.validateGame(this.gameDataService.gameData);
 
         if (validationResult) {
-            this.addMessage('Erreur de validation du jeu', false);
+            const errorMessage = this.getValidationErrorMessage(validationResult);
+            this.addMessage(errorMessage, false);
             return;
         }
 
@@ -119,6 +121,29 @@ export class EditorService {
         }
 
         this.paintTile(eventProperty.tilePosition);
+    }
+    private getValidationErrorMessage(validationResult: ValidationResult): string {
+        const errors: string[] = [];
+
+        // Parcourir chaque propriété de validationResult
+        for (const [key, value] of Object.entries(validationResult)) {
+            if (key === 'terrainCoverage' && !value.isValid) {
+                errors.push(`  - Couverture du terrain insuffisante (${value.coveragePercentage}%)`);
+            } else if (key === 'tilesAccessibility' && !value.isValid) {
+                errors.push(`  - ${value.nonAccessibleTileCount} tuiles inaccessibles`);
+            } else if (key === 'items' && !value.isValid) {
+                errors.push(`  - ${value.misplacedItems.length} objets mal placés`);
+            } else if (key === 'bridge' && !value.isValid) {
+                value.errors.forEach((error: BridgeValidationError) => {
+                    errors.push(`  - Problème de pont en [${error.x},${error.y}]: ${error.errorCode}`);
+                });
+            } else if (typeof value === 'object' && value !== null && 'isValid' in value && !value.isValid) {
+                const errorMessage: ValidationStatus = value;
+                errors.push(`  - ${key}: ${errorMessage.errorCode}`);
+            }
+        }
+
+        return errors.length > 0 ? 'Erreurs de validation :\n' + errors.join('\n') : 'Aucune erreur de validation';
     }
     private getEventProperty(event: Event): EventProperty {
         const target = event.target as HTMLElement;
