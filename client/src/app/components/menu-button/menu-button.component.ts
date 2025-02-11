@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, inject, Input } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
     selector: 'app-menu-button',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, RouterModule],
     templateUrl: './menu-button.component.html',
     styleUrls: ['./menu-button.component.scss'],
 })
@@ -15,11 +15,14 @@ export class MenuButtonComponent {
     @Input() textContent: string = '';
     @Input() routePath!: string;
 
-    constructor(private router: Router) {}
+    isActive: boolean = false;
+    private router: Router = inject(Router);
 
     navigateWithDelay() {
+        this.isActive = true;
         const delay = 200;
         setTimeout(() => {
+            this.isActive = false;
             this.router.navigate([this.routePath]);
         }, delay);
     }

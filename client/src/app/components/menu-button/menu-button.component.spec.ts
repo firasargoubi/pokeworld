@@ -38,6 +38,7 @@ describe('MenuButtonComponent', () => {
         component.navigateWithDelay();
 
         setTimeout(() => {
+            expect(component.isActive).toBeFalse();
             expect(navigateSpy).toHaveBeenCalledWith(['/test-path']);
             done();
         }, delay);
