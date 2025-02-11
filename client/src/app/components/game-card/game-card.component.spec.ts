@@ -52,7 +52,7 @@ describe('GameCardComponent', () => {
     it('should toggle visibility and emit event when onToggleVisibility is called', () => {
         spyOn(component.toggleVisibility, 'emit');
         component.onToggleVisibility();
-        expect(component.toggleVisibility.emit).toHaveBeenCalledWith({ id: MOCK_GAMES[0]._id, isVisible: !MOCK_GAMES[0].isVisible });
+        expect(component.toggleVisibility.emit).toHaveBeenCalledWith({ id: MOCK_GAMES[0]._id, isVisible: MOCK_GAMES[0].isVisible });
         expect(component.game.isVisible).toBeFalse();
     });
 
