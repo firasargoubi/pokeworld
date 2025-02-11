@@ -1,20 +1,18 @@
-// TODO add tests for board component
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BoardComponent } from '@app/components/board/board.component';
+import { MapComponent } from '@app/components/map/map.component';
 
-describe('BoardComponent', () => {
-    let component: BoardComponent;
-    let fixture: ComponentFixture<BoardComponent>;
+describe('MapComponent', () => {
+    let component: MapComponent;
+    let fixture: ComponentFixture<MapComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [BoardComponent],
+            imports: [MapComponent],
         }).compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(BoardComponent);
+        fixture = TestBed.createComponent(MapComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

@@ -1,30 +1,25 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { EditorData } from '@app/interfaces/editor/editor-data';
-import { EditorItem } from '@app/interfaces/editor/editor-item';
-import { EditorTile } from '@app/interfaces/editor/editor-tile';
+import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
+import { ITEM_DESCRIPTION, MAX_ITEM_COUNT } from '@app/consts/items.const';
+import { EditorData, EditorItem } from '@app/interfaces/editor-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
-import { ImageService } from '@app/services/image/image.service';
 import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
-import { MapSize } from '@common/map-size.enum';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
+import { DEFAULT_EDITOR_TILES, EDITOR_ERASE_TILE, ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from './editor.service.const';
+import { EventProperty } from '@app/interfaces/event-property';
 
 @Injectable({
     providedIn: 'root',
 })
 export class EditorService {
-    imageService: ImageService = inject(ImageService);
+    router: Router = inject(Router);
     gameDataService: GameDataService = inject(GameDataService);
     editorData: EditorData = this.getEditorData();
-    private selectedTile: TileType | null = null;
-    private activeTile: TileType | null = null;
-    private activeItem: ItemType | null = null;
-    private lastPosition: Position = { x: -1, y: -1 };
-    private router: Router = inject(Router);
     private gameValidationService: GameValidationService = inject(GameValidationService);
     private gameSaveService: GameSaveService = inject(GameSaveService);
 
@@ -32,39 +27,10 @@ export class EditorService {
         this.router.navigate(['/admin']);
     }
 
-    // saveButton(): void {
-    //     const validationResult = this.gameValidationService.validateGame(this.gameDataService.gameData);
-
-    //     if (validationResult !== null) {
-    //         window.console.log('Erreur de validation du jeu:', validationResult);
-    //         return;
-    //     }
-
-    //     this.gameSaveService.isNameUnique(this.gameDataService.gameData.name, this.gameDataService.gameData._id).subscribe(
-    //         (response) => {
-    //             if (response) {
-    //                 window.console.log('Le nom est déjà utilisé. Veuillez en choisir un autre.');
-    //                 return;
-    //             }
-    //             this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe(
-    //                 () => {
-    //                     window.console.log(`Le jeu "${this.gameDataService.gameData.name}" a été sauvegardé avec succès.`);
-    //                 },
-    //                 (error) => {
-    //                     window.console.error('Erreur lors de la sauvegarde du jeu:', error);
-    //                 },
-    //             );
-    //         },
-    //         (error) => {
-    //             window.console.error('Erreur lors de la vérification du nom du jeu:', error);
-    //         },
-    //     );
-    // }
-
     saveButton(): void {
         const validationResult = this.gameValidationService.validateGame(this.gameDataService.gameData);
 
-        if (validationResult !== null) {
+        if (validationResult) {
             window.console.log('Erreur de validation du jeu:', validationResult);
             return;
         }
@@ -88,45 +54,72 @@ export class EditorService {
     }
 
     onRightClick(event: MouseEvent): void {
-        const target = event.target as HTMLElement;
-        const xPos = target.getAttribute('x');
-        const yPos = target.getAttribute('y');
+        const eventProperty = this.getEventProperty(event);
 
-        if (xPos !== null && yPos !== null) {
+        if (eventProperty.tilePosition) {
             event.preventDefault();
         }
     }
 
     onMouseUp(event: MouseEvent): void {
-        this.activeTile = null;
-        this.lastPosition = { x: -1, y: -1 };
+        this.editorData.activeTile = null;
+        this.editorData.activeTilePosition = { x: -1, y: -1 };
 
-        if (this.activeItem !== null) {
-            this.dropItem(event.target as HTMLElement);
+        if (this.editorData.activeItem) {
+            const eventProperty = this.getEventProperty(event);
+            this.dropItem(eventProperty);
         }
     }
 
     onMouseMove(event: MouseEvent): void {
-        if (this.activeItem !== null) {
-            this.moveItem(event.clientX, event.clientY);
+        if (this.editorData.activeItem) {
+            const position: Position = { x: event.clientX, y: event.clientY };
+
+            if (position.x !== this.editorData.activeItemPosition.x) {
+                this.editorData.activeItemPosition.x = position.x;
+            }
+
+            if (position.y !== this.editorData.activeItemPosition.y) {
+                this.editorData.activeItemPosition.y = position.y;
+            }
         }
     }
 
     onMouseOver(event: Event): void {
-        if (this.activeTile === null) {
+        if (!this.editorData.activeTile) {
             return;
         }
 
+        const eventProperty = this.getEventProperty(event);
+
+        if (!eventProperty.tilePosition) {
+            return;
+        }
+
+        this.paintTile(eventProperty.tilePosition);
+    }
+
+    private getEventProperty(event: Event): EventProperty {
         const target = event.target as HTMLElement;
-        const xPos = target.getAttribute('x');
-        const yPos = target.getAttribute('y');
+        const tileXString = target.getAttribute('x');
+        const tileYString = target.getAttribute('y');
+        const tileString = target.getAttribute('tile');
+        const itemString = target.getAttribute('item');
 
-        if (xPos === null || yPos === null) {
-            return;
-        }
+        const tileX = tileXString ? Number(tileXString) : null;
+        const tileY = tileYString ? Number(tileYString) : null;
+        const tilePosition = tileX !== null && tileY !== null ? { x: tileX, y: tileY } : null;
 
-        const position = { x: Number(xPos), y: Number(yPos) };
-        this.paintTile(position);
+        const mouseX = (event as MouseEvent).clientX as number | undefined;
+        const mouseY = (event as MouseEvent).clientY as number | undefined;
+        const mousePosition = mouseX && mouseY ? { x: mouseX, y: mouseY } : null;
+
+        return {
+            tilePosition,
+            mousePosition,
+            tile: tileString ? (tileString as TileType) : null,
+            item: itemString ? (itemString as ItemType) : null,
+        };
     }
 
     private saveGame(): void {
@@ -140,86 +133,89 @@ export class EditorService {
         });
     }
 
-    // TODO
-    private moveItem(xPos: number, yPos: number): void {
-        window.console.log(`moveItem(${xPos}, ${yPos})`);
-    }
+    private dropItem(eventProperty: EventProperty): void {
+        const newItem = this.editorData.activeItem as ItemType;
 
-    private dropItem(target: HTMLElement): void {
-        const newItem = this.activeItem as ItemType;
-        const xPos = target.getAttribute('x');
-        const yPos = target.getAttribute('y');
+        this.setActiveItem(null, eventProperty);
 
-        if (xPos !== null && yPos !== null) {
-            const position = { x: Number(xPos), y: Number(yPos) };
-            const oldItem = this.gameDataService.getItem(position);
+        if (eventProperty.tilePosition) {
+            const tile = this.gameDataService.getTileFromPosition(eventProperty.tilePosition);
 
-            this.gameDataService.addItem(newItem, position);
-
-            if (oldItem !== null) {
-                this.updateEditorItem(oldItem);
+            const canPlaceItem = ![TileType.Water, TileType.Bridge, TileType.BrokenBridge].includes(tile);
+            if (canPlaceItem) {
+                return this.gameDataService.addItem(newItem, eventProperty.tilePosition);
             }
         }
 
-        this.activeItem = null;
-        this.updateEditorItem(newItem);
+        this.updateItem(newItem);
+    }
+
+    private setActiveItem(item: ItemType | null, eventProperty: EventProperty) {
+        this.editorData.activeItem = item;
+
+        if (item) {
+            this.editorData.activeItemImage = ITEM_IMAGES.get(item) as string;
+        } else {
+            this.editorData.activeItemImage = EMPTY_IMAGE;
+        }
+
+        if (eventProperty.mousePosition) {
+            this.editorData.activeItemPosition = eventProperty.mousePosition;
+        }
     }
 
     private onClick(event: MouseEvent, isLeftClick: boolean): void {
-        const target = event.target as HTMLElement;
-        const xPos = target.getAttribute('x');
-        const yPos = target.getAttribute('y');
-        const tile = target.getAttribute('tile');
-        const item = target.getAttribute('item');
+        const eventProperty = this.getEventProperty(event);
 
-        if (xPos !== null && yPos !== null) {
-            const position = { x: Number(xPos), y: Number(yPos) };
-            this.clickOnBoard(position, isLeftClick);
+        if (eventProperty.tilePosition) {
+            this.clickOnMap(eventProperty, isLeftClick);
             return event.preventDefault();
         }
 
-        if (tile !== null && isLeftClick) {
-            this.clickOnTile(tile as TileType);
+        if (eventProperty.tile && isLeftClick) {
+            this.clickOnTile(eventProperty.tile as TileType);
             return event.preventDefault();
         }
 
-        if (item !== null && isLeftClick) {
-            this.clickOnItem(item as ItemType);
+        if (eventProperty.item && isLeftClick) {
+            this.clickOnItem(eventProperty);
             return event.preventDefault();
         }
     }
 
-    private clickOnItem(item: ItemType) {
-        if (this.getRemainingItemCount(item) === 0) {
+    private clickOnItem(eventProperty: EventProperty): void {
+        if (this.getRemainingItemCount(eventProperty.item as ItemType) === 0) {
             return;
         }
 
-        this.activeItem = item;
-        this.updateEditorItem(item);
+        this.setActiveItem(eventProperty.item, eventProperty);
+        this.updateItem(eventProperty.item as ItemType);
     }
 
-    private clickOnBoard(pos: Position, isLeftClick: boolean): void {
-        const hasActiveItem = this.activeItem !== null;
-        const tileHasItem = this.gameDataService.getItem(pos) !== null;
+    private clickOnMap(eventProperty: EventProperty, isLeftClick: boolean): void {
+        const tileHasItem = Boolean(this.gameDataService.getItem(eventProperty.tilePosition as Position));
 
-        if (!hasActiveItem && tileHasItem && isLeftClick) {
-            return this.pickItem(pos);
+        if (!this.editorData.activeItem && tileHasItem) {
+            if (isLeftClick) {
+                return this.pickItem(eventProperty);
+            } else {
+                return this.gameDataService.removeItem(eventProperty.tilePosition as Position);
+            }
         }
 
-        if (!hasActiveItem) {
+        if (!this.editorData.activeItem) {
             if (isLeftClick) {
-                this.activeTile = this.selectedTile;
+                this.editorData.activeTile = this.editorData.selectedTile;
             } else {
-                // TODO add to const file
-                this.activeTile = TileType.Grass;
+                this.editorData.activeTile = EDITOR_ERASE_TILE;
             }
 
-            return this.paintTile(pos);
+            return this.paintTile(eventProperty.tilePosition as Position);
         }
     }
 
     private clickOnTile(tile: TileType): void {
-        this.selectedTile = tile;
+        this.editorData.selectedTile = tile;
 
         for (const tileData of this.editorData.tiles) {
             if (tileData.tile === tile) {
@@ -230,69 +226,89 @@ export class EditorService {
         }
     }
 
-    private paintTile(pos: Position): void {
-        if (this.activeTile === null) {
+    private paintTile(position: Position): void {
+        if (!this.editorData.activeTile) {
             return;
         }
 
-        if (this.lastPosition.x === pos.x && this.lastPosition.y === pos.y) {
+        if (this.editorData.activeTilePosition.x === position.x && this.editorData.activeTilePosition.y === position.y) {
             return;
         }
 
-        let newTile = this.activeTile as TileType;
-        const oldTile = this.gameDataService.getTile(pos);
+        let newTile = this.editorData.activeTile as TileType;
+        const oldTile = this.gameDataService.getTileFromPosition(position);
 
-        if (newTile === TileType.Bridge && oldTile === TileType.Bridge) {
-            newTile = TileType.BrokenBridge;
+        if (newTile === TileType.BrokenBridge && oldTile === TileType.BrokenBridge) {
+            newTile = TileType.Bridge;
         }
 
         if (newTile === oldTile) {
             return;
         }
 
-        this.lastPosition = pos;
-        this.gameDataService.editTile(newTile, pos);
+        this.editorData.activeTilePosition = position;
+        this.gameDataService.editTile(newTile, position);
+
+        const tileCannotHaveItem = [TileType.Water, TileType.Bridge, TileType.BrokenBridge].includes(newTile);
+        if (tileCannotHaveItem) {
+            this.gameDataService.removeItem(position);
+        }
     }
 
-    private pickItem(pos: Position): void {
-        const item = this.gameDataService.getItem(pos) as ItemType;
-        this.gameDataService.removeItem(pos);
-        this.activeItem = item;
-        this.updateEditorItem(item);
+    private pickItem(eventProperty: EventProperty): void {
+        const item = this.gameDataService.getItem(eventProperty.tilePosition as Position) as ItemType;
+        this.setActiveItem(item, eventProperty);
+        this.gameDataService.removeItem(eventProperty.tilePosition as Position);
     }
 
     private getEditorData(): EditorData {
+        this.verifyMapData();
+        this.gameDataService.itemUpdate.subscribe((x) => this.onItemUpdate(x));
+
         return {
-            tiles: this.getEditorTiles(),
+            tiles: DEFAULT_EDITOR_TILES,
             items: this.getEditorItems(),
-            errorMessage: this.getErrorMessage(),
+            selectedTile: null,
+            activeTile: null,
+            activeTilePosition: { x: -1, y: -1 },
+            activeItem: null,
+            activeItemImage: EMPTY_IMAGE,
+            activeItemPosition: { x: -1, y: -1 },
         };
     }
 
-    // TODO
-    private getErrorMessage(): string {
-        return 'Sample error message';
+    private onItemUpdate(item: ItemType | null): void {
+        if (!item) {
+            this.updateAllItems();
+        } else {
+            this.updateItem(item);
+        }
     }
 
-    // TODO add to const file
-    private getEditorTiles(): EditorTile[] {
-        const tiles = [TileType.Path, TileType.Bush, TileType.Water, TileType.Bridge];
-        return tiles.map(this.getEditorTile.bind(this));
+    private updateAllItems(): void {
+        this.editorData.items = this.getEditorItems();
     }
 
-    private getEditorTile(tile: TileType): EditorTile {
-        return {
-            tile,
-            image: this.imageService.getTile(tile),
-            isActive: tile === this.selectedTile,
-        };
+    private verifyMapData(): void {
+        if (!this.gameDataService.isMapValid()) {
+            this.router.navigate(['/admin']);
+        }
     }
 
-    private updateEditorItem(item: ItemType): void {
+    private updateItem(item: ItemType): void {
+        let itemsToUpdate = [item];
+
+        if (SHARED_ITEM_POOL.includes(item)) {
+            itemsToUpdate = SHARED_ITEM_POOL;
+        }
+
         for (let i = 0; i < this.editorData.items.length; i++) {
-            if (this.editorData.items[i].item === item) {
-                this.editorData.items[i] = this.getEditorItem(item);
-                return;
+            if (itemsToUpdate.includes(this.editorData.items[i].item)) {
+                const editorItem = this.getEditorItem(this.editorData.items[i].item);
+
+                if (editorItem.count !== this.editorData.items[i].count) {
+                    this.editorData.items[i] = editorItem;
+                }
             }
         }
     }
@@ -305,18 +321,34 @@ export class EditorService {
     private getEditorItem(item: ItemType): EditorItem {
         return {
             item,
-            image: this.imageService.getItem(item),
+            image: ITEM_IMAGES.get(item) as string,
+            description: ITEM_DESCRIPTION.get(item) as string,
             count: this.getRemainingItemCount(item),
         };
     }
 
-    private getRemainingItemCount(item: ItemType): number {
-        let currentItemCount = this.gameDataService.getItemCount(item);
-        const maxItemCount = this.getMaxItemCount(item);
-
-        if (this.activeItem === item) {
-            currentItemCount++;
+    private getMaxItemCount(item: ItemType): number {
+        if (item === ItemType.Flag) {
+            if (this.gameDataService.getGameMode() === GameMode.CTF) {
+                return 1;
+            } else {
+                return 0;
+            }
         }
+
+        let maxItemCount = MAX_ITEM_COUNT.get(this.gameDataService.getMapSize())?.get(item) as number;
+
+        if (SHARED_ITEM_POOL.includes(item)) {
+            const maxSharedItemCount = this.getMaxSharedItemCount(item);
+            maxItemCount = Math.min(maxItemCount, maxSharedItemCount);
+        }
+
+        return maxItemCount;
+    }
+
+    private getRemainingItemCount(item: ItemType): number {
+        const currentItemCount = this.getCurrentItemCount(item);
+        const maxItemCount = this.getMaxItemCount(item);
 
         if (maxItemCount === 1 && currentItemCount === 0) {
             return -1;
@@ -325,38 +357,27 @@ export class EditorService {
         return maxItemCount - currentItemCount;
     }
 
-    private getMaxItemCount(item: ItemType): number {
-        switch (item) {
-            case ItemType.Flag: {
-                if (this.gameDataService.getGameMode() === GameMode.CTF) {
-                    return 1;
-                }
-                return 0;
-            }
-            case ItemType.Random:
-            case ItemType.Spawn: {
-                const mapSize = this.gameDataService.getMapSize();
-                return this.getMaxPlayer(mapSize);
-            }
-            default: {
-                return 1;
-            }
+    private getCurrentItemCount(item: ItemType): number {
+        let currentItemCount = this.gameDataService.getItemCount(item);
+
+        if (this.editorData?.activeItem === item) {
+            currentItemCount++;
         }
+
+        return currentItemCount;
     }
 
-    // TODO add to const file
-    private getMaxPlayer(mapSize: MapSize): number {
-        switch (mapSize) {
-            case MapSize.Small:
-                return 2;
+    private getMaxSharedItemCount(item: ItemType): number {
+        let sharedCount = 0;
 
-            case MapSize.Medium:
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                return 4;
+        SHARED_ITEM_POOL.forEach((sharedItem) => {
+            if (sharedItem !== item) {
+                sharedCount += this.getCurrentItemCount(sharedItem);
+            }
+        });
 
-            case MapSize.Large:
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                return 6;
-        }
+        const highestMaxItemCount = MAX_ITEM_COUNT.get(this.gameDataService.getMapSize())?.get(ITEM_POOL_HIGHEST_ITEM) as number;
+
+        return highestMaxItemCount - sharedCount;
     }
 }

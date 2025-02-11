@@ -12,69 +12,52 @@ import { Subject } from 'rxjs';
     providedIn: 'root',
 })
 export class GameDataService {
-    gameData: GameData;
-    mapUpdate: Subject<Position | null>;
+    gameData: GameData = DEFAULT_GAME;
+    mapUpdate: Subject<Position | null> = new Subject();
+    itemUpdate: Subject<ItemType | null> = new Subject();
 
-    constructor() {
-        this.mapUpdate = new Subject();
-        this.gameData = DEFAULT_GAME;
-    }
-
-    resetMap() {
-        this.gameData.mapData.tiles = Array.from({ length: this.gameData.mapData.size }, () =>
-            Array(this.gameData.mapData.size).fill(TileType.Grass),
-        );
-        this.mapUpdate.next(null);
-    }
-
-    cleanMap() {
-        this.gameData.mapData.tiles = Array.from({ length: this.gameData.mapData.size }, () =>
-            Array(this.gameData.mapData.size).fill(TileType.Grass),
-        );
-
-        this.gameData.mapData.items = Object.keys(ItemType).reduce(
-            (acc, key) => {
-                acc[key as ItemType] = [];
-                return acc;
-            },
-            {} as Record<ItemType, Position[]>,
-        );
-
-        this.mapUpdate.next(null);
-    }
-
-    createGameData(size: MapSize, mode: GameMode) {
-        this.gameData = DEFAULT_GAME;
-        this.gameData.mapData.size = size;
-        this.gameData.mapData.gameMode = mode;
-        this.cleanMap();
-        this.mapUpdate.next(null);
+    createNewGame(size: MapSize, mode: GameMode) {
+        const newGameData = DEFAULT_GAME;
+        newGameData.mapData.size = size;
+        newGameData.mapData.gameMode = mode;
+        newGameData.mapData.tiles = Array.from({ length: size }, () => {
+            return Array.from({ length: size }, () => TileType.Grass);
+        });
+        this.setGameData(newGameData);
     }
 
     setGameData(gameData: GameData) {
         this.gameData = gameData;
         this.mapUpdate.next(null);
+        this.itemUpdate.next(null);
     }
 
-    editTile(tile: TileType, pos: Position) {
-        this.gameData.mapData.tiles[pos.x][pos.y] = tile;
-        this.mapUpdate.next(pos);
+    editTile(tile: TileType, position: Position) {
+        this.gameData.mapData.tiles[position.x][position.y] = tile;
+        this.mapUpdate.next(position);
     }
 
-    addItem(item: ItemType, pos: Position) {
-        this.removeItem(pos);
-        this.gameData.mapData.items[item].push(pos);
-        this.mapUpdate.next(pos);
+    addItem(item: ItemType, position: Position) {
+        this.removeItem(position);
+        this.gameData.mapData.items[item].push(position);
+
+        this.mapUpdate.next(position);
+        this.itemUpdate.next(item);
     }
 
-    removeItem(pos: Position) {
-        for (const item of Object.values(ItemType)) {
-            this.gameData.mapData.items[item] = this.gameData.mapData.items[item].filter((itemPos) => {
-                return itemPos.x !== pos.x || itemPos.y !== pos.y;
-            });
+    removeItem(position: Position): void {
+        const getItemResult = this.getItem(position);
+        if (!getItemResult) {
+            return;
         }
+        const item = getItemResult as ItemType;
 
-        this.mapUpdate.next(pos);
+        this.gameData.mapData.items[item] = this.gameData.mapData.items[item].filter((itemPosition) => {
+            return itemPosition.x !== position.x || itemPosition.y !== position.y;
+        });
+
+        this.mapUpdate.next(position);
+        this.itemUpdate.next(item);
     }
 
     getItemCount(item: ItemType): number {
@@ -106,10 +89,10 @@ export class GameDataService {
         return this.gameData.mapData.gameMode;
     }
 
-    getItem(targetPos: Position): ItemType | null {
+    getItem(position: Position): ItemType | null {
         for (const item of Object.values(ItemType)) {
-            for (const pos of this.gameData.mapData.items[item]) {
-                if (targetPos.x === pos.x && targetPos.y === pos.y) {
+            for (const itemPosition of this.gameData.mapData.items[item]) {
+                if (position.x === itemPosition.x && position.y === itemPosition.y) {
                     return item;
                 }
             }
@@ -118,8 +101,38 @@ export class GameDataService {
         return null;
     }
 
-    // TODO handle case where pos is out of bound
-    getTile(pos: Position) {
-        return this.gameData.mapData.tiles[pos.x][pos.y];
+    getTileFromPosition(position: Position): TileType {
+        return this.getTile(this.gameData.mapData.tiles, position);
+    }
+
+    getTile(tiles: TileType[][], position: Position): TileType {
+        if (this.isOutOfBound(tiles, position)) {
+            return TileType.None;
+        }
+
+        return tiles[position.x][position.y];
+    }
+
+    isOutOfBound(tiles: TileType[][], position: Position): boolean {
+        const isSmallerThanZero = position.x < 0 || position.y < 0;
+        const isHigherThanLength = position.x >= tiles.length || position.x < 0 || position.y >= tiles[position.x].length;
+
+        return isSmallerThanZero || isHigherThanLength;
+    }
+
+    isMapValid(): boolean {
+        const size = this.gameData.mapData.size;
+        const tiles = this.gameData.mapData.tiles;
+        if (tiles.length !== size) {
+            return false;
+        }
+
+        for (const row of tiles) {
+            if (row.length !== size) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
