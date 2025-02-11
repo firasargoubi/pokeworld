@@ -42,5 +42,4 @@ export const SHARED_ITEM_POOL: ItemType[] = [
     ItemType.Item6,
     ItemType.Random,
 ];
-
 export const ITEM_POOL_HIGHEST_ITEM: ItemType = ItemType.Random;

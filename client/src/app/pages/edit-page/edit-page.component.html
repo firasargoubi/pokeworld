@@ -67,5 +67,17 @@
         [style.left.px]="editorService.editorData.activeItemPosition.x"
         [style.backgroundImage]="'url(' + editorService.editorData.activeItemImage + ')'"
     ></div>
+
+    @if(editorService.messages.length > 0){
+    <div id="error-container">
+        @for(error of editorService.messages; track $index) {
+        <app-warning-confirmation-popup
+            [message]="error.message"
+            (closed)="editorService.removeMessage($index, $event)"
+            [isConfirmation]="error.isConfirmation"
+        >
+        </app-warning-confirmation-popup>
+        }
+    </div>
+    }
 </div>
-z

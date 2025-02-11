@@ -13,15 +13,34 @@ import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import { DEFAULT_EDITOR_TILES, EDITOR_ERASE_TILE, ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from './editor.service.const';
 
+interface PopupMessage {
+    message: string;
+    isConfirmation: boolean;
+    action?: () => void;
+}
+
 @Injectable({
     providedIn: 'root',
 })
 export class EditorService {
+    messages: PopupMessage[] = [];
     router: Router = inject(Router);
     gameDataService: GameDataService = inject(GameDataService);
     editorData: EditorData = this.getEditorData();
     private gameValidationService: GameValidationService = inject(GameValidationService);
     private gameSaveService: GameSaveService = inject(GameSaveService);
+
+    addMessage(message: string, isConfirmation: boolean, action?: () => void) {
+        this.messages.push({ message, isConfirmation, action });
+    }
+
+    removeMessage(index: number, confirmed: boolean) {
+        const message = this.messages[index];
+        if (message.isConfirmation && confirmed && message.action) {
+            message.action();
+        }
+        this.messages.splice(index, 1);
+    }
 
     redirectToAdminPage(): void {
         this.router.navigate(['/admin']);
@@ -31,13 +50,13 @@ export class EditorService {
         const validationResult = this.gameValidationService.validateGame(this.gameDataService.gameData);
 
         if (validationResult) {
-            window.console.log('Erreur de validation du jeu:', validationResult);
+            this.addMessage('Erreur de validation du jeu', false);
             return;
         }
 
         this.gameSaveService.isNameUnique(this.gameDataService.gameData.name, this.gameDataService.gameData._id).subscribe((isUnique) => {
             if (!isUnique) {
-                window.console.log('Le nom est déjà utilisé. Veuillez en choisir un autre.');
+                this.addMessage('Le nom est déjà utilisé. Veuillez en choisir un autre.', false);
                 return;
             }
             this.gameDataService.gameData.isVisible = false;
@@ -101,7 +120,6 @@ export class EditorService {
 
         this.paintTile(eventProperty.tilePosition);
     }
-
     private getEventProperty(event: Event): EventProperty {
         const target = event.target as HTMLElement;
         const tileXString = target.getAttribute('x');
@@ -127,11 +145,8 @@ export class EditorService {
 
     private saveGame(): void {
         this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe({
-            next: () => {
-                window.console.log(`Le jeu "${this.gameDataService.gameData.name}" a été sauvegardé avec succès.`);
-            },
             error: (error) => {
-                window.console.error('Erreur lors de la sauvegarde du jeu:', error);
+                this.addMessage('Erreur lors de la sauvegarde du jeu: ' + error, false);
             },
         });
     }
