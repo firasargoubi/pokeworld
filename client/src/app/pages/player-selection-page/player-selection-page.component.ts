@@ -1,7 +1,8 @@
-import { NgStyle } from '@angular/common';
+import { CommonModule, NgStyle } from '@angular/common';
 import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HeaderComponent } from '@app/components/header/header.component';
 import { AVATAR_DATA } from '@app/interfaces/avatars';
 import { Avatars } from '@app/interfaces/avatars.enum';
 import { DiceOption, dicePair } from '@app/interfaces/dice';
@@ -9,7 +10,7 @@ import { BONUS_POINTS, DEFAULT_STAT_POINTS, Dice, PointStat } from '@app/interfa
 
 @Component({
     selector: 'app-player-selection-page',
-    imports: [ReactiveFormsModule, NgStyle],
+    imports: [ReactiveFormsModule, NgStyle, HeaderComponent, CommonModule],
     templateUrl: './player-selection-page.component.html',
     styleUrl: './player-selection-page.component.scss',
 })
@@ -61,11 +62,13 @@ export class PlayerSelectionPageComponent {
             return {
                 background: 'blue',
                 text: 'CHOISI',
+                class: 'selected',
             };
         } else {
             return {
                 background: 'green',
                 text: 'CHOISIR',
+                class: 'unselected',
             };
         }
     }

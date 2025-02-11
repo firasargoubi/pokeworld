@@ -1,75 +1,85 @@
-<div id="page-root">
-    <header class="flex-container">
-        <h1 id="page-title">CREATION DE PERSONNAGE</h1>
-    </header>
-    <main class="flex-container">
-        <section id="avatar-info-container" class="flex-container">
-            <div id="player-name-avatar">
-                <img src="{{ avatarData[selectedAvatar].image }}" id="selected-avatar" />
-                <span id="name-form">
-                    <label for="name"> Pseudo </label>
-                    <input id="name-input" type="text" [formControl]="nameForm" id="name" autofocus />
-                </span>
-            </div>
-            @if(isWarning('name')){
-            <div class="warning">Vous devez entrer un pseudo entre 3 et 20 characteres !</div>
-            } @if(isWarning('avatar')){
-            <div class="warning">Veuillez choisir une AVATAR !</div>
-            }
-            <div id="stats-title">Statistiques</div>
-            <div id="player-stats">
-                @for(category of statList ; track i; let i = $index){
-                <div class="stat-label">{{ statFrench[category] }}</div>
-                <div class="stat-visual">
-                    <div class="stat-bar"></div>
-                    @if(isBonusPoint(category)){
-                    <div class="bonus-bar"></div>
+<div>
+    <div id="page-header">
+        <app-header [onClick]="this.goToLobby.bind(this)" [stepNumber]="'2'" [title]="'SELECTION DE PERSONNAGE'"></app-header>
+    </div>
+    <div id="ps-page-body">
+        <main class="flex-container">
+            <section id="avatar-info-container" class="flex-container">
+                <div id="player-name-avatar">
+                    <img src="{{ avatarData[selectedAvatar].image }}" id="selected-avatar" />
+                    <span id="name-form">
+                        <label for="name"> Pseudo </label>
+                        <div class="input-wrapper">
+                            <input
+                                id="name-input"
+                                [formControl]="nameForm"
+                                type="text"
+                                value="Entrer "
+                                maxlength="{{ this.maxLength }}"
+                                placeholder="tets"
+                            />
+                        </div>
+                    </span>
+                </div>
+                @if(isWarning('name')){
+                <div class="warning">Vous devez entrer un pseudo entre 3 et 20 characteres !</div>
+                } @if(isWarning('avatar')){
+                <div class="warning">Veuillez choisir une AVATAR !</div>
+                }
+                <div id="stats-title">Statistiques</div>
+                <div id="player-stats">
+                    @for(category of statList ; track i; let i = $index){
+                    <div class="stat-label">{{ statFrench[category] }}</div>
+                    <div class="stat-visual">
+                        <div class="stat-bar"></div>
+                        @if(isBonusPoint(category)){
+                        <div class="bonus-bar"></div>
+                        }
+                        <div class="stat-bonus">
+                            <span class="hp-points"> {{ getScore(category) }} PV </span>
+                            <span class="dice"> {{ getBonusDice(category) }}</span>
+                        </div>
+                    </div>
                     }
-                    <div class="stat-bonus">
-                        <span class="hp-points"> {{ getScore(category) }} PV </span>
-                        <span class="dice"> {{ getBonusDice(category) }}</span>
-                    </div>
+                    <form [formGroup]="bonusForm" id="bonus-form">
+                        <div class="flex-container">CHOIX DES BONUS</div>
+                        <legend>+2PTS BONUS</legend>
+                        <div id="point-form">
+                            <input type="radio" formControlName="points" value="life" id="life" />
+                            <label for="life"> Vie</label>
+                            <input type="radio" formControlName="points" value="speed" id="speed" />
+                            <label for="speed">Attaque</label>
+                        </div>
+                        <div id="dice-form">
+                            <legend>DE BONUS</legend>
+                            <legend>Attaque</legend>
+                            <legend>Defense</legend>
+                            <input type="radio" formControlName="bonusDice" value="{{ diceOptions.Option1 }}" id="option1" />
+                            <label for="option1"> {{ dice.D4 }} </label>
+                            <label for="option1"> {{ dice.D6 }} </label>
+                            <input type="radio" formControlName="bonusDice" value="{{ diceOptions.Option2 }}" id="option2" />
+                            <label for="option2"> {{ dice.D6 }} </label>
+                            <label for="option2"> {{ dice.D4 }} </label>
+                        </div>
+                    </form>
                 </div>
-                }
-                <form [formGroup]="bonusForm" id="bonus-form">
-                    <div class="flex-container">CHOIX DES BONUS</div>
-                    <legend>+2PTS BONUS</legend>
-                    <div id="point-form">
-                        <input type="radio" formControlName="points" value="life" id="life" />
-                        <label for="life"> Vie</label>
-                        <input type="radio" formControlName="points" value="speed" id="speed" />
-                        <label for="speed">Attaque</label>
+            </section>
+            <section id="avatar-selection-container">
+                <div id="avatar-list">
+                    @for(avatar of avatarList ; track avatarData[avatar].name ; ){
+                    <div
+                        [ngClass]="['avatar-container', getAvatarBtnStyle(avatar).class]"
+                        (click)="handleAvatarSelection(avatar)"
+                        title="{{ avatarData[avatar].name }}"
+                    >
+                        <img src="{{ avatarData[avatar].image }}" class="avatar-select" />
                     </div>
-                    <div id="dice-form">
-                        <legend>DE BONUS</legend>
-                        <legend>Attaque</legend>
-                        <legend>Defense</legend>
-                        <input type="radio" formControlName="bonusDice" value="{{ diceOptions.Option1 }}" id="option1" />
-                        <label for="option1"> {{ dice.D4 }} </label>
-                        <label for="option1"> {{ dice.D6 }} </label>
-                        <input type="radio" formControlName="bonusDice" value="{{ diceOptions.Option2 }}" id="option2" />
-                        <label for="option2"> {{ dice.D6 }} </label>
-                        <label for="option2"> {{ dice.D4 }} </label>
-                    </div>
-                </form>
-            </div>
-        </section>
-        <section id="avatar-selection-container">
-            <h2 class="flex-container">SELECTIONNE TON AVATAR</h2>
-            <div id="avatar-list">
-                @for(avatar of avatarList ; track avatarData[avatar].name ; ){
-                <div class="avatar-container" (click)="handleAvatarSelection(avatar)">
-                    <div class="avatar-name">{{ avatarData[avatar].name }}</div>
-                    <img src="{{ avatarData[avatar].image }}" class="avatar-select" />
-                    <button type="button" [ngStyle]="{ 'background-color': getAvatarBtnStyle(avatar).background }" [attr.avatar]="avatar">
-                        {{ getAvatarBtnStyle(avatar).text }}
-                    </button>
+                    }
                 </div>
-                }
-            </div>
-        </section>
-    </main>
-    <footer>
+            </section>
+        </main>
+    </div>
+    <footer id="page-footer">
         <div class="flex-container">
             <button type="button" id="start-btn" [ngStyle]="{ background: isFormValid() ? 'green' : 'red' }" (click)="goToLobby()">START GAME</button>
         </div>

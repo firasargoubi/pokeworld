@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -14,10 +14,10 @@ export class MenuButtonComponent {
     @Input() spriteImage: string = '/assets/images/menu/pokemon/normal/charizard.png';
     @Input() textContent: string = '';
     @Input() routePath!: string;
-
-    constructor(private router: Router) {}
+    private router: Router = inject(Router);
 
     navigateWithDelay() {
+        // TODO: CHANGER EN CONSTANTE
         const delay = 200;
         setTimeout(() => {
             this.router.navigate([this.routePath]);
