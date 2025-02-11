@@ -1,13 +1,13 @@
 import { CommonModule, NgStyle } from '@angular/common';
 import { Component, inject, signal, WritableSignal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { BONUS_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player';
-import { BonusDice, DICE_PAIR, DiceType } from '@app/consts/dice';
+import { BonusDice, DiceType } from '@app/consts/dice';
 import { AVATAR_DATA } from '@app/interfaces/avatars';
 import { Avatars } from '@app/interfaces/avatars.enum';
-import { PointStat, statFrench } from '@app/interfaces/player';
+import { StatType } from '@app/consts/player-stats.enum';
 
 @Component({
     selector: 'app-player-selection-page',
@@ -17,17 +17,12 @@ import { PointStat, statFrench } from '@app/interfaces/player';
 })
 export class PlayerSelectionPageComponent {
     nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
-    bonusForm: FormGroup = new FormGroup({
-        points: new FormControl('life', [Validators.required]),
-        bonusDice: new FormControl(BonusDice.Option1, [Validators.required]),
-    });
+    bonusPointsForm: FormControl = new FormControl(StatType.Life, [Validators.required]);
     maxNameLength = MAX_NAME_LENGTH;
 
-    statFrench = statFrench;
-    statList = Object.keys(this.statFrench) as (keyof typeof this.statFrench)[];
-
     diceType = DiceType;
-    bonusDice = BonusDice;
+    statType = StatType;
+    bonusDice: BonusDice = { attack: DiceType.D4, defense: DiceType.D6 };
 
     avatarData = AVATAR_DATA;
     avatarList = Object.keys(AVATAR_DATA).slice(1) as Avatars[];
@@ -36,20 +31,16 @@ export class PlayerSelectionPageComponent {
     private isStartClicked: WritableSignal<boolean> = signal(false);
     private router: Router = inject(Router);
 
-    getScore(statCategory: PointStat) {
+    getScore(statCategory: StatType) {
         return this.isBonusPoint(statCategory) ? DEFAULT_STAT_POINTS + BONUS_POINTS : DEFAULT_STAT_POINTS;
     }
 
-    isBonusPoint(statCategory: PointStat) {
-        return this.bonusForm.get('points')?.value === statCategory;
+    isBonusPoint(statCategory: StatType) {
+        return this.bonusPointsForm?.value === statCategory;
     }
 
-    isBonus6Dice(statCategory: PointStat): boolean {
-        if (statCategory === 'attack' || statCategory === 'defense') {
-            const diceOption = this.bonusForm.get('bonusDice')?.value;
-            return DICE_PAIR[diceOption][statCategory] === DiceType.D6;
-        }
-        return false;
+    toggleBonusDice(): void {
+        [this.bonusDice.attack, this.bonusDice.defense] = [this.bonusDice.defense, this.bonusDice.attack];
     }
 
     getAvatarBtnStyle(avatar: Avatars) {

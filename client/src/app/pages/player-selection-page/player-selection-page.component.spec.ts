@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@app/consts/default-player';
 import { Avatars } from '@app/interfaces/avatars.enum';
 import { PlayerSelectionPageComponent } from './player-selection-page.component';
+import { StatType } from '@app/consts/player-stats.enum';
+import { DiceType } from '@app/consts/dice';
 
 describe('PlayerSelectionPageComponent', () => {
     let component: PlayerSelectionPageComponent;
@@ -29,12 +31,11 @@ describe('PlayerSelectionPageComponent', () => {
 
     it('should have initial form state', () => {
         const nameInput = component.nameForm;
-        const bonusForm = component.bonusForm;
+        const bonusPointsForm = component.bonusPointsForm;
 
         expect(nameInput.value).toBe('');
         expect(nameInput.valid).toBeFalse();
-        expect(bonusForm.get('points')?.value).toBe('life');
-        expect(bonusForm.get('bonusDice')?.value).toBe(component.bonusDice.Option1);
+        expect(bonusPointsForm?.value).toBe(StatType.Life);
     });
 
     it('should display warning message for invalid name', () => {
@@ -100,14 +101,13 @@ describe('PlayerSelectionPageComponent', () => {
     });
 
     it('should return correct score for stat category', () => {
-        const score = component.getScore('life');
-        expect(score).toBe(DEFAULT_STAT_POINTS + BONUS_POINTS);
-    });
+        component.bonusPointsForm.setValue(StatType.Life);
 
-    it('should return correct bonus dice for stat category', () => {
-        // component.bonusForm.get('bonusDice')?.setValue(component.bonusDice.Option1);
-        // const bonusDice = component.isBonus6Dice('attack');
-        // expect(bonusDice).;
+        let score = component.getScore(StatType.Life);
+        expect(score).toBe(DEFAULT_STAT_POINTS + BONUS_POINTS);
+
+        score = component.getScore(StatType.Attack);
+        expect(score).toBe(DEFAULT_STAT_POINTS);
     });
 
     it('should return correct avatar button style', () => {
@@ -148,12 +148,32 @@ describe('PlayerSelectionPageComponent', () => {
     });
 
     it('should return true for isBonusPoint when the stat category matches the bonus form value', () => {
-        component.bonusForm.get('points')?.setValue('life');
-        expect(component.isBonusPoint('life')).toBeTrue();
+        component.bonusPointsForm?.setValue(StatType.Life);
+        expect(component.isBonusPoint(StatType.Life)).toBeTrue();
     });
 
     it('should return false for isBonusPoint when the stat category does not match the bonus form value', () => {
-        component.bonusForm.get('points')?.setValue('life');
-        expect(component.isBonusPoint('attack')).toBeFalse();
+        component.bonusPointsForm?.setValue(StatType.Life);
+        expect(component.isBonusPoint(StatType.Attack)).toBeFalse();
+    });
+
+    it('should toggle bonus dice correctly', () => {
+        expect(component.bonusDice.attack).toBe(DiceType.D4);
+        expect(component.bonusDice.defense).toBe(DiceType.D6);
+
+        component.toggleBonusDice();
+
+        expect(component.bonusDice.attack).toBe(DiceType.D6);
+        expect(component.bonusDice.defense).toBe(DiceType.D4);
+
+        component.toggleBonusDice();
+
+        expect(component.bonusDice.attack).toBe(DiceType.D4);
+        expect(component.bonusDice.defense).toBe(DiceType.D6);
+    });
+
+    it('should navigate to create page when goToCreatPage is called', () => {
+        component.goToCreatPage();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/create']);
     });
 });
