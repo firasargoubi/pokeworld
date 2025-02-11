@@ -38,11 +38,7 @@ export class GameCardComponent implements OnInit {
     }
 
     onDelete() {
-        const confirmation = window.confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');
-
-        if (confirmation) {
-            this.delete.emit(this.game._id);
-        }
+        this.delete.emit(this.game._id);
     }
 
     onToggleVisibility() {

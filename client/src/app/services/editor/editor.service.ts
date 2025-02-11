@@ -49,6 +49,7 @@ export class EditorService {
                 this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe({
                     next: () => {
                         window.console.log(`Le jeu "${this.gameDataService.gameData.name}" a été sauvegardé avec succès.`);
+                        this.redirectToAdminPage();
                     },
                     error: (error) => {
                         window.console.error('Erreur lors de la sauvegarde du jeu:', error);

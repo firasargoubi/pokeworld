@@ -11,7 +11,7 @@
                     [isAdminView]="true"
                     [cardColor]="getCardColor(i)"
                     (edit)="editGame($event)"
-                    (delete)="deleteGame($event)"
+                    (delete)="deleteGame($event, game.name)"
                     (toggleVisibility)="toggleVisibility($event)"
                 >
                 </app-game-card>
@@ -27,10 +27,10 @@
     <div id="poke-button">
         <app-pokeball-button [buttonContent]="'NOUVEAU JEU'" [delay]="200" [onClickAction]="onCreateGame.bind(this)"></app-pokeball-button>
     </div>
-    @if(errors.length > 0){
+    @if(messages.length > 0){
     <div id="error-container">
-        @for(error of errors; track $index) {
-        <app-warning-confirmation-popup [message]="error.message" (closed)="removeError($index)" [isConfirmation]="false">
+        @for(error of messages; track $index) {
+        <app-warning-confirmation-popup [message]="error.message" (closed)="removeMessage($index, $event)" [isConfirmation]="error.isConfirmation">
         </app-warning-confirmation-popup>
         }
     </div>

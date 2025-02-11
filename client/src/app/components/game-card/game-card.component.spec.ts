@@ -59,13 +59,6 @@ describe('GameCardComponent', () => {
         expect(component.delete.emit).toHaveBeenCalledWith('1');
     });
 
-    it('should not emit delete event when onDelete is canceled', () => {
-        spyOn(window, 'confirm').and.returnValue(false);
-        spyOn(component.delete, 'emit');
-        component.onDelete();
-        expect(component.delete.emit).not.toHaveBeenCalled();
-    });
-
     it('should toggle visibility and emit event when onToggleVisibility is called', () => {
         spyOn(component.toggleVisibility, 'emit');
         component.onToggleVisibility();

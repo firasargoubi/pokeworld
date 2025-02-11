@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, RouterModule } from '@angular/router';
@@ -14,18 +15,17 @@ describe('AdminPageComponent', () => {
     let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
 
     beforeEach(async () => {
-        const spy = jasmine.createSpyObj('GameSaveService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
-        spy.getAllGames.and.returnValue(of([]));
-        spy.getGame.and.returnValue(of({} as GameData));
-        spy.toggleVisibility.and.returnValue(of({} as GameData));
-        spy.deleteGame.and.returnValue(of(undefined));
+        gameSaveServiceSpy = jasmine.createSpyObj<GameSaveService>('GameSaveService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
+
+        gameSaveServiceSpy.getAllGames.and.returnValue(of([]));
+        gameSaveServiceSpy.getGame.and.returnValue(of({} as GameData));
+        gameSaveServiceSpy.toggleVisibility.and.returnValue(of({} as GameData));
+        gameSaveServiceSpy.deleteGame.and.returnValue(of(undefined));
 
         await TestBed.configureTestingModule({
-            imports: [RouterModule.forRoot([]), AdminPageComponent],
-            providers: [{ provide: GameSaveService, useValue: spy }],
+            imports: [RouterModule.forRoot([]), CommonModule, AdminPageComponent],
+            providers: [{ provide: GameSaveService, useValue: gameSaveServiceSpy }],
         }).compileComponents();
-
-        gameSaveServiceSpy = TestBed.inject(GameSaveService) as jasmine.SpyObj<GameSaveService>;
     });
 
     beforeEach(() => {
@@ -41,13 +41,11 @@ describe('AdminPageComponent', () => {
 
     it('should call loadGames on init', () => {
         const loadGamesSpy = spyOn(component, 'loadGames');
-
         component.ngOnInit();
-
         expect(loadGamesSpy).toHaveBeenCalled();
     });
 
-    it('should load games when loadGames is called', () => {
+    it('should load games successfully', () => {
         gameSaveServiceSpy.getAllGames.and.returnValue(of(MOCK_GAMES));
 
         component.loadGames();
@@ -56,61 +54,89 @@ describe('AdminPageComponent', () => {
         expect(component.games).toEqual(MOCK_GAMES);
     });
 
-    it('should navigate to edit page and store game id in sessionStorage when editGame is called', () => {
+    it('should handle error when loadGames fails', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Server error', status: 500 });
+        gameSaveServiceSpy.getAllGames.and.returnValue(throwError(() => errorResponse));
+
+        component.loadGames();
+
+        expect(component.messages.length).toBe(1);
+        expect(component.messages[0].message).toBe('Échec lors du chargement des jeux');
+    });
+
+    it('should navigate to edit page when editGame is called', () => {
         const navigateSpy = spyOn(router, 'navigate');
         const setItemSpy = spyOn(sessionStorage, 'setItem');
         const gameId = '123';
 
         gameSaveServiceSpy.getGame.and.returnValue(of({} as GameData));
+
         component.editGame(gameId);
 
         expect(setItemSpy).toHaveBeenCalledWith('editGameId', gameId);
         expect(navigateSpy).toHaveBeenCalledWith(['/edit']);
     });
 
-    it('should toggle visibility when toggleVisibility is called', () => {
-        const toggleVisibilitySpy = gameSaveServiceSpy.toggleVisibility;
-        const event = { id: '123', isVisible: true };
+    it('should handle error when editGame fails', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Not Found', status: 404 });
+        gameSaveServiceSpy.getGame.and.returnValue(throwError(() => errorResponse));
 
-        component.toggleVisibility(event);
+        component.editGame('invalid-id');
 
-        expect(toggleVisibilitySpy).toHaveBeenCalledWith(event.id);
+        expect(component.messages.length).toBe(1);
+        expect(component.messages[0].message).toBe("Ce jeu n'existe plus !");
     });
 
-    it('should delete game when deleteGame is called', () => {
-        gameSaveServiceSpy.getAllGames.and.returnValue(of(MOCK_GAMES));
+    it('should toggle visibility successfully', () => {
+        const event = { id: '123', isVisible: true };
+        component.toggleVisibility(event);
+        expect(gameSaveServiceSpy.toggleVisibility).toHaveBeenCalledWith(event.id);
+    });
+
+    it('should handle error when toggleVisibility fails', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Server error', status: 500 });
+        gameSaveServiceSpy.toggleVisibility.and.returnValue(throwError(() => errorResponse));
+
+        component.toggleVisibility({ id: '123', isVisible: true });
+
+        expect(component.messages.length).toBe(1);
+    });
+
+    it('should add a confirmation message when deleteGame is called', () => {
+        component.deleteGame('123', '');
+        expect(component.messages.length).toBe(1);
+        expect(component.messages[0].message).toBe('Êtes-vous sûr de vouloir supprimer le jeu : ');
+        expect(component.messages[0].isConfirmation).toBeTrue();
+    });
+
+    it('should delete game when confirmation is accepted', () => {
         gameSaveServiceSpy.deleteGame.and.returnValue(of(undefined));
 
-        component.ngOnInit();
+        component.deleteGame('123', '');
 
-        component.deleteGame(MOCK_GAMES[0]._id);
+        component.removeMessage(0, true);
 
-        expect(gameSaveServiceSpy.deleteGame).toHaveBeenCalledWith(MOCK_GAMES[0]._id);
-
-        expect(component.games.length).toBe(1);
-        expect(component.games[0]._id).toBe(MOCK_GAMES[1]._id);
+        expect(gameSaveServiceSpy.deleteGame).toHaveBeenCalledWith('123');
     });
 
-    it('should return the correct background class based on index', () => {
-        const testCases = [
-            { index: 0, expected: 'blue-card' },
-            { index: 1, expected: 'green-card' },
-            { index: 2, expected: 'pink-card' },
-        ];
+    it('should not delete game when confirmation is canceled', () => {
+        component.deleteGame('123', '');
 
-        testCases.forEach(({ index, expected }) => {
-            expect(component.getCardColor(index)).toBe(expected);
-        });
+        component.removeMessage(0, false);
+
+        expect(gameSaveServiceSpy.deleteGame).not.toHaveBeenCalled();
+        expect(component.messages.length).toBe(0);
     });
 
-    it('should call loadGames when handleNotFoundError is called', () => {
-        const loadGamesSpy = spyOn(component, 'loadGames');
+    it('should handle error when deleteGame fails', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Delete failed', status: 500 });
+        gameSaveServiceSpy.deleteGame.and.returnValue(throwError(() => errorResponse));
 
-        const error = new HttpErrorResponse({ error: 'Game not found', status: 404 });
+        component.deleteGame('123', '');
 
-        component['handleNotFoundError'](error);
+        component.removeMessage(0, true);
 
-        expect(loadGamesSpy).toHaveBeenCalled();
+        expect(component.messages.length).toBe(1);
     });
 
     it('should toggle isCreationMode on onCreateGame', () => {
@@ -121,22 +147,32 @@ describe('AdminPageComponent', () => {
         expect(component.isCreationMode).toBeFalse();
     });
 
-    it('should add error to errors array on handleError', () => {
-        component.errors = [];
-        const error = new HttpErrorResponse({ error: 'Test error', status: 500 });
-        component['handleError'](error);
-        expect(component.errors.length).toBe(1);
+    it('should return the correct background class based on index', () => {
+        expect(component.getCardColor(0)).toBe('blue-card');
+        expect(component.getCardColor(1)).toBe('green-card');
+        expect(component.getCardColor(2)).toBe('pink-card');
     });
 
-    it('should remove error from array on popup close', () => {
-        component.errors = [new Error('Error 1'), new Error('Error 2')];
-        component.removeError(0);
-        expect(component.errors.length).toBe(1);
-        expect(component.errors[0].message).toBe('Error 2');
+    it('should call loadGames when handleNotFoundError is called', () => {
+        const loadGamesSpy = spyOn(component, 'loadGames');
+        const error = new HttpErrorResponse({ error: 'Game not found', status: 404 });
+
+        component['handleNotFoundError'](error);
+
+        expect(loadGamesSpy).toHaveBeenCalled();
     });
 
-    it('should display multiple popups for multiple errors', () => {
-        component.errors = [new Error('Error 1'), new Error('Error 2')];
+    it('should remove message from array on popup close', () => {
+        component.messages = [{ message: 'Message 1', isConfirmation: false }];
+        component.removeMessage(0, false);
+        expect(component.messages.length).toBe(0);
+    });
+
+    it('should display multiple popups for multiple messages', () => {
+        component.messages = [
+            { message: 'Message 1', isConfirmation: false },
+            { message: 'Message 2', isConfirmation: false },
+        ];
         fixture.detectChanges();
 
         const popups = fixture.nativeElement.querySelectorAll('app-warning-confirmation-popup');
@@ -147,50 +183,5 @@ describe('AdminPageComponent', () => {
         const navigateSpy = spyOn(router, 'navigate');
         component.navigateToMenu();
         expect(navigateSpy).toHaveBeenCalledWith(['/']);
-    });
-
-    it('should close popup when X is clicked', () => {
-        component.errors = [new Error('Test error')];
-        fixture.detectChanges();
-
-        spyOn(component, 'removeError');
-        const button = fixture.nativeElement.querySelector('.card-button');
-        button.click();
-
-        expect(component.removeError).toHaveBeenCalledWith(0);
-    });
-
-    it('should add error when loadGames fails', () => {
-        const errorResponse = new HttpErrorResponse({ error: 'Server error', status: 500 });
-        gameSaveServiceSpy.getAllGames.and.returnValue(throwError(() => errorResponse));
-
-        component.loadGames();
-
-        expect(component.errors.length).toBe(1);
-    });
-    it('should add error when editGame fails', () => {
-        const errorResponse = new HttpErrorResponse({ error: 'Not Found', status: 404 });
-        gameSaveServiceSpy.getGame.and.returnValue(throwError(() => errorResponse));
-
-        component.editGame('invalid-id');
-
-        expect(component.errors.length).toBe(1);
-        expect(component.errors[0].message).toBe("Ce jeu n'existe plus !");
-    });
-    it('should add error when toggleVisibility fails', () => {
-        const errorResponse = new HttpErrorResponse({ error: 'Server error', status: 500 });
-        gameSaveServiceSpy.toggleVisibility.and.returnValue(throwError(() => errorResponse));
-
-        component.toggleVisibility({ id: '123', isVisible: true });
-
-        expect(component.errors.length).toBe(1);
-    });
-    it('should add error when deleteGame fails', () => {
-        const errorResponse = new HttpErrorResponse({ error: 'Delete failed', status: 500 });
-        gameSaveServiceSpy.deleteGame.and.returnValue(throwError(() => errorResponse));
-
-        component.deleteGame('123');
-
-        expect(component.errors.length).toBe(1);
     });
 });

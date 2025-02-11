@@ -3,7 +3,7 @@ $base-size: 0.2vw;
 #warning-popup {
     position: relative;
     min-height: $base-size * 10;
-    min-width: $base-size * 30;
+    min-width: $base-size * 50;
     max-width: $base-size * 170;
     overflow: visible;
     display: flex;
@@ -44,6 +44,7 @@ $base-size: 0.2vw;
 }
 
 #warning-details {
+    width: 100%;
     display: flex;
     position: relative;
     top: $base-size * 2;
@@ -63,8 +64,8 @@ $base-size: 0.2vw;
 
 #buttons {
     display: flex;
-    width: 50%;
-    justify-content: space-around;
+    width: 100%;
+    justify-content: space-evenly;
 }
 
 .card-button {

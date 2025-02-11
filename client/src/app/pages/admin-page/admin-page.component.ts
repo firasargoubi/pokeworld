@@ -10,6 +10,12 @@ import { WarningConfirmationPopupComponent } from '@app/components/warning-confi
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
 
+interface PopupMessage {
+    message: string;
+    isConfirmation: boolean;
+    action?: () => void;
+}
+
 @Component({
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
@@ -18,7 +24,7 @@ import { GameData } from '@common/game-data';
 })
 export class AdminPageComponent implements OnInit {
     games: GameData[] = [];
-    errors: Error[] = [];
+    messages: PopupMessage[] = [];
     showDescription: boolean = false;
     lastDescription: string = '';
     isCreationMode: boolean = false;
@@ -42,7 +48,7 @@ export class AdminPageComponent implements OnInit {
                 this.games = games;
             },
             error: () => {
-                this.handleError(new Error('Échec lors du chargement des jeux'));
+                this.addMessage('Échec lors du chargement des jeux', false);
             },
         });
     }
@@ -67,15 +73,8 @@ export class AdminPageComponent implements OnInit {
         });
     }
 
-    deleteGame(id: string) {
-        this.gameSaveService.deleteGame(id).subscribe({
-            next: () => {
-                this.games = this.games.filter((game) => game._id !== id);
-            },
-            error: (error: HttpErrorResponse) => {
-                this.handleNotFoundError(error);
-            },
-        });
+    deleteGame(id: string, name: string) {
+        this.addMessage('Êtes-vous sûr de vouloir supprimer le jeu : ' + name, true, () => this.confirmDeleteGame(id));
     }
 
     onCreateGame(): void {
@@ -88,20 +87,37 @@ export class AdminPageComponent implements OnInit {
         return classes[classIndex];
     }
 
-    removeError(index: number) {
-        this.errors.splice(index, 1);
+    removeMessage(index: number, confirmed: boolean) {
+        const message = this.messages[index];
+
+        if (message.isConfirmation && confirmed && message.action) {
+            message.action();
+        }
+
+        this.messages.splice(index, 1);
     }
 
-    private handleError(error: Error) {
-        this.errors.push(error);
+    private confirmDeleteGame(id: string) {
+        this.gameSaveService.deleteGame(id).subscribe({
+            next: () => {
+                this.games = this.games.filter((game) => game._id !== id);
+            },
+            error: (error: HttpErrorResponse) => {
+                this.handleNotFoundError(error);
+            },
+        });
+    }
+
+    private addMessage(message: string, isConfirmation: boolean, action?: () => void) {
+        this.messages.push({ message, isConfirmation, action });
     }
 
     private handleNotFoundError(error: HttpErrorResponse) {
         if (error.status === HttpStatusCode.NotFound) {
-            this.handleError(new Error("Ce jeu n'existe plus !"));
+            this.addMessage("Ce jeu n'existe plus !", false);
             this.loadGames();
         } else {
-            this.handleError(error);
+            this.addMessage(error.message, false);
         }
     }
 }
