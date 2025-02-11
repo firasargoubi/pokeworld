@@ -1,4 +1,4 @@
-import { CommonModule, NgStyle } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -11,7 +11,7 @@ import { Avatars } from '@app/interfaces/avatars.enum';
 
 @Component({
     selector: 'app-player-selection-page',
-    imports: [ReactiveFormsModule, NgStyle, HeaderComponent, CommonModule],
+    imports: [ReactiveFormsModule, HeaderComponent, CommonModule],
     templateUrl: './player-selection-page.component.html',
     styleUrl: './player-selection-page.component.scss',
 })
@@ -45,17 +45,9 @@ export class PlayerSelectionPageComponent {
 
     getAvatarBtnStyle(avatar: Avatars) {
         if (avatar === this.selectedAvatar) {
-            return {
-                background: 'avatar-selected',
-                text: 'CHOISI',
-                class: 'selected',
-            };
+            return { class: 'selected' };
         } else {
-            return {
-                background: 'avatar-unselected',
-                text: 'CHOISIR',
-                class: 'unselected',
-            };
+            return { class: 'unselected' };
         }
     }
 

@@ -46,7 +46,7 @@ export const AVATAR_DATA = {
         image: 'assets/images/game/avatars/vulpix.png',
     },
     [Avatars.Avatar11]: {
-        name: 'Ronflex',
+        name: 'Ronflex Gros',
         image: 'assets/images/game/avatars/snorlax.png',
     },
     [Avatars.Avatar12]: {

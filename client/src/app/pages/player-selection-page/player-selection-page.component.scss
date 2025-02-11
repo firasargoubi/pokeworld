@@ -57,7 +57,7 @@ main {
     display: flex;
     column-gap: 50px;
     margin: 0 $page-border-width $page-border-width 0;
-    background-color: turquoise;
+    background-color: rgb(145, 222, 145);
     border: $page-border-width solid $wheat-border-color;
     box-shadow: 0 0 0 $page-border-width $gray-border-color;
     height: 20vh;
@@ -95,7 +95,7 @@ main {
     outline: none;
 }
 #name-input::placeholder {
-    color: rgb(0, 0, 0);
+    color: rgb(0, 0, 0, 0.2);
     text-shadow: 0px 0 0 rgba(0, 0, 0, 0.5);
 }
 
@@ -206,19 +206,28 @@ main {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    height: 100%;
+    height: 80%;
     width: auto;
-    aspect-ratio: 1/1;
+    aspect-ratio: 3/2;
     margin: 0 0 0 30px;
-    border: 2px solid black;
-    background-color: white;
+    background-image: url('/assets/images/menu/stat-bar/bonus-point.png');
+    background-size: 100% 100%;
     display: inline-block;
     cursor: pointer;
+    align-self: center;
+}
+
+.bonus-button:hover {
+    filter: brightness(1.15);
 }
 
 .bonus-button:checked {
-    background-color: red;
-    border: 2px solid black;
+    opacity: 0;
+    cursor: default;
+}
+
+.bonus-button:checked:hover {
+    filter: brightness(1);
 }
 
 .dice-icon-4,
@@ -226,7 +235,7 @@ main {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-
+    filter: invert(0.7);
     height: 100%;
     width: auto;
     aspect-ratio: 1/1;
@@ -237,6 +246,11 @@ main {
     transition:
         rotate 0.5s ease-in-out,
         background-image 0.5s ease-in-out;
+}
+
+.dice-icon-6:hover,
+.dice-icon-4:hover {
+    filter: brightness(0.8);
 }
 
 .dice-icon-4 {
@@ -321,11 +335,6 @@ main {
     object-fit: cover;
 }
 
-#start-btn {
-    border: 2px solid;
-    border-radius: 10px;
-}
-
 .warning {
     font-size: 20px;
     color: red;
@@ -342,6 +351,24 @@ main {
 }
 
 #page-footer {
+    width: 100%;
     height: 10vh;
     background-color: $gray-border-color;
+    display: flex;
+    justify-content: space-around;
+}
+
+.start-btn {
+    font-family: $font-family-title;
+    height: 7vh;
+    font-size: 5vh;
+    width: 17vw;
+    border-style: none;
+    background-image: url('/assets/images/menu/buttons/admin-button/redBackgroundHighlight.png');
+    background-size: 100% 100%;
+    align-self: center;
+}
+
+#page-footer .disabled {
+    background-image: url('/assets/images/menu/buttons/admin-button/greenBackgroundHighlight.png');
 }

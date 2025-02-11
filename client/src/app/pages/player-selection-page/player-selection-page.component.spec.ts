@@ -2,10 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@app/consts/default-player';
+import { DiceType } from '@app/consts/dice';
+import { StatType } from '@app/consts/player-stats.enum';
 import { Avatars } from '@app/interfaces/avatars.enum';
 import { PlayerSelectionPageComponent } from './player-selection-page.component';
-import { StatType } from '@app/consts/player-stats.enum';
-import { DiceType } from '@app/consts/dice';
 
 describe('PlayerSelectionPageComponent', () => {
     let component: PlayerSelectionPageComponent;
@@ -114,16 +114,14 @@ describe('PlayerSelectionPageComponent', () => {
         const avatar = component.avatarList[0];
         component.selectedAvatar = avatar;
         const style = component.getAvatarBtnStyle(avatar);
-        expect(style.background).toBe('avatar-selected');
-        expect(style.text).toBe('CHOISI');
+        expect(style.class).toBe('selected');
     });
 
     it('should return correct avatar button style for unselected avatar', () => {
         const avatar = component.avatarList[0];
         component.selectedAvatar = Avatars.Default;
         const style = component.getAvatarBtnStyle(avatar);
-        expect(style.background).toBe('avatar-unselected');
-        expect(style.text).toBe('CHOISIR');
+        expect(style.class).toBe('unselected');
     });
 
     it('should validate form correctly', () => {
