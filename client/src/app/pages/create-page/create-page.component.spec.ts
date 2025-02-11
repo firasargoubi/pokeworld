@@ -1,37 +1,40 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router, RouterModule } from '@angular/router';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
-import { GameSaveService } from '@app/services/game-save/game-save.service';
-import { GameData } from '@common/game-data';
 import { of, throwError } from 'rxjs';
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { Router, RouterModule } from '@angular/router';
 import { CreatePageComponent } from './create-page.component';
+import { GameSaveService } from '@app/services/game-save/game-save.service';
+import { GameDataService } from '@app/services/game-data/game-data.service';
+import { GameData } from '@common/game-data';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
     let fixture: ComponentFixture<CreatePageComponent>;
-    let router: Router;
     let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
+    let gameDataServiceMock: jasmine.SpyObj<GameDataService>;
+    let router: Router;
 
     beforeEach(async () => {
-        const spy = jasmine.createSpyObj('GameSaveService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
-        spy.getAllGames.and.returnValue(of([]));
-        spy.getGame.and.returnValue(of({} as GameData));
-        spy.toggleVisibility.and.returnValue(of({} as GameData));
-        spy.deleteGame.and.returnValue(of(undefined));
+        gameSaveServiceSpy = jasmine.createSpyObj('GameSaveService', ['getAllGames', 'getGame']);
+        gameSaveServiceSpy.getAllGames.and.returnValue(of([]));
+        gameSaveServiceSpy.getGame.and.returnValue(of({} as GameData));
+        gameDataServiceMock = jasmine.createSpyObj('GameDataService', ['setGameData']);
 
         await TestBed.configureTestingModule({
             imports: [RouterModule.forRoot([]), CreatePageComponent],
-            providers: [{ provide: GameSaveService, useValue: spy }],
+            providers: [
+                { provide: GameSaveService, useValue: gameSaveServiceSpy },
+                { provide: GameDataService, useValue: gameDataServiceMock },
+            ],
         }).compileComponents();
 
+        gameDataServiceMock = TestBed.inject(GameDataService) as jasmine.SpyObj<GameDataService>;
         gameSaveServiceSpy = TestBed.inject(GameSaveService) as jasmine.SpyObj<GameSaveService>;
-    });
-
-    beforeEach(() => {
-        fixture = TestBed.createComponent(CreatePageComponent);
-        component = fixture.componentInstance;
         router = TestBed.inject(Router);
+        fixture = TestBed.createComponent(CreatePageComponent);
+
+        component = fixture.componentInstance;
         fixture.detectChanges();
     });
 
@@ -39,59 +42,110 @@ describe('CreatePageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should call loadGames on init', () => {
-        const loadGamesSpy = spyOn(component, 'loadGames');
-
-        component.ngOnInit();
-        expect(loadGamesSpy).toHaveBeenCalled();
-    });
-
-    it('should load games when loadGames is called', () => {
+    it('should load games on init', () => {
         gameSaveServiceSpy.getAllGames.and.returnValue(of(MOCK_GAMES));
 
-        component.loadGames();
-        expect(gameSaveServiceSpy.getAllGames).toHaveBeenCalled();
+        component.ngOnInit();
+
         expect(component.games).toEqual(MOCK_GAMES);
     });
 
-    it('should return the correct background class based on index', () => {
-        const testCases = [
-            { index: 0, expected: 'blue-card' },
-            { index: 1, expected: 'green-card' },
-            { index: 2, expected: 'pink-card' },
-        ];
+    it('should navigate to menu when navigateToMenu is called', () => {
+        const navigateSpy = spyOn(router, 'navigate');
 
-        testCases.forEach(({ index, expected }) => {
-            expect(component.getCardColor(index)).toBe(expected);
-        });
+        component.navigateToMenu();
+
+        expect(navigateSpy).toHaveBeenCalledWith(['/']);
     });
 
-    it('should call handleError when loadGames fails (INTERNAL_ERROR)', () => {
-        const error = new HttpErrorResponse({ error: 'Action failed', status: 500 });
-        gameSaveServiceSpy.getAllGames.and.returnValue(throwError(() => error));
-        const expectedMessage = 'Failed to load games. Please try again later.';
+    it('should call loadGames when handleNotFoundError is called', () => {
+        // private method
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const loadGamesSpy = spyOn(component as any, 'loadGames');
+        const error = new HttpErrorResponse({ error: 'Game not found', status: 404 });
+        component['handleNotFoundError'](error);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        const handleErrorSpy = spyOn<any>(component, 'handleError');
-        component.loadGames();
+        expect(loadGamesSpy).toHaveBeenCalled();
+    });
 
-        expect(handleErrorSpy).toHaveBeenCalledWith(expectedMessage, error);
-        expect(handleErrorSpy).toHaveBeenCalledTimes(1);
+    it('should return correct card color', () => {
+        expect(component.getCardColor(0)).toBe('blue-card');
+        expect(component.getCardColor(1)).toBe('green-card');
+        expect(component.getCardColor(2)).toBe('pink-card');
+    });
+
+    it('should handle game visibility on join', () => {
+        const navigateSpy = spyOn(router, 'navigate');
+        gameSaveServiceSpy.getGame.and.returnValue(of(MOCK_GAMES[0]));
+
+        component.onJoin(MOCK_GAMES[0]._id);
+
+        expect(gameDataServiceMock.setGameData).toHaveBeenCalledWith(MOCK_GAMES[0]);
+        expect(navigateSpy).toHaveBeenCalledWith(['/player-selection']);
+    });
+
+    it('should handle not found error on join', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'test 404 error', status: HttpStatusCode.NotFound });
+        gameSaveServiceSpy.getGame.and.returnValue(throwError(() => errorResponse));
+
+        spyOn(window, 'alert');
+        component.onJoin(MOCK_GAMES[0]._id);
+
+        expect(window.alert).toHaveBeenCalledWith("Ce jeu n'existe plus !");
+        expect(gameSaveServiceSpy.getAllGames).toHaveBeenCalled();
+    });
+
+    it('should handle game not visible on join', () => {
+        const invisibleGame = { ...MOCK_GAMES[0], isVisible: false };
+        gameSaveServiceSpy.getGame.and.returnValue(of(invisibleGame));
+
+        spyOn(window, 'alert');
+        component.onJoin(invisibleGame._id);
+        expect(window.alert).toHaveBeenCalledWith("Ce jeu n'est plus visible !");
+        expect(gameSaveServiceSpy.getAllGames).toHaveBeenCalled();
     });
 
     it('should call snackBar open when handleError is called', () => {
         const snackBarOpenSpy = spyOn(component['snackBar'], 'open');
-        const error = new HttpErrorResponse({ error: 'Test error', status: 500 });
-        const expectedMessage = `test: ${error.message}`;
 
-        component['handleError']('test', error);
-        expect(snackBarOpenSpy).toHaveBeenCalledWith(expectedMessage, 'Close', { duration: 5000 });
+        const error = new HttpErrorResponse({ error: 'Test error', status: 500 });
+
+        component['handleError'](error);
+
+        expect(snackBarOpenSpy).toHaveBeenCalledWith(error.message, 'Close', { duration: 5000 });
     });
 
-    it('should navigate to menu', () => {
-        const navigateSpy = spyOn(router, 'navigate');
+    it('should handle error when loadGames fails', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Test error', status: 500 });
+        gameSaveServiceSpy.getAllGames.and.returnValue(throwError(() => errorResponse));
+        // private method
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handleErrorSpy = spyOn<any>(component, 'handleError');
+        component['loadGames']();
 
-        component.navigateToMenu();
-        expect(navigateSpy).toHaveBeenCalledWith(['/']);
+        expect(handleErrorSpy).toHaveBeenCalledWith(errorResponse);
+    });
+
+    it('should filter visible games when loadGames is called', () => {
+        const mockGames = [
+            { ...MOCK_GAMES[0], isVisible: true },
+            { ...MOCK_GAMES[1], isVisible: false },
+        ];
+        gameSaveServiceSpy.getAllGames.and.returnValue(of(mockGames));
+
+        component['loadGames']();
+
+        expect(component.games).toEqual([mockGames[0]]);
+    });
+
+    it('should call handleError when handleNotFoundError is called with non-NotFound error', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Test error', status: HttpStatusCode.InternalServerError });
+        // private method
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handleErrorSpy = spyOn<any>(component, 'handleError');
+
+        component['handleNotFoundError'](errorResponse);
+
+        expect(handleErrorSpy).toHaveBeenCalledWith(errorResponse);
     });
 });
