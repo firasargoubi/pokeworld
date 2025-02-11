@@ -3,6 +3,7 @@ import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
 import { MapSize } from '@common/map-size.enum';
 import { Position } from '@common/position';
+import { TileType } from '@common/tile-type.enum';
 
 export const MOCK_GAMES: GameData[] = [
     {
@@ -12,7 +13,7 @@ export const MOCK_GAMES: GameData[] = [
         description: 'Description 1',
         lastEdited: new Date(),
         mapData: {
-            tiles: [],
+            tiles: Array.from({ length: MapSize.Medium }, () => Array(MapSize.Medium).fill(TileType.Grass)),
             items: {} as Record<ItemType, Position[]>,
             size: MapSize.Medium,
             gameMode: GameMode.CTF,
@@ -25,7 +26,7 @@ export const MOCK_GAMES: GameData[] = [
         description: 'Description 2',
         lastEdited: new Date(),
         mapData: {
-            tiles: [],
+            tiles: Array.from({ length: MapSize.Large }, () => Array(MapSize.Large).fill(TileType.Grass)),
             items: {} as Record<ItemType, Position[]>,
             size: MapSize.Large,
             gameMode: GameMode.CTF,

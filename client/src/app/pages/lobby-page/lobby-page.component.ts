@@ -24,17 +24,17 @@ export class LobbyPageComponent implements OnInit {
         this.generateAccessCode();
     }
 
-    generateAccessCode(): void {
-        this.accessCode = Math.floor(Math.random() * ACCESS_CODE_RANGE)
-            .toString()
-            .padStart(CODE_LENGHT, '0');
-    }
-
     startGame(): void {
         this.router.navigate(['/']);
     }
 
     leaveLobby(): void {
         this.router.navigate(['/']);
+    }
+
+    private generateAccessCode(): void {
+        this.accessCode = Math.floor(Math.random() * ACCESS_CODE_RANGE)
+            .toString()
+            .padStart(CODE_LENGHT, '0');
     }
 }
