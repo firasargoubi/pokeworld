@@ -5,8 +5,8 @@ import { MapSize } from '@common/map-size.enum';
 
 export const DEFAULT_GAME: GameData = {
     _id: '',
-    name: 'Jeu par defaut',
-    description: 'Description par defaut',
+    name: '',
+    description: '',
     lastEdited: new Date(),
     isVisible: false,
     mapData: {
