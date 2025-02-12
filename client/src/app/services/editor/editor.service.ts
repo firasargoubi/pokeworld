@@ -49,7 +49,6 @@ export class EditorService {
         this.router.navigate(['/admin']);
     }
 
-    // TODO
     saveButton(): void {
         const validationResult = this.gameValidationService.validateGame(this.gameDataService.gameData);
 
