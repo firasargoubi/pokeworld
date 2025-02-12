@@ -15,10 +15,10 @@ $final-margin-bot: calc($main-height - $final-map-size - $final-margin-top);
 $final-side-width: calc(($final-map-size - $margin-top) * 0.5);
 $final-side-height: min($final-side-width * 2 + $margin-top);
 $final-margin-side: calc(($main-width - $final-map-size - $final-side-width - $final-side-width) * 0.25);
-$final-margin-right: min(calc((($final-margin-side - $margin-top) * 0.60 + $margin-top) * 0.90), calc($margin-top * 4));
+$final-margin-right: min(calc((($final-margin-side - $margin-top) * 0.6 + $margin-top) * 0.9), calc($margin-top * 4));
 $final-margin-left: calc($final-margin-side * 2 - $final-margin-right);
 
-$tile-padding: calc($final-side-width * 0.10);
+$tile-padding: calc($final-side-width * 0.1);
 $item-padding: calc($final-side-width * 0.06);
 $item-size: calc(($final-side-width - $item-padding - $item-padding) * 0.333333);
 $stripes-size: 2.5vh;
@@ -38,9 +38,9 @@ $input-border-color: rgba(255, 255, 255, 0.82);
 $input-bg-normal: hsla(231, 12%, 45%, 0.7);
 $input-bg-active: hsla(231, 12%, 45%, 0.6);
 $item-count-bg-color: hsla(231, 12%, 45%, 0.7);
-$tool-normal-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0.0);
+$tool-normal-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0);
 $tool-hover-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0.7);
-$tool-active-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0.0);
+$tool-active-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0);
 
 $gray-box-square: '/assets/images/menu/containers/gray/square.png';
 $gray-box-rectangle: '/assets/images/menu/containers/gray/rectangle.png';
@@ -58,11 +58,13 @@ main {
     overflow: visible;
     height: $main-height;
     width: $main-width;
-    background: repeating-linear-gradient(0deg,
-            $stripes-color1,
-            $stripes-color1 $stripes-size,
-            $stripes-color2 $stripes-size,
-            $stripes-color2 $stripes-size * 2);
+    background: repeating-linear-gradient(
+        0deg,
+        $stripes-color1,
+        $stripes-color1 $stripes-size,
+        $stripes-color2 $stripes-size,
+        $stripes-color2 $stripes-size * 2
+    );
     background-size: 100% ($stripes-size * 2);
     animation: fall $stripes-animation-duration linear infinite;
     color: $text-color;
@@ -264,7 +266,7 @@ app-item {
 }
 
 .tile-grid .grid-square:active .tool,
-.tile-grid .active .tool  {
+.tile-grid .active .tool {
     border: $tool-active-border;
     background-color: $tool-active-color;
 }
@@ -299,7 +301,7 @@ app-item {
     margin-top: calc($final-side-width * 0.01);
     border-radius: calc($final-side-width * 0.015);
     padding-top: calc($final-side-width * 0.029);
-    padding-bottom: calc($final-side-width * 0.030);
+    padding-bottom: calc($final-side-width * 0.03);
     padding-left: calc($final-side-width * 0.04);
     padding-right: calc($final-side-width * 0.04);
 
@@ -326,7 +328,7 @@ app-item {
 }
 
 .input-description {
-    height: calc($final-side-width * 0.70);
+    height: calc($final-side-width * 0.7);
     padding-top: calc($final-side-width * 0.029);
     padding-bottom: calc($final-side-width * 0.029);
     padding-left: calc($final-side-width * 0.029);
@@ -430,4 +432,23 @@ app-map {
 
 .grab * {
     cursor: grabbing;
+}
+
+#error-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100%;
+    padding: 6vw;
+    user-select: none;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1vw;
+    align-items: center;
+}
+
+app-warning-confirmation-popup {
+    flex-shrink: 0;
 }

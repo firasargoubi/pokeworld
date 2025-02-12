@@ -1,0 +1,115 @@
+$base-size: 0.2vw;
+
+#warning-popup {
+    position: relative;
+    min-height: $base-size * 10;
+    min-width: $base-size * 50;
+    max-width: $base-size * 170;
+    overflow: visible;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: $base-size * 5;
+    margin-right: $base-size * 4;
+}
+
+#warning-popup::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: $base-size * 7.5;
+    background-color: #b26c2b;
+    border: ($base-size * 2) solid #49485e;
+    clip-path: polygon(
+        $base-size 0%,
+        calc(100% - #{$base-size}) 0%,
+
+        calc(100% - #{$base-size}) $base-size,
+        100% $base-size,
+
+        100% calc(100% - #{$base-size}),
+        calc(100% - #{$base-size}) calc(100% - #{$base-size}),
+        calc(100% - #{$base-size}) 100%,
+        $base-size 100%,
+
+        $base-size calc(100% - #{$base-size}),
+        0% calc(100% - #{$base-size}),
+        0% $base-size,
+        $base-size $base-size
+    );
+    z-index: 0;
+}
+
+#warning-details {
+    width: 100%;
+    display: flex;
+    position: relative;
+    top: $base-size * 2;
+    left: $base-size * 2;
+    padding: $base-size * 2 $base-size * 5;
+    flex-direction: column;
+    align-items: center;
+    gap: 1vw;
+    color: white;
+    text-align: center;
+    p {
+        position: relative;
+        font-size: $base-size * 8;
+        text-wrap: wrap;
+    }
+}
+#confirm {
+    z-index: 1;
+}
+#content {
+    white-space: pre;
+    text-align: left;
+    line-height: $base-size * 12;
+}
+
+#buttons {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+}
+
+.card-button {
+    width: 3vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.card-button .button-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    user-select: none;
+    overflow: visible;
+}
+
+.card-button:active .button-container,
+.card-singel-button:active .button-container {
+    rotate: 180deg;
+}
+
+.card-button:hover .button-container,
+.card-singel-button:hover .button-container {
+    filter: brightness(1.15);
+}
+
+.card-button .button-cross {
+    z-index: 1;
+    opacity: 0.8;
+    margin-top: 0;
+    pointer-events: none;
+    user-select: none;
+}

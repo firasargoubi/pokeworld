@@ -32,19 +32,13 @@ export class GameCardComponent implements OnInit {
     }
 
     ngOnInit() {
-        requestIdleCallback(() => {
-            this.thumbnailService.getThumbnail(this.game.mapData).then((url) => {
-                this.thumbnailUrl = url;
-            });
+        this.thumbnailService.getThumbnail(this.game.mapData).then((url) => {
+            this.thumbnailUrl = url;
         });
     }
 
     onDelete() {
-        const confirmation = window.confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');
-
-        if (confirmation) {
-            this.delete.emit(this.game._id);
-        }
+        this.delete.emit(this.game._id);
     }
 
     onToggleVisibility() {
