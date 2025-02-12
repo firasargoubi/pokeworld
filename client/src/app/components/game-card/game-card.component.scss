@@ -69,6 +69,7 @@ $clip-path: polygon(
     display: grid;
     grid-template-rows: 65% 35%;
     border-color: $blue-inner-border-color;
+    overflow: visible;
 }
 
 .green-card .card-body {
@@ -92,7 +93,7 @@ $clip-path: polygon(
     object-fit: cover;
     pointer-events: none;
     opacity: 0;
-    animation: fadeIn 0.3s ease-in-out forwards;
+    animation: fadeIn 0.7s ease-in-out forwards;
 }
 
 @keyframes fadeIn {
@@ -111,14 +112,17 @@ $clip-path: polygon(
 .game-name {
     position: absolute;
     font-size: 3vw;
+    font-weight: bolder;
     text-shadow: 0.25vw 0 0 $text-shadow-color;
     letter-spacing: 0.2vw;
     left: 10px;
     top: 4px;
-    width: 90%;
-    height: auto;
+    width: 94%;
+    height: 40%;
+    white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    display: block;
     z-index: 1;
 }
 
@@ -308,18 +312,18 @@ $clip-path: polygon(
 .card-singel-button .button-container {
     height: 100%;
     width: 100%;
-    background-image: url('/assets/images/menu/buttons/admin-button/blueBackgroundHighlight.png');
+    background-image: url('/assets/images/menu/buttons/admin-button/blue-background-highlight.png');
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
 }
 
 .green-card .card-singel-button .button-container {
-    background-image: url('/assets/images/menu/buttons/admin-button/greenBackgroundHighlight.png');
+    background-image: url('/assets/images/menu/buttons/admin-button/green-background-highlight.png');
 }
 
 .pink-card .card-singel-button .button-container {
-    background-image: url('/assets/images/menu/buttons/admin-button/redBackgroundHighlight.png');
+    background-image: url('/assets/images/menu/buttons/admin-button/red-background-highlight.png');
 }
 
 .card-singel-button p {
@@ -405,7 +409,7 @@ $clip-path: polygon(
 }
 
 .pink-card .hovered .card-description-body {
-    left: 0 !important;
+    left: 0;
 }
 
 .card-global-container .hovered .card-description-body {

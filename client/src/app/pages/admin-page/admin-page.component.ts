@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { CreateGamePopupComponent } from '@app/components/create-game-popup/create-game-popup.component';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
@@ -28,11 +29,9 @@ export class AdminPageComponent implements OnInit {
     showDescription: boolean = false;
     lastDescription: string = '';
     isCreationMode: boolean = false;
-
-    constructor(
-        private router: Router,
-        private gameSaveService: GameSaveService,
-    ) {}
+    private router: Router = inject(Router);
+    private gameSaveService: GameSaveService = inject(GameSaveService);
+    private snackBar: MatSnackBar = inject(MatSnackBar);
 
     navigateToMenu() {
         this.router.navigate(['/']);

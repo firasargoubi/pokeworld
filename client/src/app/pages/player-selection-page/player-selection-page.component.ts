@@ -1,31 +1,28 @@
-import { NgStyle } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, inject, signal, WritableSignal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HeaderComponent } from '@app/components/header/header.component';
 import { BONUS_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player';
-import { BonusDice, DICE_PAIR, DiceType } from '@app/consts/dice';
-import { AVATAR_DATA } from '@app/interfaces/avatars';
+import { BonusDice, DiceType } from '@app/consts/dice';
+import { StatType } from '@app/consts/player-stats.enum';
+import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { Avatars } from '@app/interfaces/avatars.enum';
-import { PointStat, statFrench } from '@app/interfaces/player';
 
 @Component({
     selector: 'app-player-selection-page',
-    imports: [ReactiveFormsModule, NgStyle],
+    imports: [ReactiveFormsModule, HeaderComponent, CommonModule],
     templateUrl: './player-selection-page.component.html',
     styleUrl: './player-selection-page.component.scss',
 })
 export class PlayerSelectionPageComponent {
     nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
-    bonusForm: FormGroup = new FormGroup({
-        points: new FormControl('life', [Validators.required]),
-        bonusDice: new FormControl(BonusDice.Option1, [Validators.required]),
-    });
-
-    statFrench = statFrench;
-    statList = Object.keys(this.statFrench) as (keyof typeof this.statFrench)[];
+    bonusPointsForm: FormControl = new FormControl(StatType.Life, [Validators.required]);
+    maxNameLength = MAX_NAME_LENGTH;
 
     diceType = DiceType;
-    bonusDice = BonusDice;
+    statType = StatType;
+    bonusDice: BonusDice = { attack: DiceType.D4, defense: DiceType.D6 };
 
     avatarData = AVATAR_DATA;
     avatarList = Object.keys(AVATAR_DATA).slice(1) as Avatars[];
@@ -34,33 +31,23 @@ export class PlayerSelectionPageComponent {
     private isStartClicked: WritableSignal<boolean> = signal(false);
     private router: Router = inject(Router);
 
-    getScore(statCategory: PointStat) {
+    getScore(statCategory: StatType) {
         return this.isBonusPoint(statCategory) ? DEFAULT_STAT_POINTS + BONUS_POINTS : DEFAULT_STAT_POINTS;
     }
 
-    isBonusPoint(statCategory: PointStat) {
-        return this.bonusForm.get('points')?.value === statCategory;
+    isBonusPoint(statCategory: StatType) {
+        return this.bonusPointsForm?.value === statCategory;
     }
 
-    getBonusDice(statCategory: PointStat): DiceType | null {
-        if (statCategory === 'attack' || statCategory === 'defense') {
-            const diceOption = this.bonusForm.get('bonusDice')?.value;
-            return DICE_PAIR[diceOption][statCategory];
-        }
-        return null;
+    toggleBonusDice(): void {
+        [this.bonusDice.attack, this.bonusDice.defense] = [this.bonusDice.defense, this.bonusDice.attack];
     }
 
     getAvatarBtnStyle(avatar: Avatars) {
         if (avatar === this.selectedAvatar) {
-            return {
-                background: 'avatar-selected',
-                text: 'CHOISI',
-            };
+            return { class: 'selected' };
         } else {
-            return {
-                background: 'avatar-unselected',
-                text: 'CHOISIR',
-            };
+            return { class: 'unselected' };
         }
     }
 
@@ -82,6 +69,10 @@ export class PlayerSelectionPageComponent {
         if (this.isFormValid()) {
             this.router.navigate(['/lobby']);
         }
+    }
+
+    goToCreatPage() {
+        this.router.navigate(['/create']);
     }
 
     isFormValid() {

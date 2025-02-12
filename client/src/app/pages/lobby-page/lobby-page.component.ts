@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 
-const ACCESS_CODE_MIN = 1000;
-const ACCESS_CODE_RANGE = 9000;
+const CODE_LENGHT = 4;
+const ACCESS_CODE_RANGE = 10000;
 
 @Component({
     selector: 'app-lobby-page',
@@ -17,15 +17,10 @@ const ACCESS_CODE_RANGE = 9000;
 export class LobbyPageComponent implements OnInit {
     accessCode: string = '';
     players: string[] = ['Host'];
-
-    constructor(private router: Router) {}
+    private router: Router = inject(Router);
 
     ngOnInit(): void {
         this.generateAccessCode();
-    }
-
-    generateAccessCode(): void {
-        this.accessCode = Math.floor(ACCESS_CODE_MIN + Math.random() * ACCESS_CODE_RANGE).toString();
     }
 
     startGame(): void {
@@ -34,5 +29,11 @@ export class LobbyPageComponent implements OnInit {
 
     leaveLobby(): void {
         this.router.navigate(['/']);
+    }
+
+    private generateAccessCode(): void {
+        this.accessCode = Math.floor(Math.random() * ACCESS_CODE_RANGE)
+            .toString()
+            .padStart(CODE_LENGHT, '0');
     }
 }

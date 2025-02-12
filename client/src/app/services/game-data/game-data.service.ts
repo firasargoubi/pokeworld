@@ -17,7 +17,7 @@ export class GameDataService {
     itemUpdate: Subject<ItemType | null> = new Subject();
 
     createNewGame(size: MapSize, mode: GameMode) {
-        const newGameData = DEFAULT_GAME;
+        const newGameData = structuredClone(DEFAULT_GAME);
         newGameData.mapData.size = size;
         newGameData.mapData.gameMode = mode;
         newGameData.mapData.tiles = Array.from({ length: size }, () => {
