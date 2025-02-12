@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { TestBed } from '@angular/core/testing';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { ItemType } from '@common/item-type.enum';
@@ -48,134 +46,161 @@ describe('MapService', () => {
         expect(mockGameDataService.isOutOfBound).toHaveBeenCalledWith(mockGameDataService.gameData.mapData.tiles, position);
     });
 
+    it('should update tile if new tile data is different', () => {
+        const position: Position = { x: 1, y: 1 };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getTileVisualData').and.returnValue({
+            tile: 'newTile.png',
+            underlay: 'oldUnderlay.png',
+            item: 'oldItem.png' as ItemType,
+        });
+
+        service.visualMapData.tiles[1][1] = {
+            tile: 'oldTile.png',
+            underlay: 'oldUnderlay.png',
+            item: 'oldItem.png' as ItemType,
+        };
+
+        service['updateTile'](position);
+        expect(service.visualMapData.tiles[1][1].tile).toBe('newTile.png');
+    });
+
+    it('should update underlay if new underlay data is different', () => {
+        const position: Position = { x: 1, y: 1 };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getTileVisualData').and.returnValue({
+            tile: 'oldTile.png',
+            underlay: 'newUnderlay.png',
+            item: 'oldItem.png' as ItemType,
+        });
+
+        service.visualMapData.tiles[1][1] = {
+            tile: 'oldTile.png',
+            underlay: 'oldUnderlay.png',
+            item: 'oldItem.png' as ItemType,
+        };
+
+        service['updateTile'](position);
+        expect(service.visualMapData.tiles[1][1].underlay).toBe('newUnderlay.png');
+    });
+
+    it('should update item if new item data is different', () => {
+        const position: Position = { x: 1, y: 1 };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getTileVisualData').and.returnValue({
+            tile: 'oldTile.png',
+            underlay: 'oldUnderlay.png',
+            item: 'newItem.png',
+        });
+
+        service.visualMapData.tiles[1][1] = {
+            tile: 'oldTile.png',
+            underlay: 'oldUnderlay.png',
+            item: 'oldItem.png' as ItemType,
+        };
+
+        service['updateTile'](position);
+        expect(service.visualMapData.tiles[1][1].item).toBe('newItem.png' as ItemType);
+    });
+
     it('should initialize visualMapData correctly', () => {
         expect(service.visualMapData).toBeDefined();
         expect(service.visualMapData.size).toBe(MapSize.Small);
     });
 
     it('should update all tiles on map update', () => {
-        spyOn(service, 'updateAllTiles' as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'updateAllTiles');
         mockGameDataService.mapUpdate.next(null);
-        expect((service as any).updateAllTiles).toHaveBeenCalled();
+        expect(service['updateAllTiles']).toHaveBeenCalled();
+    });
+
+    it('should update the entire map when position is null', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'updateAllTiles').and.callThrough();
+        service['onMapUpdate'](null);
+        expect(service['updateAllTiles']).toHaveBeenCalled();
+        expect(service.visualMapData.tiles.length).toBe(mockGameDataService.gameData.mapData.size);
+    });
+
+    it('should update surrounding tiles when position is provided', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'updateSuroundingTiles').and.callThrough();
+        const position: Position = { x: 2, y: 2 };
+        service['onMapUpdate'](position);
+        expect(service['updateSuroundingTiles']).toHaveBeenCalledWith(position);
     });
 
     it('should update surrounding tiles on map update with a position', () => {
-        spyOn(service, 'updateSuroundingTiles' as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'updateSuroundingTiles');
         const position: Position = { x: 1, y: 1 };
         mockGameDataService.mapUpdate.next(position);
-        expect((service as any).updateSuroundingTiles).toHaveBeenCalledWith(position);
+        expect(service['updateSuroundingTiles']).toHaveBeenCalledWith(position);
     });
 
     it('should return correct tile variants for all tile types', () => {
         const position: Position = { x: 2, y: 2 };
-        expect((service as any).getTileVariant(TileType.Water, mockGameDataService.gameData.mapData.tiles, position)).toBeDefined();
-        expect((service as any).getTileVariant(TileType.Path, mockGameDataService.gameData.mapData.tiles, position)).toBeDefined();
-        expect((service as any).getTileVariant(TileType.Bridge, mockGameDataService.gameData.mapData.tiles, position)).toBeDefined();
-        expect((service as any).getTileVariant(TileType.BrokenBridge, mockGameDataService.gameData.mapData.tiles, position)).toBeDefined();
-        expect((service as any).getTileVariant(TileType.Grass, mockGameDataService.gameData.mapData.tiles, position)).toBeDefined();
+        expect(service['getTileVariant'](TileType.Water, mockGameDataService.gameData.mapData.tiles, position)).toBeDefined();
+        expect(service['getTileVariant'](TileType.Path, mockGameDataService.gameData.mapData.tiles, position)).toBeDefined();
+        expect(service['getTileVariant'](TileType.Bridge, mockGameDataService.gameData.mapData.tiles, position)).toBeDefined();
+        expect(service['getTileVariant'](TileType.BrokenBridge, mockGameDataService.gameData.mapData.tiles, position)).toBeDefined();
+        expect(service['getTileVariant'](TileType.Grass, mockGameDataService.gameData.mapData.tiles, position)).toBeDefined();
     });
 
     it('should call updateTile on all surrounding positions', () => {
-        spyOn(service, 'updateTile' as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'updateTile');
         const position: Position = { x: 3, y: 3 };
-        (service as any).updateSuroundingTiles(position);
-        expect((service as any).updateTile).toHaveBeenCalledTimes(9);
+        service['updateSuroundingTiles'](position);
+        const numberOfCalls = 9;
+        expect(service['updateTile']).toHaveBeenCalledTimes(numberOfCalls);
     });
 
     it('should return correct underlay image for all tile types', () => {
         const position: Position = { x: 3, y: 3 };
-        mockGameDataService.getTile.and.callFake((tiles, pos) => {
-            if (pos.x === 3 && pos.y === 3) return TileType.Water;
-            return TileType.Grass;
-        });
-        spyOn(service, 'getUnderlayVariant' as any).and.returnValue('1');
+        mockGameDataService.getTile.and.returnValue(TileType.Water);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getUnderlayVariant').and.returnValue('1');
 
-        let result = (service as any).getUnderlayImage(mockGameDataService.gameData.mapData.tiles, position);
+        let result = service['getUnderlayImage'](mockGameDataService.gameData.mapData.tiles, position);
         expect(result).toContain('1');
 
         mockGameDataService.getTile.and.returnValue(TileType.BrokenBridge);
-        result = (service as any).getUnderlayImage(mockGameDataService.gameData.mapData.tiles, position);
+        result = service['getUnderlayImage'](mockGameDataService.gameData.mapData.tiles, position);
         expect(result).toContain('1');
 
         mockGameDataService.getTile.and.returnValue(TileType.Bridge);
-        result = (service as any).getUnderlayImage(mockGameDataService.gameData.mapData.tiles, position);
+        result = service['getUnderlayImage'](mockGameDataService.gameData.mapData.tiles, position);
         expect(result).toContain('0');
 
         mockGameDataService.getTile.and.returnValue(TileType.Grass);
-        result = (service as any).getUnderlayImage(mockGameDataService.gameData.mapData.tiles, position);
+        result = service['getUnderlayImage'](mockGameDataService.gameData.mapData.tiles, position);
         expect(result).toBeNull();
     });
 
     it('should correctly compare tiles', () => {
-        spyOn(service, 'compareTile' as any).and.returnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'compareTile').and.returnValue(true);
         const position: Position = { x: 4, y: 4 };
-        const result = (service as any).compareTile(mockGameDataService.gameData.mapData.tiles, position, [TileType.Grass]);
+        const result = service['compareTile'](mockGameDataService.gameData.mapData.tiles, position, [TileType.Grass]);
         expect(result).toBeTrue();
     });
 
     it('should generate random string for tile variant', () => {
-        spyOn(service, 'getRandomString' as any).and.returnValue('3');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getRandomString').and.returnValue('3');
         const position: Position = { x: 5, y: 5 };
-        const result = (service as any).getRandomString(position, 5);
+        const maxValue = 5;
+        const result = service['getRandomString'](position, maxValue);
         expect(result).toBe('3');
     });
 
-    it('should update underlay only if new value is different', () => {
-        const position: Position = { x: 1, y: 1 };
-        spyOn(service, 'getTileVisualData' as any).and.returnValue({ tile: 'tile.png', underlay: 'newUnderlay.png', item: 'item.png' });
-        service.visualMapData.tiles[1][1] = { tile: 'tile.png', underlay: 'oldUnderlay.png', item: 'item.png' as ItemType };
-        service['updateTile'](position);
-        expect(service.visualMapData.tiles[1][1].underlay).toBe('newUnderlay.png');
-    });
-
-    it('should update item only if new value is different', () => {
-        const position: Position = { x: 1, y: 1 };
-        spyOn(service, 'getTileVisualData' as any).and.returnValue({ tile: 'tile.png', underlay: 'underlay.png', item: 'newItem.png' });
-        service.visualMapData.tiles[1][1] = { tile: 'tile.png', underlay: 'underlay.png', item: 'oldItem.png' as ItemType };
-        service['updateTile'](position);
-        expect(service.visualMapData.tiles[1][1].item).toBe('newItem.png' as ItemType);
-    });
-
-    // it('should correctly check if an item is in a tile', () => {
-    //     const position: Position = { x: 2, y: 2 };
-    //     const items: Record<ItemType, Position[]> = {
-    //         [ItemType.Item1]: [{ x: 2, y: 2 }],
-    //         [ItemType.Item2]: [{ x: 1, y: 1 }],
-    //         [ItemType.Item3]: [],
-    //         [ItemType.Item4]: [],
-    //         [ItemType.Item5]: [],
-    //         [ItemType.Item6]: [],
-    //         [ItemType.Random]: [],
-    //         [ItemType.Spawn]: [],
-    //         [ItemType.Flag]: [],
-    //     };
-
-    //     const result = (service as any).getItemImage(items, position);
-    //     expect(result).toBe('/assets/images/game/items/item1.png');
-    // });
-
-    // it('should return null if no item exists in tile', () => {
-    //     const position: Position = { x: 5, y: 5 };
-    //     const items: Record<ItemType, Position[]> = {
-    //         [ItemType.Item1]: [{ x: 2, y: 2 }],
-    //         [ItemType.Item2]: [{ x: 1, y: 1 }],
-    //         [ItemType.Item3]: [],
-    //         [ItemType.Item4]: [],
-    //         [ItemType.Item5]: [],
-    //         [ItemType.Item6]: [],
-    //         [ItemType.Random]: [],
-    //         [ItemType.Spawn]: [],
-    //         [ItemType.Flag]: [],
-    //     };
-
-    //     const result = (service as any).getItemImage(items, position);
-    //     expect(result).toBeNull();
-    // });
-
     it('should return correct underlay variant for a given position', () => {
         const position: Position = { x: 2, y: 3 };
-        spyOn(service, 'getRandomString' as any).and.returnValue('2');
-        const result = (service as any).getUnderlayVariant(position);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getRandomString').and.returnValue('2');
+        const result = service['getUnderlayVariant'](position);
         expect(result).toBe('2');
     });
 
@@ -189,9 +214,129 @@ describe('MapService', () => {
         ];
         const tileTypes: TileType[] = [TileType.Grass, TileType.Path];
 
-        spyOn(service, 'compareTiles' as any).and.returnValue([true, false, true, false]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'compareTiles').and.returnValue([true, false, true, false]);
 
-        const result = (service as any).getSimilarTiles(mockGameDataService.gameData.mapData.tiles, position, deltaPositions, tileTypes);
+        const result = service['getSimilarTiles'](mockGameDataService.gameData.mapData.tiles, position, deltaPositions, tileTypes);
         expect(result).toBe('0101');
+    });
+
+    it('should correctly check if an item is in a tile', () => {
+        const position: Position = { x: 2, y: 2 };
+        const items: Record<ItemType, Position[]> = {
+            [ItemType.Item1]: [{ x: 2, y: 2 }],
+            [ItemType.Item2]: [{ x: 1, y: 1 }],
+            [ItemType.Item3]: [],
+            [ItemType.Item4]: [],
+            [ItemType.Item5]: [],
+            [ItemType.Item6]: [],
+            [ItemType.Random]: [],
+            [ItemType.Spawn]: [],
+            [ItemType.Flag]: [],
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getItem').and.callThrough();
+
+        const result = service['getItem'](items, position);
+        expect(result).toBe(ItemType.Item1);
+    });
+
+    it('should return null if no item exists in tile', () => {
+        const position: Position = { x: 5, y: 5 };
+        const items: Record<ItemType, Position[]> = {
+            [ItemType.Item1]: [{ x: 2, y: 2 }],
+            [ItemType.Item2]: [{ x: 1, y: 1 }],
+            [ItemType.Item3]: [],
+            [ItemType.Item4]: [],
+            [ItemType.Item5]: [],
+            [ItemType.Item6]: [],
+            [ItemType.Random]: [],
+            [ItemType.Spawn]: [],
+            [ItemType.Flag]: [],
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getItem').and.callThrough();
+
+        const result = service['getItem'](items, position);
+        expect(result).toBeNull();
+    });
+    it('should call updateAllTiles when position is null', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'updateAllTiles');
+        service['onMapUpdate'](null);
+        expect(service['updateAllTiles']).toHaveBeenCalled();
+    });
+
+    it('should call updateSuroundingTiles when position is not null', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'updateSuroundingTiles');
+        const position: Position = { x: 2, y: 2 };
+        service['onMapUpdate'](position);
+        expect(service['updateSuroundingTiles']).toHaveBeenCalledWith(position);
+    });
+
+    it('should return correct tile visual data', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getTileImage').and.returnValue('tile.png');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getUnderlayImage').and.returnValue('underlay.png');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getItem').and.returnValue(ItemType.Item1);
+
+        const position: Position = { x: 1, y: 1 };
+        const result = service['getTileVisualData'](mockGameDataService.gameData.mapData, position);
+
+        expect(result.tile).toBe('tile.png');
+        expect(result.underlay).toBe('underlay.png');
+        expect(result.item).toBe(ItemType.Item1);
+    });
+
+    it('should return correct water variant', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getSimilarTiles').and.returnValue('1100');
+        const position: Position = { x: 3, y: 3 };
+        const result = service['getWaterVariant'](mockGameDataService.gameData.mapData.tiles, position);
+        expect(result).toBe('1100');
+    });
+
+    it('should return correct path variant', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getSimilarTiles').and.returnValue('1010');
+        const position: Position = { x: 3, y: 3 };
+        const result = service['getPathVariant'](mockGameDataService.gameData.mapData.tiles, position);
+        expect(result).toBe('1010');
+    });
+
+    it('should return correct grass variant', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getRandomString').and.returnValue('2');
+        const position: Position = { x: 4, y: 4 };
+        const result = service['getGrassVariant'](position);
+        expect(result).toBe('2');
+    });
+
+    it('should return correct tile comparison results', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'compareTile').and.returnValue(true);
+        const position: Position = { x: 2, y: 2 };
+        const deltaPositions: Position[] = [
+            { x: -1, y: 0 },
+            { x: 1, y: 0 },
+            { x: 0, y: -1 },
+            { x: 0, y: 1 },
+        ];
+        const tileTypes: TileType[] = [TileType.Grass];
+        const result = service['compareTiles'](mockGameDataService.gameData.mapData.tiles, position, deltaPositions, tileTypes);
+        expect(result).toEqual([true, true, true, true]);
+    });
+
+    it('should return correct bridge variant based on surrounding tiles', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getSimilarTiles').and.returnValue('1001');
+        const position: Position = { x: 3, y: 3 };
+        const result = service['getBridgeVariant'](mockGameDataService.gameData.mapData.tiles, position);
+        expect(result).toBe('1');
     });
 });
