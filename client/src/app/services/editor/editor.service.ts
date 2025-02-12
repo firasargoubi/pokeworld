@@ -125,7 +125,6 @@ export class EditorService {
     private getValidationErrorMessage(validationResult: ValidationResult): string {
         const errors: string[] = [];
 
-        // Parcourir chaque propriété de validationResult
         for (const [key, value] of Object.entries(validationResult)) {
             if (key === 'terrainCoverage' && !value.isValid) {
                 errors.push(`  - Couverture du terrain insuffisante (${value.coveragePercentage}%)`);
