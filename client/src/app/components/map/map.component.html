@@ -3,7 +3,7 @@
         <div class="map">
             @for (tileRow of mapService.visualMapData.tiles; track tileRow; let x = $index) {
                 @for (tile of tileRow; track tile; let y = $index) {
-                    <div class="tile" [attr.x]="x" [attr.y]="y">
+                    <div class="tile" [attr.x]="x" [attr.y]="y" [attr.tile]="mapService.gameDataService.getTileFromPosition({ x, y })">
                         @if (tile.underlay) {
                             <div class="tile-image" [style.backgroundImage]="'url(' + tile.underlay + ')'"></div>
                         }

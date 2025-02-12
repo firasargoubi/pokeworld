@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
@@ -17,8 +17,7 @@ const ACCESS_CODE_RANGE = 10000;
 export class LobbyPageComponent implements OnInit {
     accessCode: string = '';
     players: string[] = ['Host'];
-
-    constructor(private router: Router) {}
+    private router: Router = inject(Router);
 
     ngOnInit(): void {
         this.generateAccessCode();

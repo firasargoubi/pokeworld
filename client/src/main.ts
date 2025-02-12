@@ -22,7 +22,6 @@ const routes: Routes = [
     { path: 'admin', component: AdminPageComponent },
     { path: 'create', component: CreatePageComponent },
     { path: 'edit', component: EditPageComponent },
-    { path: 'create', component: CreatePageComponent },
     { path: 'player-selection', component: PlayerSelectionPageComponent },
     { path: '**', redirectTo: '' },
 ];

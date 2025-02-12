@@ -1,4 +1,4 @@
-import { Avatars } from './avatars.enum';
+import { Avatars } from '@app/interfaces/avatars.enum';
 
 export const AVATAR_DATA = {
     [Avatars.Default]: {

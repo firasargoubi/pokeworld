@@ -26,7 +26,7 @@ import {
 })
 export class MapService {
     visualMapData: MapVisualData;
-    private gameDataService: GameDataService;
+    gameDataService: GameDataService;
 
     constructor() {
         this.gameDataService = inject(GameDataService);

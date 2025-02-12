@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BRIDGE_TYPES, MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH, MIN_TERRAIN_RATIO, REQUIRED_SPAWN_POINTS } from '@app/consts/validation-consts.enum';
+import { BRIDGE_TYPES, MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH, MIN_TERRAIN_RATIO } from './game-validation.const';
 import { ErrorCode } from '@app/interfaces/error-code.enum';
 import { BridgeValidationError, ValidationResult, ValidationStatus } from '@app/interfaces/game-validation-result';
 import { TilesCount } from '@app/interfaces/tiles-count';
@@ -9,6 +9,7 @@ import { ItemType } from '@common/item-type.enum';
 import { MapData } from '@common/map-data';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
+import { MAX_ITEM_COUNT } from '@app/consts/items.const';
 
 @Injectable({
     providedIn: 'root',
@@ -216,7 +217,8 @@ export class GameValidationService {
     }
 
     private validateSpawnPoints(map: MapData): ValidationStatus {
-        return this.validateItemCount(map, ItemType.Spawn, REQUIRED_SPAWN_POINTS[map.size]);
+        const spawnPointCount = MAX_ITEM_COUNT[map.size][ItemType.Spawn];
+        return this.validateItemCount(map, ItemType.Spawn, spawnPointCount);
     }
 
     private validateFlags(map: MapData): ValidationStatus {
