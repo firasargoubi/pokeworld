@@ -46,15 +46,15 @@
             </div>
             <div class="tool-square">
                 <div class="item-grid">
-                    @for (itemData of editorService.editorData.items; track itemData) {
-                    <div class="grid-square" [class.grayed]="itemData.count === 0">
-                        <div class="tool">
-                            <app-item [itemType]="itemData.item"></app-item>
-                            @if (itemData.count > 0) {
-                            <div class="tool-count">{{ itemData.count }}</div>
-                            }
+                    @for (itemData of editorService.editorData.items; track itemData.item) {
+                        <div class="grid-square" [class.grayed]="itemData.count === 0">
+                            <div class="tool">
+                                <app-item [itemType]="itemData.item"></app-item>
+                                @if (itemData.count > 0) {
+                                    <div class="tool-count">{{ itemData.count }}</div>
+                                }
+                            </div>
                         </div>
-                    </div>
                     }
                 </div>
             </div>
