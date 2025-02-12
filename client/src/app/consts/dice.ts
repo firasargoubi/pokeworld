@@ -1,16 +1,11 @@
 enum DiceType {
-    D6 = '⚅',
-    D4 = '⚃',
+    D4 = 'dice-icon-4',
+    D6 = 'dice-icon-6',
 }
 
-enum BonusDice {
-    Option1 = '0',
-    Option2 = '1',
+interface BonusDice {
+    attack: DiceType;
+    defense: DiceType;
 }
 
-const DICE_PAIR = [
-    { attack: DiceType.D4, defense: DiceType.D6 },
-    { attack: DiceType.D6, defense: DiceType.D4 },
-];
-
-export { DiceType, DICE_PAIR, BonusDice };
+export { DiceType, BonusDice };

@@ -11,7 +11,7 @@
     <div class="game-card">
         <div class="card-body">
             <div class="game-thumbnail" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
-                <h2 class="game-name">{{ game.name }}</h2>
+                <p class="game-name">{{ game.name }}</p>
                 <p class="size-info">{{ game.mapData.size }}x{{ game.mapData.size }}</p>
                 @if (thumbnailUrl) {
                 <img [src]="thumbnailUrl" alt="Thumbnail" class="thumbnail" />
@@ -36,7 +36,7 @@
                                 [src]="
                                     game.isVisible
                                         ? '/assets/images/menu/buttons/admin-button/eye.png'
-                                        : '/assets/images/menu/buttons/admin-button/closedEye.png'
+                                        : '/assets/images/menu/buttons/admin-button/closed-eye.png'
                                 "
                                 class="button-icon"
                             />
