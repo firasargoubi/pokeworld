@@ -76,40 +76,26 @@ describe('ThumbnailService', () => {
         expect(mapServiceSpy.getTileImage).toHaveBeenCalledTimes(MapSize.Large * MapSize.Large);
     });
 
-    // it('should load an image successfully', async () => {
-    //     const imageUrl = '/assets/images/game/tiles/grass.png';
-    //     const x = 0;
-    //     const y = 0;
+    it('should load an image successfully', async () => {
+        const imageUrl = '/assets/images/game/tiles/grass.png';
+        const x = 0;
+        const y = 0;
 
-    //     const mockImage = new Image();
-    //     spyOnProperty(mockImage, 'src', 'set').and.callFake(() => {
-    //         setTimeout(() => mockImage.onload && mockImage.onload(new Event('load')), 0);
-    //     });
+        const result = await service['loadImage'](imageUrl, x, y);
 
-    //     spyOn(window, 'Image').and.returnValue(mockImage);
+        expect(result).not.toBeNull();
+        expect(result?.[0]).toBeInstanceOf(HTMLImageElement);
+        expect(result?.[1]).toBe(x);
+        expect(result?.[2]).toBe(y);
+    });
 
-    //     const result = await service.loadImage(imageUrl, x, y);
+    it('should return null if image fails to load', async () => {
+        const imageUrl = '/assets/images/game/tiles/invalid.png';
+        const x = 1;
+        const y = 1;
 
-    //     expect(result).not.toBeNull();
-    //     expect(result?.[0]).toBeInstanceOf(HTMLImageElement);
-    //     expect(result?.[1]).toBe(x);
-    //     expect(result?.[2]).toBe(y);
-    // });
+        const result = await service['loadImage'](imageUrl, x, y);
 
-    // it('should return null if image fails to load', async () => {
-    //     const imageUrl = '/assets/images/game/tiles/invalid.png';
-    //     const x = 1;
-    //     const y = 1;
-
-    //     const mockImage = new Image();
-    //     spyOnProperty(mockImage, 'src', 'set').and.callFake(() => {
-    //         setTimeout(() => mockImage.onerror && mockImage.onerror(new Event('error')), 0);
-    //     });
-
-    //     spyOn(window, 'Image').and.returnValue(mockImage);
-
-    //     const result = await service.loadImage(imageUrl, x, y);
-
-    //     expect(result).toBeNull();
-    // });
+        expect(result).toBeNull();
+    });
 });
