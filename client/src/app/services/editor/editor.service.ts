@@ -70,7 +70,6 @@ export class EditorService {
         });
     }
 
-    // TODO
     resetButton(): void {
         const oldGameData = structuredClone(this.initialGameData);
         this.gameDataService.setGameData(oldGameData);
@@ -126,6 +125,7 @@ export class EditorService {
 
         this.paintTile(eventProperty.tilePosition);
     }
+
     private getValidationErrorMessage(validationResult: ValidationResult): string {
         const errors: string[] = [];
 
@@ -148,6 +148,7 @@ export class EditorService {
 
         return errors.length > 0 ? 'Erreurs de validation :\n' + errors.join('\n') : 'Aucune erreur de validation';
     }
+
     private getEventProperty(event: Event): EventProperty {
         const target = event.target as HTMLElement;
         const tileXString = target.getAttribute('x');

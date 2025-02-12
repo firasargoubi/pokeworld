@@ -2,16 +2,18 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { ErrorCode } from '@app/interfaces/error-code.enum';
+import { EventProperty } from '@app/interfaces/event-property';
 import { ValidationResult } from '@app/interfaces/game-validation-result';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
+import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
+import { ItemType } from '@common/item-type.enum';
 import { MapSize } from '@common/map-size.enum';
 import { TileType } from '@common/tile-type.enum';
 import { of, Subject, throwError } from 'rxjs';
 import { EditorService } from './editor.service';
-import { GameData } from '@common/game-data';
 
 describe('EditorService', () => {
     let service: EditorService;
@@ -124,6 +126,7 @@ describe('EditorService', () => {
         expect(service.messages.length).toBe(1);
         expect(service.messages[0].message).toContain('Erreur lors de la sauvegarde');
     });
+
     it('should format validation errors correctly', () => {
         const validationResult: ValidationResult = {
             ...mockValidationResult,
@@ -169,5 +172,279 @@ describe('EditorService', () => {
         service.resetButton();
 
         expect(service.gameDataService.gameData).not.toBe(service.initialGameData);
+    });
+
+    it('should call onClick with isLeftClick = true when left mouse button is clicked', () => {
+        const event = new MouseEvent('mousedown', { button: 0 });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const onclickSpy = spyOn<any>(service, 'onClick');
+        service.onMouseDown(event);
+
+        expect(onclickSpy).toHaveBeenCalledWith(event, true);
+    });
+
+    it('should call onClick with isLeftClick = false when right mouse button is clicked', () => {
+        const event = new MouseEvent('mousedown', { button: 2 });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const onclickSpy = spyOn<any>(service, 'onClick');
+        service.onMouseDown(event);
+
+        expect(onclickSpy).toHaveBeenCalledWith(event, false);
+    });
+
+    it('should call preventDefault if tilePosition is defined', () => {
+        const event = new MouseEvent('contextmenu');
+        const preventDefaultSpy = spyOn(event, 'preventDefault');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getEventProperty').and.returnValue({ tilePosition: { x: 1, y: 1 } });
+        service.onRightClick(event);
+
+        expect(preventDefaultSpy).toHaveBeenCalled();
+    });
+
+    it('should not call preventDefault if tilePosition is null', () => {
+        const event = new MouseEvent('contextmenu');
+        const preventDefaultSpy = spyOn(event, 'preventDefault');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getEventProperty').and.returnValue({ tilePosition: null });
+        service.onRightClick(event);
+
+        expect(preventDefaultSpy).not.toHaveBeenCalled();
+    });
+
+    it('should reset activeTile and activeTilePosition on mouse up', () => {
+        service.editorData.activeTile = TileType.Grass;
+        service.editorData.activeTilePosition = { x: 5, y: 5 };
+        const event = new MouseEvent('mouseup');
+        service.onMouseUp(event);
+
+        expect(service.editorData.activeTile).toBeNull();
+        expect(service.editorData.activeTilePosition).toEqual({ x: -1, y: -1 });
+    });
+
+    it('should call dropItem if activeItem is set', () => {
+        service.editorData.activeItem = ItemType.Item1;
+        const event = new MouseEvent('mouseup');
+        const eventPropertyMock: EventProperty = {
+            tilePosition: { x: 2, y: 2 },
+            mousePosition: null,
+            tile: null,
+            item: null,
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const getEventPropertySpy = spyOn<any>(service, 'getEventProperty').and.returnValue(eventPropertyMock);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const dropItemSpy = spyOn<any>(service, 'dropItem');
+
+        service.onMouseUp(event);
+
+        expect(getEventPropertySpy).toHaveBeenCalledWith(event);
+        expect(dropItemSpy).toHaveBeenCalledWith(eventPropertyMock);
+    });
+
+    it('should update activeItemPosition when activeItem is set', () => {
+        service.editorData.activeItem = ItemType.Item1;
+        service.editorData.activeItemPosition = { x: 0, y: 0 };
+        const event = new MouseEvent('mousemove', { clientX: 10, clientY: 20 });
+        service.onMouseMove(event);
+        expect(service.editorData.activeItemPosition).toEqual({ x: 10, y: 20 });
+    });
+
+    it('should not update activeItemPosition when activeItem is not set', () => {
+        service.editorData.activeItem = null;
+        service.editorData.activeItemPosition = { x: 5, y: 5 };
+        const event = new MouseEvent('mousemove', { clientX: 10, clientY: 20 });
+        service.onMouseMove(event);
+        expect(service.editorData.activeItemPosition).toEqual({ x: 5, y: 5 });
+    });
+
+    it('should not call paintTile if tilePosition is null', () => {
+        service.editorData.activeTile = TileType.Grass;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getEventProperty').and.returnValue({ tilePosition: null });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const paintTileSpy = spyOn<any>(service, 'paintTile');
+        const event = new Event('mouseover');
+        service.onMouseOver(event);
+        expect(paintTileSpy).not.toHaveBeenCalled();
+    });
+
+    it('should call paintTile if activeTile and tilePosition are valid', () => {
+        service.editorData.activeTile = TileType.Grass;
+        const mockTilePosition = { x: 2, y: 3 };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getEventProperty').and.returnValue({ tilePosition: mockTilePosition });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const paintTileSpy = spyOn<any>(service, 'paintTile');
+        const event = new Event('mouseover');
+        service.onMouseOver(event);
+        expect(paintTileSpy).toHaveBeenCalledWith(mockTilePosition);
+    });
+
+    it('should return correct event properties', () => {
+        const mockEvent = {
+            target: {
+                getAttribute: jasmine.createSpy().and.callFake((attr: string) => {
+                    const attributes: Map<string, string> = new Map([
+                        ['x', '10'],
+                        ['y', '20'],
+                        ['tile', 'Path'],
+                        ['item', 'Item1'],
+                    ]);
+                    return attributes.get(attr);
+                }),
+            },
+            clientX: 100,
+            clientY: 200,
+        } as unknown as MouseEvent;
+
+        const result = service['getEventProperty'](mockEvent);
+
+        expect(result.tilePosition).toEqual({ x: 10, y: 20 });
+        expect(result.mousePosition).toEqual({ x: 100, y: 200 });
+        expect(result.tile).toEqual(TileType.Path);
+        expect(result.item).toEqual(ItemType.Item1);
+    });
+
+    it('should handle click on item', () => {
+        const event = new MouseEvent('click');
+        const eventPropertyMock: EventProperty = {
+            tilePosition: null,
+            mousePosition: { x: 10, y: 20 },
+            tile: null,
+            item: ItemType.Item1,
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const getEventPropertySpy = spyOn<any>(service, 'getEventProperty').and.returnValue(eventPropertyMock);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const clickOnItemSpy = spyOn<any>(service, 'clickOnItem');
+
+        service['onClick'](event, true);
+
+        expect(getEventPropertySpy).toHaveBeenCalledWith(event);
+        expect(clickOnItemSpy).toHaveBeenCalledWith(eventPropertyMock);
+    });
+
+    it('should handle click on tile', () => {
+        const event = new MouseEvent('click');
+        const eventPropertyMock: EventProperty = {
+            tilePosition: null,
+            mousePosition: null,
+            tile: TileType.Grass,
+            item: null,
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const getEventPropertySpy = spyOn<any>(service, 'getEventProperty').and.returnValue(eventPropertyMock);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const clickOnTileSpy = spyOn<any>(service, 'clickOnTile');
+
+        service['onClick'](event, true);
+
+        expect(getEventPropertySpy).toHaveBeenCalledWith(event);
+        expect(clickOnTileSpy).toHaveBeenCalledWith(TileType.Grass);
+    });
+
+    it('should add item when tile is valid', () => {
+        const eventProperty: EventProperty = {
+            tilePosition: { x: 2, y: 3 },
+            mousePosition: null,
+            tile: null,
+            item: null,
+        };
+
+        gameDataServiceSpy.getTileFromPosition.and.returnValue(TileType.Grass);
+
+        service['dropItem'](eventProperty);
+
+        expect(gameDataServiceSpy.addItem).toHaveBeenCalled();
+    });
+
+    it('should handle item update', () => {
+        const item = ItemType.Item1;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const updateItemSpy = spyOn<any>(service, 'updateItem');
+
+        service['onItemUpdate'](item);
+
+        expect(updateItemSpy).toHaveBeenCalledWith(item);
+    });
+
+    it('should handle item update with null', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const updateAllItemsSpy = spyOn<any>(service, 'updateAllItems');
+
+        service['onItemUpdate'](null);
+
+        expect(updateAllItemsSpy).toHaveBeenCalled();
+    });
+
+    it('should verify map data and navigate to admin if invalid', () => {
+        gameDataServiceSpy.isMapValid.and.returnValue(false);
+        service['verifyMapData']();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
+    });
+
+    it('should verify map data and not navigate if valid', () => {
+        gameDataServiceSpy.isMapValid.and.returnValue(true);
+        service['verifyMapData']();
+        expect(routerSpy.navigate).not.toHaveBeenCalled();
+    });
+
+    it('should update all items', () => {
+        service['updateAllItems']();
+        expect(service.editorData.items.length).toBeGreaterThan(0);
+    });
+
+    it('should update item', () => {
+        const item = ItemType.Item1;
+        service['updateItem'](item);
+        expect(service.editorData.items.length).toBeGreaterThan(0);
+    });
+
+    it('should get editor items', () => {
+        const result = service['getEditorItems']();
+        expect(result.length).toBeGreaterThan(0);
+    });
+
+    it('should get editor item', () => {
+        const result = service['getEditorItem'](ItemType.Item1);
+        expect(result.item).toBe(ItemType.Item1);
+    });
+
+    it('should return the correct remaining item count', () => {
+        const currentItem = 1;
+
+        gameDataServiceSpy.getItemCount.and.returnValue(currentItem);
+        gameDataServiceSpy.getMapSize.and.returnValue(MapSize.Small);
+
+        const remainingItemCount = service['getRemainingItemCount'](ItemType.Spawn);
+
+        expect(remainingItemCount).toBe(1);
+    });
+
+    it('should return 0 if the item count is equal to the maximum allowed', () => {
+        const currentItem = 2;
+
+        gameDataServiceSpy.getItemCount.and.returnValue(currentItem);
+        gameDataServiceSpy.getMapSize.and.returnValue(MapSize.Small);
+
+        const remainingItemCount = service['getRemainingItemCount'](ItemType.Spawn);
+
+        expect(remainingItemCount).toBe(0);
+    });
+
+    it('should return the correct remaining item count for a larger map size', () => {
+        const currentItem = 1;
+
+        gameDataServiceSpy.getItemCount.and.returnValue(currentItem);
+        gameDataServiceSpy.getMapSize.and.returnValue(MapSize.Large);
+
+        const remainingItemCount = service['getRemainingItemCount'](ItemType.Spawn);
+
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        expect(remainingItemCount).toBe(5);
     });
 });
