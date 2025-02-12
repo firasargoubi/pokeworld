@@ -42,7 +42,7 @@ describe('EditorService', () => {
                 itemUpdate: itemUpdateSubject.asObservable(),
             },
         );
-        gameDataServiceSpy.gameData = MOCK_GAMES[0];
+        gameDataServiceSpy.gameData = structuredClone(MOCK_GAMES[0]);
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
         gameValidationServiceSpy.validateGame.and.returnValue(mockValidationResult);
@@ -86,19 +86,7 @@ describe('EditorService', () => {
     });
 
     it('should handle validation errors', () => {
-        const mockErrors: ValidationResult = {
-            name: { isValid: false, errorCode: ErrorCode.TooLong },
-            description: { isValid: true, errorCode: null },
-            terrainCoverage: { isValid: false, coveragePercentage: 20 },
-            tilesAccessibility: { isValid: false, nonAccessibleTileCount: 5 },
-            items: { isValid: false, misplacedItems: [{ x: 1, y: 1 }] },
-            bridge: {
-                isValid: false,
-                errors: [{ x: 2, y: 2, errorCode: ErrorCode.BridgeAtEdge }],
-            },
-            spawnPoint: { isValid: true, errorCode: null },
-            mode: { isValid: true, errorCode: null },
-        };
+        const mockErrors: ValidationResult = { ...mockValidationResult, name: { isValid: false, errorCode: ErrorCode.TooLong } };
 
         gameValidationServiceSpy.validateGame.and.returnValue(mockErrors);
         service.saveButton();
@@ -133,20 +121,15 @@ describe('EditorService', () => {
         expect(service.messages.length).toBe(1);
         expect(service.messages[0].message).toContain('Erreur lors de la sauvegarde');
     });
-
     it('should format validation errors correctly', () => {
         const validationResult: ValidationResult = {
+            ...mockValidationResult,
             name: { isValid: false, errorCode: ErrorCode.TooLong },
-            description: { isValid: true, errorCode: null },
             terrainCoverage: { isValid: false, coveragePercentage: 20 },
-            tilesAccessibility: { isValid: false, nonAccessibleTileCount: 5 },
-            items: { isValid: false, misplacedItems: [{ x: 1, y: 1 }] },
             bridge: {
                 isValid: false,
                 errors: [{ x: 2, y: 2, errorCode: ErrorCode.BridgeAtEdge }],
             },
-            spawnPoint: { isValid: true, errorCode: null },
-            mode: { isValid: true, errorCode: null },
         };
 
         const result = service['getValidationErrorMessage'](validationResult);

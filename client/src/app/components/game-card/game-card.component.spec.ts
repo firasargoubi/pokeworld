@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { GameCardComponent } from './game-card.component';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 
 describe('GameCardComponent', () => {
     let component: GameCardComponent;
