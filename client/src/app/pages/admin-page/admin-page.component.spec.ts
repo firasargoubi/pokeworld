@@ -186,4 +186,92 @@ describe('AdminPageComponent', () => {
         component.navigateToMenu();
         expect(navigateSpy).toHaveBeenCalledWith(['/']);
     });
+    it('should add a message to the messages array', () => {
+        component['addMessage']('Test message', false);
+
+        expect(component.messages.length).toBe(1);
+        expect(component.messages[0].message).toBe('Test message');
+        expect(component.messages[0].isConfirmation).toBeFalse();
+    });
+
+    it('should add a confirmation message with an action', () => {
+        const action = () => {
+            return;
+        };
+
+        component['addMessage']('Confirmation message', true, action);
+
+        expect(component.messages.length).toBe(1);
+        expect(component.messages[0].message).toBe('Confirmation message');
+        expect(component.messages[0].isConfirmation).toBeTrue();
+        expect(component.messages[0].action).toBe(action);
+    });
+    it('should add a message when the error is not 404', () => {
+        const error = new HttpErrorResponse({ error: 'Server error', status: 500 });
+        component['handleNotFoundError'](error);
+        expect(component.messages.length).toBe(1);
+    });
+
+    it('should add a message and call loadGames when the error is 404', () => {
+        const error = new HttpErrorResponse({ error: 'Not Found', status: 404 });
+        const loadGamesSpy = spyOn(component, 'loadGames');
+        component['handleNotFoundError'](error);
+        expect(component.messages.length).toBe(1);
+        expect(component.messages[0].message).toBe("Ce jeu n'existe plus !");
+        expect(loadGamesSpy).toHaveBeenCalled();
+    });
+    it('should delete the game and update the games list', () => {
+        const initialGames = structuredClone(MOCK_GAMES);
+        const gameId = initialGames[0]._id;
+
+        component.games = initialGames;
+
+        gameSaveServiceSpy.deleteGame.and.returnValue(of(undefined));
+
+        component['confirmDeleteGame'](gameId);
+
+        expect(gameSaveServiceSpy.deleteGame).toHaveBeenCalledWith(gameId);
+
+        expect(component.games.length).toBe(initialGames.length - 1);
+        expect(component.games.some((game) => game._id === gameId)).toBeFalse();
+    });
+
+    it('should handle error when deleteGame fails', () => {
+        const gameId = '123';
+        const errorResponse = new HttpErrorResponse({ error: 'Delete failed', status: 500 });
+        gameSaveServiceSpy.deleteGame.and.returnValue(throwError(() => errorResponse));
+
+        component['confirmDeleteGame'](gameId);
+
+        expect(component.messages.length).toBe(1);
+    });
+    it('should remove the message and execute the action if confirmed', () => {
+        const action = jasmine.createSpy('action');
+        component.messages = [{ message: 'Test message', isConfirmation: true, action }];
+
+        component.removeMessage(0, true);
+
+        expect(component.messages.length).toBe(0);
+        expect(action).toHaveBeenCalled();
+    });
+
+    it('should remove the message without executing the action if not confirmed', () => {
+        const action = jasmine.createSpy('action');
+        component.messages = [{ message: 'Test message', isConfirmation: true, action }];
+
+        component.removeMessage(0, false);
+
+        expect(component.messages.length).toBe(0);
+        expect(action).not.toHaveBeenCalled();
+    });
+
+    it('should not execute the action if the message is not a confirmation', () => {
+        const action = jasmine.createSpy('action');
+        component.messages = [{ message: 'Test message', isConfirmation: false, action }];
+
+        component.removeMessage(0, true);
+
+        expect(component.messages.length).toBe(0);
+        expect(action).not.toHaveBeenCalled();
+    });
 });
