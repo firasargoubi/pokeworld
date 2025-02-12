@@ -8,7 +8,7 @@ import { MapData } from '@common/map-data';
 import { MapSize } from '@common/map-size.enum';
 import { TileType } from '@common/tile-type.enum';
 import { GameValidationService } from './game-validation.service';
-import { VALIDATION_TESTS_CASES } from './validation-tests-cases.spec';
+import { VALIDATION_TESTS_CASES } from './game-validation.const.spec';
 
 describe('GameValidationService', () => {
     let service: GameValidationService;

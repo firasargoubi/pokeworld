@@ -15,15 +15,13 @@ import { MapSize } from '@common/map-size.enum';
 export class CreateGamePopupComponent {
     gameMode: keyof typeof GameMode = 'FFA';
     mapSize: keyof typeof MapSize = 'Small';
-
     gameDataService: GameDataService = inject(GameDataService);
+    router: Router = inject(Router);
 
     possibleModes = Object.entries(GameMode).map(([key, value]) => ({ key, value }));
     possibleSizes = Object.entries(MapSize)
         .filter(([, value]) => typeof value === 'number')
         .map(([key, value]) => ({ key, value: value as number }));
-
-    constructor(private router: Router) {}
 
     onSizeSelection(sizeKey: string) {
         this.mapSize = sizeKey as keyof typeof MapSize;
