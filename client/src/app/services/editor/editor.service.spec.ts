@@ -6,8 +6,10 @@ import { ValidationResult } from '@app/interfaces/game-validation-result';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
+import { GameMode } from '@common/game-mode.enum';
+import { MapSize } from '@common/map-size.enum';
 import { TileType } from '@common/tile-type.enum';
-import { of, Subject, throwError } from 'rxjs'; // Ajouter Subject
+import { of, Subject, throwError } from 'rxjs';
 import { EditorService } from './editor.service';
 
 describe('EditorService', () => {
@@ -16,6 +18,7 @@ describe('EditorService', () => {
     let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
     let gameDataServiceSpy: jasmine.SpyObj<GameDataService>;
     let routerSpy: jasmine.SpyObj<Router>;
+
     const mockValidationResult: ValidationResult = {
         name: { isValid: true, errorCode: null },
         description: { isValid: true, errorCode: null },
@@ -46,6 +49,9 @@ describe('EditorService', () => {
         gameSaveServiceSpy.isNameUnique.and.returnValue(of(true));
         gameSaveServiceSpy.saveGame.and.returnValue(of(MOCK_GAMES[0]));
         gameDataServiceSpy.isMapValid.and.returnValue(true);
+        gameDataServiceSpy.getMapSize.and.returnValue(MapSize.Small);
+        gameDataServiceSpy.getGameMode.and.returnValue(GameMode.CTF);
+        gameDataServiceSpy.getItemCount.and.returnValue(0);
 
         TestBed.configureTestingModule({
             providers: [
@@ -59,6 +65,11 @@ describe('EditorService', () => {
 
         service = TestBed.inject(EditorService);
     });
+
+    it('should create', () => {
+        expect(service).toBeTruthy();
+    });
+
     it('should add messages correctly', () => {
         service.addMessage('Test error', false);
         expect(service.messages.length).toBe(1);
@@ -73,6 +84,7 @@ describe('EditorService', () => {
         expect(service.messages.length).toBe(0);
         expect(action).toHaveBeenCalled();
     });
+
     it('should handle validation errors', () => {
         const mockErrors: ValidationResult = {
             name: { isValid: false, errorCode: ErrorCode.TooLong },
@@ -112,6 +124,7 @@ describe('EditorService', () => {
 
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
     });
+
     it('should handle save errors', () => {
         const error = new Error('Save failed');
         gameSaveServiceSpy.saveGame.and.returnValue(throwError(() => error));
@@ -142,6 +155,7 @@ describe('EditorService', () => {
         expect(result).toContain('Problème de pont');
         expect(result).toContain('dépasse la longueur maximale');
     });
+
     it('should prevent item placement on invalid tiles', () => {
         gameDataServiceSpy.getTileFromPosition.and.returnValue(TileType.Water);
         const eventProp = { tilePosition: { x: 0, y: 0 } };

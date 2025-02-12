@@ -61,6 +61,9 @@ $base-size: 0.2vw;
         text-wrap: wrap;
     }
 }
+#confirm {
+    z-index: 1;
+}
 #content {
     white-space: pre;
     text-align: left;
