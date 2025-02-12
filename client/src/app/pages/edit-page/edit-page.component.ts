@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MapComponent } from '@app/components/map/map.component';
 import { HeaderComponent } from '@app/components/header/header.component';
@@ -11,6 +11,10 @@ import { ItemComponent } from '@app/components/item/item.component';
     styleUrls: ['./edit-page.component.scss'],
     imports: [HeaderComponent, MapComponent, FormsModule, ItemComponent],
 })
-export class EditPageComponent {
+export class EditPageComponent implements OnInit {
     editorService: EditorService = inject(EditorService);
+
+    ngOnInit() {
+        this.editorService.initialGameData = structuredClone(this.editorService.gameDataService.gameData);
+    }
 }

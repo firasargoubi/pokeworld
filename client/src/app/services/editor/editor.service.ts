@@ -12,6 +12,7 @@ import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import { DEFAULT_EDITOR_TILES, EDITOR_ERASE_TILE, ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from './editor.service.const';
 import { EventProperty } from '@app/interfaces/event-property';
+import { GameData } from '@common/game-data';
 
 @Injectable({
     providedIn: 'root',
@@ -20,6 +21,7 @@ export class EditorService {
     router: Router = inject(Router);
     gameDataService: GameDataService = inject(GameDataService);
     editorData: EditorData = this.getEditorData();
+    initialGameData: GameData;
     private gameValidationService: GameValidationService = inject(GameValidationService);
     private gameSaveService: GameSaveService = inject(GameSaveService);
 
@@ -45,7 +47,8 @@ export class EditorService {
     }
 
     resetButton(): void {
-        return;
+        const oldGameData = structuredClone(this.initialGameData);
+        this.gameDataService.setGameData(oldGameData);
     }
 
     onMouseDown(event: MouseEvent): void {
@@ -123,6 +126,7 @@ export class EditorService {
     }
 
     private saveGame(): void {
+        this.gameDataService.gameData.isVisible = false;
         this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe({
             next: () => {
                 window.console.log(`Le jeu "${this.gameDataService.gameData.name}" a été sauvegardé avec succès.`);
