@@ -1,8 +1,11 @@
 <div
     class="editor-page"
+    [class.grab]="editorService.editorData.activeItem"
+    [style.--size]="editorService.gameDataService.gameData.mapData.size"
     (mousedown)="editorService.onMouseDown($event)"
     (contextmenu)="editorService.onRightClick($event)"
     (mouseup)="editorService.onMouseUp($event)"
+    (mouseleave)="editorService.onMouseUp($event)"
     (mousemove)="editorService.onMouseMove($event)"
     (mouseover)="editorService.onMouseOver($event)"
 >
@@ -11,45 +14,56 @@
     <main>
         <div class="editor-left">
             <div class="left-label">Nom</div>
-            <input class="input-name" type="text" maxlength="32" [(ngModel)]="editorService.gameDataService.gameData.name" />
+            <input
+                class="input-name" type="text" autocomplete="false" maxlength="20"
+                [(ngModel)]="editorService.gameDataService.gameData.name"
+            >
             <div class="left-label-small">Description</div>
-            <div class="input-description" contenteditable="true" spellcheck="false">{{ editorService.gameDataService.getDescription() }}</div>
+            <textarea
+                class="input-description" autocomplete="false" maxlength="350" spellcheck="false"
+                [(ngModel)]="editorService.gameDataService.gameData.description"
+            ></textarea>
             <div class="left-label-medium">Taille : {{ editorService.gameDataService.getMapSizeString() }}</div>
             <div class="left-label-medium">Mode : {{ editorService.gameDataService.getGameModeString() }}</div>
-            <!-- TODO changer pour pokemon button  -->
             <button (click)="editorService.saveButton()" class="save-button">Sauvegarder</button>
             <button (click)="editorService.resetButton()" class="reset-button">Réinitialiser</button>
         </div>
         <div class="editor-center">
-            <app-board></app-board>
-            <div class="error-message">{{ editorService.editorData.errorMessage }}</div>
+            <app-map></app-map>
         </div>
         <div class="editor-right">
             <div class="tool-square">
                 <div class="tile-grid">
                     @for (tileData of editorService.editorData.tiles; track tileData) {
-                    <div class="grid-square" [attr.tile]="tileData.tile" [class.active]="tileData.isActive">
-                        <div class="tool">
-                            <div class="tool-image" [style.backgroundImage]="'url(' + tileData.image + ')'"></div>
+                        <div class="grid-square" [attr.tile]="tileData.tile" [class.active]="tileData.isActive">
+                            <div class="tool">
+                                <div class="tool-image" [style.backgroundImage]="'url(' + tileData.image + ')'"></div>
+                            </div>
+                            <div class="tool-description" [innerHTML]="tileData.description"></div>
                         </div>
-                    </div>
                     }
                 </div>
             </div>
             <div class="tool-square">
                 <div class="item-grid">
                     @for (itemData of editorService.editorData.items; track itemData) {
-                    <div class="grid-square" [attr.item]="itemData.item" [class.grayed]="itemData.count === 0">
-                        <div class="tool">
-                            <div class="tool-image" [style.backgroundImage]="'url(' + itemData.image + ')'"></div>
-                            @if (itemData.count > 0) {
-                            <div class="tool-count">{{ itemData.count }}</div>
-                            }
+                        <div class="grid-square" [class.grayed]="itemData.count === 0">
+                            <div class="tool">
+                                <app-item [itemType]="itemData.item"></app-item>
+                                @if (itemData.count > 0) {
+                                    <div class="tool-count">{{ itemData.count }}</div>
+                                }
+                            </div>
                         </div>
-                    </div>
                     }
                 </div>
             </div>
         </div>
     </main>
+
+    <div class="grab-item"
+        [style.top.px]="editorService.editorData.activeItemPosition.y"
+        [style.left.px]="editorService.editorData.activeItemPosition.x"
+        [style.backgroundImage]="'url(' + editorService.editorData.activeItemImage + ')'"
+    ></div>
 </div>

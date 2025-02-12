@@ -1,20 +1,20 @@
-// TODO add tests for board component
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BoardComponent } from '@app/components/board/board.component';
+import { ItemComponent } from '@app/components/item/item.component';
 
-describe('BoardComponent', () => {
-    let component: BoardComponent;
-    let fixture: ComponentFixture<BoardComponent>;
+// TODO tests
+
+describe('ItemComponent', () => {
+    let component: ItemComponent;
+    let fixture: ComponentFixture<ItemComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [BoardComponent],
+            imports: [ItemComponent],
         }).compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(BoardComponent);
+        fixture = TestBed.createComponent(ItemComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

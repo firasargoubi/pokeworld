@@ -1,0 +1,74 @@
+$map-size: calc(41.25vh + min(min((100vw - 82.5vh)* 0.5 - 6.72vh, 39.15vh)* 2 + 4.2vh)* 0.5);
+
+.item-container {
+    pointer-events: all;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.item-image {
+    pointer-events: none;
+    grid-row: 1;
+    grid-column: 1;
+    margin: 12.5%;
+    width: 75%;
+    height: 75%;
+    border-radius: 8%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+::ng-deep .grayed .item-image {
+    filter: grayscale(1);
+}
+
+.item-description {
+    pointer-events: none;
+    display: none;
+    position: absolute;
+    z-index: 999;
+    grid-row: 1;
+    grid-column: 1;
+    width: calc($map-size * 0.16 * 1.815);
+    height: calc($map-size * 0.16);
+    margin-top: calc($map-size * -0.295);
+    margin-left: calc($map-size * 0.16 * 1.815 * -0.29);
+    font-size: calc($map-size * 0.029);
+    padding: calc($map-size * 0.014);
+    background: url('/assets/images/menu/containers/description-container.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    text-align: center;
+    color: black;
+    text-transform: none;
+    white-space: normal;
+}
+
+::ng-deep .map .item-description {
+    margin-top: calc($map-size * -0.263);
+    margin-left: calc($map-size * 0.16 * 1.815 * -0.33);
+}
+
+::ng-deep .map .item-image {
+    margin: 0%;
+    width: 100%;
+    height: 100%;
+}
+
+.item-container:hover .item-description,
+::ng-deep .grid-square:hover .item-description {
+    display: block;
+}
+
+::ng-deep .grab .item-description,
+::ng-deep .grab .grid-square:hover .item-description {
+    display: none;
+}
+
+::ng-deep .grab .item-container,
+::ng-deep .grab .grid-square:hover .item-container {
+    pointer-events: none;
+}

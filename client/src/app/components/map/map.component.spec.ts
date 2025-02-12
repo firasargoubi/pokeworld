@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayPageComponent } from './play-page.component';
+import { MapComponent } from '@app/components/map/map.component';
 
-describe('PlayPageComponent', () => {
-    let component: PlayPageComponent;
-    let fixture: ComponentFixture<PlayPageComponent>;
+describe('MapComponent', () => {
+    let component: MapComponent;
+    let fixture: ComponentFixture<MapComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [PlayPageComponent],
+            imports: [MapComponent],
         }).compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(PlayPageComponent);
+        fixture = TestBed.createComponent(MapComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

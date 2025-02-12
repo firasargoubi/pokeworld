@@ -1,7 +1,7 @@
 <div [ngClass]="['card-global-container', cardColor]">
     <div class="card-description" [ngClass]="{ hovered: isHovered }" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
         <div class="card-description-body">
-            <img src="/assets/images/menu/containers/description/battlePlayerSafari.png" />
+            <img src="/assets/images/menu/containers/description/battle-player-safari.png" />
             <p class="description">
                 {{ game.description }}
             </p>
@@ -36,20 +36,20 @@
                                 [src]="
                                     game.isVisible
                                         ? '/assets/images/menu/buttons/admin-button/eye.png'
-                                        : '/assets/images/menu/buttons/admin-button/closedEye.png'
+                                        : '/assets/images/menu/buttons/admin-button/closed-eye.png'
                                 "
                                 class="button-icon"
                             />
-                            <img src="/assets/images/menu/buttons/admin-button/greenBackgroundHighlight.png" class="button-container" />
+                            <img src="/assets/images/menu/buttons/admin-button/green-background-highlight.png" class="button-container" />
                         </div>
                         <div class="card-button" (click)="onEdit()">
                             <img src="/assets/images/menu/buttons/admin-button/pen.png" class="button-icon" />
-                            <img src="/assets/images/menu/buttons/admin-button/blueBackgroundHighlight.png" class="button-container" />
+                            <img src="/assets/images/menu/buttons/admin-button/blue-background-highlight.png" class="button-container" />
                         </div>
 
                         <div class="card-button" (click)="onDelete()">
                             <img src="/assets/images/menu/buttons/admin-button/bin.png" class="button-icon" />
-                            <img src="/assets/images/menu/buttons/admin-button/redBackgroundHighlight.png" class="button-container" />
+                            <img src="/assets/images/menu/buttons/admin-button/red-background-highlight.png" class="button-container" />
                         </div>
                     </div>
                     } @else {

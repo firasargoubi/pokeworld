@@ -6,15 +6,15 @@
         <div id="admin-page-body" [ngStyle]="{ 'overflow-y': isCreationMode ? 'hidden' : 'auto' }">
             <div id="game-grid">
                 @for(game of games; let i = $index; track game._id) {
-                <app-game-card
-                    [game]="game"
-                    [isAdminView]="true"
-                    [cardColor]="getCardColor(i)"
-                    (edit)="editGame($event)"
-                    (delete)="deleteGame($event)"
-                    (toggleVisibility)="toggleVisibility($event)"
-                >
-                </app-game-card>
+                    <app-game-card
+                        [game]="game"
+                        [isAdminView]="true"
+                        [cardColor]="getCardColor(i)"
+                        (edit)="editGame($event)"
+                        (delete)="deleteGame($event)"
+                        (toggleVisibility)="toggleVisibility($event)"
+                    >
+                    </app-game-card>
                 }
             </div>
             <div id="creation-game-popup" (click)="onCreateGame()" [ngStyle]="{ display: isCreationMode ? 'block' : 'none' }">

@@ -1,10 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { ThumbnailService } from '@app/services/thumbnail/thumbnail-service';
-import { GameData } from '@common/game-data';
-import { GameMode } from '@common/game-mode.enum';
-import { MapSize } from '@common/map-size.enum';
+import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { GameCardComponent } from './game-card.component';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 
 describe('GameCardComponent', () => {
     let component: GameCardComponent;
@@ -22,22 +20,8 @@ describe('GameCardComponent', () => {
 
         fixture = TestBed.createComponent(GameCardComponent);
         component = fixture.componentInstance;
+        component.game = structuredClone(MOCK_GAMES[0]);
         thumbnailServiceSpy = TestBed.inject(ThumbnailService) as jasmine.SpyObj<ThumbnailService>;
-    });
-
-    beforeEach(() => {
-        fixture = TestBed.createComponent(GameCardComponent);
-        component = fixture.componentInstance;
-
-        component.game = {
-            _id: '1',
-            name: 'Test Game',
-            description: 'A test game description',
-            mapData: { size: MapSize.Medium, gameMode: GameMode.FFA },
-            lastEdited: new Date(),
-            isVisible: true,
-        } as GameData;
-
         fixture.detectChanges();
     });
 
@@ -48,14 +32,14 @@ describe('GameCardComponent', () => {
     it('should emit edit event when onEdit is called', () => {
         spyOn(component.edit, 'emit');
         component.onEdit();
-        expect(component.edit.emit).toHaveBeenCalledWith('1');
+        expect(component.edit.emit).toHaveBeenCalledWith(MOCK_GAMES[0]._id);
     });
 
     it('should emit delete event when onDelete is confirmed', () => {
         spyOn(window, 'confirm').and.returnValue(true);
         spyOn(component.delete, 'emit');
         component.onDelete();
-        expect(component.delete.emit).toHaveBeenCalledWith('1');
+        expect(component.delete.emit).toHaveBeenCalledWith(MOCK_GAMES[0]._id);
     });
 
     it('should not emit delete event when onDelete is canceled', () => {
@@ -68,14 +52,14 @@ describe('GameCardComponent', () => {
     it('should toggle visibility and emit event when onToggleVisibility is called', () => {
         spyOn(component.toggleVisibility, 'emit');
         component.onToggleVisibility();
-        expect(component.toggleVisibility.emit).toHaveBeenCalledWith({ id: '1', isVisible: true });
+        expect(component.toggleVisibility.emit).toHaveBeenCalledWith({ id: MOCK_GAMES[0]._id, isVisible: MOCK_GAMES[0].isVisible });
         expect(component.game.isVisible).toBeFalse();
     });
 
     it('should emit join event when onJoin is called', () => {
         spyOn(component.join, 'emit');
         component.onJoin();
-        expect(component.join.emit).toHaveBeenCalledWith('1');
+        expect(component.join.emit).toHaveBeenCalledWith(MOCK_GAMES[0]._id);
     });
 
     it('should set isHovered to true onMouseEnter', () => {
@@ -88,17 +72,17 @@ describe('GameCardComponent', () => {
         expect(component.isHovered).toBeFalse();
     });
 
-    // TODO:Corriger ce TEST
     it('should format date correctly', () => {
-        // const testDate = '2023-06-15T14:30:00Z';
-        // const formattedDate = component.formatDate(testDate);
-        // expect(formattedDate).toBe('15/06/2023 10:30');
+        const testDate = new Date('2023-06-15T14:30:00Z');
+        const resultDate = component.formatDate(testDate);
+        const expectedDate = testDate.toLocaleDateString() + ' ' + testDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        expect(resultDate).toBe(expectedDate);
     });
 
     it('should apply correct class for game mode', () => {
         fixture.detectChanges();
         const modeElement = fixture.debugElement.query(By.css('.mode-name'));
-        expect(modeElement.nativeElement.textContent.trim()).toBe(GameMode.FFA);
+        expect(modeElement.nativeElement.textContent.trim()).toBe(MOCK_GAMES[0].mapData.gameMode);
     });
 
     it('should display edition-buttons only when isAdminView is true', () => {

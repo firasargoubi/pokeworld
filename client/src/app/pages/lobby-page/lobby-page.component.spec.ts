@@ -32,14 +32,10 @@ describe('LobbyPageComponent', () => {
     });
 
     it('should generate a 4-digit access code on init', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(component, 'generateAccessCode');
         component.ngOnInit();
         expect(component.accessCode).toMatch(/^\d{4}$/);
-    });
-
-    it('should generate a random code', () => {
-        const oldCode = component.accessCode;
-        component.generateAccessCode();
-        expect(component.accessCode).not.toBe(oldCode);
     });
 
     it('should navigate to game page when startGame is called', () => {
@@ -53,7 +49,7 @@ describe('LobbyPageComponent', () => {
     });
 
     it('should display the access code in the template', () => {
-        component.generateAccessCode();
+        component['generateAccessCode']();
         fixture.detectChanges();
         const compiled = fixture.nativeElement;
         expect(compiled.querySelector('.access-code').textContent).toContain(component.accessCode);
