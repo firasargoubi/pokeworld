@@ -15,44 +15,38 @@ export const ITEM_DESCRIPTION: Map<ItemType, string> = new Map([
     [ItemType.Flag, '<b>Drapeau</b>Objectif de capture de CTF'],
 ]);
 
-export const MAX_ITEM_COUNT: Map<MapSize, Map<ItemType, number>> = new Map([
-    [
-        MapSize.Small,
-        new Map([
-            [ItemType.Item1, 1],
-            [ItemType.Item2, 1],
-            [ItemType.Item3, 1],
-            [ItemType.Item4, 1],
-            [ItemType.Item5, 1],
-            [ItemType.Item6, 1],
-            [ItemType.Random, 2],
-            [ItemType.Spawn, 2],
-        ]),
-    ],
-    [
-        MapSize.Medium,
-        new Map([
-            [ItemType.Item1, 1],
-            [ItemType.Item2, 1],
-            [ItemType.Item3, 1],
-            [ItemType.Item4, 1],
-            [ItemType.Item5, 1],
-            [ItemType.Item6, 1],
-            [ItemType.Random, 4],
-            [ItemType.Spawn, 4],
-        ]),
-    ],
-    [
-        MapSize.Large,
-        new Map([
-            [ItemType.Item1, 1],
-            [ItemType.Item2, 1],
-            [ItemType.Item3, 1],
-            [ItemType.Item4, 1],
-            [ItemType.Item5, 1],
-            [ItemType.Item6, 1],
-            [ItemType.Random, 6],
-            [ItemType.Spawn, 6],
-        ]),
-    ],
-]);
+export const MAX_ITEM_COUNT: Record<MapSize, Record<ItemType, number>> = {
+    [MapSize.Small]: {
+        [ItemType.Item1]: 1,
+        [ItemType.Item2]: 1,
+        [ItemType.Item3]: 1,
+        [ItemType.Item4]: 1,
+        [ItemType.Item5]: 1,
+        [ItemType.Item6]: 1,
+        [ItemType.Random]: 2,
+        [ItemType.Spawn]: 2,
+        [ItemType.Flag]: 0,
+    },
+    [MapSize.Medium]: {
+        [ItemType.Item1]: 1,
+        [ItemType.Item2]: 1,
+        [ItemType.Item3]: 1,
+        [ItemType.Item4]: 1,
+        [ItemType.Item5]: 1,
+        [ItemType.Item6]: 1,
+        [ItemType.Random]: 4,
+        [ItemType.Spawn]: 4,
+        [ItemType.Flag]: 0,
+    },
+    [MapSize.Large]: {
+        [ItemType.Item1]: 1,
+        [ItemType.Item2]: 1,
+        [ItemType.Item3]: 1,
+        [ItemType.Item4]: 1,
+        [ItemType.Item5]: 1,
+        [ItemType.Item6]: 1,
+        [ItemType.Random]: 6,
+        [ItemType.Spawn]: 6,
+        [ItemType.Flag]: 0,
+    },
+};

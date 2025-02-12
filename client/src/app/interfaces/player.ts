@@ -1,6 +1,6 @@
 import { Avatars } from './avatars.enum';
 
-interface Player {
+export interface Player {
     name: string;
     avatar: Avatars;
     life: number;
@@ -11,14 +11,3 @@ interface Player {
     movement: number;
     action: number;
 }
-
-type PointStat = 'life' | 'speed' | 'attack' | 'defense';
-
-const statFrench = {
-    life: 'vie',
-    speed: 'vitesse',
-    attack: 'attaque',
-    defense: 'defense',
-};
-
-export { Player, PointStat, statFrench };

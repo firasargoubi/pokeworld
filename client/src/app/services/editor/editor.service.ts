@@ -25,10 +25,12 @@ export class EditorService {
     private gameValidationService: GameValidationService = inject(GameValidationService);
     private gameSaveService: GameSaveService = inject(GameSaveService);
 
+    // TODO
     redirectToAdminPage(): void {
         this.router.navigate(['/admin']);
     }
 
+    // TODO
     saveButton(): void {
         const validationResult = this.gameValidationService.validateGame(this.gameDataService.gameData);
 
@@ -46,6 +48,7 @@ export class EditorService {
         });
     }
 
+    // TODO
     resetButton(): void {
         const oldGameData = structuredClone(this.initialGameData);
         this.gameDataService.setGameData(oldGameData);
@@ -340,7 +343,7 @@ export class EditorService {
             }
         }
 
-        let maxItemCount = MAX_ITEM_COUNT.get(this.gameDataService.getMapSize())?.get(item) as number;
+        let maxItemCount = MAX_ITEM_COUNT[this.gameDataService.getMapSize()][item];
 
         if (SHARED_ITEM_POOL.includes(item)) {
             const maxSharedItemCount = this.getMaxSharedItemCount(item);
@@ -380,7 +383,7 @@ export class EditorService {
             }
         });
 
-        const highestMaxItemCount = MAX_ITEM_COUNT.get(this.gameDataService.getMapSize())?.get(ITEM_POOL_HIGHEST_ITEM) as number;
+        const highestMaxItemCount = MAX_ITEM_COUNT[this.gameDataService.getMapSize()][ITEM_POOL_HIGHEST_ITEM];
 
         return highestMaxItemCount - sharedCount;
     }

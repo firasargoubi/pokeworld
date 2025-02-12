@@ -172,7 +172,7 @@ $green-active-inner-border-color: rgb(122, 151, 101) rgb(179, 246, 168) rgb(179,
 .container:active .pokeball-open,
 .container .active-pokeball .pokeball-open {
     opacity: 1;
-    animation: none !important;
+    animation: none;
 }
 
 .container:active .pokeball-close,

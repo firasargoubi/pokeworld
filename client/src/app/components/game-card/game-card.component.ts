@@ -32,8 +32,10 @@ export class GameCardComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.thumbnailService.getThumbnail(this.game.mapData).then((url) => {
-            this.thumbnailUrl = url;
+        requestIdleCallback(() => {
+            this.thumbnailService.getThumbnail(this.game.mapData).then((url) => {
+                this.thumbnailUrl = url;
+            });
         });
     }
 
