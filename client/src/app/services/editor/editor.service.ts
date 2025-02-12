@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
 import { ITEM_DESCRIPTION, MAX_ITEM_COUNT } from '@app/consts/items.const';
 import { EditorData, EditorItem } from '@app/interfaces/editor-data';
+import { EventProperty } from '@app/interfaces/event-property';
+import { BridgeValidationError, ValidationResult, ValidationStatus } from '@app/interfaces/game-validation-result';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
@@ -11,19 +13,36 @@ import { ItemType } from '@common/item-type.enum';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import { DEFAULT_EDITOR_TILES, EDITOR_ERASE_TILE, ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from './editor.service.const';
-import { EventProperty } from '@app/interfaces/event-property';
+
+interface PopupMessage {
+    message: string;
+    isConfirmation: boolean;
+    action?: () => void;
+}
 
 @Injectable({
     providedIn: 'root',
 })
 export class EditorService {
+    messages: PopupMessage[] = [];
     router: Router = inject(Router);
     gameDataService: GameDataService = inject(GameDataService);
     editorData: EditorData = this.getEditorData();
     private gameValidationService: GameValidationService = inject(GameValidationService);
     private gameSaveService: GameSaveService = inject(GameSaveService);
 
-    // TODO
+    addMessage(message: string, isConfirmation: boolean, action?: () => void) {
+        this.messages.push({ message, isConfirmation, action });
+    }
+
+    removeMessage(index: number, confirmed: boolean) {
+        const message = this.messages[index];
+        if (message.isConfirmation && confirmed && message.action) {
+            message.action();
+        }
+        this.messages.splice(index, 1);
+    }
+
     redirectToAdminPage(): void {
         this.router.navigate(['/admin']);
     }
@@ -33,16 +52,20 @@ export class EditorService {
         const validationResult = this.gameValidationService.validateGame(this.gameDataService.gameData);
 
         if (validationResult) {
-            window.console.log('Erreur de validation du jeu:', validationResult);
+            const errorMessage = this.getValidationErrorMessage(validationResult);
+            this.addMessage(errorMessage, false);
             return;
         }
 
         this.gameSaveService.isNameUnique(this.gameDataService.gameData.name, this.gameDataService.gameData._id).subscribe((isUnique) => {
             if (!isUnique) {
-                window.console.log('Le nom est déjà utilisé. Veuillez en choisir un autre.');
+                this.addMessage('Le nom est déjà utilisé. Veuillez en choisir un autre.', false);
                 return;
             }
+            this.gameDataService.gameData.isVisible = false;
+            this.gameDataService.gameData.lastEdited = new Date();
             this.saveGame();
+            this.redirectToAdminPage();
         });
     }
 
@@ -101,7 +124,28 @@ export class EditorService {
 
         this.paintTile(eventProperty.tilePosition);
     }
+    private getValidationErrorMessage(validationResult: ValidationResult): string {
+        const errors: string[] = [];
 
+        for (const [key, value] of Object.entries(validationResult)) {
+            if (key === 'terrainCoverage' && !value.isValid) {
+                errors.push(`  - Couverture du terrain insuffisante (${value.coveragePercentage}%)`);
+            } else if (key === 'tilesAccessibility' && !value.isValid) {
+                errors.push(`  - ${value.nonAccessibleTileCount} tuiles inaccessibles`);
+            } else if (key === 'items' && !value.isValid) {
+                errors.push(`  - ${value.misplacedItems.length} objets mal placés`);
+            } else if (key === 'bridge' && !value.isValid) {
+                value.errors.forEach((error: BridgeValidationError) => {
+                    errors.push(`  - Problème de pont en [${error.x},${error.y}]: ${error.errorCode}`);
+                });
+            } else if (typeof value === 'object' && value !== null && 'isValid' in value && !value.isValid) {
+                const errorMessage: ValidationStatus = value;
+                errors.push(`  - ${key}: ${errorMessage.errorCode}`);
+            }
+        }
+
+        return errors.length > 0 ? 'Erreurs de validation :\n' + errors.join('\n') : 'Aucune erreur de validation';
+    }
     private getEventProperty(event: Event): EventProperty {
         const target = event.target as HTMLElement;
         const tileXString = target.getAttribute('x');
@@ -127,11 +171,8 @@ export class EditorService {
 
     private saveGame(): void {
         this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe({
-            next: () => {
-                window.console.log(`Le jeu "${this.gameDataService.gameData.name}" a été sauvegardé avec succès.`);
-            },
             error: (error) => {
-                window.console.error('Erreur lors de la sauvegarde du jeu:', error);
+                this.addMessage('Erreur lors de la sauvegarde du jeu: ' + error, false);
             },
         });
     }

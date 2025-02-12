@@ -1,0 +1,17 @@
+<div id="warning-popup">
+    <div id="warning-details">
+        <p id="content">{{ message }}</p>
+        <div id="buttons">
+            @if(isConfirmation){
+            <div class="card-button" id="confirm" (click)="onConfirm()">
+                <p class="button-confirm">&#10004;</p>
+                <img src="/assets/images/menu/buttons/admin-button/green-background-highlight.png" class="button-container" />
+            </div>
+            }
+            <div class="card-button" id="dismiss" (click)="onCancel()">
+                <p class="button-cross">X</p>
+                <img src="/assets/images/menu/buttons/admin-button/red-background-highlight.png" class="button-container" />
+            </div>
+        </div>
+    </div>
+</div>

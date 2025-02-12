@@ -14,13 +14,13 @@
     <main>
         <div class="editor-left">
             <div class="left-label">Nom</div>
-            <input
-                class="input-name" type="text" autocomplete="false" maxlength="20"
-                [(ngModel)]="editorService.gameDataService.gameData.name"
-            >
+            <input class="input-name" type="text" autocomplete="false" maxlength="20" [(ngModel)]="editorService.gameDataService.gameData.name" />
             <div class="left-label-small">Description</div>
             <textarea
-                class="input-description" autocomplete="false" maxlength="350" spellcheck="false"
+                class="input-description"
+                autocomplete="false"
+                maxlength="350"
+                spellcheck="false"
                 [(ngModel)]="editorService.gameDataService.gameData.description"
             ></textarea>
             <div class="left-label-medium">Taille : {{ editorService.gameDataService.getMapSizeString() }}</div>
@@ -35,35 +35,49 @@
             <div class="tool-square">
                 <div class="tile-grid">
                     @for (tileData of editorService.editorData.tiles; track tileData) {
-                        <div class="grid-square" [attr.tile]="tileData.tile" [class.active]="tileData.isActive">
-                            <div class="tool">
-                                <div class="tool-image" [style.backgroundImage]="'url(' + tileData.image + ')'"></div>
-                            </div>
-                            <div class="tool-description" [innerHTML]="tileData.description"></div>
+                    <div class="grid-square" [attr.tile]="tileData.tile" [class.active]="tileData.isActive">
+                        <div class="tool">
+                            <div class="tool-image" [style.backgroundImage]="'url(' + tileData.image + ')'"></div>
                         </div>
+                        <div class="tool-description" [innerHTML]="tileData.description"></div>
+                    </div>
                     }
                 </div>
             </div>
             <div class="tool-square">
                 <div class="item-grid">
                     @for (itemData of editorService.editorData.items; track itemData) {
-                        <div class="grid-square" [class.grayed]="itemData.count === 0">
-                            <div class="tool">
-                                <app-item [itemType]="itemData.item"></app-item>
-                                @if (itemData.count > 0) {
-                                    <div class="tool-count">{{ itemData.count }}</div>
-                                }
-                            </div>
+                    <div class="grid-square" [class.grayed]="itemData.count === 0">
+                        <div class="tool">
+                            <app-item [itemType]="itemData.item"></app-item>
+                            @if (itemData.count > 0) {
+                            <div class="tool-count">{{ itemData.count }}</div>
+                            }
                         </div>
+                    </div>
                     }
                 </div>
             </div>
         </div>
     </main>
 
-    <div class="grab-item"
+    <div
+        class="grab-item"
         [style.top.px]="editorService.editorData.activeItemPosition.y"
         [style.left.px]="editorService.editorData.activeItemPosition.x"
         [style.backgroundImage]="'url(' + editorService.editorData.activeItemImage + ')'"
     ></div>
+
+    @if(editorService.messages.length > 0){
+    <div id="error-container">
+        @for(error of editorService.messages; track $index) {
+        <app-warning-confirmation-popup
+            [message]="error.message"
+            (closed)="editorService.removeMessage($index, $event)"
+            [isConfirmation]="error.isConfirmation"
+        >
+        </app-warning-confirmation-popup>
+        }
+    </div>
+    }
 </div>

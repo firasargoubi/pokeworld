@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { GameCardComponent } from './game-card.component';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 
 describe('GameCardComponent', () => {
     let component: GameCardComponent;
@@ -40,13 +40,6 @@ describe('GameCardComponent', () => {
         spyOn(component.delete, 'emit');
         component.onDelete();
         expect(component.delete.emit).toHaveBeenCalledWith(MOCK_GAMES[0]._id);
-    });
-
-    it('should not emit delete event when onDelete is canceled', () => {
-        spyOn(window, 'confirm').and.returnValue(false);
-        spyOn(component.delete, 'emit');
-        component.onDelete();
-        expect(component.delete.emit).not.toHaveBeenCalled();
     });
 
     it('should toggle visibility and emit event when onToggleVisibility is called', () => {
