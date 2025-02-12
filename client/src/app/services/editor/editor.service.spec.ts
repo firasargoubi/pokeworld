@@ -11,6 +11,7 @@ import { MapSize } from '@common/map-size.enum';
 import { TileType } from '@common/tile-type.enum';
 import { of, Subject, throwError } from 'rxjs';
 import { EditorService } from './editor.service';
+import { GameData } from '@common/game-data';
 
 describe('EditorService', () => {
     let service: EditorService;
@@ -18,6 +19,7 @@ describe('EditorService', () => {
     let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
     let gameDataServiceSpy: jasmine.SpyObj<GameDataService>;
     let routerSpy: jasmine.SpyObj<Router>;
+    let mockGames: GameData[];
 
     const mockValidationResult: ValidationResult = {
         name: { isValid: true, errorCode: null },
@@ -37,7 +39,7 @@ describe('EditorService', () => {
         gameSaveServiceSpy = jasmine.createSpyObj('GameSaveService', ['isNameUnique', 'saveGame']);
         gameDataServiceSpy = jasmine.createSpyObj(
             'GameDataService',
-            ['getTileFromPosition', 'addItem', 'isMapValid', 'getItemCount', 'getMapSize', 'getGameMode'],
+            ['getTileFromPosition', 'addItem', 'isMapValid', 'getItemCount', 'getMapSize', 'getGameMode', 'setGameData'],
             {
                 itemUpdate: itemUpdateSubject.asObservable(),
             },
@@ -64,6 +66,7 @@ describe('EditorService', () => {
         });
 
         service = TestBed.inject(EditorService);
+        mockGames = structuredClone(MOCK_GAMES);
     });
 
     it('should create', () => {
@@ -147,5 +150,24 @@ describe('EditorService', () => {
         service['dropItem'](eventProp as any);
 
         expect(gameDataServiceSpy.addItem).not.toHaveBeenCalled();
+    });
+
+    it('should reset game data when resetButton is called', () => {
+        service.initialGameData = mockGames[0];
+        gameDataServiceSpy.gameData = mockGames[1];
+
+        service.resetButton();
+
+        expect(gameDataServiceSpy.setGameData).toHaveBeenCalledWith(service.initialGameData);
+        expect(gameDataServiceSpy.setGameData.calls.mostRecent().args[0]).toEqual(service.initialGameData);
+    });
+
+    it('should not refer to the same object for initialGameData and gameData after resetButton is called', () => {
+        service.initialGameData = mockGames[0];
+        gameDataServiceSpy.gameData = mockGames[1];
+
+        service.resetButton();
+
+        expect(service.gameDataService.gameData).not.toBe(service.initialGameData);
     });
 });
