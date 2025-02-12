@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { GameData } from '@common/game-data';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -9,8 +9,7 @@ import { environment } from 'src/environments/environment';
 })
 export class GameSaveService {
     private readonly baseUrl: string = environment.serverUrl;
-
-    constructor(private readonly http: HttpClient) {}
+    private readonly http: HttpClient = inject(HttpClient);
 
     getAllGames(): Observable<GameData[]> {
         return this.http.get<GameData[]>(`${this.baseUrl}/games`);

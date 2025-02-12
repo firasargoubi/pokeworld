@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ItemComponent } from '@app/components/item/item.component';
-
-// TODO tests
+import { ITEM_IMAGES } from '@app/consts/images.const';
+import { ITEM_DESCRIPTION } from '@app/consts/items.const';
+import { ItemType } from '@common/item-type.enum';
 
 describe('ItemComponent', () => {
     let component: ItemComponent;
@@ -21,5 +22,13 @@ describe('ItemComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should update description and image when itemType changes', () => {
+        component.itemType = ItemType.Item1;
+        component.ngOnChanges();
+
+        expect(component.description).toBe(ITEM_DESCRIPTION.get(ItemType.Item1) as string);
+        expect(component.image).toBe(ITEM_IMAGES.get(ItemType.Item1) as string);
     });
 });

@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
@@ -16,13 +16,10 @@ import { Router } from '@angular/router';
 })
 export class CreatePageComponent implements OnInit {
     games: GameData[] = [];
-
-    constructor(
-        private router: Router,
-        private gameSaveService: GameSaveService,
-        private snackBar: MatSnackBar,
-        private gameDataService: GameDataService,
-    ) {}
+    private router: Router = inject(Router);
+    private gameSaveService: GameSaveService = inject(GameSaveService);
+    private snackBar: MatSnackBar = inject(MatSnackBar);
+    private gameDataService: GameDataService = inject(GameDataService);
 
     navigateToMenu() {
         this.router.navigate(['/']);

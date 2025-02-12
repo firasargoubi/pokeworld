@@ -1,4 +1,3 @@
-/* tslint:disable:no-unused-variable */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 // NOT FOR SPRINT 1, TO BE UNCOMMENTED LATER (FUNCTIONAL)

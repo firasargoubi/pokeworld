@@ -4,7 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { BONUS_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player';
 import { BonusDice, DICE_PAIR, DiceType } from '@app/consts/dice';
-import { AVATAR_DATA } from '@app/interfaces/avatars';
+import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { Avatars } from '@app/interfaces/avatars.enum';
 import { PointStat, statFrench } from '@app/interfaces/player';
 

@@ -103,7 +103,13 @@ describe('GameCardComponent', () => {
         const mockThumbnailUrl = 'data:image/png;base64,mockthumbnail';
         thumbnailServiceSpy.getThumbnail.and.returnValue(Promise.resolve(mockThumbnailUrl));
 
-        await component.ngOnInit();
+        spyOn(window, 'requestIdleCallback').and.callFake((cb: IdleRequestCallback) => {
+            cb({ didTimeout: true } as IdleDeadline);
+            return 0;
+        });
+
+        component.ngOnInit();
+        await fixture.whenStable();
         fixture.detectChanges();
 
         expect(thumbnailServiceSpy.getThumbnail).toHaveBeenCalledWith(component.game.mapData);
