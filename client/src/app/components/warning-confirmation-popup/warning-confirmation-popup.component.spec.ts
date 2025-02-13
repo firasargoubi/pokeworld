@@ -36,7 +36,7 @@ describe('WarningConfirmationPopupComponent', () => {
 
         spyOn(component.closed, 'emit');
 
-        const confirmButton = fixture.debugElement.query(By.css('#confirm'));
+        const confirmButton = fixture.debugElement.query(By.css('#warning-confirm'));
         confirmButton.nativeElement.click();
 
         expect(component.closed.emit).toHaveBeenCalledWith(true);
@@ -45,7 +45,7 @@ describe('WarningConfirmationPopupComponent', () => {
     it('should emit false when cancel button is clicked', () => {
         spyOn(component.closed, 'emit');
 
-        const cancelButton = fixture.debugElement.query(By.css('#dismiss'));
+        const cancelButton = fixture.debugElement.query(By.css('#warning-dismiss'));
         cancelButton.nativeElement.click();
 
         expect(component.closed.emit).toHaveBeenCalledWith(false);
@@ -55,7 +55,7 @@ describe('WarningConfirmationPopupComponent', () => {
         component.isConfirmation = true;
         fixture.detectChanges();
 
-        const confirmButton = fixture.debugElement.query(By.css('#confirm'));
+        const confirmButton = fixture.debugElement.query(By.css('#warning-confirm'));
         expect(confirmButton).toBeTruthy();
     });
 
@@ -63,7 +63,7 @@ describe('WarningConfirmationPopupComponent', () => {
         component.isConfirmation = false;
         fixture.detectChanges();
 
-        const confirmButton = fixture.debugElement.query(By.css('#confirm'));
+        const confirmButton = fixture.debugElement.query(By.css('#warning-confirm'));
         expect(confirmButton).toBeFalsy();
     });
 });

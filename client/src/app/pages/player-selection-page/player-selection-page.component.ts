@@ -68,25 +68,9 @@ export class PlayerSelectionPageComponent {
         const avatarErrorMessage = 'Veuillez choisir un avatar';
 
         if (formField === 'name') {
-            if (!this.nameForm.valid && this.isStartClicked()) {
-                if (!this.messages.some((message) => message.message === nameErrorMessage)) {
-                    this.messages.push({ message: nameErrorMessage, isConfirmation: false });
-                }
-                return true;
-            } else {
-                this.messages = this.messages.filter((message) => message.message !== nameErrorMessage);
-                return false;
-            }
+            return this.handleWarning(!this.nameForm.valid && this.isStartClicked(), nameErrorMessage);
         } else if (formField === 'avatar') {
-            if (!this.isValidAvatarChoice() && this.isStartClicked()) {
-                if (!this.messages.some((message) => message.message === avatarErrorMessage)) {
-                    this.messages.push({ message: avatarErrorMessage, isConfirmation: false });
-                }
-                return true;
-            } else {
-                this.messages = this.messages.filter((message) => message.message !== avatarErrorMessage);
-                return false;
-            }
+            return this.handleWarning(!this.isValidAvatarChoice() && this.isStartClicked(), avatarErrorMessage);
         }
         return false;
     }
@@ -116,6 +100,26 @@ export class PlayerSelectionPageComponent {
 
     isFormValid() {
         return this.nameForm.valid && this.isValidAvatarChoice();
+    }
+
+    private handleWarning(condition: boolean, errorMessage: string): boolean {
+        if (condition) {
+            this.addMessage(errorMessage);
+            return true;
+        } else {
+            this.removeMessageByContent(errorMessage);
+            return false;
+        }
+    }
+
+    private addMessage(message: string) {
+        if (!this.messages.some((msg) => msg.message === message)) {
+            this.messages.push({ message, isConfirmation: false });
+        }
+    }
+
+    private removeMessageByContent(message: string) {
+        this.messages = this.messages.filter((msg) => msg.message !== message);
     }
 
     private isValidAvatarChoice() {

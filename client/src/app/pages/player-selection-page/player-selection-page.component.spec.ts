@@ -173,4 +173,33 @@ describe('PlayerSelectionPageComponent', () => {
         component.goToCreatPage();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/create']);
     });
+
+    it('should add message correctly', () => {
+        const message = 'Test message';
+        component['addMessage'](message);
+        expect(component.messages.some((msg) => msg.message === message)).toBeTrue();
+    });
+
+    it('should not add duplicate messages', () => {
+        const message = 'Test message';
+        component['addMessage'](message);
+        component['addMessage'](message);
+        expect(component.messages.filter((msg) => msg.message === message).length).toBe(1);
+    });
+
+    it('should remove message by content correctly', () => {
+        const message = 'Test message';
+        component['addMessage'](message);
+        component['removeMessageByContent'](message);
+        expect(component.messages.some((msg) => msg.message === message)).toBeFalse();
+    });
+
+    it('should handle warning correctly', () => {
+        const message = 'Test message';
+        component['handleWarning'](true, message);
+        expect(component.messages.some((msg) => msg.message === message)).toBeTrue();
+
+        component['handleWarning'](false, message);
+        expect(component.messages.some((msg) => msg.message === message)).toBeFalse();
+    });
 });

@@ -1,12 +1,12 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, RouterModule } from '@angular/router';
-import { CreatePageComponent } from './create-page.component';
-import { GameSaveService } from '@app/services/game-save/game-save.service';
-import { GameDataService } from '@app/services/game-data/game-data.service';
-import { GameData } from '@common/game-data';
 import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
+import { GameDataService } from '@app/services/game-data/game-data.service';
+import { GameSaveService } from '@app/services/game-save/game-save.service';
+import { GameData } from '@common/game-data';
+import { of, throwError } from 'rxjs';
+import { CreatePageComponent } from './create-page.component';
 
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
@@ -105,16 +105,6 @@ describe('CreatePageComponent', () => {
         expect(gameSaveServiceSpy.getAllGames).toHaveBeenCalled();
     });
 
-    it('should call snackBar open when handleError is called', () => {
-        const snackBarOpenSpy = spyOn(component['snackBar'], 'open');
-
-        const error = new HttpErrorResponse({ error: 'Test error', status: 500 });
-
-        component['handleError'](error);
-
-        expect(snackBarOpenSpy).toHaveBeenCalledWith(error.message, 'Close', { duration: 5000 });
-    });
-
     it('should handle error when loadGames fails', () => {
         const errorResponse = new HttpErrorResponse({ error: 'Test error', status: 500 });
         gameSaveServiceSpy.getAllGames.and.returnValue(throwError(() => errorResponse));
@@ -147,5 +137,27 @@ describe('CreatePageComponent', () => {
         component['handleNotFoundError'](errorResponse);
 
         expect(handleErrorSpy).toHaveBeenCalledWith(errorResponse);
+    });
+
+    it('should remove message correctly', () => {
+        const message = { message: 'Test message', isConfirmation: false };
+        component.messages.push(message);
+        component.removeMessage(0);
+        expect(component.messages.length).toBe(0);
+    });
+
+    it('should handle error when loadGames is called', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Test error', status: 500 });
+        gameSaveServiceSpy.getAllGames.and.returnValue(throwError(() => errorResponse));
+        component['loadGames']();
+        expect(component.messages.length).toBe(1);
+        expect(component.messages[0].message).toBe('Test error');
+    });
+
+    it('should handle error when handleNotFoundError is called', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Test error', status: HttpStatusCode.InternalServerError });
+        component['handleNotFoundError'](errorResponse);
+        expect(component.messages.length).toBe(1);
+        expect(component.messages[0].message).toBe('Test error');
     });
 });

@@ -52,13 +52,7 @@ export class CreatePageComponent implements OnInit {
         });
     }
 
-    removeMessage(index: number, confirmed: boolean) {
-        const message = this.messages[index];
-
-        if (message.isConfirmation && confirmed && message.action) {
-            message.action();
-        }
-
+    removeMessage(index: number) {
         this.messages.splice(index, 1);
     }
 
