@@ -70,6 +70,8 @@ main {
     aspect-ratio: 1/1;
     object-fit: cover;
     z-index: 1;
+    user-select: none;
+    pointer-events: none;
 }
 
 #avatar-shadow {
@@ -79,6 +81,8 @@ main {
     left: 3.5vh;
     bottom: 2.4vh;
     filter: brightness(0.7);
+    user-select: none;
+    pointer-events: none;
 }
 
 #name-form {
@@ -118,6 +122,7 @@ main {
     color: white;
     line-height: 0;
     width: 29ch;
+    user-select: none;
 }
 
 #player-stats {
@@ -197,6 +202,7 @@ main {
     text-shadow: 4px 0 0 $text-shadow-color;
     z-index: 2;
     opacity: 1;
+    user-select: none;
 }
 
 .bonus-value {
@@ -345,6 +351,8 @@ main {
     height: 150%;
     aspect-ratio: 1/1;
     object-fit: cover;
+    user-select: none;
+    pointer-events: none;
 }
 
 .warning {
@@ -380,6 +388,7 @@ main {
     background-image: url('/assets/images/menu/buttons/admin-button/red-background-highlight.png');
     background-size: 100% 100%;
     align-self: center;
+    user-select: none;
 }
 
 #page-footer .disabled {
