@@ -19,11 +19,6 @@
                         <p id="input-border">--------------------</p>
                     </span>
                 </div>
-                @if(needsWarning('name')){
-                <div class="warning">Vous devez entrer un pseudo entre 3 et 20 characteres !</div>
-                } @if(needsWarning('avatar')){
-                <div class="warning">Veuillez choisir une AVATAR !</div>
-                }
                 <div id="player-stats">
                     <div class="stat-container" title="Points de vie du personnage">
                         <span class="stat-bar-container">
@@ -89,7 +84,15 @@
     </div>
     <footer id="page-footer">
         <div class="flex-container">
-            <button type="button" class="start-btn" [ngClass]="{ disabled: isFormValid() }" (click)="goToLobby()">START GAME</button>
+            <button type="button" class="start-btn" [ngClass]="{ disabled: !isFormValid() }" (click)="goToLobby()">START GAME</button>
         </div>
     </footer>
 </div>
+@if(messages.length > 0){
+<div id="error-container">
+    @for(error of messages; track $index) {
+    <app-warning-confirmation-popup [message]="error.message" (closed)="removeMessage($index, $event)" [isConfirmation]="error.isConfirmation">
+    </app-warning-confirmation-popup>
+    }
+</div>
+}

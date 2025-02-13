@@ -3,19 +3,27 @@ import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
+import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { BONUS_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player';
 import { BonusDice, DiceType } from '@app/consts/dice';
 import { StatType } from '@app/consts/player-stats.enum';
-import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { Avatars } from '@app/interfaces/avatars.enum';
+
+interface PopupMessage {
+    message: string;
+    isConfirmation: boolean;
+    action?: () => void;
+}
 
 @Component({
     selector: 'app-player-selection-page',
-    imports: [ReactiveFormsModule, HeaderComponent, CommonModule],
+    imports: [ReactiveFormsModule, HeaderComponent, CommonModule, WarningConfirmationPopupComponent],
     templateUrl: './player-selection-page.component.html',
     styleUrl: './player-selection-page.component.scss',
 })
 export class PlayerSelectionPageComponent {
+    messages: PopupMessage[] = [];
     nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
     bonusPointsForm: FormControl = new FormControl(StatType.Life, [Validators.required]);
     maxNameLength = MAX_NAME_LENGTH;
@@ -56,16 +64,47 @@ export class PlayerSelectionPageComponent {
     }
 
     needsWarning(formField: string) {
+        const nameErrorMessage = 'Le nom doit contenir entre 3 et 15 caractères';
+        const avatarErrorMessage = 'Veuillez choisir un avatar';
+
         if (formField === 'name') {
-            return !this.nameForm.valid && this.isStartClicked();
+            if (!this.nameForm.valid && this.isStartClicked()) {
+                if (!this.messages.some((message) => message.message === nameErrorMessage)) {
+                    this.messages.push({ message: nameErrorMessage, isConfirmation: false });
+                }
+                return true;
+            } else {
+                this.messages = this.messages.filter((message) => message.message !== nameErrorMessage);
+                return false;
+            }
         } else if (formField === 'avatar') {
-            return !this.isValidAvatarChoice() && this.isStartClicked();
+            if (!this.isValidAvatarChoice() && this.isStartClicked()) {
+                if (!this.messages.some((message) => message.message === avatarErrorMessage)) {
+                    this.messages.push({ message: avatarErrorMessage, isConfirmation: false });
+                }
+                return true;
+            } else {
+                this.messages = this.messages.filter((message) => message.message !== avatarErrorMessage);
+                return false;
+            }
         }
         return false;
     }
 
+    removeMessage(index: number, confirmed: boolean) {
+        const message = this.messages[index];
+
+        if (message.isConfirmation && confirmed && message.action) {
+            message.action();
+        }
+
+        this.messages.splice(index, 1);
+    }
+
     goToLobby() {
         this.isStartClicked.set(true);
+        this.needsWarning('name');
+        this.needsWarning('avatar');
         if (this.isFormValid()) {
             this.router.navigate(['/lobby']);
         }
