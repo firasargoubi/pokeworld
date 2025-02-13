@@ -54,6 +54,7 @@ main {
     flex: 2;
 }
 #player-name-avatar {
+    position: relative;
     display: flex;
     column-gap: 50px;
     margin: 0 $page-border-width $page-border-width 0;
@@ -68,6 +69,16 @@ main {
     width: auto;
     aspect-ratio: 1/1;
     object-fit: cover;
+    z-index: 1;
+}
+
+#avatar-shadow {
+    height: 15%;
+    width: auto;
+    position: absolute;
+    left: 3.5vh;
+    bottom: 2.4vh;
+    filter: brightness(0.7);
 }
 
 #name-form {
@@ -148,11 +159,13 @@ main {
     top: 0;
     left: 0;
     z-index: 1;
+    user-select: none;
+    pointer-events: none;
 }
 .stat-bar {
     height: 100%;
     background-color: green;
-    flex: 4;
+    flex: 6;
 }
 
 .bonus-bar {
@@ -235,7 +248,6 @@ main {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    filter: invert(0.7);
     height: 100%;
     width: auto;
     aspect-ratio: 1/1;

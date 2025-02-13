@@ -3,7 +3,7 @@ import { Avatars } from '@app/interfaces/avatars.enum';
 export const AVATAR_DATA = {
     [Avatars.Default]: {
         name: 'Default',
-        image: 'assets/images/game/avatars/default.jpg',
+        image: 'assets/images/game/avatars/default.png',
     },
     [Avatars.Avatar1]: {
         name: 'Bulbizarre',
