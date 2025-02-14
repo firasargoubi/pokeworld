@@ -1,6 +1,7 @@
 $base-size: 0.2vw;
 
 #warning-warning-popup {
+    user-select: none;
     position: relative;
     min-height: $base-size * 10;
     min-width: $base-size * 50;

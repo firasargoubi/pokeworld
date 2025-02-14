@@ -27,12 +27,4 @@
     <div id="poke-button">
         <app-pokeball-button [buttonContent]="'NOUVEAU JEU'" [delay]="200" [onClickAction]="onCreateGame.bind(this)"></app-pokeball-button>
     </div>
-    @if(messages.length > 0){
-    <div id="error-container">
-        @for(error of messages; track $index) {
-        <app-warning-confirmation-popup [message]="error.message" (closed)="removeMessage($index, $event)" [isConfirmation]="error.isConfirmation">
-        </app-warning-confirmation-popup>
-        }
-    </div>
-    }
 </div>

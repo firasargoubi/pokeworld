@@ -365,17 +365,17 @@ main {
     font-size: 5vh;
     width: 17vw;
     border-style: none;
-    background-image: url('/assets/images/menu/buttons/admin-button/red-background-highlight.png');
+    background-image: url('/assets/images/menu/buttons/admin-button/light-green-background-highlight.png');
     background-size: 100% 100%;
     align-self: center;
     cursor: pointer;
 }
 
 #page-footer .disabled {
-    background-image: url('/assets/images/menu/buttons/admin-button/light-green-background-highlight.png');
+    background-image: url('/assets/images/menu/buttons/admin-button/red-background-highlight.png');
 }
 
-#error-container {
+.error-container {
     position: absolute;
     top: 0;
     left: 0;

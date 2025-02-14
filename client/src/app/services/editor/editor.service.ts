@@ -8,6 +8,7 @@ import { BridgeValidationError, ValidationResult, ValidationStatus } from '@app/
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
+import { PopupService } from '@app/services/popup/popup.service';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
@@ -32,18 +33,7 @@ export class EditorService {
     initialGameData: GameData;
     private gameValidationService: GameValidationService = inject(GameValidationService);
     private gameSaveService: GameSaveService = inject(GameSaveService);
-
-    addMessage(message: string, isConfirmation: boolean, action?: () => void) {
-        this.messages.push({ message, isConfirmation, action });
-    }
-
-    removeMessage(index: number, confirmed: boolean) {
-        const message = this.messages[index];
-        if (message.isConfirmation && confirmed && message.action) {
-            message.action();
-        }
-        this.messages.splice(index, 1);
-    }
+    private popupService: PopupService = inject(PopupService);
 
     redirectToAdminPage(): void {
         this.router.navigate(['/admin']);
@@ -54,18 +44,20 @@ export class EditorService {
 
         if (validationResult) {
             const errorMessage = this.getValidationErrorMessage(validationResult);
-            this.addMessage(errorMessage, false);
+            this.popupService.showPopup(errorMessage, false);
             return;
         }
 
         this.gameSaveService.isNameUnique(this.gameDataService.gameData.name, this.gameDataService.gameData._id).subscribe((isUnique) => {
             if (!isUnique) {
-                this.addMessage('Le nom est déjà utilisé. Veuillez en choisir un autre.', false);
+                this.popupService.showPopup('Le nom est déjà utilisé. Veuillez en choisir un autre.', false);
                 return;
             }
             this.gameDataService.gameData.isVisible = false;
             this.gameDataService.gameData.lastEdited = new Date();
             this.saveGame();
+            this.popupService.showPopup('Jeu sauvegardé avec succès', false);
+            this.popupService.keepMessages();
             this.redirectToAdminPage();
         });
     }
@@ -176,7 +168,7 @@ export class EditorService {
         this.gameDataService.gameData.isVisible = false;
         this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe({
             error: (error) => {
-                this.addMessage('Erreur lors de la sauvegarde du jeu: ' + error, false);
+                this.popupService.showPopup('Erreur lors de la sauvegarde du jeu: ' + error, false);
             },
         });
     }

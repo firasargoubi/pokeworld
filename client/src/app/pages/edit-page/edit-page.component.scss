@@ -31,7 +31,7 @@ $main-border-color1: #636776;
 $main-border-color2: #e9f6f7;
 $main-border-width: calc($map-size * 0.01);
 $stripes-color1: hsl(225, 6%, 15%);
-$stripes-color2: hsl(220, 6%, 20%);;
+$stripes-color2: hsl(220, 6%, 20%);
 $tool-active-color: rgba(255, 255, 255, 0.6);
 $tile-border-color: rgba(255, 255, 255, 0.5);
 $input-border-color: rgba(255, 255, 255, 0.82);
@@ -199,7 +199,7 @@ app-map {
     height: calc($final-map-size * 0.16);
     margin-top: calc($final-map-size * -0.3473);
     margin-left: calc($final-map-size * 0.16 * 1.815 * -0.19);
-    font-size: calc($final-map-size * 0.030);
+    font-size: calc($final-map-size * 0.03);
     padding: calc($final-map-size * 0.012);
     background: url('/assets/images/menu/containers/description-container.png');
     background-position: center;
@@ -434,7 +434,7 @@ app-map {
     cursor: grabbing;
 }
 
-#error-container {
+.error-container {
     position: absolute;
     top: 0;
     left: 0;

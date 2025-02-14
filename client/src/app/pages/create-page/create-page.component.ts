@@ -3,29 +3,23 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
+import { PopupService } from '@app/services/popup/popup.service';
 import { GameData } from '@common/game-data';
-
-interface PopupMessage {
-    message: string;
-    isConfirmation: boolean;
-    action?: () => void;
-}
 
 @Component({
     selector: 'app-create-page',
     templateUrl: './create-page.component.html',
     styleUrls: ['./create-page.component.scss'],
-    imports: [GameCardComponent, HeaderComponent, WarningConfirmationPopupComponent],
+    imports: [GameCardComponent, HeaderComponent],
 })
 export class CreatePageComponent implements OnInit {
     games: GameData[] = [];
-    messages: PopupMessage[] = [];
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);
     private gameDataService: GameDataService = inject(GameDataService);
+    private popupService: PopupService = inject(PopupService);
 
     navigateToMenu() {
         this.router.navigate(['/']);
@@ -52,17 +46,13 @@ export class CreatePageComponent implements OnInit {
         });
     }
 
-    removeMessage(index: number) {
-        this.messages.splice(index, 1);
-    }
-
     private loadGames() {
         this.gameSaveService.getAllGames().subscribe({
             next: (games) => {
                 this.games = games.filter((game) => game.isVisible);
             },
             error: (error: HttpErrorResponse) => {
-                this.messages.push({ message: error.error, isConfirmation: false });
+                this.popupService.showPopup(error.error);
             },
         });
     }
@@ -73,16 +63,16 @@ export class CreatePageComponent implements OnInit {
             this.router.navigate(['/player-selection']);
         } else {
             this.loadGames();
-            this.messages.push({ message: "Ce jeu n'est plus visible", isConfirmation: false });
+            this.popupService.showPopup("Ce jeu n'est plus visible");
         }
     }
 
     private handleNotFoundError(error: HttpErrorResponse) {
         if (error.status === HttpStatusCode.NotFound) {
-            this.messages.push({ message: "Ce jeu n'existe plus", isConfirmation: false });
+            this.popupService.showPopup("Ce jeu n'existe plus");
             this.loadGames();
         } else {
-            this.messages.push({ message: error.error, isConfirmation: false });
+            this.popupService.showPopup(error.error);
         }
     }
 }

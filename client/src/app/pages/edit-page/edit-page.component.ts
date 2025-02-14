@@ -18,22 +18,4 @@ export class EditPageComponent implements OnInit {
     ngOnInit() {
         this.editorService.initialGameData = structuredClone(this.editorService.gameDataService.gameData);
     }
-
-    addMessage(message: string, isConfirmation: boolean = false, action?: () => void) {
-        if (!this.editorService.messages.some((msg) => msg.message === message)) {
-            this.editorService.messages.push({ message, isConfirmation, action });
-        }
-    }
-
-    removeMessage(index: number) {
-        this.editorService.messages.splice(index, 1);
-    }
-
-    handleWarning(condition: boolean, errorMessage: string) {
-        if (condition) {
-            this.addMessage(errorMessage);
-        } else {
-            this.editorService.messages = this.editorService.messages.filter((msg) => msg.message !== errorMessage);
-        }
-    }
 }

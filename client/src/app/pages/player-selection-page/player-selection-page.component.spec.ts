@@ -43,7 +43,7 @@ describe('PlayerSelectionPageComponent', () => {
         component.nameForm.setValue('ab');
         fixture.detectChanges();
 
-        expect(component.needsWarning('name')).toBeTrue();
+        expect(component.needsWarning()).toBeTrue();
     });
 
     it('should display warning message for unselected avatar', () => {
@@ -51,7 +51,7 @@ describe('PlayerSelectionPageComponent', () => {
         component.selectedAvatar = Avatars.Default;
         fixture.detectChanges();
 
-        expect(component.needsWarning('avatar')).toBeTrue();
+        expect(component.needsWarning()).toBeTrue();
     });
 
     it('should return false for needsWarning when form field is valid', () => {
@@ -59,7 +59,7 @@ describe('PlayerSelectionPageComponent', () => {
         component['isStartClicked'].set(true);
         fixture.detectChanges();
 
-        expect(component.needsWarning('name')).toBeFalse();
+        expect(component.needsWarning()).toBeFalse();
     });
 
     it('should return false for needsWarning when isStartClicked is false', () => {
@@ -67,14 +67,14 @@ describe('PlayerSelectionPageComponent', () => {
         component['isStartClicked'].set(false);
         fixture.detectChanges();
 
-        expect(component.needsWarning('name')).toBeFalse();
+        expect(component.needsWarning()).toBeFalse();
     });
 
     it('should return false for needsWarning when formField does not correspond to any known field', () => {
         component['isStartClicked'].set(true);
         fixture.detectChanges();
 
-        expect(component.needsWarning('unknownField')).toBeFalse();
+        expect(component.needsWarning()).toBeFalse();
     });
 
     it('should select an avatar', () => {
@@ -172,34 +172,5 @@ describe('PlayerSelectionPageComponent', () => {
     it('should navigate to create page when goToCreatPage is called', () => {
         component.goToCreatPage();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/create']);
-    });
-
-    it('should add message correctly', () => {
-        const message = 'Test message';
-        component['addMessage'](message);
-        expect(component.messages.some((msg) => msg.message === message)).toBeTrue();
-    });
-
-    it('should not add duplicate messages', () => {
-        const message = 'Test message';
-        component['addMessage'](message);
-        component['addMessage'](message);
-        expect(component.messages.filter((msg) => msg.message === message).length).toBe(1);
-    });
-
-    it('should remove message by content correctly', () => {
-        const message = 'Test message';
-        component['addMessage'](message);
-        component['removeMessageByContent'](message);
-        expect(component.messages.some((msg) => msg.message === message)).toBeFalse();
-    });
-
-    it('should handle warning correctly', () => {
-        const message = 'Test message';
-        component['handleWarning'](true, message);
-        expect(component.messages.some((msg) => msg.message === message)).toBeTrue();
-
-        component['handleWarning'](false, message);
-        expect(component.messages.some((msg) => msg.message === message)).toBeFalse();
     });
 });

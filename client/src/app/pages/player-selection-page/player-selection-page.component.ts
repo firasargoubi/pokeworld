@@ -9,12 +9,7 @@ import { BONUS_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } f
 import { BonusDice, DiceType } from '@app/consts/dice';
 import { StatType } from '@app/consts/player-stats.enum';
 import { Avatars } from '@app/interfaces/avatars.enum';
-
-interface PopupMessage {
-    message: string;
-    isConfirmation: boolean;
-    action?: () => void;
-}
+import { PopupService } from '@app/services/popup/popup.service';
 
 @Component({
     selector: 'app-player-selection-page',
@@ -23,7 +18,6 @@ interface PopupMessage {
     styleUrl: './player-selection-page.component.scss',
 })
 export class PlayerSelectionPageComponent {
-    messages: PopupMessage[] = [];
     nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
     bonusPointsForm: FormControl = new FormControl(StatType.Life, [Validators.required]);
     maxNameLength = MAX_NAME_LENGTH;
@@ -38,6 +32,7 @@ export class PlayerSelectionPageComponent {
 
     private isStartClicked: WritableSignal<boolean> = signal(false);
     private router: Router = inject(Router);
+    private popupService: PopupService = inject(PopupService);
 
     getScore(statCategory: StatType) {
         return this.isBonusPoint(statCategory) ? DEFAULT_STAT_POINTS + BONUS_POINTS : DEFAULT_STAT_POINTS;
@@ -63,33 +58,28 @@ export class PlayerSelectionPageComponent {
         this.selectedAvatar = avatar;
     }
 
-    needsWarning(formField: string) {
+    needsWarning() {
+        const errors: string[] = [];
         const nameErrorMessage = 'Le nom doit contenir entre 3 et 15 caractères';
         const avatarErrorMessage = 'Veuillez choisir un avatar';
 
-        if (formField === 'name') {
-            return this.handleWarning(!this.nameForm.valid && this.isStartClicked(), nameErrorMessage);
-        } else if (formField === 'avatar') {
-            return this.handleWarning(!this.isValidAvatarChoice() && this.isStartClicked(), avatarErrorMessage);
+        if (!this.nameForm.valid && this.isStartClicked()) {
+            errors.push(nameErrorMessage);
+        }
+        if (!this.isValidAvatarChoice() && this.isStartClicked()) {
+            errors.push(avatarErrorMessage);
+        }
+
+        if (errors.length > 0) {
+            this.popupService.showPopup(errors.join('\n'));
+            return true;
         }
         return false;
     }
 
-    removeMessage(index: number, confirmed: boolean) {
-        const message = this.messages[index];
-
-        if (message.isConfirmation && confirmed && message.action) {
-            message.action();
-        }
-
-        this.messages.splice(index, 1);
-    }
-
     goToLobby() {
         this.isStartClicked.set(true);
-        this.needsWarning('name');
-        this.needsWarning('avatar');
-        if (this.isFormValid()) {
+        if (!this.needsWarning() && this.isFormValid()) {
             this.router.navigate(['/lobby']);
         }
     }
@@ -100,26 +90,6 @@ export class PlayerSelectionPageComponent {
 
     isFormValid() {
         return this.nameForm.valid && this.isValidAvatarChoice();
-    }
-
-    private handleWarning(condition: boolean, errorMessage: string): boolean {
-        if (condition) {
-            this.addMessage(errorMessage);
-            return true;
-        } else {
-            this.removeMessageByContent(errorMessage);
-            return false;
-        }
-    }
-
-    private addMessage(message: string) {
-        if (!this.messages.some((msg) => msg.message === message)) {
-            this.messages.push({ message, isConfirmation: false });
-        }
-    }
-
-    private removeMessageByContent(message: string) {
-        this.messages = this.messages.filter((msg) => msg.message !== message);
     }
 
     private isValidAvatarChoice() {
