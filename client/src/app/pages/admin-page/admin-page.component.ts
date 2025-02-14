@@ -9,12 +9,7 @@ import { PokeballButtonComponent } from '@app/components/pokeball-button/pokebal
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
-
-interface PopupMessage {
-    message: string;
-    isConfirmation: boolean;
-    action?: () => void;
-}
+import { PopupMessage } from '@app/interfaces/popup-message';
 
 @Component({
     selector: 'app-admin-page',

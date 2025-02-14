@@ -136,7 +136,7 @@ export class GameValidationService {
 
         const validationStatus = {
             isValid: currentTerrainRatio > MIN_TERRAIN_RATIO,
-            coveragePercentage: currentTerrainRatio * PERCENTAGE_MULTIPLIER,
+            coveragePercentage: parseFloat((currentTerrainRatio * PERCENTAGE_MULTIPLIER).toFixed(2)),
         };
 
         return validationStatus;
