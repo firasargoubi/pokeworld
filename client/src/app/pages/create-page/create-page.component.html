@@ -12,3 +12,11 @@
         </div>
     </div>
 </div>
+@if(messages.length > 0){
+<div id="error-container">
+    @for(error of messages; track $index) {
+    <app-warning-confirmation-popup [message]="error.message" (closed)="removeMessage($index, $event)" [isConfirmation]="error.isConfirmation">
+    </app-warning-confirmation-popup>
+    }
+</div>
+}

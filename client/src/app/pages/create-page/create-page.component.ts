@@ -1,24 +1,30 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
-import { GameDataService } from '@app/services/game-data/game-data.service';
-import { Router } from '@angular/router';
+
+interface PopupMessage {
+    message: string;
+    isConfirmation: boolean;
+    action?: () => void;
+}
 
 @Component({
     selector: 'app-create-page',
     templateUrl: './create-page.component.html',
     styleUrls: ['./create-page.component.scss'],
-    imports: [GameCardComponent, HeaderComponent],
+    imports: [GameCardComponent, HeaderComponent, WarningConfirmationPopupComponent],
 })
 export class CreatePageComponent implements OnInit {
     games: GameData[] = [];
+    messages: PopupMessage[] = [];
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);
-    private snackBar: MatSnackBar = inject(MatSnackBar);
     private gameDataService: GameDataService = inject(GameDataService);
 
     navigateToMenu() {
@@ -46,13 +52,23 @@ export class CreatePageComponent implements OnInit {
         });
     }
 
+    removeMessage(index: number, confirmed: boolean) {
+        const message = this.messages[index];
+
+        if (message.isConfirmation && confirmed && message.action) {
+            message.action();
+        }
+
+        this.messages.splice(index, 1);
+    }
+
     private loadGames() {
         this.gameSaveService.getAllGames().subscribe({
             next: (games) => {
                 this.games = games.filter((game) => game.isVisible);
             },
             error: (error: HttpErrorResponse) => {
-                this.handleError(error);
+                this.messages.push({ message: error.error, isConfirmation: false });
             },
         });
     }
@@ -63,20 +79,16 @@ export class CreatePageComponent implements OnInit {
             this.router.navigate(['/player-selection']);
         } else {
             this.loadGames();
-            alert("Ce jeu n'est plus visible !");
+            this.messages.push({ message: "Ce jeu n'est plus visible", isConfirmation: false });
         }
     }
 
     private handleNotFoundError(error: HttpErrorResponse) {
         if (error.status === HttpStatusCode.NotFound) {
-            alert("Ce jeu n'existe plus !");
+            this.messages.push({ message: "Ce jeu n'existe plus", isConfirmation: false });
             this.loadGames();
         } else {
-            this.handleError(error);
+            this.messages.push({ message: error.error, isConfirmation: false });
         }
-    }
-
-    private handleError(error: HttpErrorResponse) {
-        this.snackBar.open(`${error.message}`, 'Close', { duration: 5000 }); // Doesnt work
     }
 }
