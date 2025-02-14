@@ -90,7 +90,7 @@ describe('EditorService', () => {
         expect(action).toHaveBeenCalled();
     });
 
-    it('should handle validation errors', () => {
+    it('should handle error when saving', () => {
         const mockErrors: ValidationResult = { ...mockValidationResult, name: { isValid: false, errorCode: ErrorCode.TooLong } };
 
         gameValidationServiceSpy.validateGame.and.returnValue(mockErrors);
@@ -98,6 +98,29 @@ describe('EditorService', () => {
 
         expect(service.messages.length).toBe(1);
         expect(service.messages[0].message).toContain('Erreurs de validation');
+    });
+
+    it('should format validation errors correctly', () => {
+        const validationResult: ValidationResult = {
+            ...mockValidationResult,
+            name: { isValid: false, errorCode: ErrorCode.TooLong },
+            terrainCoverage: { isValid: false, coveragePercentage: 20 },
+            tilesAccessibility: { isValid: false, nonAccessibleTileCount: 5 },
+            items: { isValid: false, misplacedItems: [{ x: 1, y: 1 }] },
+            bridge: {
+                isValid: false,
+                errors: [{ x: 2, y: 2, errorCode: ErrorCode.BridgeAtEdge }],
+            },
+        };
+
+        const messages = service['getValidationErrorMessage'](validationResult);
+
+        expect(messages).toContain('Erreurs de validation');
+        expect(messages).toContain(ErrorCode.TooLong);
+        expect(messages).toContain(ErrorCode.TerrainCoverage);
+        expect(messages).toContain(ErrorCode.TilesAccessibility);
+        expect(messages).toContain(ErrorCode.BridgeAtEdge);
+        expect(messages).toContain(ErrorCode.Items);
     });
 
     it('should handle duplicate name error', () => {
@@ -125,24 +148,6 @@ describe('EditorService', () => {
 
         expect(service.messages.length).toBe(1);
         expect(service.messages[0].message).toContain('Erreur lors de la sauvegarde');
-    });
-
-    it('should format validation errors correctly', () => {
-        const validationResult: ValidationResult = {
-            ...mockValidationResult,
-            name: { isValid: false, errorCode: ErrorCode.TooLong },
-            terrainCoverage: { isValid: false, coveragePercentage: 20 },
-            bridge: {
-                isValid: false,
-                errors: [{ x: 2, y: 2, errorCode: ErrorCode.BridgeAtEdge }],
-            },
-        };
-
-        const result = service['getValidationErrorMessage'](validationResult);
-
-        expect(result).toContain('Couverture du terrain');
-        expect(result).toContain('Problème de pont');
-        expect(result).toContain('dépasse la longueur maximale');
     });
 
     it('should prevent item placement on invalid tiles', () => {
