@@ -3,7 +3,6 @@ import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { ItemComponent } from '@app/components/item/item.component';
 import { MapComponent } from '@app/components/map/map.component';
-import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
 import { EditorService } from '@app/services/editor/editor.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { EditPageComponent } from './edit-page.component';
@@ -31,8 +30,7 @@ describe('EditPageComponent', () => {
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
 
         await TestBed.configureTestingModule({
-            imports: [FormsModule, HeaderComponent, MapComponent, ItemComponent, WarningConfirmationPopupComponent],
-            declarations: [EditPageComponent],
+            imports: [FormsModule, HeaderComponent, MapComponent, ItemComponent, EditPageComponent],
             providers: [
                 { provide: EditorService, useValue: editorServiceSpy },
                 { provide: PopupService, useValue: popupServiceSpy },
@@ -45,7 +43,7 @@ describe('EditPageComponent', () => {
     });
 
     it('should create', () => {
-        expect(component).toBeTruthy();
+        expect(component.ngOnInit).toHaveBeenCalled();
     });
 
     it('should initialize initialGameData on ngOnInit', () => {

@@ -1,6 +1,6 @@
 $base-size: 0.2vw;
 
-#warning-warning-popup {
+#warning-popup {
     user-select: none;
     position: relative;
     min-height: $base-size * 10;
@@ -14,7 +14,7 @@ $base-size: 0.2vw;
     margin-right: $base-size * 4;
 }
 
-#warning-warning-popup::before {
+#warning-popup::before {
     content: '';
     position: absolute;
     top: 0;
@@ -44,7 +44,7 @@ $base-size: 0.2vw;
     z-index: 0;
 }
 
-#warning-warning-details {
+#warning-details {
     width: 100%;
     display: flex;
     position: relative;

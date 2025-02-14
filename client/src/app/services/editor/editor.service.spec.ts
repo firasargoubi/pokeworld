@@ -12,7 +12,7 @@ import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
 import { MapSize } from '@common/map-size.enum';
 import { TileType } from '@common/tile-type.enum';
-import { of, Subject, throwError } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { EditorService } from './editor.service';
 
 describe('EditorService', () => {
@@ -75,40 +75,6 @@ describe('EditorService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should add messages correctly', () => {
-        service.addMessage('Test error', false);
-        expect(service.messages.length).toBe(1);
-        expect(service.messages[0].message).toBe('Test error');
-    });
-
-    it('should remove messages and execute actions', () => {
-        const action = jasmine.createSpy('action');
-        service.addMessage('Test', true, action);
-
-        service.removeMessage(0, true);
-        expect(service.messages.length).toBe(0);
-        expect(action).toHaveBeenCalled();
-    });
-
-    it('should handle validation errors', () => {
-        const mockErrors: ValidationResult = { ...mockValidationResult, name: { isValid: false, errorCode: ErrorCode.TooLong } };
-
-        gameValidationServiceSpy.validateGame.and.returnValue(mockErrors);
-        service.saveButton();
-
-        expect(service.messages.length).toBe(1);
-        expect(service.messages[0].message).toContain('Erreurs de validation');
-    });
-
-    it('should handle duplicate name error', () => {
-        gameValidationServiceSpy.validateGame.and.returnValue(null);
-        gameSaveServiceSpy.isNameUnique.and.returnValue(of(false));
-        service.saveButton();
-
-        expect(service.messages.length).toBe(1);
-        expect(service.messages[0].message).toContain('déjà utilisé');
-    });
-
     it('should save successfully', () => {
         gameValidationServiceSpy.validateGame.and.returnValue(null);
         gameSaveServiceSpy.isNameUnique.and.returnValue(of(true));
@@ -117,16 +83,6 @@ describe('EditorService', () => {
 
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
     });
-
-    it('should handle save errors', () => {
-        const error = new Error('Save failed');
-        gameSaveServiceSpy.saveGame.and.returnValue(throwError(() => error));
-        service['saveGame']();
-
-        expect(service.messages.length).toBe(1);
-        expect(service.messages[0].message).toContain('Erreur lors de la sauvegarde');
-    });
-
     it('should format validation errors correctly', () => {
         const validationResult: ValidationResult = {
             ...mockValidationResult,
