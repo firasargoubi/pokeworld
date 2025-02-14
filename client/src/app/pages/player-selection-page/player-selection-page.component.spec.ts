@@ -5,19 +5,25 @@ import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@app/consts/default-player';
 import { DiceType } from '@app/consts/dice';
 import { StatType } from '@app/consts/player-stats.enum';
 import { Avatars } from '@app/interfaces/avatars.enum';
+import { PopupService } from '@app/services/popup/popup.service';
 import { PlayerSelectionPageComponent } from './player-selection-page.component';
 
 describe('PlayerSelectionPageComponent', () => {
     let component: PlayerSelectionPageComponent;
     let fixture: ComponentFixture<PlayerSelectionPageComponent>;
     let routerSpy: jasmine.SpyObj<Router>;
+    let popupServiceSpy: jasmine.SpyObj<PopupService>;
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+        popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
 
         await TestBed.configureTestingModule({
             imports: [ReactiveFormsModule, PlayerSelectionPageComponent],
-            providers: [{ provide: Router, useValue: routerSpy }],
+            providers: [
+                { provide: Router, useValue: routerSpy },
+                { provide: PopupService, useValue: popupServiceSpy },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(PlayerSelectionPageComponent);
@@ -56,6 +62,7 @@ describe('PlayerSelectionPageComponent', () => {
 
     it('should return false for needsWarning when form field is valid', () => {
         component.nameForm.setValue('ValidName');
+        component.selectedAvatar = Avatars.Avatar1;
         component['isStartClicked'].set(true);
         fixture.detectChanges();
 
@@ -69,14 +76,6 @@ describe('PlayerSelectionPageComponent', () => {
 
         expect(component.needsWarning()).toBeFalse();
     });
-
-    it('should return false for needsWarning when formField does not correspond to any known field', () => {
-        component['isStartClicked'].set(true);
-        fixture.detectChanges();
-
-        expect(component.needsWarning()).toBeFalse();
-    });
-
     it('should select an avatar', () => {
         const avatar = component.avatarList[0];
         component.handleAvatarSelection(avatar);

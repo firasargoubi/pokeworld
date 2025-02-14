@@ -3,7 +3,6 @@ import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { BONUS_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player';
 import { BonusDice, DiceType } from '@app/consts/dice';
@@ -13,7 +12,7 @@ import { PopupService } from '@app/services/popup/popup.service';
 
 @Component({
     selector: 'app-player-selection-page',
-    imports: [ReactiveFormsModule, HeaderComponent, CommonModule, WarningConfirmationPopupComponent],
+    imports: [ReactiveFormsModule, HeaderComponent, CommonModule],
     templateUrl: './player-selection-page.component.html',
     styleUrl: './player-selection-page.component.scss',
 })
