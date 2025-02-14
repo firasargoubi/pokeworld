@@ -5,8 +5,8 @@ import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
 import { filter } from 'rxjs/operators';
 
-const fadeDelay = 1000;
-const showDelay = 3000;
+const fadeDelay = 500;
+const showDelay = 1500;
 
 interface PopupMessage {
     message: string;
@@ -50,7 +50,10 @@ export class PopupService {
     }
 
     private displayPopup() {
-        const overlayConfig = this.getOverlayConfig();
+        const currentMessage = this.messages.shift();
+        if (!currentMessage) return;
+
+        const overlayConfig = this.getOverlayConfig(currentMessage.isConfirmation);
         const overlayRef = this.overlay.create(overlayConfig);
         this.overlayRefs.push(overlayRef);
         this.setOverlayZIndexHigh();
@@ -58,14 +61,13 @@ export class PopupService {
         const popupPortal = new ComponentPortal(WarningConfirmationPopupComponent);
         const popupComponentRef = overlayRef.attach(popupPortal);
 
-        const currentMessage = this.messages.shift();
-        if (currentMessage) {
-            popupComponentRef.instance.message = currentMessage.message;
-            popupComponentRef.instance.isConfirmation = currentMessage.isConfirmation;
-            popupComponentRef.instance.closed.subscribe((confirmed: boolean) => {
-                this.handlePopupClose(confirmed, overlayRef, currentMessage);
-            });
+        popupComponentRef.instance.message = currentMessage.message;
+        popupComponentRef.instance.isConfirmation = currentMessage.isConfirmation;
+        popupComponentRef.instance.closed.subscribe((confirmed: boolean) => {
+            this.handlePopupClose(confirmed, overlayRef, currentMessage);
+        });
 
+        if (!currentMessage.isConfirmation) {
             setTimeout(() => {
                 this.fadeOutPopup(overlayRef);
             }, showDelay);
@@ -77,14 +79,16 @@ export class PopupService {
         overlayElement.classList.add('fade-out');
         setTimeout(() => {
             this.handlePopupClose(false, overlayRef, null);
-        }, fadeDelay);
+        }, fadeDelay); // Complete fade out after 1 second
     }
 
-    private getOverlayConfig(): OverlayConfig {
+    private getOverlayConfig(isConfirmation: boolean): OverlayConfig {
         return new OverlayConfig({
-            hasBackdrop: false,
-            backdropClass: 'custom-backdrop-class',
-            positionStrategy: this.overlay.position().global().centerHorizontally().centerVertically(),
+            hasBackdrop: isConfirmation,
+            backdropClass: isConfirmation ? 'confirmation-backdrop-class' : 'custom-backdrop-class',
+            positionStrategy: isConfirmation
+                ? this.overlay.position().global().centerHorizontally().centerVertically()
+                : this.overlay.position().global().centerHorizontally().bottom('10%'),
             scrollStrategy: this.overlay.scrollStrategies.noop(),
         });
     }

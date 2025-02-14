@@ -48,20 +48,23 @@ body {
 }
 
 .cdk-overlay-container {
+    background-color: rgba(0, 0, 0, 0.5); /* Darker backdrop for confirmation popups */
     position: relative;
-    top: 6vw;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    top: 0;
+    padding: 6vw;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     position: absolute;
-    max-height: 88%;
     overflow-y: auto;
     gap: 1vw;
     pointer-events: auto;
     scrollbar-width: none;
 }
+
 .fade-out {
     animation: fadeOut 1s forwards;
 }
