@@ -13,6 +13,7 @@ import { PopupService } from '@app/services/popup/popup.service';
 @Component({
     selector: 'app-player-selection-page',
     imports: [ReactiveFormsModule, HeaderComponent, CommonModule],
+    imports: [ReactiveFormsModule, HeaderComponent, CommonModule],
     templateUrl: './player-selection-page.component.html',
     styleUrl: './player-selection-page.component.scss',
 })

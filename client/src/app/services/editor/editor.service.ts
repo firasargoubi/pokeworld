@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
 import { ITEM_DESCRIPTION, MAX_ITEM_COUNT } from '@app/consts/items.const';
 import { EditorData, EditorItem } from '@app/interfaces/editor-data';
+import { ErrorCode } from '@app/interfaces/error-code.enum';
 import { EventProperty } from '@app/interfaces/event-property';
 import { BridgeValidationError, ValidationResult, ValidationStatus } from '@app/interfaces/game-validation-result';
 import { GameDataService } from '@app/services/game-data/game-data.service';
@@ -115,19 +116,21 @@ export class EditorService {
         const errors: string[] = [];
 
         for (const [key, value] of Object.entries(validationResult)) {
-            if (key === 'terrainCoverage' && !value.isValid) {
-                errors.push(`  - Couverture du terrain insuffisante (${value.coveragePercentage}%)`);
-            } else if (key === 'tilesAccessibility' && !value.isValid) {
-                errors.push(`  - ${value.nonAccessibleTileCount} tuiles inaccessibles`);
-            } else if (key === 'items' && !value.isValid) {
-                errors.push(`  - ${value.misplacedItems.length} objets mal placés`);
-            } else if (key === 'bridge' && !value.isValid) {
-                value.errors.forEach((error: BridgeValidationError) => {
-                    errors.push(`  - Problème de pont en [${error.x},${error.y}]: ${error.errorCode}`);
-                });
-            } else if (typeof value === 'object' && value !== null && 'isValid' in value && !value.isValid) {
-                const errorMessage: ValidationStatus = value;
-                errors.push(`  - ${key}: ${errorMessage.errorCode}`);
+            if (!value.isValid) {
+                if (key === 'terrainCoverage') {
+                    errors.push(`  - ${ErrorCode.TerrainCoverage} (${value.coveragePercentage}%)`);
+                } else if (key === 'tilesAccessibility') {
+                    errors.push(`  - ${ErrorCode.TilesAccessibility}`);
+                } else if (key === 'items') {
+                    errors.push(`  - ${ErrorCode.Items} (${value.misplacedItems.length})`);
+                } else if (key === 'bridge') {
+                    value.errors.forEach((error: BridgeValidationError) => {
+                        errors.push(`  - ${ErrorCode.Bridge} [${error.x},${error.y}]: ${error.errorCode}`);
+                    });
+                } else if (typeof value === 'object' && value !== null && 'isValid' in value) {
+                    const errorMessage: ValidationStatus = value;
+                    errors.push(`  - ${key}: ${errorMessage.errorCode}`);
+                }
             }
         }
 
@@ -158,8 +161,10 @@ export class EditorService {
     }
 
     private saveGame(): void {
-        this.gameDataService.gameData.isVisible = false;
         this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe({
+            next: () => {
+                this.redirectToAdminPage();
+            },
             error: (error) => {
                 this.popupService.showPopup('Erreur lors de la sauvegarde du jeu: ' + error, false);
             },
