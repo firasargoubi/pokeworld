@@ -7,6 +7,7 @@
             <section id="avatar-info-container" class="flex-container">
                 <div id="player-name-avatar">
                     <img src="{{ avatarData[selectedAvatar].image }}" id="selected-avatar" />
+                    <img src="\assets\images\menu\stat-bar\shadow.png" id="avatar-shadow" />
                     <span id="name-form">
                         <input
                             id="name-input"
@@ -15,6 +16,7 @@
                             maxlength="{{ this.maxNameLength }}"
                             placeholder="Entrez votre pseudo"
                             autofocus
+                            autocomplete="off"
                         />
                         <p id="input-border">--------------------</p>
                     </span>
