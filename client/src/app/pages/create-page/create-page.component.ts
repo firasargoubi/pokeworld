@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { GameDataService } from '@app/services/game-data/game-data.service';
@@ -13,13 +13,11 @@ import { GameData } from '@common/game-data';
     templateUrl: './create-page.component.html',
     styleUrls: ['./create-page.component.scss'],
     imports: [GameCardComponent, HeaderComponent],
-    imports: [GameCardComponent, HeaderComponent],
 })
 export class CreatePageComponent implements OnInit {
     games: GameData[] = [];
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);
-    private snackBar: MatSnackBar = inject(MatSnackBar);
     private gameDataService: GameDataService = inject(GameDataService);
     private popupService: PopupService = inject(PopupService);
 
@@ -76,9 +74,5 @@ export class CreatePageComponent implements OnInit {
         } else {
             this.popupService.showPopup(error.error);
         }
-    }
-
-    private handleError(error: HttpErrorResponse) {
-        this.snackBar.open(`${error.message}`, 'Close', { duration: 5000 }); // Doesnt work
     }
 }
