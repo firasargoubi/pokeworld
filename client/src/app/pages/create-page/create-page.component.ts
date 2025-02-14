@@ -7,12 +7,7 @@ import { WarningConfirmationPopupComponent } from '@app/components/warning-confi
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
-
-interface PopupMessage {
-    message: string;
-    isConfirmation: boolean;
-    action?: () => void;
-}
+import { PopupMessage } from '@app/interfaces/popup-message';
 
 @Component({
     selector: 'app-create-page',

@@ -9,12 +9,7 @@ import { BONUS_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } f
 import { BonusDice, DiceType } from '@app/consts/dice';
 import { StatType } from '@app/consts/player-stats.enum';
 import { Avatars } from '@app/interfaces/avatars.enum';
-
-interface PopupMessage {
-    message: string;
-    isConfirmation: boolean;
-    action?: () => void;
-}
+import { PopupMessage } from '@app/interfaces/popup-message';
 
 @Component({
     selector: 'app-player-selection-page',
