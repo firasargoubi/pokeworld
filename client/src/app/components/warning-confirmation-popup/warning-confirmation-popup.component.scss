@@ -1,5 +1,15 @@
 $base-size: 0.2vw;
 
+img {
+    image-rendering: optimizeSpeed; /* STOP SMOOTHING, GIVE ME SPEED  */
+    image-rendering: -moz-crisp-edges; /* Firefox                        */
+    image-rendering: -o-crisp-edges; /* Opera                          */
+    image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering: pixelated; /* Universal support since 2021   */
+    image-rendering: optimize-contrast; /* CSS3 Proposed                  */
+    -ms-interpolation-mode: nearest-neighbor; /* IE8+                           */
+}
+
 #warning-popup {
     user-select: none;
     position: relative;
@@ -62,9 +72,6 @@ $base-size: 0.2vw;
         text-wrap: wrap;
     }
 }
-#warning-confirm {
-    z-index: 1;
-}
 #warning-content {
     white-space: pre;
     text-align: left;
@@ -107,10 +114,10 @@ $base-size: 0.2vw;
     filter: brightness(1.15);
 }
 
-.warning-card-button .warning-button-cross {
+.warning-button-mark {
     z-index: 1;
-    opacity: 0.8;
-    margin-top: 0;
-    pointer-events: none;
-    user-select: none;
+    filter: invert(0.95);
+    width: 100%;
+    height: 100%;
+    padding: 15% 30%;
 }
