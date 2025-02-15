@@ -79,7 +79,7 @@ export class PopupService {
         overlayElement.classList.add('fade-out');
         setTimeout(() => {
             this.handlePopupClose(false, overlayRef, null);
-        }, fadeDelay); // Complete fade out after 1 second
+        }, fadeDelay);
     }
 
     private getOverlayConfig(isConfirmation: boolean): OverlayConfig {
@@ -101,7 +101,7 @@ export class PopupService {
         overlayRef.dispose();
         this.overlayRefs = this.overlayRefs.filter((ref) => ref !== overlayRef);
 
-        if (this.messages.length > 0) {
+        if (this.messages.length) {
             this.displayPopup();
         } else if (this.overlayRefs.length === 0) {
             this.setOverlayZIndexLow();

@@ -13,7 +13,6 @@ import { PopupService } from '@app/services/popup/popup.service';
 @Component({
     selector: 'app-player-selection-page',
     imports: [ReactiveFormsModule, HeaderComponent, CommonModule],
-    imports: [ReactiveFormsModule, HeaderComponent, CommonModule],
     templateUrl: './player-selection-page.component.html',
     styleUrl: './player-selection-page.component.scss',
 })
@@ -70,7 +69,7 @@ export class PlayerSelectionPageComponent {
             errors.push(avatarErrorMessage);
         }
 
-        if (errors.length > 0) {
+        if (errors.length) {
             this.popupService.showPopup(errors.join('\n'));
             return true;
         }

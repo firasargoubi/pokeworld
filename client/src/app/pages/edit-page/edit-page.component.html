@@ -50,7 +50,7 @@
                     <div class="grid-square" [class.grayed]="itemData.count === 0">
                         <div class="tool">
                             <app-item [itemType]="itemData.item"></app-item>
-                            @if (itemData.count > 0) {
+                            @if (itemData.count) {
                             <div class="tool-count">{{ itemData.count }}</div>
                             }
                         </div>

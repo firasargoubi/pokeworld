@@ -7,6 +7,7 @@ import { ValidationResult } from '@app/interfaces/game-validation-result';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
+import { PopupService } from '@app/services/popup/popup.service';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
@@ -20,6 +21,7 @@ describe('EditorService', () => {
     let gameValidationServiceSpy: jasmine.SpyObj<GameValidationService>;
     let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
     let gameDataServiceSpy: jasmine.SpyObj<GameDataService>;
+    let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let routerSpy: jasmine.SpyObj<Router>;
     let mockGames: GameData[];
 
@@ -46,6 +48,7 @@ describe('EditorService', () => {
                 itemUpdate: itemUpdateSubject.asObservable(),
             },
         );
+        popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'keepMessages']);
         gameDataServiceSpy.gameData = structuredClone(MOCK_GAMES[0]);
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -63,6 +66,7 @@ describe('EditorService', () => {
                 { provide: GameValidationService, useValue: gameValidationServiceSpy },
                 { provide: GameSaveService, useValue: gameSaveServiceSpy },
                 { provide: GameDataService, useValue: gameDataServiceSpy },
+                { provide: PopupService, useValue: popupServiceSpy },
                 { provide: Router, useValue: routerSpy },
             ],
         });
@@ -83,6 +87,7 @@ describe('EditorService', () => {
 
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
     });
+
     it('should format validation errors correctly', () => {
         const validationResult: ValidationResult = {
             ...mockValidationResult,

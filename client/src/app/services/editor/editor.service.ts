@@ -29,8 +29,14 @@ export class EditorService {
     private gameSaveService: GameSaveService = inject(GameSaveService);
     private popupService: PopupService = inject(PopupService);
 
-    redirectToAdminPage(): void {
-        this.router.navigate(['/admin']);
+    redirectToAdminPage(needsConfirmation: boolean = true): void {
+        if (needsConfirmation && this.gameDataService.isModified(this.initialGameData)) {
+            this.popupService.showPopup('Voulez-vous vraiment quitter la page? Les modifications non sauvegardées seront perdues.', true, () => {
+                this.router.navigate(['/admin']);
+            });
+        } else {
+            this.router.navigate(['/admin']);
+        }
     }
 
     saveButton(): void {
@@ -50,9 +56,6 @@ export class EditorService {
             this.gameDataService.gameData.isVisible = false;
             this.gameDataService.gameData.lastEdited = new Date();
             this.saveGame();
-            this.popupService.showPopup('Jeu sauvegardé avec succès', false);
-            this.popupService.keepMessages();
-            this.redirectToAdminPage();
         });
     }
 
@@ -134,7 +137,7 @@ export class EditorService {
             }
         }
 
-        return errors.length > 0 ? 'Erreurs de validation :\n' + errors.join('\n') : 'Aucune erreur de validation';
+        return errors.length ? 'Erreurs de validation :\n' + errors.join('\n') : 'Aucune erreur de validation';
     }
 
     private getEventProperty(event: Event): EventProperty {
@@ -163,7 +166,9 @@ export class EditorService {
     private saveGame(): void {
         this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe({
             next: () => {
-                this.redirectToAdminPage();
+                this.popupService.showPopup('Jeu sauvegardé avec succès', false);
+                this.popupService.keepMessages();
+                this.redirectToAdminPage(false);
             },
             error: (error) => {
                 this.popupService.showPopup('Erreur lors de la sauvegarde du jeu: ' + error, false);

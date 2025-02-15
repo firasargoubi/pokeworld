@@ -175,4 +175,13 @@ describe('GameDataService', () => {
 
         expect(service.isMapValid()).toBeFalse();
     });
+    it('should return false if the gameData is different from the initialGameData', () => {
+        const initialGameData = structuredClone(DEFAULT_GAME);
+        initialGameData.name = 'Test';
+        expect(service.isModified(initialGameData)).toBeTrue();
+    });
+    it('should return true if the gameData is the same as the initialGameData', () => {
+        const initialGameData = structuredClone(service.gameData);
+        expect(service.isModified(initialGameData)).toBeFalse();
+    });
 });
