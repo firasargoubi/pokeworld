@@ -71,7 +71,7 @@ export class PlayerSelectionPageComponent {
         }
     }
 
-    goToCreatPage() {
+    goToCreatePage() {
         this.router.navigate(['/create']);
     }
 

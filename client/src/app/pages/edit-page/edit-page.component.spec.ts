@@ -39,8 +39,6 @@ describe('EditPageComponent', () => {
             imports: [EditPageComponent, HeaderComponent, MapComponent, ItemComponent, FormsModule],
             providers: [{ provide: EditorService, useValue: editorServiceSpy }],
         }).compileComponents();
-
-        editorServiceSpy = TestBed.inject(EditorService) as jasmine.SpyObj<EditorService>;
     });
 
     beforeEach(() => {

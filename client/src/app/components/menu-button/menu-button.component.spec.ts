@@ -5,14 +5,16 @@ import { MenuButtonComponent } from '@app/components/menu-button/menu-button.com
 describe('MenuButtonComponent', () => {
     let component: MenuButtonComponent;
     let fixture: ComponentFixture<MenuButtonComponent>;
-    let router: Router;
+    let routerSpy: jasmine.SpyObj<Router>;
     const delay = 200;
 
     beforeEach(async () => {
+        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+
         await TestBed.configureTestingModule({
             imports: [MenuButtonComponent],
+            providers: [{ provide: Router, useValue: routerSpy }],
         }).compileComponents();
-        router = TestBed.inject(Router);
     });
 
     beforeEach(() => {
@@ -32,14 +34,13 @@ describe('MenuButtonComponent', () => {
     });
 
     it('should navigate with delay when navigateWithDelay is called', (done) => {
-        const navigateSpy = spyOn(router, 'navigate');
         component.routePath = '/test-path';
 
         component.navigateWithDelay();
 
         setTimeout(() => {
             expect(component.isActive).toBeFalse();
-            expect(navigateSpy).toHaveBeenCalledWith(['/test-path']);
+            expect(routerSpy.navigate).toHaveBeenCalledWith(['/test-path']);
             done();
         }, delay);
     });

@@ -11,14 +11,12 @@ describe('LobbyPageComponent', () => {
     let routerSpy: jasmine.SpyObj<Router>;
 
     beforeEach(async () => {
-        const routerMock = jasmine.createSpyObj('Router', ['navigate']);
+        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
         await TestBed.configureTestingModule({
             imports: [CommonModule, HeaderComponent, PokeballButtonComponent, LobbyPageComponent],
-            providers: [{ provide: Router, useValue: routerMock }],
+            providers: [{ provide: Router, useValue: routerSpy }],
         }).compileComponents();
-
-        routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     });
 
     beforeEach(() => {

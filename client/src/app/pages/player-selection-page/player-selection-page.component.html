@@ -1,6 +1,6 @@
 <div>
     <div id="page-header">
-        <app-header [onClick]="this.goToCreatPage.bind(this)" [stepNumber]="'2'" [title]="'SELECTION DE PERSONNAGE'"></app-header>
+        <app-header [onClick]="this.goToCreatePage.bind(this)" [stepNumber]="'2'" [title]="'SELECTION DE PERSONNAGE'"></app-header>
     </div>
     <div id="ps-page-body">
         <main class="flex-container">
@@ -22,9 +22,9 @@
                     </span>
                 </div>
                 @if(needsWarning('name')){
-                <div class="warning">Vous devez entrer un pseudo entre 3 et 20 characteres !</div>
+                    <div class="warning">Vous devez entrer un pseudo entre 3 et 20 characteres !</div>
                 } @if(needsWarning('avatar')){
-                <div class="warning">Veuillez choisir une AVATAR !</div>
+                    <div class="warning">Veuillez choisir une AVATAR !</div>
                 }
                 <div id="player-stats">
                     <div class="stat-container" title="Points de vie du personnage">
@@ -77,13 +77,13 @@
             <section id="avatar-selection-container">
                 <div id="avatar-list">
                     @for(avatar of avatarList ; track avatarData[avatar].name ; ){
-                    <div
-                        [ngClass]="['avatar-container', getAvatarBtnStyle(avatar).class]"
-                        (click)="handleAvatarSelection(avatar)"
-                        title="{{ avatarData[avatar].name }}"
-                    >
-                        <img src="{{ avatarData[avatar].image }}" class="avatar-select" />
-                    </div>
+                        <div
+                            [ngClass]="['avatar-container', getAvatarBtnStyle(avatar).class]"
+                            (click)="handleAvatarSelection(avatar)"
+                            title="{{ avatarData[avatar].name }}"
+                        >
+                            <img src="{{ avatarData[avatar].image }}" class="avatar-select" />
+                        </div>
                     }
                 </div>
             </section>

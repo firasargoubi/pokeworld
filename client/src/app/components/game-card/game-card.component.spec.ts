@@ -10,18 +10,17 @@ describe('GameCardComponent', () => {
     let thumbnailServiceSpy: jasmine.SpyObj<ThumbnailService>;
 
     beforeEach(async () => {
-        const thumbnailSpy = jasmine.createSpyObj('ThumbnailService', ['getThumbnail']);
-        thumbnailSpy.getThumbnail.and.returnValue(Promise.resolve('data:image/png;base64,mockthumbnail'));
+        thumbnailServiceSpy = jasmine.createSpyObj('ThumbnailService', ['getThumbnail']);
+        thumbnailServiceSpy.getThumbnail.and.returnValue(Promise.resolve('data:image/png;base64,mockthumbnail'));
 
         await TestBed.configureTestingModule({
             imports: [GameCardComponent],
-            providers: [{ provide: ThumbnailService, useValue: thumbnailSpy }],
+            providers: [{ provide: ThumbnailService, useValue: thumbnailServiceSpy }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(GameCardComponent);
         component = fixture.componentInstance;
         component.game = structuredClone(MOCK_GAMES[0]);
-        thumbnailServiceSpy = TestBed.inject(ThumbnailService) as jasmine.SpyObj<ThumbnailService>;
         fixture.detectChanges();
     });
 
