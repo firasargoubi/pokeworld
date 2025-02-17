@@ -64,20 +64,6 @@ body {
     pointer-events: auto;
     scrollbar-width: none;
 }
-
-.fade-out {
-    animation: fadeOut 1s forwards;
-}
-
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-    to {
-        opacity: 0;
-    }
-}
-
 .cdk-global-overlay-wrapper {
     flex-shrink: 0;
 }

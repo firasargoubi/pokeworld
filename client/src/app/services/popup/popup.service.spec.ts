@@ -1,4 +1,5 @@
-import { Overlay, OverlayConfig, OverlayContainer } from '@angular/cdk/overlay';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Overlay, OverlayContainer } from '@angular/cdk/overlay';
 import { Component } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
@@ -19,14 +20,10 @@ class MockWarningConfirmationPopupComponent {
 
 describe('PopupService', () => {
     let service: PopupService;
-    let overlay: Overlay;
     let overlayContainer: OverlayContainer;
     let routerEventsSubject: Subject<NavigationEnd>;
-
-    const SHOW_DELAY = 1500;
-    const FADE_DELAY = 500;
-    const TOTAL_DELAY = SHOW_DELAY + FADE_DELAY;
-
+    const TOTAL_DELAY = 1500;
+    const HALF_DELAY = TOTAL_DELAY / 2;
     beforeEach(() => {
         routerEventsSubject = new Subject<NavigationEnd>();
 
@@ -49,16 +46,12 @@ describe('PopupService', () => {
         });
 
         service = TestBed.inject(PopupService);
-        overlay = TestBed.inject(Overlay);
         overlayContainer = TestBed.inject(OverlayContainer);
     });
 
     afterEach(() => {
         overlayContainer.ngOnDestroy();
     });
-
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    // private methods
 
     it('should be created', () => {
         expect(service).toBeTruthy();
@@ -80,25 +73,17 @@ describe('PopupService', () => {
         expect((service as any).overlayRefs.length).toBe(1);
     });
 
-    it('should create overlay with correct configuration', () => {
-        const spy = spyOn(overlay, 'create').and.callThrough();
-
-        // Test confirmation popup
-        service.showPopup('Confirmation', true);
-        const config: OverlayConfig | undefined = spy.calls.mostRecent().args[0];
-        if (config) {
-            expect(config.hasBackdrop).toBeTrue();
-            expect(config.backdropClass).toContain('confirmation-backdrop-class');
-        }
-    });
-
     it('should execute action on confirmation', fakeAsync(() => {
         const actionSpy = jasmine.createSpy('action');
         service.showPopup('Confirmation', true, actionSpy);
 
-        const overlayRef = (service as any).overlayRefs[0];
-        const component = overlayRef.getConfig().data.componentInstance;
-        component.closed.next(true);
+        tick(); // Laisser le popup s'afficher
+
+        const popupComponent = service.popupComponents[0];
+        expect(popupComponent).toBeDefined();
+
+        popupComponent.closed.next(true);
+        tick();
 
         expect(actionSpy).toHaveBeenCalled();
     }));
@@ -124,6 +109,67 @@ describe('PopupService', () => {
         service.showPopup('Test');
         routerEventsSubject.next(new NavigationEnd(1, '/new', '/new'));
 
+        expect((service as any).overlayRefs.length).toBe(0);
+    });
+
+    it('should handle multiple messages in sequence', fakeAsync(() => {
+        service.showPopup('First message');
+        expect((service as any).overlayRefs.length).toBe(1);
+        tick(HALF_DELAY);
+
+        service.showPopup('Second message');
+        expect((service as any).overlayRefs.length).toBe(2);
+
+        tick(HALF_DELAY);
+        expect((service as any).overlayRefs.length).toBe(1);
+    }));
+
+    it('should set and reset z-index correctly', () => {
+        service.showPopup('Test');
+        const container = overlayContainer.getContainerElement();
+        expect(container.style.zIndex).toBe('2');
+
+        service.clearMessages();
+        expect(container.style.zIndex).toBe('-1');
+    });
+
+    it('should access popup components via getter', () => {
+        service.showPopup('Test message');
+        const popupComponents = service.popupComponents;
+        expect(popupComponents.length).toBe(1);
+        expect(popupComponents[0].message).toBe('Test message');
+    });
+
+    it('should return null when no popups are active', () => {
+        expect(service.popupComponents.length).toBe(0);
+
+        service.showPopup('Test message');
+        expect(service.popupComponents.length).toBe(1);
+
+        service.clearMessages();
+        expect(service.popupComponents.length).toBe(0);
+    });
+
+    it('should display next popup when a popup is closed', fakeAsync(() => {
+        service.showPopup('First message');
+        service.showPopup('Second message');
+
+        expect(service.popupComponents.length).toBe(2);
+
+        service.popupComponents[0].closed.next(false);
+        tick();
+
+        expect(service.popupComponents.length).toBe(1);
+        expect(service.popupComponents[0].message).toBe('Second message');
+
+        service.popupComponents[0].closed.next(false);
+        tick();
+
+        expect(service.popupComponents.length).toBe(0);
+    }));
+    it('should do nothing when no message is queued', () => {
+        (service as any).messages = [];
+        (service as any).displayPopup();
         expect((service as any).overlayRefs.length).toBe(0);
     });
 });

@@ -31,10 +31,6 @@ describe('CreatePageComponent', () => {
                 { provide: PopupService, useValue: popupServiceSpy },
             ],
         }).compileComponents();
-
-        gameDataServiceMock = TestBed.inject(GameDataService) as jasmine.SpyObj<GameDataService>;
-        gameSaveServiceSpy = TestBed.inject(GameSaveService) as jasmine.SpyObj<GameSaveService>;
-        popupServiceSpy = TestBed.inject(PopupService) as jasmine.SpyObj<PopupService>;
         router = TestBed.inject(Router);
         fixture = TestBed.createComponent(CreatePageComponent);
 

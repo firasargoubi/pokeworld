@@ -18,7 +18,7 @@ describe('AdminPageComponent', () => {
 
     beforeEach(async () => {
         gameSaveServiceSpy = jasmine.createSpyObj<GameSaveService>('GameSaveService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
-        popupServiceSpy = jasmine.createSpyObj<PopupService>('PopupService', ['showPopup']);
+        popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
 
         gameSaveServiceSpy.getAllGames.and.returnValue(of([]));
         gameSaveServiceSpy.getGame.and.returnValue(of({} as GameData));
@@ -34,7 +34,6 @@ describe('AdminPageComponent', () => {
         }).compileComponents();
 
         gameSaveServiceSpy = TestBed.inject(GameSaveService) as jasmine.SpyObj<GameSaveService>;
-        popupServiceSpy = TestBed.inject(PopupService) as jasmine.SpyObj<PopupService>;
     });
 
     beforeEach(() => {
