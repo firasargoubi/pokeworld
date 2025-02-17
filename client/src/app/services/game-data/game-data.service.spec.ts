@@ -1,4 +1,3 @@
-import { TestBed } from '@angular/core/testing';
 import { DEFAULT_GAME } from '@app/consts/default-game';
 import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
@@ -11,7 +10,6 @@ describe('GameDataService', () => {
     let service: GameDataService;
 
     beforeEach(() => {
-        TestBed.configureTestingModule({});
         service = new GameDataService();
 
         service.gameData.mapData.tiles = Array.from({ length: service.gameData.mapData.size }, () =>
@@ -32,11 +30,6 @@ describe('GameDataService', () => {
     });
 
     it('should get and edit a tile correctly', () => {
-        for (let i = 0; i < service.gameData.mapData.size; i++) {
-            for (let j = 0; j < service.gameData.mapData.size; j++) {
-                service.gameData.mapData.tiles[i][j] = TileType.Water;
-            }
-        }
         service.gameData.mapData.tiles[1][1] = TileType.Grass;
         const position: Position = { x: 1, y: 1 };
         service.editTile(TileType.Water, position);

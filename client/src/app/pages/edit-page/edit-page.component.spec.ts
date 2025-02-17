@@ -39,8 +39,6 @@ describe('EditPageComponent', () => {
             imports: [EditPageComponent, HeaderComponent, MapComponent, ItemComponent, FormsModule],
             providers: [{ provide: EditorService, useValue: editorServiceSpy }],
         }).compileComponents();
-
-        editorServiceSpy = TestBed.inject(EditorService) as jasmine.SpyObj<EditorService>;
     });
 
     beforeEach(() => {
@@ -51,5 +49,10 @@ describe('EditPageComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should set initialGameData on ngOnInit', () => {
+        component.ngOnInit();
+        expect(editorServiceSpy.initialGameData).toEqual(DEFAULT_GAME);
     });
 });

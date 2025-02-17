@@ -35,8 +35,8 @@ describe('GameValidationService', () => {
     });
 
     it('should invoke validateName, validateDescription, and validateMap with the correct parameters', () => {
-        /* eslint-disable @typescript-eslint/no-explicit-any */
         // private methods
+        /* eslint-disable @typescript-eslint/no-explicit-any */
         spyOn<any>(service, 'validateMap').and.returnValue({
             name: { isValid: true, errorCode: null },
             description: { isValid: true, errorCode: null },
@@ -62,7 +62,6 @@ describe('GameValidationService', () => {
         const result = service.validateGame(game);
 
         expect(result).not.toBeNull();
-        // expect(result?.description.isValid).toBeFalse();
     });
 
     it('validateName should validate a correct game name', () => {

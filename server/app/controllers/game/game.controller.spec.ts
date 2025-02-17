@@ -16,12 +16,7 @@ describe('GameController', () => {
         gameService = createStubInstance(GameService);
         const module: TestingModule = await Test.createTestingModule({
             controllers: [GameController],
-            providers: [
-                {
-                    provide: GameService,
-                    useValue: gameService,
-                },
-            ],
+            providers: [{ provide: GameService, useValue: gameService }],
         }).compile();
 
         controller = module.get<GameController>(GameController);
@@ -166,8 +161,8 @@ describe('GameController', () => {
 
     it('isNameUnique() should return the correct uniqueness status with an ID', async () => {
         const cases = [
-            { name: 'ExistingName', id: '123', expected: true }, // Appartient à l'ID donné
-            { name: 'ExistingName', id: '456', expected: false }, // Appartient à un autre ID
+            { name: 'ExistingName', id: '123', expected: true },
+            { name: 'ExistingName', id: '456', expected: false },
         ];
 
         for (const testCase of cases) {

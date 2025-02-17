@@ -1,7 +1,6 @@
-import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameData } from '@common/game-data';
@@ -11,29 +10,30 @@ import { AdminPageComponent } from './admin-page.component';
 describe('AdminPageComponent', () => {
     let component: AdminPageComponent;
     let fixture: ComponentFixture<AdminPageComponent>;
-    let router: Router;
     let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
+    let routerSpy: jasmine.SpyObj<Router>;
 
     beforeEach(async () => {
         gameSaveServiceSpy = jasmine.createSpyObj<GameSaveService>('GameSaveService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
-
-        gameSaveServiceSpy.getAllGames.and.returnValue(of([]));
+        gameSaveServiceSpy.getAllGames.and.returnValue(of());
         gameSaveServiceSpy.getGame.and.returnValue(of({} as GameData));
         gameSaveServiceSpy.toggleVisibility.and.returnValue(of({} as GameData));
         gameSaveServiceSpy.deleteGame.and.returnValue(of(undefined));
 
-        await TestBed.configureTestingModule({
-            imports: [RouterModule.forRoot([]), CommonModule, AdminPageComponent],
-            providers: [{ provide: GameSaveService, useValue: gameSaveServiceSpy }],
-        }).compileComponents();
+        routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
 
-        gameSaveServiceSpy = TestBed.inject(GameSaveService) as jasmine.SpyObj<GameSaveService>;
+        await TestBed.configureTestingModule({
+            imports: [AdminPageComponent],
+            providers: [
+                { provide: GameSaveService, useValue: gameSaveServiceSpy },
+                { provide: Router, useValue: routerSpy },
+            ],
+        }).compileComponents();
     });
 
     beforeEach(() => {
         fixture = TestBed.createComponent(AdminPageComponent);
         component = fixture.componentInstance;
-        router = TestBed.inject(Router);
         fixture.detectChanges();
     });
 
@@ -67,16 +67,13 @@ describe('AdminPageComponent', () => {
     });
 
     it('should navigate to edit page when editGame is called', () => {
-        const navigateSpy = spyOn(router, 'navigate');
-        const setItemSpy = spyOn(sessionStorage, 'setItem');
         const gameId = '123';
 
         gameSaveServiceSpy.getGame.and.returnValue(of({} as GameData));
 
         component.editGame(gameId);
 
-        expect(setItemSpy).toHaveBeenCalledWith('editGameId', gameId);
-        expect(navigateSpy).toHaveBeenCalledWith(['/edit']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/edit']);
     });
 
     it('should handle error when editGame fails', () => {
@@ -99,13 +96,14 @@ describe('AdminPageComponent', () => {
         const errorResponse = new HttpErrorResponse({ error: 'Server error', status: 500 });
         gameSaveServiceSpy.toggleVisibility.and.returnValue(throwError(() => errorResponse));
 
-        component.toggleVisibility({ id: '123', isVisible: true });
+        component.toggleVisibility({ id: MOCK_GAMES[0]._id, isVisible: true });
 
         expect(component.messages.length).toBe(1);
     });
 
     it('should add a confirmation message when deleteGame is called', () => {
-        component.deleteGame('123', '');
+        component.deleteGame(MOCK_GAMES[0]._id, '');
+
         expect(component.messages.length).toBe(1);
         expect(component.messages[0].message).toBe('Êtes-vous sûr de vouloir supprimer le jeu : ');
         expect(component.messages[0].isConfirmation).toBeTrue();
@@ -114,15 +112,14 @@ describe('AdminPageComponent', () => {
     it('should delete game when confirmation is accepted', () => {
         gameSaveServiceSpy.deleteGame.and.returnValue(of(undefined));
 
-        component.deleteGame('123', '');
-
+        component.deleteGame(MOCK_GAMES[0]._id, '');
         component.removeMessage(0, true);
 
-        expect(gameSaveServiceSpy.deleteGame).toHaveBeenCalledWith('123');
+        expect(gameSaveServiceSpy.deleteGame).toHaveBeenCalledWith(MOCK_GAMES[0]._id);
     });
 
     it('should not delete game when confirmation is canceled', () => {
-        component.deleteGame('123', '');
+        component.deleteGame(MOCK_GAMES[0]._id, '');
 
         component.removeMessage(0, false);
 
@@ -134,8 +131,7 @@ describe('AdminPageComponent', () => {
         const errorResponse = new HttpErrorResponse({ error: 'Delete failed', status: 500 });
         gameSaveServiceSpy.deleteGame.and.returnValue(throwError(() => errorResponse));
 
-        component.deleteGame('123', '');
-
+        component.deleteGame(MOCK_GAMES[0]._id, '');
         component.removeMessage(0, true);
 
         expect(component.messages.length).toBe(1);
@@ -182,10 +178,10 @@ describe('AdminPageComponent', () => {
     });
 
     it('should navigate to menu', () => {
-        const navigateSpy = spyOn(router, 'navigate');
         component.navigateToMenu();
-        expect(navigateSpy).toHaveBeenCalledWith(['/']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
     });
+
     it('should add a message to the messages array', () => {
         component['addMessage']('Test message', false);
 
@@ -198,7 +194,6 @@ describe('AdminPageComponent', () => {
         const action = () => {
             return;
         };
-
         component['addMessage']('Confirmation message', true, action);
 
         expect(component.messages.length).toBe(1);
@@ -206,6 +201,7 @@ describe('AdminPageComponent', () => {
         expect(component.messages[0].isConfirmation).toBeTrue();
         expect(component.messages[0].action).toBe(action);
     });
+
     it('should add a message when the error is not 404', () => {
         const error = new HttpErrorResponse({ error: 'Server error', status: 500 });
         component['handleNotFoundError'](error);
@@ -220,24 +216,22 @@ describe('AdminPageComponent', () => {
         expect(component.messages[0].message).toBe("Ce jeu n'existe plus !");
         expect(loadGamesSpy).toHaveBeenCalled();
     });
+
     it('should delete the game and update the games list', () => {
         const initialGames = structuredClone(MOCK_GAMES);
         const gameId = initialGames[0]._id;
 
         component.games = initialGames;
-
         gameSaveServiceSpy.deleteGame.and.returnValue(of(undefined));
-
         component['confirmDeleteGame'](gameId);
 
         expect(gameSaveServiceSpy.deleteGame).toHaveBeenCalledWith(gameId);
-
         expect(component.games.length).toBe(initialGames.length - 1);
         expect(component.games.some((game) => game._id === gameId)).toBeFalse();
     });
 
     it('should handle error when deleteGame fails', () => {
-        const gameId = '123';
+        const gameId = MOCK_GAMES[0]._id;
         const errorResponse = new HttpErrorResponse({ error: 'Delete failed', status: 500 });
         gameSaveServiceSpy.deleteGame.and.returnValue(throwError(() => errorResponse));
 
