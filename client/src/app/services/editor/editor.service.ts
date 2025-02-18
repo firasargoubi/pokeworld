@@ -3,19 +3,19 @@ import { Router } from '@angular/router';
 import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
 import { ITEM_DESCRIPTION, MAX_ITEM_COUNT } from '@app/consts/items.const';
 import { EditorData, EditorItem } from '@app/interfaces/editor-data';
+import { ErrorCode } from '@app/interfaces/error-code.enum';
 import { EventProperty } from '@app/interfaces/event-property';
 import { BridgeValidationError, ValidationResult, ValidationStatus } from '@app/interfaces/game-validation-result';
+import { PopupMessage } from '@app/interfaces/popup-message';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
-import { PopupMessage } from '@app/interfaces/popup-message';
-import { ErrorCode } from '@app/interfaces/error-code.enum';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
-import { DEFAULT_EDITOR_TILES, EDITOR_ERASE_TILE, ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from './editor.service.const';
+import { DEFAULT_EDITOR_DATA, EDITOR_ERASE_TILE, ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from './editor.service.const';
 
 @Injectable({
     providedIn: 'root',
@@ -243,22 +243,28 @@ export class EditorService {
         const tileHasItem = Boolean(this.gameDataService.getItem(eventProperty.tilePosition as Position));
 
         if (!this.editorData.activeItem && tileHasItem) {
-            if (isLeftClick) {
-                return this.pickItem(eventProperty);
-            } else {
-                return this.gameDataService.removeItem(eventProperty.tilePosition as Position);
-            }
+            this.clickOnMapItem(eventProperty, isLeftClick);
         }
 
         if (!this.editorData.activeItem) {
-            if (isLeftClick) {
-                this.editorData.activeTile = this.editorData.selectedTile;
-            } else {
-                this.editorData.activeTile = EDITOR_ERASE_TILE;
-            }
-
+            this.editorData.activeTile = this.getSelectedTile(isLeftClick);
             return this.paintTile(eventProperty.tilePosition as Position);
         }
+    }
+
+    private clickOnMapItem(eventProperty: EventProperty, isLeftClick: boolean): void {
+        if (isLeftClick) {
+            this.pickItem(eventProperty);
+        } else {
+            this.gameDataService.removeItem(eventProperty.tilePosition as Position);
+        }
+    }
+
+    private getSelectedTile(isLeftClick: boolean): TileType | null {
+        if (isLeftClick) {
+            return this.editorData.selectedTile;
+        }
+        return EDITOR_ERASE_TILE;
     }
 
     private clickOnTile(tile: TileType): void {
@@ -310,18 +316,8 @@ export class EditorService {
 
     private getEditorData(): EditorData {
         this.verifyMapData();
-        this.gameDataService.itemUpdate.subscribe((x) => this.onItemUpdate(x));
-
-        return {
-            tiles: DEFAULT_EDITOR_TILES,
-            items: this.getEditorItems(),
-            selectedTile: null,
-            activeTile: null,
-            activeTilePosition: { x: -1, y: -1 },
-            activeItem: null,
-            activeItemImage: EMPTY_IMAGE,
-            activeItemPosition: { x: -1, y: -1 },
-        };
+        this.gameDataService.itemUpdate.subscribe(this.onItemUpdate.bind(this));
+        return { ...DEFAULT_EDITOR_DATA, items: this.getEditorItems() };
     }
 
     private onItemUpdate(item: ItemType | null): void {
@@ -416,15 +412,12 @@ export class EditorService {
 
     private getMaxSharedItemCount(item: ItemType): number {
         let sharedCount = 0;
-
         SHARED_ITEM_POOL.forEach((sharedItem) => {
             if (sharedItem !== item) {
                 sharedCount += this.getCurrentItemCount(sharedItem);
             }
         });
-
         const highestMaxItemCount = MAX_ITEM_COUNT[this.gameDataService.getMapSize()][ITEM_POOL_HIGHEST_ITEM];
-
         return highestMaxItemCount - sharedCount;
     }
 }
