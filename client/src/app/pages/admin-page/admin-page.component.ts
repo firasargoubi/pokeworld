@@ -47,7 +47,6 @@ export class AdminPageComponent implements OnInit {
     editGame(id: string) {
         this.gameSaveService.getGame(id).subscribe({
             next: () => {
-                sessionStorage.setItem('editGameId', id);
                 this.router.navigate(['/edit']);
             },
             error: (error: HttpErrorResponse) => {

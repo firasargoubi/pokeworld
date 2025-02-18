@@ -3,9 +3,8 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { ComponentRef, Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
+import { POPUP_DELAY } from '@app/consts/popup.const';
 import { filter } from 'rxjs/operators';
-
-const showDelay = 1500;
 
 interface PopupMessage {
     message: string;
@@ -17,6 +16,7 @@ interface PopupMessage {
     providedIn: 'root',
 })
 export class PopupService {
+    showDelay = POPUP_DELAY;
     private messages: PopupMessage[] = [];
     private overlayRefs: { overlayRef: OverlayRef; componentRef: ComponentRef<WarningConfirmationPopupComponent> }[] = [];
     private keepMessagesOnNavigation: boolean = false;
@@ -74,7 +74,7 @@ export class PopupService {
         if (!currentMessage.isConfirmation) {
             setTimeout(() => {
                 this.handlePopupClose(false, overlayRef, null);
-            }, showDelay);
+            }, POPUP_DELAY);
         }
     }
 

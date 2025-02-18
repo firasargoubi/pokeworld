@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
+import { POPUP_DELAY } from '@app/consts/popup.const';
 import { Subject } from 'rxjs';
 import { PopupService } from './popup.service';
 
@@ -18,12 +19,12 @@ class MockWarningConfirmationPopupComponent {
     closed = new Subject<boolean>();
 }
 
+const HALF_DELAY = POPUP_DELAY / 2;
+
 describe('PopupService', () => {
     let service: PopupService;
     let overlayContainer: OverlayContainer;
     let routerEventsSubject: Subject<NavigationEnd>;
-    const TOTAL_DELAY = 1500;
-    const HALF_DELAY = TOTAL_DELAY / 2;
     beforeEach(() => {
         routerEventsSubject = new Subject<NavigationEnd>();
 
@@ -61,8 +62,8 @@ describe('PopupService', () => {
         service.showPopup('Test message');
         service.clearMessages();
 
-        expect((service as any).messages.length).toBe(0);
-        expect((service as any).overlayRefs.length).toBe(0);
+        expect(service['messages'].length).toBe(0);
+        expect(service['overlayRefs'].length).toBe(0);
     });
 
     it('should keep overlayRefs on navigation when keepMessages is called', () => {
@@ -70,7 +71,7 @@ describe('PopupService', () => {
         service.keepMessages();
 
         routerEventsSubject.next(new NavigationEnd(1, '/edit', '/admin'));
-        expect((service as any).overlayRefs.length).toBe(1);
+        expect(service['overlayRefs'].length).toBe(1);
     });
 
     it('should execute action on confirmation', fakeAsync(() => {
@@ -90,10 +91,10 @@ describe('PopupService', () => {
 
     it('should auto-close regular popup after delay', fakeAsync(() => {
         service.showPopup('Regular message');
-        expect((service as any).overlayRefs.length).toBe(1);
+        expect(service['overlayRefs'].length).toBe(1);
 
-        tick(TOTAL_DELAY);
-        expect((service as any).overlayRefs.length).toBe(0);
+        tick(POPUP_DELAY);
+        expect(service['overlayRefs'].length).toBe(0);
     }));
 
     it('should adjust z-index correctly', () => {
@@ -101,7 +102,7 @@ describe('PopupService', () => {
         const container = overlayContainer.getContainerElement();
         expect(container.style.zIndex).toBe('2');
 
-        (service as any).setOverlayZIndexLow();
+        service['setOverlayZIndexLow']();
         expect(container.style.zIndex).toBe('-1');
     });
 
@@ -109,19 +110,19 @@ describe('PopupService', () => {
         service.showPopup('Test');
         routerEventsSubject.next(new NavigationEnd(1, '/new', '/new'));
 
-        expect((service as any).overlayRefs.length).toBe(0);
+        expect(service['overlayRefs'].length).toBe(0);
     });
 
     it('should handle multiple messages in sequence', fakeAsync(() => {
         service.showPopup('First message');
-        expect((service as any).overlayRefs.length).toBe(1);
+        expect(service['overlayRefs'].length).toBe(1);
         tick(HALF_DELAY);
 
         service.showPopup('Second message');
-        expect((service as any).overlayRefs.length).toBe(2);
+        expect(service['overlayRefs'].length).toBe(2);
 
         tick(HALF_DELAY);
-        expect((service as any).overlayRefs.length).toBe(1);
+        expect(service['overlayRefs'].length).toBe(1);
     }));
 
     it('should set and reset z-index correctly', () => {
@@ -167,9 +168,10 @@ describe('PopupService', () => {
 
         expect(service.popupComponents.length).toBe(0);
     }));
+
     it('should do nothing when no message is queued', () => {
-        (service as any).messages = [];
-        (service as any).displayPopup();
-        expect((service as any).overlayRefs.length).toBe(0);
+        service['messages'] = [];
+        service['displayPopup']();
+        expect(service['overlayRefs'].length).toBe(0);
     });
 });

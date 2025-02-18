@@ -169,7 +169,7 @@ describe('PlayerSelectionPageComponent', () => {
     });
 
     it('should navigate to create page when goToCreatPage is called', () => {
-        component.goToCreatPage();
+        component.goToCreatePage();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/create']);
     });
 });

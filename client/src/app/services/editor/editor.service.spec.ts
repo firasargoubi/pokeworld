@@ -38,15 +38,14 @@ describe('EditorService', () => {
 
     beforeEach(() => {
         const itemUpdateSubject = new Subject<void>();
+        mockGames = structuredClone(MOCK_GAMES);
 
         gameValidationServiceSpy = jasmine.createSpyObj('GameValidationService', ['validateGame']);
         gameSaveServiceSpy = jasmine.createSpyObj('GameSaveService', ['isNameUnique', 'saveGame']);
         gameDataServiceSpy = jasmine.createSpyObj(
             'GameDataService',
             ['getTileFromPosition', 'addItem', 'isMapValid', 'getItemCount', 'getMapSize', 'getGameMode', 'setGameData'],
-            {
-                itemUpdate: itemUpdateSubject.asObservable(),
-            },
+            { itemUpdate: itemUpdateSubject.asObservable() },
         );
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'keepMessages']);
         gameDataServiceSpy.gameData = structuredClone(MOCK_GAMES[0]);
@@ -55,6 +54,7 @@ describe('EditorService', () => {
         gameValidationServiceSpy.validateGame.and.returnValue(mockValidationResult);
         gameSaveServiceSpy.isNameUnique.and.returnValue(of(true));
         gameSaveServiceSpy.saveGame.and.returnValue(of(MOCK_GAMES[0]));
+        gameDataServiceSpy.gameData = structuredClone(MOCK_GAMES[0]);
         gameDataServiceSpy.isMapValid.and.returnValue(true);
         gameDataServiceSpy.getMapSize.and.returnValue(MapSize.Small);
         gameDataServiceSpy.getGameMode.and.returnValue(GameMode.CTF);
@@ -72,7 +72,6 @@ describe('EditorService', () => {
         });
 
         service = TestBed.inject(EditorService);
-        mockGames = structuredClone(MOCK_GAMES);
     });
 
     it('should create', () => {
@@ -110,8 +109,7 @@ describe('EditorService', () => {
         gameDataServiceSpy.getTileFromPosition.and.returnValue(TileType.Water);
         const eventProp = { tilePosition: { x: 0, y: 0 } };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        service['dropItem'](eventProp as any);
+        service['dropItem'](eventProp as EventProperty);
 
         expect(gameDataServiceSpy.addItem).not.toHaveBeenCalled();
     });

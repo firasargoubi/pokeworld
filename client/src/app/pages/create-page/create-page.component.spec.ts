@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -14,26 +14,27 @@ describe('CreatePageComponent', () => {
     let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
     let gameDataServiceMock: jasmine.SpyObj<GameDataService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
-    let router: Router;
+    let routerSpy: jasmine.SpyObj<Router>;
 
     beforeEach(async () => {
         gameSaveServiceSpy = jasmine.createSpyObj('GameSaveService', ['getAllGames', 'getGame']);
+        gameDataServiceMock = jasmine.createSpyObj('GameDataService', ['setGameData']);
+        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+
         gameSaveServiceSpy.getAllGames.and.returnValue(of([]));
         gameSaveServiceSpy.getGame.and.returnValue(of({} as GameData));
         gameDataServiceMock = jasmine.createSpyObj('GameDataService', ['setGameData']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
 
         await TestBed.configureTestingModule({
-            imports: [RouterModule.forRoot([]), CreatePageComponent],
             providers: [
                 { provide: GameSaveService, useValue: gameSaveServiceSpy },
                 { provide: GameDataService, useValue: gameDataServiceMock },
                 { provide: PopupService, useValue: popupServiceSpy },
+                { provide: Router, useValue: routerSpy },
             ],
         }).compileComponents();
-        router = TestBed.inject(Router);
         fixture = TestBed.createComponent(CreatePageComponent);
-
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -51,16 +52,13 @@ describe('CreatePageComponent', () => {
     });
 
     it('should navigate to menu when navigateToMenu is called', () => {
-        const navigateSpy = spyOn(router, 'navigate');
-
         component.navigateToMenu();
-
-        expect(navigateSpy).toHaveBeenCalledWith(['/']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
     });
 
     it('should call loadGames when handleNotFoundError is called', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        const loadGamesSpy = spyOn(component as any, 'loadGames');
+        const loadGamesSpy = spyOn<any>(component, 'loadGames');
         const error = new HttpErrorResponse({ error: 'Game not found', status: 404 });
         component['handleNotFoundError'](error);
 
@@ -74,13 +72,12 @@ describe('CreatePageComponent', () => {
     });
 
     it('should handle game visibility on join', () => {
-        const navigateSpy = spyOn(router, 'navigate');
         gameSaveServiceSpy.getGame.and.returnValue(of({ _id: '1', isVisible: true } as GameData));
 
         component.onJoin('1');
 
         expect(gameDataServiceMock.setGameData).toHaveBeenCalledWith({ _id: '1', isVisible: true } as GameData);
-        expect(navigateSpy).toHaveBeenCalledWith(['/player-selection']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/player-selection']);
     });
 
     it('should handle not found error on join', () => {
