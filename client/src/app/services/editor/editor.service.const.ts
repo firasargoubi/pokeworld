@@ -1,6 +1,6 @@
-import { TILE_IMAGES } from '@app/consts/images.const';
+import { EMPTY_IMAGE, TILE_IMAGES } from '@app/consts/images.const';
 import { TILE_DESCRIPTION } from '@app/consts/tiles.const';
-import { EditorTile } from '@app/interfaces/editor-data';
+import { EditorData, EditorTile } from '@app/interfaces/editor-data';
 import { ItemType } from '@common/item-type.enum';
 import { TileType } from '@common/tile-type.enum';
 
@@ -30,6 +30,17 @@ export const DEFAULT_EDITOR_TILES: EditorTile[] = [
         isActive: false,
     },
 ];
+
+export const DEFAULT_EDITOR_DATA: EditorData = {
+    tiles: DEFAULT_EDITOR_TILES,
+    items: [],
+    selectedTile: null,
+    activeTile: null,
+    activeTilePosition: { x: -1, y: -1 },
+    activeItem: null,
+    activeItemImage: EMPTY_IMAGE,
+    activeItemPosition: { x: -1, y: -1 },
+};
 
 export const EDITOR_ERASE_TILE: TileType = TileType.Grass;
 
