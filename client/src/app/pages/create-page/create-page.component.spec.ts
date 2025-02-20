@@ -1,14 +1,15 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { GameCardComponent } from '@app/components/game-card/game-card.component';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { GameData } from '@common/game-data';
 import { of, throwError } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
-import { GameCardComponent } from '@app/components/game-card/game-card.component';
-import { Component } from '@angular/core';
 
 @Component({
     selector: 'app-game-card',
@@ -24,6 +25,7 @@ describe('CreatePageComponent', () => {
     let gameDataServiceMock: jasmine.SpyObj<GameDataService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let routerSpy: jasmine.SpyObj<Router>;
+    let mockGames: GameData[];
 
     beforeEach(async () => {
         gameSaveServiceSpy = jasmine.createSpyObj('GameSaveService', ['getAllGames', 'getGame']);
@@ -52,6 +54,7 @@ describe('CreatePageComponent', () => {
         fixture = TestBed.createComponent(CreatePageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        mockGames = structuredClone(MOCK_GAMES);
     });
 
     it('should create', () => {
@@ -59,11 +62,11 @@ describe('CreatePageComponent', () => {
     });
 
     it('should load games on init', () => {
-        gameSaveServiceSpy.getAllGames.and.returnValue(of([{ _id: '1', isVisible: true } as GameData]));
+        gameSaveServiceSpy.getAllGames.and.returnValue(of(mockGames));
 
         component.ngOnInit();
 
-        expect(component.games).toEqual([{ _id: '1', isVisible: true } as GameData]);
+        expect(component.games).toEqual(mockGames);
     });
 
     it('should navigate to menu when navigateToMenu is called', () => {
@@ -87,11 +90,11 @@ describe('CreatePageComponent', () => {
     });
 
     it('should handle game visibility on join', () => {
-        gameSaveServiceSpy.getGame.and.returnValue(of({ _id: '1', isVisible: true } as GameData));
+        gameSaveServiceSpy.getGame.and.returnValue(of(mockGames[0]));
 
-        component.onJoin('1');
+        component.onJoin(mockGames[0]._id);
 
-        expect(gameDataServiceMock.setGameData).toHaveBeenCalledWith({ _id: '1', isVisible: true } as GameData);
+        expect(gameDataServiceMock.setGameData).toHaveBeenCalledWith(mockGames[0]);
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/player-selection']);
     });
 
@@ -99,17 +102,18 @@ describe('CreatePageComponent', () => {
         const errorResponse = new HttpErrorResponse({ error: 'test 404 error', status: HttpStatusCode.NotFound });
         gameSaveServiceSpy.getGame.and.returnValue(throwError(() => errorResponse));
 
-        component.onJoin('1');
+        component.onJoin(mockGames[0]._id);
 
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith("Ce jeu n'existe plus");
         expect(gameSaveServiceSpy.getAllGames).toHaveBeenCalled();
     });
 
     it('should handle game not visible on join', () => {
-        const invisibleGame = { _id: '1', isVisible: false } as GameData;
+        const invisibleGame = mockGames[0];
+        invisibleGame.isVisible = false;
         gameSaveServiceSpy.getGame.and.returnValue(of(invisibleGame));
 
-        component.onJoin('1');
+        component.onJoin(mockGames[0]._id);
 
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith("Ce jeu n'est plus visible");
         expect(gameSaveServiceSpy.getAllGames).toHaveBeenCalled();
@@ -125,12 +129,11 @@ describe('CreatePageComponent', () => {
     });
 
     it('should filter visible games when loadGames is called', () => {
-        const mockGames = [{ _id: '1', isVisible: true } as GameData, { _id: '2', isVisible: false } as GameData];
         gameSaveServiceSpy.getAllGames.and.returnValue(of(mockGames));
 
         component['loadGames']();
 
-        expect(component.games).toEqual([{ _id: '1', isVisible: true } as GameData]);
+        expect(component.games).toEqual(mockGames.filter((game) => game.isVisible));
     });
 
     it('should call handleError when handleNotFoundError is called with non-NotFound error', () => {

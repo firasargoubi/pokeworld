@@ -10,7 +10,7 @@ import { PopupService } from './popup.service';
 
 @Component({
     selector: 'app-warning-confirmation-popup',
-    template: '<div></div>',
+    template: '',
     standalone: true,
 })
 class MockWarningConfirmationPopupComponent {
