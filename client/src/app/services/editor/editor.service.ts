@@ -30,12 +30,11 @@ export class EditorService {
     private popupService: PopupService = inject(PopupService);
 
     redirectToAdminPage(needsConfirmation: boolean = true): void {
+        const navigate = async () => this.router.navigate(['/admin']);
         if (needsConfirmation && this.gameDataService.isModified(this.initialGameData)) {
-            this.popupService.showPopup('Voulez-vous vraiment quitter la page? Les modifications non sauvegardées seront perdues.', true, () => {
-                this.router.navigate(['/admin']);
-            });
+            this.popupService.showPopup('Voulez-vous vraiment quitter la page? Les modifications non sauvegardées seront perdues.', true, navigate);
         } else {
-            this.router.navigate(['/admin']);
+            navigate();
         }
     }
 
@@ -60,8 +59,15 @@ export class EditorService {
     }
 
     resetButton(): void {
-        const oldGameData = structuredClone(this.initialGameData);
-        this.gameDataService.setGameData(oldGameData);
+        const action = () => {
+            const oldGameData = structuredClone(this.initialGameData);
+            this.gameDataService.setGameData(oldGameData);
+        };
+        if (this.gameDataService.isModified(this.initialGameData)) {
+            this.popupService.showPopup('Voulez-vous vraiment réinitialiser la partie?', true, action);
+        } else {
+            action();
+        }
     }
 
     onMouseDown(event: MouseEvent): void {
