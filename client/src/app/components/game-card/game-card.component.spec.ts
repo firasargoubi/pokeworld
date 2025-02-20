@@ -104,7 +104,7 @@ describe('GameCardComponent', () => {
         await fixture.whenStable();
         fixture.detectChanges();
 
-        expect(thumbnailServiceSpy.getThumbnail).toHaveBeenCalledWith(component.game.mapData);
+        expect(thumbnailServiceSpy.getThumbnail).toHaveBeenCalledWith(component.game.mapData, true);
         expect(component.thumbnailUrl).toBe(mockThumbnailUrl);
     });
 });
