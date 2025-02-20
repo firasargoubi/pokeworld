@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { ITEM_IMAGES } from '@app/consts/images.const';
 import { MapService } from '@app/services/map/map.service';
 import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
@@ -14,8 +15,8 @@ describe('ThumbnailService', () => {
         size: MapSize.Small,
         tiles: Array(MapSize.Small).fill(Array(MapSize.Small).fill(TileType.Grass)),
         items: {
-            [ItemType.Item1]: [],
-            [ItemType.Item2]: [],
+            [ItemType.Item1]: [{ x: 1, y: 2 }],
+            [ItemType.Item2]: [{ x: 3, y: 4 }],
             [ItemType.Item3]: [],
             [ItemType.Item4]: [],
             [ItemType.Item5]: [],
@@ -97,5 +98,18 @@ describe('ThumbnailService', () => {
         const result = await service['loadImage'](imageUrl, x, y);
 
         expect(result).toBeNull();
+    });
+
+    it('should load and draw item images correctly', async () => {
+        const item1Image = '/assets/images/game/items/item1.png';
+        const item2Image = '/assets/images/game/items/item2.png';
+
+        mapServiceSpy.getTileImage.and.returnValue('/assets/images/game/tiles/grass.png');
+
+        const thumbnail = await service.getThumbnail(mockMap);
+
+        expect(thumbnail).toContain('data:image/png;base64');
+        expect(ITEM_IMAGES.get(ItemType.Item1)).toBe(item1Image);
+        expect(ITEM_IMAGES.get(ItemType.Item2)).toBe(item2Image);
     });
 });
