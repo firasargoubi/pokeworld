@@ -170,8 +170,8 @@ export class EditorService {
                 this.popupService.keepMessages();
                 this.redirectToAdminPage(false);
             },
-            error: (error) => {
-                this.popupService.showPopup('Erreur lors de la sauvegarde du jeu: ' + error, false);
+            error: () => {
+                this.popupService.showPopup('Erreur lors de la sauvegarde du jeu', false);
             },
         });
     }

@@ -1,9 +1,11 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { ITEM_IMAGES } from '@app/consts/images.const';
 import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { ErrorCode } from '@app/interfaces/error-code.enum';
 import { EventProperty } from '@app/interfaces/event-property';
+import { ValidationResult } from '@app/interfaces/game-validation-result';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
@@ -13,7 +15,7 @@ import { ItemType } from '@common/item-type.enum';
 import { MapSize } from '@common/map-size.enum';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
-import { of, Subject } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { EditorService } from './editor.service';
 import { EDITOR_ERASE_TILE } from './editor.service.const';
 import { MOCK_BAD_MOUSE_EVENT, MOCK_EVENT_PROPERTY, MOCK_MOUSE_EVENT, MOCK_VALIDATION_RESULTS } from './editor.service.spec.const';
@@ -76,10 +78,67 @@ describe('EditorService', () => {
 
     it('should create a popup when modifications are not saved and redirectToAdmin is called', () => {
         gameDataServiceSpy.isModified.and.returnValue(true);
-        popupServiceSpy.showPopup.and.callThrough();
+        popupServiceSpy.showPopup.and.callFake((message, isConfirmation, action) => {
+            if (isConfirmation && action) {
+                action();
+            }
+        });
         service.redirectToAdminPage(true);
         expect(popupServiceSpy.showPopup).toHaveBeenCalled();
-        // expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
+    });
+    it('should redirect to admin page when no modifications', () => {
+        gameDataServiceSpy.isModified.and.returnValue(false);
+        service.redirectToAdminPage();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
+    });
+
+    it('should show a popup with validation errors if validation fails', () => {
+        const mockValidationResult: ValidationResult = {
+            ...MOCK_VALIDATION_RESULTS[0],
+            terrainCoverage: { isValid: false, coveragePercentage: 50 },
+            tilesAccessibility: { isValid: false, nonAccessibleTileCount: 5 },
+            items: { isValid: false, misplacedItems: [] },
+            bridge: { isValid: false, errors: [] },
+        };
+
+        gameValidationServiceSpy.validateGame.and.returnValue(mockValidationResult);
+
+        const mockErrorMessage = 'Erreurs de validation :\n  - TerrainCoverage (50%)\n  - TilesAccessibility\n  - Items (0)';
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getValidationErrorMessage').and.returnValue(mockErrorMessage);
+
+        service.saveButton();
+
+        expect(gameValidationServiceSpy.validateGame).toHaveBeenCalled();
+
+        expect(service['getValidationErrorMessage']).toHaveBeenCalledWith(mockValidationResult);
+
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(mockErrorMessage, false);
+
+        expect(gameSaveServiceSpy.isNameUnique).not.toHaveBeenCalled();
+    });
+
+    it('should show a popup if the game name is not unique', () => {
+        gameValidationServiceSpy.validateGame.and.returnValue(null);
+
+        gameSaveServiceSpy.isNameUnique.and.returnValue(of(false));
+
+        const initialGameData = { ...MOCK_GAMES[0], isVisible: true, lastEdited: new Date() };
+        gameDataServiceSpy.gameData = initialGameData;
+
+        service.saveButton();
+
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Le nom est déjà utilisé. Veuillez en choisir un autre.', false);
+        expect(gameSaveServiceSpy.saveGame).not.toHaveBeenCalled();
+    });
+
+    it('should create a popup when the game cannot be saved', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Server error', status: 500 });
+        gameSaveServiceSpy.saveGame.and.returnValue(throwError(() => errorResponse));
+        service['saveGame']();
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Erreur lors de la sauvegarde du jeu', false);
     });
 
     it('should create', () => {
