@@ -47,14 +47,14 @@
             <div class="tool-square">
                 <div class="item-grid">
                     @for (itemData of editorService.editorData.items; track itemData.item) {
-                        <div class="grid-square" [class.grayed]="itemData.count === 0">
-                            <div class="tool">
-                                <app-item [itemType]="itemData.item"></app-item>
-                                @if (itemData.count) {
-                                    <div class="tool-count">{{ itemData.count }}</div>
-                                }
-                            </div>
+                    <div class="grid-square" [class.grayed]="itemData.count === 0">
+                        <div class="tool">
+                            <app-item [itemType]="itemData.item"></app-item>
+                            @if (itemData.count) {
+                            <div class="tool-count">{{ itemData.count }}</div>
+                            }
                         </div>
+                    </div>
                     }
                 </div>
             </div>
@@ -67,17 +67,4 @@
         [style.left.px]="editorService.editorData.activeItemPosition.x"
         [style.backgroundImage]="'url(' + editorService.editorData.activeItemImage + ')'"
     ></div>
-
-    @if(editorService.messages.length){
-        <div id="error-container">
-            @for(error of editorService.messages; track $index) {
-                <app-warning-confirmation-popup
-                [message]="error.message"
-                (closed)="editorService.removeMessage($index, $event)"
-                [isConfirmation]="error.isConfirmation"
-                >
-                </app-warning-confirmation-popup>
-            }
-        </div>
-    }
 </div>

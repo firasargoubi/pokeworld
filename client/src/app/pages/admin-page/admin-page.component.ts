@@ -6,25 +6,24 @@ import { CreateGamePopupComponent } from '@app/components/create-game-popup/crea
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
-import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
+import { PopupService } from '@app/services/popup/popup.service';
 import { GameData } from '@common/game-data';
-import { PopupMessage } from '@app/interfaces/popup-message';
 
 @Component({
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
     styleUrls: ['./admin-page.component.scss'],
-    imports: [GameCardComponent, PokeballButtonComponent, CreateGamePopupComponent, CommonModule, HeaderComponent, WarningConfirmationPopupComponent],
+    imports: [GameCardComponent, PokeballButtonComponent, CreateGamePopupComponent, CommonModule, HeaderComponent],
 })
 export class AdminPageComponent implements OnInit {
     games: GameData[] = [];
-    messages: PopupMessage[] = [];
     showDescription: boolean = false;
     lastDescription: string = '';
     isCreationMode: boolean = false;
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);
+    private popupService: PopupService = inject(PopupService);
 
     navigateToMenu() {
         this.router.navigate(['/']);
@@ -40,7 +39,7 @@ export class AdminPageComponent implements OnInit {
                 this.games = games;
             },
             error: () => {
-                this.addMessage('Échec lors du chargement des jeux', false);
+                this.popupService.showPopup('Échec lors du chargement des jeux');
             },
         });
     }
@@ -65,7 +64,7 @@ export class AdminPageComponent implements OnInit {
     }
 
     deleteGame(id: string, name: string) {
-        this.addMessage('Êtes-vous sûr de vouloir supprimer le jeu : ' + name, true, () => this.confirmDeleteGame(id));
+        this.popupService.showPopup('Êtes-vous sûr de vouloir supprimer le jeu : ' + name, true, () => this.confirmDeleteGame(id));
     }
 
     onCreateGame(): void {
@@ -76,16 +75,6 @@ export class AdminPageComponent implements OnInit {
         const classes = ['blue-card', 'green-card', 'pink-card'];
         const classIndex = index % classes.length;
         return classes[classIndex];
-    }
-
-    removeMessage(index: number, confirmed: boolean) {
-        const message = this.messages[index];
-
-        if (message.isConfirmation && confirmed && message.action) {
-            message.action();
-        }
-
-        this.messages.splice(index, 1);
     }
 
     private confirmDeleteGame(id: string) {
@@ -99,16 +88,12 @@ export class AdminPageComponent implements OnInit {
         });
     }
 
-    private addMessage(message: string, isConfirmation: boolean, action?: () => void) {
-        this.messages.push({ message, isConfirmation, action });
-    }
-
     private handleNotFoundError(error: HttpErrorResponse) {
         if (error.status === HttpStatusCode.NotFound) {
-            this.addMessage("Ce jeu n'existe plus !", false);
+            this.popupService.showPopup("Ce jeu n'existe plus !");
             this.loadGames();
         } else {
-            this.addMessage(error.message, false);
+            this.popupService.showPopup(error.message);
         }
     }
 }

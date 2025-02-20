@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-// NOT FOR SPRINT 1, TO BE UNCOMMENTED LATER (FUNCTIONAL)
 import { GameMode } from '@common/game-mode.enum';
+import { MapSize } from '@common/map-size.enum';
 import { CreateGamePopupComponent } from './create-game-popup.component';
 
 describe('CreateGamePopupComponent', () => {
@@ -28,12 +28,12 @@ describe('CreateGamePopupComponent', () => {
 
     it('should initialize gameMode to FFA and mapSize to Small', () => {
         expect(component.gameMode).toBe(GameMode.FFA);
-        expect(component.mapSize).toBe('Small');
+        expect(component.mapSize).toBe(MapSize.Small);
     });
 
     it('should update mapSize on onSizeSelection', () => {
-        component.onSizeSelection('20');
-        expect(component.mapSize).toBe('20');
+        component.onSizeSelection(MapSize.Large);
+        expect(component.mapSize).toBe(MapSize.Large);
     });
 
     // NOT FOR SPRINT 1, TO BE UNCOMMENTED LATER (FUNCTIONAL)

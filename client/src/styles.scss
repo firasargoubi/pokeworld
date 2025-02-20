@@ -28,7 +28,7 @@ $default-font: 'pixel';
     white-space: nowrap;
     overflow: hidden;
     box-sizing: border-box;
-    
+
     -ms-interpolation-mode: nearest-neighbor;
     image-rendering: -moz-crisp-edges;
     image-rendering: -webkit-optimize-contrast;
@@ -45,4 +45,25 @@ body {
     width: 100vw;
     background: $background-color;
     font-family: $default-font;
+}
+
+.cdk-overlay-container {
+    background-color: rgba(0, 0, 0, 0.5); /* Darker backdrop for confirmation popups */
+    position: relative;
+    left: 0;
+    top: 0;
+    padding: 6vw;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    overflow-y: auto;
+    gap: 1vw;
+    pointer-events: auto;
+    scrollbar-width: none;
+}
+.cdk-global-overlay-wrapper {
+    flex-shrink: 0;
 }

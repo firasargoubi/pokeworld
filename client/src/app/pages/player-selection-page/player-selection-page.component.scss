@@ -54,7 +54,6 @@ main {
     flex: 2;
 }
 #player-name-avatar {
-    position: relative;
     display: flex;
     column-gap: 50px;
     margin: 0 $page-border-width $page-border-width 0;
@@ -69,20 +68,6 @@ main {
     width: auto;
     aspect-ratio: 1/1;
     object-fit: cover;
-    z-index: 1;
-    user-select: none;
-    pointer-events: none;
-}
-
-#avatar-shadow {
-    height: 15%;
-    width: auto;
-    position: absolute;
-    left: 3.5vh;
-    bottom: 2.4vh;
-    filter: brightness(0.7);
-    user-select: none;
-    pointer-events: none;
 }
 
 #name-form {
@@ -122,7 +107,6 @@ main {
     color: white;
     line-height: 0;
     width: 29ch;
-    user-select: none;
 }
 
 #player-stats {
@@ -164,13 +148,11 @@ main {
     top: 0;
     left: 0;
     z-index: 1;
-    user-select: none;
-    pointer-events: none;
 }
 .stat-bar {
     height: 100%;
     background-color: green;
-    flex: 6;
+    flex: 4;
 }
 
 .bonus-bar {
@@ -202,7 +184,6 @@ main {
     text-shadow: 4px 0 0 $text-shadow-color;
     z-index: 2;
     opacity: 1;
-    user-select: none;
 }
 
 .bonus-value {
@@ -228,7 +209,7 @@ main {
     height: 80%;
     width: auto;
     aspect-ratio: 3/2;
-    margin: 0 0 0 60px;
+    margin: 0 0 0 30px;
     background-image: url('/assets/images/menu/stat-bar/bonus-point.png');
     background-size: 100% 100%;
     display: inline-block;
@@ -254,11 +235,12 @@ main {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
+    filter: invert(0.7);
     height: 100%;
     width: auto;
     aspect-ratio: 1/1;
     z-index: 2;
-    margin: 0 0 0 60px;
+    margin: 0 0 0 30px;
     background-color: 0;
     background-size: cover;
     transition:
@@ -351,8 +333,6 @@ main {
     height: 150%;
     aspect-ratio: 1/1;
     object-fit: cover;
-    user-select: none;
-    pointer-events: none;
 }
 
 .warning {
@@ -385,12 +365,32 @@ main {
     font-size: 5vh;
     width: 17vw;
     border-style: none;
-    background-image: url('/assets/images/menu/buttons/admin-button/red-background-highlight.png');
+    background-image: url('/assets/images/menu/buttons/admin-button/light-green-background-highlight.png');
     background-size: 100% 100%;
     align-self: center;
-    user-select: none;
+    cursor: pointer;
 }
 
 #page-footer .disabled {
-    background-image: url('/assets/images/menu/buttons/admin-button/green-background-highlight.png');
+    background-image: url('/assets/images/menu/buttons/admin-button/red-background-highlight.png');
+}
+
+.error-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100%;
+    padding: 6vw;
+    user-select: none;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1vw;
+    align-items: center;
+    z-index: 5;
+}
+
+app-warning-confirmation-popup {
+    flex-shrink: 0;
 }

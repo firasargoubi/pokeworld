@@ -1,23 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@app/consts/default-player';
 import { DiceType } from '@app/consts/dice';
 import { StatType } from '@app/consts/player-stats.enum';
 import { Avatars } from '@app/interfaces/avatars.enum';
+import { PopupService } from '@app/services/popup/popup.service';
 import { PlayerSelectionPageComponent } from './player-selection-page.component';
 
 describe('PlayerSelectionPageComponent', () => {
     let component: PlayerSelectionPageComponent;
     let fixture: ComponentFixture<PlayerSelectionPageComponent>;
     let routerSpy: jasmine.SpyObj<Router>;
+    let popupServiceSpy: jasmine.SpyObj<PopupService>;
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+        popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
 
         await TestBed.configureTestingModule({
-            imports: [ReactiveFormsModule, PlayerSelectionPageComponent],
-            providers: [{ provide: Router, useValue: routerSpy }],
+            imports: [PlayerSelectionPageComponent],
+            providers: [
+                { provide: Router, useValue: routerSpy },
+                { provide: PopupService, useValue: popupServiceSpy },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(PlayerSelectionPageComponent);
@@ -43,7 +48,7 @@ describe('PlayerSelectionPageComponent', () => {
         component.nameForm.setValue('ab');
         fixture.detectChanges();
 
-        expect(component.needsWarning('name')).toBeTrue();
+        expect(component.needsWarning()).toBeTrue();
     });
 
     it('should display warning message for unselected avatar', () => {
@@ -51,15 +56,16 @@ describe('PlayerSelectionPageComponent', () => {
         component.selectedAvatar = Avatars.Default;
         fixture.detectChanges();
 
-        expect(component.needsWarning('avatar')).toBeTrue();
+        expect(component.needsWarning()).toBeTrue();
     });
 
     it('should return false for needsWarning when form field is valid', () => {
         component.nameForm.setValue('ValidName');
+        component.selectedAvatar = Avatars.Avatar1;
         component['isStartClicked'].set(true);
         fixture.detectChanges();
 
-        expect(component.needsWarning('name')).toBeFalse();
+        expect(component.needsWarning()).toBeFalse();
     });
 
     it('should return false for needsWarning when isStartClicked is false', () => {
@@ -67,16 +73,8 @@ describe('PlayerSelectionPageComponent', () => {
         component['isStartClicked'].set(false);
         fixture.detectChanges();
 
-        expect(component.needsWarning('name')).toBeFalse();
+        expect(component.needsWarning()).toBeFalse();
     });
-
-    it('should return false for needsWarning when formField does not correspond to any known field', () => {
-        component['isStartClicked'].set(true);
-        fixture.detectChanges();
-
-        expect(component.needsWarning('unknownField')).toBeFalse();
-    });
-
     it('should select an avatar', () => {
         const avatar = component.avatarList[0];
         component.handleAvatarSelection(avatar);

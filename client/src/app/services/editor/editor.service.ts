@@ -6,10 +6,10 @@ import { EditorData, EditorItem } from '@app/interfaces/editor-data';
 import { ErrorCode } from '@app/interfaces/error-code.enum';
 import { EventProperty } from '@app/interfaces/event-property';
 import { BridgeValidationError, ValidationResult, ValidationStatus } from '@app/interfaces/game-validation-result';
-import { PopupMessage } from '@app/interfaces/popup-message';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
+import { PopupService } from '@app/services/popup/popup.service';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
@@ -21,28 +21,22 @@ import { DEFAULT_EDITOR_DATA, EDITOR_ERASE_TILE, ITEM_POOL_HIGHEST_ITEM, SHARED_
     providedIn: 'root',
 })
 export class EditorService {
-    messages: PopupMessage[] = [];
     router: Router = inject(Router);
     gameDataService: GameDataService = inject(GameDataService);
     editorData: EditorData = this.getEditorData();
     initialGameData: GameData;
     private gameValidationService: GameValidationService = inject(GameValidationService);
     private gameSaveService: GameSaveService = inject(GameSaveService);
+    private popupService: PopupService = inject(PopupService);
 
-    addMessage(message: string, isConfirmation: boolean, action?: () => void) {
-        this.messages.push({ message, isConfirmation, action });
-    }
-
-    removeMessage(index: number, confirmed: boolean) {
-        const message = this.messages[index];
-        if (message.isConfirmation && confirmed && message.action) {
-            message.action();
+    redirectToAdminPage(needsConfirmation: boolean = true): void {
+        if (needsConfirmation && this.gameDataService.isModified(this.initialGameData)) {
+            this.popupService.showPopup('Voulez-vous vraiment quitter la page? Les modifications non sauvegardées seront perdues.', true, () => {
+                this.router.navigate(['/admin']);
+            });
+        } else {
+            this.router.navigate(['/admin']);
         }
-        this.messages.splice(index, 1);
-    }
-
-    redirectToAdminPage(): void {
-        this.router.navigate(['/admin']);
     }
 
     saveButton(): void {
@@ -50,13 +44,13 @@ export class EditorService {
 
         if (validationResult) {
             const errorMessage = this.getValidationErrorMessage(validationResult);
-            this.addMessage(errorMessage, false);
+            this.popupService.showPopup(errorMessage, false);
             return;
         }
 
         this.gameSaveService.isNameUnique(this.gameDataService.gameData.name, this.gameDataService.gameData._id).subscribe((isUnique) => {
             if (!isUnique) {
-                this.addMessage('Le nom est déjà utilisé. Veuillez en choisir un autre.', false);
+                this.popupService.showPopup('Le nom est déjà utilisé. Veuillez en choisir un autre.', false);
                 return;
             }
             this.gameDataService.gameData.isVisible = false;
@@ -143,7 +137,7 @@ export class EditorService {
             }
         }
 
-        return errors.length > 0 ? 'Erreurs de validation :\n' + errors.join('\n') : 'Aucune erreur de validation';
+        return errors.length ? 'Erreurs de validation :\n' + errors.join('\n') : 'Aucune erreur de validation';
     }
 
     private getEventProperty(event: Event): EventProperty {
@@ -172,10 +166,12 @@ export class EditorService {
     private saveGame(): void {
         this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe({
             next: () => {
-                this.redirectToAdminPage();
+                this.popupService.showPopup('Jeu sauvegardé avec succès', false);
+                this.popupService.keepMessages();
+                this.redirectToAdminPage(false);
             },
-            error: (error) => {
-                this.addMessage('Erreur lors de la sauvegarde du jeu: ' + error, false);
+            error: () => {
+                this.popupService.showPopup('Erreur lors de la sauvegarde du jeu', false);
             },
         });
     }

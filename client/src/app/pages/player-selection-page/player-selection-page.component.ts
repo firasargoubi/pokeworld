@@ -3,11 +3,12 @@ import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { BONUS_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player';
 import { BonusDice, DiceType } from '@app/consts/dice';
 import { StatType } from '@app/consts/player-stats.enum';
-import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { Avatars } from '@app/interfaces/avatars.enum';
+import { PopupService } from '@app/services/popup/popup.service';
 
 @Component({
     selector: 'app-player-selection-page',
@@ -30,6 +31,7 @@ export class PlayerSelectionPageComponent {
 
     private isStartClicked: WritableSignal<boolean> = signal(false);
     private router: Router = inject(Router);
+    private popupService: PopupService = inject(PopupService);
 
     getScore(statCategory: StatType) {
         return this.isBonusPoint(statCategory) ? DEFAULT_STAT_POINTS + BONUS_POINTS : DEFAULT_STAT_POINTS;
@@ -55,18 +57,28 @@ export class PlayerSelectionPageComponent {
         this.selectedAvatar = avatar;
     }
 
-    needsWarning(formField: string) {
-        if (formField === 'name') {
-            return !this.nameForm.valid && this.isStartClicked();
-        } else if (formField === 'avatar') {
-            return !this.isValidAvatarChoice() && this.isStartClicked();
+    needsWarning() {
+        const errors: string[] = [];
+        const nameErrorMessage = 'Le nom doit contenir entre 3 et 15 caractères';
+        const avatarErrorMessage = 'Veuillez choisir un avatar';
+
+        if (!this.nameForm.valid && this.isStartClicked()) {
+            errors.push(nameErrorMessage);
+        }
+        if (!this.isValidAvatarChoice() && this.isStartClicked()) {
+            errors.push(avatarErrorMessage);
+        }
+
+        if (errors.length) {
+            this.popupService.showPopup(errors.join('\n'));
+            return true;
         }
         return false;
     }
 
     goToLobby() {
         this.isStartClicked.set(true);
-        if (this.isFormValid()) {
+        if (!this.needsWarning() && this.isFormValid()) {
             this.router.navigate(['/lobby']);
         }
     }

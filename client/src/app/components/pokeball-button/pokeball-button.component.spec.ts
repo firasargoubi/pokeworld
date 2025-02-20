@@ -22,9 +22,7 @@ describe('PokeballButtonComponent', () => {
         await TestBed.configureTestingModule({
             imports: [PokeballButtonComponent, TestHostComponent],
         }).compileComponents();
-    });
 
-    beforeEach(() => {
         fixture = TestBed.createComponent(TestHostComponent);
         component = fixture.debugElement.query(By.css('app-pokeball-button')).componentInstance;
         fixture.detectChanges();

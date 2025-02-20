@@ -135,4 +135,7 @@ export class GameDataService {
 
         return true;
     }
+    isModified(initialGameData: GameData): boolean {
+        return JSON.stringify(this.gameData) !== JSON.stringify(initialGameData);
+    }
 }

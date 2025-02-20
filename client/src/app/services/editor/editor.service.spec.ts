@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { ITEM_IMAGES } from '@app/consts/images.const';
@@ -8,6 +9,7 @@ import { ValidationResult } from '@app/interfaces/game-validation-result';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
+import { PopupService } from '@app/services/popup/popup.service';
 import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
 import { MapSize } from '@common/map-size.enum';
@@ -23,6 +25,7 @@ describe('EditorService', () => {
     let gameValidationServiceSpy: jasmine.SpyObj<GameValidationService>;
     let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
     let gameDataServiceSpy: jasmine.SpyObj<GameDataService>;
+    let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let routerSpy: jasmine.SpyObj<Router>;
 
     beforeEach(() => {
@@ -34,7 +37,18 @@ describe('EditorService', () => {
         });
         gameDataServiceSpy = jasmine.createSpyObj(
             'GameDataService',
-            ['getTileFromPosition', 'addItem', 'editTile', 'setGameData', 'removeItem', 'getItemCount', 'getItem', 'getGameMode', 'isMapValid'],
+            [
+                'getTileFromPosition',
+                'addItem',
+                'editTile',
+                'removeItem',
+                'getItemCount',
+                'getItem',
+                'getGameMode',
+                'isModified',
+                'isMapValid',
+                'setGameData',
+            ],
             {
                 itemUpdate: itemUpdateSubject.asObservable(),
                 gameData: structuredClone(MOCK_GAMES[0]),
@@ -43,6 +57,9 @@ describe('EditorService', () => {
                 getItemCount: jasmine.createSpy().and.returnValue(0),
             },
         );
+        gameDataServiceSpy.isModified.and.callThrough();
+        popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'keepMessages']);
+        gameDataServiceSpy.gameData = structuredClone(MOCK_GAMES[0]);
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
         TestBed.configureTestingModule({
@@ -51,6 +68,7 @@ describe('EditorService', () => {
                 { provide: GameValidationService, useValue: gameValidationServiceSpy },
                 { provide: GameSaveService, useValue: gameSaveServiceSpy },
                 { provide: GameDataService, useValue: gameDataServiceSpy },
+                { provide: PopupService, useValue: popupServiceSpy },
                 { provide: Router, useValue: routerSpy },
             ],
         });
@@ -58,32 +76,74 @@ describe('EditorService', () => {
         service = TestBed.inject(EditorService);
     });
 
+    it('should create a popup when modifications are not saved and redirectToAdmin is called', () => {
+        gameDataServiceSpy.isModified.and.returnValue(true);
+        popupServiceSpy.showPopup.and.callFake((message, isConfirmation, action) => {
+            if (isConfirmation && action) {
+                action();
+            }
+        });
+        service.redirectToAdminPage(true);
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
+    });
+    it('should redirect to admin page when no modifications', () => {
+        gameDataServiceSpy.isModified.and.returnValue(false);
+        service.redirectToAdminPage();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
+    });
+
+    it('should show a popup with validation errors if validation fails', () => {
+        const mockValidationResult: ValidationResult = {
+            ...MOCK_VALIDATION_RESULTS[0],
+            terrainCoverage: { isValid: false, coveragePercentage: 50 },
+            tilesAccessibility: { isValid: false, nonAccessibleTileCount: 5 },
+            items: { isValid: false, misplacedItems: [] },
+            bridge: { isValid: false, errors: [] },
+        };
+
+        gameValidationServiceSpy.validateGame.and.returnValue(mockValidationResult);
+
+        const mockErrorMessage = 'Erreurs de validation :\n  - TerrainCoverage (50%)\n  - TilesAccessibility\n  - Items (0)';
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getValidationErrorMessage').and.returnValue(mockErrorMessage);
+
+        service.saveButton();
+
+        expect(gameValidationServiceSpy.validateGame).toHaveBeenCalled();
+
+        expect(service['getValidationErrorMessage']).toHaveBeenCalledWith(mockValidationResult);
+
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(mockErrorMessage, false);
+
+        expect(gameSaveServiceSpy.isNameUnique).not.toHaveBeenCalled();
+    });
+
+    it('should show a popup if the game name is not unique', () => {
+        gameValidationServiceSpy.validateGame.and.returnValue(null);
+
+        gameSaveServiceSpy.isNameUnique.and.returnValue(of(false));
+
+        const initialGameData = { ...MOCK_GAMES[0], isVisible: true, lastEdited: new Date() };
+        gameDataServiceSpy.gameData = initialGameData;
+
+        service.saveButton();
+
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Le nom est déjà utilisé. Veuillez en choisir un autre.', false);
+        expect(gameSaveServiceSpy.saveGame).not.toHaveBeenCalled();
+    });
+
+    it('should create a popup when the game cannot be saved', () => {
+        const errorResponse = new HttpErrorResponse({ error: 'Server error', status: 500 });
+        gameSaveServiceSpy.saveGame.and.returnValue(throwError(() => errorResponse));
+        service['saveGame']();
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Erreur lors de la sauvegarde du jeu', false);
+    });
+
     it('should create', () => {
         expect(service).toBeTruthy();
     });
-
-    // it('should add messages correctly', () => {
-    //     service.addMessage('Test error', false);
-    //     expect(service.messages.length).toBe(1);
-    //     expect(service.messages[0].message).toBe('Test error');
-    // });
-
-    it('should remove messages and execute actions', () => {
-        const action = jasmine.createSpy('action');
-        service.addMessage('Test', true, action);
-        service.removeMessage(0, true);
-        expect(service.messages.length).toBe(0);
-        expect(action).toHaveBeenCalled();
-    });
-
-    it('should handle error when saving', () => {
-        const mockErrors: ValidationResult = { ...MOCK_VALIDATION_RESULTS[0], name: { isValid: false, errorCode: ErrorCode.TooLong } };
-        gameValidationServiceSpy.validateGame.and.returnValue(mockErrors);
-        service.saveButton();
-        expect(service.messages.length).toBe(1);
-        expect(service.messages[0].message).toContain('Erreurs de validation');
-    });
-
     it('should format validation errors correctly', () => {
         const messages = service['getValidationErrorMessage'](MOCK_VALIDATION_RESULTS[1]);
         const expectedList = [ErrorCode.TooLong, ErrorCode.TerrainCoverage, ErrorCode.TilesAccessibility, ErrorCode.BridgeAtEdge, ErrorCode.Items];
@@ -97,14 +157,6 @@ describe('EditorService', () => {
         expect(validationErrorMessage).toContain('Aucune erreur de validation');
     });
 
-    it('should handle duplicate name error', () => {
-        gameValidationServiceSpy.validateGame.and.returnValue(null);
-        gameSaveServiceSpy.isNameUnique.and.returnValue(of(false));
-        service.saveButton();
-        expect(service.messages.length).toBe(1);
-        expect(service.messages[0].message).toContain('déjà utilisé');
-    });
-
     it('should save successfully', () => {
         gameValidationServiceSpy.validateGame.and.returnValue(null);
         gameSaveServiceSpy.isNameUnique.and.returnValue(of(true));
@@ -112,18 +164,12 @@ describe('EditorService', () => {
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
     });
 
-    it('should handle save errors', () => {
-        gameSaveServiceSpy.saveGame.and.returnValue(throwError(() => new Error('Save failed')));
-        service['saveGame']();
-        expect(service.messages.length).toBe(1);
-        expect(service.messages[0].message).toContain('Erreur lors de la sauvegarde');
-    });
-
     it('should prevent save if invalid items', () => {
         gameDataServiceSpy.getTileFromPosition.and.returnValue(TileType.Water);
         const eventProp = { tilePosition: { x: 0, y: 0 } };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        service['dropItem'](eventProp as any);
+
+        service['dropItem'](eventProp as EventProperty);
+
         expect(gameDataServiceSpy.addItem).not.toHaveBeenCalled();
     });
 

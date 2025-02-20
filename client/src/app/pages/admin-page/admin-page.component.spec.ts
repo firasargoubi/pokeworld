@@ -3,19 +3,31 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
+import { PopupService } from '@app/services/popup/popup.service';
 import { GameData } from '@common/game-data';
 import { of, throwError } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
+import { GameCardComponent } from '@app/components/game-card/game-card.component';
+import { Component } from '@angular/core';
+@Component({
+    selector: 'app-game-card',
+    standalone: true,
+    template: '',
+})
+class MockGameCardComponent {}
 
 describe('AdminPageComponent', () => {
     let component: AdminPageComponent;
     let fixture: ComponentFixture<AdminPageComponent>;
     let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
+    let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let routerSpy: jasmine.SpyObj<Router>;
 
     beforeEach(async () => {
         gameSaveServiceSpy = jasmine.createSpyObj<GameSaveService>('GameSaveService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
-        gameSaveServiceSpy.getAllGames.and.returnValue(of());
+        popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
+
+        gameSaveServiceSpy.getAllGames.and.returnValue(of([]));
         gameSaveServiceSpy.getGame.and.returnValue(of({} as GameData));
         gameSaveServiceSpy.toggleVisibility.and.returnValue(of({} as GameData));
         gameSaveServiceSpy.deleteGame.and.returnValue(of(undefined));
@@ -26,12 +38,16 @@ describe('AdminPageComponent', () => {
             imports: [AdminPageComponent],
             providers: [
                 { provide: GameSaveService, useValue: gameSaveServiceSpy },
+                { provide: PopupService, useValue: popupServiceSpy },
                 { provide: Router, useValue: routerSpy },
             ],
         }).compileComponents();
-    });
 
-    beforeEach(() => {
+        TestBed.overrideComponent(AdminPageComponent, {
+            add: { imports: [MockGameCardComponent] },
+            remove: { imports: [GameCardComponent] },
+        });
+
         fixture = TestBed.createComponent(AdminPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
@@ -62,8 +78,7 @@ describe('AdminPageComponent', () => {
 
         component.loadGames();
 
-        expect(component.messages.length).toBe(1);
-        expect(component.messages[0].message).toBe('Échec lors du chargement des jeux');
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Échec lors du chargement des jeux');
     });
 
     it('should navigate to edit page when editGame is called', () => {
@@ -82,8 +97,7 @@ describe('AdminPageComponent', () => {
 
         component.editGame('invalid-id');
 
-        expect(component.messages.length).toBe(1);
-        expect(component.messages[0].message).toBe("Ce jeu n'existe plus !");
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith("Ce jeu n'existe plus !");
     });
 
     it('should toggle visibility successfully', () => {
@@ -98,33 +112,25 @@ describe('AdminPageComponent', () => {
 
         component.toggleVisibility({ id: MOCK_GAMES[0]._id, isVisible: true });
 
-        expect(component.messages.length).toBe(1);
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 
     it('should add a confirmation message when deleteGame is called', () => {
         component.deleteGame(MOCK_GAMES[0]._id, '');
-
-        expect(component.messages.length).toBe(1);
-        expect(component.messages[0].message).toBe('Êtes-vous sûr de vouloir supprimer le jeu : ');
-        expect(component.messages[0].isConfirmation).toBeTrue();
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 
     it('should delete game when confirmation is accepted', () => {
         gameSaveServiceSpy.deleteGame.and.returnValue(of(undefined));
 
         component.deleteGame(MOCK_GAMES[0]._id, '');
-        component.removeMessage(0, true);
+
+        const deleteAction = popupServiceSpy.showPopup.calls.mostRecent().args[2];
+        if (deleteAction) {
+            deleteAction();
+        }
 
         expect(gameSaveServiceSpy.deleteGame).toHaveBeenCalledWith(MOCK_GAMES[0]._id);
-    });
-
-    it('should not delete game when confirmation is canceled', () => {
-        component.deleteGame(MOCK_GAMES[0]._id, '');
-
-        component.removeMessage(0, false);
-
-        expect(gameSaveServiceSpy.deleteGame).not.toHaveBeenCalled();
-        expect(component.messages.length).toBe(0);
     });
 
     it('should handle error when deleteGame fails', () => {
@@ -132,9 +138,13 @@ describe('AdminPageComponent', () => {
         gameSaveServiceSpy.deleteGame.and.returnValue(throwError(() => errorResponse));
 
         component.deleteGame(MOCK_GAMES[0]._id, '');
-        component.removeMessage(0, true);
 
-        expect(component.messages.length).toBe(1);
+        const deleteAction = popupServiceSpy.showPopup.calls.mostRecent().args[2];
+        if (deleteAction) {
+            deleteAction();
+        }
+
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 
     it('should toggle isCreationMode on onCreateGame', () => {
@@ -160,60 +170,15 @@ describe('AdminPageComponent', () => {
         expect(loadGamesSpy).toHaveBeenCalled();
     });
 
-    it('should remove message from array on popup close', () => {
-        component.messages = [{ message: 'Message 1', isConfirmation: false }];
-        component.removeMessage(0, false);
-        expect(component.messages.length).toBe(0);
-    });
-
-    it('should display multiple popups for multiple messages', () => {
-        component.messages = [
-            { message: 'Message 1', isConfirmation: false },
-            { message: 'Message 2', isConfirmation: false },
-        ];
-        fixture.detectChanges();
-
-        const popups = fixture.nativeElement.querySelectorAll('app-warning-confirmation-popup');
-        expect(popups.length).toBe(2);
-    });
-
     it('should navigate to menu', () => {
         component.navigateToMenu();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
-    });
-
-    it('should add a message to the messages array', () => {
-        component['addMessage']('Test message', false);
-
-        expect(component.messages.length).toBe(1);
-        expect(component.messages[0].message).toBe('Test message');
-        expect(component.messages[0].isConfirmation).toBeFalse();
-    });
-
-    it('should add a confirmation message with an action', () => {
-        const action = () => {
-            return;
-        };
-        component['addMessage']('Confirmation message', true, action);
-
-        expect(component.messages.length).toBe(1);
-        expect(component.messages[0].message).toBe('Confirmation message');
-        expect(component.messages[0].isConfirmation).toBeTrue();
-        expect(component.messages[0].action).toBe(action);
-    });
-
-    it('should add a message when the error is not 404', () => {
-        const error = new HttpErrorResponse({ error: 'Server error', status: 500 });
-        component['handleNotFoundError'](error);
-        expect(component.messages.length).toBe(1);
     });
 
     it('should add a message and call loadGames when the error is 404', () => {
         const error = new HttpErrorResponse({ error: 'Not Found', status: 404 });
         const loadGamesSpy = spyOn(component, 'loadGames');
         component['handleNotFoundError'](error);
-        expect(component.messages.length).toBe(1);
-        expect(component.messages[0].message).toBe("Ce jeu n'existe plus !");
         expect(loadGamesSpy).toHaveBeenCalled();
     });
 
@@ -228,44 +193,5 @@ describe('AdminPageComponent', () => {
         expect(gameSaveServiceSpy.deleteGame).toHaveBeenCalledWith(gameId);
         expect(component.games.length).toBe(initialGames.length - 1);
         expect(component.games.some((game) => game._id === gameId)).toBeFalse();
-    });
-
-    it('should handle error when deleteGame fails', () => {
-        const gameId = MOCK_GAMES[0]._id;
-        const errorResponse = new HttpErrorResponse({ error: 'Delete failed', status: 500 });
-        gameSaveServiceSpy.deleteGame.and.returnValue(throwError(() => errorResponse));
-
-        component['confirmDeleteGame'](gameId);
-
-        expect(component.messages.length).toBe(1);
-    });
-    it('should remove the message and execute the action if confirmed', () => {
-        const action = jasmine.createSpy('action');
-        component.messages = [{ message: 'Test message', isConfirmation: true, action }];
-
-        component.removeMessage(0, true);
-
-        expect(component.messages.length).toBe(0);
-        expect(action).toHaveBeenCalled();
-    });
-
-    it('should remove the message without executing the action if not confirmed', () => {
-        const action = jasmine.createSpy('action');
-        component.messages = [{ message: 'Test message', isConfirmation: true, action }];
-
-        component.removeMessage(0, false);
-
-        expect(component.messages.length).toBe(0);
-        expect(action).not.toHaveBeenCalled();
-    });
-
-    it('should not execute the action if the message is not a confirmation', () => {
-        const action = jasmine.createSpy('action');
-        component.messages = [{ message: 'Test message', isConfirmation: false, action }];
-
-        component.removeMessage(0, true);
-
-        expect(component.messages.length).toBe(0);
-        expect(action).not.toHaveBeenCalled();
     });
 });
