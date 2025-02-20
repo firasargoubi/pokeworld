@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@app/consts/default-player';
 import { DiceType } from '@app/consts/dice';
@@ -19,7 +18,7 @@ describe('PlayerSelectionPageComponent', () => {
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
 
         await TestBed.configureTestingModule({
-            imports: [ReactiveFormsModule, PlayerSelectionPageComponent],
+            imports: [PlayerSelectionPageComponent],
             providers: [
                 { provide: Router, useValue: routerSpy },
                 { provide: PopupService, useValue: popupServiceSpy },

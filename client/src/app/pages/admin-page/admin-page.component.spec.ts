@@ -7,6 +7,14 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { GameData } from '@common/game-data';
 import { of, throwError } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
+import { GameCardComponent } from '@app/components/game-card/game-card.component';
+import { Component } from '@angular/core';
+@Component({
+    selector: 'app-game-card',
+    standalone: true,
+    template: '',
+})
+class MockGameCardComponent {}
 
 describe('AdminPageComponent', () => {
     let component: AdminPageComponent;
@@ -34,9 +42,12 @@ describe('AdminPageComponent', () => {
                 { provide: Router, useValue: routerSpy },
             ],
         }).compileComponents();
-    });
 
-    beforeEach(() => {
+        TestBed.overrideComponent(AdminPageComponent, {
+            add: { imports: [MockGameCardComponent] },
+            remove: { imports: [GameCardComponent] },
+        });
+
         fixture = TestBed.createComponent(AdminPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

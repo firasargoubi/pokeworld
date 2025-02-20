@@ -9,9 +9,7 @@ describe('HeaderComponent', () => {
         await TestBed.configureTestingModule({
             imports: [HeaderComponent],
         }).compileComponents();
-    });
 
-    beforeEach(() => {
         fixture = TestBed.createComponent(HeaderComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

@@ -1,12 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { HeaderComponent } from '@app/components/header/header.component';
-import { ItemComponent } from '@app/components/item/item.component';
-import { MapComponent } from '@app/components/map/map.component';
 import { DEFAULT_GAME } from '@app/consts/default-game';
 import { EMPTY_IMAGE } from '@app/consts/images.const';
 import { EditorService } from '@app/services/editor/editor.service';
 import { EditPageComponent } from './edit-page.component';
+import { MapComponent } from '@app/components/map/map.component';
+import { ItemComponent } from '@app/components/item/item.component';
+import { Component } from '@angular/core';
+@Component({
+    selector: 'app-map',
+    standalone: true,
+    template: '',
+})
+class MockMapComponent {}
+
+@Component({
+    selector: 'app-item',
+    standalone: true,
+    template: '',
+})
+class MockItemComponent {}
 
 describe('EditPageComponent', () => {
     let component: EditPageComponent;
@@ -35,12 +47,15 @@ describe('EditPageComponent', () => {
         };
 
         await TestBed.configureTestingModule({
-            imports: [EditPageComponent, HeaderComponent, MapComponent, ItemComponent, FormsModule],
+            imports: [EditPageComponent],
             providers: [{ provide: EditorService, useValue: editorServiceSpy }],
         }).compileComponents();
-    });
 
-    beforeEach(() => {
+        TestBed.overrideComponent(EditPageComponent, {
+            add: { imports: [MockMapComponent, MockItemComponent] },
+            remove: { imports: [MapComponent, ItemComponent] },
+        });
+
         fixture = TestBed.createComponent(EditPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

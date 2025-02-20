@@ -9,9 +9,7 @@ describe('MapComponent', () => {
         await TestBed.configureTestingModule({
             imports: [MapComponent],
         }).compileComponents();
-    });
 
-    beforeEach(() => {
         fixture = TestBed.createComponent(MapComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

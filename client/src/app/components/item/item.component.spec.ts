@@ -12,9 +12,7 @@ describe('ItemComponent', () => {
         await TestBed.configureTestingModule({
             imports: [ItemComponent],
         }).compileComponents();
-    });
 
-    beforeEach(() => {
         fixture = TestBed.createComponent(ItemComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
