@@ -49,7 +49,7 @@ describe('ThumbnailService', () => {
 
         mapServiceSpy.getTileImage.and.returnValue('/assets/images/game/tiles/grass.png');
 
-        const thumbnail = await service.getThumbnail(mockMap);
+        const thumbnail = await service.getThumbnail(mockMap, true);
 
         expect(thumbnail).toContain('data:image/png;base64');
         expect(mapServiceSpy.getTileImage).toHaveBeenCalledTimes(MapSize.Small * MapSize.Small);
@@ -60,7 +60,7 @@ describe('ThumbnailService', () => {
 
         mapServiceSpy.getTileImage.and.returnValue('/assets/images/game/tiles/water.png');
 
-        const thumbnail = await service.getThumbnail(mockMap);
+        const thumbnail = await service.getThumbnail(mockMap, true);
 
         expect(thumbnail).toContain('data:image/png;base64');
         expect(mapServiceSpy.getTileImage).toHaveBeenCalledTimes(MapSize.Medium * MapSize.Medium);
@@ -71,7 +71,7 @@ describe('ThumbnailService', () => {
 
         mapServiceSpy.getTileImage.and.returnValue('/assets/images/game/tiles/path.png');
 
-        const thumbnail = await service.getThumbnail(mockMap);
+        const thumbnail = await service.getThumbnail(mockMap, true);
 
         expect(thumbnail).toContain('data:image/png;base64');
         expect(mapServiceSpy.getTileImage).toHaveBeenCalledTimes(MapSize.Large * MapSize.Large);
@@ -106,7 +106,7 @@ describe('ThumbnailService', () => {
 
         mapServiceSpy.getTileImage.and.returnValue('/assets/images/game/tiles/grass.png');
 
-        const thumbnail = await service.getThumbnail(mockMap);
+        const thumbnail = await service.getThumbnail(mockMap, true);
 
         expect(thumbnail).toContain('data:image/png;base64');
         expect(ITEM_IMAGES.get(ItemType.Item1)).toBe(item1Image);

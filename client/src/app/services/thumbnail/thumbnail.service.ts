@@ -3,6 +3,7 @@ import { ITEM_IMAGES } from '@app/consts/images.const';
 import { MapService } from '@app/services/map/map.service';
 import { ItemType } from '@common/item-type.enum';
 import { MapData } from '@common/map-data';
+import { MapSize } from '@common/map-size.enum';
 import { Position } from '@common/position';
 import { BACKGROUND_COLOR, TILE_SIZE } from './thumbnail.service.const';
 
@@ -12,22 +13,26 @@ import { BACKGROUND_COLOR, TILE_SIZE } from './thumbnail.service.const';
 export class ThumbnailService {
     private mapService: MapService = inject(MapService);
 
-    async getThumbnail(map: MapData): Promise<string> {
+    async getThumbnail(map: MapData, loadItems: boolean): Promise<string> {
         const { canvas, context } = this.createCanvas(map.size);
+        const tilesPromises: Promise<[HTMLImageElement, number, number] | null>[] = [];
+        const itemsPromises: Promise<[HTMLImageElement, number, number] | null>[] = [];
 
-        const promises: Promise<[HTMLImageElement, number, number] | null>[] = [];
-        this.loadTiles(map, promises);
-        this.loadItems(map, promises);
+        this.loadTiles(map, tilesPromises);
+        if (loadItems) {
+            this.loadItems(map, itemsPromises);
+        }
 
-        const results = await Promise.all(promises);
-        this.renderImages(context, results);
+        await this.renderImages(context, tilesPromises);
+        await this.renderImages(context, itemsPromises);
 
         return canvas.toDataURL('image/png');
     }
 
-    private createCanvas(size: number): { canvas: HTMLCanvasElement; context: CanvasRenderingContext2D } {
+    private createCanvas(size: MapSize): { canvas: HTMLCanvasElement; context: CanvasRenderingContext2D } {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+
         canvas.width = size * TILE_SIZE;
         canvas.height = size * TILE_SIZE;
 
@@ -57,8 +62,8 @@ export class ThumbnailService {
         }
     }
 
-    private renderImages(context: CanvasRenderingContext2D, results: ([HTMLImageElement, number, number] | null)[]): void {
-        for (const result of results) {
+    private async renderImages(context: CanvasRenderingContext2D, promises: Promise<[HTMLImageElement, number, number] | null>[]) {
+        for await (const result of promises) {
             if (result) {
                 const [image, x, y] = result;
                 context.drawImage(image, y * TILE_SIZE, x * TILE_SIZE, TILE_SIZE, TILE_SIZE);
