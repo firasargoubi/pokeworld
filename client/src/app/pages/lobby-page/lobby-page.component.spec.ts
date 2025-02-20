@@ -1,8 +1,5 @@
-import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { HeaderComponent } from '@app/components/header/header.component';
-import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { LobbyPageComponent } from './lobby-page.component';
 
 describe('LobbyPageComponent', () => {
@@ -14,12 +11,10 @@ describe('LobbyPageComponent', () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
         await TestBed.configureTestingModule({
-            imports: [CommonModule, HeaderComponent, PokeballButtonComponent, LobbyPageComponent],
+            imports: [LobbyPageComponent],
             providers: [{ provide: Router, useValue: routerSpy }],
         }).compileComponents();
-    });
 
-    beforeEach(() => {
         fixture = TestBed.createComponent(LobbyPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

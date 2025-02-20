@@ -15,9 +15,7 @@ describe('MenuButtonComponent', () => {
             imports: [MenuButtonComponent],
             providers: [{ provide: Router, useValue: routerSpy }],
         }).compileComponents();
-    });
 
-    beforeEach(() => {
         fixture = TestBed.createComponent(MenuButtonComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

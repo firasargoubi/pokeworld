@@ -10,9 +10,7 @@ describe('WarningConfirmationPopupComponent', () => {
         await TestBed.configureTestingModule({
             imports: [WarningConfirmationPopupComponent],
         }).compileComponents();
-    });
 
-    beforeEach(() => {
         fixture = TestBed.createComponent(WarningConfirmationPopupComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
