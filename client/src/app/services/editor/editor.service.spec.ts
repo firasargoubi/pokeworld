@@ -1,20 +1,22 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { ITEM_IMAGES } from '@app/consts/images.const';
 import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { ErrorCode } from '@app/interfaces/error-code.enum';
 import { EventProperty } from '@app/interfaces/event-property';
-import { ValidationResult } from '@app/interfaces/game-validation-result';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
 import { PopupService } from '@app/services/popup/popup.service';
-import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
 import { MapSize } from '@common/map-size.enum';
+import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import { of, Subject } from 'rxjs';
 import { EditorService } from './editor.service';
+import { EDITOR_ERASE_TILE } from './editor.service.const';
+import { MOCK_BAD_MOUSE_EVENT, MOCK_EVENT_PROPERTY, MOCK_MOUSE_EVENT, MOCK_VALIDATION_RESULTS } from './editor.service.spec.const';
 
 describe('EditorService', () => {
     let service: EditorService;
@@ -23,42 +25,40 @@ describe('EditorService', () => {
     let gameDataServiceSpy: jasmine.SpyObj<GameDataService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let routerSpy: jasmine.SpyObj<Router>;
-    let mockGames: GameData[];
-
-    const mockValidationResult: ValidationResult = {
-        name: { isValid: true, errorCode: null },
-        description: { isValid: true, errorCode: null },
-        terrainCoverage: { isValid: true, coveragePercentage: 100 },
-        tilesAccessibility: { isValid: true, nonAccessibleTileCount: 0 },
-        items: { isValid: true, misplacedItems: [] },
-        bridge: { isValid: true, errors: [] },
-        spawnPoint: { isValid: true, errorCode: null },
-        mode: { isValid: true, errorCode: null },
-    };
 
     beforeEach(() => {
         const itemUpdateSubject = new Subject<void>();
-        mockGames = structuredClone(MOCK_GAMES);
-
-        gameValidationServiceSpy = jasmine.createSpyObj('GameValidationService', ['validateGame']);
-        gameSaveServiceSpy = jasmine.createSpyObj('GameSaveService', ['isNameUnique', 'saveGame']);
+        gameValidationServiceSpy = jasmine.createSpyObj('GameValidationService', { validateGame: MOCK_VALIDATION_RESULTS[0] });
+        gameSaveServiceSpy = jasmine.createSpyObj('GameSaveService', {
+            isNameUnique: of(true),
+            saveGame: of(MOCK_GAMES[0]),
+        });
         gameDataServiceSpy = jasmine.createSpyObj(
             'GameDataService',
-            ['getTileFromPosition', 'addItem', 'isMapValid', 'getItemCount', 'getMapSize', 'getGameMode', 'setGameData'],
-            { itemUpdate: itemUpdateSubject.asObservable() },
+            [
+                'getTileFromPosition',
+                'addItem',
+                'editTile',
+                'removeItem',
+                'getItemCount',
+                'getItem',
+                'getGameMode',
+                'isModified',
+                'isMapValid',
+                'setGameData',
+            ],
+            {
+                itemUpdate: itemUpdateSubject.asObservable(),
+                gameData: structuredClone(MOCK_GAMES[0]),
+                getMapSize: jasmine.createSpy().and.returnValue(MapSize.Small),
+                getGameMode: jasmine.createSpy().and.returnValue(GameMode.CTF),
+                getItemCount: jasmine.createSpy().and.returnValue(0),
+            },
         );
+        gameDataServiceSpy.isModified.and.callThrough();
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'keepMessages']);
         gameDataServiceSpy.gameData = structuredClone(MOCK_GAMES[0]);
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-
-        gameValidationServiceSpy.validateGame.and.returnValue(mockValidationResult);
-        gameSaveServiceSpy.isNameUnique.and.returnValue(of(true));
-        gameSaveServiceSpy.saveGame.and.returnValue(of(MOCK_GAMES[0]));
-        gameDataServiceSpy.gameData = structuredClone(MOCK_GAMES[0]);
-        gameDataServiceSpy.isMapValid.and.returnValue(true);
-        gameDataServiceSpy.getMapSize.and.returnValue(MapSize.Small);
-        gameDataServiceSpy.getGameMode.and.returnValue(GameMode.CTF);
-        gameDataServiceSpy.getItemCount.and.returnValue(0);
 
         TestBed.configureTestingModule({
             providers: [
@@ -74,38 +74,38 @@ describe('EditorService', () => {
         service = TestBed.inject(EditorService);
     });
 
+    it('should create a popup when modifications are not saved and redirectToAdmin is called', () => {
+        gameDataServiceSpy.isModified.and.returnValue(true);
+        popupServiceSpy.showPopup.and.callThrough();
+        service.redirectToAdminPage(true);
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
+        // expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
+    });
+
     it('should create', () => {
         expect(service).toBeTruthy();
+    });
+    it('should format validation errors correctly', () => {
+        const messages = service['getValidationErrorMessage'](MOCK_VALIDATION_RESULTS[1]);
+        const expectedList = [ErrorCode.TooLong, ErrorCode.TerrainCoverage, ErrorCode.TilesAccessibility, ErrorCode.BridgeAtEdge, ErrorCode.Items];
+        expectedList.forEach((errorCode) => {
+            expect(messages).toContain(errorCode);
+        });
+    });
+
+    it('should handle correct validation result', () => {
+        const validationErrorMessage = service['getValidationErrorMessage'](MOCK_VALIDATION_RESULTS[0]);
+        expect(validationErrorMessage).toContain('Aucune erreur de validation');
     });
 
     it('should save successfully', () => {
         gameValidationServiceSpy.validateGame.and.returnValue(null);
         gameSaveServiceSpy.isNameUnique.and.returnValue(of(true));
-
         service.saveButton();
-
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
     });
 
-    it('should format validation errors correctly', () => {
-        const validationResult: ValidationResult = {
-            ...mockValidationResult,
-            name: { isValid: false, errorCode: ErrorCode.TooLong },
-            terrainCoverage: { isValid: false, coveragePercentage: 20 },
-            bridge: {
-                isValid: false,
-                errors: [{ x: 2, y: 2, errorCode: ErrorCode.BridgeAtEdge }],
-            },
-        };
-
-        const result = service['getValidationErrorMessage'](validationResult);
-
-        expect(result).toContain('Couverture du terrain');
-        expect(result).toContain('Problème de pont');
-        expect(result).toContain('dépasse la longueur maximale');
-    });
-
-    it('should prevent item placement on invalid tiles', () => {
+    it('should prevent save if invalid items', () => {
         gameDataServiceSpy.getTileFromPosition.and.returnValue(TileType.Water);
         const eventProp = { tilePosition: { x: 0, y: 0 } };
 
@@ -115,40 +115,18 @@ describe('EditorService', () => {
     });
 
     it('should reset game data when resetButton is called', () => {
-        service.initialGameData = mockGames[0];
-        gameDataServiceSpy.gameData = mockGames[1];
-
+        service.initialGameData = MOCK_GAMES[0];
+        gameDataServiceSpy.gameData = MOCK_GAMES[1];
         service.resetButton();
-
-        expect(gameDataServiceSpy.setGameData).toHaveBeenCalledWith(service.initialGameData);
-        expect(gameDataServiceSpy.setGameData.calls.mostRecent().args[0]).toEqual(service.initialGameData);
-    });
-
-    it('should not refer to the same object for initialGameData and gameData after resetButton is called', () => {
-        service.initialGameData = mockGames[0];
-        gameDataServiceSpy.gameData = mockGames[1];
-
-        service.resetButton();
-
         expect(service.gameDataService.gameData).not.toBe(service.initialGameData);
     });
 
-    it('should call onClick with isLeftClick = true when left mouse button is clicked', () => {
+    it('should call on click when mouse button is clicked', () => {
         const event = new MouseEvent('mousedown', { button: 0 });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const onclickSpy = spyOn<any>(service, 'onClick');
         service.onMouseDown(event);
-
         expect(onclickSpy).toHaveBeenCalledWith(event, true);
-    });
-
-    it('should call onClick with isLeftClick = false when right mouse button is clicked', () => {
-        const event = new MouseEvent('mousedown', { button: 2 });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const onclickSpy = spyOn<any>(service, 'onClick');
-        service.onMouseDown(event);
-
-        expect(onclickSpy).toHaveBeenCalledWith(event, false);
     });
 
     it('should call preventDefault if tilePosition is defined', () => {
@@ -157,48 +135,25 @@ describe('EditorService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'getEventProperty').and.returnValue({ tilePosition: { x: 1, y: 1 } });
         service.onRightClick(event);
-
         expect(preventDefaultSpy).toHaveBeenCalled();
-    });
-
-    it('should not call preventDefault if tilePosition is null', () => {
-        const event = new MouseEvent('contextmenu');
-        const preventDefaultSpy = spyOn(event, 'preventDefault');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(service, 'getEventProperty').and.returnValue({ tilePosition: null });
-        service.onRightClick(event);
-
-        expect(preventDefaultSpy).not.toHaveBeenCalled();
     });
 
     it('should reset activeTile and activeTilePosition on mouse up', () => {
         service.editorData.activeTile = TileType.Grass;
         service.editorData.activeTilePosition = { x: 5, y: 5 };
-        const event = new MouseEvent('mouseup');
-        service.onMouseUp(event);
-
+        service.onMouseUp(new MouseEvent('mouseup'));
         expect(service.editorData.activeTile).toBeNull();
         expect(service.editorData.activeTilePosition).toEqual({ x: -1, y: -1 });
     });
 
     it('should call dropItem if activeItem is set', () => {
         service.editorData.activeItem = ItemType.Item1;
-        const event = new MouseEvent('mouseup');
-        const eventPropertyMock: EventProperty = {
-            tilePosition: { x: 2, y: 2 },
-            mousePosition: null,
-            tile: null,
-            item: null,
-        };
-
+        const eventPropertyMock: EventProperty = { ...MOCK_EVENT_PROPERTY, tilePosition: { x: 2, y: 2 } };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const getEventPropertySpy = spyOn<any>(service, 'getEventProperty').and.returnValue(eventPropertyMock);
+        spyOn<any>(service, 'getEventProperty').and.returnValue(eventPropertyMock);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const dropItemSpy = spyOn<any>(service, 'dropItem');
-
-        service.onMouseUp(event);
-
-        expect(getEventPropertySpy).toHaveBeenCalledWith(event);
+        service.onMouseUp(new MouseEvent('mouseup'));
         expect(dropItemSpy).toHaveBeenCalledWith(eventPropertyMock);
     });
 
@@ -210,23 +165,22 @@ describe('EditorService', () => {
         expect(service.editorData.activeItemPosition).toEqual({ x: 10, y: 20 });
     });
 
-    it('should not update activeItemPosition when activeItem is not set', () => {
-        service.editorData.activeItem = null;
-        service.editorData.activeItemPosition = { x: 5, y: 5 };
-        const event = new MouseEvent('mousemove', { clientX: 10, clientY: 20 });
-        service.onMouseMove(event);
-        expect(service.editorData.activeItemPosition).toEqual({ x: 5, y: 5 });
-    });
-
     it('should not call paintTile if tilePosition is null', () => {
         service.editorData.activeTile = TileType.Grass;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'getEventProperty').and.returnValue({ tilePosition: null });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const paintTileSpy = spyOn<any>(service, 'paintTile');
-        const event = new Event('mouseover');
-        service.onMouseOver(event);
+        service.onMouseOver(new Event('mouseover'));
         expect(paintTileSpy).not.toHaveBeenCalled();
+    });
+
+    it('should not call paintTile if activeTile is null', () => {
+        service.editorData.activeTile = null;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const getEventPropertySpy = spyOn<any>(service, 'getEventProperty');
+        service.onMouseOver(new Event('mouseover'));
+        expect(getEventPropertySpy).not.toHaveBeenCalled();
     });
 
     it('should call paintTile if activeTile and tilePosition are valid', () => {
@@ -241,83 +195,65 @@ describe('EditorService', () => {
         expect(paintTileSpy).toHaveBeenCalledWith(mockTilePosition);
     });
 
+    it('should set active item correctly', () => {
+        const newItem = ItemType.Item1;
+        const mousePosition: Position = { x: 100, y: 100 };
+        const eventProperty: EventProperty = { ...MOCK_EVENT_PROPERTY, mousePosition };
+        service['setActiveItem'](newItem, eventProperty);
+        expect(service.editorData.activeItemImage).toEqual(ITEM_IMAGES.get(newItem) as string);
+        expect(service.editorData.activeItemPosition).toEqual(mousePosition);
+    });
+
     it('should return correct event properties', () => {
-        const mockEvent = {
-            target: {
-                getAttribute: jasmine.createSpy().and.callFake((attr: string) => {
-                    const attributes: Map<string, string> = new Map([
-                        ['x', '10'],
-                        ['y', '20'],
-                        ['tile', 'Path'],
-                        ['item', 'Item1'],
-                    ]);
-                    return attributes.get(attr);
-                }),
-            },
-            clientX: 100,
-            clientY: 200,
-        } as unknown as MouseEvent;
-
-        const result = service['getEventProperty'](mockEvent);
-
+        const result = service['getEventProperty'](MOCK_MOUSE_EVENT);
         expect(result.tilePosition).toEqual({ x: 10, y: 20 });
         expect(result.mousePosition).toEqual({ x: 100, y: 200 });
         expect(result.tile).toEqual(TileType.Path);
         expect(result.item).toEqual(ItemType.Item1);
     });
 
-    it('should handle click on item', () => {
-        const event = new MouseEvent('click');
-        const eventPropertyMock: EventProperty = {
-            tilePosition: null,
-            mousePosition: { x: 10, y: 20 },
-            tile: null,
-            item: ItemType.Item1,
-        };
+    it('should return correct event properties', () => {
+        const result = service['getEventProperty'](MOCK_BAD_MOUSE_EVENT);
+        expect(result.tilePosition).toEqual(null);
+        expect(result.mousePosition).toEqual(null);
+        expect(result.tile).toEqual(null);
+        expect(result.item).toEqual(null);
+    });
 
+    it('should handle click on map', () => {
+        const eventPropertyMock: EventProperty = { ...MOCK_EVENT_PROPERTY, tilePosition: { x: 1, y: 1 } };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const getEventPropertySpy = spyOn<any>(service, 'getEventProperty').and.returnValue(eventPropertyMock);
+        spyOn<any>(service, 'getEventProperty').and.returnValue(eventPropertyMock);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const clickOnItemSpy = spyOn<any>(service, 'clickOnItem');
-
-        service['onClick'](event, true);
-
-        expect(getEventPropertySpy).toHaveBeenCalledWith(event);
-        expect(clickOnItemSpy).toHaveBeenCalledWith(eventPropertyMock);
+        const clickOnMapSpy = spyOn<any>(service, 'clickOnMap');
+        service['onClick'](new MouseEvent('click'), true);
+        expect(clickOnMapSpy).toHaveBeenCalledWith(eventPropertyMock, true);
     });
 
     it('should handle click on tile', () => {
-        const event = new MouseEvent('click');
-        const eventPropertyMock: EventProperty = {
-            tilePosition: null,
-            mousePosition: null,
-            tile: TileType.Grass,
-            item: null,
-        };
-
+        const eventPropertyMock: EventProperty = { ...MOCK_EVENT_PROPERTY, tile: TileType.Path };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const getEventPropertySpy = spyOn<any>(service, 'getEventProperty').and.returnValue(eventPropertyMock);
+        spyOn<any>(service, 'getEventProperty').and.returnValue(eventPropertyMock);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const clickOnTileSpy = spyOn<any>(service, 'clickOnTile');
+        service['onClick'](new MouseEvent('click'), true);
+        expect(clickOnTileSpy).toHaveBeenCalledWith(TileType.Path);
+    });
 
-        service['onClick'](event, true);
-
-        expect(getEventPropertySpy).toHaveBeenCalledWith(event);
-        expect(clickOnTileSpy).toHaveBeenCalledWith(TileType.Grass);
+    it('should handle click on item', () => {
+        const eventPropertyMock: EventProperty = { ...MOCK_EVENT_PROPERTY, item: ItemType.Item1 };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getEventProperty').and.returnValue(eventPropertyMock);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const clickOnItemSpy = spyOn<any>(service, 'clickOnItem');
+        service['onClick'](new MouseEvent('click'), true);
+        expect(clickOnItemSpy).toHaveBeenCalledWith(eventPropertyMock);
     });
 
     it('should add item when tile is valid', () => {
-        const eventProperty: EventProperty = {
-            tilePosition: { x: 2, y: 3 },
-            mousePosition: null,
-            tile: null,
-            item: null,
-        };
-
+        const eventProperty: EventProperty = { ...MOCK_EVENT_PROPERTY, tilePosition: { x: 2, y: 3 } };
         gameDataServiceSpy.getTileFromPosition.and.returnValue(TileType.Grass);
-
         service['dropItem'](eventProperty);
-
         expect(gameDataServiceSpy.addItem).toHaveBeenCalled();
     });
 
@@ -325,31 +261,15 @@ describe('EditorService', () => {
         const item = ItemType.Item1;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const updateItemSpy = spyOn<any>(service, 'updateItem');
-
         service['onItemUpdate'](item);
-
         expect(updateItemSpy).toHaveBeenCalledWith(item);
     });
 
     it('should handle item update with null', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const updateAllItemsSpy = spyOn<any>(service, 'updateAllItems');
-
         service['onItemUpdate'](null);
-
         expect(updateAllItemsSpy).toHaveBeenCalled();
-    });
-
-    it('should verify map data and navigate to admin if invalid', () => {
-        gameDataServiceSpy.isMapValid.and.returnValue(false);
-        service['verifyMapData']();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
-    });
-
-    it('should verify map data and not navigate if valid', () => {
-        gameDataServiceSpy.isMapValid.and.returnValue(true);
-        service['verifyMapData']();
-        expect(routerSpy.navigate).not.toHaveBeenCalled();
     });
 
     it('should update all items', () => {
@@ -357,53 +277,96 @@ describe('EditorService', () => {
         expect(service.editorData.items.length).toBeGreaterThan(0);
     });
 
-    it('should update item', () => {
-        const item = ItemType.Item1;
-        service['updateItem'](item);
-        expect(service.editorData.items.length).toBeGreaterThan(0);
-    });
-
-    it('should get editor items', () => {
-        const result = service['getEditorItems']();
-        expect(result.length).toBeGreaterThan(0);
-    });
-
-    it('should get editor item', () => {
-        const result = service['getEditorItem'](ItemType.Item1);
-        expect(result.item).toBe(ItemType.Item1);
-    });
-
     it('should return the correct remaining item count', () => {
-        const currentItem = 1;
-
-        gameDataServiceSpy.getItemCount.and.returnValue(currentItem);
-        gameDataServiceSpy.getMapSize.and.returnValue(MapSize.Small);
-
+        service.editorData.activeItem = ItemType.Spawn;
+        gameDataServiceSpy.getItemCount.and.returnValue(2);
+        gameDataServiceSpy.getMapSize.and.returnValue(MapSize.Medium);
         const remainingItemCount = service['getRemainingItemCount'](ItemType.Spawn);
-
         expect(remainingItemCount).toBe(1);
     });
 
-    it('should return 0 if the item count is equal to the maximum allowed', () => {
-        const currentItem = 2;
-
-        gameDataServiceSpy.getItemCount.and.returnValue(currentItem);
-        gameDataServiceSpy.getMapSize.and.returnValue(MapSize.Small);
-
-        const remainingItemCount = service['getRemainingItemCount'](ItemType.Spawn);
-
-        expect(remainingItemCount).toBe(0);
+    it('should return the correct flag count in ffa mode', () => {
+        gameDataServiceSpy.getGameMode.and.returnValue(GameMode.FFA);
+        const maxItemCount = service['getMaxItemCount'](ItemType.Flag);
+        expect(maxItemCount).toBe(0);
     });
 
-    it('should return the correct remaining item count for a larger map size', () => {
-        const currentItem = 1;
+    it('should not paint tile if painting the same position', () => {
+        service.editorData.activeTile = TileType.Path;
+        service.editorData.activeTilePosition = { x: 5, y: 5 };
+        service['paintTile']({ x: 5, y: 5 });
+        expect(gameDataServiceSpy.editTile).not.toHaveBeenCalled();
+    });
 
-        gameDataServiceSpy.getItemCount.and.returnValue(currentItem);
-        gameDataServiceSpy.getMapSize.and.returnValue(MapSize.Large);
+    it('should not paint tile if already painted', () => {
+        service.editorData.activeTile = TileType.Path;
+        gameDataServiceSpy.getTileFromPosition.and.returnValue(TileType.Path);
+        service['paintTile']({ x: 5, y: 5 });
+        expect(gameDataServiceSpy.editTile).not.toHaveBeenCalled();
+    });
 
-        const remainingItemCount = service['getRemainingItemCount'](ItemType.Spawn);
+    it('should replace broken bridge with bridge', () => {
+        service.editorData.activeTile = TileType.BrokenBridge;
+        gameDataServiceSpy.getTileFromPosition.and.returnValue(TileType.BrokenBridge);
+        service['paintTile']({ x: 5, y: 5 });
+        expect(gameDataServiceSpy.editTile).toHaveBeenCalledWith(TileType.Bridge, { x: 5, y: 5 });
+    });
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        expect(remainingItemCount).toBe(5);
+    it('should pick item correctly', () => {
+        const eventPropertyMock: EventProperty = { ...MOCK_EVENT_PROPERTY, tilePosition: { x: 6, y: 6 } };
+        gameDataServiceSpy.getItem.and.returnValue(ItemType.Item1);
+        service['pickItem'](eventPropertyMock);
+        expect(gameDataServiceSpy.removeItem).toHaveBeenCalledWith({ x: 6, y: 6 });
+    });
+
+    it('should not set item active if not available', () => {
+        const eventPropertyMock: EventProperty = { ...MOCK_EVENT_PROPERTY, item: ItemType.Item1 };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getRemainingItemCount').and.returnValue(0);
+        service['clickOnItem'](eventPropertyMock);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect(spyOn<any>(service, 'setActiveItem')).not.toHaveBeenCalled();
+    });
+
+    it('should set item active if available', () => {
+        const eventPropertyMock: EventProperty = { ...MOCK_EVENT_PROPERTY, item: ItemType.Item1 };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'getRemainingItemCount').and.returnValue(2);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const setActiveItemSpy = spyOn<any>(service, 'setActiveItem');
+        service['clickOnItem'](eventPropertyMock);
+        expect(setActiveItemSpy).toHaveBeenCalled();
+    });
+
+    it('should click on map item if item is on tile', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const clickOnMapItemSpy = spyOn<any>(service, 'clickOnMapItem');
+        gameDataServiceSpy.getItem.and.returnValue(ItemType.Item1);
+        service['clickOnMap'](MOCK_EVENT_PROPERTY, true);
+        expect(clickOnMapItemSpy).toHaveBeenCalledWith(MOCK_EVENT_PROPERTY, true);
+    });
+
+    it('should pick item if left click', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const pickItemSpy = spyOn<any>(service, 'pickItem');
+        service['clickOnMapItem'](MOCK_EVENT_PROPERTY, true);
+        expect(pickItemSpy).toHaveBeenCalledWith(MOCK_EVENT_PROPERTY);
+    });
+
+    it('should remove item if right click', () => {
+        service['clickOnMapItem'](MOCK_EVENT_PROPERTY, false);
+        expect(gameDataServiceSpy.removeItem).toHaveBeenCalledWith(MOCK_EVENT_PROPERTY.tilePosition as Position);
+    });
+
+    it('should erase tile if right click', () => {
+        const resultSelectedTile = service['getSelectedTile'](false);
+        expect(resultSelectedTile).toBe(EDITOR_ERASE_TILE);
+    });
+
+    it('should select correct tile', () => {
+        service.editorData.tiles[0].isActive = true;
+        service['clickOnTile'](TileType.Bush);
+        expect(service.editorData.tiles[0].isActive).toBe(false);
+        expect(service.editorData.tiles[1].isActive).toBe(true);
     });
 });

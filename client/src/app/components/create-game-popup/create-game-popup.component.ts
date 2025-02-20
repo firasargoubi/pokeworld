@@ -13,8 +13,8 @@ import { MapSize } from '@common/map-size.enum';
     imports: [PokeballButtonComponent, NgClass],
 })
 export class CreateGamePopupComponent {
-    gameMode: keyof typeof GameMode = 'FFA';
-    mapSize: keyof typeof MapSize = 'Small';
+    gameMode: GameMode = GameMode.FFA;
+    mapSize: MapSize = MapSize.Small;
     gameDataService: GameDataService = inject(GameDataService);
     router: Router = inject(Router);
 
@@ -23,17 +23,17 @@ export class CreateGamePopupComponent {
         .filter(([, value]) => typeof value === 'number')
         .map(([key, value]) => ({ key, value: value as number }));
 
-    onSizeSelection(sizeKey: string) {
-        this.mapSize = sizeKey as keyof typeof MapSize;
+    onSizeSelection(sizeKey: MapSize) {
+        this.mapSize = sizeKey;
     }
 
     // NOT FOR SPRINT 1, TO BE UNCOMMENTED LATER (FUNCTIONAL)
-    // onModeSelection(modeKey: string) {
-    //     this.gameMode = modeKey as keyof typeof GameMode;
+    // onModeSelection(modeKey: GameMode) {
+    //     this.gameMode = modeKey;
     // }
 
     onValiderSelection() {
-        this.gameDataService.createNewGame(MapSize[this.mapSize], GameMode[this.gameMode]);
+        this.gameDataService.createNewGame(this.mapSize, this.gameMode);
         this.router.navigate(['/edit']);
     }
 }
