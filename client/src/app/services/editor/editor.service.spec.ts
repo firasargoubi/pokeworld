@@ -76,7 +76,7 @@ describe('EditorService', () => {
         service = TestBed.inject(EditorService);
     });
 
-    it('should create a popup when modifications are not saved and redirectToAdmin is called', () => {
+    it('should create a popup when modifications are not saved and redirectToAdmin or reset is called ', () => {
         gameDataServiceSpy.isModified.and.returnValue(true);
         popupServiceSpy.showPopup.and.callFake((message, isConfirmation, action) => {
             if (isConfirmation && action) {
@@ -86,6 +86,8 @@ describe('EditorService', () => {
         service.redirectToAdminPage(true);
         expect(popupServiceSpy.showPopup).toHaveBeenCalled();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
+        service.resetButton();
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
     it('should redirect to admin page when no modifications', () => {
         gameDataServiceSpy.isModified.and.returnValue(false);
@@ -125,8 +127,7 @@ describe('EditorService', () => {
 
         gameSaveServiceSpy.isNameUnique.and.returnValue(of(false));
 
-        const initialGameData = { ...MOCK_GAMES[0], isVisible: true, lastEdited: new Date() };
-        gameDataServiceSpy.gameData = initialGameData;
+        gameDataServiceSpy.gameData = { ...MOCK_GAMES[0], isVisible: true, lastEdited: new Date() };
 
         service.saveButton();
 
