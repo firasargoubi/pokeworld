@@ -13,6 +13,12 @@ $text-shadow-color: rgb(112, 112, 112);
 // Assets
 $background-image: '../../../assets/images/menu/backgrounds/main-menu.png';
 $logo-image: '../../../assets/images/menu/logos/main-logo.png';
+$icon-magikarp: '../../../assets/images/menu/pokemons/chibi/magikarp.png';
+$icon-pikachu: '../../../assets/images/menu/pokemons/chibi/pikachu.png';
+$icon-mew: '../../../assets/images/menu/pokemons/chibi/mew.png';
+$icon-psyduck: '../../../assets/images/menu/pokemons/chibi/psyduck.png';
+$icon-eevee: '../../../assets/images/menu/pokemons/chibi/eevee.png';
+$icon-vulpix: '../../../assets/images/menu/pokemons/chibi/vulpix.png';
 
 // Computed measures
 $top-height: min($top-max-height, calc($top-max-width / $top-aspect-ratio));
@@ -117,14 +123,14 @@ $card-size: calc($bot-height * 0.95);
     flex-direction: column;
 }
 
-.top-right-container div {
+.top-right-container > div {
     margin-left: auto;
     width: auto;
     height: calc($top-height * 0.13);
     display: flex;
 }
 
-.top-right-container div div {
+.top-right-text {
     display: inline-block;
     width: auto;
     margin: auto 0;
@@ -135,11 +141,14 @@ $card-size: calc($bot-height * 0.95);
     text-shadow: calc($top-height * 0.00666) 0 0 $text-shadow-color;
 }
 
-.top-right-container img {
+.pokemon-icon {
     display: inline-block;
     margin: calc($top-height * 0.01);
     width: calc($top-height * 0.11);
     height: calc($top-height * 0.11);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
 .bot-container {
@@ -154,4 +163,28 @@ app-menu-button {
     height: $card-size;
     width: $card-size;
     overflow: visible;
+}
+
+.icon-magikarp {
+    background-image: url('../../../assets/images/menu/pokemons/chibi/magikarp.png');
+}
+
+.icon-pikachu {
+    background-image: url('../../../assets/images/menu/pokemons/chibi/pikachu.png');
+}
+
+.icon-mew {
+    background-image: url('../../../assets/images/menu/pokemons/chibi/mew.png');
+}
+
+.icon-psyduck {
+    background-image: url('../../../assets/images/menu/pokemons/chibi/psyduck.png');
+}
+
+.icon-eevee {
+    background-image: url('../../../assets/images/menu/pokemons/chibi/eevee.png');
+}
+
+.icon-vulpix {
+    background-image: url('../../../assets/images/menu/pokemons/chibi/vulpix.png');
 }

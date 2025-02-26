@@ -188,15 +188,16 @@ app-map {
     width: calc(0.70 * $player-card-height * $final-side-width);
     margin: calc(0.15 * $player-card-height * $final-side-width);
     margin-left: calc(0.20 * $player-card-height * $final-side-width);
-    margin-right: calc(0.18 * $player-card-height * $final-side-width);
+    margin-right: calc(0.04 * $player-card-height * $final-side-width);
     background-position: center;
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
 
 .player-name {
-    flex: 1;
+    white-space: pre;
     height: calc(0.60 * $player-card-height * $final-side-width);
+    width: auto;
     font-size: calc(0.60 * $player-card-height * $final-side-width);
     margin-top: calc(0.16 * $player-card-height * $final-side-width);
     margin-bottom: calc(0.24 * $player-card-height * $final-side-width);
@@ -206,4 +207,33 @@ app-map {
         calc(0.0150 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
         calc(0.0225 * $player-card-height * $final-side-width) calc(0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
         calc(0.0300 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
+}
+
+.player-card-space {
+    height: calc($player-card-height * $final-side-width);
+    flex: 1;
+}
+
+.has-left {
+    filter: grayscale(1);
+}
+
+.has-left .player-name {
+    text-decoration: line-through;
+}
+
+.player-fights {
+    text-align: right;
+    height: calc(0.45 * $player-card-height * $final-side-width);
+    width: calc(1.05 * $player-card-height * $final-side-width);
+    font-size: calc(0.45 * $player-card-height * $final-side-width);
+    margin-top: calc(0.27 * $player-card-height * $final-side-width);
+    margin-bottom: calc(0.28 * $player-card-height * $final-side-width);
+    margin-right: calc(0.25 * $player-card-height * $final-side-width);
+    color: $dark-text-color;
+    text-shadow:
+        calc(0.45 * 1.6666666 * 0.0075 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.45 * 1.6666666 * 0.0150 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.45 * 1.6666666 * 0.0225 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.45 * 1.6666666 * 0.0300 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
 }

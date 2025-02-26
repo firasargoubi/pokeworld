@@ -3,11 +3,16 @@ export interface MatchVisualData {
     currentTimer: number;
     maxTimer: number;
     currentPlayerTurn: number;
+    isCTF: boolean;
     players: PlayerVisualData[];
 }
 
 export interface PlayerVisualData {
-    avatarUrl: string;
     name: string;
+    avatarUrl: string;
+    fightsWon: number;
     isAdmin: boolean;
+    isBot: boolean;
+    hasLeft: boolean;
+    hasFlag: boolean;
 }
