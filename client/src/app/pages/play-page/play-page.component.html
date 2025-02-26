@@ -1,0 +1,33 @@
+<div class="play-page" [ngStyle]="{
+    '--player-count': matchVisualData.players.length,
+    '--current-player-turn':  matchVisualData.currentPlayerTurn,
+    '--bg-url': 'url(' + matchVisualData.backgroundUrl + ')',
+}">
+    <!-- <div class="thumbnail-background"></div> -->
+    <main>
+        <div class="main-left">
+            <div class="player-cards-container">
+                <div class="player-arrow-container">
+                    <div class="player-arrow"></div>
+                </div>
+                <div class="player-cards">
+                    @for (player of matchVisualData.players; track player) {
+                        <div class="player-card">
+                            <div class="player-avatar" [style.backgroundImage]="'url(' + player.avatarUrl + ')'"></div>
+                            <div class="player-name">{{ player.name }}</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="main-center">
+            <app-map></app-map>
+        </div>
+        <div class="main-right">
+        </div>
+    </main>
+    <div class="timer">
+        <div class="timer-text">26</div>
+        <div class="timer-bar"></div>
+    </div>
+</div>
