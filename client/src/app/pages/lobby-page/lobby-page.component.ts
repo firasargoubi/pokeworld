@@ -2,24 +2,48 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
-
-const CODE_LENGHT = 4;
-const ACCESS_CODE_RANGE = 10000;
+import { Avatars } from '@app/interfaces/avatars.enum';
+import { Player } from '@app/interfaces/player';
+// eslint-disable-next-line no-restricted-imports
+import { PlayerCardComponent } from '../../components/player-card/player-card.component';
 
 @Component({
     selector: 'app-lobby-page',
     templateUrl: './lobby-page.component.html',
     styleUrls: ['./lobby-page.component.scss'],
-    imports: [CommonModule, HeaderComponent],
+    imports: [CommonModule, HeaderComponent, PlayerCardComponent],
     standalone: true,
 })
 export class LobbyPageComponent implements OnInit {
     accessCode: string = '';
-    players: string[] = ['Host'];
+    players: Player[] = [];
     private router: Router = inject(Router);
 
     ngOnInit(): void {
-        this.generateAccessCode();
+        this.players = [
+            {
+                name: 'SELIM',
+                avatar: Avatars.Avatar1,
+                life: 6,
+                speed: 5,
+                attack: 10,
+                defense: 4,
+                bonusDice: { attack: 'd6', defense: 'd4' },
+                movement: 3,
+                action: 2,
+            },
+            {
+                name: 'OMAR',
+                avatar: Avatars.Avatar2,
+                life: 5,
+                speed: 6,
+                attack: 8,
+                defense: 5,
+                bonusDice: { attack: 'd8', defense: 'd6' },
+                movement: 3,
+                action: 2,
+            },
+        ];
     }
 
     startGame(): void {
@@ -31,9 +55,9 @@ export class LobbyPageComponent implements OnInit {
     }
 
     // Move to backend and add duplicate check
-    private generateAccessCode(): void {
-        this.accessCode = Math.floor(Math.random() * ACCESS_CODE_RANGE)
-            .toString()
-            .padStart(CODE_LENGHT, '0');
-    }
+    // private generateAccessCode(): void {
+    //     this.accessCode = Math.floor(Math.random() * ACCESS_CODE_RANGE)
+    //         .toString()
+    //         .padStart(CODE_LENGHT, '0');
+    // }
 }

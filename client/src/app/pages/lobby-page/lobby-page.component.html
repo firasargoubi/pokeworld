@@ -1,16 +1,21 @@
 <div id="lobby-container">
     <div id="lobby-header">
-        <app-header [onClick]="this.leaveLobby.bind(this)" [stepNumber]="'3'" [title]="'Page d`attente'"></app-header>
+        <app-header [onClick]="this.leaveLobby.bind(this)" [stepNumber]="'3'" [title]="'Page d\'attente'"></app-header>
     </div>
 
     <div id="lobby-border">
         <div id="lobby-body">
-            <p class="access-code-title">Votre code d'acces</p>
-            <p class="access-code">{{ accessCode }}</p>
-            <p class="instructions">Partagez ce code avec les autres joueurs pour jouer</p>
+            <div id="access-code-container">
+                <p class="access-code-title">Votre code d'accès</p>
+                <p class="access-code">{{ accessCode }}</p>
+                <p class="instructions">Partagez ce code avec les autres joueurs pour jouer</p>
+            </div>
 
             <div id="players-list">
                 <p class="player-title">Liste des joueurs:</p>
+                @for (player of players; track player) {
+                <app-player-card [player]="player"></app-player-card>
+                }
             </div>
         </div>
     </div>

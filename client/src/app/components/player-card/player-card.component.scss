@@ -1,0 +1,44 @@
+.player-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 350px;
+    height: 60px;
+    padding: 10px 15px;
+
+    border: 4px solid #1b4d86;
+    border-radius: 15px;
+    background-color: transparent;
+    box-shadow:
+        inset 0px -3px 0px #2a5d94,
+        inset 0px 3px 0px #5ea2db;
+
+    .pokeball-container {
+        position: relative;
+        width: 50px;
+        height: 50px;
+    }
+
+    .pokeball {
+        width: 100%;
+        height: 100%;
+        image-rendering: pixelated;
+    }
+
+    .player-avatar {
+        position: absolute;
+        top: -50%;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .player-name {
+        font-size: 18px;
+        font-weight: bold;
+        color: white;
+        text-shadow: 3px 3px black;
+        text-transform: uppercase;
+        flex-grow: 1;
+        text-align: center;
+    }
+}
