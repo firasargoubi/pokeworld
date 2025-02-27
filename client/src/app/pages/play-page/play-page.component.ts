@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { MapComponent } from '@app/components/map/map.component';
-import { EMPTY_IMAGE } from '@app/consts/images.const';
+import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
 import { MatchVisualData } from '@app/interfaces/match-visual-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
@@ -168,17 +168,23 @@ export class PlayPageComponent {
         });
 
         this.matchVisualData = {
-            isCTF: false,
+            mapSize: MapSize.Small,
+            gameMode: GameMode.FFA,
+            selfIndex: 0,
+            currentPlayerCount: 5,
+            maxPlayerCount: 6,
+            currentMovement: 3,
+            maxMovement: 4,
             currentTimer: 22,
             maxTimer: 30,
-            currentPlayerTurn: 1,
+            currentPlayerTurn: 0,
+            itemsUrl: [ITEM_IMAGES.get(ItemType.Item1) as string, ITEM_IMAGES.get(ItemType.Item2) as string],
             backgroundUrl: EMPTY_IMAGE,
             players: [
                 {
                     name: 'Selim',
                     avatarUrl: AVATAR_DATA[Avatars.Avatar1].imageCentered,
                     fightsWon: 2,
-                    hasFlag: false,
                     isAdmin: true,
                     isBot: false,
                     hasLeft: false,
@@ -187,7 +193,6 @@ export class PlayPageComponent {
                     name: 'Aziz',
                     avatarUrl: AVATAR_DATA[Avatars.Avatar2].imageCentered,
                     fightsWon: 0,
-                    hasFlag: false,
                     isAdmin: false,
                     isBot: false,
                     hasLeft: false,
@@ -196,7 +201,6 @@ export class PlayPageComponent {
                     name: 'Samer',
                     avatarUrl: AVATAR_DATA[Avatars.Avatar3].imageCentered,
                     fightsWon: 1,
-                    hasFlag: false,
                     isAdmin: false,
                     isBot: false,
                     hasLeft: false,
@@ -204,8 +208,7 @@ export class PlayPageComponent {
                 {
                     name: 'ABCDEFGHIJKLMOPQRSTUVWXY',
                     avatarUrl: AVATAR_DATA[Avatars.Avatar4].imageCentered,
-                    fightsWon: 0,
-                    hasFlag: false,
+                    fightsWon: 1,
                     isAdmin: false,
                     isBot: false,
                     hasLeft: false,
@@ -214,7 +217,6 @@ export class PlayPageComponent {
                     name: 'Mathieu',
                     avatarUrl: AVATAR_DATA[Avatars.Avatar5].imageCentered,
                     fightsWon: 0,
-                    hasFlag: false,
                     isAdmin: false,
                     isBot: false,
                     hasLeft: true,
@@ -223,7 +225,6 @@ export class PlayPageComponent {
                     name: 'Omar',
                     avatarUrl: AVATAR_DATA[Avatars.Avatar6].imageCentered,
                     fightsWon: 0,
-                    hasFlag: false,
                     isAdmin: false,
                     isBot: true,
                     hasLeft: false,
@@ -238,8 +239,18 @@ export class PlayPageComponent {
         this.matchVisualData.backgroundUrl = await inject(ThumbnailService).getThumbnail(inject(GameDataService).gameData.mapData, false);
     }
 
-    surrenderGame() {
+    surrender() {
         // TODO ajouter un popup de confirmation et la logique d'abandon
-        window.console.log('Le joueur abandonne la partie');
+        window.console.log('surrender');
+    }
+
+    action() {
+        // TODO logique d'action
+        window.console.log('action');
+    }
+
+    endTurn() {
+        // TODO logique de fin de tour
+        window.console.log('endTurn');
     }
 }

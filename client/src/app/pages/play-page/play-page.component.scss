@@ -27,9 +27,13 @@ $dark-text-color: hsl(220, 6%, 12%);
 $dark-text-shadow: hsl(220, 6%, 50%);
 
 // Assets
+$card-game-info: '../../../assets/images/menu/containers/cards/game-info.png';
 $card-gray: '../../../assets/images/menu/containers/cards/gray.png';
 $card-orange: '../../../assets/images/menu/containers/cards/orange.png';
 $arrow-orange: '../../../assets/images/menu/icons/arrows/orange-arrow.png';
+$icon-sword: '../../../assets/images/menu/icons/sword.png';
+$icon-crown: '../../../assets/images/menu/icons/crown.png';
+$icon-bot: '../../../assets/images/menu/icons/bot.png';
 
 // Computed measures
 $map-size-1: calc($main-height * (1 - $margin-top - $margin-bot));
@@ -159,6 +163,11 @@ app-map {
     display: flex;
 }
 
+.player-card-left {
+    height: calc($player-card-height * $final-side-width);
+    flex: 1;
+}
+
 *[style*="--current-player-turn: 0"] .player-card:nth-child(1),
 *[style*="--current-player-turn: 1"] .player-card:nth-child(2),
 *[style*="--current-player-turn: 2"] .player-card:nth-child(3),
@@ -184,6 +193,7 @@ app-map {
 }
 
 .player-avatar {
+    display: inline-block;
     height: calc(0.70 * $player-card-height * $final-side-width);
     width: calc(0.70 * $player-card-height * $final-side-width);
     margin: calc(0.15 * $player-card-height * $final-side-width);
@@ -195,9 +205,11 @@ app-map {
 }
 
 .player-name {
+    display: inline-block;
     white-space: pre;
     height: calc(0.60 * $player-card-height * $final-side-width);
     width: auto;
+    max-width: calc(3.15 * $player-card-height * $final-side-width);
     font-size: calc(0.60 * $player-card-height * $final-side-width);
     margin-top: calc(0.16 * $player-card-height * $final-side-width);
     margin-bottom: calc(0.24 * $player-card-height * $final-side-width);
@@ -209,9 +221,12 @@ app-map {
         calc(0.0300 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
 }
 
-.player-card-space {
-    height: calc($player-card-height * $final-side-width);
-    flex: 1;
+.is-admin .player-name {
+    max-width: calc(2.90 * $player-card-height * $final-side-width);
+}
+
+.is-bot .player-name {
+    max-width: calc(2.80 * $player-card-height * $final-side-width);
 }
 
 .has-left {
@@ -223,17 +238,107 @@ app-map {
 }
 
 .player-fights {
+    display: inline-block;
     text-align: right;
     height: calc(0.45 * $player-card-height * $final-side-width);
-    width: calc(1.05 * $player-card-height * $final-side-width);
+    width: calc(0.72 * $player-card-height * $final-side-width);
     font-size: calc(0.45 * $player-card-height * $final-side-width);
-    margin-top: calc(0.27 * $player-card-height * $final-side-width);
-    margin-bottom: calc(0.28 * $player-card-height * $final-side-width);
-    margin-right: calc(0.25 * $player-card-height * $final-side-width);
+    margin-top: calc(0.26 * $player-card-height * $final-side-width);
+    margin-bottom: calc(0.29 * $player-card-height * $final-side-width);
     color: $dark-text-color;
     text-shadow:
         calc(0.45 * 1.6666666 * 0.0075 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
         calc(0.45 * 1.6666666 * 0.0150 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
         calc(0.45 * 1.6666666 * 0.0225 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
         calc(0.45 * 1.6666666 * 0.0300 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
+}
+
+.sword-icon {
+    display: inline-block;
+    height: calc(0.44 * $player-card-height * $final-side-width);
+    width: calc(0.44 * $player-card-height * $final-side-width);
+    margin-top: calc(0.31 * $player-card-height * $final-side-width);
+    margin-bottom: calc(0.25 * $player-card-height * $final-side-width);
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-image: url($icon-sword);
+}
+
+.player-card-right {
+    text-align: right;
+    height: calc($player-card-height * $final-side-width);
+    width: calc(1.21 * $player-card-height * $final-side-width);
+    margin-right: calc(0.25 * $player-card-height * $final-side-width);
+}
+
+.info-icon {
+    display: none;
+    height: calc(0.30 * $player-card-height * $final-side-width);
+    width: calc(0.30 * $player-card-height * $final-side-width);
+    margin-left: calc(0.06 * $player-card-height * $final-side-width);
+    margin-top: calc(0.40 * $player-card-height * $final-side-width);
+    margin-bottom: calc(0.30 * $player-card-height * $final-side-width);
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.is-admin .info-icon {
+    display: inline-block;
+    background-image: url($icon-crown);
+}
+
+.is-bot .info-icon {
+    display: inline-block;
+    background-image: url($icon-bot);
+    height: calc(0.40 * $player-card-height * $final-side-width);
+    width: calc(0.40 * $player-card-height * $final-side-width);
+    margin-top: calc(0.32 * $player-card-height * $final-side-width);
+    margin-bottom: calc(0.28 * $player-card-height * $final-side-width);
+}
+
+.map-info-card {
+    height: calc(0.30 * $map-size);
+    width: $final-side-width;
+    background-image: url($card-game-info);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    padding: calc(0.019 * $map-size) calc(0.030 * $map-size);
+}
+
+.map-info-card > div {
+    height: calc(0.05 * $map-size);
+    width: calc(0.98 * $final-side-width);
+    font-size: calc(0.04 * $map-size);
+    color: $dark-text-color;
+    text-shadow:
+        calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0150 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0225 * $player-card-height * $final-side-width) calc(0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0300 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
+}
+
+.surrender-button {
+    width: calc(0.89 * $final-side-width);
+    margin-top: calc(0.015 * $map-size);
+    height: calc(0.07 * $map-size);
+    border-radius: calc(0.005 * $map-size);
+    text-decoration: none;
+    outline: none;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    font-size: calc(0.045 * $map-size);
+    color: $dark-text-color;
+    text-shadow:
+        calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0150 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0225 * $player-card-height * $final-side-width) calc(0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0300 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
+    background: transparent;
+    font-family: 'pixel', 'Pixel-Backup';
+    border: calc($map-size * 0.004) solid $dark-text-color;
+    cursor: pointer;
 }

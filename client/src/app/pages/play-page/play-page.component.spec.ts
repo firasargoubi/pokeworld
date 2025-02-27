@@ -23,8 +23,20 @@ describe('PlayPageComponent', () => {
     });
 
     it('should surrender game', () => {
-        component.surrenderGame();
+        component.surrender();
         // TODO tester la logique d'abandon
+        expect(true).toBe(true);
+    });
+
+    it('should use action', () => {
+        component.action();
+        // TODO tester la logique d'action
+        expect(true).toBe(true);
+    });
+
+    it('should end turn', () => {
+        component.endTurn();
+        // TODO tester la logique de fin de tour
         expect(true).toBe(true);
     });
 });
