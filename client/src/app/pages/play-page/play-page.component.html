@@ -12,15 +12,16 @@
                 </div>
                 <div class="player-cards">
                     @for (player of matchVisualData.players; track player) {
-                        <div class="player-card" [class.has-left]="player.hasLeft">
-                            <div class="player-avatar" [style.backgroundImage]="'url(' + player.avatarUrl + ')'"></div>
-                            <div class="player-name">&#8198;{{ player.name }}&#8202;</div>
-                            <div class="admin-icon"></div>
-                            <div class="bot-icon"></div>
-                            <div class="player-card-space"></div>
-                            <div class="flag-icon"></div>
-                            <div class="sword-icon"></div>
-                            <div class="player-fights">{{ player.fightsWon }}/3</div>
+                        <div class="player-card" [class.has-left]="player.hasLeft" [class.is-admin]="player.isAdmin" [class.is-bot]="player.isBot">
+                            <div class="player-card-left">
+                                <div class="player-avatar" [style.backgroundImage]="'url(' + player.avatarUrl + ')'"></div>
+                                <div class="player-name">&#8198;{{ player.name }}&#8202;</div>
+                                <div class="info-icon"></div>
+                            </div>
+                            <div class="player-card-right">
+                                <div class="sword-icon"></div>
+                                <div class="player-fights">{{ player.fightsWon }}/3</div>
+                            </div>
                         </div>
                     }
                 </div>
@@ -30,6 +31,25 @@
             <app-map></app-map>
         </div>
         <div class="main-right">
+            <div class="map-info-card">
+                <div>Taille de la carte : {{ matchVisualData.mapSize }} x {{ matchVisualData.mapSize }}</div>
+                <div>Mode de jeu : {{ matchVisualData.gameMode }}</div>
+                <div>Nombre de joueurs : {{ matchVisualData.currentPlayerCount }} / {{ matchVisualData.maxPlayerCount }}</div>
+                <button (click)="surrender()" class="surrender-button">< Abandonner</button>
+            </div>
+            <div class="player-info-card">
+                <div>
+                    <div class="player-info-icon" [style.backgroundImage]="'url(' + matchVisualData.players[matchVisualData.selfIndex].avatarUrl + ')'"></div>
+                    <div class="player-info-name">{{ matchVisualData.players[matchVisualData.selfIndex].name }}</div>
+                </div>
+                <div>Mouvement : {{ matchVisualData.currentMovement }} / {{ matchVisualData.maxMovement }}</div>
+                <div class="items-container">
+                    <div class="item-container" [style.backgroundImage]="'url(' + matchVisualData.itemsUrl[0] + ')'"></div>
+                    <div class="item-container" [style.backgroundImage]="'url(' + matchVisualData.itemsUrl[1] + ')'"></div>
+                </div>
+            </div>
+            <button (click)="action()" class="action-button">Action</button>
+            <button (click)="endTurn()" class="endturn-button">Fin de tour</button>
         </div>
     </main>
     <div class="timer">

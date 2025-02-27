@@ -1,9 +1,19 @@
+import { GameMode } from '@common/game-mode.enum';
+import { MapSize } from '@common/map-size.enum';
+
 export interface MatchVisualData {
+    mapSize: MapSize;
+    gameMode: GameMode;
+    selfIndex: number;
+    currentPlayerCount: number;
+    maxPlayerCount: number;
+    currentMovement: number;
+    maxMovement: number;
     backgroundUrl: string;
     currentTimer: number;
     maxTimer: number;
+    itemsUrl: string[];
     currentPlayerTurn: number;
-    isCTF: boolean;
     players: PlayerVisualData[];
 }
 
@@ -14,5 +24,4 @@ export interface PlayerVisualData {
     isAdmin: boolean;
     isBot: boolean;
     hasLeft: boolean;
-    hasFlag: boolean;
 }

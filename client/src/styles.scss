@@ -58,7 +58,8 @@ body {
 }
 
 .cdk-overlay-container {
-    background-color: rgba(0, 0, 0, 0.5); /* Darker backdrop for confirmation popups */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Darker backdrop for confirmation popups */
     position: relative;
     left: 0;
     top: 0;
@@ -74,6 +75,7 @@ body {
     pointer-events: auto;
     scrollbar-width: none;
 }
+
 .cdk-global-overlay-wrapper {
     flex-shrink: 0;
 }
