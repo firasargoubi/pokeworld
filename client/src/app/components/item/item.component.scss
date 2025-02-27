@@ -37,7 +37,7 @@ $map-size: calc(41.25vh + min(min((100vw - 82.5vh)* 0.5 - 6.72vh, 39.15vh)* 2 + 
     margin-left: calc($map-size * 0.16 * 1.815 * -0.29);
     font-size: calc($map-size * 0.029);
     padding: calc($map-size * 0.014);
-    background: url('/assets/images/menu/containers/description-container.png');
+    background: url('../../../assets/images/menu/containers/description-container.png');
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;

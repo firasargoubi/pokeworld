@@ -13,7 +13,7 @@ $padding-wheat-border: 0.7vw;
 $stripes-size: 0.7vw;
 $font-size-header: 6.5vh;
 
-$font-family-title: 'pixel';
+$font-family-title: 'pixel', 'Pixel-Backup';
 
 $card-width: 26vw;
 
@@ -54,6 +54,7 @@ main {
     flex: 2;
 }
 #player-name-avatar {
+    position: relative;
     display: flex;
     column-gap: 50px;
     margin: 0 $page-border-width $page-border-width 0;
@@ -68,6 +69,7 @@ main {
     width: auto;
     aspect-ratio: 1/1;
     object-fit: cover;
+    z-index: 1;
 }
 
 #name-form {
@@ -77,8 +79,18 @@ main {
     align-self: center;
     width: 80%;
     height: 15vh;
-    justify-content: center;
+    justify-content: center
 }
+
+#avatar-shadow {
+    height: 15%;
+    width: auto;
+    position: absolute;
+    left: 3.5vh;
+    bottom: 2.4vh;
+    filter: brightness(0.7);
+}
+
 
 #name-input {
     font-family: $font-family-title;
@@ -90,7 +102,7 @@ main {
     width: 29ch;
     font-size: 5vh;
     letter-spacing: 1vh;
-    font-family: 'pixel', sans-serif;
+    font-family: 'pixel', 'Pixel-Backup';
     text-shadow: 3px 0 0 rgba(0, 0, 0, 0.5);
     outline: none;
 }
@@ -176,7 +188,7 @@ main {
 
 .point-value {
     position: absolute;
-    bottom: -5vh;
+    bottom: -6vh;
     right: 0;
     font-size: 3em;
     font-weight: bolder;
@@ -235,7 +247,6 @@ main {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    filter: invert(0.7);
     height: 100%;
     width: auto;
     aspect-ratio: 1/1;

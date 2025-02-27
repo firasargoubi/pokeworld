@@ -75,7 +75,7 @@ $green-active-inner-border-color: rgb(122, 151, 101) rgb(179, 246, 168) rgb(179,
 }
 
 .container .body {
-    background-image: url('/assets/images/menu/containers/blue/blue-scrare-body.png');
+    background-image: url('../../../assets/images/menu/containers/blue/blue-scrare-body.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -93,7 +93,7 @@ $green-active-inner-border-color: rgb(122, 151, 101) rgb(179, 246, 168) rgb(179,
 }
 
 .orange-container .body {
-    background-image: url('/assets/images/menu/containers/orange/orange-scrare-body.png');
+    background-image: url('../../../assets/images/menu/containers/orange/orange-scrare-body.png');
     border-color: $orange-inner-border-color;
 }
 
@@ -102,7 +102,7 @@ $green-active-inner-border-color: rgb(122, 151, 101) rgb(179, 246, 168) rgb(179,
 }
 
 .green-container .body {
-    background-image: url('/assets/images/menu/containers/green/green-scrare-body.png');
+    background-image: url('../../../assets/images/menu/containers/green/green-scrare-body.png');
     border-color: $green-inner-border-color;
 }
 
@@ -111,7 +111,7 @@ $green-active-inner-border-color: rgb(122, 151, 101) rgb(179, 246, 168) rgb(179,
 }
 
 .container p {
-    font-family: 'pixel', sans-serif;
+    font-family: 'pixel', 'Pixel-Backup';
     text-shadow: calc($size * 0.011) 0 0 rgba(0, 0, 0, 0.5);
     font-size: calc($size * 0.16);
     line-height: 80%;
