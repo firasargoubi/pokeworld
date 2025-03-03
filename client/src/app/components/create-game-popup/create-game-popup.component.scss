@@ -1,7 +1,7 @@
 $base-size: 0.5vw;
 
 * {
-    font-family: 'pixel';
+    font-family: 'pixel', 'Pixel-Backup';
     font-size: $base-size * 5;
 }
 
@@ -24,7 +24,7 @@ $base-size: 0.5vw;
     height: 100%;
     padding-left: $base-size * 1.6667;
     font-size: $base-size * 7.5;
-    background-image: url('/assets/images/menu/containers/orange/orange-scrare-body.png');
+    background-image: url('../../../assets/images/menu/containers/orange/orange-scrare-body.png');
     background-repeat: repeat-x;
     background-size: contain;
     border: ($base-size * 2.3) solid #49485e;

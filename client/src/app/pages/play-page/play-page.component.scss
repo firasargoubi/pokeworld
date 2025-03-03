@@ -1,0 +1,344 @@
+// Adjustable measures
+$main-height: 100vh;
+$main-width: 100vw;
+$main-border-width: 0.005;
+$side-width: 0.50;
+$margin-top: 0.07;
+$margin-bot: 0.04;
+$margin-side: 0.12;
+$margin-left: 0.60;
+$player-arrow-width: 0.044;
+$player-card-width: 0.935;
+$player-card-height: 0.165;
+$player-card-margin: 0.015;
+$bg-stripes-size: 2.6vh;
+
+// Adjustable durations
+$stripes-animation-duration: 5s;
+$arrow-transition-time: 0.5s;
+
+// Adjustable colors
+$text-color: rgb(255, 255, 255);
+$main-border-color1: #636776;
+$main-border-color2: #e9f6f7;
+$stripes-color1: hsl(225, 6%, 15%);
+$stripes-color2: hsl(220, 6%, 17%);
+$dark-text-color: hsl(220, 6%, 12%);
+$dark-text-shadow: hsl(220, 6%, 50%);
+
+// Assets
+$card-game-info: '../../../assets/images/menu/containers/cards/game-info.png';
+$card-gray: '../../../assets/images/menu/containers/cards/gray.png';
+$card-orange: '../../../assets/images/menu/containers/cards/orange.png';
+$arrow-orange: '../../../assets/images/menu/icons/arrows/orange-arrow.png';
+$icon-sword: '../../../assets/images/menu/icons/sword.png';
+$icon-crown: '../../../assets/images/menu/icons/crown.png';
+$icon-bot: '../../../assets/images/menu/icons/bot.png';
+
+// Computed measures
+$map-size-1: calc($main-height * (1 - $margin-top - $margin-bot));
+$map-size-2: calc($main-width * (1 - $margin-side) * 1 / (1 + 2 * $side-width));
+$map-size: min($map-size-2, $map-size-1);
+$final-margin-top: calc(($main-height - $map-size) * $margin-top / ($margin-top + $margin-bot));
+$final-margin-bot: calc(($main-height - $map-size) * $margin-bot / ($margin-top + $margin-bot));
+$final-side-width: calc($map-size * $side-width);
+$margin-side-total: calc(($main-width - $map-size - 2 * $final-side-width));
+$final-margin-left: calc($margin-left * 0.5 * $margin-side-total);
+$final-margin-right: calc((1 - $margin-left) * 0.5 * $margin-side-total);
+
+.play-page {
+    height: 100vh;
+    width: 100vw;
+    background: repeating-linear-gradient(0deg,
+            $stripes-color1,
+            $stripes-color1 $bg-stripes-size,
+            $stripes-color2 $bg-stripes-size,
+            $stripes-color2 $bg-stripes-size * 2);
+    background-size: 100% ($bg-stripes-size * 2);
+    animation: fall $stripes-animation-duration linear infinite;
+}
+
+.play-page * {
+    user-select: none;
+}
+
+.thumbnail-background {
+    position: absolute;
+    height: $main-height;
+    width: $main-width;
+    background-image: var(--bg-url);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(calc(0.006 * $map-size)) brightness(0.70) saturate(0.95) contrast(0.95);
+}
+
+main {
+    overflow: visible;
+    height: $main-height;
+    width: $main-width;
+    color: $text-color;
+    position: relative;
+}
+
+main::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    border: calc($main-border-width * $map-size * 2) solid $main-border-color2;
+    outline: calc(2 * $main-border-width * $map-size) solid $main-border-color1;
+    outline-offset: calc($main-border-width * $map-size * -1);
+}
+
+@keyframes fall {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 0 $bg-stripes-size * 2;
+    }
+}
+
+.main-center {
+    display: inline-block;
+    height: $map-size;
+    width: $map-size;
+    margin-top: $final-margin-top;
+    margin-bottom: $final-margin-bot;
+}
+
+app-map {
+    display: block;
+    height: $map-size;
+    width: $map-size;
+}
+
+.main-left,
+.main-right {
+    display: inline-block;
+    height: $map-size;
+    width: $final-side-width;
+    margin-top: $final-margin-top;
+    margin-bottom: $final-margin-bot;
+    margin-left: $final-margin-left;
+    margin-right: $final-margin-right;
+}
+
+.main-right {
+    margin-left: $final-margin-right;
+    margin-right: $final-margin-left;
+}
+
+.player-cards-container {
+    height: calc(($player-card-height * var(--player-count) + $player-card-margin * (var(--player-count) - 1)) * $final-side-width);
+    width: $final-side-width;
+}
+
+.player-arrow-container {
+    display: inline-block;
+    width: calc($player-arrow-width * $final-side-width);
+    margin-right: calc((1.0 - $player-arrow-width - $player-card-width) * $final-side-width);
+    height: calc(($player-card-height * var(--player-count) + $player-card-margin * (var(--player-count) - 1)) * $final-side-width);
+}
+
+.player-cards {
+    display: inline-block;
+    width: calc($player-card-width * $final-side-width);
+    height: calc(($player-card-height * var(--player-count) + $player-card-margin * (var(--player-count) - 1)) * $final-side-width);
+}
+
+.player-card {
+    height: calc($player-card-height * $final-side-width);
+    width: calc($player-card-width * $final-side-width);
+    margin-bottom: calc($player-card-margin * $final-side-width);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-image: url($card-gray);
+    display: flex;
+}
+
+.player-card-left {
+    height: calc($player-card-height * $final-side-width);
+    flex: 1;
+}
+
+*[style*="--current-player-turn: 0"] .player-card:nth-child(1),
+*[style*="--current-player-turn: 1"] .player-card:nth-child(2),
+*[style*="--current-player-turn: 2"] .player-card:nth-child(3),
+*[style*="--current-player-turn: 3"] .player-card:nth-child(4),
+*[style*="--current-player-turn: 4"] .player-card:nth-child(5),
+*[style*="--current-player-turn: 5"] .player-card:nth-child(6) {
+    background-image: url($card-orange);
+}
+
+.player-arrow {
+    height: calc($player-card-height * $final-side-width);
+    width: calc($player-arrow-width * $final-side-width);
+    margin-top: calc(var(--current-player-turn) * ($player-card-height + $player-card-margin) * $final-side-width);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 69%;
+    background-image: url($arrow-orange);
+    transition: margin-top $arrow-transition-time ease-in-out;
+}
+
+.player-cards > .player-card:last-child {
+    margin-bottom: 0;
+}
+
+.player-avatar {
+    display: inline-block;
+    height: calc(0.70 * $player-card-height * $final-side-width);
+    width: calc(0.70 * $player-card-height * $final-side-width);
+    margin: calc(0.15 * $player-card-height * $final-side-width);
+    margin-left: calc(0.20 * $player-card-height * $final-side-width);
+    margin-right: calc(0.04 * $player-card-height * $final-side-width);
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.player-name {
+    display: inline-block;
+    white-space: pre;
+    height: calc(0.60 * $player-card-height * $final-side-width);
+    width: auto;
+    max-width: calc(3.15 * $player-card-height * $final-side-width);
+    font-size: calc(0.60 * $player-card-height * $final-side-width);
+    margin-top: calc(0.16 * $player-card-height * $final-side-width);
+    margin-bottom: calc(0.24 * $player-card-height * $final-side-width);
+    color: $dark-text-color;
+    text-shadow:
+        calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0150 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0225 * $player-card-height * $final-side-width) calc(0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0300 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
+}
+
+.is-admin .player-name {
+    max-width: calc(2.90 * $player-card-height * $final-side-width);
+}
+
+.is-bot .player-name {
+    max-width: calc(2.80 * $player-card-height * $final-side-width);
+}
+
+.has-left {
+    filter: grayscale(1);
+}
+
+.has-left .player-name {
+    text-decoration: line-through;
+}
+
+.player-fights {
+    display: inline-block;
+    text-align: right;
+    height: calc(0.45 * $player-card-height * $final-side-width);
+    width: calc(0.72 * $player-card-height * $final-side-width);
+    font-size: calc(0.45 * $player-card-height * $final-side-width);
+    margin-top: calc(0.26 * $player-card-height * $final-side-width);
+    margin-bottom: calc(0.29 * $player-card-height * $final-side-width);
+    color: $dark-text-color;
+    text-shadow:
+        calc(0.45 * 1.6666666 * 0.0075 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.45 * 1.6666666 * 0.0150 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.45 * 1.6666666 * 0.0225 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.45 * 1.6666666 * 0.0300 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
+}
+
+.sword-icon {
+    display: inline-block;
+    height: calc(0.44 * $player-card-height * $final-side-width);
+    width: calc(0.44 * $player-card-height * $final-side-width);
+    margin-top: calc(0.31 * $player-card-height * $final-side-width);
+    margin-bottom: calc(0.25 * $player-card-height * $final-side-width);
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-image: url($icon-sword);
+}
+
+.player-card-right {
+    text-align: right;
+    height: calc($player-card-height * $final-side-width);
+    width: calc(1.21 * $player-card-height * $final-side-width);
+    margin-right: calc(0.25 * $player-card-height * $final-side-width);
+}
+
+.info-icon {
+    display: none;
+    height: calc(0.30 * $player-card-height * $final-side-width);
+    width: calc(0.30 * $player-card-height * $final-side-width);
+    margin-left: calc(0.06 * $player-card-height * $final-side-width);
+    margin-top: calc(0.40 * $player-card-height * $final-side-width);
+    margin-bottom: calc(0.30 * $player-card-height * $final-side-width);
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.is-admin .info-icon {
+    display: inline-block;
+    background-image: url($icon-crown);
+}
+
+.is-bot .info-icon {
+    display: inline-block;
+    background-image: url($icon-bot);
+    height: calc(0.40 * $player-card-height * $final-side-width);
+    width: calc(0.40 * $player-card-height * $final-side-width);
+    margin-top: calc(0.32 * $player-card-height * $final-side-width);
+    margin-bottom: calc(0.28 * $player-card-height * $final-side-width);
+}
+
+.map-info-card {
+    height: calc(0.30 * $map-size);
+    width: $final-side-width;
+    background-image: url($card-game-info);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    padding: calc(0.019 * $map-size) calc(0.030 * $map-size);
+}
+
+.map-info-card > div {
+    height: calc(0.05 * $map-size);
+    width: calc(0.98 * $final-side-width);
+    font-size: calc(0.04 * $map-size);
+    color: $dark-text-color;
+    text-shadow:
+        calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0150 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0225 * $player-card-height * $final-side-width) calc(0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0300 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
+}
+
+.surrender-button {
+    width: calc(0.89 * $final-side-width);
+    margin-top: calc(0.015 * $map-size);
+    height: calc(0.07 * $map-size);
+    border-radius: calc(0.005 * $map-size);
+    text-decoration: none;
+    outline: none;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    font-size: calc(0.045 * $map-size);
+    color: $dark-text-color;
+    text-shadow:
+        calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0150 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0225 * $player-card-height * $final-side-width) calc(0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.0300 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
+    background: transparent;
+    font-family: 'pixel', 'Pixel-Backup';
+    border: calc($map-size * 0.004) solid $dark-text-color;
+    cursor: pointer;
+}

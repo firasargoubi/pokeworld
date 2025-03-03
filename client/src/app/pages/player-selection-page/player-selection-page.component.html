@@ -7,6 +7,7 @@
             <section id="avatar-info-container" class="flex-container">
                 <div id="player-name-avatar">
                     <img src="{{ avatarData[selectedAvatar].image }}" id="selected-avatar" />
+                    <img src="\assets\images\menu\stat-bar\shadow.png" id="avatar-shadow" />
                     <span id="name-form">
                         <input
                             id="name-input"
@@ -15,6 +16,7 @@
                             maxlength="{{ this.maxNameLength }}"
                             placeholder="Entrez votre pseudo"
                             autofocus
+                            autocomplete="off"
                         />
                         <p id="input-border">--------------------</p>
                     </span>
@@ -22,7 +24,7 @@
                 <div id="player-stats">
                     <div class="stat-container" title="Points de vie du personnage">
                         <span class="stat-bar-container">
-                            <img src="\assets\images\menu\stat-bar\hp-bar.png" class="bar-icon" />
+                            <img src="./assets/images/menu/stat-bar/hp-bar.png" class="bar-icon" />
                             <div class="stat-bar"></div>
                             <div class="bonus-bar" [ngClass]="{ 'bonus-active': isBonusPoint(statType.Life) }">
                                 <span class="point-value">4 HP</span>
@@ -34,7 +36,7 @@
 
                     <div class="stat-container" title="Capacite de mouvement du personnage">
                         <span class="stat-bar-container">
-                            <img src="\assets\images\menu\stat-bar\vit-bar.png" class="bar-icon" />
+                            <img src="./assets/images/menu/stat-bar/vit-bar.png" class="bar-icon" />
                             <div class="stat-bar"></div>
                             <div class="bonus-bar" [ngClass]="{ 'bonus-active': isBonusPoint(statType.Speed) }">
                                 <span class="point-value">4 MS</span>
@@ -46,7 +48,7 @@
 
                     <div class="stat-container" title="Puissance d'attaque du personnage">
                         <span class="stat-bar-container">
-                            <img src="\assets\images\menu\stat-bar\atq-bar.png" class="bar-icon" />
+                            <img src="./assets/images/menu/stat-bar/atq-bar.png" class="bar-icon" />
                             <div class="stat-bar"></div>
                             <div class="bonus-bar">
                                 <span class="point-value">4 AD</span>
@@ -57,7 +59,7 @@
 
                     <div class="stat-container" title="Capacité de défense du personnage">
                         <span class="stat-bar-container">
-                            <img src="\assets\images\menu\stat-bar\def-bar.png" class="bar-icon" />
+                            <img src="./assets/images/menu/stat-bar/def-bar.png" class="bar-icon" />
                             <div class="stat-bar"></div>
                             <div class="bonus-bar">
                                 <span class="point-value">4 DP</span>

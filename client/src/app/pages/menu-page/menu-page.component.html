@@ -1,23 +1,27 @@
-<div id="menu-page">
-    <div class="glass-container">
-        <div id="logo-container">
-            <img id="logo" src="/assets/images/menu/logos/main-logo.png" />
-            <p id="team-number">Equipe #204</p>
+<div class="menu-page">
+    <div class="background-container"></div>
+    <div class="content-container">
+        <div class="top-container">
+            <div class="top-left-container">
+                <div class="logo-container">
+                    <p class="team-number">Equipe #204</p>
+                </div>
+            </div>
+
+            <div class="top-right-container">
+                <div><div class="top-right-text">Mohamed Omar Zedek</div><div class="icon-magikarp pokemon-icon"></div></div>
+                <div><div class="top-right-text">Mathieu Lambert</div><div class="icon-pikachu pokemon-icon"></div></div>
+                <div><div class="top-right-text">Souhayl Sejjari</div><div class="icon-mew pokemon-icon"></div></div>
+                <div><div class="top-right-text">Selim Mahjoub</div><div class="icon-psyduck pokemon-icon"></div></div>
+                <div><div class="top-right-text">Samer Chebair</div><div class="icon-eevee pokemon-icon"></div></div>
+                <div><div class="top-right-text">Aziz Maaref</div><div class="icon-vulpix pokemon-icon"></div></div>
+            </div>
         </div>
 
-        <div id="credit-container">
-            <span>Mohamed Omar Zedek <img src="/assets/images/menu/pokemons/chibi/magikarp.png" class="pokemon-icon" /></span>
-            <span>Mathieu Lambert <img src="/assets/images/menu/pokemons/chibi/pikachu.png" class="pokemon-icon" /></span>
-            <span>Souhayl Sejjari <img src="/assets/images/menu/pokemons/chibi/mew.png" class="pokemon-icon" /></span>
-            <span>Selim Mahjoub <img src="/assets/images/menu/pokemons/chibi/psyduck.png" class="pokemon-icon" /></span>
-            <span>Samer Chebair<img src="/assets/images/menu/pokemons/chibi/eevee.png" class="pokemon-icon" /></span>
-            <span>Aziz Maaref <img src="/assets/images/menu/pokemons/chibi/vulpix.png" class="pokemon-icon" /></span>
-        </div>
-
-        <div id="link-container">
+        <div class="bot-container">
             <app-menu-button
                 [containerClass]="'blue-container'"
-                [spriteImage]="'/assets/images/menu/pokemons/normal/blastoise.png'"
+                [spriteImage]="'./assets/images/menu/pokemons/normal/blastoise.png'"
                 [textContent]="'Joindre<br/>Partie'"
                 [routePath]="''"
             >
@@ -25,7 +29,7 @@
 
             <app-menu-button
                 [containerClass]="'orange-container'"
-                [spriteImage]="'/assets/images/menu/pokemons/normal/charizard.png'"
+                [spriteImage]="'./assets/images/menu/pokemons/normal/charizard.png'"
                 [textContent]="'Créer<br/>Partie'"
                 [routePath]="'/create'"
             >
@@ -33,7 +37,7 @@
 
             <app-menu-button
                 [containerClass]="'green-container'"
-                [spriteImage]="'/assets/images/menu/pokemons/normal/venusaur.png'"
+                [spriteImage]="'./assets/images/menu/pokemons/normal/venusaur.png'"
                 [textContent]="'Administrer<br/>Partie'"
                 [routePath]="'/admin'"
             >

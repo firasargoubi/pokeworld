@@ -42,8 +42,8 @@ $tool-normal-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0)
 $tool-hover-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0.7);
 $tool-active-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0);
 
-$gray-box-square: '/assets/images/menu/containers/gray/square.png';
-$gray-box-rectangle: '/assets/images/menu/containers/gray/rectangle.png';
+$gray-box-square: '../../../assets/images/menu/containers/gray/square.png';
+$gray-box-rectangle: '../../../assets/images/menu/containers/gray/rectangle.png';
 
 .editor-page {
     height: 100vh;
@@ -201,7 +201,7 @@ app-map {
     margin-left: calc($final-map-size * 0.16 * 1.815 * -0.19);
     font-size: calc($final-map-size * 0.03);
     padding: calc($final-map-size * 0.012);
-    background: url('/assets/images/menu/containers/description-container.png');
+    background: url('../../../assets/images/menu/containers/description-container.png');
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -312,7 +312,7 @@ app-item {
     -webkit-appearance: none;
     font-size: calc($final-side-width * 0.07);
     background: $input-bg-normal;
-    font-family: 'pixel';
+    font-family: 'pixel', 'Pixel-Backup';
     border: calc($final-side-width * 0.0085) solid transparent;
     cursor: pointer;
 }
@@ -374,7 +374,7 @@ app-item {
     appearance: none;
     -webkit-appearance: none;
     background: $input-bg-normal;
-    font-family: 'pixel';
+    font-family: 'pixel', 'Pixel-Backup';
     border: calc($final-side-width * 0.0085) solid transparent;
     cursor: pointer;
     font-size: calc($final-side-width * 0.085);
