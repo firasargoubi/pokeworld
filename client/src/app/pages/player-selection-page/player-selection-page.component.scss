@@ -13,7 +13,7 @@ $padding-wheat-border: 0.7vw;
 $stripes-size: 0.7vw;
 $font-size-header: 6.5vh;
 
-$font-family-title: 'pixel', 'Pixel-Backup';
+$font-family-title: 'pixel';
 
 $card-width: 26vw;
 
@@ -102,7 +102,7 @@ main {
     width: 29ch;
     font-size: 5vh;
     letter-spacing: 1vh;
-    font-family: 'pixel', 'Pixel-Backup';
+    font-family: 'pixel';
     text-shadow: 3px 0 0 rgba(0, 0, 0, 0.5);
     outline: none;
 }
@@ -222,7 +222,7 @@ main {
     width: auto;
     aspect-ratio: 3/2;
     margin: 0 0 0 30px;
-    background-image: url('/assets/images/menu/stat-bar/bonus-point.png');
+    background-image: url('../../../assets/images/menu/stat-bar/bonus-point.png');
     background-size: 100% 100%;
     display: inline-block;
     cursor: pointer;
@@ -265,13 +265,13 @@ main {
 }
 
 .dice-icon-4 {
-    background-image: url('/assets/images/menu/stat-bar/inverted-dice-4.png');
+    background-image: url('../../../assets/images/menu/stat-bar/inverted-dice-4.png');
     rotate: 0deg;
     cursor: pointer;
 }
 
 .dice-icon-6 {
-    background-image: url('/assets/images/menu/stat-bar/dice-six-faces-six.png');
+    background-image: url('../../../assets/images/menu/stat-bar/dice-six-faces-six.png');
     rotate: 45deg;
     cursor: pointer;
 }
@@ -376,14 +376,14 @@ main {
     font-size: 5vh;
     width: 17vw;
     border-style: none;
-    background-image: url('/assets/images/menu/buttons/admin-button/light-green-background-highlight.png');
+    background-image: url('../../../assets/images/menu/buttons/admin-button/light-green-background-highlight.png');
     background-size: 100% 100%;
     align-self: center;
     cursor: pointer;
 }
 
 #page-footer .disabled {
-    background-image: url('/assets/images/menu/buttons/admin-button/red-background-highlight.png');
+    background-image: url('../../../assets/images/menu/buttons/admin-button/red-background-highlight.png');
 }
 
 .error-container {
