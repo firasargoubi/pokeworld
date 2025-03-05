@@ -27,7 +27,7 @@ describe('MenuButtonComponent', () => {
 
     it('should have default @Input values', () => {
         expect(component.containerClass).toBe('container orange-container');
-        expect(component.spriteImage).toBe('/assets/images/menu/pokemon/normal/charizard.png');
+        expect(component.spriteImage).toBe('./assets/images/menu/pokemon/normal/charizard.png');
         expect(component.textContent).toBe('');
     });
 

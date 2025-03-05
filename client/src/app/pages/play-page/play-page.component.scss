@@ -25,6 +25,8 @@ $stripes-color1: hsl(225, 6%, 15%);
 $stripes-color2: hsl(220, 6%, 17%);
 $dark-text-color: hsl(220, 6%, 12%);
 $dark-text-shadow: hsl(220, 6%, 50%);
+$light-text-color:  rgb(255, 255, 255);
+$medium-text-color:  hsl(220, 6%, 23%);
 
 // Assets
 $card-game-info: '../../../assets/images/menu/containers/cards/game-info.png';
@@ -74,7 +76,6 @@ $final-margin-right: calc((1 - $margin-left) * 0.5 * $margin-side-total);
 }
 
 main {
-    overflow: visible;
     height: $main-height;
     width: $main-width;
     color: $text-color;
@@ -198,21 +199,31 @@ app-map {
     width: calc(0.70 * $player-card-height * $final-side-width);
     margin: calc(0.15 * $player-card-height * $final-side-width);
     margin-left: calc(0.20 * $player-card-height * $final-side-width);
-    margin-right: calc(0.04 * $player-card-height * $final-side-width);
+    margin-right: calc(0.10 * $player-card-height * $final-side-width);
     background-position: center;
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
 
 .player-name {
+    position: relative;
     display: inline-block;
+    vertical-align:top;
     white-space: pre;
-    height: calc(0.60 * $player-card-height * $final-side-width);
+    height: calc(1.3750191307 * 0.60 * $player-card-height * $final-side-width);
     width: auto;
-    max-width: calc(3.15 * $player-card-height * $final-side-width);
-    font-size: calc(0.60 * $player-card-height * $final-side-width);
-    margin-top: calc(0.16 * $player-card-height * $final-side-width);
-    margin-bottom: calc(0.24 * $player-card-height * $final-side-width);
+    max-width: calc(3.14 * $player-card-height * $final-side-width);
+
+    height: calc(1.0 * $player-card-height * $final-side-width);
+    line-height: calc(1.0 * $player-card-height * $final-side-width);
+    font-size: calc(0.55 * $player-card-height * $final-side-width);
+
+    // height: calc(1.0 * $player-card-height * $final-side-width);
+    // line-height: calc(1.3750191307 * 0.60 * $player-card-height * $final-side-width);
+    // font-size: calc(0.60 * $player-card-height * $final-side-width);
+    // padding-top: calc(0.50 * (1.0 - 1.3750191307 * 0.60) * $player-card-height * $final-side-width);
+    // padding-bottom: calc(0.50 * (1.0 - 1.3750191307 * 0.60) * $player-card-height * $final-side-width);
+
     color: $dark-text-color;
     text-shadow:
         calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
@@ -222,11 +233,11 @@ app-map {
 }
 
 .is-admin .player-name {
-    max-width: calc(2.90 * $player-card-height * $final-side-width);
+    max-width: calc(2.80 * $player-card-height * $final-side-width);
 }
 
 .is-bot .player-name {
-    max-width: calc(2.80 * $player-card-height * $final-side-width);
+    max-width: calc(2.70 * $player-card-height * $final-side-width);
 }
 
 .has-left {
@@ -234,17 +245,33 @@ app-map {
 }
 
 .has-left .player-name {
-    text-decoration: line-through;
+    overflow: visible;
+    filter: grayscale(1);
+}
+
+.has-left .player-name:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(-0.05 * $player-card-height * $final-side-width);
+    right: calc(-0.03 * $player-card-height * $final-side-width);
+    height: 53%;
+    border-bottom: calc(0.06 * $player-card-height * $final-side-width) solid $dark-text-color;
 }
 
 .player-fights {
     display: inline-block;
     text-align: right;
-    height: calc(0.45 * $player-card-height * $final-side-width);
-    width: calc(0.72 * $player-card-height * $final-side-width);
-    font-size: calc(0.45 * $player-card-height * $final-side-width);
-    margin-top: calc(0.26 * $player-card-height * $final-side-width);
-    margin-bottom: calc(0.29 * $player-card-height * $final-side-width);
+    width: calc(0.75 * $player-card-height * $final-side-width);
+
+    height: calc(1.0 * $player-card-height * $final-side-width);
+    line-height: calc(1.0 * $player-card-height * $final-side-width);
+    font-size: calc(0.50 * $player-card-height * $final-side-width);
+    // line-height: calc(1.3750191307 * 0.45 * $player-card-height * $final-side-width);
+    // padding-top: calc(0.50 * (1.0 - 1.3750191307 * 0.45) * $player-card-height * $final-side-width);
+    // padding-bottom: calc(0.50 * (1.0 - 1.3750191307 * 0.45) * $player-card-height * $final-side-width);
+
     color: $dark-text-color;
     text-shadow:
         calc(0.45 * 1.6666666 * 0.0075 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
@@ -268,7 +295,7 @@ app-map {
 .player-card-right {
     text-align: right;
     height: calc($player-card-height * $final-side-width);
-    width: calc(1.21 * $player-card-height * $final-side-width);
+    width: calc(1.24 * $player-card-height * $final-side-width);
     margin-right: calc(0.25 * $player-card-height * $final-side-width);
 }
 
@@ -305,13 +332,15 @@ app-map {
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
-    padding: calc(0.019 * $map-size) calc(0.030 * $map-size);
+    padding: calc(0.018 * $map-size) calc(0.035 * $map-size);
 }
 
 .map-info-card > div {
-    height: calc(0.05 * $map-size);
-    width: calc(0.98 * $final-side-width);
+    width: 100%;
+    height: calc(1.3750191307 * 0.04 * $map-size);
+    line-height: calc(1.3750191307 * 0.04 * $map-size);
     font-size: calc(0.04 * $map-size);
+    
     color: $dark-text-color;
     text-shadow:
         calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
@@ -321,16 +350,20 @@ app-map {
 }
 
 .surrender-button {
-    width: calc(0.89 * $final-side-width);
-    margin-top: calc(0.015 * $map-size);
-    height: calc(0.07 * $map-size);
+    width: 100%;
+    margin-top: calc(0.013 * $map-size);
+    height: calc(1.2 * 1.3750191307 * 0.045 * $map-size);
+    padding-bottom: calc(0.2 * 1.3750191307 * 0.045 * $map-size);
     border-radius: calc(0.005 * $map-size);
+    
+    line-height: calc(1.3750191307 * 0.045 * $map-size);
+    font-size: calc(0.045 * $map-size);
+    
     text-decoration: none;
     outline: none;
     outline: none;
     appearance: none;
     -webkit-appearance: none;
-    font-size: calc(0.045 * $map-size);
     color: $dark-text-color;
     text-shadow:
         calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
@@ -338,7 +371,21 @@ app-map {
         calc(0.0225 * $player-card-height * $final-side-width) calc(0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
         calc(0.0300 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
     background: transparent;
-    font-family: 'pixel', 'Pixel-Backup';
+    font-family: 'pixel';
     border: calc($map-size * 0.004) solid $dark-text-color;
     cursor: pointer;
+}
+
+.surrender-button:hover {
+    color: $light-text-color;
+    text-shadow: none;
+    background: $dark-text-color;
+    border-color: $dark-text-color;
+}
+
+.surrender-button:active {
+    color: $light-text-color;
+    text-shadow: none;
+    background: $medium-text-color;
+    border-color: $medium-text-color;
 }

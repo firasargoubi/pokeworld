@@ -47,7 +47,7 @@ describe('ThumbnailService', () => {
     it('should generate a thumbnail with correct dimensions for Small map', async () => {
         mockMap.tiles = Array(MapSize.Small).fill(Array(MapSize.Small).fill(TileType.Grass));
 
-        mapServiceSpy.getTileImage.and.returnValue('/assets/images/game/tiles/grass.png');
+        mapServiceSpy.getTileImage.and.returnValue('./assets/images/game/tiles/grass.png');
 
         const thumbnail = await service.getThumbnail(mockMap, true);
 
@@ -58,7 +58,7 @@ describe('ThumbnailService', () => {
     it('should generate a thumbnail with correct dimensions for Medium map', async () => {
         mockMap.tiles = Array(MapSize.Medium).fill(Array(MapSize.Medium).fill(TileType.Water));
 
-        mapServiceSpy.getTileImage.and.returnValue('/assets/images/game/tiles/water.png');
+        mapServiceSpy.getTileImage.and.returnValue('./assets/images/game/tiles/water.png');
 
         const thumbnail = await service.getThumbnail(mockMap, true);
 
@@ -69,7 +69,7 @@ describe('ThumbnailService', () => {
     it('should generate a thumbnail with correct dimensions for Large map', async () => {
         mockMap.tiles = Array(MapSize.Large).fill(Array(MapSize.Large).fill(TileType.Path));
 
-        mapServiceSpy.getTileImage.and.returnValue('/assets/images/game/tiles/path.png');
+        mapServiceSpy.getTileImage.and.returnValue('./assets/images/game/tiles/path.png');
 
         const thumbnail = await service.getThumbnail(mockMap, true);
 
@@ -78,7 +78,7 @@ describe('ThumbnailService', () => {
     });
 
     it('should load an image successfully', async () => {
-        const imageUrl = '/assets/images/game/tiles/grass.png';
+        const imageUrl = './assets/images/game/tiles/grass.png';
         const x = 0;
         const y = 0;
 
@@ -91,7 +91,7 @@ describe('ThumbnailService', () => {
     });
 
     it('should return null if image fails to load', async () => {
-        const imageUrl = '/assets/images/game/tiles/invalid.png';
+        const imageUrl = './assets/images/game/tiles/invalid.png';
         const x = 1;
         const y = 1;
 
@@ -101,10 +101,10 @@ describe('ThumbnailService', () => {
     });
 
     it('should load and draw item images correctly', async () => {
-        const item1Image = '/assets/images/game/items/item1.png';
-        const item2Image = '/assets/images/game/items/item2.png';
+        const item1Image = './assets/images/game/items/item1.png';
+        const item2Image = './assets/images/game/items/item2.png';
 
-        mapServiceSpy.getTileImage.and.returnValue('/assets/images/game/tiles/grass.png');
+        mapServiceSpy.getTileImage.and.returnValue('./assets/images/game/tiles/grass.png');
 
         const thumbnail = await service.getThumbnail(mockMap, true);
 

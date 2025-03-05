@@ -111,7 +111,7 @@ $green-active-inner-border-color: rgb(122, 151, 101) rgb(179, 246, 168) rgb(179,
 }
 
 .container p {
-    font-family: 'pixel', 'Pixel-Backup';
+    font-family: 'pixel';
     text-shadow: calc($size * 0.011) 0 0 rgba(0, 0, 0, 0.5);
     font-size: calc($size * 0.16);
     line-height: 80%;
@@ -119,12 +119,6 @@ $green-active-inner-border-color: rgb(122, 151, 101) rgb(179, 246, 168) rgb(179,
     top: 10%;
     left: 10%;
     overflow: visible;
-}
-
-.container img {
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    -ms-interpolation-mode: nearest-neighbor;
 }
 
 .container .pokemon-img {
