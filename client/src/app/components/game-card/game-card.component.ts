@@ -21,10 +21,10 @@ export class GameCardComponent implements OnInit {
     @Output() toggleVisibility = new EventEmitter<{ id: string; isVisible: boolean }>();
     @Output() join = new EventEmitter<string>();
 
-    thumbnailService: ThumbnailService = inject(ThumbnailService);
     isHovered: boolean = false;
     thumbnailUrl: string;
-    gameDataService: GameDataService = inject(GameDataService);
+    private thumbnailService: ThumbnailService = inject(ThumbnailService);
+    private gameDataService: GameDataService = inject(GameDataService);
 
     onEdit() {
         this.gameDataService.setGameData(this.game);

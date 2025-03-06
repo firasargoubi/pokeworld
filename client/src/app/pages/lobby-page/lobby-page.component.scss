@@ -1,139 +1,48 @@
-$gray-border-color: #636776;
-$wheat-border-color: #e9f6f7;
-$stripes-color1: #c0e4f6;
-$stripes-color2: #d0effc;
-
-$page-border-width: 10px;
-$padding-wheat-border: 0.7vw;
-$stripes-size: 0.7vw;
-
-#lobby-header {
-    height: 7vh;
-}
-
-#lobby-border {
-    height: calc(100vh - 7vh);
-    border: $page-border-width solid $gray-border-color;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#lobby-body {
-    position: relative;
-    height: 100%;
-    width: 100%;
-    overflow-y: scroll;
-    background: repeating-linear-gradient(
-        0deg,
-        $stripes-color1,
-        $stripes-color1 $stripes-size,
-        $stripes-color2 $stripes-size,
-        $stripes-color2 $stripes-size * 2
-    );
-    background-size: 100% ($stripes-size * 2);
-    animation: fall 2s linear infinite;
-    box-sizing: border-box;
-    border: $page-border-width solid $wheat-border-color;
-    padding: $page-border-width $page-border-width;
+.lobby-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    gap: 20px;
+    padding: 20px;
 }
 
-@keyframes fall {
-    from {
-        background-position: 0 0;
+.chat-container {
+    color: black;
+    margin-top: 20px;
+    border-top: 1px solid #ccc;
+    padding-top: 20px;
+
+    .chat-history {
+        height: 150px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+
+        p {
+            margin: 5px 0;
+        }
     }
-    to {
-        background-position: 0 $stripes-size * 2;
+
+    .chat-input {
+        display: flex;
+        gap: 10px;
+
+        input {
+            flex: 1;
+            padding: 5px;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #0056b3;
+            }
+        }
     }
-}
-
-::-webkit-scrollbar {
-    display: none;
-}
-
-.access-code-title {
-    font-size: 50px;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 10px;
-}
-
-.access-code {
-    font-size: 48px;
-    font-weight: bold;
-    color: #007bff;
-    background-color: #ffffff;
-    display: inline-block;
-    padding: 15px 20px;
-    border-radius: 12px;
-    border: 3px solid $gray-border-color;
-    margin: 20px auto;
-}
-
-.instructions {
-    font-size: 36px;
-    color: #444;
-    text-align: center;
-    margin-top: 10px;
-}
-
-#players-list {
-    margin-top: 30px;
-    text-align: center;
-}
-
-.player-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-li {
-    background: #eee;
-    padding: 12px;
-    margin: 5px auto;
-    width: 60%;
-    border-radius: 5px;
-    font-size: 20px;
-}
-
-.start-button {
-    display: block;
-    margin: 20px auto;
-    padding: 15px 30px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 24px;
-    border-radius: 8px;
-}
-
-.start-button:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
-}
-
-#poke-button {
-    position: absolute;
-    right: 15%;
-    bottom: 7%;
-    width: 22.5vw;
-    height: 4.5vw;
-    overflow: visible;
-}
-
-#poke-button app-pokeball-button {
-    width: 100%;
-    height: 100%;
 }

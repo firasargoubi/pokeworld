@@ -1,0 +1,55 @@
+<div class="lobby-container">
+    <!-- Partie gauche : Créer une room -->
+    <div class="left-panel">
+        <h2>Créer une Room</h2>
+        <button (click)="createRoom()">Créer une Room</button>
+
+        @if (matchCode) {
+        <p>
+            Code de la room : <strong>{{ matchCode }}</strong>
+        </p>
+        }
+
+        <h3>Joueurs dans la room :</h3>
+        <ul>
+            @for (player of players$ | async; track player.id) {
+            <li>{{ player.name }} ({{ player.isAdmin ? 'Admin' : 'Joueur' }})</li>
+            }
+        </ul>
+
+        @if (matchCode) {
+        <button (click)="leaveRoom()">Quitter la Room</button>
+        }
+    </div>
+
+    <!-- Partie droite : Rejoindre une room -->
+    <div class="right-panel">
+        <h2>Rejoindre une Room</h2>
+        <input type="text" placeholder="Code de la room" [(ngModel)]="joinRoomCode" />
+        <br />
+        <button (click)="joinRoom()">Rejoindre</button>
+    </div>
+
+    <!-- Formulaire pour mettre à jour les informations du joueur -->
+    @if (matchCode) {
+    <div class="update-player-form">
+        <h2>Mettre à jour vos informations</h2>
+        <input type="text" placeholder="Nouveau nom" [(ngModel)]="updatedPlayerName" />
+        <button (click)="updatePlayer({ name: updatedPlayerName })">Mettre à jour</button>
+    </div>
+    }
+
+    <!-- Zone de clavardage -->
+    <div class="chat-container">
+        <h2>Chat</h2>
+        <div class="chat-history">
+            @for (message of chatMessages$ | async; track $index) {
+            <p>{{ message }}</p>
+            }
+        </div>
+        <div class="chat-input">
+            <input type="text" placeholder="Écrivez un message..." [(ngModel)]="newMessage" />
+            <button (click)="sendChatMessage()">Envoyer</button>
+        </div>
+    </div>
+</div>

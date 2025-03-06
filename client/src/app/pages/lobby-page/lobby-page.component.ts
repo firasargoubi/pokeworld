@@ -1,39 +1,37 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { HeaderComponent } from '@app/components/header/header.component';
-
-const CODE_LENGHT = 4;
-const ACCESS_CODE_RANGE = 10000;
+import { Component, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ChatSocketsService } from '@app/services/sockets/chat-socket/chat-socket.service'; // Importez le service de chat
+import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
+import { Player } from '@common/player';
+import { Observable } from 'rxjs';
 
 @Component({
-    selector: 'app-lobby-page',
+    selector: 'app-game-lobby',
     templateUrl: './lobby-page.component.html',
     styleUrls: ['./lobby-page.component.scss'],
-    imports: [CommonModule, HeaderComponent],
     standalone: true,
+    imports: [FormsModule, CommonModule],
 })
-export class LobbyPageComponent implements OnInit {
-    accessCode: string = '';
-    players: string[] = ['Host'];
-    private router: Router = inject(Router);
+export class LobbyPageComponent {
+    joinRoomCode: string = ''; // Code de la room à rejoindre
+    updatedPlayerName: string = ''; // Nouveau nom pour la mise à jour du joueur
+    players$: Observable<Player[]>; // Liste des joueurs dans la room
+    newMessage: string = ''; // Message en cours de saisie
+    chatMessages$: Observable<string[]>; // Historique des messages du chat
+    private lobbySocketsService: LobbySocketsService = inject(LobbySocketsService);
+    private chatSocketsService: ChatSocketsService = inject(ChatSocketsService); // Injectez le service de chat
 
-    ngOnInit(): void {
-        this.generateAccessCode();
+    constructor() {
+        this.players$ = this.lobbySocketsService.players$;
+        this.chatMessages$ = this.chatSocketsService.chatMessages;
     }
 
-    startGame(): void {
-        this.router.navigate(['/']);
+    get matchCode(): string | null {
+        return this.lobbySocketsService.matchRoomCode;
     }
 
-    leaveLobby(): void {
-        this.router.navigate(['/']);
-    }
-
-    // Move to backend and add duplicate check
-    private generateAccessCode(): void {
-        this.accessCode = Math.floor(Math.random() * ACCESS_CODE_RANGE)
-            .toString()
-            .padStart(CODE_LENGHT, '0');
+    leaveRoom(): void {
+        this.lobbySocketsService.leaveGame();
     }
 }
