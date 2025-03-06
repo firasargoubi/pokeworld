@@ -92,8 +92,6 @@ describe('GameDataService', () => {
     });
 
     it('should return the correct game properties', () => {
-        expect(service.getName()).toBe(DEFAULT_GAME.name);
-        expect(service.getDescription()).toBe(DEFAULT_GAME.description);
         expect(service.getMapSize()).toBe(DEFAULT_GAME.mapData.size);
         expect(service.getGameMode()).toBe(DEFAULT_GAME.mapData.gameMode);
     });

@@ -18,8 +18,6 @@ import { GameData } from '@common/game-data';
 })
 export class AdminPageComponent implements OnInit {
     games: GameData[] = [];
-    showDescription: boolean = false;
-    lastDescription: string = '';
     isCreationMode: boolean = false;
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);

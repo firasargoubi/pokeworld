@@ -1,0 +1,48 @@
+.lobby-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+.chat-container {
+    color: black;
+    margin-top: 20px;
+    border-top: 1px solid #ccc;
+    padding-top: 20px;
+
+    .chat-history {
+        height: 150px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+
+        p {
+            margin: 5px 0;
+        }
+    }
+
+    .chat-input {
+        display: flex;
+        gap: 10px;
+
+        input {
+            flex: 1;
+            padding: 5px;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #0056b3;
+            }
+        }
+    }
+}
