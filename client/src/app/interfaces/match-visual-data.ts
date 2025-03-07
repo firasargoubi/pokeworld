@@ -10,8 +10,6 @@ export interface MatchVisualData {
     currentMovement: number;
     maxMovement: number;
     backgroundUrl: string;
-    currentTimer: number;
-    maxTimer: number;
     itemsUrl: string[];
     currentPlayerTurn: number;
     players: PlayerVisualData[];
