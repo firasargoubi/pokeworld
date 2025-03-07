@@ -11,6 +11,7 @@ import { MapSize } from '@common/map-size.enum';
 import { TileType } from '@common/tile-type.enum';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { Avatars } from '@app/interfaces/avatars.enum';
+import { TimerService } from '@app/services/timer/timer.service';
 
 @Component({
     selector: 'app-play-page',
@@ -20,8 +21,14 @@ import { Avatars } from '@app/interfaces/avatars.enum';
 })
 export class PlayPageComponent {
     matchVisualData: MatchVisualData;
+    timerService: TimerService;
 
     constructor() {
+        this.timerService = inject(TimerService);
+
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        this.timerService.startTimer(30);
+
         inject(GameDataService).setGameData({
             _id: '',
             name: '',
@@ -175,8 +182,6 @@ export class PlayPageComponent {
             maxPlayerCount: 6,
             currentMovement: 3,
             maxMovement: 4,
-            currentTimer: 22,
-            maxTimer: 30,
             currentPlayerTurn: 0,
             itemsUrl: [ITEM_IMAGES.get(ItemType.Item1) as string, ITEM_IMAGES.get(ItemType.Item2) as string],
             backgroundUrl: EMPTY_IMAGE,

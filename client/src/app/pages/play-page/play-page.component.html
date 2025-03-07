@@ -51,9 +51,14 @@
             <button (click)="action()" class="action-button">Action</button>
             <button (click)="endTurn()" class="endturn-button">Fin de tour</button>
         </div>
+        <div class="timer" [class.active]="this.timerService.currentTime <= this.timerService.maxTime" [ngStyle]="{
+            '--max-time': this.timerService.maxTime,
+            '--current-time':  this.timerService.currentTime,
+        }">
+            <div class="timer-bar">
+                <div class="timer-image"></div>
+            </div>
+            <div class="timer-text">{{ this.timerService.currentTime }}</div>
+        </div>
     </main>
-    <div class="timer">
-        <div class="timer-text">26</div>
-        <div class="timer-bar"></div>
-    </div>
 </div>
