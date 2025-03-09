@@ -24,13 +24,6 @@ describe('LobbyPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should generate a 4-digit access code on init', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        spyOn<any>(component, 'generateAccessCode');
-        component.ngOnInit();
-        expect(component.accessCode).toMatch(/^\d{4}$/);
-    });
-
     it('should navigate to game page when startGame is called', () => {
         component.startGame();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
@@ -39,12 +32,5 @@ describe('LobbyPageComponent', () => {
     it('should navigate to home page when leaveLobby is called', () => {
         component.leaveLobby();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
-    });
-
-    it('should display the access code in the template', () => {
-        component['generateAccessCode']();
-        fixture.detectChanges();
-        const compiled = fixture.nativeElement;
-        expect(compiled.querySelector('.access-code').textContent).toContain(component.accessCode);
     });
 });

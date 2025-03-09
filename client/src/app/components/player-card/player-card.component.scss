@@ -1,44 +1,140 @@
 .player-card {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    width: 350px;
-    height: 60px;
-    padding: 10px 15px;
+    position: relative;
+    width: 42vw;
+    height: 12vh;
+    padding: 1vw;
+    margin: 1vw;
+    border-radius: 5%;
+    z-index: 1;
+}
 
-    border: 4px solid #1b4d86;
-    border-radius: 15px;
-    background-color: transparent;
-    box-shadow:
-        inset 0px -3px 0px #2a5d94,
-        inset 0px 3px 0px #5ea2db;
+.pokeball-container {
+    position: relative;
+    width: 8vw;
+    height: 8vw;
+    overflow: visible;
+}
 
-    .pokeball-container {
-        position: relative;
-        width: 50px;
-        height: 50px;
-    }
+.pokeball {
+    height: 16.6vh;
+    object-fit: cover;
+    margin-top: 0;
+}
 
-    .pokeball {
-        width: 100%;
-        height: 100%;
-        image-rendering: pixelated;
-    }
+.player-avatar {
+    position: absolute;
+    top: -30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12vw;
+    height: 12vw;
+}
 
-    .player-avatar {
-        position: absolute;
-        top: -50%;
-        left: 50%;
-        transform: translateX(-50%);
-    }
+.player-name {
+    font-size: 2.5vw;
+    color: white;
+    text-shadow: 0.2vw 0.2vw black;
+    text-transform: uppercase;
+    position: absolute;
+    left: 8.6vw;
+    top: 0;
+    white-space: nowrap;
+}
 
-    .player-name {
-        font-size: 18px;
-        font-weight: bold;
-        color: white;
-        text-shadow: 3px 3px black;
-        text-transform: uppercase;
-        flex-grow: 1;
-        text-align: center;
-    }
+.container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 8vw;
+    overflow: visible;
+}
+
+.background-image {
+    width: 32vw;
+    height: 10vw;
+    position: absolute;
+    left: 4vw;
+    top: -1vw;
+    z-index: -1;
+}
+
+.hp-bar {
+    position: absolute;
+    left: 20vw;
+    top: 2vw;
+    width: 15vw;
+    z-index: 1;
+}
+.action-button-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 6vw;
+    height: 100%;
+    right: 0;
+    top: 0;
+}
+
+.action-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 60%;
+    height: 100%;
+}
+
+.action-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.info-container {
+    margin-left: -1vw;
+    overflow: visible;
+}
+.hp-bar-container {
+    position: relative;
+    width: 15vw;
+    height: 2vw;
+    left: 12vw;
+    top: -2vh;
+}
+
+.hp-bar {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.hp {
+    position: absolute;
+    top: 1vh;
+    left: 3.5vw;
+    height: 50%;
+    width: 0%;
+    background-color: #45d35f;
+    transition: width 0.5s ease-in-out;
+    z-index: 2;
+}
+.hp-text {
+    position: absolute;
+    left: 32vw;
+    top: 6vh;
+    font-size: 2vw;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0.1vw 0.1vw black;
+}
+.owner-crown {
+    width: 2vw;
+    height: auto;
+    position: absolute;
+    left: 15vw;
+    top: 1vh;
 }

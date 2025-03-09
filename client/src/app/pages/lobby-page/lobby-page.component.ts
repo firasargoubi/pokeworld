@@ -2,10 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { PlayerCardComponent } from '@app/components/player-card/player-card.component';
 import { Avatars } from '@app/interfaces/avatars.enum';
 import { Player } from '@app/interfaces/player';
-// eslint-disable-next-line no-restricted-imports
-import { PlayerCardComponent } from '../../components/player-card/player-card.component';
 
 @Component({
     selector: 'app-lobby-page',
@@ -23,7 +22,7 @@ export class LobbyPageComponent implements OnInit {
         this.players = [
             {
                 name: 'SELIM',
-                avatar: Avatars.Avatar1,
+                avatar: Avatars.Avatar3,
                 life: 6,
                 speed: 5,
                 attack: 10,
@@ -35,7 +34,7 @@ export class LobbyPageComponent implements OnInit {
             {
                 name: 'OMAR',
                 avatar: Avatars.Avatar2,
-                life: 5,
+                life: 4,
                 speed: 6,
                 attack: 8,
                 defense: 5,
@@ -53,11 +52,4 @@ export class LobbyPageComponent implements OnInit {
     leaveLobby(): void {
         this.router.navigate(['/']);
     }
-
-    // Move to backend and add duplicate check
-    // private generateAccessCode(): void {
-    //     this.accessCode = Math.floor(Math.random() * ACCESS_CODE_RANGE)
-    //         .toString()
-    //         .padStart(CODE_LENGHT, '0');
-    // }
 }

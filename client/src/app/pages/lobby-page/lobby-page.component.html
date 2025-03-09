@@ -5,16 +5,18 @@
 
     <div id="lobby-border">
         <div id="lobby-body">
-            <div id="access-code-container">
-                <p class="access-code-title">Votre code d'accès</p>
-                <p class="access-code">{{ accessCode }}</p>
-                <p class="instructions">Partagez ce code avec les autres joueurs pour jouer</p>
+            <div class="access-code-container">
+                <img src="../../../assets/images/menu/containers/blue/blue-scrare-container.png" class="background-image" />
+                <div class="access-code-box">
+                    <p class="access-title">Votre code d'accès</p>
+                    <p class="access-code">3256</p>
+                    <p class="access-instruction">Partagez ce code avec les autres joueurs pour jouer</p>
+                </div>
             </div>
 
             <div id="players-list">
-                <p class="player-title">Liste des joueurs:</p>
                 @for (player of players; track player) {
-                <app-player-card [player]="player"></app-player-card>
+                <app-player-card [player]="player" [isOwner]="true"></app-player-card>
                 }
             </div>
         </div>
