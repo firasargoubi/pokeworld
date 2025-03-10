@@ -3,7 +3,7 @@
     '--current-player-turn':  matchVisualData.currentPlayerTurn,
     '--bg-url': 'url(' + matchVisualData.backgroundUrl + ')',
 }">
-    <!-- <div class="thumbnail-background"></div> -->
+    <div class="thumbnail-background"></div>
     <main>
         <div class="main-left">
             <div class="player-cards-container">
@@ -26,6 +26,7 @@
                     }
                 </div>
             </div>
+            <div class="chat-container"></div>
         </div>
         <div class="main-center">
             <app-map></app-map>
@@ -37,19 +38,29 @@
                 <div>Nombre de joueurs : {{ matchVisualData.currentPlayerCount }} / {{ matchVisualData.maxPlayerCount }}</div>
                 <button (click)="surrender()" class="surrender-button">< Abandonner</button>
             </div>
-            <div class="player-info-card">
-                <div>
-                    <div class="player-info-icon" [style.backgroundImage]="'url(' + matchVisualData.players[matchVisualData.selfIndex].avatarUrl + ')'"></div>
-                    <div class="player-info-name">{{ matchVisualData.players[matchVisualData.selfIndex].name }}</div>
+            <div class="self-info-card">
+                <div class="self-info-container">
+                    <div class="self-info-avatar" [style.backgroundImage]="'url(' + matchVisualData.players[matchVisualData.selfIndex].avatarUrl + ')'"></div>
+                    <div class="self-info-name">{{ matchVisualData.players[matchVisualData.selfIndex].name }}</div>
                 </div>
-                <div>Mouvement : {{ matchVisualData.currentMovement }} / {{ matchVisualData.maxMovement }}</div>
+                <div class="movement-container">
+                    <div class="movement-text">
+                        <div class="movement-text-left">Mouvement<div class="movement-icon"></div></div>
+                        <div class="movement-text-right">{{ matchVisualData.currentMovement }} / {{ matchVisualData.maxMovement }}</div>
+                    </div>
+                    <div class="movement-bar" [ngStyle]="{'--cur-move': matchVisualData.currentMovement, '--max-move': matchVisualData.maxMovement}">
+                        <div class="movement-bar-bot"></div>
+                        <div class="movement-bar-mid"></div>
+                        <div class="movement-bar-top"></div>
+                    </div>
+                </div>
                 <div class="items-container">
-                    <div class="item-container" [style.backgroundImage]="'url(' + matchVisualData.itemsUrl[0] + ')'"></div>
-                    <div class="item-container" [style.backgroundImage]="'url(' + matchVisualData.itemsUrl[1] + ')'"></div>
+                    <div class="item-slot"><div class="item-icon" [style.backgroundImage]="'url(' + matchVisualData.itemsUrl[0] + ')'"></div></div>
+                    <div class="item-slot"><div class="item-icon" [style.backgroundImage]="'url(' + matchVisualData.itemsUrl[1] + ')'"></div></div>
                 </div>
             </div>
-            <button (click)="action()" class="action-button">Action</button>
-            <button (click)="endTurn()" class="endturn-button">Fin de tour</button>
+            <button (click)="action()" class="action-button" [class.active]="matchVisualData.canUseAction">Action</button>
+            <button (click)="endTurn()" class="endturn-button" [class.active]="matchVisualData.canEndTurn">Terminer le tour</button>
         </div>
         <div class="timer" [class.active]="this.timerService.currentTime <= this.timerService.maxTime" [ngStyle]="{
             '--max-time': this.timerService.maxTime,
