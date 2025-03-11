@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SinonStub, SinonStubbedInstance, createStubInstance, match, spy, stub } from 'sinon';
+import { SinonSpy, SinonStub, SinonStubbedInstance, createStubInstance, match, spy, stub } from 'sinon';
 import { Server, Socket, BroadcastOperator } from 'socket.io';
 import { LobbyGateway } from './lobby.gateway';
 import { LobbyEvents } from '@common/lobby-events.enum';
@@ -11,7 +11,8 @@ describe('LobbyGateway', () => {
     let gateway: LobbyGateway;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
-    let emitPlayersInRoomStub: SinonStub;
+    let emitPlayersInRoomSpy: SinonSpy;
+    let emitStub: SinonStub;
 
     beforeEach(async () => {
         socket = createStubInstance<Socket>(Socket);
@@ -24,9 +25,14 @@ describe('LobbyGateway', () => {
         gateway['server'] = server;
         gateway['matches'] = new Map();
         gateway['playerToMatch'] = new Map();
+        gateway['lockedRooms'] = new Set();
+
+        emitStub = stub();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        server.to.returns({ emit: emitStub } as any);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        emitPlayersInRoomStub = stub(gateway as any, 'emitPlayersInRoom').callsFake(() => undefined);
+        emitPlayersInRoomSpy = spy(gateway, 'emitPlayersInRoom' as any);
     });
 
     it('should be defined', () => {
@@ -64,7 +70,7 @@ describe('LobbyGateway', () => {
         expect(players[0].isAdmin).toBeTruthy();
 
         expect(addPlayerToRoomSpy.calledWith(players[0], gameCode, socket)).toBeTruthy();
-        expect(emitPlayersInRoomStub.calledWith(gameCode)).toBeTruthy();
+        expect(emitPlayersInRoomSpy.calledWith(gameCode)).toBeTruthy();
         addPlayerToRoomSpy.restore();
     });
 
@@ -72,8 +78,23 @@ describe('LobbyGateway', () => {
         const debugSpy = spy(gateway, 'debug');
         const result = gateway.joinMatch(socket, 'non-existent-code');
 
-        expect(debugSpy.calledWith("La partie n'existe pas")).toBeTruthy();
         expect(result).toBeFalsy();
+        expect(debugSpy.calledWith("La partie n'existe pas")).toBeTruthy();
+        debugSpy.restore();
+    });
+
+    it('joinMatch should return false if room is locked', () => {
+        const gameCode = gateway.createMatchAndJoin(socket);
+        gateway.toggleLockRoom(socket, true);
+
+        const newPlayer = createStubInstance<Socket>(Socket);
+        Object.defineProperty(newPlayer, 'id', { value: 'new-player' });
+
+        const debugSpy = spy(gateway, 'debug');
+        const result = gateway.joinMatch(newPlayer, gameCode);
+
+        expect(result).toBeFalsy();
+        expect(debugSpy.calledWith('Cette partie est verrouillée')).toBeTruthy();
         debugSpy.restore();
     });
 
@@ -101,7 +122,7 @@ describe('LobbyGateway', () => {
 
         expect(result).toBeTruthy();
         expect(addPlayerToRoomSpy.calledWith(match.any, gameCode, socket)).toBeTruthy();
-        expect(emitPlayersInRoomStub.calledWith(gameCode)).toBeTruthy();
+        expect(emitPlayersInRoomSpy.calledWith(gameCode)).toBeTruthy();
         addPlayerToRoomSpy.restore();
     });
 
@@ -124,7 +145,7 @@ describe('LobbyGateway', () => {
 
         expect(result).toBeTruthy();
         expect(removePlayerStub.calledWith(socket, gameCode)).toBeTruthy();
-        expect(emitPlayersInRoomStub.calledWith(gameCode)).toBeTruthy();
+        expect(emitPlayersInRoomSpy.calledWith(gameCode)).toBeTruthy();
         removePlayerStub.restore();
     });
 
@@ -176,8 +197,51 @@ describe('LobbyGateway', () => {
         expect(players[0].avatar).toBe(Avatars.Avatar1);
 
         expect(generateUniqueNameStub.calledWith(players, 'NewName', socket.id)).toBeTruthy();
-        expect(emitPlayersInRoomStub.calledWith(gameCode)).toBeTruthy();
+        expect(emitPlayersInRoomSpy.calledWith(gameCode)).toBeTruthy();
         generateUniqueNameStub.restore();
+    });
+
+    it('toggleLockRoom should return false if player is not in any game', () => {
+        const result = gateway.toggleLockRoom(socket, true);
+        expect(result).toBeFalsy();
+    });
+
+    it('toggleLockRoom should return false if player is not an admin', () => {
+        const adminSocket = createStubInstance<Socket>(Socket);
+        Object.defineProperty(adminSocket, 'id', { value: 'admin-id' });
+        const gameCode = gateway.createMatchAndJoin(adminSocket);
+
+        Object.defineProperty(socket, 'id', { value: 'player-id' });
+        gateway.joinMatch(socket, gameCode);
+
+        const result = gateway.toggleLockRoom(socket, true);
+        expect(result).toBeFalsy();
+    });
+
+    it('toggleLockRoom should add/remove room from lockedRooms based on shouldLock parameter', () => {
+        const gameCode = gateway.createMatchAndJoin(socket);
+
+        let result = gateway.toggleLockRoom(socket, true);
+        expect(result).toBeTruthy();
+        expect(gateway['lockedRooms'].has(gameCode)).toBeTruthy();
+
+        result = gateway.toggleLockRoom(socket, false);
+        expect(result).toBeTruthy();
+        expect(gateway['lockedRooms'].has(gameCode)).toBeFalsy();
+    });
+
+    it('toggleLockRoom should emit RoomLockChanged event with lock status', () => {
+        const gameCode = gateway.createMatchAndJoin(socket);
+
+        server.to.returns({
+            emit: (event: string, lockStatus: boolean) => {
+                expect(event).toEqual(LobbyEvents.RoomLockChanged);
+                expect(lockStatus).toBeTruthy();
+            },
+        } as BroadcastOperator<unknown, unknown>);
+
+        gateway.toggleLockRoom(socket, true);
+        expect(server.to.calledWith(gameCode)).toBeTruthy();
     });
 
     it('removePlayerFromRoom should remove player from room and update maps', () => {
@@ -261,8 +325,7 @@ describe('LobbyGateway', () => {
     });
 
     it('emitPlayersInRoom should send player list to room if room exists', () => {
-        emitPlayersInRoomStub.restore();
-
+        emitPlayersInRoomSpy.restore();
         const gameCode = 'test-room';
         const testPlayers = [{ id: 'player1', name: 'Player 1', isAdmin: true }] as Player[];
         gateway['matches'].set(gameCode, testPlayers);

@@ -10,6 +10,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class LobbySocketsService {
     private matchCode: string;
     private playersSubject: BehaviorSubject<Player[]> = new BehaviorSubject<Player[]>([]);
+    private roomLockedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     private coreSocket: CoreSocketService = inject(CoreSocketService);
 
     constructor() {
@@ -20,9 +21,12 @@ export class LobbySocketsService {
         return this.matchCode;
     }
 
-    // Expose players as an observable
     get players$(): Observable<Player[]> {
         return this.playersSubject.asObservable();
+    }
+
+    get roomLocked$(): Observable<boolean> {
+        return this.roomLockedSubject.asObservable();
     }
 
     set matchRoomCode(code: string) {
@@ -37,6 +41,10 @@ export class LobbySocketsService {
         this.coreSocket.on(LobbyEvents.GameDestroyed, () => {
             this.playersSubject.next([]);
             // Rediriger l'utilisateur ou afficher un message
+        });
+
+        this.coreSocket.on(LobbyEvents.RoomLockChanged, (isLocked: boolean) => {
+            this.roomLockedSubject.next(isLocked);
         });
     }
 
@@ -62,6 +70,7 @@ export class LobbySocketsService {
             if (success) {
                 this.matchCode = '';
                 this.playersSubject.next([]);
+                this.roomLockedSubject.next(false);
             }
         });
     }
@@ -69,6 +78,17 @@ export class LobbySocketsService {
     updatePlayer(playerUpdates: Partial<Player>) {
         this.coreSocket.emit(LobbyEvents.UpdatePlayer, playerUpdates, (success: boolean) => {
             window.console.log(`update status : ${success}`);
+        });
+    }
+
+    toggleLockRoom(shouldLock: boolean): void {
+        this.coreSocket.emit(LobbyEvents.ToggleLockRoom, shouldLock, (success: boolean) => {
+            window.console.log(`toggle lock status : ${success}`);
+            if (success) {
+                // Optionnel: mettre à jour l'état local immédiatement pour une UI réactive
+                // (bien que l'événement roomLockChanged devrait arriver rapidement du serveur)
+                this.roomLockedSubject.next(shouldLock);
+            }
         });
     }
 

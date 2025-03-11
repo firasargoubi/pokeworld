@@ -19,12 +19,14 @@ export class JoinPageComponent {
     players$: Observable<Player[]>; // Liste des joueurs dans la room
     newMessage: string = ''; // Message en cours de saisie
     chatMessages$: Observable<string[]>; // Historique des messages du chat
+    isRoomLocked$: Observable<boolean>; // État de verrouillage de la room
     private lobbySocketsService: LobbySocketsService = inject(LobbySocketsService);
     private chatSocketsService: ChatSocketsService = inject(ChatSocketsService); // Injectez le service de chat
 
     constructor() {
         this.players$ = this.lobbySocketsService.players$;
         this.chatMessages$ = this.chatSocketsService.chatMessages;
+        this.isRoomLocked$ = this.lobbySocketsService.roomLocked$;
     }
 
     get matchCode(): string | null {
@@ -51,6 +53,14 @@ export class JoinPageComponent {
     updatePlayer(playerUpdates: Partial<Player>): void {
         this.lobbySocketsService.updatePlayer(playerUpdates);
         this.updatedPlayerName = ''; // Réinitialiser le champ
+    }
+
+    lockRoom() {
+        this.lobbySocketsService.toggleLockRoom(true);
+    }
+
+    unlockRoom() {
+        this.lobbySocketsService.toggleLockRoom(false);
     }
 
     // Envoyer un message dans le chat

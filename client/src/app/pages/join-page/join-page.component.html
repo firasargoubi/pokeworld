@@ -8,6 +8,27 @@
         <p>
             Code de la room : <strong>{{ matchCode }}</strong>
         </p>
+
+        <!-- Afficher l'état de verrouillage -->
+        <div class="lock-status">
+            <p>
+                Statut Room : <strong>{{ (isRoomLocked$ | async) ? 'Verrouillée' : 'Ouverte' }}</strong>
+            </p>
+            
+            <!-- Afficher les boutons seulement pour l'admin -->
+            @for (player of players$ | async; track player.id) {
+                @if (player.isAdmin) {
+                    <div class="lock-controls">
+                        <button (click)="lockRoom()" [disabled]="(isRoomLocked$ | async)">
+                            🔒 Verrouiller
+                        </button>
+                        <button (click)="unlockRoom()" [disabled]="(isRoomLocked$ | async) === false">
+                            🔓 Déverrouiller
+                        </button>
+                    </div>
+                }
+            }
+        </div>
         }
 
         <h3>Joueurs dans la room :</h3>
@@ -28,6 +49,11 @@
         <input type="text" placeholder="Code de la room" [(ngModel)]="joinRoomCode" />
         <br />
         <button (click)="joinRoom()">Rejoindre</button>
+
+        <!-- Message d'erreur si la salle est verrouillée -->
+        @if (isRoomLocked$ | async) {
+            <p class="error-message">Cette salle est actuellement verrouillée.</p>
+        }
     </div>
 
     <!-- Formulaire pour mettre à jour les informations du joueur -->
