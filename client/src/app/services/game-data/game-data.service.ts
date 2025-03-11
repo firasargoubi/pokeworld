@@ -64,14 +64,6 @@ export class GameDataService {
         return this.gameData.mapData.items[item].length;
     }
 
-    getName(): string {
-        return this.gameData.name;
-    }
-
-    getDescription(): string {
-        return this.gameData.description;
-    }
-
     getMapSize(): MapSize {
         return this.gameData.mapData.size;
     }
@@ -135,6 +127,7 @@ export class GameDataService {
 
         return true;
     }
+
     isModified(initialGameData: GameData): boolean {
         return JSON.stringify(this.gameData) !== JSON.stringify(initialGameData);
     }

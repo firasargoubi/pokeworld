@@ -7,11 +7,12 @@ import { Avatars } from '@app/interfaces/avatars.enum';
 import { Player } from '@app/interfaces/player';
 
 @Component({
-    selector: 'app-lobby-page',
+    selector: 'app-game-lobby',
     templateUrl: './lobby-page.component.html',
     styleUrls: ['./lobby-page.component.scss'],
     imports: [CommonModule, HeaderComponent, PlayerCardComponent],
     standalone: true,
+    imports: [FormsModule, CommonModule],
 })
 export class LobbyPageComponent implements OnInit {
     accessCode: string = '';

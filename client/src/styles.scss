@@ -1,19 +1,14 @@
 $background-color: rgb(31, 32, 35);
-$default-font: 'pixel', 'Pixel-Backup';
-
-// @font-face {
-//     font-family: 'pixel';
-//     src: url('https://polytechnique-montr-al.gitlab.io/log2990/20251/equipe-204/LOG2990-204/assets/fonts/pixel.woff2') format('woff2');
-// }
+$default-font: 'pixel';
 
 @font-face {
-    font-family: 'Pixel';
+    font-family: 'pixel';
     src: url('./assets/fonts/pixel.woff2') format('woff2');
 }
 
 @font-face {
-    font-family: 'Power-Green-Narrow';
-    src: url('./assets/fonts/Pokemon-Em-Narrow.ttf') format('truetype');
+    font-family: 'pokemon-narrow';
+    src: url('./assets/fonts/pokemon-narrow.woff2') format('woff2');
 }
 
 :root {
@@ -39,6 +34,9 @@ $default-font: 'pixel', 'Pixel-Backup';
     overflow: hidden;
     box-sizing: border-box;
 
+    image-rendering: optimizeSpeed;
+    image-rendering: -o-crisp-edges;
+    image-rendering: optimize-contrast;
     -ms-interpolation-mode: nearest-neighbor;
     image-rendering: -moz-crisp-edges;
     image-rendering: -webkit-optimize-contrast;
@@ -59,7 +57,6 @@ body {
 
 .cdk-overlay-container {
     background-color: rgba(0, 0, 0, 0.5);
-    /* Darker backdrop for confirmation popups */
     position: relative;
     left: 0;
     top: 0;
