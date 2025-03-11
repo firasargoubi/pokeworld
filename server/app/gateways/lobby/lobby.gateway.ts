@@ -12,6 +12,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     private matches: Map<string, Player[]> = new Map(); // gameCode -> joueurs
     private playerToMatch: Map<string, string> = new Map(); // player's socket.id -> gameCode
+    private lockedRooms: Set<string> = new Set();
 
     @SubscribeMessage(LobbyEvents.CreateGame)
     createMatchAndJoin(socket: Socket): string {
@@ -29,6 +30,10 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     joinMatch(socket: Socket, gameCode: string): boolean {
         if (!this.matches.has(gameCode)) {
             this.debug("La partie n'existe pas");
+            return false;
+        }
+        if (this.lockedRooms.has(gameCode)) {
+            this.debug('Cette partie est verrouillée');
             return false;
         }
         if (this.playerToMatch.get(socket.id) === gameCode) {
@@ -79,6 +84,26 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
 
         this.emitPlayersInRoom(gameCode);
+        return true;
+    }
+
+    @SubscribeMessage(LobbyEvents.ToggleLockRoom)
+    toggleLockRoom(socket: Socket, shouldLock: boolean): boolean {
+        const gameCode = this.playerToMatch.get(socket.id);
+        if (!gameCode) return false;
+
+        const playersInRoom = this.matches.get(gameCode);
+        const player = playersInRoom.find((p) => p.id === socket.id);
+
+        if (!player.isAdmin) return false;
+
+        if (shouldLock) {
+            this.lockedRooms.add(gameCode);
+        } else {
+            this.lockedRooms.delete(gameCode);
+        }
+
+        this.server.to(gameCode).emit(LobbyEvents.RoomLockChanged, shouldLock);
         return true;
     }
 
