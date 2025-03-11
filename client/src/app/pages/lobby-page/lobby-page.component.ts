@@ -12,7 +12,6 @@ import { Player } from '@app/interfaces/player';
     styleUrls: ['./lobby-page.component.scss'],
     imports: [CommonModule, HeaderComponent, PlayerCardComponent],
     standalone: true,
-    imports: [FormsModule, CommonModule],
 })
 export class LobbyPageComponent implements OnInit {
     accessCode: string = '';
