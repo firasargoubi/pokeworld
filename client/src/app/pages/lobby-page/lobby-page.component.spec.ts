@@ -33,4 +33,10 @@ describe('LobbyPageComponent', () => {
         component.leaveLobby();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
     });
+
+    it('should toggle isLocked state when toggleLock is called', () => {
+        const initialLockState = component.isLocked;
+        component.toggleLock();
+        expect(component.isLocked).toBe(!initialLockState);
+    });
 });

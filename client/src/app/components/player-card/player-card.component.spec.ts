@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { Avatars } from '@app/interfaces/avatars.enum';
-import { Player } from '@app/interfaces/player';
+import { Player } from '@common/player';
 import { PlayerCardComponent } from './player-card.component';
 
 describe('PlayerCardComponent', () => {
@@ -10,15 +10,26 @@ describe('PlayerCardComponent', () => {
     let fixture: ComponentFixture<PlayerCardComponent>;
 
     const mockPlayer: Player = {
+        id: '1',
         name: 'Player',
-        avatar: Avatars.Avatar1,
-        life: 4,
-        speed: 6,
-        attack: 8,
-        defense: 5,
-        bonusDice: { attack: 'd8', defense: 'd6' },
-        movement: 3,
-        action: 2,
+        avatar: Avatars.Avatar3,
+        playerStats: {
+            health: 6,
+            speed: 5,
+            attack: 10,
+            defense: 4,
+            attackDice: 'd6',
+            defenseDice: 'd4',
+        },
+        currentStats: {
+            health: 6,
+            items: [],
+            position: { x: 0, y: 0 },
+            speed: 5,
+            action: 2,
+        },
+        isAdmin: true,
+        isConnected: true,
     };
 
     beforeEach(async () => {
@@ -48,39 +59,39 @@ describe('PlayerCardComponent', () => {
     it('should return the correct background image based on isViewer', () => {
         component.isViewer = true;
         fixture.detectChanges();
-        expect(component.backgroundImageUrl).toBe('../../../assets/images/menu/containers/orange/orange-scrare-body.png');
+        expect(component.backgroundImageUrl).toBe('../../../assets/images/menu/containers/player-card/orange-container.png');
 
         component.isViewer = false;
         fixture.detectChanges();
-        expect(component.backgroundImageUrl).toBe('../../../assets/images/menu/containers/blue/blue-scrare-body.png');
+        expect(component.backgroundImageUrl).toBe('../../../assets/images/menu/containers/player-card/dark-blue-container.png');
     });
 
     it('should return the correct HP bar width', () => {
-        component.player.life = 4;
+        component.player.playerStats.health = 4;
         expect(component.getHpBarWidth()).toBe('55%');
 
-        component.player.life = 6;
-        expect(component.getHpBarWidth()).toBe('73%');
+        component.player.playerStats.health = 6;
+        expect(component.getHpBarWidth()).toBe('74%');
 
-        component.player.life = 3;
+        component.player.playerStats.health = 3;
         expect(component.getHpBarWidth()).toBe('0%');
     });
 
     it('should display HP text correctly', () => {
         fixture.detectChanges();
         const hpTextElement = fixture.debugElement.query(By.css('.hp-text'));
-        expect(hpTextElement.nativeElement.textContent.trim()).toBe(`${mockPlayer.life} /6`);
+        expect(hpTextElement.nativeElement.textContent.trim()).toBe(`${mockPlayer.playerStats.health}/ 6`);
     });
 
-    it('should display the crown when isOwner is true', () => {
-        component.isOwner = true;
+    it('should display the crown when isAdmin is true', () => {
+        component.player.isAdmin = true;
         fixture.detectChanges();
         const crownElement = fixture.debugElement.query(By.css('.owner-crown'));
         expect(crownElement).toBeTruthy();
     });
 
     it('should not display the crown when isOwner is false', () => {
-        component.isOwner = false;
+        component.player.isAdmin = false;
         fixture.detectChanges();
         const crownElement = fixture.debugElement.query(By.css('.owner-crown'));
         expect(crownElement).toBeFalsy();

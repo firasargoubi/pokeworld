@@ -50,7 +50,7 @@ $stripes-size: 0.7vw;
 }
 .access-code-container {
     position: relative;
-    width: 25vw;
+    width: 27vw;
     height: 30vh;
     top: 4vh;
     left: 4vw;
@@ -70,14 +70,15 @@ $stripes-size: 0.7vw;
     z-index: 2;
 }
 .access-title {
-    font-size: 14px;
+    font-size: 20px;
     margin-top: 20px;
+    text-shadow: 0.8px 0.8px black;
 }
 
 .access-code {
-    font-size: 40px;
-    font-weight: bold;
-    margin-top: 10px;
+    font-size: 50px;
+    margin-top: 5px;
+    color: #aae7f7;
 }
 
 .access-instruction {
@@ -86,10 +87,18 @@ $stripes-size: 0.7vw;
     word-wrap: break-word;
     text-align: center;
     margin: 5px auto;
-    margin-top: 15px;
+    margin-top: 25px;
     white-space: pre-wrap;
+    text-shadow: 1px 1px black;
 }
-
+.lock-icon {
+    width: 6vw;
+    height: 9vh;
+    margin-bottom: 10px;
+}
+#lock-control-container {
+    margin-left: 36vw;
+}
 @keyframes fall {
     from {
         background-position: 0 0;

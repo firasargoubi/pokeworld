@@ -6,7 +6,7 @@
     <div id="lobby-border">
         <div id="lobby-body">
             <div class="access-code-container">
-                <img src="../../../assets/images/menu/containers/blue/blue-scrare-container.png" class="background-image" />
+                <img src="../../../assets/images/menu/containers/dark-blue/dark-blue-scrare.png" class="background-image" />
                 <div class="access-code-box">
                     <p class="access-title">Votre code d'accès</p>
                     <p class="access-code">3256</p>
@@ -16,8 +16,15 @@
 
             <div id="players-list">
                 @for (player of players; track player) {
-                <app-player-card [player]="player" [isOwner]="true"></app-player-card>
+                <app-player-card [player]="player" [isViewer]="false"></app-player-card>
                 }
+                <div id="lock-control-container">
+                    <img
+                        (click)="toggleLock()"
+                        [src]="isLocked ? '../../../assets/images/menu/icons/lock.png' : '../../../assets/images/menu/icons/unlock.png'"
+                        class="lock-icon"
+                    />
+                </div>
             </div>
         </div>
     </div>

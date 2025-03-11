@@ -7,7 +7,7 @@
         <img [src]="backgroundImageUrl" class="background-image" />
         <div class="container">
             <span class="player-name">{{ player.name }}</span>
-            @if (isOwner){
+            @if (player.isAdmin){
             <img src="../../../assets/images/menu/icons/crown.png" alt="Owner" class="owner-crown" />
 
             }
@@ -15,7 +15,7 @@
                 <img src="../../../assets/images/menu/stat-bar/hp-bar.png" class="hp-bar" />
                 <div class="hp" [style.width]="getHpBarWidth()"></div>
             </div>
-            <span class="hp-text">{{ player.life }} /6</span>
+            <span class="hp-text">{{ player.playerStats.health }}/ 6</span>
         </div>
     </div>
     <div class="action-button-container">
