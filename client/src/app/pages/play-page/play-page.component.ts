@@ -177,8 +177,10 @@ export class PlayPageComponent {
         this.matchVisualData = {
             mapSize: MapSize.Small,
             gameMode: GameMode.FFA,
+            canUseAction: true,
+            canEndTurn: true,
             selfIndex: 0,
-            currentPlayerCount: 5,
+            currentPlayerCount: 6,
             maxPlayerCount: 6,
             currentMovement: 3,
             maxMovement: 4,
@@ -189,7 +191,7 @@ export class PlayPageComponent {
                 {
                     name: 'Selim',
                     avatarUrl: AVATAR_DATA[Avatars.Avatar1].imageCentered,
-                    fightsWon: 2,
+                    fightsWon: 0,
                     isAdmin: true,
                     isBot: false,
                     hasLeft: false,
@@ -205,15 +207,15 @@ export class PlayPageComponent {
                 {
                     name: 'Samer',
                     avatarUrl: AVATAR_DATA[Avatars.Avatar3].imageCentered,
-                    fightsWon: 1,
+                    fightsWon: 0,
                     isAdmin: false,
                     isBot: false,
                     hasLeft: false,
                 },
                 {
-                    name: 'ABCDEFGHIJKLMOPQRSTUVWXY',
+                    name: 'Souhayl',
                     avatarUrl: AVATAR_DATA[Avatars.Avatar4].imageCentered,
-                    fightsWon: 1,
+                    fightsWon: 0,
                     isAdmin: false,
                     isBot: false,
                     hasLeft: false,
@@ -224,14 +226,14 @@ export class PlayPageComponent {
                     fightsWon: 0,
                     isAdmin: false,
                     isBot: false,
-                    hasLeft: true,
+                    hasLeft: false,
                 },
                 {
                     name: 'Omar',
                     avatarUrl: AVATAR_DATA[Avatars.Avatar6].imageCentered,
                     fightsWon: 0,
                     isAdmin: false,
-                    isBot: true,
+                    isBot: false,
                     hasLeft: false,
                 },
             ],
@@ -257,5 +259,9 @@ export class PlayPageComponent {
     endTurn() {
         // TODO logique de fin de tour
         window.console.log('endTurn');
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        this.matchVisualData.currentPlayerTurn = (this.matchVisualData.currentPlayerTurn + 1) % this.matchVisualData.players.length;
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        this.timerService.startTimer(30);
     }
 }

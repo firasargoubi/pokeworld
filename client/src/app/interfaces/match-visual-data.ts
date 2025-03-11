@@ -4,6 +4,8 @@ import { MapSize } from '@common/map-size.enum';
 export interface MatchVisualData {
     mapSize: MapSize;
     gameMode: GameMode;
+    canUseAction: boolean;
+    canEndTurn: boolean;
     selfIndex: number;
     currentPlayerCount: number;
     maxPlayerCount: number;
