@@ -1,5 +1,6 @@
 <div class="lobby-container">
     <h3>Joueurs dans la room :</h3>
+    <div>GAME CODE : {{ this.matchCode }}</div>
     <ul>
         @for (player of players$ | async; track player.id) {
         <li>{{ player.name }} ({{ player.isAdmin ? 'Admin' : 'Joueur' }})</li>

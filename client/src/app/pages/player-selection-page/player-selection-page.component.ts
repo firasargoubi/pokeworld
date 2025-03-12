@@ -1,14 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal, WritableSignal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { BONUS_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player';
+import { MAX_NAME_LENGTH, MIN_NAME_LENGTH, DEFAULT_STAT_POINTS, BONUS_POINTS } from '@app/consts/default-player';
 import { BonusDice, DiceType } from '@app/consts/dice';
 import { StatType } from '@app/consts/player-stats.enum';
-import { Avatars } from '@app/interfaces/avatars.enum';
+import { Avatars } from '@common/avatars.enum';
 import { PopupService } from '@app/services/popup/popup.service';
+import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
+import { AvatarSelectionService } from '@app/services/avatar-selection/avatar-selection.service';
+import { Player } from '@common/player';
 
 @Component({
     selector: 'app-player-selection-page',
@@ -19,22 +21,26 @@ import { PopupService } from '@app/services/popup/popup.service';
 export class PlayerSelectionPageComponent {
     nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
     bonusPointsForm: FormControl = new FormControl(StatType.Life, [Validators.required]);
-    maxNameLength = MAX_NAME_LENGTH;
-
-    diceType = DiceType;
-    statType = StatType;
     bonusDice: BonusDice = { attack: DiceType.D4, defense: DiceType.D6 };
 
-    avatarData = AVATAR_DATA;
-    avatarList = Object.keys(AVATAR_DATA).slice(1) as Avatars[];
-    selectedAvatar: Avatars = Avatars.Default;
+    maxNameLength = MAX_NAME_LENGTH;
+    statType = StatType;
 
-    private isStartClicked: WritableSignal<boolean> = signal(false);
     private router: Router = inject(Router);
+    private lobbySocketService: LobbySocketsService = inject(LobbySocketsService);
+    private avatarSelectionService: AvatarSelectionService = inject(AvatarSelectionService);
     private popupService: PopupService = inject(PopupService);
 
-    getScore(statCategory: StatType) {
-        return this.isBonusPoint(statCategory) ? DEFAULT_STAT_POINTS + BONUS_POINTS : DEFAULT_STAT_POINTS;
+    get avatarData() {
+        return this.avatarSelectionService.avatarData;
+    }
+
+    get avatarList() {
+        return this.avatarSelectionService.avatarList;
+    }
+
+    get selectedAvatar() {
+        return this.avatarSelectionService.selectedAvatar;
     }
 
     isBonusPoint(statCategory: StatType) {
@@ -46,52 +52,76 @@ export class PlayerSelectionPageComponent {
     }
 
     getAvatarBtnStyle(avatar: Avatars) {
-        if (avatar === this.selectedAvatar) {
-            return { class: 'selected' };
-        } else {
-            return { class: 'unselected' };
-        }
+        const avatarStatus = this.avatarSelectionService.getAvatarStatus(avatar);
+        return { class: avatarStatus };
     }
 
     handleAvatarSelection(avatar: Avatars) {
-        this.selectedAvatar = avatar;
-    }
-
-    needsWarning() {
-        const errors: string[] = [];
-        const nameErrorMessage = 'Le nom doit contenir entre 3 et 15 caractères';
-        const avatarErrorMessage = 'Veuillez choisir un avatar';
-
-        if (!this.nameForm.valid && this.isStartClicked()) {
-            errors.push(nameErrorMessage);
+        const isAvatarAvailable = this.avatarSelectionService.isAvatarAvailable(avatar);
+        if (isAvatarAvailable) {
+            this.avatarSelectionService.updatePlayerAvatar(avatar);
+            this.avatarSelectionService.selectedAvatar = avatar;
         }
-        if (!this.isValidAvatarChoice() && this.isStartClicked()) {
-            errors.push(avatarErrorMessage);
-        }
-
-        if (errors.length) {
-            this.popupService.showPopup(errors.join('\n'));
-            return true;
-        }
-        return false;
     }
 
     goToLobby() {
-        this.isStartClicked.set(true);
-        if (!this.needsWarning() && this.isFormValid()) {
+        const warnings = this.getWarnings();
+        const haveWarnings = warnings.length > 0;
+        if (haveWarnings) {
+            this.popupService.showPopup(warnings.join('\n'));
+        } else {
+            this.lobbySocketService.updatePlayer(this.getPlayerData());
             this.router.navigate(['/lobby']);
         }
     }
 
-    goToCreatePage() {
-        this.router.navigate(['/create']);
+    goToMenu() {
+        this.lobbySocketService.leaveGame();
+        this.avatarSelectionService.resetAvatar();
+        this.router.navigate(['/']);
     }
 
     isFormValid() {
-        return this.nameForm.valid && this.isValidAvatarChoice();
+        return this.getWarnings().length === 0;
     }
 
-    private isValidAvatarChoice() {
-        return this.selectedAvatar !== Avatars.Default;
+    private getPlayerData() {
+        const playerUpdates: Partial<Player> = {
+            name: this.nameForm.value,
+            avatar: this.selectedAvatar,
+            playerStats: {
+                health: this.getBonusStat(StatType.Life),
+                speed: this.getBonusStat(StatType.Speed),
+                attack: DEFAULT_STAT_POINTS,
+                defense: DEFAULT_STAT_POINTS,
+                attackDice: this.bonusDice.attack,
+                defenseDice: this.bonusDice.defense,
+            },
+            isConnected: true,
+        };
+
+        return playerUpdates;
+    }
+
+    private getBonusStat(statCategory: StatType) {
+        return this.isBonusPoint(statCategory) ? DEFAULT_STAT_POINTS + BONUS_POINTS : DEFAULT_STAT_POINTS;
+    }
+
+    private getWarnings() {
+        const nameErrorMessage = 'Le nom doit contenir entre 3 et 15 caractères';
+        const avatarErrorMessage = 'Veuillez choisir un avatar';
+        const warningList = [];
+
+        if (!this.nameForm.valid) {
+            warningList.push(nameErrorMessage);
+        }
+        if (!this.isAvatarChosen()) {
+            warningList.push(avatarErrorMessage);
+        }
+        return warningList;
+    }
+
+    private isAvatarChosen() {
+        return this.avatarSelectionService.selectedAvatar !== Avatars.Default;
     }
 }

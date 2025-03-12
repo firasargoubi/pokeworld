@@ -27,6 +27,7 @@ const routes: Routes = [
     { path: 'debug', component: DebugPageComponent },
     { path: 'join', component: JoinPageComponent },
     { path: 'lobby', component: LobbyPageComponent },
+    { path: 'join', component: JoinPageComponent },
     { path: 'admin', component: AdminPageComponent },
     { path: 'create', component: CreatePageComponent },
     { path: 'edit', component: EditPageComponent },

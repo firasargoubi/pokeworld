@@ -21,7 +21,7 @@ export const NEW_PLAYER: Player = {
         action: 3,
     },
     isAdmin: false,
-    isConnected: true,
+    isConnected: false,
 };
 
 export const CODE_RANGE = 10000;

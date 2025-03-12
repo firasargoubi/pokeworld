@@ -10,7 +10,7 @@ import { ItemType } from '@common/item-type.enum';
 import { MapSize } from '@common/map-size.enum';
 import { TileType } from '@common/tile-type.enum';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { Avatars } from '@app/interfaces/avatars.enum';
+import { Avatars } from '@common/avatars.enum';
 import { TimerService } from '@app/services/timer/timer.service';
 
 @Component({

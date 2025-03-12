@@ -327,12 +327,17 @@ main {
 }
 
 .selected,
-.avatar-container:hover {
+:not(.locked).avatar-container:hover {
     border: 0.6vw solid white;
     box-shadow:
         0.6vw 0 0 $text-shadow-color,
         0 0.6vw 0 $text-shadow-color;
 }
+
+.locked{
+    filter: grayscale(1);
+}
+
 
 .flex-container {
     display: flex;
