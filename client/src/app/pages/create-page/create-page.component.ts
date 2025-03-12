@@ -59,9 +59,7 @@ export class CreatePageComponent implements OnInit {
 
     private async createGame(game: GameData) {
         if (game.isVisible) {
-            window.console.log('HERE 1');
             const hasCreatedGame = await this.lobbySocketService.createMatch(game._id);
-            window.console.log('HERE 2');
             if (hasCreatedGame) {
                 this.router.navigate(['/player-selection']);
                 return;

@@ -17,6 +17,7 @@ import { Observable } from 'rxjs';
 })
 export class LobbyPageComponent {
     accessCode: string = '';
+    isAdmin: boolean = false;
     players: Player[] = [];
     players$: Observable<Player[]>;
     isLocked: boolean = false;
@@ -27,6 +28,9 @@ export class LobbyPageComponent {
     constructor() {
         this.players$ = this.lobbySocketsService.players$;
         this.isRoomLocked$ = this.lobbySocketsService.roomLocked$;
+        if (this.lobbySocketsService.matchCode === '') {
+            this.router.navigate(['/']);
+        }
     }
 
     get matchCode(): string | null {

@@ -16,7 +16,7 @@
 
             <div id="players-list">
                 @for (player of (players$ | async); track player) {
-                <app-player-card [player]="player" [isViewer]="false"></app-player-card>
+                    <app-player-card [player]="player" [isViewer]="false"></app-player-card>
                 }
                 <div id="lock-control-container">
                     <img

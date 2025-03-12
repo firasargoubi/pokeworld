@@ -12,37 +12,32 @@ export class MatchService {
     private playerToMatchCode: Map<string, string> = new Map();
 
     async createMatch(gameId: string, playerId: string): Promise<string> {
-        // eslint-disable-next-line no-console
-        console.log('HERE MatchService.createMatch');
+        let matchCode = '';
         const gameData: GameData = await this.gameService.getGameData(gameId);
 
-        if (gameData._id === '') {
-            return '';
+        if (gameData._id) {
+            matchCode = this.getMatchCode();
+            const match: Match = { gameData, matchData: structuredClone(DEFAULT_MATCH_DATA) };
+            match.matchData.code = matchCode;
+            this.matches.set(matchCode, match);
+
+            const newPlayer = { ...DEFAULT_PLAYER, id: playerId, isAdmin: true };
+            this.addPlayerToMatch(newPlayer, matchCode);
         }
-
-        const matchCode: string = this.getMatchCode();
-        const match: Match = { gameData, matchData: structuredClone(DEFAULT_MATCH_DATA) };
-        match.matchData.code = matchCode;
-        this.matches.set(matchCode, match);
-
-        const newPlayer = { ...DEFAULT_PLAYER, id: playerId, isAdmin: true };
-        this.addPlayerToMatch(newPlayer, matchCode);
 
         return matchCode;
     }
 
     joinMatch(matchCode: string, playerId: string): boolean {
         const match: Match | null = this.getMatch(matchCode) ?? null;
-        const isMatchLocked: boolean = match?.matchData.isLocked ?? true;
+        const isMatchUnlocked = !(match?.matchData.isLocked ?? true);
 
-        if (isMatchLocked) {
-            return false;
+        if (isMatchUnlocked) {
+            const newPlayer = { ...DEFAULT_PLAYER, id: playerId };
+            this.addPlayerToMatch(newPlayer, matchCode);
         }
 
-        const newPlayer = { ...DEFAULT_PLAYER, id: playerId };
-        this.addPlayerToMatch(newPlayer, matchCode);
-
-        return true;
+        return isMatchUnlocked;
     }
 
     removePlayerFromMatch(playerId: string, matchCode: string): void {

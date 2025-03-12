@@ -11,7 +11,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
     providedIn: 'root',
 })
 export class LobbySocketsService {
-    private matchCode: string;
+    matchCode: string;
     private playersSubject: BehaviorSubject<Player[]>;
     private roomLockedSubject: BehaviorSubject<boolean>;
     private coreSocket: CoreSocketService;
@@ -46,7 +46,10 @@ export class LobbySocketsService {
 
     async createMatch(gameId: string): Promise<boolean> {
         return new Promise((resolve) => {
-            this.coreSocket.emit(LobbyEvent.CreateMatch, gameId, (matchCode: string) => resolve(matchCode !== ''));
+            this.coreSocket.emit(LobbyEvent.CreateMatch, gameId, (matchCode: string) => {
+                this.matchCode = matchCode;
+                resolve(matchCode !== '');
+            });
         });
     }
 
@@ -98,7 +101,7 @@ export class LobbySocketsService {
     }
 
     private setupLobbyListeners(): void {
-        this.coreSocket.on(LobbyEvent.UpdatePlayer, this.onUpdatePlayersLists.bind(this));
+        this.coreSocket.on(LobbyEvent.UpdatePlayerList, this.onUpdatePlayersLists.bind(this));
         this.coreSocket.on(LobbyEvent.RoomLockChanged, this.onRoomLockChanged.bind(this));
         this.coreSocket.on(LobbyEvent.MatchStarted, this.onMatchStarted.bind(this));
     }

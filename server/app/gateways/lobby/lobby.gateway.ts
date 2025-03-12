@@ -13,7 +13,13 @@ export class LobbyGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(LobbyEvent.CreateMatch)
     async createMatch(socket: Socket, gameId: string): Promise<string> {
-        return await this.matchService.createMatch(gameId, socket.id);
+        const matchCode = await this.matchService.createMatch(gameId, socket.id);
+
+        if (matchCode) {
+            socket.join(matchCode);
+        }
+
+        return matchCode;
     }
 
     @SubscribeMessage(LobbyEvent.JoinMatch)
@@ -21,6 +27,7 @@ export class LobbyGateway implements OnGatewayDisconnect {
         const hasJoinedMatch = this.matchService.joinMatch(matchCode, socket.id);
 
         if (hasJoinedMatch) {
+            socket.join(matchCode);
             this.emitPlayersInMatch(matchCode);
         }
 
@@ -36,6 +43,7 @@ export class LobbyGateway implements OnGatewayDisconnect {
             const playerIds = this.matchService.deleteMatch(matchCode);
             playerIds.forEach((playerId) => {
                 if (playerId !== socket.id) {
+                    this.server.sockets.sockets.get(playerId)?.leave(matchCode);
                     this.emitPlayerRemovedFromRoom(playerId);
                 }
             });
@@ -43,6 +51,7 @@ export class LobbyGateway implements OnGatewayDisconnect {
             this.matchService.removePlayerFromMatch(socket.id, matchCode);
             this.emitPlayersInMatch(matchCode);
         }
+        socket.leave(matchCode);
     }
 
     @SubscribeMessage(LobbyEvent.KickPlayer)
@@ -51,6 +60,7 @@ export class LobbyGateway implements OnGatewayDisconnect {
         const isAdmin = this.matchService.isPlayerAdmin(socket.id);
 
         if (isAdmin && targetPlayerId !== socket.id) {
+            this.server.sockets.sockets.get(targetPlayerId).leave(matchCode);
             this.matchService.removePlayerFromMatch(targetPlayerId, matchCode);
             this.emitPlayerRemovedFromRoom(targetPlayerId);
             this.emitPlayersInMatch(matchCode);
