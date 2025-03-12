@@ -1,10 +1,10 @@
+import { Avatars } from '@common/avatars.enum';
+import { LobbyEvent } from '@common/lobby-event.enum';
+import { Player } from '@common/player';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSpy, SinonStub, SinonStubbedInstance, createStubInstance, match, spy, stub } from 'sinon';
-import { Server, Socket, BroadcastOperator } from 'socket.io';
+import { BroadcastOperator, Server, Socket } from 'socket.io';
 import { LobbyGateway } from './lobby.gateway';
-import { LobbyEvents } from '@common/lobby-events.enum';
-import { Player } from '@common/player';
-import { Avatars } from '@common/avatars.enum';
 import { CODE_LENGTH } from './lobby.gateway.constants';
 
 describe('LobbyGateway', () => {
@@ -41,21 +41,21 @@ describe('LobbyGateway', () => {
 
     it('hello message should be sent on connection', () => {
         gateway.handleConnection(socket);
-        expect(socket.emit.calledWith(LobbyEvents.Debug, match.any)).toBeTruthy();
+        expect(socket.emit.calledWith(LobbyEvent.Debug, match.any)).toBeTruthy();
     });
 
     it('handleDisconnect should send goodbye message and call leaveGame', () => {
         const leaveGameSpy = spy(gateway, 'leaveGame');
         gateway.handleDisconnect(socket);
 
-        expect(socket.emit.calledWith(LobbyEvents.Debug, 'Goodbye World!')).toBeTruthy();
+        expect(socket.emit.calledWith(LobbyEvent.Debug, 'Goodbye World!')).toBeTruthy();
         expect(leaveGameSpy.calledWith(socket)).toBeTruthy();
         leaveGameSpy.restore();
     });
 
     it('debug should emit message to all clients', () => {
         gateway.debug('Hello World!');
-        expect(server.emit.calledWith(LobbyEvents.Debug, 'Hello World!')).toBeTruthy();
+        expect(server.emit.calledWith(LobbyEvent.Debug, 'Hello World!')).toBeTruthy();
     });
 
     it('createMatchAndJoin should create a new game and add the admin player', () => {
@@ -235,7 +235,7 @@ describe('LobbyGateway', () => {
 
         server.to.returns({
             emit: (event: string, lockStatus: boolean) => {
-                expect(event).toEqual(LobbyEvents.RoomLockChanged);
+                expect(event).toEqual(LobbyEvent.RoomLockChanged);
                 expect(lockStatus).toBeTruthy();
             },
         } as BroadcastOperator<unknown, unknown>);
@@ -296,7 +296,7 @@ describe('LobbyGateway', () => {
 
         server.to.returns({
             emit: (event: string, code: string) => {
-                expect(event).toEqual(LobbyEvents.GameDestroyed);
+                expect(event).toEqual(LobbyEvent.GameDestroyed);
                 expect(code).toEqual({ gameCode });
             },
         } as BroadcastOperator<unknown, unknown>);
@@ -332,7 +332,7 @@ describe('LobbyGateway', () => {
 
         server.to.returns({
             emit: (event: string, players: Player[]) => {
-                expect(event).toEqual(LobbyEvents.UpdatePlayersLists);
+                expect(event).toEqual(LobbyEvent.UpdatePlayersLists);
                 expect(players).toEqual(testPlayers);
             },
         } as BroadcastOperator<unknown, unknown>);

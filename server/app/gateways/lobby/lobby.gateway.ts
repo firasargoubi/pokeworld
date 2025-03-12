@@ -1,4 +1,4 @@
-import { LobbyEvents } from '@common/lobby-events.enum';
+import { LobbyEvent } from '@common/lobby-event.enum';
 import { Player } from '@common/player';
 import { Injectable } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -14,7 +14,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private playerToMatch: Map<string, string> = new Map(); // player's socket.id -> gameCode
     private lockedRooms: Set<string> = new Set();
 
-    @SubscribeMessage(LobbyEvents.CreateGame)
+    @SubscribeMessage(LobbyEvent.CreateGame)
     createMatchAndJoin(socket: Socket): string {
         const gameCode = this.generateUniqueGameCode();
         this.matches.set(gameCode, []);
@@ -26,7 +26,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return gameCode;
     }
 
-    @SubscribeMessage(LobbyEvents.JoinGame)
+    @SubscribeMessage(LobbyEvent.JoinGame)
     joinMatch(socket: Socket, gameCode: string): boolean {
         if (!this.matches.has(gameCode)) {
             this.debug("La partie n'existe pas");
@@ -51,7 +51,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return true;
     }
 
-    @SubscribeMessage(LobbyEvents.LeaveGame)
+    @SubscribeMessage(LobbyEvent.LeaveGame)
     leaveGame(socket: Socket): boolean {
         const gameCode = this.playerToMatch.get(socket.id);
         if (!gameCode) return false;
@@ -69,7 +69,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return true;
     }
 
-    @SubscribeMessage(LobbyEvents.UpdatePlayer)
+    @SubscribeMessage(LobbyEvent.UpdatePlayer)
     updatePlayer(socket: Socket, updatedFields: Partial<Player>): boolean {
         const gameCode = this.playerToMatch.get(socket.id);
         if (!gameCode) return false;
@@ -87,7 +87,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return true;
     }
 
-    @SubscribeMessage(LobbyEvents.ToggleLockRoom)
+    @SubscribeMessage(LobbyEvent.ToggleLockRoom)
     toggleLockRoom(socket: Socket, shouldLock: boolean): boolean {
         const gameCode = this.playerToMatch.get(socket.id);
         if (!gameCode) return false;
@@ -103,30 +103,30 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.lockedRooms.delete(gameCode);
         }
 
-        this.server.to(gameCode).emit(LobbyEvents.RoomLockChanged, shouldLock);
+        this.server.to(gameCode).emit(LobbyEvent.RoomLockChanged, shouldLock);
         return true;
     }
 
     // Sprint 3 - Chat
-    // @SubscribeMessage(LobbyEvents.NewMessage)
+    // @SubscribeMessage(LobbyEvent.NewMessage)
     // sendMessageToPlayersInRoom(socket: Socket, message: string) {
     //     const gameCode = this.playerToMatch.get(socket.id);
     //     if (gameCode) {
-    //         this.server.to(gameCode).emit(LobbyEvents.NewMessage, message);
+    //         this.server.to(gameCode).emit(LobbyEvent.NewMessage, message);
     //     }
     // }
 
     handleConnection(socket: Socket) {
-        socket.emit(LobbyEvents.Debug, 'Hello World!');
+        socket.emit(LobbyEvent.Debug, 'Hello World!');
     }
 
     handleDisconnect(socket: Socket) {
-        socket.emit(LobbyEvents.Debug, 'Goodbye World!');
+        socket.emit(LobbyEvent.Debug, 'Goodbye World!');
         this.leaveGame(socket);
     }
 
     debug(message: string) {
-        this.server.emit(LobbyEvents.Debug, message);
+        this.server.emit(LobbyEvent.Debug, message);
     }
 
     private removePlayerFromRoom(socket: Socket, gameCode: string): void {
@@ -147,7 +147,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private destroyRoom(gameCode: string): void {
         const playersInRoom = this.matches.get(gameCode);
         if (playersInRoom) {
-            this.server.to(gameCode).emit(LobbyEvents.GameDestroyed, { gameCode });
+            this.server.to(gameCode).emit(LobbyEvent.GameDestroyed, { gameCode });
             playersInRoom.forEach((player) => {
                 const socket = this.server.sockets.sockets.get(player.id);
                 if (socket) socket.leave(gameCode);
@@ -166,7 +166,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private emitPlayersInRoom(gameCode: string): void {
         const playersInRoom = this.matches.get(gameCode);
         if (playersInRoom) {
-            this.server.to(gameCode).emit(LobbyEvents.UpdatePlayersLists, playersInRoom);
+            this.server.to(gameCode).emit(LobbyEvent.UpdatePlayersLists, playersInRoom);
         }
     }
 

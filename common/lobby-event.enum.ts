@@ -1,13 +1,15 @@
-export enum LobbyEvents {
-    CreateGame = 'createGame',
-    JoinGame = 'joinGame',
-    LeaveGame = 'leaveGame',
+export enum LobbyEvent {
+    CreateMatch = 'createMatch',
+    JoinMatch = 'joinMatch',
+    LeaveMatch = 'leaveMatch',
     UpdatePlayer = 'updatePlayer',
     UpdatePlayersLists = 'updatePlayerLists',
-    GameDestroyed = 'gameDestroyed',
+    MatchDestroyed = 'matchDestroyed',
     ToggleLockRoom = 'toggleLockRoom',
     RoomLockChanged = 'roomLockChanged',
     NewMessage = 'newMessage',
     ClearMessages = 'clearMessages',
     Debug = 'debug',
+    StartMatch = 'startMatch',
+    MatchStarted = 'matchStarted',
 }
