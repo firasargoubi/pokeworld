@@ -6,6 +6,7 @@ import { HeaderComponent } from '@app/components/header/header.component';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { GameData } from '@common/game-data';
 
 @Component({
@@ -19,6 +20,7 @@ export class CreatePageComponent implements OnInit {
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);
     private gameDataService: GameDataService = inject(GameDataService);
+    private lobbySocketService: LobbySocketsService = inject(LobbySocketsService);
     private popupService: PopupService = inject(PopupService);
 
     navigateToMenu() {
@@ -38,7 +40,7 @@ export class CreatePageComponent implements OnInit {
     onJoin(gameId: string) {
         this.gameSaveService.getGame(gameId).subscribe({
             next: (game: GameData) => {
-                this.handleGameVisibility(game);
+                this.createGame(game);
             },
             error: (error: HttpErrorResponse) => {
                 this.handleNotFoundError(error);
@@ -57,9 +59,10 @@ export class CreatePageComponent implements OnInit {
         });
     }
 
-    private handleGameVisibility(game: GameData) {
+    private createGame(game: GameData) {
         if (game.isVisible) {
             this.gameDataService.setGameData(game);
+            this.lobbySocketService.createGame();
             this.router.navigate(['/player-selection']);
         } else {
             this.loadGames();

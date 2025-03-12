@@ -1,3 +1,24 @@
-<p>
-  join-page works!
-</p>
+<div id="join-page-container">
+    <div id="join-page-header">
+        <app-header [onClick]="this.navigateToMenu.bind(this)" [stepNumber]="'1'" [title]="'PAGE DE CONNEXION'"></app-header>
+    </div>
+    <div id="join-page-border">
+        <div id="join-page-body">
+            <div id="main-container">
+                <input id="input" [(ngModel)]="gameCode" maxlength="{{codeLength}}" autofocus (keyup)="joinGame($event)" />
+                <div id="main-container-body">
+                    <p id="main-message">Entrez votre code d'accès</p>
+
+                    <div id="visual-input-container">
+                        <div class="number">{{ this.gameCode[0] }}</div>
+                        <div class="number">{{ this.gameCode[1] }}</div>
+                        <div class="number">{{ this.gameCode[2] }}</div>
+                        <div class="number">{{ this.gameCode[3] }}</div>
+                    </div>
+
+                    <p id="main-message">Appuyer sur Entrer pour valider</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
