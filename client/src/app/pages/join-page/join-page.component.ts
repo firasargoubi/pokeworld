@@ -22,7 +22,7 @@ export class JoinPageComponent {
         const validLength = this.gameCode.length === CODE_LENGTH;
         // remaining : verify gameSize and room locked/unlocked
         if (isJoinKey && validLength) {
-            this.lobbySocketService.joinGame(this.gameCode);
+            this.lobbySocketService.joinMatch(this.gameCode);
             this.router.navigate(['/player-selection']);
         }
     }

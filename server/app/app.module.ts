@@ -5,7 +5,8 @@ import { GameController } from './controllers/game/game.controller';
 import { LobbyGateway } from './gateways/lobby/lobby.gateway';
 import { Game, gameSchema } from './model/schema/game.schema';
 import { GameService } from './services/game/game.service';
-// import { ChatGateway } from './gateways/chat/chat.gateway';
+import { MatchService } from './services/match/match.service';
+
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
@@ -19,6 +20,6 @@ import { GameService } from './services/game/game.service';
         MongooseModule.forFeature([{ name: Game.name, schema: gameSchema }]),
     ],
     controllers: [GameController],
-    providers: [LobbyGateway, Logger, GameService],
+    providers: [LobbyGateway, Logger, GameService, MatchService],
 })
 export class AppModule {}

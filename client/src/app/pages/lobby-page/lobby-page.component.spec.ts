@@ -12,7 +12,7 @@ describe('LobbyPageComponent', () => {
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-        lobbySocketsServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['toggleLockRoom', 'leaveGame'], {
+        lobbySocketsServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['toggleLockRoom', 'leaveMatch'], {
             roomLocked$: of(false),
             players$: of([]),
         });
@@ -34,28 +34,23 @@ describe('LobbyPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should navigate to game page when startGame is called', () => {
-        component.startGame();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+    it('should call startMatch when startMatchButton is called', () => {
+        component.startMatchButton();
+        expect(lobbySocketsServiceSpy.startMatch).toHaveBeenCalled();
     });
 
-    it('should navigate to home page when leaveLobby is called', () => {
-        component.leaveLobby();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
-    });
-
-    it('should call toggleLockRoom(true) when lockRoom is called', () => {
-        component.lockRoom();
+    it('should call toggleLockRoom when lockRoomButton is called', () => {
+        component.lockRoomButton();
         expect(lobbySocketsServiceSpy.toggleLockRoom).toHaveBeenCalledWith(true);
     });
 
-    it('should call toggleLockRoom(false) when unlockRoom is called', () => {
-        component.unlockRoom();
+    it('should call toggleLockRoom when unlockRoomButton is called', () => {
+        component.unlockRoomButton();
         expect(lobbySocketsServiceSpy.toggleLockRoom).toHaveBeenCalledWith(false);
     });
 
-    it('should call leaveGame when leaveLobby is called', () => {
-        component.leaveLobby();
-        expect(lobbySocketsServiceSpy.leaveGame).toHaveBeenCalled();
+    it('should call leaveMatch when leaveLobby is called', () => {
+        component.leaveLobbyButton();
+        expect(lobbySocketsServiceSpy.leaveMatch).toHaveBeenCalled();
     });
 });

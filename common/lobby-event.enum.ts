@@ -1,15 +1,15 @@
 export enum LobbyEvent {
+    DebugMessage = 'debugMessage',
+
     CreateMatch = 'createMatch',
     JoinMatch = 'joinMatch',
     LeaveMatch = 'leaveMatch',
     UpdatePlayer = 'updatePlayer',
-    UpdatePlayersLists = 'updatePlayerLists',
-    MatchDestroyed = 'matchDestroyed',
+    KickPlayer = 'kickPlayer',
     ToggleLockRoom = 'toggleLockRoom',
-    RoomLockChanged = 'roomLockChanged',
-    NewMessage = 'newMessage',
-    ClearMessages = 'clearMessages',
-    Debug = 'debug',
     StartMatch = 'startMatch',
+
+    UpdatePlayerList = 'UpdatePlayerList',
+    RoomLockChanged = 'roomLockChanged',
     MatchStarted = 'matchStarted',
 }

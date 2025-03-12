@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
-
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { Game } from '@app/model/schema/game.schema';
+import { GameData } from '@common/game-data';
+import { DEFAULT_GAME } from './game.service.const';
 
 @Injectable()
 export class GameService {
@@ -22,6 +23,23 @@ export class GameService {
             throw new NotFoundException(`Game with ID ${id} not found.`);
         }
         return game;
+    }
+
+    async getGameData(id: string): Promise<GameData> {
+        const game = await this.gameModel.findById(id).exec();
+
+        if (!game) {
+            return DEFAULT_GAME;
+        }
+
+        return {
+            _id: game._id.toString(),
+            name: game.name,
+            description: game.description,
+            lastEdited: game.lastEdited,
+            isVisible: game.isVisible,
+            mapData: game.mapData,
+        };
     }
 
     async saveGame(gameDto: CreateGameDto): Promise<Game> {

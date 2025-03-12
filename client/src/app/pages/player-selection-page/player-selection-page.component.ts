@@ -76,7 +76,7 @@ export class PlayerSelectionPageComponent {
     }
 
     goToMenu() {
-        this.lobbySocketService.leaveGame();
+        this.lobbySocketService.leaveMatch();
         this.avatarSelectionService.resetAvatar();
         this.router.navigate(['/']);
     }

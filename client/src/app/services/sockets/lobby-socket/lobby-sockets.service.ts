@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { LobbyEvent } from '@common/lobby-event.enum';
@@ -15,6 +16,7 @@ export class LobbySocketsService {
     private roomLockedSubject: BehaviorSubject<boolean>;
     private coreSocket: CoreSocketService;
     private matchDataService: MatchDataService;
+    private router: Router;
 
     constructor() {
         this.matchCode = '';
@@ -22,6 +24,7 @@ export class LobbySocketsService {
         this.roomLockedSubject = new BehaviorSubject<boolean>(false);
         this.coreSocket = inject(CoreSocketService);
         this.matchDataService = inject(MatchDataService);
+        this.router = inject(Router);
         this.setupLobbyListeners();
     }
 
@@ -41,9 +44,9 @@ export class LobbySocketsService {
         this.matchCode = code;
     }
 
-    createMatch(): void {
-        this.coreSocket.emit(LobbyEvent.CreateMatch, (matchCode: string) => {
-            this.matchRoomCode = matchCode;
+    async createMatch(gameId: string): Promise<boolean> {
+        return new Promise((resolve) => {
+            this.coreSocket.emit(LobbyEvent.CreateMatch, gameId, (matchCode: string) => resolve(matchCode !== ''));
         });
     }
 
@@ -91,11 +94,11 @@ export class LobbySocketsService {
 
     startMatch(): void {
         this.coreSocket.emit(LobbyEvent.StartMatch);
+        window.console.log('LobbySocketService: startMatch');
     }
 
     private setupLobbyListeners(): void {
-        this.coreSocket.on(LobbyEvent.UpdatePlayersLists, this.onUpdatePlayersLists.bind(this));
-        this.coreSocket.on(LobbyEvent.MatchDestroyed, this.onMatchDestroyed.bind(this));
+        this.coreSocket.on(LobbyEvent.UpdatePlayer, this.onUpdatePlayersLists.bind(this));
         this.coreSocket.on(LobbyEvent.RoomLockChanged, this.onRoomLockChanged.bind(this));
         this.coreSocket.on(LobbyEvent.MatchStarted, this.onMatchStarted.bind(this));
     }
@@ -104,17 +107,18 @@ export class LobbySocketsService {
         this.roomLockedSubject.next(isLocked);
     }
 
-    private onMatchDestroyed() {
-        // TODO TEMP Rediriger l'utilisateur ou afficher un message
-        this.playersSubject.next([]);
-    }
-
     private onUpdatePlayersLists(players: Player[]) {
+        if (players.length === 0) {
+            this.router.navigate(['/']);
+        }
+
         // TODO TEMP Update the subject so all subscribers are notified
         this.playersSubject.next(players);
     }
 
     private onMatchStarted(match: Match) {
+        window.console.log('LobbySocketService: onMatchStarted');
         this.matchDataService.startMatch(match);
+        this.router.navigate(['/play']);
     }
 }

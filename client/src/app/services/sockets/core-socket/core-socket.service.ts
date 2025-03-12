@@ -48,8 +48,9 @@ export class CoreSocketService {
     }
 
     private setupCoreListeners(): void {
-        this.socket.on(LobbyEvent.Debug, (message: string) => {
-            window.console.log('Debug message from server socket:', message);
+        // TODO TEMP retirer cela avant la remise du sprint 2
+        this.socket.on(LobbyEvent.DebugMessage, (message: string) => {
+            window.console.log('DebugMessage:', message);
         });
     }
 }

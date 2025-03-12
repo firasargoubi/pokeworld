@@ -1,6 +1,6 @@
 <div id="lobby-container">
     <div id="lobby-header">
-        <app-header [onClick]="this.leaveLobby.bind(this)" [stepNumber]="'3'" [title]="'Page d\'attente'"></app-header>
+        <app-header [onClick]="this.leaveLobbyButton.bind(this)" [stepNumber]="'3'" [title]="'Page d\'attente'"></app-header>
     </div>
 
     <div id="lobby-border">
@@ -20,7 +20,7 @@
                 }
                 <div id="lock-control-container">
                     <img
-                        (click)="isRoomLocked$ ? unlockRoom() : lockRoom()"
+                        (click)="isRoomLocked$ ? unlockRoomButton() : unlockRoomButton()"
                         [src]="isRoomLocked$ ? '../../../assets/images/menu/icons/lock.png' : '../../../assets/images/menu/icons/unlock.png'"
                         class="lock-icon"
                     />
@@ -29,6 +29,6 @@
         </div>
     </div>
     <div id="poke-button">
-        <app-pokeball-button [buttonContent]="'LANCER PARTIE'" [onClickAction]="startGame.bind(this)"> </app-pokeball-button>
+        <app-pokeball-button [buttonContent]="'LANCER PARTIE'" [onClickAction]="this.startMatchButton.bind(this)"> </app-pokeball-button>
     </div>
 </div>

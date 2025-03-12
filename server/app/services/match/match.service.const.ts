@@ -1,7 +1,8 @@
 import { Avatars } from '@common/avatars.enum';
+import { MatchData } from '@common/match';
 import { Player } from '@common/player';
 
-export const NEW_PLAYER: Player = {
+export const DEFAULT_PLAYER: Player = {
     id: '',
     name: '',
     avatar: Avatars.Default,
@@ -22,6 +23,13 @@ export const NEW_PLAYER: Player = {
     },
     isAdmin: false,
     isConnected: false,
+};
+
+export const DEFAULT_MATCH_DATA: MatchData = {
+    code: '',
+    isLocked: false,
+    activePlayer: 0,
+    players: [],
 };
 
 export const CODE_RANGE = 10000;

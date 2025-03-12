@@ -9,7 +9,7 @@ import { Player } from '@common/player';
 import { Observable } from 'rxjs';
 
 @Component({
-    selector: 'app-game-lobby',
+    selector: 'app-lobby-page',
     templateUrl: './lobby-page.component.html',
     styleUrls: ['./lobby-page.component.scss'],
     imports: [CommonModule, HeaderComponent, PlayerCardComponent, PokeballButtonComponent],
@@ -33,20 +33,20 @@ export class LobbyPageComponent {
         return this.lobbySocketsService.matchRoomCode;
     }
 
-    startGame(): void {
+    startMatchButton(): void {
+        this.lobbySocketsService.startMatch();
+    }
+
+    leaveLobbyButton(): void {
+        this.lobbySocketsService.leaveMatch();
         this.router.navigate(['/']);
     }
 
-    leaveLobby(): void {
-        this.lobbySocketsService.leaveGame();
-        this.router.navigate(['/']);
-    }
-
-    lockRoom(): void {
+    lockRoomButton(): void {
         this.lobbySocketsService.toggleLockRoom(true);
     }
 
-    unlockRoom(): void {
+    unlockRoomButton(): void {
         this.lobbySocketsService.toggleLockRoom(false);
     }
 }

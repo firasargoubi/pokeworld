@@ -3,7 +3,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
@@ -19,7 +18,6 @@ export class CreatePageComponent implements OnInit {
     games: GameData[] = [];
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);
-    private gameDataService: GameDataService = inject(GameDataService);
     private lobbySocketService: LobbySocketsService = inject(LobbySocketsService);
     private popupService: PopupService = inject(PopupService);
 
@@ -59,15 +57,19 @@ export class CreatePageComponent implements OnInit {
         });
     }
 
-    private createGame(game: GameData) {
+    private async createGame(game: GameData) {
         if (game.isVisible) {
-            this.gameDataService.setGameData(game);
-            this.lobbySocketService.createGame();
-            this.router.navigate(['/player-selection']);
-        } else {
-            this.loadGames();
-            this.popupService.showPopup("Ce jeu n'est plus visible");
+            window.console.log('HERE 1');
+            const hasCreatedGame = await this.lobbySocketService.createMatch(game._id);
+            window.console.log('HERE 2');
+            if (hasCreatedGame) {
+                this.router.navigate(['/player-selection']);
+                return;
+            }
         }
+
+        this.loadGames();
+        this.popupService.showPopup("Ce jeu n'est plus visible");
     }
 
     private handleNotFoundError(error: HttpErrorResponse) {
