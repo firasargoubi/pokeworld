@@ -1,13 +1,34 @@
-<div class="lobby-container">
-    <h3>Joueurs dans la room :</h3>
-    <div>GAME CODE : {{ this.matchCode }}</div>
-    <ul>
-        @for (player of players$ | async; track player.id) {
-        <li>{{ player.name }} ({{ player.isAdmin ? 'Admin' : 'Joueur' }})</li>
-        }
-    </ul>
+<div id="lobby-container">
+    <div id="lobby-header">
+        <app-header [onClick]="this.leaveLobby.bind(this)" [stepNumber]="'3'" [title]="'Page d\'attente'"></app-header>
+    </div>
 
-    @if (matchCode) {
-    <button (click)="leaveRoom()">Quitter la Room</button>
-    }
+    <div id="lobby-border">
+        <div id="lobby-body">
+            <div class="access-code-container">
+                <img src="../../../assets/images/menu/containers/dark-blue/dark-blue-scrare.png" class="background-image" />
+                <div class="access-code-box">
+                    <p class="access-title">Votre code d'accès</p>
+                    <p class="access-code">{{ this.matchCode }}</p>
+                    <p class="access-instruction">Partagez ce code avec les autres joueurs pour jouer</p>
+                </div>
+            </div>
+
+            <div id="players-list">
+                @for (player of (players$ | async); track player) {
+                <app-player-card [player]="player" [isViewer]="false"></app-player-card>
+                }
+                <div id="lock-control-container">
+                    <img
+                        (click)="isRoomLocked$ ? unlockRoom() : lockRoom()"
+                        [src]="isRoomLocked$ ? '../../../assets/images/menu/icons/lock.png' : '../../../assets/images/menu/icons/unlock.png'"
+                        class="lock-icon"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="poke-button">
+        <app-pokeball-button [buttonContent]="'LANCER PARTIE'" [onClickAction]="startGame.bind(this)"> </app-pokeball-button>
+    </div>
 </div>

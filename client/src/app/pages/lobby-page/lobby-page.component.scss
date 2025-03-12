@@ -1,48 +1,122 @@
-.lobby-container {
+$gray-border-color: #636776;
+$wheat-border-color: #e9f6f7;
+$stripes-color1: #c0e4f6;
+$stripes-color2: #d0effc;
+
+$page-border-width: 10px;
+$stripes-size: 0.7vw;
+
+#lobby-container {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 20px;
+    height: 100vh;
+    width: 100vw;
+    align-items: center;
 }
 
-.chat-container {
-    color: black;
+#lobby-header {
+    width: 100%;
+    height: 7vh;
+}
+
+#lobby-border {
+    height: calc(100vh - 7vh);
+    width: 100%;
+    border: $page-border-width solid $gray-border-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#lobby-body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px;
+    background: repeating-linear-gradient(
+        0deg,
+        $stripes-color1,
+        $stripes-color1 $stripes-size,
+        $stripes-color2 $stripes-size,
+        $stripes-color2 $stripes-size * 2
+    );
+    background-size: 100% ($stripes-size * 2);
+    animation: fall 2s linear infinite;
+    border: $page-border-width solid $wheat-border-color;
+    text-align: center;
+    border-radius: 0;
+}
+.access-code-container {
+    position: relative;
+    width: 27vw;
+    height: 30vh;
+    top: 4vh;
+    left: 4vw;
+}
+
+.background-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.access-code-box {
+    position: relative;
+    z-index: 2;
+}
+.access-title {
+    font-size: 20px;
     margin-top: 20px;
-    border-top: 1px solid #ccc;
-    padding-top: 20px;
+    text-shadow: 0.8px 0.8px black;
+}
 
-    .chat-history {
-        height: 150px;
-        overflow-y: auto;
-        border: 1px solid #ccc;
-        padding: 10px;
-        margin-bottom: 10px;
-        background-color: #f9f9f9;
+.access-code {
+    font-size: 50px;
+    margin-top: 5px;
+    color: #aae7f7;
+}
 
-        p {
-            margin: 5px 0;
-        }
+.access-instruction {
+    font-size: 12px;
+    width: 165px;
+    word-wrap: break-word;
+    text-align: center;
+    margin: 5px auto;
+    margin-top: 25px;
+    white-space: pre-wrap;
+    text-shadow: 1px 1px black;
+}
+.lock-icon {
+    width: 6vw;
+    height: 9vh;
+    margin-bottom: 10px;
+}
+#lock-control-container {
+    margin-left: 36vw;
+}
+#poke-button {
+    position: absolute;
+    right: 5%;
+    bottom: 7%;
+    width: 22.5vw;
+    height: 4.5vw;
+    overflow: visible;
+}
+
+#poke-button app-pokeball-button {
+    width: 100%;
+    height: 100%;
+}
+@keyframes fall {
+    from {
+        background-position: 0 0;
     }
-
-    .chat-input {
-        display: flex;
-        gap: 10px;
-
-        input {
-            flex: 1;
-            padding: 5px;
-        }
-
-        button {
-            padding: 5px 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-
-            &:hover {
-                background-color: #0056b3;
-            }
-        }
+    to {
+        background-position: 0 $stripes-size * 2;
     }
 }

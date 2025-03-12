@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { ChatSocketsService } from '@app/services/sockets/chat-socket/chat-socket.service'; // Importez le service de chat
+import { Router } from '@angular/router';
+import { HeaderComponent } from '@app/components/header/header.component';
+import { PlayerCardComponent } from '@app/components/player-card/player-card.component';
+import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { Player } from '@common/player';
 import { Observable } from 'rxjs';
@@ -10,22 +12,20 @@ import { Observable } from 'rxjs';
     selector: 'app-game-lobby',
     templateUrl: './lobby-page.component.html',
     styleUrls: ['./lobby-page.component.scss'],
+    imports: [CommonModule, HeaderComponent, PlayerCardComponent, PokeballButtonComponent],
     standalone: true,
-    imports: [FormsModule, CommonModule],
 })
 export class LobbyPageComponent {
-    joinRoomCode: string = ''; // Code de la room à rejoindre
-    updatedPlayerName: string = ''; // Nouveau nom pour la mise à jour du joueur
-    players$: Observable<Player[]>; // Liste des joueurs dans la room
-    newMessage: string = ''; // Message en cours de saisie
-    chatMessages$: Observable<string[]>; // Historique des messages du chat
-    isRoomLocked$: Observable<boolean>; // État de verrouillage de la room
+    accessCode: string = '';
+    players: Player[] = [];
+    players$: Observable<Player[]>;
+    isLocked: boolean = false;
+    isRoomLocked$: Observable<boolean>;
+    private router: Router = inject(Router);
     private lobbySocketsService: LobbySocketsService = inject(LobbySocketsService);
-    private chatSocketsService: ChatSocketsService = inject(ChatSocketsService); // Injectez le service de chat
 
     constructor() {
         this.players$ = this.lobbySocketsService.players$;
-        this.chatMessages$ = this.chatSocketsService.chatMessages;
         this.isRoomLocked$ = this.lobbySocketsService.roomLocked$;
     }
 
@@ -33,15 +33,20 @@ export class LobbyPageComponent {
         return this.lobbySocketsService.matchRoomCode;
     }
 
-    leaveRoom(): void {
-        this.lobbySocketsService.leaveGame();
+    startGame(): void {
+        this.router.navigate(['/']);
     }
 
-    lockRoom() {
+    leaveLobby(): void {
+        this.lobbySocketsService.leaveGame();
+        this.router.navigate(['/']);
+    }
+
+    lockRoom(): void {
         this.lobbySocketsService.toggleLockRoom(true);
     }
 
-    unlockRoom() {
+    unlockRoom(): void {
         this.lobbySocketsService.toggleLockRoom(false);
     }
 }
