@@ -18,11 +18,13 @@ export const DEFAULT_PLAYER: Player = {
         health: 0,
         items: [],
         position: { x: 0, y: 0 },
-        speed: 0,
-        action: 3,
+        movement: 0,
+        action: false,
+        fightsWon: 0,
     },
     isAdmin: false,
     isConnected: false,
+    isBot: false,
 };
 
 export const DEFAULT_MATCH_DATA: MatchData = {
@@ -34,4 +36,3 @@ export const DEFAULT_MATCH_DATA: MatchData = {
 
 export const CODE_RANGE = 10000;
 export const CODE_LENGTH = 4;
-export const MAX_PLAYERS = 5;

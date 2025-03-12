@@ -1,7 +1,6 @@
 // core-socket.service.ts
 import { Injectable } from '@angular/core';
-import { LobbyEvent } from '@common/lobby-event.enum';
-import { Observable, Observer } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
@@ -10,22 +9,30 @@ import { environment } from 'src/environments/environment';
 })
 export class CoreSocketService {
     private socket: Socket;
-    private status: Observable<boolean>;
+    private status: BehaviorSubject<boolean>;
 
     constructor() {
+        this.status = new BehaviorSubject<boolean>(false);
+
         this.socket = io(environment.socketUrl, {
             transports: ['websocket'],
             upgrade: false,
         });
-        this.status = new Observable<boolean>((observer: Observer<boolean>) => {
-            this.socket.on('connect', () => observer.next(true));
-            this.socket.on('disconnect', () => observer.next(false));
-        });
-        this.setupCoreListeners();
+
+        this.socket.on('connect', () => this.status.next(true));
+        this.socket.on('disconnect', () => this.status.next(false));
     }
 
     get connectionStatus(): Observable<boolean> {
-        return this.status;
+        return this.status.asObservable();
+    }
+
+    getSocketId(): string {
+        return this.socket.id ?? '';
+    }
+
+    disconnect(): void {
+        this.socket.disconnect();
     }
 
     emit<T, C>(event: string, ...args: T[] | [...T[], C]): void {
@@ -41,16 +48,5 @@ export class CoreSocketService {
 
     on<T>(event: string, callback: (...args: T[]) => void): void {
         this.socket.on(event, callback);
-    }
-
-    disconnect(): void {
-        this.socket.disconnect();
-    }
-
-    private setupCoreListeners(): void {
-        // TODO TEMP retirer cela avant la remise du sprint 2
-        this.socket.on(LobbyEvent.DebugMessage, (message: string) => {
-            window.console.log('DebugMessage:', message);
-        });
     }
 }

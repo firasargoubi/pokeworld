@@ -10,6 +10,7 @@ export interface Player {
     currentStats: CurrentStats;
     isAdmin: boolean;
     isConnected: boolean;
+    isBot: boolean;
 }
 
 export interface PlayertStats {
@@ -25,6 +26,7 @@ export interface CurrentStats {
     health: number;
     items: ItemType[];
     position: Position;
-    speed: number;
-    action: number;
+    movement: number;
+    action: boolean;
+    fightsWon: number;
 }

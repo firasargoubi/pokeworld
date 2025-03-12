@@ -1,17 +1,16 @@
 import { Component, inject } from '@angular/core';
 import { MapComponent } from '@app/components/map/map.component';
-import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
-import { MatchVisualData } from '@app/interfaces/match-visual-data';
+import { EMPTY_IMAGE } from '@app/consts/images.const';
+import { PlayerVisualData } from '@app/interfaces/player-visual-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { CommonModule } from '@angular/common';
-import { GameMode } from '@common/game-mode.enum';
-import { ItemType } from '@common/item-type.enum';
-import { MapSize } from '@common/map-size.enum';
-import { TileType } from '@common/tile-type.enum';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { Avatars } from '@common/avatars.enum';
 import { TimerService } from '@app/services/timer/timer.service';
+import { MatchDataService } from '@app/services/match-data/match-data.service';
+import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
+import { Router } from '@angular/router';
+import { PopupService } from '@app/services/popup/popup.service';
 
 @Component({
     selector: 'app-play-page',
@@ -20,235 +19,96 @@ import { TimerService } from '@app/services/timer/timer.service';
     imports: [MapComponent, CommonModule],
 })
 export class PlayPageComponent {
-    matchVisualData: MatchVisualData;
+    thumbnailUrl: string;
     timerService: TimerService;
+    private matchDataService: MatchDataService;
+    private gameDataService: GameDataService;
+    private coreSocketService: CoreSocketService;
+    private popupService: PopupService;
+    private router: Router;
 
     constructor() {
+        this.coreSocketService = inject(CoreSocketService);
+        this.popupService = inject(PopupService);
+        this.router = inject(Router);
+        this.coreSocketService.connectionStatus.subscribe((status) => this.verifySocketConnection(status));
+
         this.timerService = inject(TimerService);
+        this.matchDataService = inject(MatchDataService);
+        this.gameDataService = inject(GameDataService);
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        this.timerService.startTimer(30);
-
-        inject(GameDataService).setGameData({
-            _id: '',
-            name: '',
-            description: '',
-            lastEdited: new Date(),
-            isVisible: false,
-            mapData: {
-                items: {
-                    [ItemType.Item1]: [],
-                    [ItemType.Item2]: [],
-                    [ItemType.Item3]: [],
-                    [ItemType.Item4]: [],
-                    [ItemType.Item5]: [],
-                    [ItemType.Item6]: [],
-                    [ItemType.Random]: [],
-                    [ItemType.Spawn]: [],
-                    [ItemType.Flag]: [],
-                },
-                tiles: [
-                    [
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Path,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Bush,
-                        TileType.Bush,
-                        TileType.Path,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Bush,
-                        TileType.Bush,
-                        TileType.Bush,
-                        TileType.Path,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Bush,
-                        TileType.Bush,
-                        TileType.Path,
-                        TileType.Bush,
-                    ],
-                    [
-                        TileType.Grass,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Path,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Water,
-                        TileType.Bridge,
-                        TileType.Water,
-                    ],
-                    [
-                        TileType.Path,
-                        TileType.Path,
-                        TileType.Path,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Water,
-                        TileType.Path,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Path,
-                        TileType.Path,
-                        TileType.Path,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Path,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Bush,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Path,
-                        TileType.Path,
-                        TileType.Path,
-                        TileType.Path,
-                        TileType.Path,
-                        TileType.Grass,
-                    ],
-                    [
-                        TileType.Bush,
-                        TileType.Bush,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                        TileType.Grass,
-                    ],
-                ],
-                size: MapSize.Small,
-                gameMode: GameMode.FFA,
-            },
-        });
-
-        this.matchVisualData = {
-            mapSize: MapSize.Small,
-            gameMode: GameMode.FFA,
-            canUseAction: true,
-            canEndTurn: true,
-            selfIndex: 0,
-            currentPlayerCount: 6,
-            maxPlayerCount: 6,
-            currentMovement: 3,
-            maxMovement: 4,
-            currentPlayerTurn: 0,
-            itemsUrl: [ITEM_IMAGES.get(ItemType.Item1) as string, ITEM_IMAGES.get(ItemType.Item2) as string],
-            backgroundUrl: EMPTY_IMAGE,
-            players: [
-                {
-                    name: 'Selim',
-                    avatarUrl: AVATAR_DATA[Avatars.Avatar1].imageCentered,
-                    fightsWon: 0,
-                    isAdmin: true,
-                    isBot: false,
-                    hasLeft: false,
-                },
-                {
-                    name: 'Aziz',
-                    avatarUrl: AVATAR_DATA[Avatars.Avatar2].imageCentered,
-                    fightsWon: 0,
-                    isAdmin: false,
-                    isBot: false,
-                    hasLeft: false,
-                },
-                {
-                    name: 'Samer',
-                    avatarUrl: AVATAR_DATA[Avatars.Avatar3].imageCentered,
-                    fightsWon: 0,
-                    isAdmin: false,
-                    isBot: false,
-                    hasLeft: false,
-                },
-                {
-                    name: 'Souhayl',
-                    avatarUrl: AVATAR_DATA[Avatars.Avatar4].imageCentered,
-                    fightsWon: 0,
-                    isAdmin: false,
-                    isBot: false,
-                    hasLeft: false,
-                },
-                {
-                    name: 'Mathieu',
-                    avatarUrl: AVATAR_DATA[Avatars.Avatar5].imageCentered,
-                    fightsWon: 0,
-                    isAdmin: false,
-                    isBot: false,
-                    hasLeft: false,
-                },
-                {
-                    name: 'Omar',
-                    avatarUrl: AVATAR_DATA[Avatars.Avatar6].imageCentered,
-                    fightsWon: 0,
-                    isAdmin: false,
-                    isBot: false,
-                    hasLeft: false,
-                },
-            ],
-        };
-
-        this.delayedContructor();
+        this.thumbnailUrl = EMPTY_IMAGE;
+        this.generateThumbnail();
     }
 
-    async delayedContructor() {
-        this.matchVisualData.backgroundUrl = await inject(ThumbnailService).getThumbnail(inject(GameDataService).gameData.mapData, false);
+    get mapSize(): number {
+        return this.gameDataService.gameData.mapData.size;
+    }
+
+    get gameMode(): string {
+        return this.gameDataService.gameData.mapData.gameMode;
+    }
+
+    get canUseAction(): boolean {
+        const isActivePlayer = this.matchDataService.matchData.activePlayer === this.matchDataService.selfIndex;
+        const canUseAction = this.matchDataService.matchData.players[this.matchDataService.selfIndex].currentStats.action;
+        return isActivePlayer && canUseAction;
+    }
+
+    get canEndTurn(): boolean {
+        return this.matchDataService.matchData.activePlayer === this.matchDataService.selfIndex;
+    }
+
+    get selfIndex(): number {
+        return this.matchDataService.selfIndex;
+    }
+
+    get currentPlayerCount(): number {
+        return this.matchDataService.matchData.players.filter((p) => p.isConnected).length;
+    }
+
+    get maxPlayerCount(): number {
+        return this.matchDataService.matchData.players.length;
+    }
+
+    get activePlayer(): number {
+        return this.matchDataService.matchData.activePlayer;
+    }
+
+    get players(): PlayerVisualData[] {
+        return this.matchDataService.matchData.players.map((player) => ({
+            name: player.name,
+            avatarUrl: AVATAR_DATA[player.avatar].imageCentered,
+            fightsWon: player.currentStats.fightsWon,
+            isAdmin: player.isAdmin,
+            isBot: player.isBot,
+            isConnected: player.isConnected,
+        }));
+    }
+
+    get selfAvatarUrl(): string {
+        return this.players[this.matchDataService.selfIndex].avatarUrl;
+    }
+
+    get selfName(): string {
+        return this.players[this.matchDataService.selfIndex].name;
+    }
+
+    get currentMovement(): number {
+        return this.matchDataService.matchData.players[this.matchDataService.selfIndex].currentStats.movement;
+    }
+
+    get maxMovement(): number {
+        return this.matchDataService.matchData.players[this.matchDataService.selfIndex].playerStats.speed;
+    }
+
+    async generateThumbnail() {
+        this.thumbnailUrl = await inject(ThumbnailService).getThumbnail(inject(GameDataService).gameData.mapData, false);
     }
 
     surrender() {
-        // TODO ajouter un popup de confirmation et la logique d'abandon
-        window.console.log('surrender');
+        const navigate = async () => this.router.navigate(['/']);
+        this.popupService.showPopup('Voulez-vous vraiment abandonner? ', true, navigate);
     }
 
     action() {
@@ -258,10 +118,20 @@ export class PlayPageComponent {
 
     endTurn() {
         // TODO logique de fin de tour
-        window.console.log('endTurn');
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        this.matchVisualData.currentPlayerTurn = (this.matchVisualData.currentPlayerTurn + 1) % this.matchVisualData.players.length;
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        this.timerService.startTimer(30);
+        // window.console.log('endTurn');
+        // // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        // this.matchVisualData.currentPlayerTurn = (this.matchVisualData.currentPlayerTurn + 1) % this.matchVisualData.players.length;
+        // // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        // this.timerService.startTimer(30);
+    }
+
+    private verifySocketConnection(isConnected: boolean) {
+        if (!isConnected) {
+            if (this.timerService) {
+                this.popupService.showPopup('Erreur de connection avec le serveur');
+                this.popupService.keepMessages();
+            }
+            this.router.navigate(['/']);
+        }
     }
 }

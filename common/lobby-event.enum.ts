@@ -1,6 +1,4 @@
 export enum LobbyEvent {
-    DebugMessage = 'debugMessage',
-
     CreateMatch = 'createMatch',
     JoinMatch = 'joinMatch',
     LeaveMatch = 'leaveMatch',

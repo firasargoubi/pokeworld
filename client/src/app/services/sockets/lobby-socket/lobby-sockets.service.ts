@@ -55,7 +55,6 @@ export class LobbySocketsService {
 
     joinMatch(matchCode: string): void {
         this.coreSocket.emit(LobbyEvent.JoinMatch, matchCode, (success: boolean) => {
-            window.console.log('join status : ' + success);
             if (success) {
                 this.matchCode = matchCode;
             }
@@ -64,7 +63,6 @@ export class LobbySocketsService {
 
     leaveMatch(): void {
         this.coreSocket.emit(LobbyEvent.LeaveMatch, (success: boolean) => {
-            window.console.log('leave status : ' + success);
             // peut etre supprimé pour l'instant necessaire pour la coherence de l'Affichage
             if (success) {
                 this.matchCode = '';
@@ -75,9 +73,7 @@ export class LobbySocketsService {
     }
 
     updatePlayer(playerUpdates: Partial<Player>) {
-        this.coreSocket.emit(LobbyEvent.UpdatePlayer, playerUpdates, (success: boolean) => {
-            window.console.log(`update status : ${success}`);
-        });
+        this.coreSocket.emit(LobbyEvent.UpdatePlayer, playerUpdates);
     }
 
     toggleLockRoom(shouldLock: boolean): void {
@@ -97,7 +93,6 @@ export class LobbySocketsService {
 
     startMatch(): void {
         this.coreSocket.emit(LobbyEvent.StartMatch);
-        window.console.log('LobbySocketService: startMatch');
     }
 
     private setupLobbyListeners(): void {
@@ -120,8 +115,7 @@ export class LobbySocketsService {
     }
 
     private onMatchStarted(match: Match) {
-        window.console.log('LobbySocketService: onMatchStarted');
-        this.matchDataService.startMatch(match);
+        this.matchDataService.startMatch(match, this.coreSocket.getSocketId());
         this.router.navigate(['/play']);
     }
 }

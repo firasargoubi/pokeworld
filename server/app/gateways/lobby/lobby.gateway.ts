@@ -3,17 +3,17 @@ import { Player } from '@common/player';
 import { Inject, Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { MatchService } from '@app/services/match/match.service';
+import { LobbyService } from '@app/services/lobby/lobby.service';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
 export class LobbyGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
-    @Inject(MatchService) private readonly matchService: MatchService;
+    @Inject(LobbyService) private readonly lobbyService: LobbyService;
 
     @SubscribeMessage(LobbyEvent.CreateMatch)
     async createMatch(socket: Socket, gameId: string): Promise<string> {
-        const matchCode = await this.matchService.createMatch(gameId, socket.id);
+        const matchCode = await this.lobbyService.createMatch(gameId, socket.id);
 
         if (matchCode) {
             socket.join(matchCode);
@@ -24,7 +24,7 @@ export class LobbyGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(LobbyEvent.JoinMatch)
     joinMatch(socket: Socket, matchCode: string): boolean {
-        const hasJoinedMatch = this.matchService.joinMatch(matchCode, socket.id);
+        const hasJoinedMatch = this.lobbyService.joinMatch(matchCode, socket.id);
 
         if (hasJoinedMatch) {
             socket.join(matchCode);
@@ -36,11 +36,11 @@ export class LobbyGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(LobbyEvent.LeaveMatch)
     leaveMatch(socket: Socket) {
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(socket.id);
-        const isAdmin = this.matchService.isPlayerAdmin(socket.id);
+        const matchCode = this.lobbyService.getMatchCodeFromPlayerId(socket.id);
+        const isAdmin = this.lobbyService.isPlayerAdmin(socket.id);
 
         if (isAdmin) {
-            const playerIds = this.matchService.deleteMatch(matchCode);
+            const playerIds = this.lobbyService.deleteMatch(matchCode);
             playerIds.forEach((playerId) => {
                 if (playerId !== socket.id) {
                     this.server.sockets.sockets.get(playerId)?.leave(matchCode);
@@ -48,7 +48,7 @@ export class LobbyGateway implements OnGatewayDisconnect {
                 }
             });
         } else {
-            this.matchService.removePlayerFromMatch(socket.id, matchCode);
+            this.lobbyService.removePlayerFromMatch(socket.id, matchCode);
             this.emitPlayersInMatch(matchCode);
         }
         socket.leave(matchCode);
@@ -56,12 +56,12 @@ export class LobbyGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(LobbyEvent.KickPlayer)
     kickPlayer(socket: Socket, targetPlayerId: string) {
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(socket.id);
-        const isAdmin = this.matchService.isPlayerAdmin(socket.id);
+        const matchCode = this.lobbyService.getMatchCodeFromPlayerId(socket.id);
+        const isAdmin = this.lobbyService.isPlayerAdmin(socket.id);
 
         if (isAdmin && targetPlayerId !== socket.id) {
             this.server.sockets.sockets.get(targetPlayerId).leave(matchCode);
-            this.matchService.removePlayerFromMatch(targetPlayerId, matchCode);
+            this.lobbyService.removePlayerFromMatch(targetPlayerId, matchCode);
             this.emitPlayerRemovedFromRoom(targetPlayerId);
             this.emitPlayersInMatch(matchCode);
         }
@@ -69,13 +69,13 @@ export class LobbyGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(LobbyEvent.UpdatePlayer)
     updatePlayer(socket: Socket, updatedFields: Partial<Player>): boolean {
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(socket.id);
-        const players = this.matchService.getPlayers(matchCode);
+        const matchCode = this.lobbyService.getMatchCodeFromPlayerId(socket.id);
+        const players = this.lobbyService.getPlayers(matchCode);
         const player = players.find((p) => p.id === socket.id);
 
         Object.assign(player, updatedFields);
         if (updatedFields.name) {
-            player.name = this.matchService.getUniqueName(updatedFields.name, socket.id);
+            player.name = this.lobbyService.getUniqueName(updatedFields.name, socket.id);
         }
 
         this.emitPlayersInMatch(matchCode);
@@ -85,13 +85,13 @@ export class LobbyGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(LobbyEvent.ToggleLockRoom)
     toggleLockRoom(socket: Socket, isLocked: boolean): boolean {
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(socket.id);
-        const players = this.matchService.getPlayers(matchCode);
+        const matchCode = this.lobbyService.getMatchCodeFromPlayerId(socket.id);
+        const players = this.lobbyService.getPlayers(matchCode);
         const player = players.find((p) => p.id === socket.id);
 
         if (!player.isAdmin) return false;
 
-        this.matchService.setMatchLockState(matchCode, isLocked);
+        this.lobbyService.setMatchLockState(matchCode, isLocked);
 
         this.server.to(matchCode).emit(LobbyEvent.RoomLockChanged, isLocked);
 
@@ -100,10 +100,9 @@ export class LobbyGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(LobbyEvent.StartMatch)
     startMatch(socket: Socket) {
-        // eslint-disable-next-line no-console
-        console.log('LobbyEvent.StartMatch');
-        // eslint-disable-next-line no-console
-        console.log(socket.id);
+        const matchCode = this.lobbyService.getMatchCodeFromPlayerId(socket.id);
+        const match = this.lobbyService.getMatch(matchCode);
+        this.server.to(matchCode).emit(LobbyEvent.MatchStarted, match);
     }
 
     handleDisconnect(socket: Socket) {
@@ -111,12 +110,12 @@ export class LobbyGateway implements OnGatewayDisconnect {
     }
 
     private emitPlayersInMatch(matchCode: string): void {
-        const players = this.matchService.getPlayers(matchCode);
+        const players = this.lobbyService.getPlayers(matchCode);
         this.server.to(matchCode).emit(LobbyEvent.UpdatePlayerList, players);
     }
 
     private emitPlayerRemovedFromRoom(clientId: string): void {
         const socket = this.server.sockets.sockets.get(clientId);
-        socket.emit(LobbyEvent.UpdatePlayerList, []);
+        socket?.emit(LobbyEvent.UpdatePlayerList, []);
     }
 }

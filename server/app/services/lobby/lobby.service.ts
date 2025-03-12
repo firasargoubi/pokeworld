@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
-import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA, DEFAULT_PLAYER } from './match.service.const';
+import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA, DEFAULT_PLAYER } from './lobby.service.const';
 import { GameService } from '@app/services/game/game.service';
 import { GameData } from '@common/game-data';
 
 @Injectable()
-export class MatchService {
+export class LobbyService {
     @Inject(GameService) private readonly gameService: GameService;
     private matches: Map<string, Match> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
@@ -96,7 +96,7 @@ export class MatchService {
         this.getMatch(matchCode).matchData.isLocked = isLocked;
     }
 
-    private getMatch(matchCode: string): Match {
+    getMatch(matchCode: string): Match {
         return this.matches.get(matchCode);
     }
 
