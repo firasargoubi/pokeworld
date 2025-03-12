@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { Avatars } from '@app/interfaces/avatars.enum';
+import { Avatars } from '@common/avatars.enum';
 import { Player } from '@common/player';
 import { PlayerCardComponent } from './player-card.component';
 
