@@ -1,4 +1,5 @@
 <div class="player-card">
+    @if(player.isConnected){
     <div class="pokeball-container">
         <img src="/assets/images/menu/buttons/poke-button/party-ball.png" alt="Pokéball" class="pokeball" />
         <img [src]="avatarUrl" alt="Avatar" class="player-avatar" />
@@ -20,7 +21,15 @@
     </div>
     <div class="action-button-container">
         <button class="action-button">
-            <img src="/assets/images/menu/icons/recycle-bin.png" alt="Kick Player" />
+            <img src="/assets/images/menu/icons/kick.png" alt="Kick Player" />
         </button>
     </div>
+    } @else {
+    <div class="not-connected-container">
+        <div class="pokeball-container">
+            <img src="/assets/images/menu/buttons/poke-button/party-ball.png" alt="Pokéball" class="pokeball" />
+        </div>
+        <img [src]="backgroundImageUrl" class="background-image" />
+    </div>
+    }
 </div>
