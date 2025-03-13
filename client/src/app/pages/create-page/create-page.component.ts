@@ -62,7 +62,7 @@ export class CreatePageComponent implements OnInit {
     private createGame(game: GameData) {
         if (game.isVisible) {
             this.gameDataService.setGameData(game);
-            this.lobbySocketService.createGame();
+            this.lobbySocketService.createGame(game);
             this.router.navigate(['/player-selection']);
         } else {
             this.loadGames();

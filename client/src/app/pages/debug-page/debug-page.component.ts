@@ -6,6 +6,7 @@ import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { Player } from '@common/player';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -40,7 +41,7 @@ export class DebugPageComponent {
 
     // Créer une room
     createRoom(): void {
-        this.lobbySocketsService.createGame();
+        this.lobbySocketsService.createGame(MOCK_GAMES[0]);
         this.selfID = this.coreSocket.selfId;
     }
 

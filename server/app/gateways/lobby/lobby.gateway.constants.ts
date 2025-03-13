@@ -1,4 +1,5 @@
 import { Avatars } from '@common/avatars.enum';
+import { MapSize } from '@common/map-size.enum';
 import { DiceType } from '@common/dice';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
@@ -35,4 +36,11 @@ export const NEW_PLAYER: Player = {
 
 export const CODE_RANGE = 10000;
 export const CODE_LENGTH = 4;
-export const MAX_PLAYERS = 5;
+
+export const MIN_PLAYERS = 2;
+
+export const MAX_PLAYERS = {
+    [MapSize.Small]: 2,
+    [MapSize.Medium]: 4,
+    [MapSize.Large]: 6,
+};

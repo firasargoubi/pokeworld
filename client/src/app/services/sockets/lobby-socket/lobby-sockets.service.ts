@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { LobbyEvents } from '@common/lobby-events.enum';
 import { Player } from '@common/player';
+import { GameData } from '@common/game-data';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -47,8 +48,8 @@ export class LobbySocketsService {
         });
     }
 
-    createGame(): void {
-        this.coreSocket.emit(LobbyEvents.CreateGame, (gameCode: string) => {
+    createGame(gameData: GameData): void {
+        this.coreSocket.emit(LobbyEvents.CreateGame, gameData, (gameCode: string) => {
             this.matchRoomCode = gameCode;
         });
     }
