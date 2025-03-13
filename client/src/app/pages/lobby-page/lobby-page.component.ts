@@ -17,16 +17,16 @@ import { Observable } from 'rxjs';
 })
 export class LobbyPageComponent {
     accessCode: string = '';
-    players: Player[] = [];
     players$: Observable<Player[]>;
-    isLocked: boolean = false;
-    isRoomLocked$: Observable<boolean>;
+    isRoomLocked: boolean;
     private router: Router = inject(Router);
     private lobbySocketsService: LobbySocketsService = inject(LobbySocketsService);
 
     constructor() {
         this.players$ = this.lobbySocketsService.players$;
-        this.isRoomLocked$ = this.lobbySocketsService.roomLocked$;
+        this.lobbySocketsService.roomLocked$.subscribe((isRoomLocked) => {
+            this.isRoomLocked = isRoomLocked;
+        });
     }
 
     get matchCode(): string | null {
@@ -42,11 +42,7 @@ export class LobbyPageComponent {
         this.router.navigate(['/']);
     }
 
-    lockRoom(): void {
-        this.lobbySocketsService.toggleLockRoom(true);
-    }
-
-    unlockRoom(): void {
-        this.lobbySocketsService.toggleLockRoom(false);
+    toggleLockRoom(): void {
+        this.lobbySocketsService.toggleLockRoom(!this.isRoomLocked);
     }
 }

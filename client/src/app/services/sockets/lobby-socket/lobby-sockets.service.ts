@@ -42,7 +42,6 @@ export class LobbySocketsService {
             this.playersSubject.next([]);
             // Rediriger l'utilisateur ou afficher un message
         });
-
         this.coreSocket.on(LobbyEvents.RoomLockChanged, (isLocked: boolean) => {
             this.roomLockedSubject.next(isLocked);
         });
@@ -54,12 +53,15 @@ export class LobbySocketsService {
         });
     }
 
-    joinGame(gameCode: string): void {
-        this.coreSocket.emit(LobbyEvents.JoinGame, gameCode, (success: boolean) => {
-            window.console.log('join status : ' + success);
-            if (success) {
-                this.matchCode = gameCode;
-            }
+    joinGame(gameCode: string): Observable<boolean> {
+        return new Observable((observer) => {
+            this.coreSocket.emit(LobbyEvents.JoinGame, gameCode, (success: boolean) => {
+                window.console.log('join status : ' + success);
+                if (success) {
+                    this.matchCode = gameCode;
+                }
+                observer.next(success);
+            });
         });
     }
 

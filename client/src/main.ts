@@ -25,7 +25,6 @@ const routes: Routes = [
     { path: '', component: MenuPageComponent, pathMatch: 'full' },
     { path: 'play', component: PlayPageComponent },
     { path: 'debug', component: DebugPageComponent },
-    { path: 'join', component: JoinPageComponent },
     { path: 'lobby', component: LobbyPageComponent },
     { path: 'join', component: JoinPageComponent },
     { path: 'admin', component: AdminPageComponent },

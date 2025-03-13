@@ -19,11 +19,12 @@ export class JoinPageComponent {
 
     joinGame(event: KeyboardEvent) {
         const isJoinKey = event.key === 'Enter';
-        const validLength = this.gameCode.length === CODE_LENGTH;
-        // remaining : verify gameSize and room locked/unlocked
-        if (isJoinKey && validLength) {
-            this.lobbySocketService.joinGame(this.gameCode);
-            this.router.navigate(['/player-selection']);
+        if (isJoinKey) {
+            this.lobbySocketService.joinGame(this.gameCode).subscribe((joinStatus) => {
+                if (joinStatus) {
+                    this.router.navigate(['/player-selection']);
+                }
+            });
         }
     }
 
