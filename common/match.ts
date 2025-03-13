@@ -10,6 +10,7 @@ export interface Match {
 export interface MatchData {
     gameCode: string;
     players: Player[];
-    chatHistory: ChatMessage;
-    timer: number;
+    isLocked: boolean;
+    chatHistory?: ChatMessage;
+    timer?: number;
 }

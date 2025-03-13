@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ChatSocketsService } from '@app/services/sockets/chat-socket/chat-socket.service'; // Importez le service de chat
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { Player } from '@common/player';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -35,12 +36,12 @@ export class DebugPageComponent {
 
     // Créer une room
     createRoom(): void {
-        this.lobbySocketsService.createGame();
+        this.lobbySocketsService.createGame(MOCK_GAMES[0]);
     }
 
     // Rejoindre une room
     joinRoom(): void {
-        this.lobbySocketsService.joinGame(this.joinRoomCode);
+        this.lobbySocketsService.joinGame(this.joinRoomCode).subscribe();
         this.joinRoomCode = '';
     }
 
