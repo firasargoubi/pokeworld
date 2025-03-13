@@ -79,7 +79,7 @@ main {
     align-self: center;
     width: 80%;
     height: 15vh;
-    justify-content: center
+    justify-content: center;
 }
 
 #avatar-shadow {
@@ -90,7 +90,6 @@ main {
     bottom: 2.4vh;
     filter: brightness(0.7);
 }
-
 
 #name-input {
     font-family: $font-family-title;
@@ -334,10 +333,9 @@ main {
         0 0.6vw 0 $text-shadow-color;
 }
 
-.locked{
+.locked {
     filter: grayscale(1);
 }
-
 
 .flex-container {
     display: flex;

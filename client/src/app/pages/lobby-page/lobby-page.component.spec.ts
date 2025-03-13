@@ -44,18 +44,29 @@ describe('LobbyPageComponent', () => {
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
     });
 
-    it('should call toggleLockRoom(true) when lockRoom is called', () => {
-        component.lockRoom();
-        expect(lobbySocketsServiceSpy.toggleLockRoom).toHaveBeenCalledWith(true);
-    });
-
-    it('should call toggleLockRoom(false) when unlockRoom is called', () => {
-        component.unlockRoom();
-        expect(lobbySocketsServiceSpy.toggleLockRoom).toHaveBeenCalledWith(false);
-    });
-
     it('should call leaveGame when leaveLobby is called', () => {
         component.leaveLobby();
         expect(lobbySocketsServiceSpy.leaveGame).toHaveBeenCalled();
+    });
+
+    it('should toggle room lock status when toggleLockRoom is called', () => {
+        component.isRoomLocked = false;
+        component.toggleLockRoom();
+        expect(lobbySocketsServiceSpy.toggleLockRoom).toHaveBeenCalledWith(true);
+
+        component.isRoomLocked = true;
+        component.toggleLockRoom();
+        expect(lobbySocketsServiceSpy.toggleLockRoom).toHaveBeenCalledWith(false);
+    });
+
+    it('should return correct match code', () => {
+        lobbySocketsServiceSpy.matchRoomCode = 'ABC123';
+        expect(component.matchCode).toBe('ABC123');
+    });
+
+    it('should subscribe to players$ observable', () => {
+        component.players$.subscribe((players) => {
+            expect(players).toEqual([]);
+        });
     });
 });

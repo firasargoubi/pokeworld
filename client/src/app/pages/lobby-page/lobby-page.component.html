@@ -20,8 +20,8 @@
                 }
                 <div id="lock-control-container">
                     <img
-                        (click)="isRoomLocked$ ? unlockRoom() : lockRoom()"
-                        [src]="isRoomLocked$ ? '../../../assets/images/menu/icons/lock.png' : '../../../assets/images/menu/icons/unlock.png'"
+                        (click)="toggleLockRoom()"
+                        [src]="isRoomLocked ? '../../../assets/images/menu/icons/lock.png' : '../../../assets/images/menu/icons/unlock.png'"
                         class="lock-icon"
                     />
                 </div>

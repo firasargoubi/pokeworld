@@ -9,6 +9,7 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { AvatarStatus } from '@common/avatar-status.enum';
 import { Avatars } from '@common/avatars.enum';
+import { Subject } from 'rxjs';
 import { PlayerSelectionPageComponent } from './player-selection-page.component';
 
 describe('PlayerSelectionPageComponent', () => {
@@ -18,6 +19,7 @@ describe('PlayerSelectionPageComponent', () => {
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let lobbySocketServiceSpy: jasmine.SpyObj<LobbySocketsService>;
     let avatarSelectionServiceSpy: jasmine.SpyObj<AvatarSelectionService>;
+    let roomLockedSubject: Subject<boolean>;
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
@@ -31,6 +33,9 @@ describe('PlayerSelectionPageComponent', () => {
                 avatarList: Object.keys(AVATAR_DATA).slice(1) as Avatars[],
             },
         );
+
+        roomLockedSubject = new Subject<boolean>();
+        Object.defineProperty(lobbySocketServiceSpy, 'roomLocked$', { get: () => roomLockedSubject.asObservable() });
 
         await TestBed.configureTestingModule({
             imports: [ReactiveFormsModule],
@@ -77,6 +82,8 @@ describe('PlayerSelectionPageComponent', () => {
     it('should navigate to lobby if form is valid', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(component, 'getWarnings').and.returnValue([]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        component['quitOnLockSub'] = { unsubscribe: jasmine.createSpy('unsubscribe') } as any;
         component.goToLobby();
         expect(lobbySocketServiceSpy.updatePlayer).toHaveBeenCalled();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/lobby']);
@@ -147,5 +154,14 @@ describe('PlayerSelectionPageComponent', () => {
 
     it('should return correct avatar list', () => {
         expect(component.avatarList).toEqual(Object.keys(AVATAR_DATA).slice(1) as Avatars[]);
+    });
+
+    it('should subscribe to roomLocked$ on init', () => {
+        spyOn(component, 'goToMenu');
+
+        component.ngOnInit();
+
+        roomLockedSubject.next(true);
+        expect(component.goToMenu).toHaveBeenCalled();
     });
 });
