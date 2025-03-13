@@ -44,7 +44,7 @@ export class CombatGateway implements OnGatewayDisconnect {
     handleDisconnect(socket: Socket) {
         for (const [combatRoomCode, state] of this.combatTurnSystems.entries()) {
             if (state.players.some((player) => player.id === socket.id)) {
-                this.lobbyGateway.debug(`CombatGateway: Socket ${socket.id} déconnecté de la room de combat ${combatRoomCode}`);
+                this.lobbyGateway.debug(socket, `CombatGateway: Socket ${socket.id} déconnecté de la room de combat ${combatRoomCode}`);
                 this.endCombat(combatRoomCode);
             }
         }
@@ -125,7 +125,6 @@ export class CombatGateway implements OnGatewayDisconnect {
 
         this.updatePlayerBonusStats(combatRoomCode, activePlayer);
         this.server.to(combatRoomCode).emit(CombatEvents.StartTimer, turnDelay);
-        this.lobbyGateway.debug(`CombatGateway: Starting turn for player ${activePlayer.id}`);
         this.server.to(activePlayer.id).emit(CombatEvents.CombatTurnStarted);
         this.server.to(inactivePlayer.id).emit(CombatEvents.CombatTurnStopped);
 
