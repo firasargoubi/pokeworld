@@ -143,6 +143,14 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
         socket.emit(LobbyEvents.Debug, message);
     }
 
+    getPlayerById(playerId: string): Player {
+        const gameCode = this.playerToMatch.get(playerId);
+        if (!gameCode) return null;
+        const playersInRoom = this.matches.get(gameCode);
+        if (!playersInRoom) return null;
+        return playersInRoom.find((p) => p.id === playerId);
+    }
+
     private removePlayerFromRoom(socket: Socket, gameCode: string): void {
         const match = this.matches.get(gameCode);
         if (!match) return;

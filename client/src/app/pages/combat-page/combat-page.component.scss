@@ -40,6 +40,40 @@ $combat-info-height: 28vh;
     }
 }
 
+#timer {
+    position: absolute;
+    top: 0.5vh;
+    right: 0.5vh;
+    font-size: 7vh;
+    display: flex;
+    align-items: center;
+    user-select: none;
+}
+
+#timer #timer-icon {
+    height: 6vh;
+    aspect-ratio: 1/1;
+    margin: 0 0 8px 8px;
+    background-image: url('../../../assets/images/menu/icons/clock.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    user-select: none;
+    animation: timer 5s steps(2) infinite;
+}
+
+@keyframes timer {
+    0% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(180deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 #ennemy-container {
     position: absolute;
     top: 20vh;
@@ -73,6 +107,23 @@ $combat-info-height: 28vh;
     user-select: none;
 }
 
+#ennemy-container .hurt {
+    animation: hurt 0.5s ease-in-out;
+}
+
+#ennemy-container .attack {
+    animation: attack 0.5s ease-in-out;
+}
+
+#ennemy-container .escape {
+    animation: escape 1.5s ease-in-out;
+}
+
+#ennemy-container .death {
+    animation: death 1.5s ease-in-out;
+    opacity: 0;
+}
+
 #self-container {
     position: absolute;
     bottom: $combat-info-height;
@@ -91,6 +142,7 @@ $combat-info-height: 28vh;
 }
 
 #self-container .pokemon-container {
+    position: relative;
     z-index: 1;
     width: 100%;
     position: absolute;
@@ -109,12 +161,29 @@ $combat-info-height: 28vh;
     user-select: none;
 }
 
+#self-container .hurt {
+    animation: hurt 0.5s ease-in-out;
+}
+
+#self-container .attack {
+    animation: self-attack 0.5s ease-in-out;
+}
+
+#self-container .escape {
+    animation: escape 1.5s ease-in-out;
+}
+
+#self-container .death {
+    animation: death 1.5s ease-in-out;
+    opacity: 0;
+}
+
 .hp-container {
     position: absolute;
     bottom: $combat-info-height;
     right: 7vw;
     width: 38vw;
-    aspect-ratio: 20/7;
+    aspect-ratio: 20/5;
     background-image: url('../../../assets/images/menu/containers/description/battle-player-safari-rotated.png');
     background-size: 100% 100%;
     background-position: center;
@@ -125,8 +194,7 @@ $combat-info-height: 28vh;
 
 .ennemy-hp-container {
     background-image: url('../../../assets/images/menu/containers/description/battle-player-safari-rotated-mirorded.png');
-    aspect-ratio: 20/7;
-    bottom: 60%;
+    bottom: 70%;
     left: -40vw;
 }
 
@@ -175,14 +243,25 @@ $combat-info-height: 28vh;
 
 .hp-container .hp-bar .hp-backround .hp-progress {
     height: 100%;
-    width: 80%;
+    width: 100%;
     background-color: #50d16c;
+    transition:
+        width 0.1s ease-in-out,
+        color 0.1s ease-in-out;
+}
+
+.hp-container .hp-bar .hp-backround .orange-hp {
+    background-color: #f7a440;
+}
+
+.hp-container .hp-bar .hp-backround .red-hp {
+    background-color: #f74c4c;
 }
 
 .hp-value {
     position: absolute;
     right: 0;
-    bottom: -200%;
+    bottom: -150%;
     font-size: 2.4vw;
 }
 
@@ -192,7 +271,7 @@ $combat-info-height: 28vh;
     height: $combat-info-height;
     width: 100%;
     background-color: #283030;
-    z-index: 2;
+    z-index: 5;
     padding: 0.5vw;
     display: flex;
 }
@@ -221,7 +300,7 @@ $combat-info-height: 28vh;
 #action-container .conatiner-body {
     padding: 3% 0% 3% 0%;
     display: grid;
-    grid-template-columns: 1.3fr 1fr;
+    grid-template-columns: 1fr 1fr;
     column-gap: 10%;
 }
 
@@ -235,6 +314,7 @@ $combat-info-height: 28vh;
     display: flex;
     align-items: center;
     cursor: pointer;
+    transition: opacity 0.3s ease-in-out;
 }
 
 .container-selection {
@@ -253,6 +333,18 @@ $combat-info-height: 28vh;
 
 .action-button:active {
     filter: brightness(1.4);
+}
+
+.not-current-turn .action-button {
+    opacity: 0.5;
+    cursor: default;
+    pointer-events: none;
+}
+
+#combat-footer #action-container .disabled {
+    opacity: 0.5;
+    cursor: default;
+    pointer-events: none;
 }
 
 .empty-button {
@@ -284,13 +376,80 @@ $combat-info-height: 28vh;
     width: 100%;
     color: #585851;
     font-size: 4vw;
+    user-select: none;
 }
 
 .stat-value {
     text-align: left;
 }
 
-.stat-label {
-    text-align: right;
+.bonus-value {
+    width: 10%;
 }
 
+.stat-label {
+    text-align: left;
+    width: 30%;
+}
+
+@keyframes attack {
+    0% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(-30px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes self-attack {
+    0% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(30px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes escape {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    50% {
+        transform: translateX(-500px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(-300px);
+        opacity: 0;
+    }
+}
+
+@keyframes hurt {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes death {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}

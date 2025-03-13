@@ -14,27 +14,25 @@
             <p>
                 Statut Room : <strong>{{ (isRoomLocked$ | async) ? 'Verrouillée' : 'Ouverte' }}</strong>
             </p>
-            
+
             <!-- Afficher les boutons seulement pour l'admin -->
-            @for (player of players$ | async; track player.id) {
-                @if (player.isAdmin) {
-                    <div class="lock-controls">
-                        <button (click)="lockRoom()" [disabled]="(isRoomLocked$ | async)">
-                            🔒 Verrouiller
-                        </button>
-                        <button (click)="unlockRoom()" [disabled]="(isRoomLocked$ | async) === false">
-                            🔓 Déverrouiller
-                        </button>
-                    </div>
-                }
-            }
+            @for (player of players$ | async; track player.id) { @if (player.isAdmin) {
+            <div class="lock-controls">
+                <button (click)="lockRoom()" [disabled]="isRoomLocked$ | async">🔒 Verrouiller</button>
+                <button (click)="unlockRoom()" [disabled]="(isRoomLocked$ | async) === false">🔓 Déverrouiller</button>
+            </div>
+            } }
         </div>
         }
 
         <h3>Joueurs dans la room :</h3>
         <ul>
             @for (player of players$ | async; track player.id) {
-            <li>{{ player.name }} ({{ player.isAdmin ? 'Admin' : 'Joueur' }})</li>
+            <li>
+                {{ player.name }} ({{ player.isAdmin ? 'Admin' : 'Joueur' }}) @if('this.selfId' !== player.id) { @if (this.selfID !== player.id) {
+                <button (click)="startCombat(player.id)">combat</button>
+                } }
+            </li>
             }
         </ul>
 
@@ -52,7 +50,7 @@
 
         <!-- Message d'erreur si la salle est verrouillée -->
         @if (isRoomLocked$ | async) {
-            <p class="error-message">Cette salle est actuellement verrouillée.</p>
+        <p class="error-message">Cette salle est actuellement verrouillée.</p>
         }
     </div>
 
