@@ -1,21 +1,21 @@
 import { inject, Injectable } from '@angular/core';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { MatchEvent } from '@common/match-event.enum';
+import { TurnEvent } from '@common/turn-event.enum';
 
 @Injectable({
     providedIn: 'root',
 })
-export class MatchSocketsService {
+export class TurnSocketsService {
     private coreSocket: CoreSocketService;
 
     constructor() {
         this.coreSocket = inject(CoreSocketService);
-        this.setupMatchListeners();
+        this.setupTurnListeners();
     }
 
-    private setupMatchListeners(): void {
-        this.coreSocket.on(MatchEvent.Temp, () => {
-            window.console.log('MatchSocketsService recieved event: Temp');
+    private setupTurnListeners(): void {
+        this.coreSocket.on(TurnEvent.TurnStarted, () => {
+            window.console.log('TurnSocketsService recieved event: TurnEvent.TurnStarted');
         });
     }
 }

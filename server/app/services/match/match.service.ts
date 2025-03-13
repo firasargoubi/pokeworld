@@ -3,7 +3,7 @@ import { Match } from '@common/match';
 import { Player } from '@common/player';
 import { GameData } from '@common/game-data';
 import { GameService } from '@app/services/game/game.service';
-import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA, DEFAULT_PLAYER, MAX_PLAYERS } from './match.service.const';
+import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA, DEFAULT_PLAYER, MAX_PLAYERS, MIN_PLAYERS } from './match.service.const';
 
 @Injectable()
 export class MatchService {
@@ -16,7 +16,7 @@ export class MatchService {
         const gameData: GameData = await this.gameService.getGameData(gameId);
 
         if (gameData._id) {
-            matchCode = this.getMatchCode();
+            matchCode = this.getNewMatchCode();
             const match: Match = { gameData, matchData: structuredClone(DEFAULT_MATCH_DATA) };
             match.matchData.code = matchCode;
             this.setMatch(matchCode, match);
@@ -28,16 +28,27 @@ export class MatchService {
         return matchCode;
     }
 
-    joinMatch(matchCode: string, playerId: string): boolean {
-        const match: Match | null = this.getMatch(matchCode) ?? null;
-        const isMatchUnlocked = !(match?.matchData.isLocked ?? true);
+    startMatch(playerId: string) {
+        let matchCode = '';
 
-        if (isMatchUnlocked) {
+        const canStartMatch = this.canStartMatch(playerId);
+        if (canStartMatch) {
+            matchCode = this.getMatchCodeFromPlayerId(playerId);
+            this.sanitizeMatch(matchCode);
+        }
+
+        return matchCode;
+    }
+
+    joinMatch(matchCode: string, playerId: string): boolean {
+        const canJoin = !this.isMatchLocked(matchCode);
+
+        if (canJoin) {
             const newPlayer = { ...DEFAULT_PLAYER, id: playerId };
             this.addPlayerToMatch(newPlayer, matchCode);
         }
 
-        return isMatchUnlocked;
+        return canJoin;
     }
 
     isPlayerAdmin(playerId: string): boolean {
@@ -72,7 +83,7 @@ export class MatchService {
         return newName;
     }
 
-    getMatchCode(): string {
+    getNewMatchCode(): string {
         let matchCode: string;
 
         do {
@@ -97,7 +108,10 @@ export class MatchService {
     }
 
     removePlayerFromMatch(playerId: string, matchCode: string): void {
-        this.matches.get(matchCode)?.matchData.players.filter((player) => player.id !== playerId);
+        const match = this.matches.get(matchCode);
+        if (match) {
+            match.matchData.players = match.matchData.players.filter((p) => p.id !== playerId);
+        }
         this.playerToMatchCode.delete(playerId);
     }
 
@@ -134,12 +148,36 @@ export class MatchService {
         return this.getPlayers(matchCode);
     }
 
-    isRoomLocked(matchCode: string): boolean {
-        const match = this.getMatch(matchCode);
-        const maxPlayerCount = MAX_PLAYERS[match.gameData.mapData.size];
-        const currentPlayerCount = match.matchData.players.length;
-        const isRoomFull = currentPlayerCount >= maxPlayerCount;
+    isMatchLocked(matchCode: string): boolean {
+        let isMatchLocked = true;
 
-        return match.matchData.isLocked || isRoomFull;
+        const match = this.getMatch(matchCode);
+        if (match) {
+            const maxPlayerCount = MAX_PLAYERS[match.gameData.mapData.size];
+            const currentPlayerCount = match.matchData.players.length;
+            const isMatchFull = currentPlayerCount >= maxPlayerCount;
+            isMatchLocked = match.matchData.isLocked || isMatchFull;
+        }
+
+        return isMatchLocked;
+    }
+
+    private canStartMatch(playerId: string): boolean {
+        const matchCode = this.getMatchCodeFromPlayerId(playerId);
+        const match = this.getMatch(matchCode);
+        const currentPlayerCount = match.matchData.players.length;
+
+        const isAdmin = this.isPlayerAdmin(playerId);
+        const isMatchLocked = this.isMatchLocked(matchCode);
+        const hasEnoughPlayers = currentPlayerCount >= MIN_PLAYERS;
+        const areAllPlayersConnected = match.matchData.players.every((p) => p.isConnected);
+
+        return isAdmin && isMatchLocked && hasEnoughPlayers && areAllPlayersConnected;
+    }
+
+    private sanitizeMatch(matchCode: string) {
+        // TODO mettre les joueurs dans le bon ordre
+        // eslint-disable-next-line no-console
+        console.log('MatchService.sanitizeMatch()', matchCode);
     }
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
@@ -11,7 +11,6 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { Avatars } from '@common/avatars.enum';
 import { Player } from '@common/player';
-import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-player-selection-page',
@@ -19,7 +18,7 @@ import { Subscription } from 'rxjs';
     templateUrl: './player-selection-page.component.html',
     styleUrl: './player-selection-page.component.scss',
 })
-export class PlayerSelectionPageComponent implements OnInit {
+export class PlayerSelectionPageComponent {
     nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
     bonusPointsForm: FormControl = new FormControl(StatType.Life, [Validators.required]);
     bonusDice: BonusDice = { attack: DiceType.D4, defense: DiceType.D6 };
@@ -31,7 +30,6 @@ export class PlayerSelectionPageComponent implements OnInit {
     private lobbySocketService: LobbySocketsService = inject(LobbySocketsService);
     private avatarSelectionService: AvatarSelectionService = inject(AvatarSelectionService);
     private popupService: PopupService = inject(PopupService);
-    private quitOnLockSub: Subscription;
 
     get avatarData() {
         return this.avatarSelectionService.avatarData;
@@ -43,14 +41,6 @@ export class PlayerSelectionPageComponent implements OnInit {
 
     get selectedAvatar() {
         return this.avatarSelectionService.selectedAvatar;
-    }
-
-    ngOnInit(): void {
-        this.quitOnLockSub = this.lobbySocketService.roomLocked$.subscribe((isRoomLocked) => {
-            if (isRoomLocked) {
-                this.goToMenu();
-            }
-        });
     }
 
     isBonusPoint(statCategory: StatType) {
@@ -81,7 +71,6 @@ export class PlayerSelectionPageComponent implements OnInit {
             this.popupService.showPopup(warnings.join('\n'));
         } else {
             this.lobbySocketService.updatePlayer(this.getPlayerData());
-            this.quitOnLockSub.unsubscribe();
             this.router.navigate(['/lobby']);
         }
     }

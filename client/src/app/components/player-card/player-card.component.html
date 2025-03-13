@@ -1,35 +1,42 @@
 <div class="player-card">
     @if(player.isConnected){
-    <div class="pokeball-container">
-        <img src="/assets/images/menu/buttons/poke-button/party-ball.png" alt="Pokéball" class="pokeball" />
-        <img [src]="avatarUrl" alt="Avatar" class="player-avatar" />
-    </div>
-    <div class="info-container">
-        <img [src]="backgroundImageUrl" class="background-image" />
-        <div class="container">
-            <span class="player-name">{{ player.name }}</span>
-            @if (player.isAdmin){
-            <img src="../../../assets/images/menu/icons/crown.png" alt="Owner" class="owner-crown" />
-
-            }
-            <div class="hp-bar-container">
-                <img src="../../../assets/images/menu/stat-bar/hp-bar.png" class="hp-bar" />
-                <div class="hp" [style.width]="getHpBarWidth()"></div>
-            </div>
-            <span class="hp-text">{{ player.playerStats.health }}/ 6</span>
-        </div>
-    </div>
-    <div class="action-button-container">
-        <button class="action-button">
-            <img src="/assets/images/menu/icons/kick.png" alt="Kick Player" />
-        </button>
-    </div>
-    } @else {
-    <div class="not-connected-container">
         <div class="pokeball-container">
             <img src="/assets/images/menu/buttons/poke-button/party-ball.png" alt="Pokéball" class="pokeball" />
+            <img [src]="avatarUrl" alt="Avatar" class="player-avatar" />
         </div>
-        <img [src]="backgroundImageUrl" class="background-image" />
-    </div>
+        <div class="info-container">
+            <img [src]="backgroundImageUrl" class="background-image" />
+            <div class="container">
+                <span class="player-name">{{ player.name }}</span>
+                @if (player.isAdmin){
+                <img src="../../../assets/images/menu/icons/crown.png" alt="Owner" class="owner-crown" />
+
+                }
+                <div class="hp-bar-container">
+                    <img src="../../../assets/images/menu/stat-bar/hp-bar.png" class="hp-bar" />
+                    <div class="hp" [style.width]="getHpBarWidth()"></div>
+                </div>
+                <span class="hp-text">{{ player.playerStats.health }}/ 6</span>
+            </div>
+        </div>
+        <div class="action-button-container">
+            <button class="action-button" (click)="kickPlayerButton(player.id)">
+                <img src="/assets/images/menu/icons/kick.png" alt="Kick Player" />
+            </button>
+        </div>
+    } @else {
+        <div class="not-connected-container">
+            <div class="pokeball-container">
+                <img src="/assets/images/menu/buttons/poke-button/party-ball.png" alt="Pokéball" class="pokeball" />
+            </div>
+            <img [src]="backgroundImageUrl" class="background-image" />
+        </div>
+        <div class="info-container">
+        </div>
+        <div class="action-button-container">
+            <button class="action-button" (click)="kickPlayerButton(player.id)">
+                <img src="/assets/images/menu/icons/kick.png" alt="Kick Player" />
+            </button>
+        </div>
     }
 </div>

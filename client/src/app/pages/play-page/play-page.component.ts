@@ -113,7 +113,6 @@ export class PlayPageComponent {
 
     action() {
         // TODO logique d'action
-        window.console.log('action');
     }
 
     endTurn() {

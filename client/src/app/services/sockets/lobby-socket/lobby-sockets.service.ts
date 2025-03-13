@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
+import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match } from '@common/match';
@@ -16,6 +17,7 @@ export class LobbySocketsService {
     private roomLockedSubject: BehaviorSubject<boolean>;
     private coreSocket: CoreSocketService;
     private matchDataService: MatchDataService;
+    private popupService: PopupService;
     private router: Router;
 
     constructor() {
@@ -25,6 +27,7 @@ export class LobbySocketsService {
         this.coreSocket = inject(CoreSocketService);
         this.matchDataService = inject(MatchDataService);
         this.router = inject(Router);
+        this.popupService = inject(PopupService);
         this.setupLobbyListeners();
     }
 
@@ -53,6 +56,10 @@ export class LobbySocketsService {
         });
     }
 
+    kickPlayer(playerId: string) {
+        this.coreSocket.emit(LobbyEvent.KickPlayer, playerId);
+    }
+
     joinMatch(matchCode: string): Observable<boolean> {
         return new Observable((observer) => {
             this.coreSocket.emit(LobbyEvent.JoinMatch, matchCode, (success: boolean) => {
@@ -65,8 +72,8 @@ export class LobbySocketsService {
     }
 
     leaveMatch(): void {
+        // TODO refaire cette fonction pour inclure le popup de confirmation
         this.coreSocket.emit(LobbyEvent.LeaveMatch, (success: boolean) => {
-            // peut etre supprimé pour l'instant necessaire pour la coherence de l'Affichage
             if (success) {
                 this.matchCode = '';
                 this.playersSubject.next([]);
@@ -79,8 +86,8 @@ export class LobbySocketsService {
         this.coreSocket.emit(LobbyEvent.UpdatePlayer, playerUpdates);
     }
 
-    toggleLockRoom(lockStatus: boolean): void {
-        this.coreSocket.emit(LobbyEvent.ToggleLockRoom, lockStatus);
+    changeLockStatus(lockStatus: boolean): void {
+        this.coreSocket.emit(LobbyEvent.ChangeLockStatus, lockStatus);
     }
 
     startMatch(): void {
@@ -89,21 +96,23 @@ export class LobbySocketsService {
 
     private setupLobbyListeners(): void {
         this.coreSocket.on(LobbyEvent.UpdatePlayerList, this.onUpdatePlayersLists.bind(this));
-        this.coreSocket.on(LobbyEvent.RoomLockChanged, this.onRoomLockChanged.bind(this));
+        this.coreSocket.on(LobbyEvent.LockStatusChanged, this.onLockStatusChanged.bind(this));
         this.coreSocket.on(LobbyEvent.MatchStarted, this.onMatchStarted.bind(this));
+        this.coreSocket.on(LobbyEvent.RemovedFromMatch, this.onRemovedFromMatch.bind(this));
     }
 
-    private onRoomLockChanged(isLocked: boolean) {
+    private onLockStatusChanged(isLocked: boolean) {
         this.roomLockedSubject.next(isLocked);
     }
 
     private onUpdatePlayersLists(players: Player[]) {
-        if (players.length === 0) {
-            this.router.navigate(['/']);
-        }
-
-        // TODO TEMP Update the subject so all subscribers are notified
         this.playersSubject.next(players);
+    }
+
+    private onRemovedFromMatch() {
+        this.popupService.showPopup('Vous avez été retiré de la partie');
+        this.popupService.keepMessages();
+        this.router.navigate(['/']);
     }
 
     private onMatchStarted(match: Match) {

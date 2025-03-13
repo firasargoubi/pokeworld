@@ -47,6 +47,10 @@ export class LobbyPageComponent {
     }
 
     toggleLockRoom(): void {
-        this.lobbySocketsService.toggleLockRoom(!this.isRoomLocked);
+        this.lobbySocketsService.changeLockStatus(!this.isRoomLocked);
+    }
+
+    kickPlayerButton(playerId: string): void {
+        this.lobbySocketsService.kickPlayer(playerId);
     }
 }

@@ -24,47 +24,52 @@ export class LobbyGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(LobbyEvent.JoinMatch)
     joinMatch(socket: Socket, matchCode: string): boolean {
-        const hasJoinedMatch = this.matchService.joinMatch(matchCode, socket.id);
+        const hasJoined = this.matchService.joinMatch(matchCode, socket.id);
 
-        if (hasJoinedMatch) {
+        if (hasJoined) {
             socket.join(matchCode);
-            this.emitPlayersInMatch(matchCode);
+            this.emitUpdatePlayerList(matchCode);
+            this.emitLockStatusChanged(matchCode);
         }
 
-        return hasJoinedMatch;
+        return hasJoined;
     }
 
     @SubscribeMessage(LobbyEvent.LeaveMatch)
     leaveMatch(socket: Socket) {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(socket.id);
-        const isAdmin = this.matchService.isPlayerAdmin(socket.id);
+        if (matchCode) {
+            const isAdmin = this.matchService.isPlayerAdmin(socket.id);
 
-        if (isAdmin) {
-            const playerIds = this.matchService.destroyMatch(matchCode);
-            playerIds.forEach((playerId) => {
-                if (playerId !== socket.id) {
-                    this.server.sockets.sockets.get(playerId)?.leave(matchCode);
-                    this.emitPlayerRemovedFromRoom(playerId);
-                }
-            });
-        } else {
-            this.matchService.removePlayerFromMatch(socket.id, matchCode);
-            this.emitPlayersInMatch(matchCode);
+            if (isAdmin) {
+                const playerIds = this.matchService.destroyMatch(matchCode);
+                playerIds.forEach((playerId) => {
+                    if (playerId !== socket.id) {
+                        this.server.sockets.sockets.get(playerId)?.leave(matchCode);
+                        this.emitRemovedFromMatch(playerId);
+                    }
+                });
+            } else {
+                this.matchService.removePlayerFromMatch(socket.id, matchCode);
+                this.emitUpdatePlayerList(matchCode);
+                this.emitLockStatusChanged(matchCode);
+            }
+            socket.leave(matchCode);
         }
-        socket.leave(matchCode);
     }
 
     @SubscribeMessage(LobbyEvent.KickPlayer)
     kickPlayer(socket: Socket, targetPlayerId: string) {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(socket.id);
         const isAdmin = this.matchService.isPlayerAdmin(socket.id);
-        const isTryingToKickThemselve = targetPlayerId !== socket.id;
+        const isTryingToKickThemselve = targetPlayerId === socket.id;
 
         if (isAdmin && !isTryingToKickThemselve) {
             this.server.sockets.sockets.get(targetPlayerId).leave(matchCode);
             this.matchService.removePlayerFromMatch(targetPlayerId, matchCode);
-            this.emitPlayerRemovedFromRoom(targetPlayerId);
-            this.emitPlayersInMatch(matchCode);
+            this.emitRemovedFromMatch(targetPlayerId);
+            this.emitUpdatePlayerList(matchCode);
+            this.emitLockStatusChanged(matchCode);
         }
     }
 
@@ -79,24 +84,27 @@ export class LobbyGateway implements OnGatewayDisconnect {
             player.name = this.matchService.getUniqueName(updatedFields.name, socket.id);
         }
 
-        this.emitPlayersInMatch(matchCode);
+        this.emitUpdatePlayerList(matchCode);
     }
 
     @SubscribeMessage(LobbyEvent.StartMatch)
     startMatch(socket: Socket) {
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(socket.id);
-        const match = this.matchService.getMatch(matchCode);
-        this.server.to(matchCode).emit(LobbyEvent.MatchStarted, match);
+        const matchCode = this.matchService.startMatch(socket.id);
+
+        if (matchCode) {
+            const match = this.matchService.getMatch(matchCode);
+            this.server.to(matchCode).emit(LobbyEvent.MatchStarted, match);
+        }
     }
 
-    @SubscribeMessage(LobbyEvent.ToggleLockRoom)
-    toggleLockRoom(socket: Socket, isLocked: boolean) {
+    @SubscribeMessage(LobbyEvent.ChangeLockStatus)
+    changeLockStatus(socket: Socket, isLocked: boolean) {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(socket.id);
         const isAdmin = this.matchService.isPlayerAdmin(socket.id);
 
         if (isAdmin) {
             this.matchService.setMatchLockState(matchCode, isLocked);
-            this.emitRoomLockStatus(matchCode);
+            this.emitLockStatusChanged(matchCode);
         }
     }
 
@@ -104,18 +112,18 @@ export class LobbyGateway implements OnGatewayDisconnect {
         this.leaveMatch(socket);
     }
 
-    private emitRoomLockStatus(gameCode: string): void {
-        const lockedStatus = this.matchService.isRoomLocked(gameCode);
-        this.server.to(gameCode).emit(LobbyEvent.RoomLockChanged, lockedStatus);
+    private emitLockStatusChanged(gameCode: string): void {
+        const lockedStatus = this.matchService.isMatchLocked(gameCode);
+        this.server.to(gameCode).emit(LobbyEvent.LockStatusChanged, lockedStatus);
     }
 
-    private emitPlayersInMatch(matchCode: string): void {
+    private emitUpdatePlayerList(matchCode: string): void {
         const players = this.matchService.getPlayers(matchCode);
         this.server.to(matchCode).emit(LobbyEvent.UpdatePlayerList, players);
     }
 
-    private emitPlayerRemovedFromRoom(clientId: string): void {
+    private emitRemovedFromMatch(clientId: string): void {
         const socket = this.server.sockets.sockets.get(clientId);
-        socket?.emit(LobbyEvent.UpdatePlayerList, []);
+        socket?.emit(LobbyEvent.RemovedFromMatch);
     }
 }

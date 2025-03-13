@@ -10,6 +10,7 @@ import { Player } from '@common/player';
 export class PlayerCardComponent {
     @Input() player!: Player;
     @Input() isViewer: boolean = false;
+    @Input() kickPlayerButton: (playerId: string) => void;
 
     get avatarUrl(): string {
         return AVATAR_DATA[this.player.avatar]?.image;

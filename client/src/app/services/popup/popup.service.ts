@@ -16,7 +16,6 @@ interface PopupMessage {
     providedIn: 'root',
 })
 export class PopupService {
-    showDelay = POPUP_DELAY;
     private messages: PopupMessage[] = [];
     private overlayRefs: { overlayRef: OverlayRef; componentRef: ComponentRef<WarningConfirmationPopupComponent> }[] = [];
     private keepMessagesOnNavigation: boolean = false;

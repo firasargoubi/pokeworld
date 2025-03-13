@@ -48,10 +48,10 @@ export class DebugPageComponent {
     }
 
     lockRoom() {
-        this.lobbySocketsService.toggleLockRoom(true);
+        this.lobbySocketsService.changeLockStatus(true);
     }
 
     unlockRoom() {
-        this.lobbySocketsService.toggleLockRoom(false);
+        this.lobbySocketsService.changeLockStatus(false);
     }
 }
