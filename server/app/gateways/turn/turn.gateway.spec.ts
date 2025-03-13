@@ -1,29 +1,33 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { TurnGateway } from './turn.gateway';
+import { MatchService } from '@app/services/match/match.service';
 
 describe('TurnGateway', () => {
     let gateway: TurnGateway;
-    let socket: SinonStubbedInstance<Socket>;
-    let server: SinonStubbedInstance<Server>;
+    // let mockSocket: SinonStubbedInstance<Socket>;
+    let mockServer: SinonStubbedInstance<Server>;
+    let mockMatchService: SinonStubbedInstance<MatchService>;
     let emitStub: SinonStub;
 
     beforeEach(async () => {
-        socket = createStubInstance<Socket>(Socket);
-        server = createStubInstance<Server>(Server);
+        // mockSocket = createStubInstance<Socket>(Socket);
+        mockServer = createStubInstance<Server>(Server);
+        mockMatchService = createStubInstance<MatchService>(MatchService);
+
         const module: TestingModule = await Test.createTestingModule({
-            providers: [TurnGateway],
+            providers: [TurnGateway, { provide: Server, useValue: mockServer }, { provide: MatchService, useValue: mockMatchService }],
         }).compile();
-        gateway = module.get<TurnGateway>(TurnGateway);
 
         emitStub = stub();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        server.to.returns({ emit: emitStub } as any);
+        mockServer.to.returns({ emit: emitStub } as any);
+        gateway = module.get<TurnGateway>(TurnGateway);
+        gateway['server'] = mockServer;
     });
 
     it('should be defined', () => {
         expect(gateway).toBeDefined();
-        expect(socket).toBeDefined();
     });
 });
