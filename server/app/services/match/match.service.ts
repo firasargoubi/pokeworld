@@ -15,7 +15,7 @@ export class MatchService {
         let matchCode = '';
         const gameData: GameData = await this.gameService.getGameData(gameId);
 
-        if (gameData._id) {
+        if (gameData._id && gameData.isVisible) {
             matchCode = this.getNewMatchCode();
             const match: Match = { gameData, matchData: structuredClone(DEFAULT_MATCH_DATA) };
             match.matchData.code = matchCode;

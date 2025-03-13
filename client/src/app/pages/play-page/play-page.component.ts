@@ -25,6 +25,7 @@ export class PlayPageComponent {
     private gameDataService: GameDataService;
     private coreSocketService: CoreSocketService;
     private popupService: PopupService;
+    private thumbnailService: ThumbnailService;
     private router: Router;
 
     constructor() {
@@ -36,6 +37,7 @@ export class PlayPageComponent {
         this.timerService = inject(TimerService);
         this.matchDataService = inject(MatchDataService);
         this.gameDataService = inject(GameDataService);
+        this.thumbnailService = inject(ThumbnailService);
 
         this.thumbnailUrl = EMPTY_IMAGE;
         this.generateThumbnail();
@@ -103,7 +105,7 @@ export class PlayPageComponent {
     }
 
     async generateThumbnail() {
-        this.thumbnailUrl = await inject(ThumbnailService).getThumbnail(inject(GameDataService).gameData.mapData, false);
+        this.thumbnailUrl = await this.thumbnailService.getThumbnail(this.gameDataService.gameData.mapData, false);
     }
 
     surrender() {

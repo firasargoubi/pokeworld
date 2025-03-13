@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DEFAULT_GAME } from '@app/consts/default-game';
+import { DEFAULT_GAME } from '@app/consts/default-game.const';
 import { EMPTY_IMAGE } from '@app/consts/images.const';
 import { EditorService } from '@app/services/editor/editor.service';
 import { EditPageComponent } from './edit-page.component';

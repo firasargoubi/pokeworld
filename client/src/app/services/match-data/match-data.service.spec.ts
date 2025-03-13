@@ -7,7 +7,7 @@ describe('MatchDataService', () => {
     let mockGameDataService: jasmine.SpyObj<GameDataService>;
 
     beforeEach(() => {
-        mockGameDataService = jasmine.createSpyObj('GameDataService', []);
+        mockGameDataService = jasmine.createSpyObj('GameDataService', ['getMapSize']);
 
         TestBed.configureTestingModule({
             providers: [MatchDataService, { provide: GameDataService, useValue: mockGameDataService }],

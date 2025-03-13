@@ -12,7 +12,7 @@ describe('LobbyPageComponent', () => {
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-        lobbySocketsServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['toggleLockRoom', 'leaveMatch'], {
+        lobbySocketsServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['changeLockStatus', 'leaveMatch', 'startMatch'], {
             roomLocked$: of(false),
             players$: of([]),
         });
@@ -40,18 +40,18 @@ describe('LobbyPageComponent', () => {
     });
 
     it('should call leaveGame when leaveLobby is called', () => {
-        component.leaveLobby();
-        expect(lobbySocketsServiceSpy.leaveGame).toHaveBeenCalled();
+        component.leaveLobbyButton();
+        expect(lobbySocketsServiceSpy.leaveMatch).toHaveBeenCalled();
     });
 
     it('should toggle room lock status when toggleLockRoom is called', () => {
         component.isRoomLocked = false;
         component.toggleLockRoom();
-        expect(lobbySocketsServiceSpy.toggleLockRoom).toHaveBeenCalledWith(true);
+        expect(lobbySocketsServiceSpy.changeLockStatus).toHaveBeenCalledWith(true);
 
         component.isRoomLocked = true;
         component.toggleLockRoom();
-        expect(lobbySocketsServiceSpy.toggleLockRoom).toHaveBeenCalledWith(false);
+        expect(lobbySocketsServiceSpy.changeLockStatus).toHaveBeenCalledWith(false);
     });
 
     it('should return correct match code', () => {

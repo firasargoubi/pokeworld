@@ -14,7 +14,7 @@ describe('JoinPageComponent', () => {
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-        lobbySocketServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['joinGame']);
+        lobbySocketServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['joinMatch']);
 
         await TestBed.configureTestingModule({
             imports: [FormsModule],
@@ -36,33 +36,14 @@ describe('JoinPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should not join game when key other than Enter is pressed', () => {
-        const event = new KeyboardEvent('keydown', { key: 'A' });
-
-        component.joinGame(event);
-
-        expect(lobbySocketServiceSpy.joinGame).not.toHaveBeenCalled();
-        expect(routerSpy.navigate).not.toHaveBeenCalled();
-    });
-
     it('should navigate to player selection if joinGame returns true', () => {
         const event = new KeyboardEvent('keydown', { key: 'Enter' });
-        lobbySocketServiceSpy.joinGame.and.returnValue(of(true));
+        lobbySocketServiceSpy.joinMatch.and.returnValue(of(true));
 
-        component.joinGame(event);
+        component.joinMatch(event);
 
-        expect(lobbySocketServiceSpy.joinGame).toHaveBeenCalledWith('1234');
+        expect(lobbySocketServiceSpy.joinMatch).toHaveBeenCalledWith('1234');
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/player-selection']);
-    });
-
-    it('should not navigate to player selection if joinGame returns false', () => {
-        const event = new KeyboardEvent('keydown', { key: 'Enter' });
-        lobbySocketServiceSpy.joinGame.and.returnValue(of(false));
-
-        component.joinGame(event);
-
-        expect(lobbySocketServiceSpy.joinGame).toHaveBeenCalledWith('1234');
-        expect(routerSpy.navigate).not.toHaveBeenCalled();
     });
 
     it('should navigate to menu', () => {

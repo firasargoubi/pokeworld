@@ -37,7 +37,6 @@ export class PopupService {
     }
 
     showPopup(message: string, isConfirmation: boolean = false, action?: () => void) {
-        this.clearMessages();
         this.messages.push({ message, isConfirmation, action });
         this.displayPopup();
     }

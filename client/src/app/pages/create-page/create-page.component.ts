@@ -1,4 +1,3 @@
-import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
@@ -35,14 +34,14 @@ export class CreatePageComponent implements OnInit {
         return classes[classIndex];
     }
 
-    onJoin(gameId: string) {
-        this.gameSaveService.getGame(gameId).subscribe({
-            next: (game: GameData) => {
-                this.createGame(game);
-            },
-            error: (error: HttpErrorResponse) => {
-                this.handleNotFoundError(error);
-            },
+    async createMatch(gameId: string) {
+        this.lobbySocketService.createMatch(gameId).then((hasCreatedGame) => {
+            if (hasCreatedGame) {
+                this.router.navigate(['/player-selection']);
+            } else {
+                this.loadGames();
+                this.popupService.showPopup("Ce jeu n'est plus disponible");
+            }
         });
     }
 
@@ -51,31 +50,9 @@ export class CreatePageComponent implements OnInit {
             next: (games) => {
                 this.games = games.filter((game) => game.isVisible);
             },
-            error: (error: HttpErrorResponse) => {
-                this.popupService.showPopup(error.error);
+            error: () => {
+                this.popupService.showPopup('Erreur de connection avec le serveur');
             },
         });
-    }
-
-    private async createGame(game: GameData) {
-        if (game.isVisible) {
-            const hasCreatedGame = await this.lobbySocketService.createMatch(game._id);
-            if (hasCreatedGame) {
-                this.router.navigate(['/player-selection']);
-                return;
-            }
-        }
-
-        this.loadGames();
-        this.popupService.showPopup("Ce jeu n'est plus visible");
-    }
-
-    private handleNotFoundError(error: HttpErrorResponse) {
-        if (error.status === HttpStatusCode.NotFound) {
-            this.popupService.showPopup("Ce jeu n'existe plus");
-            this.loadGames();
-        } else {
-            this.popupService.showPopup(error.error);
-        }
     }
 }

@@ -19,6 +19,7 @@ export class JoinPageComponent {
 
     joinMatch(event: KeyboardEvent) {
         const isJoinKey = event.key === 'Enter';
+
         if (isJoinKey) {
             this.lobbySocketService.joinMatch(this.gameCode).subscribe((joinStatus) => {
                 if (joinStatus) {
