@@ -187,6 +187,7 @@ describe('LobbyGateway', () => {
         const playerSocket = createStubInstance<Socket>(Socket);
         Object.defineProperty(playerSocket, 'id', { value: 'player-2' });
         gateway.joinMatch(playerSocket, gameCode);
+        gateway.updatePlayer(playerSocket, { name: 'Player 2', isConnected: true });
 
         let currentMatch = gateway['matches'].get(gameCode);
         expect(currentMatch.matchData.isLocked).toBeTruthy();
@@ -224,6 +225,8 @@ describe('LobbyGateway', () => {
         const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const generateUniqueNameStub = stub(gateway, 'generateUniqueName' as any).returns('NewName');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        const updateRoomLockStatusSpy = spy(gateway, 'updateRoomLockStatus' as any);
 
         const updateData: Partial<Player> = {
             name: 'NewName',
@@ -235,6 +238,7 @@ describe('LobbyGateway', () => {
         expect(player.name).toBe('NewName');
         expect(player.avatar).toBe(Avatars.Avatar1);
 
+        expect(updateRoomLockStatusSpy.calledWith(match.any, gameCode)).toBeTruthy();
         expect(generateUniqueNameStub.calledWith(gateway['matches'].get(gameCode).matchData.players, 'NewName', socket.id)).toBeTruthy();
         expect(emitPlayersInRoomSpy.calledWith(gameCode)).toBeTruthy();
         generateUniqueNameStub.restore();
@@ -263,6 +267,7 @@ describe('LobbyGateway', () => {
         const playerSocket = createStubInstance<Socket>(Socket);
         Object.defineProperty(playerSocket, 'id', { value: 'player-2' });
         gateway.joinMatch(playerSocket, gameCode);
+        gateway.updatePlayer(playerSocket, { name: 'Player 2', isConnected: true });
 
         const currentMatch = gateway['matches'].get(gameCode);
         expect(currentMatch.matchData.isLocked).toBeTruthy();

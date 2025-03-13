@@ -34,6 +34,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
         newPlayer.id = socket.id;
         newPlayer.name = 'Admin';
         newPlayer.isAdmin = true;
+        newPlayer.isConnected = true;
         this.addPlayerToRoom(newPlayer, gameCode, socket);
         this.emitPlayersInRoom(gameCode);
 
@@ -101,6 +102,8 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
             player.name = this.generateUniqueName(match.matchData.players, updatedFields.name, socket.id);
         }
 
+        this.updateRoomLockStatus(match, gameCode);
+
         this.emitPlayersInRoom(gameCode);
         return true;
     }
@@ -116,10 +119,10 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (!player.isAdmin) return false;
 
         if (!shouldLock) {
-            const currentPlayerCount = match.matchData.players.length;
+            const connectedPlayerCount = match.matchData.players.filter((p) => p.isConnected).length;
             const maxPlayers = MAX_PLAYERS[match.gameData.mapData.size];
 
-            if (currentPlayerCount >= maxPlayers) {
+            if (connectedPlayerCount >= maxPlayers) {
                 this.debug(socket, `Impossible de déverrouiller: nombre maximum de joueurs atteint (${maxPlayers})`);
                 return false;
             }
@@ -198,16 +201,17 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     private updateRoomLockStatus(match: Match, gameCode: string): void {
         const maxPlayers = MAX_PLAYERS[match.gameData.mapData.size];
-        const currentPlayerCount = match.matchData.players.length;
+        const connectedPlayerCount = match.matchData.players.filter((player) => player.isConnected).length;
 
-        if (currentPlayerCount >= maxPlayers && !match.matchData.isLocked) {
+        if (connectedPlayerCount >= maxPlayers && !match.matchData.isLocked) {
             match.matchData.isLocked = true;
             this.server.to(gameCode).emit(LobbyEvents.RoomLockChanged, true);
-        } else if (currentPlayerCount < maxPlayers && match.matchData.isLocked) {
+        } else if (connectedPlayerCount < maxPlayers && match.matchData.isLocked) {
             match.matchData.isLocked = false;
             this.server.to(gameCode).emit(LobbyEvents.RoomLockChanged, false);
         }
     }
+
     private generateUniqueGameCode(): string {
         let code: string;
         do {
