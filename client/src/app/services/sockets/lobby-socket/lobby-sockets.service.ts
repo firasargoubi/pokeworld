@@ -53,12 +53,11 @@ export class LobbySocketsService {
         });
     }
 
-    joinGame(gameCode: string): Observable<boolean> {
+    joinMatch(matchCode: string): Observable<boolean> {
         return new Observable((observer) => {
-            this.coreSocket.emit(LobbyEvents.JoinGame, gameCode, (success: boolean) => {
-                window.console.log('join status : ' + success);
+            this.coreSocket.emit(LobbyEvent.JoinMatch, matchCode, (success: boolean) => {
                 if (success) {
-                    this.matchCode = gameCode;
+                    this.matchCode = matchCode;
                 }
                 observer.next(success);
             });
@@ -80,19 +79,8 @@ export class LobbySocketsService {
         this.coreSocket.emit(LobbyEvent.UpdatePlayer, playerUpdates);
     }
 
-    toggleLockRoom(shouldLock: boolean): void {
-        this.coreSocket.emit(LobbyEvent.ToggleLockRoom, shouldLock, (success: boolean) => {
-            window.console.log(`toggle lock status : ${success}`);
-            if (success) {
-                // Optionnel: mettre à jour l'état local immédiatement pour une UI réactive
-                // (bien que l'événement roomLockChanged devrait arriver rapidement du serveur)
-                this.roomLockedSubject.next(shouldLock);
-            }
-        });
-    }
-
-    disconnect(): void {
-        this.coreSocket.disconnect();
+    toggleLockRoom(lockStatus: boolean): void {
+        this.coreSocket.emit(LobbyEvent.ToggleLockRoom, lockStatus);
     }
 
     startMatch(): void {
@@ -119,7 +107,7 @@ export class LobbySocketsService {
     }
 
     private onMatchStarted(match: Match) {
-        this.matchDataService.startMatch(match, this.coreSocket.getSocketId());
+        this.matchDataService.startMatch(match, this.coreSocket.selfId);
         this.router.navigate(['/play']);
     }
 }

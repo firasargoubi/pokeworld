@@ -27,8 +27,8 @@ export class CoreSocketService {
         return this.status.asObservable();
     }
 
-    get selfId(): string | undefined {
-        return this.socket.id;
+    get selfId(): string {
+        return this.socket.id as string;
     }
 
     emit<T, C>(event: string, ...args: T[] | [...T[], C]): void {

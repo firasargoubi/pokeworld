@@ -28,16 +28,17 @@ export class DebugPageComponent {
         return this.lobbySocketsService.matchRoomCode;
     }
 
-    createRoom(): void {
-        this.lobbySocketsService.createMatch('asd');
+    createMatch(): void {
+        // Il faut spécifier le ID de la carte (game) sur laquelle on veut jouer le match
+        this.lobbySocketsService.createMatch('');
     }
 
-    joinRoom(): void {
+    joinMatch(): void {
         this.lobbySocketsService.joinMatch(this.joinRoomCode);
         this.joinRoomCode = '';
     }
 
-    leaveRoom(): void {
+    leaveMatch(): void {
         this.lobbySocketsService.leaveMatch();
     }
 

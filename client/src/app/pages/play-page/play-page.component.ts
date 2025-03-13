@@ -51,7 +51,7 @@ export class PlayPageComponent {
 
     get canUseAction(): boolean {
         const isActivePlayer = this.matchDataService.matchData.activePlayer === this.matchDataService.selfIndex;
-        const canUseAction = this.matchDataService.matchData.players[this.matchDataService.selfIndex].currentStats.action;
+        const canUseAction = this.matchDataService.matchData.players[this.matchDataService.selfIndex].currentStats.hasAction;
         return isActivePlayer && canUseAction;
     }
 

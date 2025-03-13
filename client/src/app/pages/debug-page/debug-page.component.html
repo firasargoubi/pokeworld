@@ -2,7 +2,7 @@
     <!-- Partie gauche : Créer une room -->
     <div class="left-panel">
         <h2>Créer une Room</h2>
-        <button (click)="createRoom()">Créer une Room</button>
+        <button (click)="createMatch()">Créer une Room</button>
 
         @if (matchCode) {
             <p>Code de la room : <strong>{{ matchCode }}</strong></p>
@@ -35,7 +35,7 @@
         </ul>
 
         @if (matchCode) {
-            <button (click)="leaveRoom()">Quitter la Room</button>
+            <button (click)="leaveMatch()">Quitter la Room</button>
         }
     </div>
 
@@ -44,7 +44,7 @@
         <h2>Rejoindre une Room</h2>
         <input type="text" placeholder="Code de la room" [(ngModel)]="joinRoomCode" />
         <br />
-        <button (click)="joinRoom()">Rejoindre</button>
+        <button (click)="joinMatch()">Rejoindre</button>
 
         <!-- Message d'erreur si la salle est verrouillée -->
         @if (isRoomLocked$ | async) {
