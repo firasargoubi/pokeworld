@@ -312,7 +312,7 @@ app-item {
     -webkit-appearance: none;
     font-size: calc($final-side-width * 0.07);
     background: $input-bg-normal;
-    font-family: 'pixel';
+    font-family: 'pixel', 'Pixel-Backup';
     border: calc($final-side-width * 0.0085) solid transparent;
     cursor: pointer;
 }
@@ -374,7 +374,7 @@ app-item {
     appearance: none;
     -webkit-appearance: none;
     background: $input-bg-normal;
-    font-family: 'pixel';
+    font-family: 'pixel', 'Pixel-Backup';
     border: calc($final-side-width * 0.0085) solid transparent;
     cursor: pointer;
     font-size: calc($final-side-width * 0.085);

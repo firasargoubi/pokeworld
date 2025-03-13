@@ -1,40 +1,74 @@
-<div id="combat-page">
-    <div id="combat-info">
-        <div id="action-container"></div>
-        <div id="stats-container"></div>
+<div id="combat-page" [ngClass]="{ 'not-current-turn': !iscurrentTurn }">
+    <div id="timer">
+        {{ this.currentTime }} /{{ this.maxTime }}
+        <div id="timer-icon"></div>
     </div>
     <div id="ennemy-container">
         <div class="ennemy-hp-container hp-container">
             <div class="body">
-                <p class="name">Selim</p>
+                <p class="name">{{ this.ennemyPlayer.name }}</p>
                 <div class="hp-bar">
                     <div class="hp-backround">
-                        <div class="hp-progress"></div>
+                        <div
+                            class="hp-progress"
+                            [style.width]="(this.ennemyPlayer.currentStats.health / this.ennemyPlayer.playerStats.health) * 100 + '%'"
+                            [ngClass]="{
+                                'orange-hp':
+                                    this.ennemyPlayer.currentStats.health / this.ennemyPlayer.playerStats.health >= 0.4 &&
+                                    this.ennemyPlayer.currentStats.health / this.ennemyPlayer.playerStats.health < 0.75,
+                                'red-hp': this.ennemyPlayer.currentStats.health / this.ennemyPlayer.playerStats.health < 0.4
+                            }"
+                        ></div>
                     </div>
-                    <p class="hp-value">4/6</p>
+                    <p class="hp-value">{{ this.ennemyPlayer.currentStats.health }}/{{ this.ennemyPlayer.playerStats.health }}</p>
                 </div>
             </div>
         </div>
 
-        <img class="battel-plateform" src="./assets/images/game/battle-platforms/basic-grass.png" />
-        <span class="pokemon-container">
-            <img class="pokemon-gif" src="./assets/images/game/avatars-gifs/charmander.gif" />
+        <img class="battel-plateform" src="{{ this.battlePlatformData[this.ennemyPlayer.currentStats.tileType].enemyPlatform }}" />
+        <span
+            class="pokemon-container"
+            [ngClass]="{
+                hurt: this.animation.ennemyDamage,
+                attack: this.animation.ennemyattack,
+                escape: this.animation.ennemyEscape,
+                death: this.animation.ennemyDeath
+            }"
+        >
+            <img class="pokemon-gif" src="{{ this.avatarsData[this.ennemyPlayer.avatar].frontGif }}" />
         </span>
     </div>
     <div id="self-container">
-        <img class="battel-plateform" src="./assets/images/game/battle-platforms/lightdirtplat.png" />
-        <span class="pokemon-container">
-            <img class="pokemon-gif" src="./assets/images/game/avatars-gifs/pikachu-back.gif" />
+        <img class="battel-plateform" src="{{ this.battlePlatformData[this.selfPlayer.currentStats.tileType].selfPlatform }}" />
+        <span
+            class="pokemon-container"
+            [ngClass]="{
+                hurt: this.animation.selfDamage,
+                attack: this.animation.selfattack,
+                escape: this.animation.selfEscape,
+                death: this.animation.selfDeath
+            }"
+        >
+            <img class="pokemon-gif" src="{{ this.avatarsData[this.selfPlayer.avatar].backGif }}" />
         </span>
     </div>
     <div class="self-hp-container hp-container">
         <div class="body">
-            <p class="name">Selim</p>
+            <p class="name">{{ this.selfPlayer.name }}</p>
             <div class="hp-bar">
                 <div class="hp-backround">
-                    <div class="hp-progress"></div>
+                    <div
+                        class="hp-progress"
+                        [style.width]="(this.selfPlayer.currentStats.health / this.selfPlayer.playerStats.health) * 100 + '%'"
+                        [ngClass]="{
+                            'orange-hp':
+                                this.selfPlayer.currentStats.health / this.selfPlayer.playerStats.health >= 0.33 &&
+                                this.selfPlayer.currentStats.health / this.selfPlayer.playerStats.health < 0.75,
+                            'red-hp': this.selfPlayer.currentStats.health / this.selfPlayer.playerStats.health < 0.33
+                        }"
+                    ></div>
                 </div>
-                <p class="hp-value">4/6</p>
+                <p class="hp-value">{{ this.selfPlayer.currentStats.health }}/{{ this.selfPlayer.playerStats.health }}</p>
             </div>
         </div>
     </div>
@@ -42,13 +76,13 @@
         <div id="action-container">
             <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png" />
             <div class="conatiner-body">
-                <div class="action-button">
+                <div class="action-button" (click)="this.attackAttempt()">
                     <img class="container-selection" src="./assets/images/menu/containers/combat-container/container-selection.png" />
                     <p>Attaquer</p>
                 </div>
-                <div class="action-button">
+                <div class="action-button" [ngClass]="{ disabled: selfPlayer.currentStats.escapes === 0 }" (click)="this.escapeAttempt()">
                     <img class="container-selection" src="./assets/images/menu/containers/combat-container/container-selection.png" />
-                    <p>Fuire</p>
+                    <p>Fuire {{ this.selfPlayer.currentStats.escapes }}/ 2</p>
                 </div>
                 <p class="empty-button">_</p>
                 <p class="empty-button">_</p>
@@ -60,15 +94,17 @@
             <div class="conatiner-body">
                 <div class="stat-container">
                     <span class="stat-label">AP</span>
-                    <span class="stat-value">4 / 6</span>
-                </div>
-                <div class="stat-container">
-                    <span class="stat-label">Vit</span>
-                    <span class="stat-value">4 / 6</span>
+                    <span class="bonus-value">+{{ selfPlayer.currentStats.attackBonus }}</span>
+                    <span class="stat-value">{{ this.selfPlayer.currentStats.attack }} / {{ this.selfPlayer.playerStats.attack }}</span>
                 </div>
                 <div class="stat-container">
                     <span class="stat-label">Def</span>
-                    <span class="stat-value">4 / 6</span>
+                    <span class="bonus-value">+{{ selfPlayer.currentStats.defenseBonus }}</span>
+                    <span class="stat-value">{{ this.selfPlayer.currentStats.defense }} / {{ this.selfPlayer.playerStats.defense }}</span>
+                </div>
+                <div class="stat-container">
+                    <span class="stat-label">Vit</span>
+                    <span class="stat-value">{{ this.selfPlayer.currentStats.speed }} / {{ this.selfPlayer.playerStats.speed }}</span>
                 </div>
             </div>
             <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />

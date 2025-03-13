@@ -3,13 +3,13 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { MAX_NAME_LENGTH, MIN_NAME_LENGTH, DEFAULT_STAT_POINTS, BONUS_POINTS } from '@app/consts/default-player';
+import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player';
 import { BonusDice, DiceType } from '@app/consts/dice';
 import { StatType } from '@app/consts/player-stats.enum';
-import { Avatars } from '@common/avatars.enum';
+import { AvatarSelectionService } from '@app/services/avatar-selection/avatar-selection.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-import { AvatarSelectionService } from '@app/services/avatar-selection/avatar-selection.service';
+import { Avatars } from '@common/avatars.enum';
 import { Player } from '@common/player';
 import { Subscription } from 'rxjs';
 
@@ -107,6 +107,7 @@ export class PlayerSelectionPageComponent implements OnInit {
                 defense: DEFAULT_STAT_POINTS,
                 attackDice: this.bonusDice.attack,
                 defenseDice: this.bonusDice.defense,
+                escapes: DEFAULT_ESCAPE_POINTS,
             },
             isConnected: true,
         };

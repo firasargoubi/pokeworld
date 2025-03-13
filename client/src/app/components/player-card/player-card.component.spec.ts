@@ -2,14 +2,15 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { Avatars } from '@common/avatars.enum';
-import { Player } from '@common/player';
+import { DiceType } from '@common/dice';
+import { CurrentStats, Player, PlayertStats } from '@common/player';
 import { PlayerCardComponent } from './player-card.component';
 
 describe('PlayerCardComponent', () => {
     let component: PlayerCardComponent;
     let fixture: ComponentFixture<PlayerCardComponent>;
 
-    const mockPlayer: Player = {
+    const mockPlayer = {
         id: '1',
         name: 'Player',
         avatar: Avatars.Avatar3,
@@ -18,19 +19,18 @@ describe('PlayerCardComponent', () => {
             speed: 5,
             attack: 10,
             defense: 4,
-            attackDice: 'd6',
-            defenseDice: 'd4',
-        },
+            attackDice: DiceType.D6,
+            defenseDice: DiceType.D4,
+        } as PlayertStats,
         currentStats: {
             health: 6,
-            items: [],
             position: { x: 0, y: 0 },
             speed: 5,
             action: 2,
-        },
+        } as CurrentStats,
         isAdmin: true,
         isConnected: true,
-    };
+    } as Player;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({

@@ -19,7 +19,10 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const gameCode = this.generateUniqueGameCode();
         this.matches.set(gameCode, []);
 
-        const newPlayer = { ...NEW_PLAYER, id: socket.id, name: 'Admin', isAdmin: true };
+        const newPlayer = structuredClone(NEW_PLAYER);
+        newPlayer.id = socket.id;
+        newPlayer.name = 'Admin';
+        newPlayer.isAdmin = true;
         this.addPlayerToRoom(newPlayer, gameCode, socket);
         this.emitPlayersInRoom(gameCode);
 
@@ -127,6 +130,14 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     debug(message: string) {
         this.server.emit(LobbyEvents.Debug, message);
+    }
+
+    getPlayerById(playerId: string): Player {
+        const gameCode = this.playerToMatch.get(playerId);
+        if (!gameCode) return null;
+        const playersInRoom = this.matches.get(gameCode);
+        if (!playersInRoom) return null;
+        return playersInRoom.find((p) => p.id === playerId);
     }
 
     private removePlayerFromRoom(socket: Socket, gameCode: string): void {
