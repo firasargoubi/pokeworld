@@ -3,10 +3,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameController } from './controllers/game/game.controller';
 import { LobbyGateway } from './gateways/lobby/lobby.gateway';
+import { TurnGateway } from './gateways/turn/turn.gateway';
 import { Game, gameSchema } from './model/schema/game.schema';
 import { GameService } from './services/game/game.service';
 import { LobbyService } from './services/lobby/lobby.service';
-import { TurnGateway } from './gateways/turn/turn.gateway';
 
 @Module({
     imports: [

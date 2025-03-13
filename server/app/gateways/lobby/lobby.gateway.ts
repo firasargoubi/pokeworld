@@ -5,6 +5,8 @@ import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServe
 import { Server, Socket } from 'socket.io';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
+import { Match } from '@common/match';
+import { CODE_LENGTH, CODE_RANGE, NEW_PLAYER, MAX_PLAYERS } from './lobby.gateway.constants';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
@@ -85,6 +87,13 @@ export class LobbyGateway implements OnGatewayDisconnect {
         return true;
     }
 
+    @SubscribeMessage(LobbyEvent.StartMatch)
+    startMatch(socket: Socket) {
+        const matchCode = this.matchService.getMatchCodeFromPlayerId(socket.id);
+        const match = this.matchService.getMatch(matchCode);
+        this.server.to(matchCode).emit(LobbyEvent.MatchStarted, match);
+    }
+
     @SubscribeMessage(LobbyEvent.ToggleLockRoom)
     toggleLockRoom(socket: Socket, isLocked: boolean): boolean {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(socket.id);
@@ -100,12 +109,30 @@ export class LobbyGateway implements OnGatewayDisconnect {
         return true;
     }
 
-    @SubscribeMessage(LobbyEvent.StartMatch)
-    startMatch(socket: Socket) {
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(socket.id);
-        const match = this.matchService.getMatch(matchCode);
-        this.server.to(matchCode).emit(LobbyEvent.MatchStarted, match);
-    }
+    // @SubscribeMessage(LobbyEvents.ToggleLockRoom)
+    // toggleLockRoom(socket: Socket, shouldLock: boolean): boolean {
+    //     const gameCode = this.playerToMatch.get(socket.id);
+    //     if (!gameCode) return false;
+
+    //     const match = this.matches.get(gameCode);
+    //     const player = match.matchData.players.find((p) => p.id === socket.id);
+
+    //     if (!player.isAdmin) return false;
+
+    //     if (!shouldLock) {
+    //         const connectedPlayerCount = match.matchData.players.filter((p) => p.isConnected).length;
+    //         const maxPlayers = MAX_PLAYERS[match.gameData.mapData.size];
+
+    //         if (connectedPlayerCount >= maxPlayers) {
+    //             this.debug(socket, `Impossible de déverrouiller: nombre maximum de joueurs atteint (${maxPlayers})`);
+    //             return false;
+    //         }
+    //     }
+
+    //     match.matchData.isLocked = shouldLock;
+    //     this.server.to(gameCode).emit(LobbyEvents.RoomLockChanged, shouldLock);
+    //     return true;
+    // }
 
     handleDisconnect(socket: Socket) {
         this.leaveMatch(socket);
@@ -119,5 +146,22 @@ export class LobbyGateway implements OnGatewayDisconnect {
     private emitPlayerRemovedFromRoom(clientId: string): void {
         const socket = this.server.sockets.sockets.get(clientId);
         socket?.emit(LobbyEvent.UpdatePlayerList, []);
+    }
+    
+    debug(socket, message: string) {
+        socket.emit(LobbyEvents.Debug, message);
+    }
+
+    private updateRoomLockStatus(match: Match, gameCode: string): void {
+        const maxPlayers = MAX_PLAYERS[match.gameData.mapData.size];
+        const connectedPlayerCount = match.matchData.players.filter((player) => player.isConnected).length;
+
+        if (connectedPlayerCount >= maxPlayers && !match.matchData.isLocked) {
+            match.matchData.isLocked = true;
+            this.server.to(gameCode).emit(LobbyEvents.RoomLockChanged, true);
+        } else if (connectedPlayerCount < maxPlayers && match.matchData.isLocked) {
+            match.matchData.isLocked = false;
+            this.server.to(gameCode).emit(LobbyEvents.RoomLockChanged, false);
+        }
     }
 }

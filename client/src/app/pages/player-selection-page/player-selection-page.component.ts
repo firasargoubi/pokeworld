@@ -1,16 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { MAX_NAME_LENGTH, MIN_NAME_LENGTH, DEFAULT_STAT_POINTS, BONUS_POINTS } from '@app/consts/default-player';
+import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player';
 import { BonusDice, DiceType } from '@app/consts/dice';
 import { StatType } from '@app/consts/player-stats.enum';
-import { Avatars } from '@common/avatars.enum';
+import { AvatarSelectionService } from '@app/services/avatar-selection/avatar-selection.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-import { AvatarSelectionService } from '@app/services/avatar-selection/avatar-selection.service';
+import { Avatars } from '@common/avatars.enum';
 import { Player } from '@common/player';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-player-selection-page',
@@ -18,7 +19,7 @@ import { Player } from '@common/player';
     templateUrl: './player-selection-page.component.html',
     styleUrl: './player-selection-page.component.scss',
 })
-export class PlayerSelectionPageComponent {
+export class PlayerSelectionPageComponent implements OnInit {
     nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
     bonusPointsForm: FormControl = new FormControl(StatType.Life, [Validators.required]);
     bonusDice: BonusDice = { attack: DiceType.D4, defense: DiceType.D6 };
@@ -30,6 +31,7 @@ export class PlayerSelectionPageComponent {
     private lobbySocketService: LobbySocketsService = inject(LobbySocketsService);
     private avatarSelectionService: AvatarSelectionService = inject(AvatarSelectionService);
     private popupService: PopupService = inject(PopupService);
+    private quitOnLockSub: Subscription;
 
     get avatarData() {
         return this.avatarSelectionService.avatarData;
@@ -41,6 +43,14 @@ export class PlayerSelectionPageComponent {
 
     get selectedAvatar() {
         return this.avatarSelectionService.selectedAvatar;
+    }
+
+    ngOnInit(): void {
+        this.quitOnLockSub = this.lobbySocketService.roomLocked$.subscribe((isRoomLocked) => {
+            if (isRoomLocked) {
+                this.goToMenu();
+            }
+        });
     }
 
     isBonusPoint(statCategory: StatType) {
@@ -71,6 +81,7 @@ export class PlayerSelectionPageComponent {
             this.popupService.showPopup(warnings.join('\n'));
         } else {
             this.lobbySocketService.updatePlayer(this.getPlayerData());
+            this.quitOnLockSub.unsubscribe();
             this.router.navigate(['/lobby']);
         }
     }
@@ -96,6 +107,7 @@ export class PlayerSelectionPageComponent {
                 defense: DEFAULT_STAT_POINTS,
                 attackDice: this.bonusDice.attack,
                 defenseDice: this.bonusDice.defense,
+                escapes: DEFAULT_ESCAPE_POINTS,
             },
             isConnected: true,
         };

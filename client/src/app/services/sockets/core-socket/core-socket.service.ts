@@ -27,12 +27,8 @@ export class CoreSocketService {
         return this.status.asObservable();
     }
 
-    getSocketId(): string {
-        return this.socket.id ?? '';
-    }
-
-    disconnect(): void {
-        this.socket.disconnect();
+    get selfId(): string | undefined {
+        return this.socket.id;
     }
 
     emit<T, C>(event: string, ...args: T[] | [...T[], C]): void {

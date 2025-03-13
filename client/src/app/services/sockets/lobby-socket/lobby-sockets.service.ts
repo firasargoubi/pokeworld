@@ -53,11 +53,15 @@ export class LobbySocketsService {
         });
     }
 
-    joinMatch(matchCode: string): void {
-        this.coreSocket.emit(LobbyEvent.JoinMatch, matchCode, (success: boolean) => {
-            if (success) {
-                this.matchCode = matchCode;
-            }
+    joinGame(gameCode: string): Observable<boolean> {
+        return new Observable((observer) => {
+            this.coreSocket.emit(LobbyEvents.JoinGame, gameCode, (success: boolean) => {
+                window.console.log('join status : ' + success);
+                if (success) {
+                    this.matchCode = gameCode;
+                }
+                observer.next(success);
+            });
         });
     }
 

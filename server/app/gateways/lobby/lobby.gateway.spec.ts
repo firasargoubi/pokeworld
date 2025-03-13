@@ -1,11 +1,19 @@
 import { Avatars } from '@common/avatars.enum';
+import { GameData } from '@common/game-data';
+import { GameMode } from '@common/game-mode.enum';
+import { ItemType } from '@common/item-type.enum';
 import { LobbyEvent } from '@common/lobby-event.enum';
+import { LobbyEvents } from '@common/lobby-events.enum';
+import { MapSize } from '@common/map-size.enum';
+import { Match } from '@common/match';
 import { Player } from '@common/player';
+import { Position } from '@common/position';
+import { TileType } from '@common/tile-type.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSpy, SinonStub, SinonStubbedInstance, createStubInstance, match, spy, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
 import { LobbyGateway } from './lobby.gateway';
-import { CODE_LENGTH } from './lobby.gateway.constants';
+import { CODE_LENGTH, MAX_PLAYERS } from './lobby.gateway.constants';
 
 describe('LobbyGateway', () => {
     let gateway: LobbyGateway;
@@ -13,6 +21,8 @@ describe('LobbyGateway', () => {
     let server: SinonStubbedInstance<Server>;
     let emitPlayersInRoomSpy: SinonSpy;
     let emitStub: SinonStub;
+    let debugStub: SinonStub;
+    let mockGameData: GameData;
 
     beforeEach(async () => {
         socket = createStubInstance<Socket>(Socket);
@@ -25,12 +35,25 @@ describe('LobbyGateway', () => {
         gateway['server'] = server;
         gateway['matches'] = new Map();
         gateway['playerToMatch'] = new Map();
-        gateway['lockedRooms'] = new Set();
+
+        mockGameData = {
+            _id: 'test-game-id',
+            name: 'Test Game',
+            description: 'A test game for unit tests',
+            lastEdited: new Date(),
+            isVisible: true,
+            mapData: {
+                tiles: Array.from({ length: MapSize.Small }, () => Array(MapSize.Medium).fill(TileType.Grass)),
+                items: {} as Record<ItemType, Position[]>,
+                size: MapSize.Small,
+                gameMode: GameMode.FFA,
+            },
+        };
 
         emitStub = stub();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         server.to.returns({ emit: emitStub } as any);
-
+        debugStub = stub(gateway, 'debug').callsFake(() => undefined);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         emitPlayersInRoomSpy = spy(gateway, 'emitPlayersInRoom' as any);
     });
@@ -53,68 +76,65 @@ describe('LobbyGateway', () => {
         leaveGameSpy.restore();
     });
 
-    it('debug should emit message to all clients', () => {
-        gateway.debug('Hello World!');
-        expect(server.emit.calledWith(LobbyEvent.Debug, 'Hello World!')).toBeTruthy();
+    it('debug should emit message to client', () => {
+        debugStub.restore();
+        gateway.debug(socket, 'Hello World!');
+        expect(socket.emit.calledWith(LobbyEvents.Debug, 'Hello World!')).toBeTruthy();
     });
 
     it('createMatchAndJoin should create a new game and add the admin player', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const addPlayerToRoomSpy = spy(gateway, 'addPlayerToRoom' as any);
 
-        const gameCode = gateway.createMatchAndJoin(socket);
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
 
         expect(gateway['matches'].has(gameCode)).toBeTruthy();
-        const players = gateway['matches'].get(gameCode);
-        expect(players.length).toBe(1);
-        expect(players[0].isAdmin).toBeTruthy();
+        const currentMatch = gateway['matches'].get(gameCode);
+        expect(currentMatch.matchData.players.length).toBe(1);
+        expect(currentMatch.matchData.players[0].isAdmin).toBeTruthy();
 
-        expect(addPlayerToRoomSpy.calledWith(players[0], gameCode, socket)).toBeTruthy();
+        expect(addPlayerToRoomSpy.calledWith(currentMatch.matchData.players[0], gameCode, socket)).toBeTruthy();
         expect(emitPlayersInRoomSpy.calledWith(gameCode)).toBeTruthy();
         addPlayerToRoomSpy.restore();
     });
 
     it('joinMatch should return false if game code does not exist', () => {
-        const debugSpy = spy(gateway, 'debug');
         const result = gateway.joinMatch(socket, 'non-existent-code');
 
         expect(result).toBeFalsy();
-        expect(debugSpy.calledWith("La partie n'existe pas")).toBeTruthy();
-        debugSpy.restore();
+        expect(debugStub.calledWith(socket, "La partie n'existe pas")).toBeTruthy();
     });
 
     it('joinMatch should return false if room is locked', () => {
-        const gameCode = gateway.createMatchAndJoin(socket);
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
         gateway.toggleLockRoom(socket, true);
 
         const newPlayer = createStubInstance<Socket>(Socket);
         Object.defineProperty(newPlayer, 'id', { value: 'new-player' });
 
-        const debugSpy = spy(gateway, 'debug');
         const result = gateway.joinMatch(newPlayer, gameCode);
 
         expect(result).toBeFalsy();
-        expect(debugSpy.calledWith('Cette partie est verrouillée')).toBeTruthy();
-        debugSpy.restore();
+        expect(debugStub.calledWith(newPlayer, 'Cette partie est verrouillée ou pleine')).toBeTruthy();
     });
 
     it('joinMatch should return false when player is already in the requested game', () => {
-        const gameCode = gateway.createMatchAndJoin(socket);
-        const debugSpy = spy(gateway, 'debug');
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
 
         const result = gateway.joinMatch(socket, gameCode);
 
         expect(result).toBeFalsy();
-        expect(debugSpy.calledWith('Vous êtes déjà dans cette partie')).toBeTruthy();
-        debugSpy.restore();
+        expect(debugStub.calledWith(socket, 'Vous êtes déjà dans cette partie')).toBeTruthy();
     });
 
     it('joinMatch should return true and add player to existing game', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const addPlayerToRoomSpy = spy(gateway, 'addPlayerToRoom' as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        const updateRoomLockStatusSpy = spy(gateway, 'updateRoomLockStatus' as any);
 
         Object.defineProperty(socket, 'id', { value: 'admin-socket-id' });
-        const gameCode = gateway.createMatchAndJoin(socket);
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
         const playerSocket = createStubInstance<Socket>(Socket);
         Object.defineProperty(playerSocket, 'id', { value: 'player-socket-id' });
 
@@ -122,6 +142,7 @@ describe('LobbyGateway', () => {
 
         expect(result).toBeTruthy();
         expect(addPlayerToRoomSpy.calledWith(match.any, gameCode, socket)).toBeTruthy();
+        expect(updateRoomLockStatusSpy.calledWith(match.any, gameCode)).toBeTruthy();
         expect(emitPlayersInRoomSpy.calledWith(gameCode)).toBeTruthy();
         addPlayerToRoomSpy.restore();
     });
@@ -134,7 +155,7 @@ describe('LobbyGateway', () => {
     it('leaveGame should remove non-admin player and emit updated player list', () => {
         const adminSocket = createStubInstance<Socket>(Socket);
         Object.defineProperty(adminSocket, 'id', { value: 'admin-socket-id' });
-        const gameCode = gateway.createMatchAndJoin(adminSocket);
+        const gameCode = gateway.createMatchAndJoin(adminSocket, mockGameData);
 
         gateway.joinMatch(socket, gameCode);
 
@@ -150,7 +171,7 @@ describe('LobbyGateway', () => {
     });
 
     it('leaveGame should destroy room if admin leaves', () => {
-        const gameCode = gateway.createMatchAndJoin(socket);
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const destroyRoomStub = stub(gateway, 'destroyRoom' as any).callsFake(() => undefined);
 
@@ -161,15 +182,35 @@ describe('LobbyGateway', () => {
         destroyRoomStub.restore();
     });
 
-    it('leaveGame should handle case where gameCode exists but players list is undefined', () => {
-        gateway['playerToMatch'].set(socket.id, 'invalid-game');
-        const result = gateway.leaveGame(socket);
-        expect(result).toBeTruthy();
+    it('leaveGame should auto-unlock room when player count drops below maximum', () => {
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
+
+        const playerSocket = createStubInstance<Socket>(Socket);
+        Object.defineProperty(playerSocket, 'id', { value: 'player-2' });
+        gateway.joinMatch(playerSocket, gameCode);
+        gateway.updatePlayer(playerSocket, { name: 'Player 2', isConnected: true });
+
+        let currentMatch = gateway['matches'].get(gameCode);
+        expect(currentMatch.matchData.isLocked).toBeTruthy();
+
+        server.to.resetHistory();
+        emitStub.resetHistory();
+
+        gateway.leaveGame(playerSocket);
+
+        currentMatch = gateway['matches'].get(gameCode);
+        expect(currentMatch.matchData.isLocked).toBeFalsy();
+        expect(emitStub.calledWith(LobbyEvents.RoomLockChanged, false)).toBeTruthy();
     });
 
     it('updatePlayer should handle case where gameCode exists but player not found', () => {
         const gameCode = 'empty-game';
-        gateway['matches'].set(gameCode, []);
+        const emptyMatch: Match = {
+            gameData: mockGameData,
+            matchData: { gameCode, players: [], isLocked: false },
+        };
+
+        gateway['matches'].set(gameCode, emptyMatch);
         gateway['playerToMatch'].set(socket.id, gameCode);
 
         const result = gateway.updatePlayer(socket, { name: 'New Name' });
@@ -182,9 +223,11 @@ describe('LobbyGateway', () => {
     });
 
     it('updatePlayer should update player fields and emit updated list', () => {
-        const gameCode = gateway.createMatchAndJoin(socket);
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const generateUniqueNameStub = stub(gateway, 'generateUniqueName' as any).returns('NewName');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        const updateRoomLockStatusSpy = spy(gateway, 'updateRoomLockStatus' as any);
 
         const updateData: Partial<Player> = {
             name: 'NewName',
@@ -192,11 +235,12 @@ describe('LobbyGateway', () => {
         };
         gateway.updatePlayer(socket, updateData);
 
-        const players = gateway['matches'].get(gameCode);
-        expect(players[0].name).toBe('NewName');
-        expect(players[0].avatar).toBe(Avatars.Avatar1);
+        const player = gateway['matches'].get(gameCode).matchData.players[0];
+        expect(player.name).toBe('NewName');
+        expect(player.avatar).toBe(Avatars.Avatar1);
 
-        expect(generateUniqueNameStub.calledWith(players, 'NewName', socket.id)).toBeTruthy();
+        expect(updateRoomLockStatusSpy.calledWith(match.any, gameCode)).toBeTruthy();
+        expect(generateUniqueNameStub.calledWith(gateway['matches'].get(gameCode).matchData.players, 'NewName', socket.id)).toBeTruthy();
         expect(emitPlayersInRoomSpy.calledWith(gameCode)).toBeTruthy();
         generateUniqueNameStub.restore();
     });
@@ -209,7 +253,7 @@ describe('LobbyGateway', () => {
     it('toggleLockRoom should return false if player is not an admin', () => {
         const adminSocket = createStubInstance<Socket>(Socket);
         Object.defineProperty(adminSocket, 'id', { value: 'admin-id' });
-        const gameCode = gateway.createMatchAndJoin(adminSocket);
+        const gameCode = gateway.createMatchAndJoin(adminSocket, mockGameData);
 
         Object.defineProperty(socket, 'id', { value: 'player-id' });
         gateway.joinMatch(socket, gameCode);
@@ -218,20 +262,43 @@ describe('LobbyGateway', () => {
         expect(result).toBeFalsy();
     });
 
-    it('toggleLockRoom should add/remove room from lockedRooms based on shouldLock parameter', () => {
-        const gameCode = gateway.createMatchAndJoin(socket);
+    it('toggleLockRoom should prevent unlocking when max players reached', () => {
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
+
+        const playerSocket = createStubInstance<Socket>(Socket);
+        Object.defineProperty(playerSocket, 'id', { value: 'player-2' });
+        gateway.joinMatch(playerSocket, gameCode);
+        gateway.updatePlayer(playerSocket, { name: 'Player 2', isConnected: true });
+
+        const currentMatch = gateway['matches'].get(gameCode);
+        expect(currentMatch.matchData.isLocked).toBeTruthy();
+
+        emitStub.resetHistory();
+        const result = gateway.toggleLockRoom(socket, false);
+
+        expect(result).toBeFalsy();
+        expect(currentMatch.matchData.isLocked).toBeTruthy();
+        const maxPlayers = MAX_PLAYERS[MapSize.Small];
+        expect(debugStub.calledWith(socket, `Impossible de déverrouiller: nombre maximum de joueurs atteint (${maxPlayers})`)).toBeTruthy();
+        expect(emitStub.calledWith(LobbyEvents.RoomLockChanged)).toBeFalsy();
+    });
+
+    it('toggleLockRoom should update isLocked based on shouldLock parameter', () => {
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
 
         let result = gateway.toggleLockRoom(socket, true);
         expect(result).toBeTruthy();
-        expect(gateway['lockedRooms'].has(gameCode)).toBeTruthy();
+        let currentMatch = gateway['matches'].get(gameCode);
+        expect(currentMatch.matchData.isLocked).toBeTruthy();
 
         result = gateway.toggleLockRoom(socket, false);
         expect(result).toBeTruthy();
-        expect(gateway['lockedRooms'].has(gameCode)).toBeFalsy();
+        currentMatch = gateway['matches'].get(gameCode);
+        expect(currentMatch.matchData.isLocked).toBeFalsy();
     });
 
     it('toggleLockRoom should emit RoomLockChanged event with lock status', () => {
-        const gameCode = gateway.createMatchAndJoin(socket);
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
 
         server.to.returns({
             emit: (event: string, lockStatus: boolean) => {
@@ -245,19 +312,20 @@ describe('LobbyGateway', () => {
     });
 
     it('removePlayerFromRoom should remove player from room and update maps', () => {
-        const gameCode = gateway.createMatchAndJoin(socket);
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
         const socketPlayer2 = createStubInstance<Socket>(Socket);
         Object.defineProperty(socketPlayer2, 'id', { value: 'player-2' });
         gateway.joinMatch(socketPlayer2, gameCode);
 
         gateway['removePlayerFromRoom'](socket, gameCode);
+        const currentMatch = gateway['matches'].get(gameCode);
 
-        expect(gateway['matches'].get(gameCode).some((p) => p.id === socket.id)).toBeFalsy();
+        expect(currentMatch.matchData.players.some((p) => p.id === socket.id)).toBeFalsy();
         expect(gateway['playerToMatch'].has(socket.id)).toBeFalsy();
     });
 
     it('removePlayerFromRoom should call destroyRoom if room becomes empty', () => {
-        const gameCode = gateway.createMatchAndJoin(socket);
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const destroyRoomStub = stub(gateway, 'destroyRoom' as any).callsFake(() => undefined);
 
@@ -273,13 +341,16 @@ describe('LobbyGateway', () => {
     });
 
     it('destroyRoom should notify all players and remove room data', () => {
-        const gameCode = 'test-game-123';
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
         const players = [
             { id: 'player1', name: 'Player 1', isAdmin: true },
             { id: 'player2', name: 'Player 2', isAdmin: false },
         ] as Player[];
 
-        gateway['matches'].set(gameCode, players);
+        const currentMatch = gateway['matches'].get(gameCode);
+        currentMatch.matchData.players = players;
+        gateway['matches'].set(gameCode, currentMatch);
+
         const socket1 = createStubInstance<Socket>(Socket);
         Object.defineProperty(socket1, 'id', { value: 'player1' });
         const socket2 = createStubInstance<Socket>(Socket);
@@ -311,14 +382,14 @@ describe('LobbyGateway', () => {
 
     it('addPlayerToRoom should add player to room and update maps', () => {
         const leaveGameStub = stub(gateway, 'leaveGame').returns(true);
-        const gameCode = gateway.createMatchAndJoin(socket);
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
         const player = { id: 'player-id', name: 'Player', isAdmin: false } as Player;
 
         gateway['addPlayerToRoom'](player, gameCode, socket);
-        const players = gateway['matches'].get(gameCode);
+        const currentMatch = gateway['matches'].get(gameCode);
 
         expect(leaveGameStub.calledWith(socket)).toBeTruthy();
-        expect(players.some((p) => p.id === player.id)).toBeTruthy();
+        expect(currentMatch.matchData.players.some((p) => p.id === player.id)).toBeTruthy();
         expect(gateway['playerToMatch'].get(player.id)).toBe(gameCode);
         expect(socket.join.calledWith(gameCode)).toBeTruthy();
         leaveGameStub.restore();
@@ -326,9 +397,12 @@ describe('LobbyGateway', () => {
 
     it('emitPlayersInRoom should send player list to room if room exists', () => {
         emitPlayersInRoomSpy.restore();
-        const gameCode = 'test-room';
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
         const testPlayers = [{ id: 'player1', name: 'Player 1', isAdmin: true }] as Player[];
-        gateway['matches'].set(gameCode, testPlayers);
+
+        const currentMatch = gateway['matches'].get(gameCode);
+        currentMatch.matchData.players = testPlayers;
+        gateway['matches'].set(gameCode, currentMatch);
 
         server.to.returns({
             emit: (event: string, players: Player[]) => {
@@ -356,5 +430,14 @@ describe('LobbyGateway', () => {
         const name = gateway['generateUniqueName'](players, 'FirstPlayer', currentPlayerId);
 
         expect(name).toBe('FirstPlayer-2');
+    });
+
+    it('updateRoomLockStatus should lock room when max players reached', () => {
+        const gameCode = gateway.createMatchAndJoin(socket, mockGameData);
+        const currentMatch = gateway['matches'].get(gameCode);
+
+        gateway['updateRoomLockStatus'](currentMatch, gameCode);
+        expect(currentMatch.matchData.isLocked).toBeFalsy();
+        expect(emitStub.calledWith(LobbyEvents.RoomLockChanged, false)).toBeFalsy();
     });
 });
