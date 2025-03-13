@@ -10,4 +10,6 @@ export enum LobbyEvents {
     NewMessage = 'newMessage',
     ClearMessages = 'clearMessages',
     Debug = 'debug',
+    StartCombat = 'startCombat',
+    CombatStarted = 'CombatStarted',
 }

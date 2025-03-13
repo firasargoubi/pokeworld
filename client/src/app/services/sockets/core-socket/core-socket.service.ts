@@ -26,7 +26,11 @@ export class CoreSocketService {
     get connectionStatus(): Observable<boolean> {
         return this.status;
     }
-    // Methodes generiques
+
+    get selfId(): string | undefined {
+        return this.socket.id;
+    }
+
     emit<T, C>(event: string, ...args: T[] | [...T[], C]): void {
         const lastArg = args[args.length - 1];
 
