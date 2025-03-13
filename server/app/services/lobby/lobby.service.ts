@@ -4,12 +4,12 @@ import { Player } from '@common/player';
 import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA, DEFAULT_PLAYER } from './lobby.service.const';
 import { GameService } from '@app/services/game/game.service';
 import { GameData } from '@common/game-data';
+import { MatchService } from '@app/services/match/match.service';
 
 @Injectable()
 export class LobbyService {
     @Inject(GameService) private readonly gameService: GameService;
-    private matches: Map<string, Match> = new Map();
-    private playerToMatchCode: Map<string, string> = new Map();
+    @Inject(MatchService) private readonly matchService: MatchService;
 
     async createMatch(gameId: string, playerId: string): Promise<string> {
         let matchCode = '';
@@ -19,30 +19,25 @@ export class LobbyService {
             matchCode = this.getMatchCode();
             const match: Match = { gameData, matchData: structuredClone(DEFAULT_MATCH_DATA) };
             match.matchData.code = matchCode;
-            this.matches.set(matchCode, match);
+            this.matchService.setMatch(matchCode, match);
 
             const newPlayer = { ...DEFAULT_PLAYER, id: playerId, isAdmin: true };
-            this.addPlayerToMatch(newPlayer, matchCode);
+            this.matchService.addPlayerToMatch(newPlayer, matchCode);
         }
 
         return matchCode;
     }
 
     joinMatch(matchCode: string, playerId: string): boolean {
-        const match: Match | null = this.getMatch(matchCode) ?? null;
+        const match: Match | null = this.matchService.getMatch(matchCode) ?? null;
         const isMatchUnlocked = !(match?.matchData.isLocked ?? true);
 
         if (isMatchUnlocked) {
             const newPlayer = { ...DEFAULT_PLAYER, id: playerId };
-            this.addPlayerToMatch(newPlayer, matchCode);
+            this.matchService.addPlayerToMatch(newPlayer, matchCode);
         }
 
         return isMatchUnlocked;
-    }
-
-    removePlayerFromMatch(playerId: string, matchCode: string): void {
-        this.matches.get(matchCode)?.matchData.players.filter((player) => player.id !== playerId);
-        this.playerToMatchCode.delete(playerId);
     }
 
     isPlayerAdmin(playerId: string): boolean {
@@ -51,20 +46,16 @@ export class LobbyService {
         return player?.isAdmin ?? false;
     }
 
-    getMatchCodeFromPlayerId(playerId: string): string {
-        return this.playerToMatchCode.get(playerId);
-    }
-
-    deleteMatch(matchCode: string): string[] {
+    destroyMatch(matchCode: string): string[] {
         const players = this.getPlayers(matchCode);
         const playerIds = [];
 
         players.forEach((player) => {
-            this.playerToMatchCode.delete(player.id);
+            this.matchService.removePlayerFromMatch(matchCode, player.id);
             playerIds.push(player.id);
         });
 
-        this.matches.delete(matchCode);
+        this.matchService.removeMatch(matchCode);
         return playerIds;
     }
 
@@ -82,7 +73,7 @@ export class LobbyService {
     }
 
     getPlayers(matchCode: string): Player[] {
-        const match = this.getMatch(matchCode);
+        const match = this.matchService.getMatch(matchCode);
         return match?.matchData.players ?? [];
     }
 
@@ -92,21 +83,8 @@ export class LobbyService {
         return player;
     }
 
-    setMatchLockState(matchCode: string, isLocked: boolean) {
-        this.getMatch(matchCode).matchData.isLocked = isLocked;
-    }
-
-    getMatch(matchCode: string): Match {
-        return this.matches.get(matchCode);
-    }
-
-    private addPlayerToMatch(player: Player, matchCode: string): void {
-        this.matches.get(matchCode).matchData.players.push(player);
-        this.playerToMatchCode.set(player.id, matchCode);
-    }
-
     private getPlayersFromPlayerId(playerId: string): Player[] {
-        const matchCode = this.getMatchCodeFromPlayerId(playerId);
+        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
         return this.getPlayers(matchCode);
     }
 
@@ -117,7 +95,7 @@ export class LobbyService {
             matchCode = Math.floor(Math.random() * CODE_RANGE)
                 .toString()
                 .padStart(CODE_LENGTH, '0');
-        } while (this.matches.has(matchCode));
+        } while (this.matchService.hasMatchCode(matchCode));
 
         return matchCode;
     }
