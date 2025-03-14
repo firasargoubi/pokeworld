@@ -61,7 +61,7 @@ export const MOCK_CURRENT_STATS: CurrentStats[] = [
 
 export const MOCK_PLAYERS: Player[] = [
     {
-        id: 'P111',
+        id: '3333',
         name: 'Player1',
         avatar: Avatars.Avatar1,
         playerStats: structuredClone(MOCK_PLAYER_STATS[0]),
@@ -71,7 +71,27 @@ export const MOCK_PLAYERS: Player[] = [
         isBot: false,
     },
     {
-        id: '',
+        id: '4444',
+        name: '',
+        avatar: Avatars.Avatar2,
+        playerStats: structuredClone(MOCK_PLAYER_STATS[1]),
+        currentStats: structuredClone(MOCK_CURRENT_STATS[1]),
+        isAdmin: false,
+        isConnected: true,
+        isBot: false,
+    },
+    {
+        id: '5555',
+        name: 'Player1',
+        avatar: Avatars.Avatar1,
+        playerStats: structuredClone(MOCK_PLAYER_STATS[0]),
+        currentStats: structuredClone(MOCK_CURRENT_STATS[0]),
+        isAdmin: true,
+        isConnected: true,
+        isBot: false,
+    },
+    {
+        id: '6666',
         name: '',
         avatar: Avatars.Avatar2,
         playerStats: structuredClone(MOCK_PLAYER_STATS[1]),
@@ -89,7 +109,7 @@ export const MOCK_MATCH_DATAS: MatchData[] = [
         isStarted: false,
         isLocked: false,
         activePlayer: 0,
-        players: structuredClone(MOCK_PLAYERS),
+        players: [structuredClone(MOCK_PLAYERS[0]), structuredClone(MOCK_PLAYERS[1])],
     },
     {
         code: '2222',
@@ -97,15 +117,7 @@ export const MOCK_MATCH_DATAS: MatchData[] = [
         isStarted: true,
         isLocked: true,
         activePlayer: 0,
-        players: structuredClone(MOCK_PLAYERS),
-    },
-    {
-        code: '3333',
-        isDebugMode: true,
-        isStarted: true,
-        isLocked: true,
-        activePlayer: 0,
-        players: structuredClone(MOCK_PLAYERS),
+        players: [structuredClone(MOCK_PLAYERS[2]), structuredClone(MOCK_PLAYERS[3])],
     },
 ];
 
