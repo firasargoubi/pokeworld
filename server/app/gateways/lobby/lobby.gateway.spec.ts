@@ -4,6 +4,8 @@ import { Server, Socket } from 'socket.io';
 import { LobbyGateway } from './lobby.gateway';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { Player } from '@common/player';
+import { MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
+import { LobbyEvent } from '@common/lobby-event.enum';
 
 describe('LobbyGateway', () => {
     let gateway: LobbyGateway;
@@ -16,6 +18,7 @@ describe('LobbyGateway', () => {
         mockSocket = createStubInstance<Socket>(Socket);
         mockLobbyService = createStubInstance<LobbyService>(LobbyService);
         mockServer = createStubInstance<Server>(Server);
+        emitStub = stub();
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [LobbyGateway, { provide: Server, useValue: mockServer }, { provide: LobbyService, useValue: mockLobbyService }],
@@ -23,17 +26,8 @@ describe('LobbyGateway', () => {
 
         gateway = module.get<LobbyGateway>(LobbyGateway);
 
-        gateway['server'] = {
-            sockets: {
-                sockets: {
-                    get: () => mockSocket,
-                },
-            },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any;
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        mockServer.to.returns({ emit: emitStub } as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        gateway['server'] = { to: () => ({ emit: emitStub }), sockets: { sockets: { get: () => mockSocket } } } as any;
     });
 
     it('should be defined', () => {
@@ -85,9 +79,43 @@ describe('LobbyGateway', () => {
     });
 
     it('should join room on connectPlayer', () => {
-        const playerId = 'player1';
-        const matchCode = 'match123';
+        const playerId = '1234';
+        const matchCode = '5678';
         gateway.connectPlayer(playerId, matchCode);
         expect(mockSocket.join.calledWith(matchCode)).toBeTruthy();
+    });
+
+    it('should leave room on disconnectPlayer', () => {
+        const playerId = '1234';
+        const matchCode = '5678';
+        Object.defineProperty(mockSocket, 'rooms', { value: [matchCode] });
+        gateway.disconnectPlayer(playerId);
+        expect(mockSocket.leave.calledWith(matchCode)).toBeTruthy();
+    });
+
+    it('should emit MatchStarted on emitMatchStarted', () => {
+        const matchCode = '1234';
+        gateway.emitMatchStarted(matchCode, MOCK_MATCHES[0]);
+        expect(emitStub.calledWith(LobbyEvent.MatchStarted, MOCK_MATCHES[0])).toBeTruthy();
+    });
+
+    it('should emit LockStatusChanged on emitLockStatusChanged', () => {
+        const matchCode = '1234';
+        const lockedStatus = true;
+        gateway.emitLockStatusChanged(matchCode, lockedStatus);
+        expect(emitStub.calledWith(LobbyEvent.LockStatusChanged, lockedStatus)).toBeTruthy();
+    });
+
+    it('should emit UpdatePlayerList on emitUpdatePlayerList', () => {
+        const matchCode = '1234';
+        const players = MOCK_PLAYERS;
+        gateway.emitUpdatePlayerList(matchCode, players);
+        expect(emitStub.calledWith(LobbyEvent.UpdatePlayerList, players)).toBeTruthy();
+    });
+
+    it('should emit RemovedFromMatch on emitRemovedFromMatch', () => {
+        const clientId = '1234';
+        gateway.emitRemovedFromMatch(clientId);
+        expect(mockSocket.emit.calledWith(LobbyEvent.RemovedFromMatch)).toBeTruthy();
     });
 });
