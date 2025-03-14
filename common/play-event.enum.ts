@@ -1,4 +1,4 @@
-export enum TurnEvent {
+export enum PlayEvent {
     EndTurn = 'endTurn',
     StartCombat = 'endTurn',
 

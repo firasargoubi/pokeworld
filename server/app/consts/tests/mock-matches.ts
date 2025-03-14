@@ -87,18 +87,24 @@ export const MOCK_PLAYERS: Player[] = [
 export const MOCK_MATCH_DATAS: MatchData[] = [
     {
         code: '1111',
-        isLocked: true,
+        isDebugMode: false,
+        isStarted: false,
+        isLocked: false,
         activePlayer: 0,
         players: structuredClone(MOCK_PLAYERS),
     },
     {
         code: '2222',
+        isDebugMode: false,
+        isStarted: true,
         isLocked: true,
         activePlayer: 0,
         players: structuredClone(MOCK_PLAYERS),
     },
     {
         code: '3333',
+        isDebugMode: true,
+        isStarted: true,
         isLocked: true,
         activePlayer: 0,
         players: structuredClone(MOCK_PLAYERS),

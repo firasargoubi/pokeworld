@@ -3,11 +3,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameController } from './controllers/game/game.controller';
 import { LobbyGateway } from './gateways/lobby/lobby.gateway';
-import { TurnGateway } from './gateways/turn/turn.gateway';
+import { PlayGateway } from './gateways/play/play.gateway';
 import { Game, gameSchema } from './model/schema/game.schema';
 import { GameService } from './services/game/game.service';
 import { CombatGateway } from './gateways/combat/combat.gateway';
 import { MatchService } from './services/match/match.service';
+import { LobbyService } from './services/lobby/lobby.service';
+import { PlayService } from './services/play/play.service';
 
 @Module({
     imports: [
@@ -22,6 +24,6 @@ import { MatchService } from './services/match/match.service';
         MongooseModule.forFeature([{ name: Game.name, schema: gameSchema }]),
     ],
     controllers: [GameController],
-    providers: [LobbyGateway, TurnGateway, CombatGateway, Logger, GameService, MatchService],
+    providers: [Logger, GameService, MatchService, LobbyGateway, LobbyService, PlayGateway, PlayService, CombatGateway],
 })
 export class AppModule {}

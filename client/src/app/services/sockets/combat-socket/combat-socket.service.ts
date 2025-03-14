@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { CombatEvent } from '@common/combat-event.enum';
-import { TurnEvent } from '@common/turn-event.enum';
+import { PlayEvent } from '@common/play-event.enum';
 import { AttackResult, CombatData, CombatResult } from '@common/combat-interfaces';
 import { Player } from '@common/player';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -42,7 +42,7 @@ export class CombatSocketService {
     }
 
     initFight(targetPlayerId: string): void {
-        this.coreSocket.emit(TurnEvent.StartCombat, targetPlayerId);
+        this.coreSocket.emit(PlayEvent.StartCombat, targetPlayerId);
     }
 
     escapeAttempt(): void {
@@ -60,7 +60,7 @@ export class CombatSocketService {
     }
 
     private setupCombatListeners(): void {
-        this.coreSocket.on(TurnEvent.CombatStarted, (combatData: CombatData) => {
+        this.coreSocket.on(PlayEvent.CombatStarted, (combatData: CombatData) => {
             const playerOne: Player = combatData.players[0];
             const playerTwo: Player = combatData.players[1];
 

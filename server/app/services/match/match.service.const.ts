@@ -1,6 +1,5 @@
 import { Avatars } from '@common/avatars.enum';
 import { MatchData } from '@common/match';
-import { MapSize } from '@common/map-size.enum';
 import { DiceType } from '@common/dice';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
@@ -41,17 +40,11 @@ export const DEFAULT_PLAYER: Player = {
 export const DEFAULT_MATCH_DATA: MatchData = {
     code: '',
     isLocked: false,
+    isStarted: false,
+    isDebugMode: false,
     activePlayer: 0,
     players: [],
 };
 
 export const CODE_RANGE = 10000;
 export const CODE_LENGTH = 4;
-
-export const MIN_PLAYERS = 2;
-
-export const MAX_PLAYERS = {
-    [MapSize.Small]: 2,
-    [MapSize.Medium]: 4,
-    [MapSize.Large]: 6,
-};

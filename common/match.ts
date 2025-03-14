@@ -9,6 +9,8 @@ export interface Match {
 export interface MatchData {
     code: string;
     isLocked: boolean;
+    isStarted: boolean;
+    isDebugMode: boolean;
     activePlayer: number;
     players: Player[];
 }

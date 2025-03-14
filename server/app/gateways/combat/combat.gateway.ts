@@ -1,7 +1,7 @@
 import { CombatEvent } from '@common/combat-event.enum';
 import { AttackResult, CombatData, CombatResult, CombatState } from '@common/combat-interfaces';
 import { DICE_MAX_VALUE, DiceType } from '@common/dice';
-import { TurnEvent } from '@common/turn-event.enum';
+import { PlayEvent } from '@common/play-event.enum';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
 import { Inject, Injectable } from '@nestjs/common';
@@ -24,7 +24,7 @@ export class CombatGateway implements OnGatewayDisconnect {
     @Inject(MatchService) private readonly matchService: MatchService;
     private combatTurnSystems: Map<string, CombatState> = new Map();
 
-    @SubscribeMessage(TurnEvent.StartCombat)
+    @SubscribeMessage(PlayEvent.StartCombat)
     startCombat(socket: Socket, targetPlayerId: string): void {
         this.initiateCombat(socket, targetPlayerId);
     }
@@ -61,7 +61,7 @@ export class CombatGateway implements OnGatewayDisconnect {
         targetSocket?.join(combatRoomCode);
 
         const combatData: CombatData = { combatRoomCode, players: [initiatingPlayer, targetPlayer] };
-        this.server.to(combatRoomCode).emit(TurnEvent.CombatStarted, combatData);
+        this.server.to(combatRoomCode).emit(PlayEvent.CombatStarted, combatData);
 
         this.updatePlayersStatsByCurrentTile([initiatingPlayer, targetPlayer]);
         this.startTurnSystem(combatRoomCode, [initiatingPlayer, targetPlayer]);

@@ -1,73 +1,34 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
 import { GameData } from '@common/game-data';
-import { GameService } from '@app/services/game/game.service';
-import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA, DEFAULT_PLAYER, MAX_PLAYERS, MIN_PLAYERS } from './match.service.const';
+import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA, DEFAULT_PLAYER } from './match.service.const';
 
 @Injectable()
 export class MatchService {
-    @Inject(GameService) private readonly gameService: GameService;
     private matches: Map<string, Match> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
 
-    async createMatch(gameId: string, playerId: string): Promise<string> {
-        let matchCode = '';
-        const gameData: GameData = await this.gameService.getGameData(gameId);
-
-        if (gameData._id && gameData.isVisible) {
-            matchCode = this.getNewMatchCode();
-            const match: Match = { gameData, matchData: structuredClone(DEFAULT_MATCH_DATA) };
-            match.matchData.code = matchCode;
-            this.setMatch(matchCode, match);
-
-            const newPlayer = { ...DEFAULT_PLAYER, id: playerId, isAdmin: true };
-            this.addPlayerToMatch(newPlayer, matchCode);
-        }
-
+    createMatch(gameData: GameData): string {
+        const matchCode = this.getNewMatchCode();
+        const match: Match = { gameData, matchData: structuredClone(DEFAULT_MATCH_DATA) };
+        match.matchData.code = matchCode;
+        this.matches.set(matchCode, match);
         return matchCode;
     }
 
-    startMatch(playerId: string) {
-        let matchCode = '';
-
-        const canStartMatch = this.canStartMatch(playerId);
-        if (canStartMatch) {
-            matchCode = this.getMatchCodeFromPlayerId(playerId);
-            this.sanitizeMatch(matchCode);
-        }
-
-        return matchCode;
+    isPlayerInMatch(playerId: string): boolean {
+        return this.playerToMatchCode.has(playerId);
     }
 
-    joinMatch(matchCode: string, playerId: string): boolean {
-        const canJoin = !this.isMatchLocked(matchCode);
-
-        if (canJoin) {
-            const newPlayer = { ...DEFAULT_PLAYER, id: playerId };
-            this.addPlayerToMatch(newPlayer, matchCode);
-        }
-
-        return canJoin;
+    getIsMatchStarted(matchCode: string): boolean {
+        return this.getMatch(matchCode)?.matchData.isStarted;
     }
 
     isPlayerAdmin(playerId: string): boolean {
         const players = this.getPlayersFromPlayerId(playerId);
         const player = players.find((p) => p.id === playerId);
         return player?.isAdmin ?? false;
-    }
-
-    destroyMatch(matchCode: string): string[] {
-        const players = this.getPlayers(matchCode);
-        const playerIds = [];
-
-        players.forEach((player) => {
-            this.removePlayerFromMatch(matchCode, player.id);
-            playerIds.push(player.id);
-        });
-
-        this.removeMatch(matchCode);
-        return playerIds;
     }
 
     getUniqueName(name: string, playerId: string): string {
@@ -99,18 +60,13 @@ export class MatchService {
         return this.matches.get(matchCode);
     }
 
-    setMatch(matchCode: string, match: Match) {
-        this.matches.set(matchCode, match);
-    }
-
-    removeMatch(matchCode: string) {
-        this.matches.delete(matchCode);
-    }
-
     removePlayerFromMatch(playerId: string, matchCode: string): void {
         const match = this.matches.get(matchCode);
         if (match) {
             match.matchData.players = match.matchData.players.filter((p) => p.id !== playerId);
+            if (!match.matchData.players) {
+                this.matches.delete(matchCode);
+            }
         }
         this.playerToMatchCode.delete(playerId);
     }
@@ -123,9 +79,10 @@ export class MatchService {
         this.getMatch(matchCode).matchData.isLocked = isLocked;
     }
 
-    addPlayerToMatch(player: Player, matchCode: string): void {
-        this.matches.get(matchCode).matchData.players.push(player);
-        this.playerToMatchCode.set(player.id, matchCode);
+    addPlayerToMatch(playerId: string, matchCode: string, isAdmin: boolean): void {
+        const newPlayer = { ...DEFAULT_PLAYER, id: playerId, isAdmin };
+        this.matches.get(matchCode).matchData.players.push(newPlayer);
+        this.playerToMatchCode.set(playerId, matchCode);
     }
 
     hasMatchCode(matchCode: string): boolean {
@@ -148,35 +105,8 @@ export class MatchService {
         return this.getPlayers(matchCode);
     }
 
-    isMatchLocked(matchCode: string): boolean {
-        let isMatchLocked = true;
-
-        const match = this.getMatch(matchCode);
-        if (match) {
-            const maxPlayerCount = MAX_PLAYERS[match.gameData.mapData.size];
-            const currentPlayerCount = match.matchData.players.length;
-            const isMatchFull = currentPlayerCount >= maxPlayerCount;
-            isMatchLocked = match.matchData.isLocked || isMatchFull;
-        }
-
-        return isMatchLocked;
-    }
-
-    private canStartMatch(playerId: string): boolean {
-        const matchCode = this.getMatchCodeFromPlayerId(playerId);
-        const match = this.getMatch(matchCode);
-        const currentPlayerCount = match.matchData.players.length;
-
-        const isAdmin = this.isPlayerAdmin(playerId);
-        const isMatchLocked = this.isMatchLocked(matchCode);
-        const hasEnoughPlayers = currentPlayerCount >= MIN_PLAYERS;
-        const areAllPlayersConnected = match.matchData.players.every((p) => p.isConnected);
-
-        return isAdmin && isMatchLocked && hasEnoughPlayers && areAllPlayersConnected;
-    }
-
-    private sanitizeMatch(matchCode: string) {
-        // TODO mettre les joueurs dans le bon ordre
+    startMatch(matchCode: string) {
+        // TODO mettre les joueurs dans le bon ordre x sanitizeMatch
         // eslint-disable-next-line no-console
         console.log('MatchService.sanitizeMatch()', matchCode);
     }
