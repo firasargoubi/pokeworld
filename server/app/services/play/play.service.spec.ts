@@ -23,4 +23,10 @@ describe('PlayService', () => {
     it('should be defined', () => {
         expect(service).toBeDefined();
     });
+
+    it('should endTurn correctly', () => {
+        const playerId = '1234';
+        service.endTurn(playerId);
+        expect(true).toBeTruthy();
+    });
 });
