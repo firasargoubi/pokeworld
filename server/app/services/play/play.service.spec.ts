@@ -1,17 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { GameService } from '@app/services/game/game.service';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { PlayService } from './play.service';
+import { MatchService } from '@app/services/match/match.service';
+import { PlayGateway } from '@app/gateways/play/play.gateway';
 
 describe('PlayService', () => {
     let service: PlayService;
-    let mockGameService: SinonStubbedInstance<GameService>;
+    let mockMatchService: SinonStubbedInstance<MatchService>;
+    let mockePlayGateway: SinonStubbedInstance<PlayGateway>;
 
     beforeAll(async () => {
-        mockGameService = createStubInstance<GameService>(GameService);
+        mockMatchService = createStubInstance<MatchService>(MatchService);
+        mockePlayGateway = createStubInstance<PlayGateway>(PlayGateway);
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [PlayService, { provide: GameService, useValue: mockGameService }],
+            providers: [PlayService, { provide: MatchService, useValue: mockMatchService }, { provide: PlayGateway, useValue: mockePlayGateway }],
         }).compile();
 
         service = module.get<PlayService>(PlayService);

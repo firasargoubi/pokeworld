@@ -5,8 +5,6 @@ import { MapSize } from '@common/map-size.enum';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 
-// TODO verifier si on peut mettre les constantes dans common pour ne pas eviter la duplication de fichiers de contantes entre le front et le back
-
 export const MOCK_GAMES: GameData[] = [
     {
         _id: '123',

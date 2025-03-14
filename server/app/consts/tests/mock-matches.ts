@@ -5,8 +5,6 @@ import { CurrentStats, Player, PlayertStats } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
 import { MOCK_GAMES } from './mock-games';
 
-// TODO verifier si on peut mettre les constantes dans common pour ne pas eviter la duplication de fichiers de contantes entre le front et le back
-
 export const MOCK_PLAYER_STATS: PlayertStats[] = [
     {
         health: 6,

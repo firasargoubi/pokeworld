@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 import { CombatEvent } from '@common/combat-event.enum';
-import { TurnEvent } from '@common/turn-event.enum';
+import { PlayEvent } from '@common/play-event.enum';
 import { Player } from '@common/player';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
@@ -143,7 +143,7 @@ describe('CombatGateway', () => {
 
         server.to.returns({
             emit: (event: string) => {
-                expect(event).toEqual(TurnEvent.CombatStarted);
+                expect(event).toEqual(PlayEvent.CombatStarted);
             },
         } as BroadcastOperator<unknown, unknown>);
 

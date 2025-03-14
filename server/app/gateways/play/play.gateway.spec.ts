@@ -22,7 +22,7 @@ describe('PlayGateway', () => {
 
         emitStub = stub();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        mockServer.to.return({ emit: emitStub } as any);
+        mockServer.to.returns({ emit: emitStub } as any);
         gateway = module.get<PlayGateway>(PlayGateway);
         gateway['server'] = mockServer;
     });

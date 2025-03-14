@@ -3,7 +3,7 @@ import { DiceType } from '@common/dice';
 import { Match, MatchData } from '@common/match';
 import { CurrentStats, Player, PlayertStats } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
-import { MOCK_GAMES } from './mock-games.spec';
+import { MOCK_GAMES } from './mock-games';
 
 export const MOCK_PLAYER_STATS: PlayertStats[] = [
     {
@@ -85,18 +85,24 @@ export const MOCK_PLAYERS: Player[] = [
 export const MOCK_MATCH_DATAS: MatchData[] = [
     {
         code: '1111',
-        isLocked: true,
+        isDebugMode: false,
+        isStarted: false,
+        isLocked: false,
         activePlayer: 0,
         players: structuredClone(MOCK_PLAYERS),
     },
     {
         code: '2222',
+        isDebugMode: false,
+        isStarted: true,
         isLocked: true,
         activePlayer: 0,
         players: structuredClone(MOCK_PLAYERS),
     },
     {
         code: '3333',
+        isDebugMode: true,
+        isStarted: true,
         isLocked: true,
         activePlayer: 0,
         players: structuredClone(MOCK_PLAYERS),

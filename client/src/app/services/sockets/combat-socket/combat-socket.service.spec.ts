@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { CombatEvent } from '@common/combat-event.enum';
 import { AttackResult, CombatResult, CombatData } from '@common/combat-interfaces';
-import { TurnEvent } from '@common/turn-event.enum';
+import { PlayEvent } from '@common/play-event.enum';
 import { Player } from '@common/player';
 import { CombatSocketService } from './combat-socket.service';
 
@@ -56,7 +56,7 @@ describe('CombatSocketService', () => {
         const targetPlayerId = 'player123';
         service.initFight(targetPlayerId);
 
-        expect(coreSocketSpy.emit).toHaveBeenCalledOnceWith(TurnEvent.StartCombat, targetPlayerId);
+        expect(coreSocketSpy.emit).toHaveBeenCalledOnceWith(PlayEvent.StartCombat, targetPlayerId);
     });
 
     it('should call coreSocket.emit with EscapeAttempt event and correct data', () => {
@@ -103,7 +103,7 @@ describe('CombatSocketService', () => {
         expect(service['selfPlayerSubject'].value?.id).toBe(coreSocketSpy.selfId);
         expect(service['ennemyPlayerSubject'].value?.id).toBe('enemyId');
         expect(service['router'].navigate).toHaveBeenCalledWith(['/combat']);
-        expect(coreSocketSpy.on).toHaveBeenCalledWith(TurnEvent.CombatStarted, jasmine.any(Function));
+        expect(coreSocketSpy.on).toHaveBeenCalledWith(PlayEvent.CombatStarted, jasmine.any(Function));
     });
 
     it('should set players and navigate to /combat on CombatStarted event when selfPlayer is the second player', () => {
@@ -120,7 +120,7 @@ describe('CombatSocketService', () => {
         expect(service['selfPlayerSubject'].value?.id).toBe(coreSocketSpy.selfId);
         expect(service['ennemyPlayerSubject'].value?.id).toBe('enemyId');
         expect(service['router'].navigate).toHaveBeenCalledWith(['/combat']);
-        expect(coreSocketSpy.on).toHaveBeenCalledWith(TurnEvent.CombatStarted, jasmine.any(Function));
+        expect(coreSocketSpy.on).toHaveBeenCalledWith(PlayEvent.CombatStarted, jasmine.any(Function));
     });
 
     it('should update escapeResult on EscapedResult event', () => {
