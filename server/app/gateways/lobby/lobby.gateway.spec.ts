@@ -40,9 +40,10 @@ describe('LobbyGateway', () => {
         expect(mockLobbyService.createMatch.calledWith(mockSocket.id, gameId)).toBeTruthy();
     });
 
-    it('should startMatch on startMatch event', () => {
-        gateway.startMatch(mockSocket);
-        expect(mockLobbyService.startMatch.calledWith(mockSocket.id)).toBeTruthy();
+    it('should joinMatch on joinMatch event', () => {
+        const matchCode = '1234';
+        gateway.joinMatch(mockSocket, matchCode);
+        expect(mockLobbyService.joinMatch.calledWith(mockSocket.id, matchCode)).toBeTruthy();
     });
 
     it('should leaveMatch on leaveMatch event', () => {

@@ -61,9 +61,12 @@ describe('MatchService', () => {
     });
 
     it('should getUniqueName correctly', () => {
-        const playerId = 'newPlayer';
-        const result = service.getUniqueName('uniqueName', playerId);
-        expect(result).toBe('uniqueName');
+        const name = 'bob';
+        const newPlayerId = '4111';
+        service.addPlayerToMatch(newPlayerId, structuredClone(MATCH_CODES[0]), false);
+        expect(service.getUniqueName(name, newPlayerId)).toBe(name);
+        service.getPlayer(structuredClone(PLAYER_IDS[0])).name = name;
+        expect(service.getUniqueName(name, newPlayerId)).toBe(`${name}-2`);
     });
 
     it('should getNewMatchCode correctly', () => {
@@ -83,6 +86,14 @@ describe('MatchService', () => {
         expect(service.isPlayerInMatch(playerId)).toBe(true);
         service.removePlayerFromMatch(playerId, structuredClone(MATCH_CODES[0]));
         expect(service.isPlayerInMatch(playerId)).toBe(false);
+    });
+
+    it('should delete match if no player is left', () => {
+        expect(service.hasMatchCode(structuredClone(MATCH_CODES[0]))).toBe(true);
+        service.getPlayers(MATCH_CODES[0]).forEach((player) => {
+            service.removePlayerFromMatch(player.id, MATCH_CODES[0]);
+        });
+        expect(service.hasMatchCode(structuredClone(MATCH_CODES[0]))).toBe(false);
     });
 
     it('should getMatchCodeFromPlayerId correctly', () => {

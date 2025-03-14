@@ -22,13 +22,24 @@ export class MatchService {
     }
 
     getIsMatchStarted(matchCode: string): boolean {
-        return this.getMatch(matchCode)?.matchData.isStarted;
+        let isStarted = false;
+        const match = this.getMatch(matchCode);
+        if (match) {
+            isStarted = match.matchData.isStarted;
+        }
+        return isStarted;
     }
 
     isPlayerAdmin(playerId: string): boolean {
+        let isAdmin = false;
         const players = this.getPlayersFromPlayerId(playerId);
-        const player = players.find((p) => p.id === playerId);
-        return player?.isAdmin ?? false;
+        if (players) {
+            const player = players.find((p) => p.id === playerId);
+            if (player) {
+                isAdmin = player.isAdmin;
+            }
+        }
+        return isAdmin;
     }
 
     getUniqueName(name: string, playerId: string): string {
@@ -64,7 +75,7 @@ export class MatchService {
         const match = this.matches.get(matchCode);
         if (match) {
             match.matchData.players = match.matchData.players.filter((p) => p.id !== playerId);
-            if (!match.matchData.players) {
+            if (match.matchData.players.length <= 0) {
                 this.matches.delete(matchCode);
             }
         }
@@ -90,8 +101,12 @@ export class MatchService {
     }
 
     getPlayers(matchCode: string): Player[] {
+        let players: Player[] = [];
         const match = this.getMatch(matchCode);
-        return match?.matchData.players ?? [];
+        if (match) {
+            players = match.matchData.players;
+        }
+        return players;
     }
 
     getPlayer(playerId: string): Player {

@@ -48,7 +48,7 @@ export class LobbyService {
                 const players = this.matchService.getPlayers(matchCode);
                 players.forEach((player) => {
                     if (player.id !== playerId) {
-                        this.matchService.removePlayerFromMatch(playerId, matchCode);
+                        this.matchService.removePlayerFromMatch(player.id, matchCode);
                         this.lobbyGateway.disconnectPlayer(player.id);
                         this.lobbyGateway.emitRemovedFromMatch(player.id);
                     }

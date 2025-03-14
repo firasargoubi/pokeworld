@@ -52,14 +52,19 @@ export class LobbyGateway implements OnGatewayDisconnect {
     }
 
     connectPlayer(playerId: string, matchCode: string) {
-        this.server.sockets.sockets.get(playerId)?.join(matchCode);
+        const socket = this.server.sockets.sockets.get(playerId);
+        if (socket) {
+            socket.join(matchCode);
+        }
     }
 
     disconnectPlayer(playerId: string) {
         const socket = this.server.sockets.sockets.get(playerId);
-        socket?.rooms.forEach((room) => {
-            socket.leave(room);
-        });
+        if (socket) {
+            socket.rooms.forEach((room) => {
+                socket.leave(room);
+            });
+        }
     }
 
     emitMatchStarted(matchCode: string, match: Match) {
@@ -75,6 +80,9 @@ export class LobbyGateway implements OnGatewayDisconnect {
     }
 
     emitRemovedFromMatch(clientId: string): void {
-        this.server.sockets.sockets.get(clientId)?.emit(LobbyEvent.RemovedFromMatch);
+        const socket = this.server.sockets.sockets.get(clientId);
+        if (socket) {
+            socket.emit(LobbyEvent.RemovedFromMatch);
+        }
     }
 }
