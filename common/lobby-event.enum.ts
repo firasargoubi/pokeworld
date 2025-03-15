@@ -10,4 +10,5 @@ export enum LobbyEvent {
     RemovedFromMatch = 'removedFromMatch',
     UpdatePlayerList = 'updatePlayerList',
     LockStatusChanged = 'lockStatusChanged',
+    Warning = 'warning',
 }

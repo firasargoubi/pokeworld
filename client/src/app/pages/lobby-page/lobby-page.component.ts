@@ -43,7 +43,6 @@ export class LobbyPageComponent {
 
     leaveLobbyButton(): void {
         this.lobbySocketsService.leaveMatch();
-        this.router.navigate(['/']);
     }
 
     toggleLockRoom(): void {

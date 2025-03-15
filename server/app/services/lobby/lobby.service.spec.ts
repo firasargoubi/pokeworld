@@ -48,15 +48,18 @@ describe('LobbyService', () => {
     it('should joinMatch correctly', () => {
         const playerId = '1122';
         const matchCode = '3344';
+
+        mockMatchService.getMatch.returns({ gameData: MOCK_GAMES[0], matchData: { ...DEFAULT_MATCH_DATA, players: [] } });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        sandbox.stub(service as any, 'isMatchLocked').returns(false);
+        sandbox.stub(service as any, 'canPlayerJoinMatch').returns(true);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const emitUpdatePlayerListStub = sandbox.stub(service as any, 'emitUpdatePlayerList');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const emitLockStatusChangedStub = sandbox.stub(service as any, 'emitLockStatusChanged');
 
-        service.joinMatch(playerId, matchCode);
+        const result = service.joinMatch(playerId, matchCode);
 
+        expect(result).toBeTruthy();
         expect(mockMatchService.addPlayerToMatch.calledWith(playerId, matchCode, false)).toBeTruthy();
         expect(mockeLobbyGateway.connectPlayer.calledWith(playerId, matchCode)).toBeTruthy();
         expect(emitUpdatePlayerListStub.calledWith(matchCode)).toBeTruthy();
@@ -64,15 +67,20 @@ describe('LobbyService', () => {
     });
 
     it('should createMatch correctly', async () => {
-        mockGameService.getGameData.resolves(MOCK_GAMES[0]);
         mockMatchService.isPlayerInMatch.returns(false);
         mockMatchService.createMatch.returns('1234');
 
-        const result = await service.createMatch('1122', 'game1');
+        const result = service.createMatch('1122', MOCK_GAMES[0]);
 
         expect(mockMatchService.addPlayerToMatch.calledWith('1122', '1234', true)).toBeTruthy();
         expect(mockeLobbyGateway.connectPlayer.calledWith('1122', '1234')).toBeTruthy();
         expect(result).toBe('1234');
+    });
+
+    it('should not createMatch if player is in match', async () => {
+        mockMatchService.isPlayerInMatch.returns(true);
+        const result = service.createMatch('1122', MOCK_GAMES[0]);
+        expect(result).toBe('');
     });
 
     it('should leaveMatch correctly', () => {
@@ -225,7 +233,7 @@ describe('LobbyService', () => {
         expect(result).toBe(true);
     });
 
-    it('should isMatchLocked return true when match is full', () => {
+    it('should isMatchFull return true when match is full', () => {
         const matchCode = '3344';
         mockMatchService.getMatch.returns({
             gameData: MOCK_GAMES[0],
@@ -243,7 +251,7 @@ describe('LobbyService', () => {
             },
         });
 
-        const result = service['isMatchLocked'](matchCode);
+        const result = service['isMatchFull'](matchCode);
         expect(result).toBe(true);
     });
 
@@ -272,5 +280,40 @@ describe('LobbyService', () => {
         expect(isSortedDescending(match.matchData.players)).toBe(false);
         service['sanitizeMatch'](matchCode);
         expect(isSortedDescending(match.matchData.players)).toBe(true);
+    });
+
+    it('should canPlayerJoinMatch call warn on hasMatchCode false', () => {
+        mockMatchService.hasMatchCode.returns(false);
+        service['canPlayerJoinMatch']('1122', '3344');
+        expect(mockeLobbyGateway.warn.calledWith('1122', "La partie n'existe pas")).toBeTruthy();
+    });
+
+    it('should canPlayerJoinMatch call warn on isMatchFull true', () => {
+        mockMatchService.hasMatchCode.returns(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'isMatchFull').returns(true);
+        service['canPlayerJoinMatch']('1122', '3344');
+        expect(mockeLobbyGateway.warn.calledWith('1122', 'La partie est pleine')).toBeTruthy();
+    });
+
+    it('should canPlayerJoinMatch call warn on isMatchLocked true', () => {
+        mockMatchService.hasMatchCode.returns(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'isMatchFull').returns(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'isMatchLocked').returns(true);
+        service['canPlayerJoinMatch']('1122', '3344');
+        expect(mockeLobbyGateway.warn.calledWith('1122', 'La partie est verouillée')).toBeTruthy();
+    });
+
+    it('should canPlayerJoinMatch call warn on isMatchLocked true', () => {
+        mockMatchService.hasMatchCode.returns(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'isMatchFull').returns(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'isMatchLocked').returns(false);
+        mockMatchService.isPlayerInMatch.returns(true);
+        service['canPlayerJoinMatch']('1122', '3344');
+        expect(mockeLobbyGateway.warn.calledWith('1122', 'Vous êtes déjà dans une partie')).toBeTruthy();
     });
 });

@@ -34,8 +34,8 @@ export class CreatePageComponent implements OnInit {
         return classes[classIndex];
     }
 
-    async createMatch(gameId: string) {
-        this.lobbySocketService.createMatch(gameId).then((hasCreatedGame) => {
+    async createMatch(gameData: GameData) {
+        this.lobbySocketService.createMatch(gameData).then((hasCreatedGame) => {
             if (hasCreatedGame) {
                 this.router.navigate(['/player-selection']);
             } else {

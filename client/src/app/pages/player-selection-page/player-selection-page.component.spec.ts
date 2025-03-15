@@ -90,7 +90,6 @@ describe('PlayerSelectionPageComponent', () => {
         component.goToMenu();
         expect(lobbySocketServiceSpy.leaveMatch).toHaveBeenCalled();
         expect(avatarSelectionServiceSpy.resetAvatar).toHaveBeenCalled();
-        expect(routerSpy.navigate).toHaveBeenCalled();
     });
 
     it('should validate form as valid when there are no warnings', () => {

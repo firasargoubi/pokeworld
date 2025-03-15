@@ -1,6 +1,7 @@
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Player } from '@common/player';
 import { Inject, Injectable } from '@nestjs/common';
+import { GameData } from '@common/game-data';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { LobbyService } from '@app/services/lobby/lobby.service';
@@ -12,8 +13,8 @@ export class LobbyGateway implements OnGatewayDisconnect {
     @Inject(LobbyService) private readonly lobbyService: LobbyService;
 
     @SubscribeMessage(LobbyEvent.CreateMatch)
-    async createMatch(socket: Socket, gameId: string): Promise<string> {
-        return await this.lobbyService.createMatch(socket.id, gameId);
+    createMatch(socket: Socket, gameData: GameData): string {
+        return this.lobbyService.createMatch(socket.id, gameData);
     }
 
     @SubscribeMessage(LobbyEvent.JoinMatch)
@@ -78,6 +79,13 @@ export class LobbyGateway implements OnGatewayDisconnect {
         const socket = this.server.sockets.sockets.get(clientId);
         if (socket) {
             socket.emit(LobbyEvent.RemovedFromMatch);
+        }
+    }
+
+    warn(playerId: string, message: string) {
+        const socket = this.server.sockets.sockets.get(playerId);
+        if (socket) {
+            socket.emit(LobbyEvent.Warning, message);
         }
     }
 }

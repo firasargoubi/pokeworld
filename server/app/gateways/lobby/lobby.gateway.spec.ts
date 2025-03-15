@@ -6,6 +6,7 @@ import { LobbyService } from '@app/services/lobby/lobby.service';
 import { Player } from '@common/player';
 import { MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { LobbyEvent } from '@common/lobby-event.enum';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games';
 
 describe('LobbyGateway', () => {
     let gateway: LobbyGateway;
@@ -35,9 +36,8 @@ describe('LobbyGateway', () => {
     });
 
     it('should createMatch on createMatch event', () => {
-        const gameId = '1234';
-        gateway.createMatch(mockSocket, gameId);
-        expect(mockLobbyService.createMatch.calledWith(mockSocket.id, gameId)).toBeTruthy();
+        gateway.createMatch(mockSocket, MOCK_GAMES[0]);
+        expect(mockLobbyService.createMatch.calledWith(mockSocket.id, MOCK_GAMES[0])).toBeTruthy();
     });
 
     it('should joinMatch on joinMatch event', () => {
@@ -118,5 +118,14 @@ describe('LobbyGateway', () => {
         const clientId = '1234';
         gateway.emitRemovedFromMatch(clientId);
         expect(mockSocket.emit.calledWith(LobbyEvent.RemovedFromMatch)).toBeTruthy();
+    });
+
+    it('should emit Warning on warn', () => {
+        const playerId = '1234';
+        const warningMessage = 'Ceci est un avertissement';
+
+        gateway.warn(playerId, warningMessage);
+
+        expect(mockSocket.emit.calledWith(LobbyEvent.Warning, warningMessage)).toBeTruthy();
     });
 });

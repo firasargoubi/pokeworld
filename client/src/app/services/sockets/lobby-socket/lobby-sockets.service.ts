@@ -7,6 +7,7 @@ import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';
 import { Player } from '@common/player';
+import { GameData } from '@common/game-data';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -48,9 +49,9 @@ export class LobbySocketsService {
         this.matchCode = code;
     }
 
-    async createMatch(gameId: string): Promise<boolean> {
+    async createMatch(gameData: GameData): Promise<boolean> {
         return new Promise((resolve) => {
-            this.coreSocket.emit(LobbyEvent.CreateMatch, gameId, (matchCode: string) => {
+            this.coreSocket.emit(LobbyEvent.CreateMatch, gameData, (matchCode: string) => {
                 this.matchCode = matchCode;
                 resolve(matchCode !== '');
             });
@@ -90,6 +91,7 @@ export class LobbySocketsService {
 
     private leaveMatchAction(): void {
         this.coreSocket.emit(LobbyEvent.LeaveMatch);
+        this.matchCode = '';
         this.router.navigate(['/']);
     }
 
@@ -98,6 +100,7 @@ export class LobbySocketsService {
         this.coreSocket.on(LobbyEvent.LockStatusChanged, this.onLockStatusChanged.bind(this));
         this.coreSocket.on(PlayEvent.MatchStarted, this.onMatchStarted.bind(this));
         this.coreSocket.on(LobbyEvent.RemovedFromMatch, this.onRemovedFromMatch.bind(this));
+        this.coreSocket.on(LobbyEvent.Warning, this.onWarning.bind(this));
     }
 
     private onLockStatusChanged(isLocked: boolean) {
@@ -109,6 +112,7 @@ export class LobbySocketsService {
     }
 
     private onRemovedFromMatch() {
+        this.matchCode = '';
         this.popupService.showPopup('Vous avez été retiré de la partie');
         this.popupService.keepMessages();
         this.router.navigate(['/']);
@@ -117,5 +121,9 @@ export class LobbySocketsService {
     private onMatchStarted(match: Match) {
         this.matchDataService.startMatch(match, this.coreSocket.selfId);
         this.router.navigate(['/play']);
+    }
+
+    private onWarning(message: string) {
+        this.popupService.showPopup(message);
     }
 }

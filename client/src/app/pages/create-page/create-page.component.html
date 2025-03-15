@@ -6,7 +6,7 @@
         <div id="admin-page-body">
             <div id="game-grid">
                 @for(game of games; let i = $index; track game._id) {
-                    <app-game-card [game]="game" [isAdminView]="false" [cardColor]="getCardColor(i)" (join)="createMatch(game._id)"> </app-game-card>
+                    <app-game-card [game]="game" [isAdminView]="false" [cardColor]="getCardColor(i)" (join)="createMatch(game)"> </app-game-card>
                 }
             </div>
         </div>

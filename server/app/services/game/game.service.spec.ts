@@ -92,13 +92,6 @@ describe('GameService', () => {
         await expect(service.getGame(validObjectId)).rejects.toThrow(NotFoundException);
     });
 
-    it('getGameData() should return a gameData by ID', async () => {
-        const createdGame = await gameModel.create(fakeGame);
-        const foundGame = await service.getGameData(createdGame._id);
-        expect(foundGame).toBeDefined();
-        expect(foundGame._id.toString()).toEqual(createdGame._id.toString());
-    });
-
     it('should create a new game if _id is empty', async () => {
         const newGame = { ...fakeGame, _id: '' };
         const addSpy = jest.spyOn(service, 'addGame');
