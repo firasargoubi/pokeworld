@@ -1,10 +1,10 @@
 import { Avatars } from '@common/avatars.enum';
-import { MapSize } from '@common/map-size.enum';
+import { MatchData } from '@common/match';
 import { DiceType } from '@common/dice';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
 
-export const NEW_PLAYER: Player = {
+export const DEFAULT_PLAYER: Player = {
     id: '',
     name: '',
     avatar: Avatars.Default,
@@ -26,21 +26,25 @@ export const NEW_PLAYER: Player = {
         attackBonus: 0,
         defenseBonus: 0,
         items: [],
-        action: 3,
         position: { x: 0, y: 0 },
-        tileType: TileType.Grass,
+        movement: 0,
+        hasAction: false,
+        fightsWon: 0,
+        standingTile: TileType.Grass,
     },
     isAdmin: false,
     isConnected: false,
+    isBot: false,
+};
+
+export const DEFAULT_MATCH_DATA: MatchData = {
+    code: '',
+    isLocked: false,
+    isStarted: false,
+    isDebugMode: false,
+    activePlayer: 0,
+    players: [],
 };
 
 export const CODE_RANGE = 10000;
 export const CODE_LENGTH = 4;
-
-export const MIN_PLAYERS = 2;
-
-export const MAX_PLAYERS = {
-    [MapSize.Small]: 2,
-    [MapSize.Medium]: 4,
-    [MapSize.Large]: 6,
-};

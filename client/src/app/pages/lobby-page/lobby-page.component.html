@@ -1,12 +1,14 @@
 <div id="lobby-container">
     <div id="lobby-header">
-        <app-header [onClick]="this.leaveLobby.bind(this)" [stepNumber]="'3'" [title]="'Page d\'attente'"></app-header>
+        <app-header [onClick]="this.leaveLobbyButton.bind(this)" [stepNumber]="'3'"
+            [title]="'Page d\'attente'"></app-header>
     </div>
 
     <div id="lobby-border">
         <div id="lobby-body">
             <div class="access-code-container">
-                <img src="../../../assets/images/menu/containers/dark-blue/dark-blue-scrare.png" class="background-image" />
+                <img src="../../../assets/images/menu/containers/dark-blue/dark-blue-scrare.png"
+                    class="background-image" />
                 <div class="access-code-box">
                     <p class="access-title">Votre code d'accès</p>
                     <p class="access-code">{{ this.matchCode }}</p>
@@ -16,19 +18,18 @@
 
             <div id="players-list">
                 @for (player of (players$ | async); track player) {
-                <app-player-card [player]="player" [isViewer]="false"></app-player-card>
+                    <app-player-card [player]="player" [isViewer]="false" [kickPlayerButton]="kickPlayerButton.bind(this)"></app-player-card>
                 }
                 <div id="lock-control-container">
-                    <img
-                        (click)="toggleLockRoom()"
+                    <img (click)="toggleLockRoom()"
                         [src]="isRoomLocked ? '../../../assets/images/menu/icons/lock.png' : '../../../assets/images/menu/icons/unlock.png'"
-                        class="lock-icon"
-                    />
+                        class="lock-icon" />
                 </div>
             </div>
         </div>
     </div>
     <div id="poke-button">
-        <app-pokeball-button [buttonContent]="'LANCER PARTIE'" [onClickAction]="startGame.bind(this)"> </app-pokeball-button>
+        <app-pokeball-button [buttonContent]="'LANCER PARTIE'" [onClickAction]="this.startMatchButton.bind(this)">
+        </app-pokeball-button>
     </div>
 </div>

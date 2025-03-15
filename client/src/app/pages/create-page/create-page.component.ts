@@ -1,9 +1,7 @@
-import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
@@ -19,7 +17,6 @@ export class CreatePageComponent implements OnInit {
     games: GameData[] = [];
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);
-    private gameDataService: GameDataService = inject(GameDataService);
     private lobbySocketService: LobbySocketsService = inject(LobbySocketsService);
     private popupService: PopupService = inject(PopupService);
 
@@ -37,14 +34,14 @@ export class CreatePageComponent implements OnInit {
         return classes[classIndex];
     }
 
-    onJoin(gameId: string) {
-        this.gameSaveService.getGame(gameId).subscribe({
-            next: (game: GameData) => {
-                this.createGame(game);
-            },
-            error: (error: HttpErrorResponse) => {
-                this.handleNotFoundError(error);
-            },
+    async createMatch(gameData: GameData) {
+        this.lobbySocketService.createMatch(gameData).then((hasCreatedGame) => {
+            if (hasCreatedGame) {
+                this.router.navigate(['/player-selection']);
+            } else {
+                this.loadGames();
+                this.popupService.showPopup("Ce jeu n'est plus disponible");
+            }
         });
     }
 
@@ -53,29 +50,9 @@ export class CreatePageComponent implements OnInit {
             next: (games) => {
                 this.games = games.filter((game) => game.isVisible);
             },
-            error: (error: HttpErrorResponse) => {
-                this.popupService.showPopup(error.error);
+            error: () => {
+                this.popupService.showPopup('Erreur de connection avec le serveur');
             },
         });
-    }
-
-    private createGame(game: GameData) {
-        if (game.isVisible) {
-            this.gameDataService.setGameData(game);
-            this.lobbySocketService.createGame(game);
-            this.router.navigate(['/player-selection']);
-        } else {
-            this.loadGames();
-            this.popupService.showPopup("Ce jeu n'est plus visible");
-        }
-    }
-
-    private handleNotFoundError(error: HttpErrorResponse) {
-        if (error.status === HttpStatusCode.NotFound) {
-            this.popupService.showPopup("Ce jeu n'existe plus");
-            this.loadGames();
-        } else {
-            this.popupService.showPopup(error.error);
-        }
     }
 }

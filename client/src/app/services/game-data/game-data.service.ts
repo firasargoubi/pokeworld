@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DEFAULT_GAME } from '@app/consts/default-game';
+import { DEFAULT_GAME } from '@app/consts/default-game.const';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';

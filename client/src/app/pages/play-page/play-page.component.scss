@@ -32,6 +32,7 @@ $dark-text-shadow: hsl(220, 6%, 50%);
 
 // Assets
 $card-game-info: '../../../assets/images/menu/containers/cards/game-info.png';
+$card-self-info: '../../../assets/images/menu/containers/cards/self-info.png';
 $card-gray: '../../../assets/images/menu/containers/cards/gray.png';
 $card-orange: '../../../assets/images/menu/containers/cards/orange.png';
 $arrow-orange: '../../../assets/images/menu/icons/arrows/orange-arrow.png';
@@ -69,6 +70,7 @@ $timer-current-ratio: calc(0.49 - var(--current-time) / var(--max-time));
 $timer-half-true: calc(max($timer-current-ratio, -1 * $timer-current-ratio) / $timer-current-ratio * 0.5 + 0.5);
 $timer-half-false: calc(1.0 - $timer-half-true);
 $total-player-cards-height: calc(($player-card-height * var(--player-count) + $player-card-margin * (var(--player-count) - 1)) * $final-side-width);
+$shadow: drop-shadow(0 0 calc(0.005 * $map-size) rgba(0, 0, 0, 0.15));
 
 .play-page {
     height: 100vh;
@@ -153,6 +155,7 @@ app-map {
     margin-bottom: $final-margin-bot;
     margin-left: $final-margin-left;
     margin-right: $final-margin-right;
+    overflow: visible;
 }
 
 .main-right {
@@ -161,6 +164,7 @@ app-map {
 }
 
 .player-cards-container {
+    overflow: visible;
     height: $total-player-cards-height;
     width: $final-side-width;
 }
@@ -171,6 +175,7 @@ app-map {
     width: calc($player-arrow-width * $final-side-width);
     margin-right: calc((1.0 - $player-arrow-width - $player-card-width) * $final-side-width);
     height: $total-player-cards-height;
+    filter: $shadow;
 }
 
 .player-cards {
@@ -178,6 +183,7 @@ app-map {
     vertical-align: top;
     width: calc($player-card-width * $final-side-width);
     height: $total-player-cards-height;
+    filter: $shadow;
 }
 
 .player-card {
@@ -340,6 +346,7 @@ app-map {
     width: $final-side-width;
     background-image: url($card-game-info);
     padding: calc(0.018 * $map-size) calc(0.035 * $map-size);
+    filter: $shadow;
 }
 
 .map-info-card > div {
@@ -505,9 +512,9 @@ app-map {
     margin-top: calc(0.02 * $map-size);
     height: calc(0.465 * $map-size);
     width: $final-side-width;
-    background-image: url($card-game-info);
+    background-image: url($card-self-info);
     padding: calc(0.018 * $map-size) calc(0.035 * $map-size);
-    
+    filter: $shadow;
     color: $dark-text-color;
     text-shadow:
         calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
@@ -518,7 +525,7 @@ app-map {
 
 .self-info-container {
     width: calc($final-side-width - 0.070 * $map-size);
-    margin-top: calc(0.012 * $map-size);
+    margin-top: calc(0.014 * $map-size);
     height: calc(0.068 * $map-size);
     font-size: calc(0.04 * $map-size);
 }
@@ -579,7 +586,7 @@ app-map {
     cursor: not-allowed;
     background-color: transparent;
     background-image: url($action-button);
-    filter: grayscale(1.00) brightness(1.08);
+    filter: grayscale(1.00) brightness(1.08) $shadow;
 }
 
 .endturn-button {
@@ -590,22 +597,22 @@ app-map {
 .action-button.active,
 .endturn-button.active {
     cursor: pointer;
-    filter: none;
+    filter: $shadow;
 }
 
 .action-button.active:hover,
 .endturn-button.active:hover {
-    filter: saturate(0.98) brightness(1.08) grayscale(0.03);
+    filter: saturate(0.98) brightness(1.08) grayscale(0.03) $shadow;
 }
 
 .action-button.active:active,
 .endturn-button.active:active {
-    filter: saturate(0.96) brightness(1.16) grayscale(0.06);
+    filter: saturate(0.96) brightness(1.16) grayscale(0.06) $shadow;
 }
 
 .movement-container {
     width: calc($final-side-width - 0.070 * $map-size);
-    margin-top: calc(0.011 * $map-size);
+    margin-top: calc(0.0125 * $map-size);
     height: calc(0.090 * $map-size);
 }
 
@@ -688,7 +695,7 @@ app-map {
 .items-container {
     width: calc($final-side-width - 0.070 * $map-size);
     height: calc(0.195 * $map-size);
-    margin-top: calc(0.025 * $map-size);
+    margin-top: calc(0.032 * $map-size);
 }
 
 .play-page .item-slot {

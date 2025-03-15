@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { ITEM_IMAGES } from '@app/consts/images.const';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games';
 import { ErrorCode } from '@app/interfaces/error-code.enum';
 import { EventProperty } from '@app/interfaces/event-property';
 import { ValidationResult } from '@app/interfaces/game-validation-result';

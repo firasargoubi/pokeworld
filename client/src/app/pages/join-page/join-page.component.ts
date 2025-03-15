@@ -17,10 +17,11 @@ export class JoinPageComponent {
     private router: Router = inject(Router);
     private lobbySocketService: LobbySocketsService = inject(LobbySocketsService);
 
-    joinGame(event: KeyboardEvent) {
+    joinMatch(event: KeyboardEvent) {
         const isJoinKey = event.key === 'Enter';
+
         if (isJoinKey) {
-            this.lobbySocketService.joinGame(this.gameCode).subscribe((joinStatus) => {
+            this.lobbySocketService.joinMatch(this.gameCode).subscribe((joinStatus) => {
                 if (joinStatus) {
                     this.router.navigate(['/player-selection']);
                 }

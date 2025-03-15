@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <img class="battel-plateform" src="{{ this.battlePlatformData[this.ennemyPlayer.currentStats.tileType].enemyPlatform }}" />
+        <img class="battel-plateform" src="{{ this.battlePlatformData[this.ennemyPlayer.currentStats.standingTile].enemyPlatform }}" />
         <span
             class="pokemon-container"
             [ngClass]="{
@@ -39,7 +39,7 @@
         </span>
     </div>
     <div id="self-container">
-        <img class="battel-plateform" src="{{ this.battlePlatformData[this.selfPlayer.currentStats.tileType].selfPlatform }}" />
+        <img class="battel-plateform" src="{{ this.battlePlatformData[this.selfPlayer.currentStats.standingTile].selfPlatform }}" />
         <span
             class="pokemon-container"
             [ngClass]="{

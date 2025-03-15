@@ -1,4 +1,3 @@
-import { ChatMessage } from './chat-message';
 import { GameData } from './game-data';
 import { Player } from './player';
 
@@ -8,9 +7,10 @@ export interface Match {
 }
 
 export interface MatchData {
-    gameCode: string;
-    players: Player[];
+    code: string;
     isLocked: boolean;
-    chatHistory?: ChatMessage;
-    timer?: number;
+    isStarted: boolean;
+    isDebugMode: boolean;
+    activePlayer: number;
+    players: Player[];
 }

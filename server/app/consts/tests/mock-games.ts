@@ -32,4 +32,17 @@ export const MOCK_GAMES: GameData[] = [
             gameMode: GameMode.CTF,
         },
     },
+    {
+        _id: '789',
+        name: 'Game 3',
+        isVisible: true,
+        description: 'Description 3',
+        lastEdited: new Date(),
+        mapData: {
+            tiles: Array.from({ length: MapSize.Small }, () => Array(MapSize.Small).fill(TileType.Grass)),
+            items: {} as Record<ItemType, Position[]>,
+            size: MapSize.Small,
+            gameMode: GameMode.FFA,
+        },
+    },
 ];

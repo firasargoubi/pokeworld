@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { of } from 'rxjs';
 import { LobbyPageComponent } from './lobby-page.component';
@@ -9,10 +10,12 @@ describe('LobbyPageComponent', () => {
     let fixture: ComponentFixture<LobbyPageComponent>;
     let routerSpy: jasmine.SpyObj<Router>;
     let lobbySocketsServiceSpy: jasmine.SpyObj<LobbySocketsService>;
+    let popupServiceSpy: jasmine.SpyObj<PopupService>;
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-        lobbySocketsServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['toggleLockRoom', 'leaveGame'], {
+        popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
+        lobbySocketsServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['changeLockStatus', 'leaveMatch', 'startMatch', 'kickPlayer'], {
             roomLocked$: of(false),
             players$: of([]),
         });
@@ -21,6 +24,7 @@ describe('LobbyPageComponent', () => {
             imports: [LobbyPageComponent],
             providers: [
                 { provide: Router, useValue: routerSpy },
+                { provide: PopupService, useValue: popupServiceSpy },
                 { provide: LobbySocketsService, useValue: lobbySocketsServiceSpy },
             ],
         }).compileComponents();
@@ -34,29 +38,24 @@ describe('LobbyPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should navigate to game page when startGame is called', () => {
-        component.startGame();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+    it('should call startMatch when startMatchButton is called', () => {
+        component.startMatchButton();
+        expect(lobbySocketsServiceSpy.startMatch).toHaveBeenCalled();
     });
 
-    it('should navigate to home page when leaveLobby is called', () => {
-        component.leaveLobby();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
-    });
-
-    it('should call leaveGame when leaveLobby is called', () => {
-        component.leaveLobby();
-        expect(lobbySocketsServiceSpy.leaveGame).toHaveBeenCalled();
+    it('should call showPopup when leaveLobbyButton is called', () => {
+        component.leaveLobbyButton();
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Voulez-vous vraiment quitter ?', true, jasmine.any(Function));
     });
 
     it('should toggle room lock status when toggleLockRoom is called', () => {
         component.isRoomLocked = false;
         component.toggleLockRoom();
-        expect(lobbySocketsServiceSpy.toggleLockRoom).toHaveBeenCalledWith(true);
+        expect(lobbySocketsServiceSpy.changeLockStatus).toHaveBeenCalledWith(true);
 
         component.isRoomLocked = true;
         component.toggleLockRoom();
-        expect(lobbySocketsServiceSpy.toggleLockRoom).toHaveBeenCalledWith(false);
+        expect(lobbySocketsServiceSpy.changeLockStatus).toHaveBeenCalledWith(false);
     });
 
     it('should return correct match code', () => {

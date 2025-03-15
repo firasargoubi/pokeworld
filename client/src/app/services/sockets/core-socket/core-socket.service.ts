@@ -1,7 +1,6 @@
 // core-socket.service.ts
 import { Injectable } from '@angular/core';
-import { LobbyEvents } from '@common/lobby-events.enum';
-import { Observable, Observer } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
@@ -10,25 +9,26 @@ import { environment } from 'src/environments/environment';
 })
 export class CoreSocketService {
     private socket: Socket;
-    private status = new Observable<boolean>((observer: Observer<boolean>) => {
-        this.socket.on('connect', () => observer.next(true));
-        this.socket.on('disconnect', () => observer.next(false));
-    });
+    private status: BehaviorSubject<boolean>;
 
     constructor() {
+        this.status = new BehaviorSubject<boolean>(false);
+
         this.socket = io(environment.socketUrl, {
             transports: ['websocket'],
             upgrade: false,
         });
-        this.setupCoreListeners();
+
+        this.socket.on('connect', () => this.status.next(true));
+        this.socket.on('disconnect', () => this.status.next(false));
     }
 
     get connectionStatus(): Observable<boolean> {
-        return this.status;
+        return this.status.asObservable();
     }
 
-    get selfId(): string | undefined {
-        return this.socket.id;
+    get selfId(): string {
+        return this.socket.id as string;
     }
 
     emit<T, C>(event: string, ...args: T[] | [...T[], C]): void {
@@ -44,17 +44,5 @@ export class CoreSocketService {
 
     on<T>(event: string, callback: (...args: T[]) => void): void {
         this.socket.on(event, callback);
-    }
-
-    disconnect(): void {
-        this.socket.disconnect();
-    }
-
-    private setupCoreListeners(): void {
-        this.socket.on('hello', (message: string) => window.console.log('Server:', message));
-        this.socket.on('clock', (time: string) => window.console.log('Server time:', time));
-        this.socket.on(LobbyEvents.Debug, (message: string) => {
-            window.console.log('Debug message from server:', message);
-        });
     }
 }

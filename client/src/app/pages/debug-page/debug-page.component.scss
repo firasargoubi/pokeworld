@@ -178,3 +178,22 @@ $clip-path: polygon(
     font-size: 0.9rem;
     margin-top: 5px;
 }
+
+.left-panel {
+    padding: 40px;
+}
+
+
+.right-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 40px;
+}
+
+.update-player-form {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 40px;
+}

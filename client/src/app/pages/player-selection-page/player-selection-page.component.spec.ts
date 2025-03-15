@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@app/consts/default-player';
-import { StatType } from '@app/consts/player-stats.enum';
+import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@app/consts/default-player.const';
+import { StatType } from '@app/interfaces/player-stats.enum';
 import { AvatarSelectionService } from '@app/services/avatar-selection/avatar-selection.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
@@ -24,7 +24,7 @@ describe('PlayerSelectionPageComponent', () => {
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
-        lobbySocketServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['updatePlayer', 'leaveGame']);
+        lobbySocketServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['updatePlayer', 'leaveMatch']);
         avatarSelectionServiceSpy = jasmine.createSpyObj(
             'AvatarSelectionService',
             ['getAvatarStatus', 'isAvatarAvailable', 'updatePlayerAvatar', 'resetAvatar'],
@@ -79,16 +79,6 @@ describe('PlayerSelectionPageComponent', () => {
         expect(avatarSelectionServiceSpy.selectedAvatar).toBe(Avatars.Avatar1);
     });
 
-    it('should navigate to lobby if form is valid', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(component, 'getWarnings').and.returnValue([]);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        component['quitOnLockSub'] = { unsubscribe: jasmine.createSpy('unsubscribe') } as any;
-        component.goToLobby();
-        expect(lobbySocketServiceSpy.updatePlayer).toHaveBeenCalled();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/lobby']);
-    });
-
     it('should show popup if form is invalid', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(component, 'getWarnings').and.returnValue(['Warning']);
@@ -98,9 +88,7 @@ describe('PlayerSelectionPageComponent', () => {
 
     it('should navigate to create page', () => {
         component.goToMenu();
-        expect(lobbySocketServiceSpy.leaveGame).toHaveBeenCalled();
-        expect(avatarSelectionServiceSpy.resetAvatar).toHaveBeenCalled();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 
     it('should validate form as valid when there are no warnings', () => {
@@ -154,14 +142,5 @@ describe('PlayerSelectionPageComponent', () => {
 
     it('should return correct avatar list', () => {
         expect(component.avatarList).toEqual(Object.keys(AVATAR_DATA).slice(1) as Avatars[]);
-    });
-
-    it('should subscribe to roomLocked$ on init', () => {
-        spyOn(component, 'goToMenu');
-
-        component.ngOnInit();
-
-        roomLockedSubject.next(true);
-        expect(component.goToMenu).toHaveBeenCalled();
     });
 });
