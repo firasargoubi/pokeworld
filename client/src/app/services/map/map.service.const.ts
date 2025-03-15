@@ -1,11 +1,13 @@
+import { MapVisualData, TileVisualData } from '@app/interfaces/map-visual-data';
+import { MapSize } from '@common/map-size.enum';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
-import { TileVisualData } from '@app/interfaces/map-visual-data';
 
 export const DEFAULT_TILE_VISUAL: TileVisualData = {
     tile: '',
     underlay: null,
     item: null,
+    player: null,
 };
 
 export const PATH_SIMILAR_TILES = [TileType.Path, TileType.None, TileType.Bridge, TileType.BrokenBridge];
@@ -52,3 +54,8 @@ export const SURROUNDING_POSITIONS_PLUS: Position[] = [
     { x: 0, y: 1 },
     { x: 1, y: 0 },
 ];
+
+export const DEFAULT_MAP_VISUAL_DATA: MapVisualData = {
+    tiles: Array.from({ length: MapSize.Small }, () => Array(MapSize.Small).fill(DEFAULT_TILE_VISUAL)),
+    size: MapSize.Small,
+};

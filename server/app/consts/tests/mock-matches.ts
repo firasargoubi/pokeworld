@@ -69,6 +69,7 @@ export const MOCK_PLAYERS: Player[] = [
         isAdmin: true,
         isConnected: true,
         isBot: false,
+        spawnPoint: { x: 3, y: 3 },
     },
     {
         id: '4444',
@@ -79,6 +80,7 @@ export const MOCK_PLAYERS: Player[] = [
         isAdmin: false,
         isConnected: true,
         isBot: false,
+        spawnPoint: { x: 4, y: 4 },
     },
     {
         id: '5555',
@@ -89,6 +91,7 @@ export const MOCK_PLAYERS: Player[] = [
         isAdmin: true,
         isConnected: true,
         isBot: false,
+        spawnPoint: { x: 5, y: 5 },
     },
     {
         id: '6666',
@@ -99,6 +102,7 @@ export const MOCK_PLAYERS: Player[] = [
         isAdmin: false,
         isConnected: true,
         isBot: false,
+        spawnPoint: { x: 6, y: 6 },
     },
 ];
 

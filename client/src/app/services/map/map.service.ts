@@ -1,14 +1,17 @@
 import { inject, Injectable } from '@angular/core';
+import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { IMAGE_SUFIX, TILE_IMAGES_PREFIX, UNDERLAY_IMAGES_PREFIX } from '@app/consts/images.const';
 import { MapVisualData, TileVisualData } from '@app/interfaces/map-visual-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { ItemType } from '@common/item-type.enum';
 import { MapData } from '@common/map-data';
+import { Player } from '@common/player';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import {
     BRIDGE_SIMILAR_TILES,
     BRIDGE_VARIANTS,
+    DEFAULT_MAP_VISUAL_DATA,
     DEFAULT_TILE_VISUAL,
     MAX_GRASS_VARIANT,
     MAX_UNDERLAY_VARIANT,
@@ -25,13 +28,18 @@ import {
     providedIn: 'root',
 })
 export class MapService {
-    visualMapData: MapVisualData;
-    gameDataService: GameDataService;
+    visualMapData: MapVisualData = DEFAULT_MAP_VISUAL_DATA;
+    gameDataService: GameDataService = inject(GameDataService);
+    private players: Player[] = [];
 
     constructor() {
-        this.gameDataService = inject(GameDataService);
         this.updateAllTiles();
         this.gameDataService.mapUpdate.subscribe((x) => this.onMapUpdate(x));
+    }
+
+    setPlayers(players: Player[]) {
+        this.players = players;
+        players.forEach((p) => this.updateTile(p.currentStats.position));
     }
 
     getTileImage(tiles: TileType[][], position: Position): string {
@@ -47,7 +55,20 @@ export class MapService {
             tile: this.getTileImage(mapData.tiles, position),
             underlay: this.getUnderlayImage(mapData.tiles, position),
             item: this.getItem(mapData.items, position),
+            player: this.getPlayerAvatar(position),
         };
+    }
+
+    private getPlayerAvatar(position: Position): string | null {
+        let playerAvatar: string | null = null;
+
+        this.players.forEach((player) => {
+            if (player.currentStats.position.x === position.x && player.currentStats.position.y === position.y) {
+                playerAvatar = AVATAR_DATA[player.avatar].imageFace;
+            }
+        });
+
+        return playerAvatar;
     }
 
     private getTileVariant(tile: TileType, tiles: TileType[][], position: Position): string {
@@ -115,6 +136,10 @@ export class MapService {
 
         if (oldData.item !== newData.item) {
             this.visualMapData.tiles[position.x][position.y].item = newData.item;
+        }
+
+        if (oldData.item !== newData.player) {
+            this.visualMapData.tiles[position.x][position.y].player = newData.player;
         }
     }
 

@@ -123,8 +123,6 @@ export class PlayPageComponent {
     }
 
     action() {
-        window.console.log('selfIndex', this.matchDataService.selfIndex);
-        window.console.log('activePlayer', this.matchDataService.matchData.activePlayer);
         // TODO logique d'action
     }
 
@@ -132,13 +130,6 @@ export class PlayPageComponent {
         if (this.canEndTurn) {
             this.playSocketsService.endTurn();
         }
-        
-        // TODO logique de fin de tour
-        // window.console.log('endTurn');
-        // // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        // this.matchVisualData.currentPlayerTurn = (this.matchVisualData.currentPlayerTurn + 1) % this.matchVisualData.players.length;
-        // // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        // this.timerService.startTimer(30);
     }
 
     private verifySocketConnection(isConnected: boolean) {

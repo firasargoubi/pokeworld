@@ -107,3 +107,7 @@ app-item,
 ::ng-deep .grab .tile:has(.item) {
     cursor: grabbing;
 }
+
+.player {
+    background-size: contain;
+}

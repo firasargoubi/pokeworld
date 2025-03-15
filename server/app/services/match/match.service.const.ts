@@ -1,9 +1,9 @@
+import { TurnData } from '@app/interfaces/turn-data';
 import { Avatars } from '@common/avatars.enum';
-import { MatchData, TurnPhase } from '@common/match';
 import { DiceType } from '@common/dice';
+import { MatchData, TurnPhase } from '@common/match';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
-import { TurnData } from '@app/interfaces/turn-data';
 
 export const DEFAULT_PLAYER: Player = {
     id: '',
@@ -36,6 +36,7 @@ export const DEFAULT_PLAYER: Player = {
     isAdmin: false,
     isConnected: false,
     isBot: false,
+    spawnPoint: { x: 0, y: 0 },
 };
 
 export const DEFAULT_MATCH_DATA: MatchData = {

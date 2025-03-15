@@ -13,6 +13,7 @@ export class ItemComponent implements OnChanges {
     @Input() itemType: ItemType;
     @Input() x: number;
     @Input() y: number;
+    @Input() showDescription: boolean;
     description: string;
     image: string;
 

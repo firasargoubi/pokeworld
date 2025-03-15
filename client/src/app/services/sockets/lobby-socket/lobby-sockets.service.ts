@@ -86,7 +86,6 @@ export class LobbySocketsService {
     }
 
     startMatch(): void {
-        window.console.log('LobbyEvent.StartMatch');
         this.coreSocket.emit(LobbyEvent.StartMatch);
     }
 

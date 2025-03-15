@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
-import { MapService } from '@app/services/map/map.service';
+import { Component, inject, Input } from '@angular/core';
 import { ItemComponent } from '@app/components/item/item.component';
+import { MapService } from '@app/services/map/map.service';
 
 @Component({
     selector: 'app-map',
@@ -10,5 +10,6 @@ import { ItemComponent } from '@app/components/item/item.component';
     imports: [ItemComponent],
 })
 export class MapComponent {
+    @Input() isEditor = false;
     mapService: MapService = inject(MapService);
 }
