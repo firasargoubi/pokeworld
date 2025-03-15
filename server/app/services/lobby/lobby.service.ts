@@ -1,10 +1,10 @@
 import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { MatchService } from '@app/services/match/match.service';
+import { PlayService } from '@app/services/play/play.service';
 import { GameData } from '@common/game-data';
 import { Player } from '@common/player';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { MAX_PLAYERS, MIN_PLAYERS } from './lobby.service.const';
-import { PlayService } from '@app/services/play/play.service';
 
 @Injectable()
 export class LobbyService {
