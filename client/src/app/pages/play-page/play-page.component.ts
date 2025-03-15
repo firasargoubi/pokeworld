@@ -1,17 +1,17 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { MapComponent } from '@app/components/map/map.component';
+import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { EMPTY_IMAGE } from '@app/consts/images.const';
 import { PlayerVisualData } from '@app/interfaces/player-visual-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
-import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
-import { CommonModule } from '@angular/common';
-import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { TimerService } from '@app/services/timer/timer.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
-import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { Router } from '@angular/router';
 import { PopupService } from '@app/services/popup/popup.service';
+import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { PlaySocketsService } from '@app/services/sockets/play-socket/play-sockets.service';
+import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { TurnPhase } from '@common/match';
 
 @Component({
@@ -129,7 +129,10 @@ export class PlayPageComponent {
     }
 
     endTurn() {
-        this.playSocketsService.endTurn();
+        if (this.canEndTurn) {
+            this.playSocketsService.endTurn();
+        }
+        
         // TODO logique de fin de tour
         // window.console.log('endTurn');
         // // eslint-disable-next-line @typescript-eslint/no-magic-numbers

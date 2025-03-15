@@ -13,6 +13,7 @@ export interface Player {
     isAdmin: boolean;
     isConnected: boolean;
     isBot: boolean;
+    spawnPoint: Position;
 }
 
 export interface PlayertStats {

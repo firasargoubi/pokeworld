@@ -496,7 +496,7 @@ app-map {
 }
 
 .active .timer-image {
-    animation: timer-animation calc(var(--max-time) * 1.1s) linear 1 forwards;
+    animation: timer-animation calc(var(--max-time) * 1.01s + 0.1s) linear 1 forwards;
 }
 
 @keyframes timer-animation {

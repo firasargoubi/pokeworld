@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { TurnData } from '@app/interfaces/turn-data';
+import { GameData } from '@common/game-data';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
-import { GameData } from '@common/game-data';
+import { Injectable } from '@nestjs/common';
 import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA, DEFAULT_PLAYER, DEFAULT_TURN_DATA } from './match.service.const';
-import { TurnData } from '@app/interfaces/turn-data';
 
 @Injectable()
 export class MatchService {
@@ -84,6 +84,10 @@ export class MatchService {
             match.matchData.players = match.matchData.players.filter((p) => p.id !== playerId);
             if (match.matchData.players.length <= 0) {
                 this.matches.delete(matchCode);
+                const timeout = this.turnDatas.get(matchCode).phaseTimeout;
+                if (timeout) {
+                    clearInterval(timeout);
+                }
                 this.turnDatas.delete(matchCode);
             }
         }

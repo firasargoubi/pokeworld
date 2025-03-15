@@ -1,11 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
+import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { Match } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';
 import { ONE_SECOND } from './play-sockets.const';
-import { PopupService } from '@app/services/popup/popup.service';
 
 @Injectable({
     providedIn: 'root',

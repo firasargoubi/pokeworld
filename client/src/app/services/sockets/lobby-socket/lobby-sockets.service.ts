@@ -3,11 +3,11 @@ import { Router } from '@angular/router';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
+import { GameData } from '@common/game-data';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';
 import { Player } from '@common/player';
-import { GameData } from '@common/game-data';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -120,7 +120,6 @@ export class LobbySocketsService {
     }
 
     private onMatchStarted(match: Match) {
-        window.console.log('PlayEvent.MatchStarted');
         this.matchDataService.startMatch(match, this.coreSocket.selfId);
         this.router.navigate(['/play']);
     }

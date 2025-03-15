@@ -1,9 +1,9 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { MatchService } from '@app/services/match/match.service';
 import { PlayGateway } from '@app/gateways/play/play.gateway';
-import { Player } from '@common/player';
-import { HALF_POINT, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
+import { MatchService } from '@app/services/match/match.service';
 import { Match, TurnPhase } from '@common/match';
+import { Player } from '@common/player';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { HALF_POINT, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
 
 @Injectable()
 export class PlayService {
@@ -12,29 +12,36 @@ export class PlayService {
 
     startMatch(matchCode: string) {
         const match = this.matchService.getMatch(matchCode);
-        this.sanitizeMatch(match);
+        this.reorganizeMatch(match);
         this.playGateway.emitMatchStarted(matchCode, match);
         this.nextTurnPhase(matchCode);
     }
 
     endTurn(playerId: string) {
-        // eslint-disable-next-line no-console
-        console.log('PlayService.endTurn()', playerId);
+        if (this.canEndTurn(playerId)) {
+            this.nextTurnPhase(this.matchService.getMatchCodeFromPlayerId(playerId));
+        }
+    }
+
+    private canEndTurn(playerId: string): boolean {
+        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+        const match = this.matchService.getMatch(matchCode);
+        const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
+        const isActivePlayer = match.matchData.activePlayer === playerIndex;
+        const isDuringTurnPhase = match.matchData.phase === TurnPhase.Turn;
+
+        return isActivePlayer && isDuringTurnPhase;
     }
 
     private startPreTurn(match: Match) {
         this.depleteCurrentStats(match.matchData.players[match.matchData.activePlayer]);
         match.matchData.activePlayer = this.getNextCurrentIndex(match.matchData.players, match.matchData.activePlayer);
         this.playGateway.emitPreTurnStarted(match.matchData.code, match);
-        // eslint-disable-next-line no-console
-        console.log('startPreTurn(), playerTurn:', match.matchData.activePlayer);
     }
 
     private startTurn(match: Match) {
         this.resetCurrentStats(match.matchData.players[match.matchData.activePlayer]);
         this.playGateway.emitTurnStarted(match.matchData.code, match);
-        // eslint-disable-next-line no-console
-        console.log('startTurn(), playerTurn:', match.matchData.activePlayer);
     }
 
     private nextTurnPhase(matchCode: string) {
@@ -92,14 +99,29 @@ export class PlayService {
         return nextIndex;
     }
 
-    private sanitizeMatch(match: Match) {
+    private reorganizeMatch(match: Match) {
         match.matchData.activePlayer = match.matchData.players.length - 1;
         match.matchData.isStarted = true;
+        this.sortPlayers(match);
+        this.assignSpawnPoints(match);
+    }
+
+    private sortPlayers(match: Match) {
         match.matchData.players = match.matchData.players.sort((a: Player, b: Player) => {
             if (a.playerStats.speed !== b.playerStats.speed) {
                 return b.playerStats.speed - a.playerStats.speed;
             }
             return Math.random() - HALF_POINT;
+        });
+    }
+
+    private assignSpawnPoints(match: Match) {
+        const spawnPoints = match.gameData.mapData.items.Spawn;
+        const shuffledSpawnPoints = spawnPoints.sort(() => Math.random() - 0.5).slice(0, match.matchData.players.length);
+        
+        shuffledSpawnPoints.forEach((spawnPoint, i) => {
+            match.matchData.players[i].spawnPoint = spawnPoint;
+            match.matchData.players[i].currentStats.position = spawnPoint;
         });
     }
 }
