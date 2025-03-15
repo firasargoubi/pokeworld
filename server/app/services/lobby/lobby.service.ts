@@ -3,7 +3,8 @@ import { MatchService } from '@app/services/match/match.service';
 import { GameData } from '@common/game-data';
 import { Player } from '@common/player';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { HALF_POINT, MAX_PLAYERS, MIN_PLAYERS } from './lobby.service.const';
+import { MAX_PLAYERS, MIN_PLAYERS } from './lobby.service.const';
+import { PlayService } from '@app/services/play/play.service';
 
 @Injectable()
 export class LobbyService {
@@ -78,19 +79,20 @@ export class LobbyService {
     }
 
     updatePlayer(playerId: string, updatedFields: Partial<Player>) {
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-        const players = this.matchService.getPlayers(matchCode);
-        const player = players.find((p) => p.id === playerId);
+        if (updatedFields) {
+            const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+            const players = this.matchService.getPlayers(matchCode);
+            const player = players.find((p) => p.id === playerId);
 
-        Object.assign(player, updatedFields);
-        if (updatedFields.name) {
-            player.name = this.matchService.getUniqueName(updatedFields.name, playerId);
+            Object.assign(player, updatedFields);
+            if (updatedFields.name) {
+                player.name = this.matchService.getUniqueName(updatedFields.name, playerId);
+            }
+            if (updatedFields.isConnected) {
+                this.emitLockStatusChanged(matchCode);
+            }
+            this.emitUpdatePlayerList(matchCode);
         }
-        if (updatedFields.isConnected) {
-            this.emitLockStatusChanged(matchCode);
-        }
-
-        this.emitUpdatePlayerList(matchCode);
     }
 
     startMatch(playerId: string) {
@@ -197,16 +199,5 @@ export class LobbyService {
 
     private canJoinMatch(matchCode: string): boolean {
         return !this.isMatchFull(matchCode) && !this.isMatchLocked(matchCode);
-    }
-
-    private sanitizeMatch(matchCode: string) {
-        const match = this.matchService.getMatch(matchCode);
-        match.matchData.isStarted = true;
-        match.matchData.players = match.matchData.players.sort((a: Player, b: Player) => {
-            if (a.playerStats.speed !== b.playerStats.speed) {
-                return b.playerStats.speed - a.playerStats.speed;
-            }
-            return Math.random() - HALF_POINT;
-        });
     }
 }

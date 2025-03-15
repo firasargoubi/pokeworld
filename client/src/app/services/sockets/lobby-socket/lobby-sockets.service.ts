@@ -86,6 +86,7 @@ export class LobbySocketsService {
     }
 
     startMatch(): void {
+        window.console.log('LobbyEvent.StartMatch');
         this.coreSocket.emit(LobbyEvent.StartMatch);
     }
 
@@ -119,6 +120,7 @@ export class LobbySocketsService {
     }
 
     private onMatchStarted(match: Match) {
+        window.console.log('PlayEvent.MatchStarted');
         this.matchDataService.startMatch(match, this.coreSocket.selfId);
         this.router.navigate(['/play']);
     }

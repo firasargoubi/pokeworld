@@ -47,7 +47,7 @@ export const DEFAULT_MATCH_DATA: MatchData = {
     players: [],
     maxTimer: 0,
     currentTimer: 0,
-    phase: TurnPhase.PreTurn,
+    phase: TurnPhase.Turn,
 };
 
 export const CODE_RANGE = 10000;

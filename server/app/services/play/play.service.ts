@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayGateway } from '@app/gateways/play/play.gateway';
 import { Player } from '@common/player';
-import { HALF_POINT, PRE_TURN_DURATION, TURN_DURATION } from './match.service.const';
+import { HALF_POINT, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
 import { Match, TurnPhase } from '@common/match';
 
 @Injectable()
@@ -23,18 +23,18 @@ export class PlayService {
     }
 
     private startPreTurn(match: Match) {
+        match.matchData.activePlayer = this.getNextCurrentIndex(match.matchData.players, match.matchData.activePlayer);
         this.depleteCurrentStats(match.matchData.players[match.matchData.activePlayer]);
         this.playGateway.emitPreTurnStarted(match.matchData.code, match);
         // eslint-disable-next-line no-console
-        console.log('startPreTurn()');
+        console.log('startPreTurn(), playerTurn:', match.matchData.activePlayer);
     }
 
     private startTurn(match: Match) {
-        match.matchData.activePlayer = this.getNextCurrentIndex(match.matchData.players, match.matchData.activePlayer);
         this.resetCurrentStats(match.matchData.players[match.matchData.activePlayer]);
         this.playGateway.emitTurnStarted(match.matchData.code, match);
         // eslint-disable-next-line no-console
-        console.log('startTurn()');
+        console.log('startTurn(), playerTurn:', match.matchData.activePlayer);
     }
 
     private nextTurnPhase(matchCode: string) {
@@ -93,7 +93,7 @@ export class PlayService {
     }
 
     private sanitizeMatch(match: Match) {
-        match.matchData.activePlayer = 0;
+        match.matchData.activePlayer = match.matchData.players.length - 1;
         match.matchData.isStarted = true;
         match.matchData.players = match.matchData.players.sort((a: Player, b: Player) => {
             if (a.playerStats.speed !== b.playerStats.speed) {
