@@ -89,7 +89,7 @@ export class LobbySocketsService {
 
     private leaveMatchAction(): void {
         this.coreSocket.emit(LobbyEvent.LeaveMatch);
-        this.router.navigate(['/admin']);
+        this.router.navigate(['/']);
     }
 
     private setupLobbyListeners(): void {
