@@ -4,7 +4,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { LobbyService } from '@app/services/lobby/lobby.service';
-import { Match } from '@common/match';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
@@ -65,10 +64,6 @@ export class LobbyGateway implements OnGatewayDisconnect {
                 socket.leave(room);
             });
         }
-    }
-
-    emitMatchStarted(matchCode: string, match: Match) {
-        this.server.to(matchCode).emit(LobbyEvent.MatchStarted, match);
     }
 
     emitLockStatusChanged(matchCode: string, lockedStatus: boolean) {

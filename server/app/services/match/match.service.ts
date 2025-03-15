@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
 import { GameData } from '@common/game-data';
-import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA, DEFAULT_PLAYER } from './match.service.const';
+import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA, DEFAULT_PLAYER, DEFAULT_TURN_DATA } from './match.service.const';
+import { TurnData } from '@app/interfaces/turn-data';
 
 @Injectable()
 export class MatchService {
     private matches: Map<string, Match> = new Map();
+    private turnDatas: Map<string, TurnData> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
 
     createMatch(gameData: GameData): string {
@@ -14,6 +16,7 @@ export class MatchService {
         const match: Match = { gameData, matchData: structuredClone(DEFAULT_MATCH_DATA) };
         match.matchData.code = matchCode;
         this.matches.set(matchCode, match);
+        this.turnDatas.set(matchCode, DEFAULT_TURN_DATA);
         return matchCode;
     }
 
@@ -71,12 +74,17 @@ export class MatchService {
         return this.matches.get(matchCode);
     }
 
+    getTurnData(matchCode: string): TurnData {
+        return this.turnDatas.get(matchCode);
+    }
+
     removePlayerFromMatch(playerId: string, matchCode: string): void {
-        const match = this.matches.get(matchCode);
+        const match = this.getMatch(matchCode);
         if (match) {
             match.matchData.players = match.matchData.players.filter((p) => p.id !== playerId);
             if (match.matchData.players.length <= 0) {
                 this.matches.delete(matchCode);
+                this.turnDatas.delete(matchCode);
             }
         }
         this.playerToMatchCode.delete(playerId);
@@ -92,7 +100,7 @@ export class MatchService {
 
     addPlayerToMatch(playerId: string, matchCode: string, isAdmin: boolean): void {
         const newPlayer = { ...DEFAULT_PLAYER, id: playerId, isAdmin };
-        this.matches.get(matchCode).matchData.players.push(newPlayer);
+        this.getMatch(matchCode).matchData.players.push(newPlayer);
         this.playerToMatchCode.set(playerId, matchCode);
     }
 

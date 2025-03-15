@@ -3,13 +3,15 @@ import { MatchService } from '@app/services/match/match.service';
 import { GameService } from '@app/services/game/game.service';
 import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { Player } from '@common/player';
-import { HALF_POINT, MAX_PLAYERS, MIN_PLAYERS } from './lobby.service.const';
+import { MAX_PLAYERS, MIN_PLAYERS } from './lobby.service.const';
+import { PlayService } from '@app/services/play/play.service';
 
 @Injectable()
 export class LobbyService {
     @Inject(forwardRef(() => LobbyGateway)) private readonly lobbyGateway: LobbyGateway;
     @Inject(GameService) private readonly gameService: GameService;
     @Inject(MatchService) private readonly matchService: MatchService;
+    @Inject(PlayService) private readonly playService: PlayService;
 
     async createMatch(playerId: string, gameId: string): Promise<string> {
         let matchCode = '';
@@ -100,9 +102,7 @@ export class LobbyService {
         const canStartMatch = this.canStartMatch(playerId);
         if (canStartMatch) {
             const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-            this.sanitizeMatch(matchCode);
-            const match = this.matchService.getMatch(matchCode);
-            this.lobbyGateway.emitMatchStarted(matchCode, match);
+            this.playService.startMatch(matchCode);
         }
     }
 
@@ -163,16 +163,5 @@ export class LobbyService {
         }
 
         return isMatchLocked;
-    }
-
-    private sanitizeMatch(matchCode: string) {
-        const match = this.matchService.getMatch(matchCode);
-        match.matchData.isStarted = true;
-        match.matchData.players = match.matchData.players.sort((a: Player, b: Player) => {
-            if (a.playerStats.speed !== b.playerStats.speed) {
-                return b.playerStats.speed - a.playerStats.speed;
-            }
-            return Math.random() - HALF_POINT;
-        });
     }
 }

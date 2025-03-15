@@ -1,4 +1,4 @@
-import { MatchData } from '@common/match';
+import { MatchData, TurnPhase } from '@common/match';
 
 export const DEFAULT_MATCH: MatchData = {
     code: '',
@@ -7,4 +7,7 @@ export const DEFAULT_MATCH: MatchData = {
     isLocked: false,
     activePlayer: 0,
     players: [],
+    maxTimer: 0,
+    currentTimer: 0,
+    phase: TurnPhase.PreTurn,
 };

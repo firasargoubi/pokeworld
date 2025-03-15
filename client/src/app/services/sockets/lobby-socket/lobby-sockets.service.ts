@@ -5,6 +5,7 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match } from '@common/match';
+import { PlayEvent } from '@common/play-event.enum';
 import { Player } from '@common/player';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -95,7 +96,7 @@ export class LobbySocketsService {
     private setupLobbyListeners(): void {
         this.coreSocket.on(LobbyEvent.UpdatePlayerList, this.onUpdatePlayersLists.bind(this));
         this.coreSocket.on(LobbyEvent.LockStatusChanged, this.onLockStatusChanged.bind(this));
-        this.coreSocket.on(LobbyEvent.MatchStarted, this.onMatchStarted.bind(this));
+        this.coreSocket.on(PlayEvent.MatchStarted, this.onMatchStarted.bind(this));
         this.coreSocket.on(LobbyEvent.RemovedFromMatch, this.onRemovedFromMatch.bind(this));
     }
 

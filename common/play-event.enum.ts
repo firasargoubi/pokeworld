@@ -1,8 +1,9 @@
 export enum PlayEvent {
     EndTurn = 'endTurn',
-    StartCombat = 'endTurn',
+    StartCombat = 'startCombat',
 
-    TurnStarted = 'turnStart',
-    PreTurnStarted = 'preTurnStart',
-    CombatStarted = 'CombatStarted'
+    TurnStarted = 'turnStarted',
+    PreTurnStarted = 'preTurnStarted',
+    CombatStarted = 'combatStarted',
+    MatchStarted = 'matchStarted',
 }

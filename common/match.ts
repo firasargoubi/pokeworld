@@ -8,9 +8,18 @@ export interface Match {
 
 export interface MatchData {
     code: string;
+    phase: TurnPhase;
+    currentTimer: number;
+    maxTimer: number;
     isLocked: boolean;
     isStarted: boolean;
     isDebugMode: boolean;
     activePlayer: number;
     players: Player[];
+}
+
+export enum TurnPhase {
+    PreTurn = 'preTurn',
+    Turn = 'turn',
+    WaitingForCombat = 'waitingForCombat',
 }

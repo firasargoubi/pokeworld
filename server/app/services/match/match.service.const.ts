@@ -1,8 +1,9 @@
 import { Avatars } from '@common/avatars.enum';
-import { MatchData } from '@common/match';
+import { MatchData, TurnPhase } from '@common/match';
 import { DiceType } from '@common/dice';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
+import { TurnData } from '@app/interfaces/turn-data';
 
 export const DEFAULT_PLAYER: Player = {
     id: '',
@@ -44,7 +45,15 @@ export const DEFAULT_MATCH_DATA: MatchData = {
     isDebugMode: false,
     activePlayer: 0,
     players: [],
+    maxTimer: 0,
+    currentTimer: 0,
+    phase: TurnPhase.PreTurn,
 };
 
 export const CODE_RANGE = 10000;
 export const CODE_LENGTH = 4;
+
+export const DEFAULT_TURN_DATA: TurnData = {
+    lastPhaseStartTime: new Date(),
+    phaseTimeout: null,
+};
