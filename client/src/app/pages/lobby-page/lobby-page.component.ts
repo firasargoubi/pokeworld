@@ -7,9 +7,10 @@ import { PokeballButtonComponent } from '@app/components/pokeball-button/pokebal
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { Player } from '@common/player';
 import { Observable } from 'rxjs';
+import { PopupService } from '@app/services/popup/popup.service';
 
 @Component({
-    selector: 'app-game-lobby',
+    selector: 'app-lobby-page',
     templateUrl: './lobby-page.component.html',
     styleUrls: ['./lobby-page.component.scss'],
     imports: [CommonModule, HeaderComponent, PlayerCardComponent, PokeballButtonComponent],
@@ -17,12 +18,17 @@ import { Observable } from 'rxjs';
 })
 export class LobbyPageComponent {
     accessCode: string = '';
+    isAdmin: boolean = false;
     players$: Observable<Player[]>;
     isRoomLocked: boolean;
+    private popupService: PopupService = inject(PopupService);
     private router: Router = inject(Router);
     private lobbySocketsService: LobbySocketsService = inject(LobbySocketsService);
 
     constructor() {
+        if (this.lobbySocketsService.matchCode === '') {
+            this.router.navigate(['/']);
+        }
         this.players$ = this.lobbySocketsService.players$;
         this.lobbySocketsService.roomLocked$.subscribe((isRoomLocked) => {
             this.isRoomLocked = isRoomLocked;
@@ -33,16 +39,19 @@ export class LobbyPageComponent {
         return this.lobbySocketsService.matchRoomCode;
     }
 
-    startGame(): void {
-        this.router.navigate(['/']);
+    startMatchButton(): void {
+        this.lobbySocketsService.startMatch();
     }
 
-    leaveLobby(): void {
-        this.lobbySocketsService.leaveGame();
-        this.router.navigate(['/']);
+    leaveLobbyButton(): void {
+        this.popupService.showPopup('Voulez-vous vraiment quitter ?', true, this.lobbySocketsService.leaveMatch.bind(this.lobbySocketsService));
     }
 
     toggleLockRoom(): void {
-        this.lobbySocketsService.toggleLockRoom(!this.isRoomLocked);
+        this.lobbySocketsService.changeLockStatus(!this.isRoomLocked);
+    }
+
+    kickPlayerButton(playerId: string): void {
+        this.lobbySocketsService.kickPlayer(playerId);
     }
 }

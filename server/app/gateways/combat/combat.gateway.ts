@@ -1,11 +1,10 @@
-import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
-import { CombatEvents } from '@common/combat-events.enum';
+import { CombatEvent } from '@common/combat-event.enum';
 import { AttackResult, CombatData, CombatResult, CombatState } from '@common/combat-interfaces';
 import { DICE_MAX_VALUE, DiceType } from '@common/dice';
-import { LobbyEvents } from '@common/lobby-events.enum';
+import { PlayEvent } from '@common/play-event.enum';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import {
@@ -16,26 +15,26 @@ import {
     MIN_TURN_DURATION,
     PLAYER_STATS_MALUS,
 } from './combat.gateway.constants';
+import { MatchService } from '@app/services/match/match.service';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
 export class CombatGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
-    private combatTurnSystems: Map<string, CombatState> = new Map(); // combatRoomCode -> CombatState
+    @Inject(MatchService) private readonly matchService: MatchService;
+    private combatTurnSystems: Map<string, CombatState> = new Map();
 
-    constructor(private readonly lobbyGateway: LobbyGateway) {}
-
-    @SubscribeMessage(LobbyEvents.StartCombat)
+    @SubscribeMessage(PlayEvent.StartCombat)
     startCombat(socket: Socket, targetPlayerId: string): void {
         this.initiateCombat(socket, targetPlayerId);
     }
 
-    @SubscribeMessage(CombatEvents.EscapeAttempt)
+    @SubscribeMessage(CombatEvent.EscapeAttempt)
     escapeAttempt(_, payload: { combatRoomCode: string; playerId: string }): void {
         this.escape(payload.combatRoomCode, payload.playerId);
     }
 
-    @SubscribeMessage(CombatEvents.AttackAttempt)
+    @SubscribeMessage(CombatEvent.AttackAttempt)
     attackAttempt(_, payload: { combatRoomCode: string; targetId: string }): void {
         this.executeAttackAndCheckVictory(payload.combatRoomCode, payload.targetId);
         this.forceCombatTurnSwitch(payload.combatRoomCode);
@@ -44,30 +43,25 @@ export class CombatGateway implements OnGatewayDisconnect {
     handleDisconnect(socket: Socket) {
         for (const [combatRoomCode, state] of this.combatTurnSystems.entries()) {
             if (state.players.some((player) => player.id === socket.id)) {
-                this.lobbyGateway.debug(socket, `CombatGateway: Socket ${socket.id} déconnecté de la room de combat ${combatRoomCode}`);
+                // eslint-disable-next-line no-console
+                console.log(`CombatGateway: Socket ${socket.id} déconnecté de la room de combat ${combatRoomCode}`);
                 this.endCombat(combatRoomCode);
             }
         }
     }
 
-    private getPlayerById(combatRoomCode: string, playerId: string): Player {
-        return this.combatTurnSystems.get(combatRoomCode).players.find((p) => p.id === playerId);
-    }
-
     private initiateCombat(socket: Socket, targetPlayerId: string): void {
-        const targetPlayer = this.lobbyGateway.getPlayerById(targetPlayerId);
-        const initiatingPlayer = this.lobbyGateway.getPlayerById(socket.id);
+        const targetPlayer = this.matchService.getPlayer(targetPlayerId);
+        const initiatingPlayer = this.matchService.getPlayer(socket.id);
 
         const combatRoomCode = this.generateUniqueCombatCode();
 
         socket.join(combatRoomCode);
         const targetSocket = this.server.sockets.sockets.get(targetPlayerId);
-        if (targetSocket) {
-            targetSocket.join(combatRoomCode);
-        }
+        targetSocket?.join(combatRoomCode);
 
         const combatData: CombatData = { combatRoomCode, players: [initiatingPlayer, targetPlayer] };
-        this.server.to(combatRoomCode).emit(LobbyEvents.CombatStarted, combatData);
+        this.server.to(combatRoomCode).emit(PlayEvent.CombatStarted, combatData);
 
         this.updatePlayersStatsByCurrentTile([initiatingPlayer, targetPlayer]);
         this.startTurnSystem(combatRoomCode, [initiatingPlayer, targetPlayer]);
@@ -87,7 +81,7 @@ export class CombatGateway implements OnGatewayDisconnect {
 
     private updatePlayersStatsByCurrentTile(players: Player[]) {
         for (const player of players) {
-            if (player.currentStats.tileType === TileType.Path) {
+            if (player.currentStats.standingTile === TileType.Path) {
                 player.currentStats.attack -= PLAYER_STATS_MALUS;
                 player.currentStats.defense -= PLAYER_STATS_MALUS;
             }
@@ -124,9 +118,9 @@ export class CombatGateway implements OnGatewayDisconnect {
         }
 
         this.updatePlayerBonusStats(combatRoomCode, activePlayer);
-        this.server.to(combatRoomCode).emit(CombatEvents.StartTimer, turnDelay);
-        this.server.to(activePlayer.id).emit(CombatEvents.CombatTurnStarted);
-        this.server.to(inactivePlayer.id).emit(CombatEvents.CombatTurnStopped);
+        this.server.to(combatRoomCode).emit(CombatEvent.StartTimer, turnDelay);
+        this.server.to(activePlayer.id).emit(CombatEvent.CombatTurnStarted);
+        this.server.to(inactivePlayer.id).emit(CombatEvent.CombatTurnStopped);
 
         const timer = setTimeout(() => {
             const victory = this.executeAttackAndCheckVictory(combatRoomCode, inactivePlayer.id);
@@ -160,14 +154,14 @@ export class CombatGateway implements OnGatewayDisconnect {
         const state = this.combatTurnSystems.get(combatRoomCode);
         if (!state) return;
 
-        const player = this.getPlayerById(combatRoomCode, playerId);
+        const player = this.matchService.getPlayer(playerId);
 
         if (player.currentStats.escapes > 0) {
             player.currentStats.escapes--;
             this.notifyPlayersStatsUpdate(combatRoomCode);
 
             if (Math.random() < ESCAPE_RATIO) {
-                this.server.to(combatRoomCode).emit(CombatEvents.EscapedResult, playerId);
+                this.server.to(combatRoomCode).emit(CombatEvent.EscapedResult, playerId);
                 this.endCombat(combatRoomCode);
             }
         }
@@ -178,8 +172,8 @@ export class CombatGateway implements OnGatewayDisconnect {
         const state = this.combatTurnSystems.get(combatRoomCode);
         if (!state) return;
 
-        const currentPlayer = this.getPlayerById(combatRoomCode, state.players[state.currentTurnIndex].id);
-        const targetPlayer = this.getPlayerById(combatRoomCode, targetId);
+        const currentPlayer = this.matchService.getPlayer(state.players[state.currentTurnIndex].id);
+        const targetPlayer = this.matchService.getPlayer(targetId);
         if (!currentPlayer || !targetPlayer) return;
 
         const attackDamage =
@@ -193,7 +187,7 @@ export class CombatGateway implements OnGatewayDisconnect {
         }
 
         const attackResult: AttackResult = { targetId, attackDamage };
-        this.server.to(combatRoomCode).emit(CombatEvents.AttackResult, attackResult);
+        this.server.to(combatRoomCode).emit(CombatEvent.AttackResult, attackResult);
 
         if (targetPlayer.currentStats.health <= 0) {
             this.endCombat(combatRoomCode, currentPlayer.id);
@@ -219,7 +213,7 @@ export class CombatGateway implements OnGatewayDisconnect {
         const state = this.combatTurnSystems.get(combatRoomCode);
         if (!state) return;
 
-        this.server.to(combatRoomCode).emit(CombatEvents.UpdatePlayers, state.players);
+        this.server.to(combatRoomCode).emit(CombatEvent.UpdatePlayers, state.players);
     }
 
     private resetPlayers(players: Player[]): void {
@@ -251,7 +245,7 @@ export class CombatGateway implements OnGatewayDisconnect {
             combatResult.loserId = player1.id === winnerId ? player2.id : player1.id;
         }
 
-        this.server.to(combatRoomCode).emit(CombatEvents.EndCombat, combatResult);
+        this.server.to(combatRoomCode).emit(CombatEvent.EndCombat, combatResult);
 
         this.combatTurnSystems.delete(combatRoomCode);
 

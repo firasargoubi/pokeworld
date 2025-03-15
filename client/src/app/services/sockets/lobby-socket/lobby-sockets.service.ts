@@ -1,6 +1,10 @@
 import { inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { MatchDataService } from '@app/services/match-data/match-data.service';
+import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { LobbyEvents } from '@common/lobby-events.enum';
+import { LobbyEvent } from '@common/lobby-event.enum';
+import { Match } from '@common/match';
 import { Player } from '@common/player';
 import { GameData } from '@common/game-data';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -9,12 +13,22 @@ import { BehaviorSubject, Observable } from 'rxjs';
     providedIn: 'root',
 })
 export class LobbySocketsService {
-    private matchCode: string;
-    private playersSubject: BehaviorSubject<Player[]> = new BehaviorSubject<Player[]>([]);
-    private roomLockedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-    private coreSocket: CoreSocketService = inject(CoreSocketService);
+    matchCode: string;
+    private playersSubject: BehaviorSubject<Player[]>;
+    private roomLockedSubject: BehaviorSubject<boolean>;
+    private coreSocket: CoreSocketService;
+    private matchDataService: MatchDataService;
+    private popupService: PopupService;
+    private router: Router;
 
     constructor() {
+        this.matchCode = '';
+        this.playersSubject = new BehaviorSubject<Player[]>([]);
+        this.roomLockedSubject = new BehaviorSubject<boolean>(false);
+        this.coreSocket = inject(CoreSocketService);
+        this.matchDataService = inject(MatchDataService);
+        this.router = inject(Router);
+        this.popupService = inject(PopupService);
         this.setupLobbyListeners();
     }
 
@@ -34,68 +48,79 @@ export class LobbySocketsService {
         this.matchCode = code;
     }
 
-    setupLobbyListeners(): void {
-        this.coreSocket.on(LobbyEvents.UpdatePlayersLists, (players: Player[]) => {
-            // Update the subject so all subscribers are notified
-            this.playersSubject.next(players);
-        });
-        this.coreSocket.on(LobbyEvents.GameDestroyed, () => {
-            this.playersSubject.next([]);
-            // Rediriger l'utilisateur ou afficher un message
-        });
-        this.coreSocket.on(LobbyEvents.RoomLockChanged, (isLocked: boolean) => {
-            this.roomLockedSubject.next(isLocked);
+    async createMatch(gameData: GameData): Promise<boolean> {
+        return new Promise((resolve) => {
+            this.coreSocket.emit(LobbyEvent.CreateMatch, gameData, (matchCode: string) => {
+                this.matchCode = matchCode;
+                resolve(matchCode !== '');
+            });
         });
     }
 
-    createGame(gameData: GameData): void {
-        this.coreSocket.emit(LobbyEvents.CreateGame, gameData, (gameCode: string) => {
-            this.matchRoomCode = gameCode;
-        });
+    kickPlayer(playerId: string) {
+        this.coreSocket.emit(LobbyEvent.KickPlayer, playerId);
     }
 
-    joinGame(gameCode: string): Observable<boolean> {
+    joinMatch(matchCode: string): Observable<boolean> {
         return new Observable((observer) => {
-            this.coreSocket.emit(LobbyEvents.JoinGame, gameCode, (success: boolean) => {
-                window.console.log('join status : ' + success);
+            this.coreSocket.emit(LobbyEvent.JoinMatch, matchCode, (success: boolean) => {
                 if (success) {
-                    this.matchCode = gameCode;
+                    this.matchCode = matchCode;
                 }
                 observer.next(success);
             });
         });
     }
 
-    leaveGame(): void {
-        this.coreSocket.emit(LobbyEvents.LeaveGame, (success: boolean) => {
-            window.console.log('leave status : ' + success);
-            // peut etre supprimé pour l'instant necessaire pour la coherence de l'Affichage
-            if (success) {
-                this.matchCode = '';
-                this.playersSubject.next([]);
-                this.roomLockedSubject.next(false);
-            }
-        });
-    }
-
     updatePlayer(playerUpdates: Partial<Player>) {
-        this.coreSocket.emit(LobbyEvents.UpdatePlayer, playerUpdates, (success: boolean) => {
-            window.console.log(`update status : ${success}`);
-        });
+        this.coreSocket.emit(LobbyEvent.UpdatePlayer, playerUpdates);
     }
 
-    toggleLockRoom(shouldLock: boolean): void {
-        this.coreSocket.emit(LobbyEvents.ToggleLockRoom, shouldLock, (success: boolean) => {
-            window.console.log(`toggle lock status : ${success}`);
-            if (success) {
-                // Optionnel: mettre à jour l'état local immédiatement pour une UI réactive
-                // (bien que l'événement roomLockChanged devrait arriver rapidement du serveur)
-                this.roomLockedSubject.next(shouldLock);
-            }
-        });
+    changeLockStatus(lockStatus: boolean): void {
+        this.coreSocket.emit(LobbyEvent.ChangeLockStatus, lockStatus);
     }
 
-    disconnect(): void {
-        this.coreSocket.disconnect();
+    startMatch(): void {
+        this.coreSocket.emit(LobbyEvent.StartMatch);
+    }
+
+    leaveMatch(): void {
+        this.coreSocket.emit(LobbyEvent.LeaveMatch);
+        this.matchCode = '';
+        this.router.navigate(['/']);
+    }
+
+    private setupLobbyListeners(): void {
+        this.coreSocket.on(LobbyEvent.UpdatePlayerList, this.onUpdatePlayersLists.bind(this));
+        this.coreSocket.on(LobbyEvent.LockStatusChanged, this.onLockStatusChanged.bind(this));
+        this.coreSocket.on(LobbyEvent.MatchStarted, this.onMatchStarted.bind(this));
+        this.coreSocket.on(LobbyEvent.RemovedFromMatch, this.onRemovedFromMatch.bind(this));
+        this.coreSocket.on(LobbyEvent.Warning, this.onWarning.bind(this));
+    }
+
+    private onLockStatusChanged(isLocked: boolean) {
+        this.roomLockedSubject.next(isLocked);
+    }
+
+    private onUpdatePlayersLists(players: Player[]) {
+        this.playersSubject.next(players);
+    }
+
+    private onRemovedFromMatch() {
+        this.matchCode = '';
+        this.popupService.showPopup('Vous avez été retiré de la partie');
+        this.popupService.keepMessages();
+        this.router.navigate(['/']);
+    }
+
+    private onMatchStarted(match: Match) {
+        this.matchDataService.startMatch(match, this.coreSocket.selfId);
+        this.router.navigate(['/play']);
+    }
+
+    private onWarning(message: string) {
+        if (!this.popupService.isDisplayed) {
+            this.popupService.showPopup(message);
+        }
     }
 }

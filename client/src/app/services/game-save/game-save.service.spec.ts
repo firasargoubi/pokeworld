@@ -1,7 +1,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games';
 import { GameData } from '@common/game-data';
 import { GameSaveService } from './game-save.service';
 

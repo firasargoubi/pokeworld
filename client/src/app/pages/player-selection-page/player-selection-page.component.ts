@@ -3,15 +3,14 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player';
-import { BonusDice, DiceType } from '@app/consts/dice';
-import { StatType } from '@app/consts/player-stats.enum';
+import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player.const';
+import { BonusDice, DiceType } from '@app/consts/dice.const';
+import { StatType } from '@app/interfaces/player-stats.enum';
 import { AvatarSelectionService } from '@app/services/avatar-selection/avatar-selection.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { Avatars } from '@common/avatars.enum';
 import { Player } from '@common/player';
-import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-player-selection-page',
@@ -31,7 +30,6 @@ export class PlayerSelectionPageComponent implements OnInit {
     private lobbySocketService: LobbySocketsService = inject(LobbySocketsService);
     private avatarSelectionService: AvatarSelectionService = inject(AvatarSelectionService);
     private popupService: PopupService = inject(PopupService);
-    private quitOnLockSub: Subscription;
 
     get avatarData() {
         return this.avatarSelectionService.avatarData;
@@ -46,11 +44,7 @@ export class PlayerSelectionPageComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.quitOnLockSub = this.lobbySocketService.roomLocked$.subscribe((isRoomLocked) => {
-            if (isRoomLocked) {
-                this.goToMenu();
-            }
-        });
+        this.avatarSelectionService.resetAvatar();
     }
 
     isBonusPoint(statCategory: StatType) {
@@ -81,15 +75,12 @@ export class PlayerSelectionPageComponent implements OnInit {
             this.popupService.showPopup(warnings.join('\n'));
         } else {
             this.lobbySocketService.updatePlayer(this.getPlayerData());
-            this.quitOnLockSub.unsubscribe();
             this.router.navigate(['/lobby']);
         }
     }
 
     goToMenu() {
-        this.lobbySocketService.leaveGame();
-        this.avatarSelectionService.resetAvatar();
-        this.router.navigate(['/']);
+        this.popupService.showPopup('Voulez-vous vraiment quitter ?', true, this.lobbySocketService.leaveMatch.bind(this.lobbySocketService));
     }
 
     isFormValid() {

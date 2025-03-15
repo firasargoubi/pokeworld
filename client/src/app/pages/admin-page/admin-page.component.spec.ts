@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games.spec';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { GameData } from '@common/game-data';

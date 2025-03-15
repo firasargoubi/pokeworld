@@ -1,1 +1,1 @@
-export const POPUP_DELAY = 2000;
+export const POPUP_DELAY = 3000;

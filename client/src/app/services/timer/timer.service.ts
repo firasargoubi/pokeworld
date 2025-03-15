@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { DEFAULT_TIME, ONE_SECOND, TIMER_START_DELAY } from './timer.service.const';
+import { DEFAULT_MAX_TIME, DEFAULT_TIME, ONE_SECOND, TIMER_START_DELAY } from './timer.service.const';
 
 @Injectable({
     providedIn: 'root',
 })
 export class TimerService {
-    maxTime: number = DEFAULT_TIME;
+    maxTime: number = DEFAULT_MAX_TIME;
     currentTime: number = DEFAULT_TIME;
     interval: number | null = null;
 

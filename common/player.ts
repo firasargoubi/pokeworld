@@ -1,9 +1,8 @@
 import { Avatars } from './avatars.enum';
+import { DiceType } from './dice';
 import { ItemType } from './item-type.enum';
 import { Position } from './position';
-import { DiceType } from './dice';
 import { TileType } from './tile-type.enum';
-
 
 export interface Player {
     id: string;
@@ -13,6 +12,7 @@ export interface Player {
     currentStats: CurrentStats;
     isAdmin: boolean;
     isConnected: boolean;
+    isBot: boolean;
 }
 
 export interface PlayertStats {
@@ -26,15 +26,17 @@ export interface PlayertStats {
 }
 
 export interface CurrentStats {
+    items: ItemType[];
+    position: Position;
+    movement: number;
+    hasAction: boolean;
+    fightsWon: number;
     health: number;
-    speed: number;
     attack: number;
     defense: number;
-    escapes: number;
+    speed: number;
     attackBonus: number;
     defenseBonus: number;
-    items: ItemType[];
-    action: number;
-    position: Position;
-    tileType: TileType
+    escapes: number;
+    standingTile: TileType;
 }
