@@ -44,7 +44,7 @@ export class CombatGateway implements OnGatewayDisconnect {
         for (const [combatRoomCode, state] of this.combatTurnSystems.entries()) {
             if (state.players.some((player) => player.id === socket.id)) {
                 // eslint-disable-next-line no-console
-                console.log(`CombatGateway: Socket ${socket.id} déconnecté de la room de combat ${combatRoomCode}`); // TODO TEMP
+                console.log(`CombatGateway: Socket ${socket.id} déconnecté de la room de combat ${combatRoomCode}`);
                 this.endCombat(combatRoomCode);
             }
         }
@@ -168,7 +168,6 @@ export class CombatGateway implements OnGatewayDisconnect {
         this.forceCombatTurnSwitch(combatRoomCode);
     }
 
-    // TODO Diviser cette fonction en deux? executeAttack() et checkVictory()
     private executeAttackAndCheckVictory(combatRoomCode: string, targetId: string): boolean | void {
         const state = this.combatTurnSystems.get(combatRoomCode);
         if (!state) return;

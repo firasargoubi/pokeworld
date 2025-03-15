@@ -3,7 +3,7 @@ import { MatchService } from '@app/services/match/match.service';
 import { GameService } from '@app/services/game/game.service';
 import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { Player } from '@common/player';
-import { MAX_PLAYERS, MIN_PLAYERS } from './lobby.service.const';
+import { HALF_POINT, MAX_PLAYERS, MIN_PLAYERS } from './lobby.service.const';
 
 @Injectable()
 export class LobbyService {
@@ -100,7 +100,7 @@ export class LobbyService {
         const canStartMatch = this.canStartMatch(playerId);
         if (canStartMatch) {
             const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-            this.matchService.startMatch(matchCode);
+            this.sanitizeMatch(matchCode);
             const match = this.matchService.getMatch(matchCode);
             this.lobbyGateway.emitMatchStarted(matchCode, match);
         }
@@ -163,5 +163,16 @@ export class LobbyService {
         }
 
         return isMatchLocked;
+    }
+
+    private sanitizeMatch(matchCode: string) {
+        const match = this.matchService.getMatch(matchCode);
+        match.matchData.isStarted = true;
+        match.matchData.players = match.matchData.players.sort((a: Player, b: Player) => {
+            if (a.playerStats.speed !== b.playerStats.speed) {
+                return b.playerStats.speed - a.playerStats.speed;
+            }
+            return Math.random() - HALF_POINT;
+        });
     }
 }

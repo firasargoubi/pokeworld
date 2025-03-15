@@ -72,14 +72,7 @@ export class LobbySocketsService {
     }
 
     leaveMatch(): void {
-        // TODO refaire cette fonction pour inclure le popup de confirmation
-        this.coreSocket.emit(LobbyEvent.LeaveMatch, (success: boolean) => {
-            if (success) {
-                this.matchCode = '';
-                this.playersSubject.next([]);
-                this.roomLockedSubject.next(false);
-            }
-        });
+        this.popupService.showPopup('Voulez-vous vraiment quitter le lobby?', true, this.leaveMatchAction.bind(this));
     }
 
     updatePlayer(playerUpdates: Partial<Player>) {
@@ -92,6 +85,11 @@ export class LobbySocketsService {
 
     startMatch(): void {
         this.coreSocket.emit(LobbyEvent.StartMatch);
+    }
+
+    private leaveMatchAction(): void {
+        this.coreSocket.emit(LobbyEvent.LeaveMatch);
+        this.router.navigate(['/admin']);
     }
 
     private setupLobbyListeners(): void {

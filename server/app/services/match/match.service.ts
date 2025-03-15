@@ -119,10 +119,4 @@ export class MatchService {
         const matchCode = this.getMatchCodeFromPlayerId(playerId);
         return this.getPlayers(matchCode);
     }
-
-    startMatch(matchCode: string) {
-        // TODO mettre les joueurs dans le bon ordre x sanitizeMatch
-        // eslint-disable-next-line no-console
-        console.log('MatchService.sanitizeMatch()', matchCode);
-    }
 }

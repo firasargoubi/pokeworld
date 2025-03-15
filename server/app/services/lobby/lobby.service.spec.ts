@@ -48,7 +48,6 @@ describe('LobbyService', () => {
     it('should joinMatch correctly', () => {
         const playerId = '1122';
         const matchCode = '3344';
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sandbox.stub(service as any, 'isMatchLocked').returns(false);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -57,6 +56,7 @@ describe('LobbyService', () => {
         const emitLockStatusChangedStub = sandbox.stub(service as any, 'emitLockStatusChanged');
 
         service.joinMatch(playerId, matchCode);
+
         expect(mockMatchService.addPlayerToMatch.calledWith(playerId, matchCode, false)).toBeTruthy();
         expect(mockeLobbyGateway.connectPlayer.calledWith(playerId, matchCode)).toBeTruthy();
         expect(emitUpdatePlayerListStub.calledWith(matchCode)).toBeTruthy();
@@ -95,7 +95,7 @@ describe('LobbyService', () => {
         mockMatchService.getMatchCodeFromPlayerId.returns('3344');
         mockMatchService.getIsMatchStarted.returns(false);
         mockMatchService.isPlayerAdmin.returns(true);
-        mockMatchService.getPlayers.returns([MOCK_PLAYERS[0]]);
+        mockMatchService.getPlayers.returns([structuredClone(MOCK_PLAYERS[0])]);
 
         service.leaveMatch('1122');
 
@@ -109,7 +109,6 @@ describe('LobbyService', () => {
         const kickPlayerStub = sandbox.stub(service, 'kickPlayer');
 
         service.tryKickPlayer('admin1', '1122');
-
         expect(kickPlayerStub.calledWith('1122')).toBeTruthy();
     });
 
@@ -134,8 +133,7 @@ describe('LobbyService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const emitUpdatePlayerListStub = sandbox.stub(service as any, 'emitUpdatePlayerList');
 
-        service.updatePlayer(MOCK_PLAYERS[0].id, { name: 'Bob', isConnected: true });
-
+        service.updatePlayer(structuredClone(MOCK_PLAYERS[0]).id, { name: 'Bob', isConnected: true });
         expect(emitUpdatePlayerListStub.calledWith('3344')).toBeTruthy();
     });
 
@@ -144,11 +142,12 @@ describe('LobbyService', () => {
         mockMatchService.isPlayerAdmin.returns(true);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sandbox.stub(service as any, 'isMatchLocked').returns(true);
-        mockMatchService.getMatch.returns(MOCK_MATCHES[0]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const sanitizeMatchStub = sandbox.stub(service as any, 'sanitizeMatch');
+        mockMatchService.getMatch.returns(structuredClone(MOCK_MATCHES[0]));
 
         service.startMatch('1122');
-
-        expect(mockMatchService.startMatch.calledWith('3344')).toBeTruthy();
+        expect(sanitizeMatchStub.calledWith('3344')).toBeTruthy();
     });
 
     it('should changeLockStatus correctly', () => {
@@ -201,7 +200,6 @@ describe('LobbyService', () => {
         mockMatchService.getPlayers.returns(players);
 
         service['emitUpdatePlayerList'](matchCode);
-
         expect(mockeLobbyGateway.emitUpdatePlayerList.calledWith(matchCode, players)).toBeTruthy();
     });
 
@@ -246,7 +244,33 @@ describe('LobbyService', () => {
         });
 
         const result = service['isMatchLocked'](matchCode);
-
         expect(result).toBe(true);
+    });
+
+    it('should sort player by speed on sanitizeMatch', () => {
+        const matchCode = '3344';
+        const match = {
+            gameData: MOCK_GAMES[0],
+            matchData: {
+                ...DEFAULT_MATCH_DATA,
+                players: [
+                    { ...DEFAULT_PLAYER, playerStats: { ...DEFAULT_PLAYER.playerStats, speed: 5 } },
+                    { ...DEFAULT_PLAYER, playerStats: { ...DEFAULT_PLAYER.playerStats, speed: 3 } },
+                    { ...DEFAULT_PLAYER, playerStats: { ...DEFAULT_PLAYER.playerStats, speed: 2 } },
+                    { ...DEFAULT_PLAYER, playerStats: { ...DEFAULT_PLAYER.playerStats, speed: 4 } },
+                    { ...DEFAULT_PLAYER, playerStats: { ...DEFAULT_PLAYER.playerStats, speed: 1 } },
+                    { ...DEFAULT_PLAYER, playerStats: { ...DEFAULT_PLAYER.playerStats, speed: 3 } },
+                ],
+            },
+        };
+        mockMatchService.getMatch.returns(match);
+        const isSortedDescending = (players: Player[]) => {
+            const speeds = players.map((p) => p.playerStats.speed);
+            return speeds.every((s, i) => i === 0 || s <= speeds[i - 1]);
+        };
+
+        expect(isSortedDescending(match.matchData.players)).toBe(false);
+        service['sanitizeMatch'](matchCode);
+        expect(isSortedDescending(match.matchData.players)).toBe(true);
     });
 });
