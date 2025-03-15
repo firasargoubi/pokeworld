@@ -11,6 +11,8 @@ import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { Router } from '@angular/router';
 import { PopupService } from '@app/services/popup/popup.service';
+import { PlaySocketsService } from '@app/services/sockets/play-socket/play-sockets.service';
+import { TurnPhase } from '@common/match';
 
 @Component({
     selector: 'app-play-page',
@@ -21,6 +23,7 @@ import { PopupService } from '@app/services/popup/popup.service';
 export class PlayPageComponent {
     thumbnailUrl: string;
     timerService: TimerService;
+    private playSocketsService: PlaySocketsService;
     private matchDataService: MatchDataService;
     private gameDataService: GameDataService;
     private coreSocketService: CoreSocketService;
@@ -34,6 +37,7 @@ export class PlayPageComponent {
         this.router = inject(Router);
         this.coreSocketService.connectionStatus.subscribe((status) => this.verifySocketConnection(status));
 
+        this.playSocketsService = inject(PlaySocketsService);
         this.timerService = inject(TimerService);
         this.matchDataService = inject(MatchDataService);
         this.gameDataService = inject(GameDataService);
@@ -53,12 +57,17 @@ export class PlayPageComponent {
 
     get canUseAction(): boolean {
         const isActivePlayer = this.matchDataService.matchData.activePlayer === this.matchDataService.selfIndex;
+        const isATurnPhase = this.matchDataService.matchData.phase === TurnPhase.Turn;
         const canUseAction = this.matchDataService.matchData.players[this.matchDataService.selfIndex].currentStats.hasAction;
-        return isActivePlayer && canUseAction;
+
+        return isActivePlayer && isATurnPhase && canUseAction;
     }
 
     get canEndTurn(): boolean {
-        return this.matchDataService.matchData.activePlayer === this.matchDataService.selfIndex;
+        const isActivePlayer = this.matchDataService.matchData.activePlayer === this.matchDataService.selfIndex;
+        const isATurnPhase = this.matchDataService.matchData.phase === TurnPhase.Turn;
+
+        return isActivePlayer && isATurnPhase;
     }
 
     get selfIndex(): number {
@@ -114,10 +123,13 @@ export class PlayPageComponent {
     }
 
     action() {
+        window.console.log('selfIndex', this.matchDataService.selfIndex);
+        window.console.log('activePlayer', this.matchDataService.matchData.activePlayer);
         // TODO logique d'action
     }
 
     endTurn() {
+        this.playSocketsService.endTurn();
         // TODO logique de fin de tour
         // window.console.log('endTurn');
         // // eslint-disable-next-line @typescript-eslint/no-magic-numbers

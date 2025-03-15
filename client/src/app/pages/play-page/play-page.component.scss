@@ -66,7 +66,7 @@ $timer-height: min($timer-height-1, $timer-height-2);
 $final-margin-top-2: calc($timer-height + ($main-height - $map-size) * $margin-top-2 / ($margin-top-2 + $margin-bot));
 $final-margin-top: min($final-margin-top-1, $final-margin-top-2);
 $final-margin-bot: calc($main-height - $map-size - $final-margin-top);
-$timer-current-ratio: calc(0.49 - var(--current-time) / var(--max-time));
+$timer-current-ratio: calc(0.48 - var(--current-time) / var(--max-time));
 $timer-half-true: calc(max($timer-current-ratio, -1 * $timer-current-ratio) / $timer-current-ratio * 0.5 + 0.5);
 $timer-half-false: calc(1.0 - $timer-half-true);
 $total-player-cards-height: calc(($player-card-height * var(--player-count) + $player-card-margin * (var(--player-count) - 1)) * $final-side-width);
@@ -496,7 +496,7 @@ app-map {
 }
 
 .active .timer-image {
-    animation: timer-animation calc(var(--max-time) * 1s + 0.20s) linear 1 forwards;
+    animation: timer-animation calc(var(--max-time) * 1.1s) linear 1 forwards;
 }
 
 @keyframes timer-animation {

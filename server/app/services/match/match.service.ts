@@ -99,7 +99,7 @@ export class MatchService {
     }
 
     addPlayerToMatch(playerId: string, matchCode: string, isAdmin: boolean): void {
-        const newPlayer = { ...DEFAULT_PLAYER, id: playerId, isAdmin };
+        const newPlayer = { ...structuredClone(DEFAULT_PLAYER), id: playerId, isAdmin };
         this.getMatch(matchCode).matchData.players.push(newPlayer);
         this.playerToMatchCode.set(playerId, matchCode);
     }

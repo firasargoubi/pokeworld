@@ -84,14 +84,16 @@ export class LobbyService {
             const players = this.matchService.getPlayers(matchCode);
             const player = players.find((p) => p.id === playerId);
 
-            Object.assign(player, updatedFields);
-            if (updatedFields.name) {
-                player.name = this.matchService.getUniqueName(updatedFields.name, playerId);
+            if (player) {
+                Object.assign(player, updatedFields);
+                if (updatedFields.name) {
+                    player.name = this.matchService.getUniqueName(updatedFields.name, playerId);
+                }
+                if (updatedFields.isConnected) {
+                    this.emitLockStatusChanged(matchCode);
+                }
+                this.emitUpdatePlayerList(matchCode);
             }
-            if (updatedFields.isConnected) {
-                this.emitLockStatusChanged(matchCode);
-            }
-            this.emitUpdatePlayerList(matchCode);
         }
     }
 

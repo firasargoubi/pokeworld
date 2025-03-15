@@ -23,8 +23,8 @@ export class PlayService {
     }
 
     private startPreTurn(match: Match) {
-        match.matchData.activePlayer = this.getNextCurrentIndex(match.matchData.players, match.matchData.activePlayer);
         this.depleteCurrentStats(match.matchData.players[match.matchData.activePlayer]);
+        match.matchData.activePlayer = this.getNextCurrentIndex(match.matchData.players, match.matchData.activePlayer);
         this.playGateway.emitPreTurnStarted(match.matchData.code, match);
         // eslint-disable-next-line no-console
         console.log('startPreTurn(), playerTurn:', match.matchData.activePlayer);
@@ -42,13 +42,13 @@ export class PlayService {
         switch (match.matchData.phase) {
             case TurnPhase.PreTurn:
                 match.matchData.phase = TurnPhase.Turn;
-                this.startTurn(match);
                 this.startTurnTimer(match, TURN_DURATION);
+                this.startTurn(match);
                 break;
             case TurnPhase.Turn:
                 match.matchData.phase = TurnPhase.PreTurn;
-                this.startPreTurn(match);
                 this.startTurnTimer(match, PRE_TURN_DURATION);
+                this.startPreTurn(match);
                 break;
         }
     }

@@ -4,7 +4,6 @@ import { GameMode } from '@common/game-mode.enum';
 import { ItemType } from '@common/item-type.enum';
 import { MapSize } from '@common/map-size.enum';
 import { Player } from '@common/player';
-import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 
 export const DEBUG_GAMES = [

@@ -34,6 +34,10 @@ export class DebugPageComponent {
         this.lobbySocketsService.createMatch(game).then((joinStatus) => {
             if (joinStatus) {
                 this.isAdmin = true;
+                this.copyToClipboard(this.lobbySocketsService.matchCode);
+
+                // Commenter cette ligne pour tester la character selection
+                this.lobbySocketsService.updatePlayer(DEBUG_PLAYERS[0]);
             }
         });
     }
@@ -42,9 +46,16 @@ export class DebugPageComponent {
         this.lobbySocketsService.joinMatch(this.joinRoomCode).subscribe((joinStatus) => {
             if (joinStatus) {
                 this.isAdmin = false;
+
+                // Commenter cette ligne pour tester la character selection
+                this.lobbySocketsService.updatePlayer(DEBUG_PLAYERS[1]);
             }
         });
         this.joinRoomCode = '';
+    }
+
+    copyToClipboard(text: string) {
+        navigator.clipboard.writeText(text);
     }
 
     leaveMatch(): void {
