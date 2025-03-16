@@ -98,7 +98,7 @@ $text-shadow-color: rgb(112, 112, 112);
     border: calc($corner-square-size * 2) solid #f87030;
     clip-path: $clip-path;
 
-    background-image: url('/assets/images/menu/containers/pink/pink-scrare-body.png');
+    background-image: url('../../../assets/images/menu/containers/pink/pink-scrare-body.png');
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -121,7 +121,7 @@ $text-shadow-color: rgb(112, 112, 112);
     justify-content: center;
     overflow: visible;
 
-    background-image: url('/assets/images/menu/containers/dark-blue/party-ball.png');
+    background-image: url('../../../assets/images/menu/containers/dark-blue/party-ball.png');
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -157,7 +157,7 @@ $text-shadow-color: rgb(112, 112, 112);
 .player-card .crown {
     height: 100%;
     aspect-ratio: 1/1;
-    background-image: url('/assets/images/menu/icons/crown.png');
+    background-image: url('../../../assets/images/menu/icons/crown.png');
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;

@@ -124,7 +124,7 @@ export class LobbySocketsService {
             }
             this.popupService.showPopup(removalReason);
             this.popupService.keepMessages();
-            if (removalReason === Warning.Kick) {
+            if ([Warning.Kick, Warning.AdminQuit].includes(removalReason)) {
                 goToMenu();
             }
         }
