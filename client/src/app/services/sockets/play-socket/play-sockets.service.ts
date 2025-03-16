@@ -94,11 +94,6 @@ export class PlaySocketsService {
             const player2 = this.matchDataService.matchData.players[combatBroadcastData.playerTwoIndex].name;
             this.popupService.showPopup(`${player1} et ${player2} entrent en combat!`);
         }
-
-        const temp = 7000;
-        setTimeout(() => {
-            this.timerService.unPauseTimer();
-        }, temp);
     }
 
     private onCombatStarted(combatData: CombatData) {
@@ -134,7 +129,7 @@ export class PlaySocketsService {
         const playerName = match.matchData.players[match.matchData.activePlayer].name;
         this.timerService.startTimer(match.matchData.maxTimer / ONE_SECOND);
         this.mapService.clearOverlays();
-        this.popupService.showPopup(`Début du tour de ${playerName}`);
+        this.popupService.showPopup(`Tour de ${playerName}`);
     }
 
     private onTurnStarted(match: Match) {

@@ -122,7 +122,7 @@ export class PlayService {
         this.playGateway.emitCombatBroadcast(matchCode, {
             match,
             playerOneIndex: this.matchService.getPlayerIndex(playerId),
-            playerTwoIndex: this.matchService.getPlayerIndex(playerId),
+            playerTwoIndex: this.matchService.getPlayerIndex(tragetPlayerId),
         });
 
         // this.combatService.initiateCombat(playerId, tragetPlayerId);
