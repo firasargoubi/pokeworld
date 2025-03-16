@@ -150,7 +150,7 @@ export class PlayPageComponent {
             this.playSocketsService.endTurn();
         }
     }
-    
+
     surrender() {
         this.popupService.showPopup('Voulez-vous vraiment abandonner ?', true, this.leaveMatch.bind(this));
     }

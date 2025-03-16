@@ -11,18 +11,13 @@ export class CombatGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
     @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
 
-    @SubscribeMessage(CombatEvent.StartCombat)
-    startCombat(socket: Socket, targetPlayerId: string): void {
-        this.combatService.initiateCombat(socket, targetPlayerId);
-    }
-
     @SubscribeMessage(CombatEvent.EscapeAttempt)
-    escapeAttempt(_, escapeAttempt: EscapeAttempt): void {
+    escapeAttempt(_: Socket, escapeAttempt: EscapeAttempt): void {
         this.combatService.escape(escapeAttempt.combatRoomCode, escapeAttempt.playerId);
     }
 
     @SubscribeMessage(CombatEvent.AttackAttempt)
-    attackAttempt(_, attackAttempt: AttackAttempt): void {
+    attackAttempt(_: Socket, attackAttempt: AttackAttempt): void {
         this.combatService.executeAttackAndCheckVictory(attackAttempt.combatRoomCode, attackAttempt.targetId);
         this.combatService.forceCombatTurnSwitch(attackAttempt.combatRoomCode);
     }

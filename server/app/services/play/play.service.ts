@@ -1,4 +1,5 @@
 import { PlayGateway } from '@app/gateways/play/play.gateway';
+import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
 import { Match, TurnPhase } from '@common/match';
@@ -13,6 +14,7 @@ export class PlayService {
     @Inject(forwardRef(() => PlayGateway)) private readonly playGateway: PlayGateway;
     @Inject(MatchService) private readonly matchService: MatchService;
     @Inject(MovementService) private readonly movementService: MovementService;
+    @Inject(CombatService) private readonly combatService: CombatService;
 
     getPossibleMoves(playerId: string): Position[] {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
@@ -111,9 +113,11 @@ export class PlayService {
         // eslint-disable-next-line no-console
         console.log('START FIGHT', playerId, tragetPlayerId);
 
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-        const match = this.matchService.getMatch(matchCode);
-        this.playGateway.emitBridgeChanged(matchCode, match);
+        this.combatService.initiateCombat(playerId, tragetPlayerId);
+
+        // const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+        // const match = this.matchService.getMatch(matchCode);
+        // this.playGateway.emitBridgeChanged(matchCode, match);
     }
 
     private toggleBridgeTile(match: Match, position: Position) {

@@ -6,7 +6,6 @@ import { DICE_MAX_VALUE, DiceType } from '@common/dice';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { Socket } from 'socket.io';
 import {
     COMBAT_CODE_LENGTH,
     COMBAT_CODE_RANGE,
@@ -26,20 +25,24 @@ export class CombatService {
         return this.combatTurnSystems;
     }
 
-    initiateCombat(socket: Socket, targetPlayerId: string): void {
+    initiateCombat(playerId: string, targetPlayerId: string): void {
         const targetPlayer = this.matchService.getPlayer(targetPlayerId);
-        const initiatingPlayer = this.matchService.getPlayer(socket.id);
+        const initiatingPlayer = this.matchService.getPlayer(playerId);
 
         const combatRoomCode = this.generateUniqueCombatCode();
 
-        socket.join(combatRoomCode);
+        this.combatGateway.getSocketById(playerId).join(combatRoomCode);
         const targetSocket = this.combatGateway.getSocketById(targetPlayerId);
         if (targetSocket) {
             targetSocket.join(combatRoomCode);
         }
 
         const combatData: CombatData = { combatRoomCode, players: [initiatingPlayer, targetPlayer] };
+        // eslint-disable-next-line no-console
+        console.log('BEFORE emit CombatStarted');
         this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.CombatStarted, combatData);
+        // eslint-disable-next-line no-console
+        console.log('AFTER emit CombatStarted');
 
         this.updatePlayersStatsByCurrentTile([initiatingPlayer, targetPlayer]);
         this.startTurnSystem(combatRoomCode, [initiatingPlayer, targetPlayer]);

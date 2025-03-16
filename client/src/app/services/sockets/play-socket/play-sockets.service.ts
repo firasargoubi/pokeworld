@@ -3,8 +3,11 @@ import { MOVE_ANIMATION_DURATION } from '@app/consts/default-player.const';
 import { MapService } from '@app/services/map/map.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { CombatEvent } from '@common/combat-event.enum';
+import { CombatData } from '@common/combat-interfaces';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match, PlayerMovementData } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';
@@ -20,6 +23,7 @@ export class PlaySocketsService {
     private timerService: TimerService = inject(TimerService);
     private mapService: MapService = inject(MapService);
     private popupService: PopupService = inject(PopupService);
+    private combatSocketService: CombatSocketService = inject(CombatSocketService);
 
     constructor() {
         this.setupPlayListeners();
@@ -74,10 +78,15 @@ export class PlaySocketsService {
     private setupPlayListeners(): void {
         this.coreSocket.on(PlayEvent.PreTurnStarted, this.onPreTurnStarted.bind(this));
         this.coreSocket.on(PlayEvent.TurnStarted, this.onTurnStarted.bind(this));
-        this.coreSocket.on(LobbyEvent.PlayerLeft, this.onPlayerLeft.bind(this));
         this.coreSocket.on(PlayEvent.PlayerMoved, this.onPlayerMoved.bind(this));
         this.coreSocket.on(PlayEvent.DebugModeChanged, this.onDebugModeChanged.bind(this));
         this.coreSocket.on(PlayEvent.BridgeChanged, this.onBridgeChanged.bind(this));
+        this.coreSocket.on(LobbyEvent.PlayerLeft, this.onPlayerLeft.bind(this));
+        this.coreSocket.on(CombatEvent.CombatStarted, this.onCombatStarted.bind(this));
+    }
+
+    private onCombatStarted(combatData: CombatData) {
+        this.combatSocketService.startCombat(combatData);
     }
 
     private onBridgeChanged(match: Match) {
