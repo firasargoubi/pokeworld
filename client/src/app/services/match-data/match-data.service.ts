@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
 import { DEFAULT_GAME } from '@app/consts/default-game.const';
-import { MapService } from '@app/services/map/map.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
 import { Match, MatchData } from '@common/match';

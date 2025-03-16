@@ -4,11 +4,13 @@ import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { GameService } from '@app/services/game/game.service';
 import { MatchService } from '@app/services/match/match.service';
 import { DEFAULT_MATCH_DATA } from '@app/services/match/match.service.const';
+import { PlayService } from '@app/services/play/play.service';
 import { DEFAULT_PLAYER } from '@common/const/default-player.const';
 import { Player } from '@common/player';
 import { Warning } from '@common/warning.enum';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createSandbox, createStubInstance, SinonSandbox, SinonStubbedInstance } from 'sinon';
+import * as sinon from 'sinon';
+import { SinonSandbox, SinonStubbedInstance, createStubInstance } from 'sinon';
 import { LobbyService } from './lobby.service';
 
 describe('LobbyService', () => {
@@ -16,19 +18,22 @@ describe('LobbyService', () => {
     let sandbox: SinonSandbox;
     let mockGameService: SinonStubbedInstance<GameService>;
     let mockMatchService: SinonStubbedInstance<MatchService>;
-    let mockeLobbyGateway: SinonStubbedInstance<LobbyGateway>;
+    let mockLobbyGateway: SinonStubbedInstance<LobbyGateway>;
+    let mockPlayService: SinonStubbedInstance<PlayService>;
 
     beforeAll(async () => {
         mockGameService = createStubInstance<GameService>(GameService);
         mockMatchService = createStubInstance<MatchService>(MatchService);
-        mockeLobbyGateway = createStubInstance<LobbyGateway>(LobbyGateway);
+        mockLobbyGateway = createStubInstance<LobbyGateway>(LobbyGateway);
+        mockPlayService = createStubInstance<PlayService>(PlayService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 LobbyService,
                 { provide: GameService, useValue: mockGameService },
                 { provide: MatchService, useValue: mockMatchService },
-                { provide: LobbyGateway, useValue: mockeLobbyGateway },
+                { provide: LobbyGateway, useValue: mockLobbyGateway },
+                { provide: PlayService, useValue: mockPlayService },
             ],
         }).compile();
 
@@ -36,7 +41,7 @@ describe('LobbyService', () => {
     });
 
     beforeEach(() => {
-        sandbox = createSandbox();
+        sandbox = sinon.createSandbox();
     });
 
     afterEach(() => {
@@ -51,9 +56,13 @@ describe('LobbyService', () => {
         const playerId = '1122';
         const matchCode = '3344';
 
+        mockMatchService.hasMatchCode.returns(true);
         mockMatchService.getMatch.returns({ gameData: MOCK_GAMES[0], matchData: { ...DEFAULT_MATCH_DATA, players: [] } });
+        mockMatchService.isPlayerInMatch.returns(false);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        sandbox.stub(service, 'canPlayerJoinMatch' as any).returns(true);
+        sandbox.stub(service as any, 'isMatchFull').returns(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'isMatchLocked').returns(false);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const emitUpdatePlayerListStub = sandbox.stub(service as any, 'emitUpdatePlayerList');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,23 +72,25 @@ describe('LobbyService', () => {
 
         expect(result).toBeTruthy();
         expect(mockMatchService.addPlayerToMatch.calledWith(playerId, matchCode, false)).toBeTruthy();
-        expect(mockeLobbyGateway.connectPlayer.calledWith(playerId, matchCode)).toBeTruthy();
+        expect(mockLobbyGateway.connectPlayer.calledWith(playerId, matchCode)).toBeTruthy();
         expect(emitUpdatePlayerListStub.calledWith(matchCode)).toBeTruthy();
         expect(emitLockStatusChangedStub.calledWith(matchCode)).toBeTruthy();
     });
 
-    it('should generate match code and add player as admin when creating a new game', async () => {
+    it('should generate match code and add player as admin when creating a new game', () => {
         mockMatchService.isPlayerInMatch.returns(false);
         mockMatchService.createMatch.returns('1234');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-unused-vars
+        const emitUpdatePlayerListStub = sandbox.stub(service as any, 'emitUpdatePlayerList');
 
         const result = service.createMatch('1122', MOCK_GAMES[0]);
 
         expect(mockMatchService.addPlayerToMatch.calledWith('1122', '1234', true)).toBeTruthy();
-        expect(mockeLobbyGateway.connectPlayer.calledWith('1122', '1234')).toBeTruthy();
+        expect(mockLobbyGateway.connectPlayer.calledWith('1122', '1234')).toBeTruthy();
         expect(result).toBe('1234');
     });
 
-    it('should not createMatch if player is in match', async () => {
+    it('should not createMatch if player is in match', () => {
         mockMatchService.isPlayerInMatch.returns(true);
         const result = service.createMatch('1122', MOCK_GAMES[0]);
         expect(result).toBe('');
@@ -110,8 +121,8 @@ describe('LobbyService', () => {
         service.leaveMatch('1122');
 
         expect(mockMatchService.removePlayerFromMatch.calledWith('1122', '3344')).toBeTruthy();
-        expect(mockeLobbyGateway.disconnectPlayer.calledWith(MOCK_PLAYERS[0].id)).toBeTruthy();
-        expect(mockeLobbyGateway.emitRemovedFromMatch.calledWith(MOCK_PLAYERS[0].id)).toBeTruthy();
+        expect(mockLobbyGateway.disconnectPlayer.calledWith(MOCK_PLAYERS[0].id)).toBeTruthy();
+        expect(mockLobbyGateway.warn.calledWith(MOCK_PLAYERS[0].id, Warning.AdminQuit)).toBeTruthy();
     });
 
     it('should KickPlayer correctly', () => {
@@ -119,7 +130,7 @@ describe('LobbyService', () => {
         const removePlayerStub = sandbox.stub(service, 'removePlayer');
 
         service.kickPlayer('admin1', '1122');
-        expect(removePlayerStub.calledWith('1122')).toBeTruthy();
+        expect(removePlayerStub.calledWith('1122', Warning.Kick)).toBeTruthy();
     });
 
     it('should remove player correctly', () => {
@@ -132,7 +143,8 @@ describe('LobbyService', () => {
         service.removePlayer('1122', Warning.AdminQuit);
 
         expect(mockMatchService.removePlayerFromMatch.calledWith('1122', '3344')).toBeTruthy();
-        expect(mockeLobbyGateway.emitRemovedFromMatch.calledWith('1122')).toBeTruthy();
+        expect(mockLobbyGateway.warn.calledWith('1122', Warning.AdminQuit)).toBeTruthy();
+        expect(mockLobbyGateway.disconnectPlayer.calledWith('1122')).toBeTruthy();
         expect(emitUpdatePlayerListStub.calledWith('3344')).toBeTruthy();
         expect(emitLockStatusChangedStub.calledWith('3344')).toBeTruthy();
     });
@@ -147,7 +159,7 @@ describe('LobbyService', () => {
         service.updatePlayer(structuredClone(MOCK_PLAYERS[0]).id, { name: 'Bob', isConnected: true });
         expect(emitUpdatePlayerListStub.calledWith('3344')).toBeTruthy();
 
-        expect(mockeLobbyGateway.emitGameDataToPlayer.calledWith(MOCK_PLAYERS[0].id, MOCK_MATCHES[0].gameData)).toBeTruthy();
+        expect(mockLobbyGateway.emitGameDataToPlayer.calledWith(MOCK_PLAYERS[0].id, MOCK_MATCHES[0].gameData)).toBeTruthy();
     });
 
     it('should sanitize match data and start game when admin initiates', () => {
@@ -187,7 +199,7 @@ describe('LobbyService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         expect((service as any).isMatchLocked.calledWith(matchCode)).toBeTruthy();
         expect(kickJoiningPlayersStub.calledWith(matchCode)).toBeTruthy();
-        expect(mockeLobbyGateway.emitLockStatusChanged.calledWith(matchCode, true)).toBeTruthy();
+        expect(mockLobbyGateway.emitLockStatusChanged.calledWith(matchCode, true)).toBeTruthy();
     });
 
     it('should remove all non-connected players when room is locked', () => {
@@ -213,7 +225,7 @@ describe('LobbyService', () => {
         mockMatchService.getPlayers.returns(players);
 
         service['emitUpdatePlayerList'](matchCode);
-        expect(mockeLobbyGateway.emitUpdatePlayerList.calledWith(matchCode, players)).toBeTruthy();
+        expect(mockLobbyGateway.emitUpdatePlayerList.calledWith(matchCode, players)).toBeTruthy();
     });
 
     it('should canStartMatch return true when conditions are met', () => {
@@ -231,7 +243,7 @@ describe('LobbyService', () => {
             },
         });
         mockMatchService.isPlayerAdmin.returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sandbox.stub(service as any, 'isMatchLocked').returns(true);
 
         const result = service['canStartMatch'](playerId);
@@ -248,10 +260,6 @@ describe('LobbyService', () => {
                 players: [
                     { ...DEFAULT_PLAYER, id: '1122', isConnected: true },
                     { ...DEFAULT_PLAYER, id: '1133', isConnected: true },
-                    { ...DEFAULT_PLAYER, id: '1144', isConnected: true },
-                    { ...DEFAULT_PLAYER, id: '1155', isConnected: true },
-                    { ...DEFAULT_PLAYER, id: '1166', isConnected: true },
-                    { ...DEFAULT_PLAYER, id: '1177', isConnected: true },
                 ],
             },
         });
@@ -290,7 +298,7 @@ describe('LobbyService', () => {
     it('should canPlayerJoinMatch call warn on hasMatchCode false', () => {
         mockMatchService.hasMatchCode.returns(false);
         service['canPlayerJoinMatch']('1122', '3344');
-        expect(mockeLobbyGateway.warn.calledWith('1122', "La partie n'existe pas")).toBeTruthy();
+        expect(mockLobbyGateway.warn.calledWith('1122', "La partie n'existe pas")).toBeTruthy();
     });
 
     it('should canPlayerJoinMatch call warn on isMatchFull true', () => {
@@ -298,7 +306,7 @@ describe('LobbyService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sandbox.stub(service as any, 'isMatchFull').returns(true);
         service['canPlayerJoinMatch']('1122', '3344');
-        expect(mockeLobbyGateway.warn.calledWith('1122', 'La partie est pleine')).toBeTruthy();
+        expect(mockLobbyGateway.warn.calledWith('1122', 'La partie est pleine')).toBeTruthy();
     });
 
     it('should canPlayerJoinMatch call warn on isMatchLocked true', () => {
@@ -308,7 +316,7 @@ describe('LobbyService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sandbox.stub(service as any, 'isMatchLocked').returns(true);
         service['canPlayerJoinMatch']('1122', '3344');
-        expect(mockeLobbyGateway.warn.calledWith('1122', Warning.RoomLocked)).toBeTruthy();
+        expect(mockLobbyGateway.warn.calledWith('1122', Warning.RoomLocked)).toBeTruthy();
     });
 
     it('should canPlayerJoinMatch call warn on isMatchLocked true', () => {
@@ -319,6 +327,6 @@ describe('LobbyService', () => {
         sandbox.stub(service as any, 'isMatchLocked').returns(false);
         mockMatchService.isPlayerInMatch.returns(true);
         service['canPlayerJoinMatch']('1122', '3344');
-        expect(mockeLobbyGateway.warn.calledWith('1122', 'Vous êtes déjà dans une partie')).toBeTruthy();
+        expect(mockLobbyGateway.warn.calledWith('1122', 'Vous êtes déjà dans une partie')).toBeTruthy();
     });
 });
