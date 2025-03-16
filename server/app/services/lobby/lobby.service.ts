@@ -3,6 +3,7 @@ import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { GameData } from '@common/game-data';
 import { Player } from '@common/player';
+import { Warning } from '@common/warning.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { MAX_PLAYERS, MIN_PLAYERS } from './lobby.service.const';
 
@@ -65,7 +66,7 @@ export class LobbyService {
         const connectedPlayers = match.matchData.players.filter((p) => p.isConnected);
         if (connectedPlayers.length <= 1) {
             this.lobbyGateway.disconnectPlayer(connectedPlayers[0].id);
-            this.lobbyGateway.emitRemovedFromMatch(connectedPlayers[0].id);
+            this.lobbyGateway.emitRemovedFromMatch(connectedPlayers[0].id, Warning.LastPlayerRemaining);
             match.matchData.players.forEach((p) => {
                 this.matchService.removePlayerFromMatch(p.id, matchCode);
             });

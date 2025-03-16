@@ -6,4 +6,5 @@ export enum Warning {
     RoomFull = 'La partie est pleine',
     AlreadyInGame = 'Vous êtes déjà dans une partie',
     NotExistGame = "La partie n'existe pas",
+    LastPlayerRemaining = "La partie est terminée car tous les autres joueurs ont quittés",
 }

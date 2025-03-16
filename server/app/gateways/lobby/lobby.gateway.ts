@@ -95,6 +95,10 @@ export class LobbyGateway implements OnGatewayDisconnect {
         }
     }
 
+    emitPlayerLeft(matchCode: string, match: Match) {
+        this.server.to(matchCode).emit(LobbyEvent.PlayerLeft, match);
+    }
+
     warn(playerId: string, message: string) {
         const socket = this.server.sockets.sockets.get(playerId);
         if (socket) {
