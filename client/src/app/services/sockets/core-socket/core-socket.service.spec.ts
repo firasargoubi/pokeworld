@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { SocketTestHelper } from '@app/classes/socket-test-helper';
-import { CoreSocketService } from './core-socket.service';
 import { Socket } from 'socket.io-client';
+import { CoreSocketService } from './core-socket.service';
 
 describe('CoreSocketService', () => {
     let service: CoreSocketService;
@@ -74,20 +74,11 @@ describe('CoreSocketService', () => {
         expect(callbackSpy).toHaveBeenCalledWith(testData);
     });
 
-    it('should update status through private setStatusConnected method', () => {
+    it('should update status through setStatusConneted or setStatusDisconnected method', () => {
         service['setStatusConnected']();
+        expect(service['status'].value).toBeTrue();
 
-        service.connectionStatus.subscribe((status) => {
-            expect(status).toBeTrue();
-        });
-    });
-
-    it('should update status through private setStatusDisconnected method', () => {
-        service['setStatusConnected']();
         service['setStatusDisconnected']();
-
-        service.connectionStatus.subscribe((status) => {
-            expect(status).toBeFalse();
-        });
+        expect(service['status'].value).toBeFalse();
     });
 });

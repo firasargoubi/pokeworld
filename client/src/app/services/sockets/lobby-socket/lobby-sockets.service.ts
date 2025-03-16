@@ -1,12 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
+import { GameData } from '@common/game-data';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
-import { GameData } from '@common/game-data';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -14,21 +15,15 @@ import { BehaviorSubject, Observable } from 'rxjs';
 })
 export class LobbySocketsService {
     matchCode: string;
-    private playersSubject: BehaviorSubject<Player[]>;
-    private roomLockedSubject: BehaviorSubject<boolean>;
-    private coreSocket: CoreSocketService;
-    private matchDataService: MatchDataService;
-    private popupService: PopupService;
-    private router: Router;
+    private gameDataService: GameDataService = inject(GameDataService);
+    private playersSubject: BehaviorSubject<Player[]> = new BehaviorSubject<Player[]>([]);
+    private roomLockedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    private coreSocket: CoreSocketService = inject(CoreSocketService);
+    private matchDataService: MatchDataService = inject(MatchDataService);
+    private popupService: PopupService = inject(PopupService);
+    private router: Router = inject(Router);
 
     constructor() {
-        this.matchCode = '';
-        this.playersSubject = new BehaviorSubject<Player[]>([]);
-        this.roomLockedSubject = new BehaviorSubject<boolean>(false);
-        this.coreSocket = inject(CoreSocketService);
-        this.matchDataService = inject(MatchDataService);
-        this.router = inject(Router);
-        this.popupService = inject(PopupService);
         this.setupLobbyListeners();
     }
 
@@ -96,6 +91,7 @@ export class LobbySocketsService {
         this.coreSocket.on(LobbyEvent.MatchStarted, this.onMatchStarted.bind(this));
         this.coreSocket.on(LobbyEvent.RemovedFromMatch, this.onRemovedFromMatch.bind(this));
         this.coreSocket.on(LobbyEvent.Warning, this.onWarning.bind(this));
+        this.coreSocket.on(LobbyEvent.EmitGameData, this.onEmitGameData.bind(this));
     }
 
     private onLockStatusChanged(isLocked: boolean) {
@@ -122,5 +118,9 @@ export class LobbySocketsService {
         if (!this.popupService.isDisplayed) {
             this.popupService.showPopup(message);
         }
+    }
+
+    private onEmitGameData(gameData: GameData) {
+        this.gameDataService.gameData = gameData;
     }
 }

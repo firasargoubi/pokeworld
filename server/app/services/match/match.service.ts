@@ -1,8 +1,9 @@
+import { DEFAULT_PLAYER } from '@common/const/default-player.const';
 import { GameData } from '@common/game-data';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
 import { Injectable } from '@nestjs/common';
-import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA, DEFAULT_PLAYER } from './match.service.const';
+import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA } from './match.service.const';
 
 @Injectable()
 export class MatchService {

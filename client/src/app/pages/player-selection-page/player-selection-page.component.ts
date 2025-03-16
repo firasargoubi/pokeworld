@@ -89,7 +89,7 @@ export class PlayerSelectionPageComponent implements OnInit {
 
     private getPlayerData() {
         const playerUpdates: Partial<Player> = {
-            name: this.nameForm.value,
+            name: this.nameForm.value.toUpperCase().trim(),
             avatar: this.selectedAvatar,
             playerStats: {
                 health: this.getBonusStat(StatType.Life),

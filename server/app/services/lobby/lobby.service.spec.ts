@@ -3,7 +3,8 @@ import { MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { GameService } from '@app/services/game/game.service';
 import { MatchService } from '@app/services/match/match.service';
-import { DEFAULT_MATCH_DATA, DEFAULT_PLAYER } from '@app/services/match/match.service.const';
+import { DEFAULT_MATCH_DATA } from '@app/services/match/match.service.const';
+import { DEFAULT_PLAYER } from '@common/const/default-player.const';
 import { Player } from '@common/player';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createSandbox, createStubInstance, SinonSandbox, SinonStubbedInstance } from 'sinon';
@@ -140,9 +141,12 @@ describe('LobbyService', () => {
         mockMatchService.getPlayers.returns(MOCK_PLAYERS);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const emitUpdatePlayerListStub = sandbox.stub(service as any, 'emitUpdatePlayerList');
+        mockMatchService.getMatch.returns(MOCK_MATCHES[0]);
 
         service.updatePlayer(structuredClone(MOCK_PLAYERS[0]).id, { name: 'Bob', isConnected: true });
         expect(emitUpdatePlayerListStub.calledWith('3344')).toBeTruthy();
+
+        expect(mockeLobbyGateway.emitGameDataToPlayer.calledWith(MOCK_PLAYERS[0].id, MOCK_MATCHES[0].gameData)).toBeTruthy();
     });
 
     it('should sanitize match data and start game when admin initiates', () => {

@@ -11,6 +11,7 @@ describe('LobbyPageComponent', () => {
     let routerSpy: jasmine.SpyObj<Router>;
     let lobbySocketsServiceSpy: jasmine.SpyObj<LobbySocketsService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
+    let clipboardSpy: jasmine.SpyObj<Clipboard>;
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
@@ -19,6 +20,7 @@ describe('LobbyPageComponent', () => {
             roomLocked$: of(false),
             players$: of([]),
         });
+        clipboardSpy = jasmine.createSpyObj('clipboard', ['writeText']);
 
         await TestBed.configureTestingModule({
             imports: [LobbyPageComponent],
@@ -72,5 +74,20 @@ describe('LobbyPageComponent', () => {
     it('should kickPlayer when kickPlayer is called', () => {
         component.kickPlayer('playerId');
         expect(lobbySocketsServiceSpy.kickPlayer).toHaveBeenCalledWith('playerId');
+    });
+
+    it('should copy match code to clipboard', () => {
+        const originalClipboard = navigator.clipboard;
+        Object.defineProperty(navigator, 'clipboard', { value: clipboardSpy, writable: true, configurable: true });
+
+        lobbySocketsServiceSpy.matchRoomCode = '1234';
+        component.copyMatchCode();
+        expect(clipboardSpy.writeText).toHaveBeenCalledWith('1234');
+
+        lobbySocketsServiceSpy.matchRoomCode = '';
+        component.copyMatchCode();
+        expect(clipboardSpy.writeText).toHaveBeenCalledWith('');
+
+        Object.defineProperty(navigator, 'clipboard', { value: originalClipboard, writable: true, configurable: true });
     });
 });
