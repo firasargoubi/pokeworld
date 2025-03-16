@@ -22,6 +22,11 @@
                     </div>
                     <p class="hp-value">{{ this.ennemyPlayer.currentStats.health }}/{{ this.ennemyPlayer.playerStats.health }}</p>
                 </div>
+                @if(this.iscurrentTurn) {
+                <p class="dice-bonus">DEF: +{{ this.ennemyPlayer.currentStats.defenseBonus }}</p>
+                } @else {
+                <p class="dice-bonus">AP: +{{ this.ennemyPlayer.currentStats.attackBonus }}</p>
+                }
             </div>
         </div>
 
@@ -94,12 +99,16 @@
             <div class="conatiner-body">
                 <div class="stat-container">
                     <span class="stat-label">AP</span>
+                    @if(this.iscurrentTurn) {
                     <span class="bonus-value">+{{ selfPlayer.currentStats.attackBonus }}</span>
+                    }
                     <span class="stat-value">{{ this.selfPlayer.currentStats.attack }} / {{ this.selfPlayer.playerStats.attack }}</span>
                 </div>
                 <div class="stat-container">
                     <span class="stat-label">Def</span>
+                    @if(!this.iscurrentTurn) {
                     <span class="bonus-value">+{{ selfPlayer.currentStats.defenseBonus }}</span>
+                    }
                     <span class="stat-value">{{ this.selfPlayer.currentStats.defense }} / {{ this.selfPlayer.playerStats.defense }}</span>
                 </div>
                 <div class="stat-container">

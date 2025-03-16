@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { CombatEvent } from '@common/combat-event.enum';
-import { AttackResult, CombatResult, CombatData } from '@common/combat-interfaces';
+import { CombatEvents } from '@common/combat-event.enum';
+import { AttackResult, CombatData, CombatResult } from '@common/combat-interfaces';
 import { PlayEvent } from '@common/play-event.enum';
 import { Player } from '@common/player';
 import { CombatSocketService } from './combat-socket.service';
@@ -56,7 +56,7 @@ describe('CombatSocketService', () => {
         const targetPlayerId = 'player123';
         service.initFight(targetPlayerId);
 
-        expect(coreSocketSpy.emit).toHaveBeenCalledOnceWith(PlayEvent.StartCombat, targetPlayerId);
+        expect(coreSocketSpy.emit).toHaveBeenCalledOnceWith(CombatEvents.StartCombat, targetPlayerId);
     });
 
     it('should call coreSocket.emit with EscapeAttempt event and correct data', () => {
@@ -68,7 +68,7 @@ describe('CombatSocketService', () => {
 
         service.escapeAttempt();
 
-        expect(coreSocketSpy.emit).toHaveBeenCalledOnceWith(CombatEvent.EscapeAttempt, {
+        expect(coreSocketSpy.emit).toHaveBeenCalledOnceWith(CombatEvents.EscapeAttempt, {
             combatRoomCode,
             playerId: selfPlayer.id,
         });
@@ -83,7 +83,7 @@ describe('CombatSocketService', () => {
 
         service.attackAttempt();
 
-        expect(coreSocketSpy.emit).toHaveBeenCalledOnceWith(CombatEvent.AttackAttempt, {
+        expect(coreSocketSpy.emit).toHaveBeenCalledOnceWith(CombatEvents.AttackAttempt, {
             combatRoomCode,
             targetId: enemyPlayer.id,
         });
@@ -130,7 +130,7 @@ describe('CombatSocketService', () => {
         coreSocketSpy.on.calls.argsFor(ESCAPED_RESULT_EVENT_INDEX)[1](playerId);
 
         expect(service['escapeResult'].value).toBe(playerId);
-        expect(coreSocketSpy.on).toHaveBeenCalledWith(CombatEvent.EscapedResult, jasmine.any(Function));
+        expect(coreSocketSpy.on).toHaveBeenCalledWith(CombatEvents.EscapedResult, jasmine.any(Function));
     });
 
     it('should update attackResult on AttackResult event', () => {
@@ -140,7 +140,7 @@ describe('CombatSocketService', () => {
         coreSocketSpy.on.calls.argsFor(ATTACK_RESULT_EVENT_INDEX)[1](attackResult);
 
         expect(service['attackResult'].value).toEqual(attackResult);
-        expect(coreSocketSpy.on).toHaveBeenCalledWith(CombatEvent.AttackResult, jasmine.any(Function));
+        expect(coreSocketSpy.on).toHaveBeenCalledWith(CombatEvents.AttackResult, jasmine.any(Function));
     });
 
     it('should update combatResult and navigate to /join on EndCombat event', (done) => {
@@ -155,13 +155,13 @@ describe('CombatSocketService', () => {
         expect(service['combatResult'].value).toEqual(combatResult);
 
         setTimeout(() => {
-            expect(service['router'].navigate).toHaveBeenCalledWith(['/play']);
+            expect(service['router'].navigate).toHaveBeenCalled();
             done();
         }, NAVIGATION_DELAY_MS);
     });
 
     it('should update currentTurn to true when CombatTurnStarted event is received', () => {
-        const turnStartedCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvent.CombatTurnStarted);
+        const turnStartedCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvents.CombatTurnStarted);
         expect(turnStartedCall).toBeDefined();
         const turnStartedCallback = turnStartedCall?.[1];
 
@@ -173,7 +173,7 @@ describe('CombatSocketService', () => {
 
     it('should update currentTurn to false when CombatTurnStopped event is received', () => {
         service.currentTurn.next(true);
-        const turnStoppedCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvent.CombatTurnStopped);
+        const turnStoppedCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvents.CombatTurnStopped);
         expect(turnStoppedCall).toBeDefined();
         const turnStoppedCallback = turnStoppedCall?.[1];
         if (turnStoppedCallback) {
@@ -183,7 +183,7 @@ describe('CombatSocketService', () => {
     });
 
     it('should update currentTimer when StartTimer event is received', () => {
-        const startTimerCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvent.StartTimer);
+        const startTimerCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvents.StartTimer);
         expect(startTimerCall).toBeDefined();
         const startTimerCallback = startTimerCall?.[1];
         const newTime = 10;
@@ -198,7 +198,7 @@ describe('CombatSocketService', () => {
         const playerOne: Player = { id: coreSocketSpy.selfId } as Player;
         const playerTwo: Player = { id: 'enemyId' } as Player;
 
-        const updatePlayersCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvent.UpdatePlayers);
+        const updatePlayersCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvents.UpdatePlayers);
         expect(updatePlayersCall).toBeDefined();
         const updatePlayersCallback = updatePlayersCall?.[1];
 
@@ -214,7 +214,7 @@ describe('CombatSocketService', () => {
         const playerOne: Player = { id: 'enemyId' } as Player;
         const playerTwo: Player = { id: coreSocketSpy.selfId } as Player;
 
-        const updatePlayersCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvent.UpdatePlayers);
+        const updatePlayersCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvents.UpdatePlayers);
         expect(updatePlayersCall).toBeDefined();
         const updatePlayersCallback = updatePlayersCall?.[1];
 

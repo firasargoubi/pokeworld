@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
+import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { Player } from '@common/player';
 import { Observable } from 'rxjs';
@@ -19,6 +21,8 @@ export class DebugPageComponent {
     players$: Observable<Player[]>;
     isRoomLocked$: Observable<boolean>;
     private lobbySocketsService: LobbySocketsService = inject(LobbySocketsService);
+    private coreSocket: CoreSocketService = inject(CoreSocketService);
+    private combatSocketService: CombatSocketService = inject(CombatSocketService);
 
     constructor() {
         this.players$ = this.lobbySocketsService.players$;
@@ -67,5 +71,13 @@ export class DebugPageComponent {
     selectDebugPlayer(index: number) {
         const playerModifs = DEBUG_PLAYERS[index];
         this.lobbySocketsService.updatePlayer(playerModifs);
+    }
+
+    displayCombatButton(playerId: string): boolean {
+        return this.coreSocket.selfId !== playerId;
+    }
+
+    startCombat(targetPlayerId: string): void {
+        this.combatSocketService.initFight(targetPlayerId);
     }
 }

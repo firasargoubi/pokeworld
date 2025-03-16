@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { GameData } from '@common/game-data';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
-import { GameData } from '@common/game-data';
+import { Injectable } from '@nestjs/common';
 import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA, DEFAULT_PLAYER } from './match.service.const';
 
 @Injectable()
@@ -91,7 +91,9 @@ export class MatchService {
     }
 
     addPlayerToMatch(playerId: string, matchCode: string, isAdmin: boolean): void {
-        const newPlayer = { ...DEFAULT_PLAYER, id: playerId, isAdmin };
+        const newPlayer = structuredClone(DEFAULT_PLAYER);
+        newPlayer.id = playerId;
+        newPlayer.isAdmin = isAdmin;
         this.matches.get(matchCode).matchData.players.push(newPlayer);
         this.playerToMatchCode.set(playerId, matchCode);
     }

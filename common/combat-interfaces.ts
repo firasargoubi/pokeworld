@@ -20,3 +20,14 @@ export interface CombatState {
     players: Player[];
     currentTurnIndex: number;
 }
+
+export interface EscapeAttempt {
+    combatRoomCode: string;
+    playerId: string | undefined;
+}
+
+export interface AttackAttempt {
+    combatRoomCode: string;
+    targetId: string | undefined;
+
+}
