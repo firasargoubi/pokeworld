@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@app/consts/default-player.const';
+import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS } from '@app/consts/default-player.const';
 import { StatType } from '@app/interfaces/player-stats.enum';
 import { AvatarSelectionService } from '@app/services/avatar-selection/avatar-selection.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -58,6 +58,11 @@ describe('PlayerSelectionPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('should reset avatar on initialization', () => {
+        component.ngOnInit();
+        expect(avatarSelectionServiceSpy.resetAvatar).toHaveBeenCalled();
+    });
+
     it('should toggle bonus dice', () => {
         const initialAttackDice = component.bonusDice.attack;
         const initialDefenseDice = component.bonusDice.defense;
@@ -80,7 +85,7 @@ describe('PlayerSelectionPageComponent', () => {
     });
 
     it('should show popup if form is invalid', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any  -- Private method
         spyOn<any>(component, 'getWarnings').and.returnValue(['Warning']);
         component.goToLobby();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Warning');
@@ -92,13 +97,13 @@ describe('PlayerSelectionPageComponent', () => {
     });
 
     it('should validate form as valid when there are no warnings', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any  -- Private method
         spyOn<any>(component, 'getWarnings').and.returnValue([]);
         expect(component.isFormValid()).toBeTrue();
     });
 
     it('should validate form as invalid when there are warnings', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any  -- Private method
         spyOn<any>(component, 'getWarnings').and.returnValue(['Warning']);
         expect(component.isFormValid()).toBeFalse();
     });
@@ -142,5 +147,46 @@ describe('PlayerSelectionPageComponent', () => {
 
     it('should return correct avatar list', () => {
         expect(component.avatarList).toEqual(Object.keys(AVATAR_DATA).slice(1) as Avatars[]);
+    });
+
+    it('should return selected avatar when Avatar1 is chosen', () => {
+        avatarSelectionServiceSpy.selectedAvatar = Avatars.Avatar1;
+        expect(component.selectedAvatar).toBe(Avatars.Avatar1);
+    });
+
+    it('should update player and navigate to lobby when form is valid', () => {
+        component.nameForm.setValue('ValidName');
+        avatarSelectionServiceSpy.selectedAvatar = Avatars.Avatar1;
+        avatarSelectionServiceSpy.isAvatarAvailable.and.returnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Private method
+        spyOn<any>(component, 'getWarnings').and.returnValue([]);
+        component.goToLobby();
+
+        expect(component.nameForm.valid).toBeTrue();
+        expect(component['getWarnings']().length).toBe(0);
+        expect(popupServiceSpy.showPopup).not.toHaveBeenCalled();
+        expect(lobbySocketServiceSpy.updatePlayer).toHaveBeenCalledWith(jasmine.any(Object));
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/lobby']);
+    });
+
+    it('should return correct player data with bonus points applied', () => {
+        component.nameForm.setValue('TestPlayer');
+        avatarSelectionServiceSpy.selectedAvatar = Avatars.Avatar3;
+        component.bonusPointsForm.setValue(StatType.Speed);
+        const playerData = component['getPlayerData']();
+        expect(playerData).toEqual({
+            name: 'TestPlayer',
+            avatar: Avatars.Avatar3,
+            playerStats: {
+                health: DEFAULT_STAT_POINTS,
+                speed: DEFAULT_STAT_POINTS + BONUS_POINTS,
+                attack: DEFAULT_STAT_POINTS,
+                defense: DEFAULT_STAT_POINTS,
+                attackDice: component.bonusDice.attack,
+                defenseDice: component.bonusDice.defense,
+                escapes: DEFAULT_ESCAPE_POINTS,
+            },
+            isConnected: true,
+        });
     });
 });

@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PlayerCardComponent } from '@app/components/player-card/player-card.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
@@ -22,13 +21,9 @@ export class LobbyPageComponent {
     players$: Observable<Player[]>;
     isRoomLocked: boolean;
     private popupService: PopupService = inject(PopupService);
-    private router: Router = inject(Router);
     private lobbySocketsService: LobbySocketsService = inject(LobbySocketsService);
 
     constructor() {
-        if (this.lobbySocketsService.matchCode === '') {
-            this.router.navigate(['/']);
-        }
         this.players$ = this.lobbySocketsService.players$;
         this.lobbySocketsService.roomLocked$.subscribe((isRoomLocked) => {
             this.isRoomLocked = isRoomLocked;
@@ -51,7 +46,7 @@ export class LobbyPageComponent {
         this.lobbySocketsService.changeLockStatus(!this.isRoomLocked);
     }
 
-    kickPlayerButton(playerId: string): void {
+    kickPlayer(playerId: string): void {
         this.lobbySocketsService.kickPlayer(playerId);
     }
 }

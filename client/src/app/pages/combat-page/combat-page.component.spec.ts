@@ -229,4 +229,20 @@ describe('CombatPageComponent', () => {
         component['handleBeforeUnload']();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
     });
+
+    it('should clear interval when timer reaches zero', () => {
+        jasmine.clock().install();
+
+        component['currentTime'] = 1;
+        const initialInterval = (component['timerInterval'] = window.setInterval(() => void 0, ONE_SEC));
+        component['setTimer']();
+        expect(component['timerInterval']).not.toBeNull();
+        jasmine.clock().tick(ONE_SEC);
+        expect(component['currentTime']).toBe(0);
+        jasmine.clock().tick(ONE_SEC);
+        expect(component['timerInterval']).toBeNull();
+        expect(initialInterval).not.toBe(component['timerInterval']);
+
+        jasmine.clock().uninstall();
+    });
 });

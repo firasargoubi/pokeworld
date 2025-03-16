@@ -15,7 +15,7 @@ export class TurnSocketsService {
 
     private setupTurnListeners(): void {
         this.coreSocket.on(PlayEvent.TurnStarted, () => {
-            window.console.log('TurnSocketsService recieved event: PlayEvent.TurnStarted');
+            // window.console.log('TurnSocketsService recieved event: PlayEvent.TurnStarted');
         });
     }
 }
