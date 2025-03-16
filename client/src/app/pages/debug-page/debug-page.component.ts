@@ -76,7 +76,7 @@ export class DebugPageComponent {
     }
 
     selectDebugPlayer(index: number) {
-        const playerModifs = DEBUG_PLAYERS[index];
+        const playerModifs = structuredClone(DEBUG_PLAYERS[index]);
         this.lobbySocketsService.updatePlayer(playerModifs);
     }
 }

@@ -99,8 +99,7 @@ export class CombatSocketService {
         this.attackResult.next(attackResult);
     }
 
-    private onEndCombat(result: CombatResult) {
-        window.console.log(`Combat terminé, ganant: ${result.winnerId}`);
-        // TODO
+    private onEndCombat() {
+        this.router.navigate(['/play']);
     }
 }
