@@ -19,14 +19,13 @@ import {
     MAX_GRASS_VARIANT,
     MAX_UNDERLAY_VARIANT,
     PATH_SIMILAR_TILES,
-    PLAYER_OVERLAY,
     POSSIBLE_MOVE_OVERLAY,
     RANDOM_NUMBER_BASE,
     RANDOM_NUMBER_MULTIPLIER,
     SURROUNDING_POSITIONS_DONUT,
     SURROUNDING_POSITIONS_PLUS,
     SURROUNDING_POSITIONS_SQUARE,
-    WATER_SIMILAR_TILES,
+    WATER_SIMILAR_TILES
 } from './map.service.const';
 
 @Injectable({
@@ -108,14 +107,20 @@ export class MapService {
 
     private getOverlay(position: Position): string | null {
         let overlay = null;
+
+        const isHovering = this.hoverMoves.find((pos) => pos.x === position.x && pos.y === position.y);
+        const isOnPlayer = this.playerPosition.x === position.x && this.playerPosition.y === position.y;
+        const isPossibleMove = this.possibleMoves.find((pos) => pos.x === position.x && pos.y === position.y);
+        const canMove = this.possibleMoves.length > 0;
         
-        if (this.hoverMoves.find((pos) => pos.x === position.x && pos.y === position.y)) {
-            overlay = HOVER_MOVE_OVERLAY;
-        } else if (this.playerPosition.x === position.x && this.playerPosition.y === position.y) {
-            overlay = PLAYER_OVERLAY;
-        } else if (this.possibleMoves.find((pos) => pos.x === position.x && pos.y === position.y)) {
-            overlay = POSSIBLE_MOVE_OVERLAY;
+        if (canMove && (isOnPlayer || isPossibleMove)) {
+            if (isHovering) {
+                overlay = HOVER_MOVE_OVERLAY;
+            } else {
+                overlay = POSSIBLE_MOVE_OVERLAY;
+            }
         }
+
         return overlay;
     }
 

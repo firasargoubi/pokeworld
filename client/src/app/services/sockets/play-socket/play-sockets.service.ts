@@ -38,6 +38,11 @@ export class PlaySocketsService {
         this.coreSocket.emit(PlayEvent.Move, position);
     }
 
+    changeDebugMode(): void {
+        window.console.log('changeDebugMode');
+        this.coreSocket.emit(PlayEvent.ChangeDebugMode);
+    }
+
     setHoverMoves(position: Position): void {
         this.coreSocket.emit(PlayEvent.GetHoverMoves, position, (hoverMoves: Position[]) => {
             this.mapService.setHoverMoves(hoverMoves);
@@ -55,6 +60,17 @@ export class PlaySocketsService {
         this.coreSocket.on(PlayEvent.TurnStarted, this.onTurnStarted.bind(this));
         this.coreSocket.on(LobbyEvent.PlayerLeft, this.onPlayerLeft.bind(this));
         this.coreSocket.on(PlayEvent.PlayerMoved, this.onPlayerMoved.bind(this));
+        this.coreSocket.on(PlayEvent.DebugModeChanged, this.onDebugModeChanged.bind(this));
+    }
+
+    private onDebugModeChanged(match: Match) {
+        this.matchDataService.updateMatch(match);
+        if (match.matchData.isDebugMode) {
+            this.popupService.showPopup('Mode de debug activé');
+        } else {
+            this.popupService.showPopup('Mode de debug désactivé');
+        }
+        this.setActivePlayerPossibleMoves();
     }
 
     private onPlayerMoved(playerMovementData: PlayerMovementData) {

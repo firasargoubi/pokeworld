@@ -59,6 +59,18 @@ export class PlayService {
         }
     }
 
+    changeDebugMode(playerId: string) {
+        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+        if (matchCode) {
+            const isAdmin = this.matchService.isPlayerAdmin(playerId);
+            if (isAdmin) {
+                const match = this.matchService.getMatch(playerId);
+                match.matchData.isDebugMode = !match.matchData.isDebugMode;
+                this.playGateway.emitDebugModeChanged(matchCode, match);
+            }
+        }
+    }
+
     private canEndTurn(playerId: string): boolean {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
         const match = this.matchService.getMatch(matchCode);

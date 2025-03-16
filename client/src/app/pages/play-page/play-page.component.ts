@@ -105,6 +105,12 @@ export class PlayPageComponent {
         return this.matchDataService.matchData.players[this.matchDataService.selfIndex].playerStats.speed;
     }
 
+    onKeyDown(event: KeyboardEvent) {
+        if (event.key === 'd' || event.key === 'D') {
+            this.playSocketsService.changeDebugMode();
+        }
+    }
+
     computeVisualData() {
         this.playVisualData = {
             mapSize: this.mapSize,

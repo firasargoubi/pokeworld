@@ -32,6 +32,11 @@ export class PlayGateway {
         this.playService.move(socket.id, position);
     }
 
+    @SubscribeMessage(PlayEvent.ChangeDebugMode)
+    changeDebugMode(socket: Socket) {
+        this.playService.changeDebugMode(socket.id);
+    }
+
     emitPlayerMoved(matchCode: string, playerMovementData: PlayerMovementData) {
         this.server.to(matchCode).emit(PlayEvent.PlayerMoved, playerMovementData);
     }
@@ -46,5 +51,9 @@ export class PlayGateway {
 
     emitPreTurnStarted(matchCode: string, match: Match) {
         this.server.to(matchCode).emit(PlayEvent.PreTurnStarted, match);
+    }
+
+    emitDebugModeChanged(matchCode: string, match: Match) {
+        this.server.to(matchCode).emit(PlayEvent.DebugModeChanged, match);
     }
 }
