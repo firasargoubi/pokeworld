@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MapComponent } from '@app/components/map/map.component';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
@@ -104,7 +104,7 @@ export class PlayPageComponent {
     get maxMovement(): number {
         return this.matchDataService.matchData.players[this.matchDataService.selfIndex].playerStats.speed;
     }
-
+    @HostListener('document:keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
         if (event.key === 'd' || event.key === 'D') {
             this.playSocketsService.changeDebugMode();

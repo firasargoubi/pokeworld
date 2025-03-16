@@ -74,16 +74,11 @@ export class MapService {
     }
 
     movePlayer(playerMovementData: PlayerMovementData) {
-        if (playerMovementData.match.matchData.isDebugMode) {
-            this.players = playerMovementData.match.matchData.players;
-            this.updateAllTiles();
-        } else {
-            for (let i = 1; i < playerMovementData.movement.length; i++) {
-                setTimeout(() => {
-                    this.players[playerMovementData.playerIndex].currentStats.position = playerMovementData.movement[i];
-                    this.updateAllTiles();
-                }, MOVE_ANIMATION_DURATION * i);
-            }
+        for (let i = 1; i < playerMovementData.movement.length; i++) {
+            setTimeout(() => {
+                this.players[playerMovementData.playerIndex].currentStats.position = playerMovementData.movement[i];
+                this.updateAllTiles();
+            }, MOVE_ANIMATION_DURATION * i);
         }
     }
 
@@ -108,9 +103,9 @@ export class MapService {
     private getOverlay(position: Position): string | null {
         let overlay = null;
 
-        const isHovering = this.hoverMoves.find((pos) => pos.x === position.x && pos.y === position.y);
-        const isOnPlayer = this.playerPosition.x === position.x && this.playerPosition.y === position.y;
-        const isPossibleMove = this.possibleMoves.find((pos) => pos.x === position.x && pos.y === position.y);
+        const isHovering = this.isHoveringPosition(position);
+        const isOnPlayer = this.isOnPlayer(position);
+        const isPossibleMove = this.isPossibleMove(position);
         const canMove = this.possibleMoves.length > 0;
         
         if (canMove && (isOnPlayer || isPossibleMove)) {
@@ -122,6 +117,18 @@ export class MapService {
         }
 
         return overlay;
+    }
+    
+    private isPossibleMove(position: Position): boolean {
+        return Boolean(this.possibleMoves.find((pos) => pos.x === position.x && pos.y === position.y));
+    }
+
+    private isOnPlayer(position: Position): boolean {
+        return this.playerPosition.x === position.x && this.playerPosition.y === position.y;
+    }
+
+    private isHoveringPosition(position: Position): boolean {
+        return Boolean(this.hoverMoves.find((pos) => pos.x === position.x && pos.y === position.y));
     }
 
     private getPlayerAvatar(position: Position): string | null {

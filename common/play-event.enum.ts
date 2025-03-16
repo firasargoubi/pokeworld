@@ -5,6 +5,7 @@ export enum PlayEvent {
     GetHoverMoves = 'getHoverMoves',
     Move = 'move',
     ChangeDebugMode = 'changeDebugMode',
+    GetActionMoves = 'getActionMoves',
 
     DebugModeChanged = 'debugModeChanged',
     TurnStarted = 'turnStarted',

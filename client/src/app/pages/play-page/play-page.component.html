@@ -1,4 +1,4 @@
-<div class="play-page" (keydown)="onKeyDown($event)" [ngStyle]="{'--player-count': playVisualData.maxPlayerCount, '--current-player-turn':  playVisualData.activePlayer, '--bg-url': 'url(' + playVisualData.thumbnailUrl + ')'}">
+<div class="play-page" [ngStyle]="{'--player-count': playVisualData.maxPlayerCount, '--current-player-turn':  playVisualData.activePlayer, '--bg-url': 'url(' + playVisualData.thumbnailUrl + ')'}">
     <div class="thumbnail-background"></div>
     <main>
         <div class="main-left">

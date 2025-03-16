@@ -46,6 +46,18 @@ export class PlayService {
         return moves;
     }
 
+    getActionMoves(playerId: string): Position[] {
+        let actionMoves = [];
+        
+        if (this.matchService.isActivePlayer(playerId)) {
+            const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+            const match = this.matchService.getMatch(matchCode);
+            actionMoves = this.movementService.getActions(match);
+        }
+
+        return actionMoves;
+    }
+
     startMatch(matchCode: string) {
         const match = this.matchService.getMatch(matchCode);
         this.reorganizeMatch(match);
@@ -64,7 +76,7 @@ export class PlayService {
         if (matchCode) {
             const isAdmin = this.matchService.isPlayerAdmin(playerId);
             if (isAdmin) {
-                const match = this.matchService.getMatch(playerId);
+                const match = this.matchService.getMatch(matchCode);
                 match.matchData.isDebugMode = !match.matchData.isDebugMode;
                 this.playGateway.emitDebugModeChanged(matchCode, match);
             }

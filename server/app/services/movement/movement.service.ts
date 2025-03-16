@@ -18,13 +18,29 @@ export class MovementService {
     getShortestPath(match: Match, target: Position): ShortestPath {
         const active = match.matchData.players[match.matchData.activePlayer];
         const start = active.currentStats.position;
+        
+        if (match.matchData.isDebugMode) {
+            return { moveCost: 0, path: [start, target] };
+        }
+
         const { distances, predecessors } = this.calculateDistancesAndPredecessors(start, match, Infinity);
         const path = this.reconstructPath(target, predecessors);
         return { moveCost: distances[target.x][target.y], path: path || [] };
     }
 
-    canMove(match: Match, target: Position): boolean {
-        return this.getPossibleMoves(match).some((pos) => pos.x === target.x && pos.y === target.y);
+    getActions(match: Match): Position[] {
+        const position = match.matchData.players[match.matchData.activePlayer].currentStats.position;
+        return NEIGHBOR_OFFSETS.filter((delta) => {
+            const neighbor: Position = { x: position.x + delta.x, y: position.y + delta.y };
+            const hasPlayer = this.isTileOccupiedByPlayer(neighbor, match);
+            const hasBridge = this.isTileABridge(neighbor, match);
+            return hasPlayer || hasBridge;
+        });
+    }
+
+    private isTileABridge(position: Position, match: Match): boolean {
+        const tile = match.gameData.mapData.tiles[position.x][position.y];
+        return tile === TileType.Bridge || tile === TileType.BrokenBridge;
     }
 
     private getPossibleMovesStandard(currentPos: Position, movementRange: number, match: Match): Position[] {
@@ -66,7 +82,7 @@ export class MovementService {
     private processNeighbor(context: NeighborContext): void {
         const neighbor: Position = { x: context.pos.x + context.offset.x, y: context.pos.y + context.offset.y };
         if (this.isOutOfBounds(neighbor, context.size)) return;
-        if (this.isTileBlockedByPlayer(neighbor, context.match)) return;
+        if (this.isTileOccupiedByPlayer(neighbor, context.match)) return;
         const moveCost = this.getMovementCost(neighbor, context.match.gameData.mapData);
         const newCost = context.cost + moveCost;
         if (newCost <= context.maxCost && newCost < context.distances[neighbor.x][neighbor.y]) {
@@ -105,7 +121,7 @@ export class MovementService {
         return path.length > 1 ? path : null;
     }
 
-    private isTileBlockedByPlayer(position: Position, match: Match): boolean {
+    private isTileOccupiedByPlayer(position: Position, match: Match): boolean {
         return match.matchData.players.some((p) => p.currentStats.position.x === position.x && p.currentStats.position.y === position.y);
     }
 

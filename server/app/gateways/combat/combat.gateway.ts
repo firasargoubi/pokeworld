@@ -1,3 +1,4 @@
+import { MatchService } from '@app/services/match/match.service';
 import { CombatEvent } from '@common/combat-event.enum';
 import { AttackResult, CombatData, CombatResult, CombatState } from '@common/combat-interfaces';
 import { DICE_MAX_VALUE, DiceType } from '@common/dice';
@@ -15,7 +16,6 @@ import {
     MIN_TURN_DURATION,
     PLAYER_STATS_MALUS,
 } from './combat.gateway.constants';
-import { MatchService } from '@app/services/match/match.service';
 
 @WebSocketGateway({ cors: true })
 @Injectable()

@@ -27,6 +27,11 @@ export class PlayGateway {
         return this.playService.getHoverMoves(socket.id, position);
     }
 
+    @SubscribeMessage(PlayEvent.GetActionMoves)
+    getActionMoves(socket: Socket): Position[] {
+        return this.playService.getActionMoves(socket.id);
+    }
+
     @SubscribeMessage(PlayEvent.Move)
     move(socket: Socket, position: Position) {
         this.playService.move(socket.id, position);

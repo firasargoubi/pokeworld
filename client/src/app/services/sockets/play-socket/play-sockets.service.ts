@@ -39,7 +39,6 @@ export class PlaySocketsService {
     }
 
     changeDebugMode(): void {
-        window.console.log('changeDebugMode');
         this.coreSocket.emit(PlayEvent.ChangeDebugMode);
     }
 
@@ -78,11 +77,7 @@ export class PlaySocketsService {
         this.matchDataService.updateMatch(playerMovementData.match);
         this.mapService.movePlayer(playerMovementData);
         if (this.matchDataService.isActivePlayer()) {
-            if (this.matchDataService.matchData.isDebugMode) {
-                this.setActivePlayerPossibleMoves.bind(this)
-            } else {
-                setTimeout(this.setActivePlayerPossibleMoves.bind(this), MOVE_ANIMATION_DURATION * playerMovementData.movement.length);
-            }
+            setTimeout(this.setActivePlayerPossibleMoves.bind(this), MOVE_ANIMATION_DURATION * playerMovementData.movement.length);
         }
     }
 
