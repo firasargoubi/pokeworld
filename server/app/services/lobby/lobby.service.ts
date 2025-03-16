@@ -97,11 +97,10 @@ export class LobbyService {
         }
     }
 
-    removePlayer(targetPlayerId: string, removalReason: Warning) {
+    removePlayer(targetPlayerId: string, warning: Warning) {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(targetPlayerId);
-
         this.matchService.removePlayerFromMatch(targetPlayerId, matchCode);
-        this.lobbyGateway.warn(targetPlayerId, removalReason);
+        this.lobbyGateway.warn(targetPlayerId, warning);
         this.lobbyGateway.disconnectPlayer(targetPlayerId);
         this.emitUpdatePlayerList(matchCode);
         this.emitLockStatusChanged(matchCode);

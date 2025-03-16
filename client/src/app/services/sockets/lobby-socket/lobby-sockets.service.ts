@@ -107,16 +107,16 @@ export class LobbySocketsService {
         this.router.navigate(['/play']);
     }
 
-    private onWarning(removalReason: Warning) {
+    private onWarning(warning: Warning) {
         this.popupService.clearMessages();
-        if ([Warning.RoomLocked].includes(removalReason)) {
-            this.popupService.showPopup(removalReason, true, this.goToMenu.bind(this));
-        } else if ([Warning.Kick, Warning.AdminQuit, Warning.LastPlayerRemaining].includes(removalReason)) {
-            this.popupService.showPopup(removalReason);
+        if ([Warning.RoomLocked].includes(warning)) {
+            this.popupService.showPopup(warning, true, this.goToMenu.bind(this));
+        } else if ([Warning.Kick, Warning.AdminQuit, Warning.LastPlayerRemaining].includes(warning)) {
+            this.popupService.showPopup(warning);
             this.popupService.keepMessages();
             this.goToMenu();
         } else {
-            this.popupService.showPopup(removalReason);
+            this.popupService.showPopup(warning);
         }
     }
 
