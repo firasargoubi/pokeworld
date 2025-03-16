@@ -42,20 +42,46 @@ export class LobbyService {
     }
 
     leaveMatch(playerId: string) {
+        this.lobbyGateway.disconnectPlayer(playerId);
+
         const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
         const isMatchStarted = this.matchService.getIsMatchStarted(matchCode);
-        const isAdmin = this.matchService.isPlayerAdmin(playerId);
 
-        this.lobbyGateway.disconnectPlayer(playerId);
+        if (matchCode) {
+            if (isMatchStarted) {
+                this.leaveStartedMatch(matchCode, playerId);
+            } else {
+                this.leaveNotStartedMatch(matchCode, playerId);
+            }
+        }
+    }
+
+    leaveStartedMatch(matchCode: string, playerId: string) {
+        const match = this.matchService.getMatch(matchCode);
+        const player = match.matchData.players.find((p) => p.id === playerId);
+        if (player) {
+            player.isConnected = false;
+        }
+        const connectedPlayers = match.matchData.players.filter((p) => p.isConnected);
+        if (connectedPlayers.length <= 1) {
+            this.lobbyGateway.disconnectPlayer(connectedPlayers[0].id);
+            this.lobbyGateway.emitRemovedFromMatch(connectedPlayers[0].id);
+            match.matchData.players.forEach((p) => { this.matchService.removePlayerFromMatch(p.id, matchCode); });
+        } else {
+            this.lobbyGateway.emitPlayerLeft(matchCode, match);
+            this.playService.endTurn(playerId);
+        }
+    }
+
+    leaveNotStartedMatch(playerId: string, matchCode: string) {
+        const isAdmin = this.matchService.isPlayerAdmin(playerId);
         this.matchService.removePlayerFromMatch(playerId, matchCode);
 
-        if (matchCode && !isMatchStarted) {
-            if (isAdmin) {
-                this.kickAllPlayers(matchCode);
-            } else {
-                this.emitUpdatePlayerList(matchCode);
-                this.emitLockStatusChanged(matchCode);
-            }
+        if (isAdmin) {
+            this.kickAllPlayers(matchCode);
+        } else {
+            this.emitUpdatePlayerList(matchCode);
+            this.emitLockStatusChanged(matchCode);
         }
     }
 

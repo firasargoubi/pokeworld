@@ -3,8 +3,7 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MapComponent } from '@app/components/map/map.component';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { EMPTY_IMAGE } from '@app/consts/images.const';
-import { PlayerVisualData } from '@app/interfaces/player-visual-data';
+import { PlayerVisualData, PlayVisualData } from '@app/interfaces/play-visual-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -13,6 +12,7 @@ import { PlaySocketsService } from '@app/services/sockets/play-socket/play-socke
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { TurnPhase } from '@common/match';
+import { DEFAULT_PLAY_VISUAL_DATA } from './play-page.component.const';
 
 @Component({
     selector: 'app-play-page',
@@ -21,34 +21,25 @@ import { TurnPhase } from '@common/match';
     imports: [MapComponent, CommonModule],
 })
 export class PlayPageComponent {
-    thumbnailUrl: string;
-    timerService: TimerService;
-    private playSocketsService: PlaySocketsService;
-    private matchDataService: MatchDataService;
-    private gameDataService: GameDataService;
-    private coreSocketService: CoreSocketService;
-    private popupService: PopupService;
-    private thumbnailService: ThumbnailService;
-    private router: Router;
+    playVisualData: PlayVisualData = structuredClone(DEFAULT_PLAY_VISUAL_DATA);
+    timerService: TimerService = inject(TimerService);
+    private playSocketsService: PlaySocketsService = inject(PlaySocketsService);
+    private matchDataService: MatchDataService = inject(MatchDataService);
+    private gameDataService: GameDataService = inject(GameDataService);
+    private coreSocketService: CoreSocketService = inject(CoreSocketService);
+    private popupService: PopupService = inject(PopupService);
+    private thumbnailService: ThumbnailService = inject(ThumbnailService);
+    private router: Router = inject(Router);
 
     constructor() {
-        this.coreSocketService = inject(CoreSocketService);
-        this.popupService = inject(PopupService);
-        this.router = inject(Router);
         this.coreSocketService.connectionStatus.subscribe((status) => this.verifySocketConnection(status));
-
-        this.playSocketsService = inject(PlaySocketsService);
-        this.timerService = inject(TimerService);
-        this.matchDataService = inject(MatchDataService);
-        this.gameDataService = inject(GameDataService);
-        this.thumbnailService = inject(ThumbnailService);
-
-        this.thumbnailUrl = EMPTY_IMAGE;
+        this.computeVisualData();
+        this.matchDataService.matchUpdate.subscribe(this.computeVisualData.bind(this));
         this.generateThumbnail();
     }
 
-    get mapSize(): number {
-        return this.gameDataService.gameData.mapData.size;
+    get mapSize(): string {
+        return this.gameDataService.gameData.mapData.size.toString();
     }
 
     get gameMode(): string {
@@ -88,6 +79,7 @@ export class PlayPageComponent {
 
     get players(): PlayerVisualData[] {
         return this.matchDataService.matchData.players.map((player) => ({
+            id: player.id,
             name: player.name,
             avatarUrl: AVATAR_DATA[player.avatar].imageCentered,
             fightsWon: player.currentStats.fightsWon,
@@ -113,13 +105,28 @@ export class PlayPageComponent {
         return this.matchDataService.matchData.players[this.matchDataService.selfIndex].playerStats.speed;
     }
 
-    async generateThumbnail() {
-        this.thumbnailUrl = await this.thumbnailService.getThumbnail(this.gameDataService.gameData.mapData, false);
+    computeVisualData() {
+        this.playVisualData = {
+            mapSize: this.mapSize,
+            gameMode: this.gameMode,
+            canUseAction: this.canUseAction,
+            canEndTurn: this.canEndTurn,
+            selfIndex: this.selfIndex,
+            currentPlayerCount: this.currentPlayerCount,
+            maxPlayerCount: this.maxPlayerCount,
+            activePlayer: this.activePlayer,
+            players: this.players,
+            selfAvatarUrl: this.selfAvatarUrl,
+            selfName: this.selfName,
+            currentMovement: this.currentMovement,
+            maxMovement: this.maxMovement,
+            thumbnailUrl: this.playVisualData.thumbnailUrl,
+        };
     }
 
-    surrender() {
-        const navigate = async () => this.router.navigate(['/']);
-        this.popupService.showPopup('Voulez-vous vraiment abandonner? ', true, navigate);
+    async generateThumbnail() {
+        const url = await this.thumbnailService.getThumbnail(this.gameDataService.gameData.mapData, false);
+        this.playVisualData.thumbnailUrl = url;
     }
 
     action() {
@@ -131,14 +138,24 @@ export class PlayPageComponent {
             this.playSocketsService.endTurn();
         }
     }
+    
+    surrender() {
+        this.popupService.showPopup('Voulez-vous vraiment abandonner ?', true, this.leaveMatch.bind(this));
+    }
+
+    private leaveMatch() {
+        this.playSocketsService.leaveMatch();
+        this.router.navigate(['/']);
+    }
 
     private verifySocketConnection(isConnected: boolean) {
-        if (!isConnected) {
+        if (!isConnected || this.matchDataService.matchData.players.length <= 0) {
             if (this.timerService) {
                 this.popupService.showPopup('Erreur de connection avec le serveur');
                 this.popupService.keepMessages();
             }
             this.router.navigate(['/']);
+            window.console.log('redirect');
         }
     }
 }

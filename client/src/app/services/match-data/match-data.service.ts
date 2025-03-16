@@ -1,6 +1,8 @@
 import { inject, Injectable } from '@angular/core';
+import { DEFAULT_GAME } from '@app/consts/default-game.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { Match, MatchData } from '@common/match';
+import { Subject } from 'rxjs';
 import { MapService } from '../map/map.service';
 import { DEFAULT_MATCH } from './match-data.service.const';
 
@@ -9,7 +11,8 @@ import { DEFAULT_MATCH } from './match-data.service.const';
 })
 export class MatchDataService {
     selfIndex: number = 0;
-    matchData: MatchData = DEFAULT_MATCH;
+    matchUpdate: Subject<null> = new Subject();
+    matchData: MatchData = structuredClone(DEFAULT_MATCH);
     private gameDataService: GameDataService = inject(GameDataService);
     private mapService: MapService = inject(MapService);
 
@@ -19,8 +22,16 @@ export class MatchDataService {
         this.mapService.setPlayers(match.matchData.players);
     }
 
+    resetMatch() {
+        this.updateMatch({
+            matchData: structuredClone(DEFAULT_MATCH),
+            gameData: structuredClone(DEFAULT_GAME),
+        });
+    }
+
     updateMatch(match: Match) {
         this.gameDataService.setGameData(match.gameData);
         this.matchData = match.matchData;
+        this.matchUpdate.next(null);
     }
 }

@@ -1,9 +1,9 @@
+import { PlayService } from '@app/services/play/play.service';
+import { Match } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { PlayService } from '@app/services/play/play.service';
-import { Match } from '@common/match';
 
 @WebSocketGateway({ cors: true })
 @Injectable()

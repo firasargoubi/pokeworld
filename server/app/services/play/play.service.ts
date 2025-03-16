@@ -102,6 +102,7 @@ export class PlayService {
     private reorganizeMatch(match: Match) {
         match.matchData.activePlayer = match.matchData.players.length - 1;
         match.matchData.isStarted = true;
+        match.matchData.isLocked = true;
         this.sortPlayers(match);
         this.assignSpawnPoints(match);
     }

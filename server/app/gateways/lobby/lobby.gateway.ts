@@ -1,10 +1,11 @@
+import { LobbyService } from '@app/services/lobby/lobby.service';
+import { GameData } from '@common/game-data';
 import { LobbyEvent } from '@common/lobby-event.enum';
+import { Match } from '@common/match';
 import { Player } from '@common/player';
 import { Inject, Injectable } from '@nestjs/common';
-import { GameData } from '@common/game-data';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { LobbyService } from '@app/services/lobby/lobby.service';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
@@ -80,6 +81,10 @@ export class LobbyGateway implements OnGatewayDisconnect {
         if (socket) {
             socket.emit(LobbyEvent.RemovedFromMatch);
         }
+    }
+
+    emitPlayerLeft(matchCode: string, match: Match) {
+        this.server.to(matchCode).emit(LobbyEvent.PlayerLeft, match);
     }
 
     warn(playerId: string, message: string) {
