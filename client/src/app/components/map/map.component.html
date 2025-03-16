@@ -1,9 +1,9 @@
 <div class="map-wrapper" [style.--size]="mapService.visualMapData.size" [class.is-editor]="isEditor">
-    <div class="map-container" (mouseout)="onHover(-1, -1)">
+    <div class="map-container" (mouseout)="onHover({ x: -1, y: -1 })">
         <div class="map">
             @for (tileRow of mapService.visualMapData.tiles; track tileRow; let x = $index) {
                 @for (tile of tileRow; track tile; let y = $index) {
-                    <div (mouseenter)="onHover(x, y)" (click)="clickTile(x, y)" class="tile" [attr.x]="x" [attr.y]="y" [class]="tile.overlay" [attr.tile]="mapService.gameDataService.getTileFromPosition({ x, y })">
+                    <div (mouseenter)="onHover({ x, y })" (click)="clickTile({ x, y})" class="tile" [attr.x]="x" [attr.y]="y" [class]="tile.overlay" [attr.tile]="mapService.gameDataService.getTileFromPosition({ x, y })">
                         @if (tile.underlay) {
                             <div class="tile-image" [style.backgroundImage]="'url(' + tile.underlay + ')'"></div>
                         }

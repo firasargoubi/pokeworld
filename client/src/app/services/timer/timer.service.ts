@@ -6,6 +6,7 @@ import { DEFAULT_MAX_TIME, DEFAULT_TIME, ONE_SECOND, TIMER_START_DELAY } from '.
 })
 export class TimerService {
     maxTime: number = DEFAULT_MAX_TIME;
+    lastStartTime: number = DEFAULT_MAX_TIME;
     currentTime: number = DEFAULT_TIME;
     interval: number | null = null;
 

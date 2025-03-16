@@ -4,4 +4,4 @@ export const PRE_TURN_DURATION = 500;
 
 export const TURN_DURATION = 300000;
 
-export const ONE_SECOND = 1000;
+export const MS_CONVERSION_FACTOR = 10;

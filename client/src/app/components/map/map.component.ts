@@ -17,16 +17,17 @@ export class MapComponent {
     playSocketsService: PlaySocketsService = inject(PlaySocketsService);
     private lastHover: Position = { x: -1, y: -1 };
 
-    onHover(x: number, y: number) {
-        if (!this.isEditor && (this.lastHover.x !== x || this.lastHover.y !== y)) {
-            this.lastHover = { x, y };
-            this.playSocketsService.setHoverMoves({ x, y });
+    onHover(position: Position) {
+        const hoveringLastTile = this.lastHover.x !== position.x || this.lastHover.y !== position.y;
+        if (!this.isEditor && hoveringLastTile) {
+            this.lastHover = position;
+            this.playSocketsService.setHoverMoves(position);
         }
     }
 
-    clickTile(x: number, y: number) {
+    clickTile(position: Position) {
         if (!this.isEditor) {
-            this.playSocketsService.clickTile({ x, y });
+            this.playSocketsService.clickTile(position);
         }
     }
 }
