@@ -34,4 +34,5 @@ export const DEFAULT_PLAYER: Player = {
     isAdmin: false,
     isConnected: false,
     isBot: false,
+    spawnPoint: { x: 0, y: 0 },
 };
