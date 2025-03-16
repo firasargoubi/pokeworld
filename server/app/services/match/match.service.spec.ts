@@ -1,10 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { MatchService } from './match.service';
-import { createSandbox, SinonSandbox } from 'sinon';
 import { MOCK_GAMES } from '@app/consts/tests/mock-games';
-import { MACTHES, MATCH_CODES, PLAYER_IDS, PLAYER_TO_MATCH_CODE } from './match.service.spec.const';
-import { CODE_LENGTH } from './match.service.const';
 import { MOCK_MATCHES } from '@app/consts/tests/mock-matches';
+import { Test, TestingModule } from '@nestjs/testing';
+import { createSandbox, SinonSandbox } from 'sinon';
+import { MatchService } from './match.service';
+import { CODE_LENGTH, DEFAULT_TURN_DATA } from './match.service.const';
+import { MACTHES, MATCH_CODES, PLAYER_IDS, PLAYER_TO_MATCH_CODE } from './match.service.spec.const';
 
 describe('MatchService', () => {
     let service: MatchService;
@@ -22,6 +22,10 @@ describe('MatchService', () => {
         sandbox = createSandbox();
         service['matches'] = structuredClone(MACTHES);
         service['playerToMatchCode'] = structuredClone(PLAYER_TO_MATCH_CODE);
+        service['turnDatas'] = new Map([
+            [MATCH_CODES[0], structuredClone(DEFAULT_TURN_DATA)],
+            [MATCH_CODES[1], structuredClone(DEFAULT_TURN_DATA)],
+        ]);
     });
 
     afterEach(() => {
@@ -89,11 +93,13 @@ describe('MatchService', () => {
     });
 
     it('should delete match if no player is left', () => {
-        expect(service.hasMatchCode(structuredClone(MATCH_CODES[0]))).toBe(true);
-        service.getPlayers(MATCH_CODES[0]).forEach((player) => {
-            service.removePlayerFromMatch(player.id, MATCH_CODES[0]);
+        const matchCode = MATCH_CODES[0];
+        expect(service.hasMatchCode(matchCode)).toBe(true);
+        [PLAYER_IDS[0], PLAYER_IDS[1]].forEach((playerId) => {
+            service.removePlayerFromMatch(playerId, matchCode);
         });
-        expect(service.hasMatchCode(structuredClone(MATCH_CODES[0]))).toBe(false);
+        expect(service.hasMatchCode(matchCode)).toBe(false);
+        expect(service['turnDatas'].has(matchCode)).toBe(false);
     });
 
     it('should getMatchCodeFromPlayerId correctly', () => {
