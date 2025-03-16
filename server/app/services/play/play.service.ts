@@ -124,8 +124,7 @@ export class PlayService {
             playerOneIndex: this.matchService.getPlayerIndex(playerId),
             playerTwoIndex: this.matchService.getPlayerIndex(tragetPlayerId),
         });
-
-        // this.combatService.initiateCombat(playerId, tragetPlayerId);
+        this.combatService.initiateCombat(playerId, tragetPlayerId);
     }
 
     private toggleBridgeTile(match: Match, position: Position) {
