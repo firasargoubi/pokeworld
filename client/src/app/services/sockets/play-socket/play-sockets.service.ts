@@ -88,8 +88,7 @@ export class PlaySocketsService {
 
     private onPauseTurn(match: Match) {
         this.matchDataService.updateMatch(match);
-        this.timerService.pause();
-        window.console.log('onPauseTurn', match.matchData.currentTimer);
+        this.timerService.pauseTimer(match.matchData.currentTimer);
     }
 
     private onCombatStarted(combatData: CombatData) {
