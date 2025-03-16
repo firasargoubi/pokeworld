@@ -1,13 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { GameData } from '@common/game-data';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match } from '@common/match';
-import { PlayEvent } from '@common/play-event.enum';
 import { Player } from '@common/player';
+import { Warning } from '@common/warning.enum';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -15,12 +16,13 @@ import { BehaviorSubject, Observable } from 'rxjs';
 })
 export class LobbySocketsService {
     matchCode: string;
-    private playersSubject: BehaviorSubject<Player[]>;
-    private roomLockedSubject: BehaviorSubject<boolean>;
-    private coreSocket: CoreSocketService;
-    private matchDataService: MatchDataService;
-    private popupService: PopupService;
-    private router: Router;
+    private gameDataService: GameDataService = inject(GameDataService);
+    private playersSubject: BehaviorSubject<Player[]> = new BehaviorSubject<Player[]>([]);
+    private roomLockedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    private coreSocket: CoreSocketService = inject(CoreSocketService);
+    private matchDataService: MatchDataService = inject(MatchDataService);
+    private popupService: PopupService = inject(PopupService);
+    private router: Router = inject(Router);
 
     constructor() {
         this.matchCode = '';
@@ -73,10 +75,6 @@ export class LobbySocketsService {
         });
     }
 
-    leaveMatch(): void {
-        this.popupService.showPopup('Voulez-vous vraiment quitter le lobby?', true, this.leaveMatchAction.bind(this));
-    }
-
     updatePlayer(playerUpdates: Partial<Player>) {
         this.coreSocket.emit(LobbyEvent.UpdatePlayer, playerUpdates);
     }
@@ -89,7 +87,7 @@ export class LobbySocketsService {
         this.coreSocket.emit(LobbyEvent.StartMatch);
     }
 
-    private leaveMatchAction(): void {
+    leaveMatch(): void {
         this.coreSocket.emit(LobbyEvent.LeaveMatch);
         this.matchCode = '';
         this.router.navigate(['/']);
@@ -98,9 +96,10 @@ export class LobbySocketsService {
     private setupLobbyListeners(): void {
         this.coreSocket.on(LobbyEvent.UpdatePlayerList, this.onUpdatePlayersLists.bind(this));
         this.coreSocket.on(LobbyEvent.LockStatusChanged, this.onLockStatusChanged.bind(this));
-        this.coreSocket.on(PlayEvent.MatchStarted, this.onMatchStarted.bind(this));
+        this.coreSocket.on(LobbyEvent.MatchStarted, this.onMatchStarted.bind(this));
         this.coreSocket.on(LobbyEvent.RemovedFromMatch, this.onRemovedFromMatch.bind(this));
         this.coreSocket.on(LobbyEvent.Warning, this.onWarning.bind(this));
+        this.coreSocket.on(LobbyEvent.EmitGameData, this.onEmitGameData.bind(this));
     }
 
     private onLockStatusChanged(isLocked: boolean) {
@@ -111,11 +110,9 @@ export class LobbySocketsService {
         this.playersSubject.next(players);
     }
 
-    private onRemovedFromMatch() {
+    private onRemovedFromMatch(removalReason: Warning) {
         this.matchCode = '';
-        this.popupService.showPopup('Vous avez été retiré de la partie');
-        this.popupService.keepMessages();
-        this.router.navigate(['/']);
+        this.onWarning(removalReason);
     }
 
     private onMatchStarted(match: Match) {
@@ -123,7 +120,24 @@ export class LobbySocketsService {
         this.router.navigate(['/play']);
     }
 
-    private onWarning(message: string) {
-        this.popupService.showPopup(message);
+    private onWarning(removalReason: Warning) {
+        if (!this.popupService.isDisplayed) {
+            const goToMenu = () => {
+                this.router.navigate(['/']);
+            };
+            if (removalReason === Warning.RoomLocked) {
+                this.popupService.showPopup(removalReason, true, goToMenu);
+                return;
+            }
+            this.popupService.showPopup(removalReason);
+            this.popupService.keepMessages();
+            if ([Warning.Kick, Warning.AdminQuit].includes(removalReason)) {
+                goToMenu();
+            }
+        }
+    }
+
+    private onEmitGameData(gameData: GameData) {
+        this.gameDataService.gameData = gameData;
     }
 }
