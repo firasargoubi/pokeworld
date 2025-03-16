@@ -3,7 +3,8 @@ import { GameData } from '@common/game-data';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
-import { Inject, Injectable } from '@nestjs/common';
+import { Warning } from '@common/warning.enum';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -11,7 +12,7 @@ import { Server, Socket } from 'socket.io';
 @Injectable()
 export class LobbyGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
-    @Inject(LobbyService) private readonly lobbyService: LobbyService;
+    @Inject(forwardRef(() => LobbyService)) private readonly lobbyService: LobbyService;
 
     @SubscribeMessage(LobbyEvent.CreateMatch)
     createMatch(socket: Socket, gameData: GameData): string {
@@ -30,7 +31,7 @@ export class LobbyGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(LobbyEvent.KickPlayer)
     kickPlayer(socket: Socket, targetPlayerId: string) {
-        this.lobbyService.tryKickPlayer(socket.id, targetPlayerId);
+        this.lobbyService.kickPlayer(socket.id, targetPlayerId);
     }
 
     @SubscribeMessage(LobbyEvent.UpdatePlayer)
@@ -68,6 +69,10 @@ export class LobbyGateway implements OnGatewayDisconnect {
         }
     }
 
+    emitMatchStarted(matchCode: string, match: Match) {
+        this.server.to(matchCode).emit(LobbyEvent.MatchStarted, match);
+    }
+
     emitLockStatusChanged(matchCode: string, lockedStatus: boolean) {
         this.server.to(matchCode).emit(LobbyEvent.LockStatusChanged, lockedStatus);
     }
@@ -76,15 +81,18 @@ export class LobbyGateway implements OnGatewayDisconnect {
         this.server.to(matchCode).emit(LobbyEvent.UpdatePlayerList, players);
     }
 
-    emitRemovedFromMatch(clientId: string): void {
+    emitGameDataToPlayer(clientId: string, gameData: GameData) {
         const socket = this.server.sockets.sockets.get(clientId);
         if (socket) {
-            socket.emit(LobbyEvent.RemovedFromMatch);
+            socket.emit(LobbyEvent.EmitGameData, gameData);
         }
     }
 
-    emitPlayerLeft(matchCode: string, match: Match) {
-        this.server.to(matchCode).emit(LobbyEvent.PlayerLeft, match);
+    emitRemovedFromMatch(clientId: string, removalReason: Warning): void {
+        const socket = this.server.sockets.sockets.get(clientId);
+        if (socket) {
+            socket.emit(LobbyEvent.RemovedFromMatch, removalReason);
+        }
     }
 
     warn(playerId: string, message: string) {

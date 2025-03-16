@@ -1,9 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { CombatEvent } from '@common/combat-event.enum';
-import { PlayEvent } from '@common/play-event.enum';
-import { AttackResult, CombatData, CombatResult } from '@common/combat-interfaces';
+import { CombatEvents } from '@common/combat-event.enum';
+import { AttackAttempt, AttackResult, CombatData, CombatResult, EscapeAttempt } from '@common/combat-interfaces';
 import { Player } from '@common/player';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -27,7 +26,6 @@ export class CombatSocketService {
     private router: Router = inject(Router);
 
     constructor() {
-        this.combatResult.next(null);
         this.setupCombatListeners();
         this.setupTurnListeners();
         this.setupPlayerUpdateListener();
@@ -42,25 +40,27 @@ export class CombatSocketService {
     }
 
     initFight(targetPlayerId: string): void {
-        this.coreSocket.emit(PlayEvent.StartCombat, targetPlayerId);
+        this.coreSocket.emit(CombatEvents.StartCombat, targetPlayerId);
     }
 
     escapeAttempt(): void {
-        this.coreSocket.emit(CombatEvent.EscapeAttempt, {
+        const escapeAttempt: EscapeAttempt = {
             combatRoomCode: this.combatRoomCode,
             playerId: this.selfPlayerSubject.value?.id,
-        });
+        };
+        this.coreSocket.emit(CombatEvents.EscapeAttempt, escapeAttempt);
     }
 
     attackAttempt(): void {
-        this.coreSocket.emit(CombatEvent.AttackAttempt, {
+        const attackAttempt: AttackAttempt = {
             combatRoomCode: this.combatRoomCode,
             targetId: this.ennemyPlayerSubject.value?.id,
-        });
+        };
+        this.coreSocket.emit(CombatEvents.AttackAttempt, attackAttempt);
     }
 
     private setupCombatListeners(): void {
-        this.coreSocket.on(PlayEvent.CombatStarted, (combatData: CombatData) => {
+        this.coreSocket.on(CombatEvents.CombatStarted, (combatData: CombatData) => {
             const playerOne: Player = combatData.players[0];
             const playerTwo: Player = combatData.players[1];
 
@@ -82,14 +82,15 @@ export class CombatSocketService {
             this.attackResult.next(attackResult);
         });
 
-        this.coreSocket.on(CombatEvent.EndCombat, (result: CombatResult) => {
-            // popup instead
+        this.coreSocket.on(CombatEvents.EndCombat, (result: CombatResult) => {
+            // TODO: popup instead
             window.console.log(`Combat terminé, ganant: ${result.winnerId}`);
             this.combatResult.next(result);
 
             const navigationDelay = 1200;
             setTimeout(() => {
-                this.router.navigate(['/play']);
+                // TODO: Should be play page (also change test)
+                this.router.navigate(['/debug']);
             }, navigationDelay);
         });
     }

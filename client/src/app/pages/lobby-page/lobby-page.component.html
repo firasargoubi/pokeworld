@@ -1,35 +1,63 @@
 <div id="lobby-container">
     <div id="lobby-header">
-        <app-header [onClick]="this.leaveLobbyButton.bind(this)" [stepNumber]="'3'"
-            [title]="'Page d\'attente'"></app-header>
+        <app-header [onClick]="this.leaveLobbyButton.bind(this)" [stepNumber]="'3'" [title]="'Page d\'attente'"></app-header>
     </div>
 
     <div id="lobby-border">
         <div id="lobby-body">
             <div class="access-code-container">
-                <img src="../../../assets/images/menu/containers/dark-blue/dark-blue-scrare.png"
-                    class="background-image" />
-                <div class="access-code-box">
-                    <p class="access-title">Votre code d'accès</p>
-                    <p class="access-code">{{ this.matchCode }}</p>
-                    <p class="access-instruction">Partagez ce code avec les autres joueurs pour jouer</p>
+                <p class="access-title">Votre code d'accès</p>
+                <p class="access-code">{{ this.matchCode }}</p>
+                <!-- <div class="access-instruction">Partagez ce code avec les autres joueurs pour jouer</div> -->
+                @if (this.isSelfAdmin) {
+                <div class="access-instruction">
+                    <div class="lock-container" (click)="this.toggleLockRoom()">
+                        @if (this.isRoomLocked) {
+                        <p>🔒</p>
+                        } @else {
+                        <p>🔓</p>
+
+                        }
+                    </div>
+                    <div class="copy-container" (click)="this.copyMatchCode()">
+                        <img src="./assets/images/menu/icons/copy.png" />
+                    </div>
                 </div>
+                } @else{
+                <div class="access-instruction">
+                    @if (this.isRoomLocked) {
+                    <p>🔒</p>
+                    } @else {
+                    <p>🔓</p>
+                    }
+                    <div class="copy-container" (click)="this.copyMatchCode()">
+                        <img src="./assets/images/menu/icons/copy.png" />
+                    </div>
+                </div>
+                }
             </div>
 
             <div id="players-list">
-                @for (player of (players$ | async); track player) {
-                    <app-player-card [player]="player" [isViewer]="false" [kickPlayerButton]="kickPlayerButton.bind(this)"></app-player-card>
-                }
-                <div id="lock-control-container">
-                    <img (click)="toggleLockRoom()"
-                        [src]="isRoomLocked ? '../../../assets/images/menu/icons/lock.png' : '../../../assets/images/menu/icons/unlock.png'"
-                        class="lock-icon" />
+                @for (player of (players$ | async); track player.id) { @if (player.isConnected) {
+                <div class="player-card-container">
+                    <app-player-card
+                        [player]="player"
+                        [displayBanButton]="this.isSelfAdmin"
+                        [isSelfPlayer]="this.selfId === player.id"
+                        [onClick]="kickPlayer.bind(this, player.id)"
+                    ></app-player-card>
                 </div>
+                } } @for (availebelPlayer of this.availebelPlayers; track $index) {
+                <div class="player-card-container">
+                    <app-player-card [isDisconeected]="true"></app-player-card>
+                </div>
+                }
             </div>
         </div>
     </div>
+    @if (this.isSelfAdmin) {
     <div id="poke-button">
-        <app-pokeball-button [buttonContent]="'LANCER PARTIE'" [onClickAction]="this.startMatchButton.bind(this)">
-        </app-pokeball-button>
+        <app-pokeball-button [buttonContent]="'LANCER PARTIE'" [onClickAction]="this.startMatchButton.bind(this)"></app-pokeball-button>
     </div>
+    }
 </div>

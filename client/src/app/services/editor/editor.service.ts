@@ -47,6 +47,7 @@ export class EditorService {
             return;
         }
 
+        this.gameDataService.gameData.name = this.gameDataService.gameData.name.trim();
         this.gameSaveService.isNameUnique(this.gameDataService.gameData.name, this.gameDataService.gameData._id).subscribe((isUnique) => {
             if (!isUnique) {
                 this.popupService.showPopup('Le nom est déjà utilisé. Veuillez en choisir un autre.', false);

@@ -7,6 +7,7 @@ import { MOCK_GAMES } from '@app/consts/tests/mock-games';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { GameData } from '@common/game-data';
 import { of, throwError } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
@@ -25,6 +26,7 @@ describe('CreatePageComponent', () => {
     let gameDataServiceMock: jasmine.SpyObj<GameDataService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let routerSpy: jasmine.SpyObj<Router>;
+    let lobbySocketServiceSpy: jasmine.SpyObj<LobbySocketsService>;
     let mockGames: GameData[];
 
     beforeEach(async () => {
@@ -36,12 +38,14 @@ describe('CreatePageComponent', () => {
         gameSaveServiceSpy.getGame.and.returnValue(of({} as GameData));
         gameDataServiceMock = jasmine.createSpyObj('GameDataService', ['setGameData']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
+        lobbySocketServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['createMatch']);
 
         await TestBed.configureTestingModule({
             providers: [
                 { provide: GameSaveService, useValue: gameSaveServiceSpy },
                 { provide: GameDataService, useValue: gameDataServiceMock },
                 { provide: PopupService, useValue: popupServiceSpy },
+                { provide: LobbySocketsService, useValue: lobbySocketServiceSpy },
                 { provide: Router, useValue: routerSpy },
             ],
         }).compileComponents();
@@ -89,5 +93,18 @@ describe('CreatePageComponent', () => {
         gameSaveServiceSpy.getAllGames.and.returnValue(of(mockGames));
         component['loadGames']();
         expect(component.games).toEqual(mockGames.filter((game) => game.isVisible));
+    });
+
+    it('should handle createMatch success and failure', async () => {
+        lobbySocketServiceSpy.createMatch.and.returnValue(Promise.resolve(true));
+        await component.createMatch(MOCK_GAMES[0]);
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/player-selection']);
+        expect(popupServiceSpy.showPopup).not.toHaveBeenCalled();
+
+        lobbySocketServiceSpy.createMatch.and.returnValue(Promise.resolve(false));
+        spyOn(component as CreatePageComponent & { loadGames: () => void }, 'loadGames');
+        await component.createMatch(MOCK_GAMES[0]);
+        expect(component['loadGames']).toHaveBeenCalled();
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith("Ce jeu n'est plus disponible");
     });
 });

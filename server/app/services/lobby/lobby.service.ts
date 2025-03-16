@@ -87,42 +87,42 @@ export class LobbyService {
         }
     }
 
-    tryKickPlayer(playerId: string, targetPlayerId: string) {
-        const isAdmin = this.matchService.isPlayerAdmin(playerId);
-        const isTryingToKickThemselve = targetPlayerId === playerId;
+    kickPlayer(currentPlayerId: string, targetPlayerId: string) {
+        const isAdmin = this.matchService.isPlayerAdmin(currentPlayerId);
+        const isTryingToKickThemselve = currentPlayerId === targetPlayerId;
 
         if (isAdmin && !isTryingToKickThemselve) {
-            this.kickPlayer(targetPlayerId);
+            this.removePlayer(targetPlayerId, Warning.Kick);
         }
     }
 
-    kickPlayer(playerId: string) {
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+    removePlayer(targetPlayerId: string, removalReason: Warning) {
+        const matchCode = this.matchService.getMatchCodeFromPlayerId(targetPlayerId);
 
-        this.matchService.removePlayerFromMatch(playerId, matchCode);
-        this.lobbyGateway.emitRemovedFromMatch(playerId);
-        this.lobbyGateway.disconnectPlayer(playerId);
+        this.matchService.removePlayerFromMatch(targetPlayerId, matchCode);
+        this.lobbyGateway.emitRemovedFromMatch(targetPlayerId, removalReason);
+        this.lobbyGateway.disconnectPlayer(targetPlayerId);
         this.emitUpdatePlayerList(matchCode);
         this.emitLockStatusChanged(matchCode);
     }
 
     updatePlayer(playerId: string, updatedFields: Partial<Player>) {
-        if (updatedFields) {
-            const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-            const players = this.matchService.getPlayers(matchCode);
-            const player = players.find((p) => p.id === playerId);
+        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+        const players = this.matchService.getPlayers(matchCode);
+        const player = players.find((p) => p.id === playerId);
 
-            if (player) {
-                Object.assign(player, updatedFields);
-                if (updatedFields.name) {
-                    player.name = this.matchService.getUniqueName(updatedFields.name, playerId);
-                }
-                if (updatedFields.isConnected) {
-                    this.emitLockStatusChanged(matchCode);
-                }
-                this.emitUpdatePlayerList(matchCode);
-            }
+        Object.assign(player, updatedFields);
+        if (updatedFields.name) {
+            player.name = this.matchService.getUniqueName(updatedFields.name, playerId);
         }
+        if (updatedFields.isConnected) {
+            const gameData = this.matchService.getMatch(matchCode).gameData;
+            this.lobbyGateway.emitGameDataToPlayer(playerId, gameData);
+
+            this.emitLockStatusChanged(matchCode);
+        }
+
+        this.emitUpdatePlayerList(matchCode);
     }
 
     startMatch(playerId: string) {
@@ -148,7 +148,7 @@ export class LobbyService {
         players.forEach((player) => {
             this.matchService.removePlayerFromMatch(player.id, matchCode);
             this.lobbyGateway.disconnectPlayer(player.id);
-            this.lobbyGateway.emitRemovedFromMatch(player.id);
+            this.lobbyGateway.emitRemovedFromMatch(player.id, Warning.AdminQuit);
         });
     }
 
@@ -156,16 +156,16 @@ export class LobbyService {
         let result = true;
 
         if (!this.matchService.hasMatchCode(matchCode)) {
-            this.lobbyGateway.warn(playerId, "La partie n'existe pas");
+            this.lobbyGateway.warn(playerId, Warning.NotExistGame);
             result = false;
         } else if (this.isMatchFull(matchCode)) {
-            this.lobbyGateway.warn(playerId, 'La partie est pleine');
+            this.lobbyGateway.warn(playerId, Warning.RoomFull);
             result = false;
         } else if (this.isMatchLocked(matchCode)) {
-            this.lobbyGateway.warn(playerId, 'La partie est verouillée');
+            this.lobbyGateway.warn(playerId, Warning.RoomLocked);
             result = false;
         } else if (this.matchService.isPlayerInMatch(playerId)) {
-            this.lobbyGateway.warn(playerId, 'Vous êtes déjà dans une partie');
+            this.lobbyGateway.warn(playerId, Warning.AlreadyInGame);
             result = false;
         }
 
@@ -184,7 +184,7 @@ export class LobbyService {
         const players = this.matchService.getPlayers(matchCode);
         players.forEach((player) => {
             if (!player.isConnected) {
-                this.kickPlayer(player.id);
+                this.removePlayer(player.id, Warning.RoomLocked);
             }
         });
     }

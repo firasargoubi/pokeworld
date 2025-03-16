@@ -8,8 +8,7 @@ import { CombatAnimations } from '@app/interfaces/combat-animations';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { AttackResult } from '@common/combat-interfaces';
 import { Player } from '@common/player';
-
-const ONE_SEC = 1000;
+import { COMBAT_TIME_SCALE } from './combat-page.component.const';
 
 @Component({
     selector: 'app-combat-page',
@@ -45,7 +44,7 @@ export class CombatPageComponent implements OnDestroy, OnInit {
                 this.iscurrentTurn = turn;
             });
             this.combatSocketService.currentTimer.subscribe((timer) => {
-                this.maxTime = timer / ONE_SEC;
+                this.maxTime = timer / COMBAT_TIME_SCALE;
                 this.setTimer();
             });
             this.combatSocketService.attackResult.subscribe((attackResult) => {
@@ -161,7 +160,7 @@ export class CombatPageComponent implements OnDestroy, OnInit {
                     this.timerInterval = null;
                 }
             }
-        }, ONE_SEC);
+        }, COMBAT_TIME_SCALE);
     }
 
     private handleBeforeUnload(): void {

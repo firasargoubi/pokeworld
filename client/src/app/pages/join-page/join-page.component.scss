@@ -85,7 +85,7 @@ $clip-path: polygon(
     border: calc($corner-square-size * 2) solid #48485f;
     clip-path: $clip-path;
 
-    background-image: url('/assets/images/menu/containers/dark-blue/dark-blue-scrare-body.png');
+    background-image: url('../../../assets/images/menu/containers/dark-blue/dark-blue-scrare-body.png');
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -128,7 +128,6 @@ $clip-path: polygon(
     justify-content: center;
     height: 24%;
 }
-
 
 #visual-input-container .number {
     height: 100%;

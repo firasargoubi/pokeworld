@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { CODE_LENGTH } from '@app/consts/join.const';
+import { PlayerSelectionService } from '@app/services/player-selection/player-selection.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 
 @Component({
@@ -16,11 +17,13 @@ export class JoinPageComponent {
     codeLength: number = CODE_LENGTH;
     private router: Router = inject(Router);
     private lobbySocketService: LobbySocketsService = inject(LobbySocketsService);
+    private playerSelectionService: PlayerSelectionService = inject(PlayerSelectionService);
 
     joinMatch(event: KeyboardEvent) {
         const isJoinKey = event.key === 'Enter';
 
         if (isJoinKey) {
+            this.playerSelectionService.matchCode = this.gameCode;
             this.lobbySocketService.joinMatch(this.gameCode).subscribe((joinStatus) => {
                 if (joinStatus) {
                     this.router.navigate(['/player-selection']);

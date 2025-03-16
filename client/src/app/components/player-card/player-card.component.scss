@@ -1,144 +1,220 @@
-.player-card {
-    display: flex;
-    align-items: center;
-    position: relative;
-    width: 42vw;
-    height: 12vh;
-    padding: 1vw;
-    margin: 1vw;
-    border-radius: 5%;
-    z-index: 1;
-}
+$corner-square-size: 0.3vw;
+$clip-path: polygon(
+    $corner-square-size 0%,
+    calc(100% - #{$corner-square-size}) 0%,
 
-.pokeball-container {
-    position: relative;
-    width: 8vw;
-    overflow: visible;
-}
+    calc(100% - #{$corner-square-size}) $corner-square-size,
+    100% $corner-square-size,
 
-.pokeball {
-    height: 16.6vh;
-    object-fit: cover;
-    top: 0;
-}
+    100% calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) 100%,
+    $corner-square-size 100%,
 
-.player-avatar {
-    position: absolute;
-    top: -20%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 12vw;
-    height: 12vw;
-}
+    $corner-square-size calc(100% - #{$corner-square-size}),
+    0% calc(100% - #{$corner-square-size}),
+    0% $corner-square-size,
+    $corner-square-size $corner-square-size
+);
 
-.player-name {
-    font-size: 2.5vw;
-    color: white;
-    text-shadow: 0.2vw 0.2vw black;
-    text-transform: uppercase;
-    position: absolute;
-    left: 8.6vw;
-    top: 0;
-    white-space: nowrap;
-}
+$inner-border-width: 0.3vw;
 
-.container {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 8vw;
-    overflow: visible;
-}
+$text-shadow-color: rgb(112, 112, 112);
 
-.background-image {
-    width: 78%;
+.player-component {
     height: 100%;
-    position: absolute;
-    left: 4vw;
-    top: 0.1vh;
-    z-index: -1;
+    width: 100%;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 5% 95% 0%;
+    overflow: visible;
 }
 
-.hp-bar {
-    position: absolute;
-    left: 20vw;
-    top: 2vw;
-    width: 15vw;
-    z-index: 1;
-}
-.action-button-container {
-    position: absolute;
+.ban-button {
+    height: 100%;
+    width: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
-    width: 6vw;
-    height: 100%;
-    right: 0;
-    top: 0;
 }
 
-.action-button {
-    background: none;
-    border: none;
+.display-ban-button {
+    grid-template-columns: 5% 87% 8%;
+}
+
+.ban-icon {
+    height: 100%;
+    width: 80%;
+    background-image: url('../../../assets/images/menu/icons/kick.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
     cursor: pointer;
-    width: 60%;
-    height: 100%;
 }
 
-.action-button img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.ban-icon:hover {
+    filter: brightness(1.2);
 }
-.info-container {
-    margin-left: -1vw;
+
+.ban-icon:active {
+    rotate: 180deg;
+}
+
+.is-admin .ban-icon {
+    user-select: none;
+    cursor: not-allowed;
+}
+
+.is-admin .ban-icon:hover {
+    filter: brightness(1);
+}
+
+.is-admin .ban-icon:active {
+    rotate: 0deg;
+}
+
+.player-card {
+    position: relative;
+    height: 100%;
+    width: 100%;
+
+    border: calc($corner-square-size * 2) solid #48485f;
+    clip-path: $clip-path;
+
+    background-image: url('../../../assets/images/menu/containers/dark-blue/dark-blue-scrare-body.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: visible;
+
+    padding: $inner-border-width;
+    box-shadow:
+        inset $inner-border-width 0 0 0 #80c0d8,
+        inset calc(-1 * $inner-border-width) 0 0 0 #2878b0,
+        inset 0 $inner-border-width 0 0 #80c0d8,
+        inset 0 calc(-1 * $inner-border-width) 0 0 #2878b0;
+}
+
+.is-self-player-card .player-card {
+    border: calc($corner-square-size * 2) solid #f87030;
+    clip-path: $clip-path;
+
+    background-image: url('../../../assets/images/menu/containers/pink/pink-scrare-body.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: visible;
+
+    padding: $inner-border-width;
+    box-shadow:
+        inset $inner-border-width 0 0 0 rgb(247, 209, 216),
+        inset calc(-1 * $inner-border-width) 0 0 0 rgb(231, 163, 131),
+        inset 0 $inner-border-width 0 0 rgb(247, 209, 216),
+        inset 0 calc(-1 * $inner-border-width) 0 0 rgb(231, 163, 131);
+}
+
+.avatar-container {
+    height: 100%;
+    aspect-ratio: 1/1;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+
+    background-image: url('../../../assets/images/menu/containers/dark-blue/party-ball.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: visible;
+    position: relative;
+}
+
+.avatar-container .avatar {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 100%;
+    user-select: none;
+    pointer-events: none;
+}
+
+.player-card .player-name {
+    position: absolute;
+    top: 7%;
+    left: 13%;
+    font-size: 2vw;
+    text-shadow: 0.25vw 0 0 $text-shadow-color;
+    display: flex;
+    justify-content: start;
+    gap: 1vw;
+    height: 50%;
+    width: 80%;
+    z-index: 3;
+    user-select: none;
+}
+
+.player-card .crown {
+    height: 100%;
+    aspect-ratio: 1/1;
+    background-image: url('../../../assets/images/menu/icons/crown.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+}
+
+.is-admin .player-card .crown {
+    opacity: 1;
+}
+
+.player-card .hp-bar {
+    position: absolute;
+    bottom: 40%;
+    right: 4%;
+    width: 40%;
+    aspect-ratio: 20/1.4;
+    background-image: url('../../../assets/images/menu/stat-bar/hp-bar.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: end;
     overflow: visible;
 }
-.hp-bar-container {
-    position: relative;
-    width: 15vw;
-    height: 2vw;
-    left: 12vw;
-    top: -2vh;
-}
 
-.hp-bar {
-    width: 100%;
+.player-card .hp-bar .hp-backround {
+    background-color: #727272;
+    width: 77%;
     height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
+    margin: 2%;
+    z-index: -1;
+    display: flex;
+    justify-content: start;
 }
 
-.hp {
+.player-card .hp-bar .hp-backround .hp-progress {
+    height: 100%;
+    width: 100%;
+    background-color: #50d16c;
+}
+
+.hp-value {
     position: absolute;
-    top: 1vh;
-    left: 3.5vw;
-    height: 50%;
-    width: 0%;
-    background-color: #45d35f;
-    transition: width 0.5s ease-in-out;
-    z-index: 2;
+    right: 0;
+    bottom: -120%;
+    font-size: 2vw;
+    text-shadow: 0.25vw 0 0 $text-shadow-color;
+    user-select: none;
 }
-.hp-text {
-    position: absolute;
-    left: 31vw;
-    top: 6vh;
-    font-size: 2.5vw;
-    color: white;
-    text-shadow: 0.1vw 0.1vw black;
+
+.is-disconeected {
+    transform: translateX(80%);
+    filter: brightness(0.4);
 }
-.owner-crown {
-    width: 2vw;
-    height: auto;
-    position: absolute;
-    left: 15vw;
-    top: 1vh;
-}
-.not-connected-container .background-image {
-    filter: brightness(50%);
-}
-.not-connected-container .pokeball-container {
-    filter: brightness(50%);
+
+.is-disconeected .avatar,
+.is-disconeected .player-card *,
+.is-disconeected .ban-button {
+    display: none;
 }

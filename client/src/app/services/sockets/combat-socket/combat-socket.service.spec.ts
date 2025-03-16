@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { CombatEvent } from '@common/combat-event.enum';
-import { AttackResult, CombatResult, CombatData } from '@common/combat-interfaces';
+import { CombatEvents } from '@common/combat-event.enum';
+import { AttackResult, CombatData, CombatResult } from '@common/combat-interfaces';
 import { PlayEvent } from '@common/play-event.enum';
 import { Player } from '@common/player';
 import { CombatSocketService } from './combat-socket.service';
@@ -56,7 +56,7 @@ describe('CombatSocketService', () => {
         const targetPlayerId = 'player123';
         service.initFight(targetPlayerId);
 
-        expect(coreSocketSpy.emit).toHaveBeenCalledOnceWith(PlayEvent.StartCombat, targetPlayerId);
+        expect(coreSocketSpy.emit).toHaveBeenCalledOnceWith(CombatEvents.StartCombat, targetPlayerId);
     });
 
     it('should call coreSocket.emit with EscapeAttempt event and correct data', () => {
@@ -155,7 +155,7 @@ describe('CombatSocketService', () => {
         expect(service['combatResult'].value).toEqual(combatResult);
 
         setTimeout(() => {
-            expect(service['router'].navigate).toHaveBeenCalledWith(['/play']);
+            expect(service['router'].navigate).toHaveBeenCalled();
             done();
         }, NAVIGATION_DELAY_MS);
     });

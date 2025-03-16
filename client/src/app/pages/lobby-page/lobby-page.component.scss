@@ -6,6 +6,28 @@ $stripes-color2: #d0effc;
 $page-border-width: 10px;
 $stripes-size: 0.7vw;
 
+$corner-square-size: 0.6vw;
+$clip-path: polygon(
+    $corner-square-size 0%,
+    calc(100% - #{$corner-square-size}) 0%,
+
+    calc(100% - #{$corner-square-size}) $corner-square-size,
+    100% $corner-square-size,
+
+    100% calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) 100%,
+    $corner-square-size 100%,
+
+    $corner-square-size calc(100% - #{$corner-square-size}),
+    0% calc(100% - #{$corner-square-size}),
+    0% $corner-square-size,
+    $corner-square-size $corner-square-size
+);
+
+$inner-border-width: 0.5vw;
+$text-shadow-color: rgb(112, 112, 112);
+
 #lobby-container {
     display: flex;
     flex-direction: column;
@@ -34,7 +56,6 @@ $stripes-size: 0.7vw;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 20px;
     background: repeating-linear-gradient(
         0deg,
         $stripes-color1,
@@ -50,10 +71,27 @@ $stripes-size: 0.7vw;
 }
 .access-code-container {
     position: relative;
-    width: 27vw;
-    height: 30vh;
+    width: 35%;
+    aspect-ratio: 30/17;
     top: 4vh;
-    left: 4vw;
+    left: 7%;
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+
+    border: calc($corner-square-size * 2) solid #48485f;
+    clip-path: $clip-path;
+
+    background-image: url('../../../assets/images/menu/containers/dark-blue/dark-blue-scrare-body.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    padding: $inner-border-width;
+    box-shadow:
+        inset $inner-border-width 0 0 0 #80c0d8,
+        inset calc(-1 * $inner-border-width) 0 0 0 #2878b0,
+        inset 0 $inner-border-width 0 0 #80c0d8,
+        inset 0 calc(-1 * $inner-border-width) 0 0 #2878b0;
 }
 
 .background-image {
@@ -68,43 +106,87 @@ $stripes-size: 0.7vw;
 .access-code-box {
     position: relative;
     z-index: 2;
+    user-select: all;
 }
 .access-title {
-    font-size: 20px;
-    margin-top: 20px;
-    text-shadow: 0.8px 0.8px black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5vw;
+    text-shadow: 0.25vw 0 0 $text-shadow-color;
+    margin: 0 0 5% 0;
+    user-select: none;
 }
 
 .access-code {
-    font-size: 50px;
-    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 6vw;
+    margin: 0 0 4% 0;
     color: #aae7f7;
 }
 
 .access-instruction {
-    font-size: 12px;
-    width: 165px;
-    word-wrap: break-word;
-    text-align: center;
-    margin: 5px auto;
-    margin-top: 25px;
-    white-space: pre-wrap;
-    text-shadow: 1px 1px black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2vw;
+    margin: 0 0 0 0;
+    color: #ffffff;
+    text-shadow: 0.25vw 0 0 $text-shadow-color;
+    justify-content: space-around;
 }
-.lock-icon {
-    width: 6vw;
-    height: 9vh;
-    margin-bottom: 10px;
+
+.copy-container,
+.lock-container {
+    height: 75%;
+    aspect-ratio: 25/10;
+    background-image: url('../../../assets/images/menu/buttons/admin-button/blue-background-highlight.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-#lock-control-container {
-    margin-left: 36vw;
+
+.copy-container {
+    background-image: url('../../../assets/images/menu/buttons/admin-button/green-background-highlight.png');
 }
+
+.copy-container img {
+    height: 65%;
+}
+
+.lock-container p {
+    font-size: 2.3vw;
+    text-shadow: 0.25vw 0 0 $text-shadow-color;
+    user-select: none;
+}
+
+.copy-container:hover,
+.lock-container:hover {
+    filter: brightness(1.2);
+}
+
+.copy-container:active,
+.lock-container:active {
+    rotate: 180deg;
+}
+
+.copy-container:active *,
+.lock-container:active * {
+    rotate: 180deg;
+}
+
 #poke-button {
     position: absolute;
     right: 5%;
-    bottom: 7%;
+    bottom: 4%;
     width: 22.5vw;
-    height: 4.5vw;
+    height: 4vw;
     overflow: visible;
 }
 
@@ -119,4 +201,21 @@ $stripes-size: 0.7vw;
     to {
         background-position: 0 $stripes-size * 2;
     }
+}
+
+#players-list {
+    height: 90%;
+    width: 45%;
+    display: flex;
+    justify-content: start;
+    flex-direction: column;
+    overflow: visible;
+}
+
+.player-card-container {
+    width: 100%;
+    aspect-ratio: 30/4.3;
+    z-index: 1;
+    margin: 0 0 2% 0;
+    overflow: visible;
 }

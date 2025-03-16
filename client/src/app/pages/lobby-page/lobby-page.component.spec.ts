@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { of } from 'rxjs';
 import { LobbyPageComponent } from './lobby-page.component';
@@ -9,18 +10,23 @@ describe('LobbyPageComponent', () => {
     let fixture: ComponentFixture<LobbyPageComponent>;
     let routerSpy: jasmine.SpyObj<Router>;
     let lobbySocketsServiceSpy: jasmine.SpyObj<LobbySocketsService>;
+    let popupServiceSpy: jasmine.SpyObj<PopupService>;
+    let clipboardSpy: jasmine.SpyObj<Clipboard>;
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-        lobbySocketsServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['changeLockStatus', 'leaveMatch', 'startMatch'], {
+        popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
+        lobbySocketsServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['changeLockStatus', 'leaveMatch', 'startMatch', 'kickPlayer'], {
             roomLocked$: of(false),
             players$: of([]),
         });
+        clipboardSpy = jasmine.createSpyObj('clipboard', ['writeText']);
 
         await TestBed.configureTestingModule({
             imports: [LobbyPageComponent],
             providers: [
                 { provide: Router, useValue: routerSpy },
+                { provide: PopupService, useValue: popupServiceSpy },
                 { provide: LobbySocketsService, useValue: lobbySocketsServiceSpy },
             ],
         }).compileComponents();
@@ -39,9 +45,9 @@ describe('LobbyPageComponent', () => {
         expect(lobbySocketsServiceSpy.startMatch).toHaveBeenCalled();
     });
 
-    it('should call leaveGame when leaveLobby is called', () => {
+    it('should call showPopup when leaveLobbyButton is called', () => {
         component.leaveLobbyButton();
-        expect(lobbySocketsServiceSpy.leaveMatch).toHaveBeenCalled();
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Voulez-vous vraiment quitter ?', true, jasmine.any(Function));
     });
 
     it('should toggle room lock status when toggleLockRoom is called', () => {
@@ -63,5 +69,25 @@ describe('LobbyPageComponent', () => {
         component.players$.subscribe((players) => {
             expect(players).toEqual([]);
         });
+    });
+
+    it('should kickPlayer when kickPlayer is called', () => {
+        component.kickPlayer('playerId');
+        expect(lobbySocketsServiceSpy.kickPlayer).toHaveBeenCalledWith('playerId');
+    });
+
+    it('should copy match code to clipboard', () => {
+        const originalClipboard = navigator.clipboard;
+        Object.defineProperty(navigator, 'clipboard', { value: clipboardSpy, writable: true, configurable: true });
+
+        lobbySocketsServiceSpy.matchRoomCode = '1234';
+        component.copyMatchCode();
+        expect(clipboardSpy.writeText).toHaveBeenCalledWith('1234');
+
+        lobbySocketsServiceSpy.matchRoomCode = '';
+        component.copyMatchCode();
+        expect(clipboardSpy.writeText).toHaveBeenCalledWith('');
+
+        Object.defineProperty(navigator, 'clipboard', { value: originalClipboard, writable: true, configurable: true });
     });
 });

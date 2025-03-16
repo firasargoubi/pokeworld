@@ -1,7 +1,6 @@
-export enum CombatEvent {
-    EscapeAttempt = 'escapeAttempt',
-    AttackAttempt = 'attackAttempt',
-    
+export enum CombatEvents {
+    StartCombat = 'startCombat',
+    CombatStarted = 'CombatStarted',
     CombatTurnStarted = 'combatTurnStarted',
     CombatTurnStopped = 'combatTurnStopped',
     StartTimer = 'startTimer',
