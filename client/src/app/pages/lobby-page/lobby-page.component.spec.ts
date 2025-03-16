@@ -68,4 +68,9 @@ describe('LobbyPageComponent', () => {
             expect(players).toEqual([]);
         });
     });
+
+    it('should kickPlayer when kickPlayer is called', () => {
+        component.kickPlayer('playerId');
+        expect(lobbySocketsServiceSpy.kickPlayer).toHaveBeenCalledWith('playerId');
+    });
 });

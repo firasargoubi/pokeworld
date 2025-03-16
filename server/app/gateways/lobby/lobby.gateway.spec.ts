@@ -7,6 +7,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { LobbyGateway } from './lobby.gateway';
+import { GameData } from '@common/game-data';
+import { Match } from '@common/match';
 
 describe('LobbyGateway', () => {
     let gateway: LobbyGateway;
@@ -14,6 +16,8 @@ describe('LobbyGateway', () => {
     let mockServer: SinonStubbedInstance<Server>;
     let mockLobbyService: SinonStubbedInstance<LobbyService>;
     let emitStub: SinonStub;
+    let mockGame: GameData;
+    let mockMatch: Match;
 
     beforeEach(async () => {
         mockSocket = createStubInstance<Socket>(Socket);
@@ -29,6 +33,8 @@ describe('LobbyGateway', () => {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         gateway['server'] = { to: () => ({ emit: emitStub }), sockets: { sockets: { get: () => mockSocket } } } as any;
+        mockGame = structuredClone(MOCK_GAMES[0]);
+        mockMatch = structuredClone(MOCK_MATCHES[0]);
     });
 
     it('should be defined', () => {
@@ -36,8 +42,8 @@ describe('LobbyGateway', () => {
     });
 
     it('should createMatch on createMatch event', () => {
-        gateway.createMatch(mockSocket, MOCK_GAMES[0]);
-        expect(mockLobbyService.createMatch.calledWith(mockSocket.id, MOCK_GAMES[0])).toBeTruthy();
+        gateway.createMatch(mockSocket, mockGame);
+        expect(mockLobbyService.createMatch.calledWith(mockSocket.id, mockGame)).toBeTruthy();
     });
 
     it('should joinMatch on joinMatch event', () => {
@@ -96,8 +102,8 @@ describe('LobbyGateway', () => {
 
     it('should emit MatchStarted on emitMatchStarted', () => {
         const matchCode = '1234';
-        gateway.emitMatchStarted(matchCode, MOCK_MATCHES[0]);
-        expect(emitStub.calledWith(LobbyEvent.MatchStarted, MOCK_MATCHES[0])).toBeTruthy();
+        gateway.emitMatchStarted(matchCode, mockMatch);
+        expect(emitStub.calledWith(LobbyEvent.MatchStarted, mockMatch)).toBeTruthy();
     });
 
     it('should emit LockStatusChanged on emitLockStatusChanged', () => {

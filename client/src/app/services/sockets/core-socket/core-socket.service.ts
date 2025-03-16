@@ -1,4 +1,3 @@
-// core-socket.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
@@ -19,8 +18,8 @@ export class CoreSocketService {
             upgrade: false,
         });
 
-        this.socket.on('connect', () => this.status.next(true));
-        this.socket.on('disconnect', () => this.status.next(false));
+        this.socket.on('connect', this.setStatusConnected.bind(this));
+        this.socket.on('disconnect', this.setStatusDisconnected.bind(this));
     }
 
     get connectionStatus(): Observable<boolean> {
@@ -44,5 +43,13 @@ export class CoreSocketService {
 
     on<T>(event: string, callback: (...args: T[]) => void): void {
         this.socket.on(event, callback);
+    }
+
+    private setStatusConnected(): void {
+        this.status.next(true);
+    }
+
+    private setStatusDisconnected(): void {
+        this.status.next(false);
     }
 }

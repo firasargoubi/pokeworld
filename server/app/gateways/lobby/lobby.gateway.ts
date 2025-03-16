@@ -1,11 +1,11 @@
-import { LobbyService } from '@app/services/lobby/lobby.service';
-import { GameData } from '@common/game-data';
 import { LobbyEvent } from '@common/lobby-event.enum';
-import { Match } from '@common/match';
 import { Player } from '@common/player';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { LobbyService } from '@app/services/lobby/lobby.service';
+import { Match } from '@common/match';
+import { GameData } from '@common/game-data';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
