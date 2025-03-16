@@ -105,9 +105,10 @@ export class MatchService {
             match.matchData.players = match.matchData.players.filter((p) => p.id !== playerId);
             if (match.matchData.players.length <= 0) {
                 this.matches.delete(matchCode);
-                const timeout = this.turnDatas.get(matchCode).phaseTimeout;
-                if (timeout) {
-                    clearInterval(timeout);
+                const turnData = this.turnDatas.get(matchCode);
+                if (turnData.phaseTimeout) {
+                    clearTimeout(turnData.phaseTimeout);
+                    turnData.phaseTimeout = null;
                 }
                 this.turnDatas.delete(matchCode);
             }

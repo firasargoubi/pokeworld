@@ -50,14 +50,14 @@ export class LobbyService {
 
         if (matchCode) {
             if (isMatchStarted) {
-                this.leaveStartedMatch(matchCode, playerId);
+                this.leaveStartedMatch(playerId, matchCode);
             } else {
-                this.leaveNotStartedMatch(matchCode, playerId);
+                this.leaveNotStartedMatch(playerId, matchCode);
             }
         }
     }
 
-    leaveStartedMatch(matchCode: string, playerId: string) {
+    leaveStartedMatch(playerId: string, matchCode: string) {
         const match = this.matchService.getMatch(matchCode);
         const player = match.matchData.players.find((p) => p.id === playerId);
         if (player) {

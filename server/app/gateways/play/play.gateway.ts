@@ -70,4 +70,8 @@ export class PlayGateway {
     emitDebugModeChanged(matchCode: string, match: Match) {
         this.server.to(matchCode).emit(PlayEvent.DebugModeChanged, match);
     }
+
+    emitPauseTurn(matchCode: string, match: Match) {
+        this.server.to(matchCode).emit(PlayEvent.PauseTurn, match);
+    }
 }

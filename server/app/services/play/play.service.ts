@@ -7,7 +7,7 @@ import { Player } from '@common/player';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { HALF_POINT, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
+import { HALF_POINT, ONE_SECOND, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
 
 @Injectable()
 export class PlayService {
@@ -110,14 +110,19 @@ export class PlayService {
     }
 
     private startFight(playerId: string, tragetPlayerId: string) {
-        // eslint-disable-next-line no-console
-        console.log('START FIGHT', playerId, tragetPlayerId);
+        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+        const match = this.matchService.getMatch(matchCode);
+        const turnData = this.matchService.getTurnData(matchCode);
+        if (turnData.phaseTimeout) {
+            clearTimeout(turnData.phaseTimeout);
+            turnData.phaseTimeout = null;
+        }
+        const elapsedTime = Math.floor(Math.abs(new Date().getTime() - turnData.lastPhaseStartTime.getTime()) / ONE_SECOND);
+        match.matchData.currentTimer = match.matchData.currentTimer - elapsedTime;
 
-        this.combatService.initiateCombat(playerId, tragetPlayerId);
+        this.playGateway.emitPauseTurn(matchCode, match);
 
-        // const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-        // const match = this.matchService.getMatch(matchCode);
-        // this.playGateway.emitBridgeChanged(matchCode, match);
+        // this.combatService.initiateCombat(playerId, tragetPlayerId);
     }
 
     private toggleBridgeTile(match: Match, position: Position) {
@@ -171,6 +176,7 @@ export class PlayService {
         const turnData = this.matchService.getTurnData(match.matchData.code);
         if (turnData.phaseTimeout) {
             clearTimeout(turnData.phaseTimeout);
+            turnData.phaseTimeout = null;
         }
         turnData.lastPhaseStartTime = new Date();
         match.matchData.currentTimer = duration;
