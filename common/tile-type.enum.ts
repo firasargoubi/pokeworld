@@ -7,3 +7,13 @@ export enum TileType {
     BrokenBridge = 'BrokenBridge',
     None = 'None',
 }
+
+export enum TileCost {
+    Path = 0,
+    Grass = 1,
+    Bush = 2,
+    Water = Infinity,
+    Bridge = 1,
+    BrokenBridge = Infinity,
+    None = Infinity,
+}
