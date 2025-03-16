@@ -15,7 +15,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
     providedIn: 'root',
 })
 export class LobbySocketsService {
-    matchCode: string;
+    matchCode: string = '';
     private gameDataService: GameDataService = inject(GameDataService);
     private playersSubject: BehaviorSubject<Player[]> = new BehaviorSubject<Player[]>([]);
     private roomLockedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -25,13 +25,6 @@ export class LobbySocketsService {
     private router: Router = inject(Router);
 
     constructor() {
-        this.matchCode = '';
-        this.playersSubject = new BehaviorSubject<Player[]>([]);
-        this.roomLockedSubject = new BehaviorSubject<boolean>(false);
-        this.coreSocket = inject(CoreSocketService);
-        this.matchDataService = inject(MatchDataService);
-        this.router = inject(Router);
-        this.popupService = inject(PopupService);
         this.setupLobbyListeners();
     }
 

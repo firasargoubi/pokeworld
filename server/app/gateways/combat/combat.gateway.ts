@@ -1,5 +1,5 @@
 import { CombatService } from '@app/services/combat/combat.service';
-import { CombatEvents } from '@common/combat-event.enum';
+import { CombatEvent } from '@common/combat-event.enum';
 import { AttackAttempt, EscapeAttempt } from '@common/combat-interfaces';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -11,17 +11,17 @@ export class CombatGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
     @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
 
-    @SubscribeMessage(CombatEvents.StartCombat)
+    @SubscribeMessage(CombatEvent.StartCombat)
     startCombat(socket: Socket, targetPlayerId: string): void {
         this.combatService.initiateCombat(socket, targetPlayerId);
     }
 
-    @SubscribeMessage(CombatEvents.EscapeAttempt)
+    @SubscribeMessage(CombatEvent.EscapeAttempt)
     escapeAttempt(_, escapeAttempt: EscapeAttempt): void {
         this.combatService.escape(escapeAttempt.combatRoomCode, escapeAttempt.playerId);
     }
 
-    @SubscribeMessage(CombatEvents.AttackAttempt)
+    @SubscribeMessage(CombatEvent.AttackAttempt)
     attackAttempt(_, attackAttempt: AttackAttempt): void {
         this.combatService.executeAttackAndCheckVictory(attackAttempt.combatRoomCode, attackAttempt.targetId);
         this.combatService.forceCombatTurnSwitch(attackAttempt.combatRoomCode);

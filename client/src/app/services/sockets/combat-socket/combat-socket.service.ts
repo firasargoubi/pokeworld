@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { CombatEvents } from '@common/combat-event.enum';
+import { CombatEvent } from '@common/combat-event.enum';
 import { AttackAttempt, AttackResult, CombatData, CombatResult, EscapeAttempt } from '@common/combat-interfaces';
 import { Player } from '@common/player';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -40,7 +40,7 @@ export class CombatSocketService {
     }
 
     initFight(targetPlayerId: string): void {
-        this.coreSocket.emit(CombatEvents.StartCombat, targetPlayerId);
+        this.coreSocket.emit(CombatEvent.StartCombat, targetPlayerId);
     }
 
     escapeAttempt(): void {
@@ -48,7 +48,7 @@ export class CombatSocketService {
             combatRoomCode: this.combatRoomCode,
             playerId: this.selfPlayerSubject.value?.id,
         };
-        this.coreSocket.emit(CombatEvents.EscapeAttempt, escapeAttempt);
+        this.coreSocket.emit(CombatEvent.EscapeAttempt, escapeAttempt);
     }
 
     attackAttempt(): void {
@@ -56,11 +56,11 @@ export class CombatSocketService {
             combatRoomCode: this.combatRoomCode,
             targetId: this.ennemyPlayerSubject.value?.id,
         };
-        this.coreSocket.emit(CombatEvents.AttackAttempt, attackAttempt);
+        this.coreSocket.emit(CombatEvent.AttackAttempt, attackAttempt);
     }
 
     private setupCombatListeners(): void {
-        this.coreSocket.on(CombatEvents.CombatStarted, (combatData: CombatData) => {
+        this.coreSocket.on(CombatEvent.CombatStarted, (combatData: CombatData) => {
             const playerOne: Player = combatData.players[0];
             const playerTwo: Player = combatData.players[1];
 
@@ -82,7 +82,7 @@ export class CombatSocketService {
             this.attackResult.next(attackResult);
         });
 
-        this.coreSocket.on(CombatEvents.EndCombat, (result: CombatResult) => {
+        this.coreSocket.on(CombatEvent.EndCombat, (result: CombatResult) => {
             // TODO: popup instead
             window.console.log(`Combat terminé, ganant: ${result.winnerId}`);
             this.combatResult.next(result);

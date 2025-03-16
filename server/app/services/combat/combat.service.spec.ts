@@ -2,7 +2,7 @@
 // This test suite is 100 lines longer than the recommended maximum
 import { CombatGateway } from '@app/gateways/combat/combat.gateway';
 import { MatchService } from '@app/services/match/match.service';
-import { CombatEvents } from '@common/combat-event.enum';
+import { CombatEvent } from '@common/combat-event.enum';
 import { AttackResult, CombatState } from '@common/combat-interfaces';
 import { DiceType } from '@common/dice';
 import { Player } from '@common/player';
@@ -158,7 +158,7 @@ describe('CombatService', () => {
         expect(combatGatewayStub.getSocketById.calledWith(player2.id)).toBeTruthy();
 
         const expectedCombatData = { combatRoomCode, players: [player1, player2] };
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.CombatStarted, expectedCombatData)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.CombatStarted, expectedCombatData)).toBeTruthy();
 
         updatePlayersStatsByCurrentTileSpy.restore();
         startTurnSystemSpy.restore();
@@ -205,7 +205,7 @@ describe('CombatService', () => {
         expect(notifyPlayersStatsUpdateSpy.calledWith(combatRoomCode)).toBeTruthy();
         expect(endCombatSpy.calledWith(combatRoomCode)).toBeTruthy();
         expect(forceCombatTurnSwitchSpy.calledWith(combatRoomCode)).toBeTruthy();
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.EscapedResult, player1.id)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EscapedResult, player1.id)).toBeTruthy();
 
         randomStub.restore();
     });
@@ -241,7 +241,7 @@ describe('CombatService', () => {
 
         expect(notifyPlayersStatsUpdateSpy.calledWith(combatRoomCode)).toBeTruthy();
         expect(
-            combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.AttackResult, {
+            combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.AttackResult, {
                 targetId: player2.id,
                 attackDamage: 2,
             } as AttackResult),
@@ -269,7 +269,7 @@ describe('CombatService', () => {
 
         expect(notifyPlayersStatsUpdateSpy.calledWith(combatRoomCode)).toBeTruthy();
         expect(
-            combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.AttackResult, {
+            combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.AttackResult, {
                 targetId: player2.id,
                 attackDamage: 2,
             } as AttackResult),
@@ -295,7 +295,7 @@ describe('CombatService', () => {
         expect(reseatPlayersSpy.calledWith([player2, player1])).toBeTruthy();
 
         const expectedCombatResult = { winnerId: player1.id, loserId: player2.id };
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.EndCombat, expectedCombatResult)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, expectedCombatResult)).toBeTruthy();
         expect(leaveCombatSpy.calledWith(combatRoomCode, combatState)).toBeTruthy();
 
         expect(service['combatTurnSystems'].has(combatRoomCode)).toBeFalsy();
@@ -319,7 +319,7 @@ describe('CombatService', () => {
         service.endCombat(combatRoomCode, player2.id);
 
         const expectedCombatResult = { winnerId: player2.id, loserId: player1.id };
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.EndCombat, expectedCombatResult)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, expectedCombatResult)).toBeTruthy();
 
         clearTimeoutSpy.restore();
         reseatPlayersSpy.restore();
@@ -343,7 +343,7 @@ describe('CombatService', () => {
         expect(reseatPlayersSpy.calledWith([player2, player1])).toBeTruthy();
 
         const expectedCombatResult = { winnerId: null, loserId: null };
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.EndCombat, expectedCombatResult)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, expectedCombatResult)).toBeTruthy();
 
         clearTimeoutSpy.restore();
         reseatPlayersSpy.restore();
@@ -454,9 +454,9 @@ describe('CombatService', () => {
         expect(updatePlayerBonusStatsSpy.calledWith(combatRoomCode, player1, true)).toBeTruthy();
         expect(updatePlayerBonusStatsSpy.calledWith(combatRoomCode, player2, false)).toBeTruthy();
 
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.StartTimer, MAX_TURN_DURATION)).toBeTruthy();
-        expect(combatGatewayStub.emitToPlayer.calledWith(player1.id, CombatEvents.CombatTurnStarted)).toBeTruthy();
-        expect(combatGatewayStub.emitToPlayer.calledWith(player2.id, CombatEvents.CombatTurnStopped)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.StartTimer, MAX_TURN_DURATION)).toBeTruthy();
+        expect(combatGatewayStub.emitToPlayer.calledWith(player1.id, CombatEvent.CombatTurnStarted)).toBeTruthy();
+        expect(combatGatewayStub.emitToPlayer.calledWith(player2.id, CombatEvent.CombatTurnStopped)).toBeTruthy();
 
         const stateBefore = service['combatTurnSystems'].get(combatRoomCode);
         expect(stateBefore.timer).toBeDefined();
@@ -495,9 +495,9 @@ describe('CombatService', () => {
         proceedCombatTurnSpy = stub(service, 'proceedCombatTurn' as any);
 
         expect(updatePlayerBonusStatsSpy.calledWith(combatRoomCode, player1)).toBeTruthy();
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.StartTimer, MIN_TURN_DURATION)).toBeTruthy();
-        expect(combatGatewayStub.emitToPlayer.calledWith(player1.id, CombatEvents.CombatTurnStarted)).toBeTruthy();
-        expect(combatGatewayStub.emitToPlayer.calledWith(player2.id, CombatEvents.CombatTurnStopped)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.StartTimer, MIN_TURN_DURATION)).toBeTruthy();
+        expect(combatGatewayStub.emitToPlayer.calledWith(player1.id, CombatEvent.CombatTurnStarted)).toBeTruthy();
+        expect(combatGatewayStub.emitToPlayer.calledWith(player2.id, CombatEvent.CombatTurnStopped)).toBeTruthy();
 
         clock.tick(MIN_TURN_DURATION);
 
@@ -561,7 +561,7 @@ describe('CombatService', () => {
         service['combatTurnSystems'].set(combatRoomCode, combatState);
         service['notifyPlayersStatsUpdate'](combatRoomCode);
 
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.UpdatePlayers, combatState.players)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.UpdatePlayers, combatState.players)).toBeTruthy();
     });
 
     it('should copy playerStats values to currentStats for each player', () => {

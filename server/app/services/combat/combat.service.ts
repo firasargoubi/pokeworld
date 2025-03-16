@@ -1,6 +1,6 @@
 import { CombatGateway } from '@app/gateways/combat/combat.gateway';
 import { MatchService } from '@app/services/match/match.service';
-import { CombatEvents } from '@common/combat-event.enum';
+import { CombatEvent } from '@common/combat-event.enum';
 import { AttackResult, CombatData, CombatResult, CombatState } from '@common/combat-interfaces';
 import { DICE_MAX_VALUE, DiceType } from '@common/dice';
 import { Player } from '@common/player';
@@ -39,7 +39,7 @@ export class CombatService {
         }
 
         const combatData: CombatData = { combatRoomCode, players: [initiatingPlayer, targetPlayer] };
-        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvents.CombatStarted, combatData);
+        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.CombatStarted, combatData);
 
         this.updatePlayersStatsByCurrentTile([initiatingPlayer, targetPlayer]);
         this.startTurnSystem(combatRoomCode, [initiatingPlayer, targetPlayer]);
@@ -56,7 +56,7 @@ export class CombatService {
             this.notifyPlayersStatsUpdate(combatRoomCode);
 
             if (Math.random() < ESCAPE_RATIO) {
-                this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvents.EscapedResult, playerId);
+                this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.EscapedResult, playerId);
                 this.endCombat(combatRoomCode);
             }
         }
@@ -80,7 +80,7 @@ export class CombatService {
         }
 
         const attackResult: AttackResult = { targetId, attackDamage };
-        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvents.AttackResult, attackResult);
+        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.AttackResult, attackResult);
 
         if (targetPlayer.currentStats.health <= 0) {
             this.endCombat(combatRoomCode, currentPlayer.id);
@@ -109,7 +109,7 @@ export class CombatService {
             combatResult.loserId = player1.id === winnerId ? player2.id : player1.id;
         }
 
-        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvents.EndCombat, combatResult);
+        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.EndCombat, combatResult);
 
         this.combatTurnSystems.delete(combatRoomCode);
 
@@ -180,9 +180,9 @@ export class CombatService {
 
         this.updatePlayerBonusStats(combatRoomCode, activePlayer, true);
         this.updatePlayerBonusStats(combatRoomCode, inactivePlayer, false);
-        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvents.StartTimer, turnDelay);
-        this.combatGateway.emitToPlayer(activePlayer.id, CombatEvents.CombatTurnStarted);
-        this.combatGateway.emitToPlayer(inactivePlayer.id, CombatEvents.CombatTurnStopped);
+        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.StartTimer, turnDelay);
+        this.combatGateway.emitToPlayer(activePlayer.id, CombatEvent.CombatTurnStarted);
+        this.combatGateway.emitToPlayer(inactivePlayer.id, CombatEvent.CombatTurnStopped);
 
         const timer = setTimeout(() => {
             const victory = this.executeAttackAndCheckVictory(combatRoomCode, inactivePlayer.id);
@@ -217,7 +217,7 @@ export class CombatService {
     private notifyPlayersStatsUpdate(combatRoomCode: string) {
         const state = this.combatTurnSystems.get(combatRoomCode);
 
-        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvents.UpdatePlayers, state.players);
+        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.UpdatePlayers, state.players);
     }
 
     private resetPlayers(players: Player[]): void {

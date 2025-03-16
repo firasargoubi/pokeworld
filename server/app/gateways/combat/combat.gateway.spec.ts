@@ -1,5 +1,5 @@
 import { CombatService } from '@app/services/combat/combat.service';
-import { CombatEvents } from '@common/combat-event.enum';
+import { CombatEvent } from '@common/combat-event.enum';
 import { CombatState } from '@common/combat-interfaces';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
@@ -78,7 +78,7 @@ describe('CombatGateway', () => {
 
     it('should emit an event to a combat room using emitToCombatRoom', () => {
         const combatRoomCode = 'room123';
-        const event = CombatEvents.EscapeAttempt;
+        const event = CombatEvent.EscapeAttempt;
         const payload = { test: 'data' };
         gateway.emitToCombatRoom(combatRoomCode, event, payload);
         expect(emitStub.calledWith(event, payload)).toBeTruthy();
@@ -86,13 +86,13 @@ describe('CombatGateway', () => {
 
     it('should emit an event to a player using emitToPlayer when socket exists', () => {
         socket1.emit = stub();
-        gateway.emitToPlayer('test-socket-id', CombatEvents.AttackAttempt, { data: 123 });
-        expect(socket1.emit.calledWith(CombatEvents.AttackAttempt, { data: 123 })).toBeTruthy();
+        gateway.emitToPlayer('test-socket-id', CombatEvent.AttackAttempt, { data: 123 });
+        expect(socket1.emit.calledWith(CombatEvent.AttackAttempt, { data: 123 })).toBeTruthy();
     });
 
     it('should not emit an event in emitToPlayer if socket is not found', () => {
         stub(gateway, 'getSocketById').returns(null);
-        gateway.emitToPlayer('non-existent-socket', CombatEvents.AttackAttempt, { data: 123 });
+        gateway.emitToPlayer('non-existent-socket', CombatEvent.AttackAttempt, { data: 123 });
         expect(socket1.emit.notCalled).toBeTruthy();
     });
 });
