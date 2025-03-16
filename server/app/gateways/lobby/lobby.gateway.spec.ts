@@ -9,6 +9,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { LobbyGateway } from './lobby.gateway';
+import { Warning } from '@common/warning.enum';
 
 describe('LobbyGateway', () => {
     let gateway: LobbyGateway;
@@ -122,7 +123,7 @@ describe('LobbyGateway', () => {
 
     it('should emit RemovedFromMatch on emitRemovedFromMatch', () => {
         const clientId = '1234';
-        gateway.emitRemovedFromMatch(clientId);
+        gateway.emitRemovedFromMatch(clientId, Warning.AdminQuit);
         expect(mockSocket.emit.calledWith(LobbyEvent.RemovedFromMatch)).toBeTruthy();
     });
 

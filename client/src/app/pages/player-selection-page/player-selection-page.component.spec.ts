@@ -2,13 +2,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS } from '@app/consts/default-player.const';
+import { BONUS_POINTS, DEFAULT_STAT_POINTS, DEFAULT_ESCAPE_POINTS } from '@app/consts/default-player.const';
 import { StatType } from '@app/interfaces/player-stats.enum';
-import { AvatarSelectionService } from '@app/services/avatar-selection/avatar-selection.service';
+import { PlayerSelectionService } from '@app/services/player-selection/player-selection.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { AvatarStatus } from '@common/avatar-status.enum';
 import { Avatars } from '@common/avatars.enum';
+import { DiceType } from '@common/dice';
 import { Subject } from 'rxjs';
 import { PlayerSelectionPageComponent } from './player-selection-page.component';
 
@@ -18,19 +19,33 @@ describe('PlayerSelectionPageComponent', () => {
     let routerSpy: jasmine.SpyObj<Router>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let lobbySocketServiceSpy: jasmine.SpyObj<LobbySocketsService>;
-    let avatarSelectionServiceSpy: jasmine.SpyObj<AvatarSelectionService>;
+    let playerSelectionServiceSpy: jasmine.SpyObj<PlayerSelectionService>;
     let roomLockedSubject: Subject<boolean>;
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
         lobbySocketServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['updatePlayer', 'leaveMatch']);
-        avatarSelectionServiceSpy = jasmine.createSpyObj(
-            'AvatarSelectionService',
-            ['getAvatarStatus', 'isAvatarAvailable', 'updatePlayerAvatar', 'resetAvatar'],
+        playerSelectionServiceSpy = jasmine.createSpyObj(
+            'PlayerSelectionService',
+            ['getAvatarStatus', 'isAvatarAvailable', 'updatePlayerAvatar', 'resetAvatar', 'setPlayerData', 'joinLobby', 'handleAvatarSelection'],
             {
                 avatarData: AVATAR_DATA,
                 avatarList: Object.keys(AVATAR_DATA).slice(1) as Avatars[],
+                playerData: {
+                    name: '',
+                    avatar: Avatars.Avatar1, // Set a valid avatar value
+                    playerStats: {
+                        health: 0,
+                        speed: 0,
+                        attack: 0,
+                        defense: 0,
+                        attackDice: DiceType.D4,
+                        defenseDice: DiceType.D6,
+                        escapes: 0,
+                    },
+                    isConnected: true,
+                },
             },
         );
 
@@ -43,7 +58,7 @@ describe('PlayerSelectionPageComponent', () => {
                 { provide: Router, useValue: routerSpy },
                 { provide: PopupService, useValue: popupServiceSpy },
                 { provide: LobbySocketsService, useValue: lobbySocketServiceSpy },
-                { provide: AvatarSelectionService, useValue: avatarSelectionServiceSpy },
+                { provide: PlayerSelectionService, useValue: playerSelectionServiceSpy },
             ],
         }).compileComponents();
     });
@@ -51,7 +66,8 @@ describe('PlayerSelectionPageComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(PlayerSelectionPageComponent);
         component = fixture.componentInstance;
-        avatarSelectionServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
+        playerSelectionServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
+        fixture.detectChanges();
     });
 
     it('should create', () => {
@@ -60,7 +76,7 @@ describe('PlayerSelectionPageComponent', () => {
 
     it('should reset avatar on initialization', () => {
         component.ngOnInit();
-        expect(avatarSelectionServiceSpy.resetAvatar).toHaveBeenCalled();
+        expect(playerSelectionServiceSpy.resetAvatar).toHaveBeenCalled();
     });
 
     it('should toggle bonus dice', () => {
@@ -72,16 +88,9 @@ describe('PlayerSelectionPageComponent', () => {
     });
 
     it('should return correct avatar button style', () => {
-        avatarSelectionServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
+        playerSelectionServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
         const style = component.getAvatarBtnStyle(Avatars.Avatar1);
         expect(style).toEqual({ class: AvatarStatus.UNSELECTED });
-    });
-
-    it('should handle avatar selection', () => {
-        avatarSelectionServiceSpy.isAvatarAvailable.and.returnValue(true);
-        component.handleAvatarSelection(Avatars.Avatar1);
-        expect(avatarSelectionServiceSpy.updatePlayerAvatar).toHaveBeenCalledWith(Avatars.Avatar1);
-        expect(avatarSelectionServiceSpy.selectedAvatar).toBe(Avatars.Avatar1);
     });
 
     it('should show popup if form is invalid', () => {
@@ -117,19 +126,19 @@ describe('PlayerSelectionPageComponent', () => {
     it('should return correct warnings', () => {
         component.nameForm.setValue('');
         expect(component['getWarnings']()).toContain('Le nom doit contenir entre 3 et 15 caractères');
-        component['avatarSelectionService'].selectedAvatar = Avatars.Default;
+        component['playerSelectionService'].playerData.avatar = Avatars.Default;
         expect(component['getWarnings']()).toContain('Veuillez choisir un avatar');
     });
 
     it('should check if avatar is chosen', () => {
-        component['avatarSelectionService'].selectedAvatar = Avatars.Avatar1;
+        component['playerSelectionService'].playerData.avatar = Avatars.Avatar1;
         expect(component['isAvatarChosen']()).toBeTrue();
-        component['avatarSelectionService'].selectedAvatar = Avatars.Default;
+        component['playerSelectionService'].playerData.avatar = Avatars.Default;
         expect(component['isAvatarChosen']()).toBeFalse();
     });
 
     it('should return correct avatar button style', () => {
-        avatarSelectionServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
+        playerSelectionServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
         const style = component.getAvatarBtnStyle(Avatars.Avatar1);
         expect(style).toEqual({ class: AvatarStatus.UNSELECTED });
     });
@@ -149,44 +158,72 @@ describe('PlayerSelectionPageComponent', () => {
         expect(component.avatarList).toEqual(Object.keys(AVATAR_DATA).slice(1) as Avatars[]);
     });
 
-    it('should return selected avatar when Avatar1 is chosen', () => {
-        avatarSelectionServiceSpy.selectedAvatar = Avatars.Avatar1;
+    it('should return the selected avatar', () => {
         expect(component.selectedAvatar).toBe(Avatars.Avatar1);
     });
 
-    it('should update player and navigate to lobby when form is valid', () => {
-        component.nameForm.setValue('ValidName');
-        avatarSelectionServiceSpy.selectedAvatar = Avatars.Avatar1;
-        avatarSelectionServiceSpy.isAvatarAvailable.and.returnValue(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Private method
-        spyOn<any>(component, 'getWarnings').and.returnValue([]);
-        component.goToLobby();
-
-        expect(component.nameForm.valid).toBeTrue();
-        expect(component['getWarnings']().length).toBe(0);
-        expect(popupServiceSpy.showPopup).not.toHaveBeenCalled();
-        expect(lobbySocketServiceSpy.updatePlayer).toHaveBeenCalledWith(jasmine.any(Object));
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/lobby']);
+    it('should reset avatar on init', () => {
+        component.ngOnInit();
+        expect(playerSelectionServiceSpy.resetAvatar).toHaveBeenCalled();
     });
 
-    it('should return correct player data with bonus points applied', () => {
+    it('should set player data and join lobby when form is valid', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(component, 'getWarnings').and.returnValue([]);
+        component.goToLobby();
+        expect(playerSelectionServiceSpy.setPlayerData).toHaveBeenCalled();
+        expect(playerSelectionServiceSpy.joinLobby).toHaveBeenCalled();
+    });
+
+    it('should not join lobby when form is invalid', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(component, 'getWarnings').and.returnValue(['Warning']);
+        component.goToLobby();
+        expect(playerSelectionServiceSpy.joinLobby).not.toHaveBeenCalled();
+    });
+
+    it('should show popup when navigating to menu', () => {
+        component.goToMenu();
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Voulez-vous vraiment quitter ?', true, jasmine.any(Function));
+    });
+
+    it('should return correct player data', () => {
         component.nameForm.setValue('TestPlayer');
-        avatarSelectionServiceSpy.selectedAvatar = Avatars.Avatar3;
-        component.bonusPointsForm.setValue(StatType.Speed);
+        component.bonusPointsForm.setValue(StatType.Life);
         const playerData = component['getPlayerData']();
         expect(playerData).toEqual({
             name: 'TESTPLAYER',
-            avatar: Avatars.Avatar3,
+            avatar: Avatars.Avatar1,
             playerStats: {
-                health: DEFAULT_STAT_POINTS,
-                speed: DEFAULT_STAT_POINTS + BONUS_POINTS,
+                health: DEFAULT_STAT_POINTS + BONUS_POINTS,
+                speed: DEFAULT_STAT_POINTS,
                 attack: DEFAULT_STAT_POINTS,
                 defense: DEFAULT_STAT_POINTS,
-                attackDice: component.bonusDice.attack,
-                defenseDice: component.bonusDice.defense,
+                attackDice: DiceType.D4,
+                defenseDice: DiceType.D6,
                 escapes: DEFAULT_ESCAPE_POINTS,
             },
-            isConnected: true,
         });
+    });
+
+    it('should return correct bonus stat', () => {
+        component.bonusPointsForm.setValue(StatType.Life);
+        expect(component['getBonusStat'](StatType.Life)).toBe(DEFAULT_STAT_POINTS + BONUS_POINTS);
+        component.bonusPointsForm.setValue(StatType.Speed);
+        expect(component['getBonusStat'](StatType.Speed)).toBe(DEFAULT_STAT_POINTS + BONUS_POINTS);
+    });
+
+    it('should return correct warnings', () => {
+        component.nameForm.setValue('');
+        expect(component['getWarnings']()).toContain('Le nom doit contenir entre 3 et 15 caractères');
+        component['playerSelectionService'].playerData.avatar = Avatars.Default;
+        expect(component['getWarnings']()).toContain('Veuillez choisir un avatar');
+    });
+
+    it('should check if avatar is chosen', () => {
+        component['playerSelectionService'].playerData.avatar = Avatars.Avatar1;
+        expect(component['isAvatarChosen']()).toBeTrue();
+        component['playerSelectionService'].playerData.avatar = Avatars.Default;
+        expect(component['isAvatarChosen']()).toBeFalse();
     });
 });

@@ -12,6 +12,7 @@ import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
+import { Warning } from '@common/warning.enum';
 import { LobbySocketsService } from './lobby-sockets.service';
 
 describe('LobbySocketsService', () => {
@@ -211,10 +212,18 @@ describe('LobbySocketsService', () => {
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/play']);
     });
 
-    it('should show popup and navigate on RemovedFromMatch event', () => {
-        const removedCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === LobbyEvent.RemovedFromMatch);
-        removedCall?.[1]();
-        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Vous avez été retiré de la partie');
+    it('should handle player removal from match', () => {
+        const removalReason = Warning.RoomLocked;
+        service['onRemovedFromMatch'](removalReason);
+        expect(service.matchCode).toBe('');
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(removalReason, true, jasmine.any(Function));
+    });
+
+    it('should handle player removal from match with other reasons', () => {
+        const removalReason = Warning.Kick;
+        service['onRemovedFromMatch'](removalReason);
+        expect(service.matchCode).toBe('');
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(removalReason);
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
     });

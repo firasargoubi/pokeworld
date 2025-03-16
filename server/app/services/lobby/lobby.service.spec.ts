@@ -9,6 +9,7 @@ import { Player } from '@common/player';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createSandbox, createStubInstance, SinonSandbox, SinonStubbedInstance } from 'sinon';
 import { LobbyService } from './lobby.service';
+import { Warning } from '@common/warning.enum';
 
 describe('LobbyService', () => {
     let service: LobbyService;
@@ -128,7 +129,7 @@ describe('LobbyService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const emitLockStatusChangedStub = sandbox.stub(service as any, 'emitLockStatusChanged');
 
-        service.removePlayer('1122');
+        service.removePlayer('1122', Warning.AdminQuit);
 
         expect(mockMatchService.removePlayerFromMatch.calledWith('1122', '3344')).toBeTruthy();
         expect(mockeLobbyGateway.emitRemovedFromMatch.calledWith('1122')).toBeTruthy();
@@ -307,7 +308,7 @@ describe('LobbyService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sandbox.stub(service as any, 'isMatchLocked').returns(true);
         service['canPlayerJoinMatch']('1122', '3344');
-        expect(mockeLobbyGateway.warn.calledWith('1122', 'La partie est verouillée')).toBeTruthy();
+        expect(mockeLobbyGateway.warn.calledWith('1122', Warning.RoomLocked)).toBeTruthy();
     });
 
     it('should canPlayerJoinMatch call warn on isMatchLocked true', () => {

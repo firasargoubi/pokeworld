@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player.const';
 import { BonusDice, DiceType } from '@app/consts/dice.const';
 import { StatType } from '@app/interfaces/player-stats.enum';
-import { AvatarSelectionService } from '@app/services/avatar-selection/avatar-selection.service';
+import { PlayerSelectionService } from '@app/services/player-selection/player-selection.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { Avatars } from '@common/avatars.enum';
@@ -25,26 +24,24 @@ export class PlayerSelectionPageComponent implements OnInit {
 
     maxNameLength = MAX_NAME_LENGTH;
     statType = StatType;
-
-    private router: Router = inject(Router);
+    playerSelectionService: PlayerSelectionService = inject(PlayerSelectionService);
     private lobbySocketService: LobbySocketsService = inject(LobbySocketsService);
-    private avatarSelectionService: AvatarSelectionService = inject(AvatarSelectionService);
     private popupService: PopupService = inject(PopupService);
 
     get avatarData() {
-        return this.avatarSelectionService.avatarData;
+        return this.playerSelectionService.avatarData;
     }
 
     get avatarList() {
-        return this.avatarSelectionService.avatarList;
+        return this.playerSelectionService.avatarList;
     }
 
     get selectedAvatar() {
-        return this.avatarSelectionService.selectedAvatar;
+        return this.playerSelectionService.playerData.avatar as Avatars;
     }
 
     ngOnInit(): void {
-        this.avatarSelectionService.resetAvatar();
+        this.playerSelectionService.resetAvatar();
     }
 
     isBonusPoint(statCategory: StatType) {
@@ -56,16 +53,8 @@ export class PlayerSelectionPageComponent implements OnInit {
     }
 
     getAvatarBtnStyle(avatar: Avatars) {
-        const avatarStatus = this.avatarSelectionService.getAvatarStatus(avatar);
+        const avatarStatus = this.playerSelectionService.getAvatarStatus(avatar);
         return { class: avatarStatus };
-    }
-
-    handleAvatarSelection(avatar: Avatars) {
-        const isAvatarAvailable = this.avatarSelectionService.isAvatarAvailable(avatar);
-        if (isAvatarAvailable) {
-            this.avatarSelectionService.updatePlayerAvatar(avatar);
-            this.avatarSelectionService.selectedAvatar = avatar;
-        }
     }
 
     goToLobby() {
@@ -74,13 +63,15 @@ export class PlayerSelectionPageComponent implements OnInit {
         if (haveWarnings) {
             this.popupService.showPopup(warnings.join('\n'));
         } else {
-            this.lobbySocketService.updatePlayer(this.getPlayerData());
-            this.router.navigate(['/lobby']);
+            const playerUpdates = this.getPlayerData();
+            this.playerSelectionService.setPlayerData(playerUpdates);
+            this.playerSelectionService.joinLobby();
         }
     }
 
     goToMenu() {
         this.popupService.showPopup('Voulez-vous vraiment quitter ?', true, this.lobbySocketService.leaveMatch.bind(this.lobbySocketService));
+        this.playerSelectionService.matchCode = '';
     }
 
     isFormValid() {
@@ -100,9 +91,7 @@ export class PlayerSelectionPageComponent implements OnInit {
                 defenseDice: this.bonusDice.defense,
                 escapes: DEFAULT_ESCAPE_POINTS,
             },
-            isConnected: true,
         };
-
         return playerUpdates;
     }
 
@@ -125,6 +114,6 @@ export class PlayerSelectionPageComponent implements OnInit {
     }
 
     private isAvatarChosen() {
-        return this.avatarSelectionService.selectedAvatar !== Avatars.Default;
+        return this.selectedAvatar !== Avatars.Default;
     }
 }

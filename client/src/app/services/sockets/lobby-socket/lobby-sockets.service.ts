@@ -8,6 +8,7 @@ import { GameData } from '@common/game-data';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
+import { Warning } from '@common/warning.enum';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -102,11 +103,9 @@ export class LobbySocketsService {
         this.playersSubject.next(players);
     }
 
-    private onRemovedFromMatch() {
+    private onRemovedFromMatch(removalReason: Warning) {
         this.matchCode = '';
-        this.popupService.showPopup('Vous avez été retiré de la partie');
-        this.popupService.keepMessages();
-        this.router.navigate(['/']);
+        this.onWarning(removalReason);
     }
 
     private onMatchStarted(match: Match) {
@@ -114,9 +113,20 @@ export class LobbySocketsService {
         this.router.navigate(['/play']);
     }
 
-    private onWarning(message: string) {
+    private onWarning(removalReason: Warning) {
         if (!this.popupService.isDisplayed) {
-            this.popupService.showPopup(message);
+            const goToMenu = () => {
+                this.router.navigate(['/']);
+            };
+            if (removalReason === Warning.RoomLocked) {
+                this.popupService.showPopup(removalReason, true, goToMenu);
+                return;
+            }
+            this.popupService.showPopup(removalReason);
+            this.popupService.keepMessages();
+            if (removalReason === Warning.Kick) {
+                goToMenu();
+            }
         }
     }
 
