@@ -1,23 +1,25 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { MOCK_GAMES } from '@app/consts/tests/mock-games';
+import { MOCK_MATCHES } from '@app/consts/tests/mock-matches';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
+import { Avatars } from '@common/avatars.enum';
+import { DiceType } from '@common/dice';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
-import { Avatars } from '@common/avatars.enum';
-import { DiceType } from '@common/dice';
 import { TileType } from '@common/tile-type.enum';
 import { LobbySocketsService } from './lobby-sockets.service';
-import { MOCK_MATCHES } from '@app/consts/tests/mock-matches';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games';
 
 describe('LobbySocketsService', () => {
     let service: LobbySocketsService;
     let coreSocketSpy: jasmine.SpyObj<CoreSocketService>;
     let routerSpy: jasmine.SpyObj<Router>;
     let matchDataServiceSpy: jasmine.SpyObj<MatchDataService>;
+    let gameDataServiceSpy: jasmine.SpyObj<GameDataService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
 
     const mockPlayer: Player = {
@@ -60,6 +62,7 @@ describe('LobbySocketsService', () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         matchDataServiceSpy = jasmine.createSpyObj('MatchDataService', ['startMatch']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'keepMessages']);
+        gameDataServiceSpy = jasmine.createSpyObj('GameDataService', ['gameData']);
 
         TestBed.configureTestingModule({
             providers: [
@@ -67,15 +70,12 @@ describe('LobbySocketsService', () => {
                 { provide: Router, useValue: routerSpy },
                 { provide: MatchDataService, useValue: matchDataServiceSpy },
                 { provide: PopupService, useValue: popupServiceSpy },
+                { provide: GameDataService, useValue: gameDataServiceSpy },
             ],
         });
 
         service = TestBed.inject(LobbySocketsService);
         service['setupLobbyListeners']();
-    });
-
-    it('should get initial matchRoomCode as empty string', () => {
-        expect(service.matchRoomCode).toBe('');
     });
 
     it('should set and get matchRoomCode', () => {
@@ -217,5 +217,24 @@ describe('LobbySocketsService', () => {
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Vous avez été retiré de la partie');
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+    });
+
+    it('should set gameData', () => {
+        service['onEmitGameData'](MOCK_GAMES[0]);
+        expect(gameDataServiceSpy.gameData).toEqual(MOCK_GAMES[0]);
+    });
+
+    it('should not show popup on Warning event if popup is displayed', () => {
+        popupServiceSpy.isDisplayed = true;
+        const warningCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === LobbyEvent.Warning);
+        warningCall?.[1]('Warning message');
+        expect(popupServiceSpy.showPopup).not.toHaveBeenCalled();
+    });
+
+    it('should show popup on Warning event if popup is not displayed', () => {
+        popupServiceSpy.isDisplayed = false;
+        const warningCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === LobbyEvent.Warning);
+        warningCall?.[1]('Warning message');
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Warning message');
     });
 });

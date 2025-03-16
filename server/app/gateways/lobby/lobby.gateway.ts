@@ -80,6 +80,13 @@ export class LobbyGateway implements OnGatewayDisconnect {
         this.server.to(matchCode).emit(LobbyEvent.UpdatePlayerList, players);
     }
 
+    emitGameDataToPlayer(clientId: string, gameData: GameData) {
+        const socket = this.server.sockets.sockets.get(clientId);
+        if (socket) {
+            socket.emit(LobbyEvent.EmitGameData, gameData);
+        }
+    }
+
     emitRemovedFromMatch(clientId: string): void {
         const socket = this.server.sockets.sockets.get(clientId);
         if (socket) {

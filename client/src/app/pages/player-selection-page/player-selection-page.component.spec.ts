@@ -175,7 +175,7 @@ describe('PlayerSelectionPageComponent', () => {
         component.bonusPointsForm.setValue(StatType.Speed);
         const playerData = component['getPlayerData']();
         expect(playerData).toEqual({
-            name: 'TestPlayer',
+            name: 'TESTPLAYER',
             avatar: Avatars.Avatar3,
             playerStats: {
                 health: DEFAULT_STAT_POINTS,

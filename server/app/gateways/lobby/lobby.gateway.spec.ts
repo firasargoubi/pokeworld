@@ -1,14 +1,14 @@
 import { MOCK_GAMES } from '@app/consts/tests/mock-games';
 import { MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { LobbyService } from '@app/services/lobby/lobby.service';
+import { GameData } from '@common/game-data';
 import { LobbyEvent } from '@common/lobby-event.enum';
+import { Match } from '@common/match';
 import { Player } from '@common/player';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { LobbyGateway } from './lobby.gateway';
-import { GameData } from '@common/game-data';
-import { Match } from '@common/match';
 
 describe('LobbyGateway', () => {
     let gateway: LobbyGateway;
@@ -133,5 +133,14 @@ describe('LobbyGateway', () => {
         gateway.warn(playerId, warningMessage);
 
         expect(mockSocket.emit.calledWith(LobbyEvent.Warning, warningMessage)).toBeTruthy();
+    });
+
+    it('should emit GameData on emitGameDataToPlayer', () => {
+        const clientId = '1234';
+        const gameData = { _id: '1234' } as GameData;
+
+        gateway.emitGameDataToPlayer(clientId, gameData);
+
+        expect(mockSocket.emit.calledWith(LobbyEvent.EmitGameData, gameData)).toBeTruthy();
     });
 });

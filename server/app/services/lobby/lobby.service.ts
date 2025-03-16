@@ -1,9 +1,10 @@
 import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { MatchService } from '@app/services/match/match.service';
 import { GameData } from '@common/game-data';
+import { MAX_PLAYERS } from '@common/max-players.const';
 import { Player } from '@common/player';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { HALF_POINT, MAX_PLAYERS, MIN_PLAYERS } from './lobby.service.const';
+import { HALF_POINT, MIN_PLAYERS } from './lobby.service.const';
 
 @Injectable()
 export class LobbyService {
@@ -86,6 +87,9 @@ export class LobbyService {
             player.name = this.matchService.getUniqueName(updatedFields.name, playerId);
         }
         if (updatedFields.isConnected) {
+            const gameData = this.matchService.getMatch(matchCode).gameData;
+            this.lobbyGateway.emitGameDataToPlayer(playerId, gameData);
+
             this.emitLockStatusChanged(matchCode);
         }
 
