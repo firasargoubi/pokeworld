@@ -27,8 +27,6 @@ export class CombatSocketService {
 
     constructor() {
         this.setupCombatListeners();
-        this.setupTurnListeners();
-        this.setupPlayerUpdateListener();
     }
 
     get selfPlayer$(): Observable<Player | null> {
@@ -37,10 +35,6 @@ export class CombatSocketService {
 
     get ennemyPlayer$(): Observable<Player | null> {
         return this.ennemyPlayerSubject.asObservable();
-    }
-
-    initFight(targetPlayerId: string): void {
-        this.coreSocket.emit(CombatEvent.StartCombat, targetPlayerId);
     }
 
     escapeAttempt(): void {
@@ -60,58 +54,58 @@ export class CombatSocketService {
     }
 
     private setupCombatListeners(): void {
-        this.coreSocket.on(CombatEvent.CombatStarted, (combatData: CombatData) => {
-            const playerOne: Player = combatData.players[0];
-            const playerTwo: Player = combatData.players[1];
-
-            const isSelfPlayerOne = playerOne.id === this.coreSocket.selfId;
-            const selfPlayer = isSelfPlayerOne ? playerOne : playerTwo;
-            const ennemyPlayer = isSelfPlayerOne ? playerTwo : playerOne;
-            this.combatRoomCode = combatData.combatRoomCode;
-
-            this.selfPlayerSubject.next(selfPlayer);
-            this.ennemyPlayerSubject.next(ennemyPlayer);
-            this.router.navigate(['/combat']);
-        });
-
-        this.coreSocket.on(CombatEvent.EscapedResult, (playerId: string) => {
-            this.escapeResult.next(playerId);
-        });
-
-        this.coreSocket.on(CombatEvent.AttackResult, (attackResult: AttackResult) => {
-            this.attackResult.next(attackResult);
-        });
-
-        this.coreSocket.on(CombatEvent.EndCombat, (result: CombatResult) => {
-            // TODO: popup instead
-            window.console.log(`Combat terminé, ganant: ${result.winnerId}`);
-            this.combatResult.next(result);
-
-            const navigationDelay = 1200;
-            setTimeout(() => {
-                // TODO: Should be play page (also change test)
-                this.router.navigate(['/debug']);
-            }, navigationDelay);
-        });
+        this.coreSocket.on(CombatEvent.CombatStarted, this.onCombatStarted.bind(this));
+        this.coreSocket.on(CombatEvent.EscapedResult, this.onEscapedResult.bind(this));
+        this.coreSocket.on(CombatEvent.AttackResult, this.onAttackResult.bind(this));
+        this.coreSocket.on(CombatEvent.EndCombat, this.onEndCombat.bind(this));
+        this.coreSocket.on(CombatEvent.CombatTurnStarted, this.onCombatTurnStarted.bind(this));
+        this.coreSocket.on(CombatEvent.CombatTurnStopped, this.onCombatTurnStopped.bind(this));
+        this.coreSocket.on(CombatEvent.StartTimer, this.onStartTimer.bind(this));
+        this.coreSocket.on(CombatEvent.UpdatePlayers, this.onUpdatePlayers.bind(this));
     }
 
-    private setupTurnListeners(): void {
-        this.coreSocket.on(CombatEvent.CombatTurnStarted, () => {
-            this.currentTurn.next(true);
-        });
-        this.coreSocket.on(CombatEvent.CombatTurnStopped, () => {
-            this.currentTurn.next(false);
-        });
-        this.coreSocket.on(CombatEvent.StartTimer, (time: number) => {
-            this.currentTimer.next(time);
-        });
+    private onCombatTurnStarted() {
+        this.currentTurn.next(true);
     }
 
-    private setupPlayerUpdateListener(): void {
-        this.coreSocket.on(CombatEvent.UpdatePlayers, ([playerOne, playerTwo]: Player[]) => {
-            const isSelfPlayerOne = playerOne.id === this.coreSocket.selfId;
-            this.selfPlayerSubject.next(isSelfPlayerOne ? playerOne : playerTwo);
-            this.ennemyPlayerSubject.next(isSelfPlayerOne ? playerTwo : playerOne);
-        });
+    private onCombatTurnStopped() {
+        this.currentTurn.next(false);
+    }
+
+    private onStartTimer(time: number) {
+        this.currentTimer.next(time);
+    }
+
+    private onUpdatePlayers([playerOne, playerTwo]: Player[]) {
+        const isSelfPlayerOne = playerOne.id === this.coreSocket.selfId;
+        this.selfPlayerSubject.next(isSelfPlayerOne ? playerOne : playerTwo);
+        this.ennemyPlayerSubject.next(isSelfPlayerOne ? playerTwo : playerOne);
+    }
+
+    private onCombatStarted(combatData: CombatData) {
+        const playerOne: Player = combatData.players[0];
+        const playerTwo: Player = combatData.players[1];
+
+        const isSelfPlayerOne = playerOne.id === this.coreSocket.selfId;
+        const selfPlayer = isSelfPlayerOne ? playerOne : playerTwo;
+        const ennemyPlayer = isSelfPlayerOne ? playerTwo : playerOne;
+        this.combatRoomCode = combatData.combatRoomCode;
+
+        this.selfPlayerSubject.next(selfPlayer);
+        this.ennemyPlayerSubject.next(ennemyPlayer);
+        this.router.navigate(['/combat']);
+    }
+
+    private onEscapedResult(playerId: string) {
+        this.escapeResult.next(playerId);
+    }
+
+    private onAttackResult(attackResult: AttackResult) {
+        this.attackResult.next(attackResult);
+    }
+
+    private onEndCombat(result: CombatResult) {
+        window.console.log(`Combat terminé, ganant: ${result.winnerId}`);
+        // TODO
     }
 }
