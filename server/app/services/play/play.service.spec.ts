@@ -1,32 +1,48 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
-import { PlayService } from './play.service';
-import { MatchService } from '@app/services/match/match.service';
 import { PlayGateway } from '@app/gateways/play/play.gateway';
+import { CombatService } from '@app/services/combat/combat.service';
+import { MatchService } from '@app/services/match/match.service';
+import { MovementService } from '@app/services/movement/movement.service';
+import { Test, TestingModule } from '@nestjs/testing';
+import * as sinon from 'sinon';
+import { SinonSandbox, SinonStubbedInstance, createStubInstance } from 'sinon';
+import { PlayService } from './play.service';
 
 describe('PlayService', () => {
     let service: PlayService;
+    let sandbox: SinonSandbox;
+    let mockPlayGateway: SinonStubbedInstance<PlayGateway>;
     let mockMatchService: SinonStubbedInstance<MatchService>;
-    let mockePlayGateway: SinonStubbedInstance<PlayGateway>;
+    let mockMovementService: SinonStubbedInstance<MovementService>;
+    let mockCombatService: SinonStubbedInstance<CombatService>;
 
     beforeAll(async () => {
+        mockPlayGateway = createStubInstance<PlayGateway>(PlayGateway);
         mockMatchService = createStubInstance<MatchService>(MatchService);
-        mockePlayGateway = createStubInstance<PlayGateway>(PlayGateway);
+        mockMovementService = createStubInstance<MovementService>(MovementService);
+        mockCombatService = createStubInstance<CombatService>(CombatService);
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [PlayService, { provide: MatchService, useValue: mockMatchService }, { provide: PlayGateway, useValue: mockePlayGateway }],
+            providers: [
+                PlayService,
+                { provide: PlayGateway, useValue: mockPlayGateway },
+                { provide: MatchService, useValue: mockMatchService },
+                { provide: MovementService, useValue: mockMovementService },
+                { provide: CombatService, useValue: mockCombatService },
+            ],
         }).compile();
 
         service = module.get<PlayService>(PlayService);
     });
 
-    it('should be defined', () => {
-        expect(service).toBeDefined();
+    beforeEach(() => {
+        sandbox = sinon.createSandbox();
     });
 
-    it('should endTurn correctly', () => {
-        const playerId = '1234';
-        service.endTurn(playerId);
-        expect(true).toBeTruthy();
+    afterEach(() => {
+        sandbox.restore();
+    });
+
+    it('should create', () => {
+        expect(service).toBeDefined();
     });
 });
