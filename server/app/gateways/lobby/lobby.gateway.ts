@@ -3,7 +3,6 @@ import { GameData } from '@common/game-data';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
-import { Warning } from '@common/warning.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -85,13 +84,6 @@ export class LobbyGateway implements OnGatewayDisconnect {
         const socket = this.server.sockets.sockets.get(clientId);
         if (socket) {
             socket.emit(LobbyEvent.EmitGameData, gameData);
-        }
-    }
-
-    emitRemovedFromMatch(clientId: string, removalReason: Warning): void {
-        const socket = this.server.sockets.sockets.get(clientId);
-        if (socket) {
-            socket.emit(LobbyEvent.RemovedFromMatch, removalReason);
         }
     }
 

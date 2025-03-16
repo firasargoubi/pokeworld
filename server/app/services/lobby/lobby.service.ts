@@ -66,7 +66,7 @@ export class LobbyService {
         const connectedPlayers = match.matchData.players.filter((p) => p.isConnected);
         if (connectedPlayers.length <= 1) {
             this.lobbyGateway.disconnectPlayer(connectedPlayers[0].id);
-            this.lobbyGateway.emitRemovedFromMatch(connectedPlayers[0].id, Warning.LastPlayerRemaining);
+            this.lobbyGateway.warn(connectedPlayers[0].id, Warning.LastPlayerRemaining);
             match.matchData.players.forEach((p) => {
                 this.matchService.removePlayerFromMatch(p.id, matchCode);
             });
@@ -101,7 +101,7 @@ export class LobbyService {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(targetPlayerId);
 
         this.matchService.removePlayerFromMatch(targetPlayerId, matchCode);
-        this.lobbyGateway.emitRemovedFromMatch(targetPlayerId, removalReason);
+        this.lobbyGateway.warn(targetPlayerId, removalReason);
         this.lobbyGateway.disconnectPlayer(targetPlayerId);
         this.emitUpdatePlayerList(matchCode);
         this.emitLockStatusChanged(matchCode);
@@ -149,7 +149,7 @@ export class LobbyService {
         players.forEach((player) => {
             this.matchService.removePlayerFromMatch(player.id, matchCode);
             this.lobbyGateway.disconnectPlayer(player.id);
-            this.lobbyGateway.emitRemovedFromMatch(player.id, Warning.AdminQuit);
+            this.lobbyGateway.warn(player.id, Warning.AdminQuit);
         });
     }
 
