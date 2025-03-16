@@ -492,19 +492,19 @@ app-map {
     width: calc(200vw + 2 * $timer-height);
     background-image: url($timer-image);
     background-size: auto $timer-height;
-    transform: translateX(calc(-0.55 * $timer-height));
+    transform: translateX(calc((var(--max-time) - var(--pause-time)) / var(--max-time) * -103vw - 2.5vw));
 }
 
 .active .timer-image {
-    animation: timer-animation calc(var(--max-time) * 1.01s + 0.1s) linear 1 forwards;
+    animation: timer-animation calc(var(--pause-time) * 1.01s - 0.7s) linear 1 forwards;
 }
 
 @keyframes timer-animation {
     from {
-        transform: translateX(calc(-0.55 * $timer-height));
+        transform: translateX(calc((var(--max-time) - var(--pause-time)) / var(--max-time) * -103vw - 2.5vw));
     }
     to {
-        transform: translateX(calc(-1.45 * $timer-height - 100vw));
+        transform: translateX(calc(-103vw - 2.5vw));
     }
 }
 

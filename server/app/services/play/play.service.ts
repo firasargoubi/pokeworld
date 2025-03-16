@@ -119,15 +119,11 @@ export class PlayService {
         }
         const elapsedTime = Math.abs(new Date().getTime() - turnData.lastPhaseStartTime.getTime());
         match.matchData.currentTimer = match.matchData.currentTimer - elapsedTime;
-
-        // eslint-disable-next-line no-console, @typescript-eslint/no-magic-numbers
-        console.log('maxTimer', match.matchData.maxTimer / 1000);
-        // eslint-disable-next-line no-console, @typescript-eslint/no-magic-numbers
-        console.log('remainingTime', match.matchData.currentTimer / 1000);
-        // eslint-disable-next-line no-console, @typescript-eslint/no-magic-numbers
-        console.log('elapsedTime', elapsedTime / 1000);
-
-        this.playGateway.emitPauseTurn(matchCode, match);
+        this.playGateway.emitCombatBroadcast(matchCode, {
+            match,
+            playerOneIndex: this.matchService.getPlayerIndex(playerId),
+            playerTwoIndex: this.matchService.getPlayerIndex(playerId),
+        });
 
         // this.combatService.initiateCombat(playerId, tragetPlayerId);
     }

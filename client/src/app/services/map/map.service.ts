@@ -243,7 +243,7 @@ export class MapService {
         if (oldData.item !== newData.item) {
             oldData.item = newData.item;
         }
-        if (oldData.item !== newData.player) {
+        if (oldData.player !== newData.player) {
             oldData.player = newData.player;
         }
         if (oldData.overlay !== newData.overlay) {

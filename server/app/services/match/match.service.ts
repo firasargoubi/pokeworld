@@ -11,6 +11,12 @@ export class MatchService {
     private turnDatas: Map<string, TurnData> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
 
+    getPlayerIndex(playerId: string): number {
+        const gameCode = this.getMatchCodeFromPlayerId(playerId);
+        const players = this.getPlayers(gameCode);
+        return players.findIndex((p) => p.id === playerId);
+    }
+
     createMatch(gameData: GameData): string {
         const matchCode = this.getNewMatchCode();
         const match: Match = { gameData, matchData: structuredClone(DEFAULT_MATCH_DATA) };
