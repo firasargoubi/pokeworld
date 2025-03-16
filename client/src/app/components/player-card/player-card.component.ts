@@ -18,5 +18,7 @@ export class PlayerCardComponent {
     @Input() displayBanButton: boolean = false;
     @Input() onClick: () => void;
 
-    avatarsData = AVATAR_DATA;
+    get avatarUrl(): string {
+        return AVATAR_DATA[this.player.avatar].htmlImageCentred;
+    }
 }

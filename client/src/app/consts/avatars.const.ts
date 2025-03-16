@@ -96,6 +96,7 @@ export const AVATAR_DATA = {
         image: './assets/images/game/avatars/magikarp.png',
         imageFace: '../../../assets/images/game/avatars/face/magikarp.png',
         imageCentered: '../../../assets/images/game/avatars/centered/magikarp.png',
+        htmlImageCentred: './assets/images/game/avatars/centered/magikarp.png',
         frontGif: './assets/images/game/avatars-gifs/magikarp.gif',
         backGif: './assets/images/game/avatars-gifs/magikarp-back.gif',
     },
