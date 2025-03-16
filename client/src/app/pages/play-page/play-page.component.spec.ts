@@ -83,4 +83,26 @@ describe('PlayPageComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
+    it('should verify socket connection and do nothing if connected', () => {
+        connectionStatusSubject.next(true);
+
+        expect(mockPopupService.showPopup).not.toHaveBeenCalled();
+        expect(mockPopupService.keepMessages).not.toHaveBeenCalled();
+        expect(mockRouter.navigate).not.toHaveBeenCalled();
+    });
+
+    it('should show popup, keep messages, and navigate if socket disconnects', () => {
+        connectionStatusSubject.next(false);
+
+        expect(mockPopupService.showPopup).toHaveBeenCalledWith('Erreur de connection avec le serveur');
+        expect(mockPopupService.keepMessages).toHaveBeenCalled();
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
+    });
+
+    it('should return selfIndex from matchDataService', () => {
+        const expectedSelfIndex = 0;
+        expect(component.selfIndex).toBe(expectedSelfIndex);
+        expect(component.selfIndex).toBe(mockMatchDataService.selfIndex);
+    });
 });

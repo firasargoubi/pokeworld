@@ -79,6 +79,7 @@ describe('LobbyService', () => {
     it('should generate match code and add player as admin when creating a new game', () => {
         mockMatchService.isPlayerInMatch.returns(false);
         mockMatchService.createMatch.returns('1234');
+
         const result = service.createMatch('1122', MOCK_GAMES[0]);
 
         expect(mockMatchService.addPlayerToMatch.calledWith('1122', '1234', true)).toBeTruthy();
@@ -101,11 +102,11 @@ describe('LobbyService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const emitLockStatusChangedStub = sandbox.stub(service as any, 'emitLockStatusChanged');
 
-        service.leaveMatch('1122');
+        service.leaveMatch('3344');
 
         expect(mockMatchService.removePlayerFromMatch.called).toBeTruthy();
-        expect(emitUpdatePlayerListStub.calledWith('1122')).toBeTruthy();
-        expect(emitLockStatusChangedStub.calledWith('1122')).toBeTruthy();
+        expect(emitUpdatePlayerListStub.calledWith('3344')).toBeTruthy();
+        expect(emitLockStatusChangedStub.calledWith('3344')).toBeTruthy();
     });
 
     it('should kick everyone when admin leave match', () => {

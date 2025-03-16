@@ -4,7 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { createSandbox, SinonSandbox } from 'sinon';
 import { MatchService } from './match.service';
 import { CODE_LENGTH, DEFAULT_TURN_DATA } from './match.service.const';
-import { MACTHES, MATCH_CODES, PLAYER_IDS, PLAYER_TO_MATCH_CODE } from './match.service.spec.const';
+import { MATCH_CODES, MATCHES, PLAYER_IDS, PLAYER_TO_MATCH_CODE } from './match.service.spec.const';
 
 describe('MatchService', () => {
     let service: MatchService;
@@ -20,7 +20,7 @@ describe('MatchService', () => {
 
     beforeEach(() => {
         sandbox = createSandbox();
-        service['matches'] = structuredClone(MACTHES);
+        service['matches'] = structuredClone(MATCHES);
         service['playerToMatchCode'] = structuredClone(PLAYER_TO_MATCH_CODE);
         service['turnDatas'] = new Map([
             [MATCH_CODES[0], structuredClone(DEFAULT_TURN_DATA)],
@@ -130,7 +130,7 @@ describe('MatchService', () => {
 
     it('should getPlayers correctly', () => {
         const result = service.getPlayers(structuredClone(MATCH_CODES[0]));
-        expect(result).toEqual(MACTHES.get(structuredClone(MATCH_CODES[0])).matchData.players);
+        expect(result).toEqual(MATCHES.get(structuredClone(MATCH_CODES[0])).matchData.players);
     });
 
     it('should getPlayer correctly', () => {
@@ -140,6 +140,39 @@ describe('MatchService', () => {
 
     it('should getPlayersFromPlayerId correctly', () => {
         const result = service.getPlayersFromPlayerId(structuredClone(PLAYER_IDS[0]));
-        expect(result).toEqual(MACTHES.get(structuredClone(MATCH_CODES[0])).matchData.players);
+        expect(result).toEqual(MATCHES.get(structuredClone(MATCH_CODES[0])).matchData.players);
+    });
+
+    it('should correctly identify active player', () => {
+        const matchCode = MATCH_CODES[0];
+        const match = service['matches'].get(matchCode);
+        match.matchData.activePlayer = 0;
+        const activePlayerId = match.matchData.players[0].id;
+        expect(service.isActivePlayer(activePlayerId)).toBe(true);
+        expect(service.isActivePlayer(PLAYER_IDS[1])).toBe(false);
+        expect(service.isActivePlayer('unknown')).toBe(false);
+    });
+
+    it('should get turn data correctly', () => {
+        const turnData = service.getTurnData(MATCH_CODES[0]);
+        expect(turnData).toEqual(structuredClone(DEFAULT_TURN_DATA));
+        expect(service.getTurnData('unknown')).toBeUndefined();
+    });
+
+    it('should clear timeout in removePlayerFromMatch when phaseTimeout is set', () => {
+        const matchCode = MATCH_CODES[0];
+        const turnData = service['turnDatas'].get(matchCode);
+        const fakeTimeout = {} as NodeJS.Timeout;
+        turnData.phaseTimeout = fakeTimeout;
+
+        const clearTimeoutSpy = sandbox.spy(global, 'clearTimeout');
+
+        [PLAYER_IDS[0], PLAYER_IDS[1]].forEach((playerId) => {
+            service.removePlayerFromMatch(playerId, matchCode);
+        });
+
+        expect(service.hasMatchCode(matchCode)).toBe(false);
+        expect(service['turnDatas'].has(matchCode)).toBe(false);
+        expect(clearTimeoutSpy.calledOnceWith(fakeTimeout)).toBe(true);
     });
 });
