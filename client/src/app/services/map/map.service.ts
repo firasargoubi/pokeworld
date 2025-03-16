@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { MOVE_ANIMATION_DURATION } from '@app/consts/default-player.const';
 import { IMAGE_SUFIX, TILE_IMAGES_PREFIX, UNDERLAY_IMAGES_PREFIX } from '@app/consts/images.const';
-import { MapVisualData, TileVisualData } from '@app/interfaces/map-visual-data';
+import { MapVisualData, OverlayTiles, TileVisualData } from '@app/interfaces/map-visual-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { ItemType } from '@common/item-type.enum';
 import { MapData } from '@common/map-data';
@@ -11,9 +11,11 @@ import { Player } from '@common/player';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import {
+    ACTION_OVERLAY,
     BRIDGE_SIMILAR_TILES,
     BRIDGE_VARIANTS,
     DEFAULT_MAP_VISUAL_DATA,
+    DEFAULT_OVERLAY_TILES,
     DEFAULT_TILE_VISUAL,
     HOVER_MOVE_OVERLAY,
     MAX_GRASS_VARIANT,
@@ -32,12 +34,10 @@ import {
     providedIn: 'root',
 })
 export class MapService {
-    visualMapData: MapVisualData = DEFAULT_MAP_VISUAL_DATA;
+    visualMapData: MapVisualData = structuredClone(DEFAULT_MAP_VISUAL_DATA);
     gameDataService: GameDataService = inject(GameDataService);
+    private overlayTiles: OverlayTiles = structuredClone(DEFAULT_OVERLAY_TILES);
     private players: Player[] = [];
-    private possibleMoves: Position[] = [];
-    private hoverMoves: Position[] = [];
-    private playerPosition: Position = { x: -1, y: -1 };
 
     constructor() {
         this.updateAllTiles();
@@ -45,27 +45,30 @@ export class MapService {
     }
 
     setHoverMoves(hoverMoves: Position[]) {
-        const oldhoverMoves = this.hoverMoves;
-        this.hoverMoves = hoverMoves;
-        oldhoverMoves.forEach((pos) => this.updateTile(pos));
-        hoverMoves.forEach((pos) => this.updateTile(pos));
+        this.overlayTiles.hoverMoves = hoverMoves;
+        this.updateAllTiles();
     }
 
     setPossibleMoves(possibleMoves: Position[], playerPosition: Position) {
-        const oldPlayerPosition = this.playerPosition;
-        const oldPossibleMoves = this.possibleMoves;
+        this.overlayTiles.playerPosition = playerPosition;
+        this.overlayTiles.possibleMoves = possibleMoves;
+        this.updateAllTiles();
+    }
 
-        this.playerPosition = playerPosition;
-        this.possibleMoves = possibleMoves;
-
-        this.updateTile(oldPlayerPosition);
-        this.updateTile(playerPosition)
-        oldPossibleMoves.forEach((pos) => this.updateTile(pos));
-        possibleMoves.forEach((pos) => this.updateTile(pos));
+    setActions(actions: Position[], playerPosition: Position) {
+        this.overlayTiles.actions = actions;
+        this.overlayTiles.playerPosition = playerPosition;
+        this.updateAllTiles();
     }
 
     clearOverlays() {
-        this.setPossibleMoves([], { x: -1, y: -1 });
+        this.overlayTiles = structuredClone(DEFAULT_OVERLAY_TILES);
+        this.updateAllTiles();
+    }
+
+    clearActions() {
+        this.overlayTiles.actions = [];
+        this.updateAllTiles();
     }
 
     setPlayers(players: Player[]) {
@@ -90,6 +93,11 @@ export class MapService {
         return `${imagePrefix}${tileVariant}${IMAGE_SUFIX}`;
     }
 
+    
+    hasActionOverlay(): boolean {
+        return this.overlayTiles.actions.length > 0;
+    }
+
     private getTileVisualData(mapData: MapData, position: Position): TileVisualData {
         return {
             tile: this.getTileImage(mapData.tiles, position),
@@ -103,13 +111,30 @@ export class MapService {
     private getOverlay(position: Position): string | null {
         let overlay = null;
 
-        const isHovering = this.isHoveringPosition(position);
-        const isOnPlayer = this.isOnPlayer(position);
-        const isPossibleMove = this.isPossibleMove(position);
-        const canMove = this.possibleMoves.length > 0;
-        
-        if (canMove && (isOnPlayer || isPossibleMove)) {
-            if (isHovering) {
+        if (this.hasActionOverlay()) {
+            overlay = this.getActionOverlay(position);
+        } else if (this.hasPossibleMove()) {
+            overlay = this.getMoveOverlay(position);
+        }
+
+        return overlay;
+    }
+
+    private getActionOverlay(position: Position): string | null {
+        let overlay = null;
+
+        if (this.isOnPlayer(position) || this.isAction(position)) {
+            overlay = ACTION_OVERLAY;
+        }
+
+        return overlay;
+    }
+    
+    private getMoveOverlay(position: Position): string | null {
+        let overlay = null;
+
+        if (this.isOnPlayer(position) || this.isPossibleMove(position)) {
+            if (this.isHoveringPosition(position)) {
                 overlay = HOVER_MOVE_OVERLAY;
             } else {
                 overlay = POSSIBLE_MOVE_OVERLAY;
@@ -118,17 +143,25 @@ export class MapService {
 
         return overlay;
     }
+
+    private hasPossibleMove(): boolean {
+        return this.overlayTiles.possibleMoves.length > 0;
+    }
     
     private isPossibleMove(position: Position): boolean {
-        return Boolean(this.possibleMoves.find((pos) => pos.x === position.x && pos.y === position.y));
+        return Boolean(this.overlayTiles.possibleMoves.find((pos) => pos.x === position.x && pos.y === position.y));
+    }
+
+    private isAction(position: Position): boolean {
+        return Boolean(this.overlayTiles.actions.find((pos) => pos.x === position.x && pos.y === position.y));
     }
 
     private isOnPlayer(position: Position): boolean {
-        return this.playerPosition.x === position.x && this.playerPosition.y === position.y;
+        return this.overlayTiles.playerPosition.x === position.x && this.overlayTiles.playerPosition.y === position.y;
     }
 
     private isHoveringPosition(position: Position): boolean {
-        return Boolean(this.hoverMoves.find((pos) => pos.x === position.x && pos.y === position.y));
+        return Boolean(this.overlayTiles.hoverMoves.find((pos) => pos.x === position.x && pos.y === position.y));
     }
 
     private getPlayerAvatar(position: Position): string | null {

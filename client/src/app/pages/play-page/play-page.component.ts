@@ -5,6 +5,7 @@ import { MapComponent } from '@app/components/map/map.component';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { PlayerVisualData, PlayVisualData } from '@app/interfaces/play-visual-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
+import { MapService } from '@app/services/map/map.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
@@ -29,6 +30,7 @@ export class PlayPageComponent {
     private coreSocketService: CoreSocketService = inject(CoreSocketService);
     private popupService: PopupService = inject(PopupService);
     private thumbnailService: ThumbnailService = inject(ThumbnailService);
+    private mapService: MapService = inject(MapService);
     private router: Router = inject(Router);
 
     constructor() {
@@ -135,8 +137,12 @@ export class PlayPageComponent {
         this.playVisualData.thumbnailUrl = url;
     }
 
-    action() {
-        // TODO logique d'action
+    useAction() {
+        if (this.mapService.hasActionOverlay()) {
+            this.mapService.clearActions();
+        } else if (this.canUseAction) {
+            this.playSocketsService.displayActions();
+        }
     }
 
     endTurn() {

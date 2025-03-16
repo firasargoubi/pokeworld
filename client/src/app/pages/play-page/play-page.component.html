@@ -55,7 +55,7 @@
                     <div class="item-slot"><div class="item-icon"></div></div>
                 </div>
             </div>
-            <button (click)="action()" class="action-button" [class.active]="playVisualData.canUseAction">Action</button>
+            <button (click)="useAction()" class="action-button" [class.active]="playVisualData.canUseAction">Action</button>
             <button (click)="endTurn()" class="endturn-button" [class.active]="playVisualData.canEndTurn">Terminer le tour</button>
         </div>
         <div class="timer" [class.active]="timerService.currentTime <= timerService.maxTime" [ngStyle]="{

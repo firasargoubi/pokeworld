@@ -5,8 +5,10 @@ export enum PlayEvent {
     GetHoverMoves = 'getHoverMoves',
     Move = 'move',
     ChangeDebugMode = 'changeDebugMode',
-    GetActionMoves = 'getActionMoves',
+    GetActions = 'getActions',
+    Action = 'action',
 
+    BridgeChanged = 'bridgeChanged',
     DebugModeChanged = 'debugModeChanged',
     TurnStarted = 'turnStarted',
     PreTurnStarted = 'preTurnStarted',

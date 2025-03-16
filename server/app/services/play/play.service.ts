@@ -4,6 +4,7 @@ import { MovementService } from '@app/services/movement/movement.service';
 import { Match, TurnPhase } from '@common/match';
 import { Player } from '@common/player';
 import { Position } from '@common/position';
+import { TileType } from '@common/tile-type.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { HALF_POINT, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
 
@@ -24,11 +25,25 @@ export class PlayService {
             const player = this.matchService.getPlayer(playerId);
             const match = this.matchService.getMatch(matchCode);
             const shortestPath = this.movementService.getShortestPath(match, position);
+
             if (shortestPath.moveCost <= player.currentStats.movement) {
                 player.currentStats.position = position;
                 player.currentStats.movement -= shortestPath.moveCost;
                 const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
                 this.playGateway.emitPlayerMoved(matchCode, { match, movement: shortestPath.path, playerIndex });
+            }
+        }
+    }
+
+    action(playerId: string, position: Position) {
+        if (this.matchService.isActivePlayer(playerId)) {
+            const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+            const match = this.matchService.getMatch(matchCode);
+            const actions = this.movementService.getActions(match);
+
+            if (actions.some((a) => a.x === position.x && a.y === position.y)) {
+                match.matchData.players.find((p) => p.id === playerId).currentStats.hasAction = false;
+                this.executeAction(position, match, playerId);
             }
         }
     }
@@ -46,16 +61,16 @@ export class PlayService {
         return moves;
     }
 
-    getActionMoves(playerId: string): Position[] {
-        let actionMoves = [];
-        
+    getActions(playerId: string): Position[] {
+        let actions = [];
+
         if (this.matchService.isActivePlayer(playerId)) {
             const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
             const match = this.matchService.getMatch(matchCode);
-            actionMoves = this.movementService.getActions(match);
+            actions = this.movementService.getActions(match);
         }
 
-        return actionMoves;
+        return actions;
     }
 
     startMatch(matchCode: string) {
@@ -81,6 +96,34 @@ export class PlayService {
                 this.playGateway.emitDebugModeChanged(matchCode, match);
             }
         }
+    }
+
+    private executeAction(position: Position, match: Match, playerId: string) {
+        const player = match.matchData.players.find((p) => p.currentStats.position.x === position.x && p.currentStats.position.y === position.y);
+        if (player) {
+            this.startFight(playerId, player.id);
+        } else {
+            this.toggleBridgeTile(match, position);
+        }
+    }
+
+    private startFight(playerId: string, tragetPlayerId: string) {
+        // eslint-disable-next-line no-console
+        console.log('START FIGHT', playerId, tragetPlayerId);
+
+        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+        const match = this.matchService.getMatch(matchCode);
+        this.playGateway.emitBridgeChanged(matchCode, match);
+    }
+
+    private toggleBridgeTile(match: Match, position: Position) {
+        const tile = match.gameData.mapData.tiles[position.x][position.y];
+        if (tile === TileType.Bridge) {
+            match.gameData.mapData.tiles[position.x][position.y] = TileType.BrokenBridge;
+        } else if (tile === TileType.BrokenBridge) {
+            match.gameData.mapData.tiles[position.x][position.y] = TileType.Bridge;
+        }
+        this.playGateway.emitBridgeChanged(match.matchData.code, match);
     }
 
     private canEndTurn(playerId: string): boolean {
@@ -147,7 +190,6 @@ export class PlayService {
 
     private getNextCurrentIndex(players: Player[], currentIndex: number): number {
         const totalPlayers = players.length;
-
         let nextIndex = (currentIndex + 1) % totalPlayers;
 
         let steps = 0;
@@ -178,9 +220,9 @@ export class PlayService {
 
     private assignSpawnPoints(match: Match) {
         const spawnPoints = match.gameData.mapData.items.Spawn;
-        const shuffledSpawnPoints = spawnPoints.sort(() => Math.random() - 0.5).slice(0, match.matchData.players.length);
+        const shuffledSpawnPoints = spawnPoints.sort(() => Math.random() - HALF_POINT).slice(0, match.matchData.players.length);
         match.gameData.mapData.items.Spawn = spawnPoints.filter((s) => shuffledSpawnPoints.includes(s));
-        
+
         shuffledSpawnPoints.forEach((spawnPoint, i) => {
             match.matchData.players[i].spawnPoint = spawnPoint;
             match.matchData.players[i].currentStats.position = spawnPoint;

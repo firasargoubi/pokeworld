@@ -66,7 +66,9 @@ export class LobbyService {
         if (connectedPlayers.length <= 1) {
             this.lobbyGateway.disconnectPlayer(connectedPlayers[0].id);
             this.lobbyGateway.emitRemovedFromMatch(connectedPlayers[0].id);
-            match.matchData.players.forEach((p) => { this.matchService.removePlayerFromMatch(p.id, matchCode); });
+            match.matchData.players.forEach((p) => {
+                this.matchService.removePlayerFromMatch(p.id, matchCode);
+            });
         } else {
             this.lobbyGateway.emitPlayerLeft(matchCode, match);
             this.playService.endTurn(playerId);
@@ -193,16 +195,18 @@ export class LobbyService {
     }
 
     private canStartMatch(playerId: string): boolean {
+        let canStartMatch = false;
         const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-        const match = this.matchService.getMatch(matchCode);
-        const currentPlayerCount = match.matchData.players.length;
-
-        const isAdmin = this.matchService.isPlayerAdmin(playerId);
-        const isMatchLocked = !this.canJoinMatch(matchCode);
-        const hasEnoughPlayers = currentPlayerCount >= MIN_PLAYERS;
-        const areAllPlayersConnected = match.matchData.players.every((p) => p.isConnected);
-
-        return isAdmin && isMatchLocked && hasEnoughPlayers && areAllPlayersConnected;
+        if (matchCode) {
+            const match = this.matchService.getMatch(matchCode);
+            const currentPlayerCount = match.matchData.players.length;
+            const isAdmin = this.matchService.isPlayerAdmin(playerId);
+            const isMatchLocked = !this.canJoinMatch(matchCode);
+            const hasEnoughPlayers = currentPlayerCount >= MIN_PLAYERS;
+            const areAllPlayersConnected = match.matchData.players.every((p) => p.isConnected);
+            canStartMatch = isAdmin && isMatchLocked && hasEnoughPlayers && areAllPlayersConnected;
+        }
+        return canStartMatch;
     }
 
     private isMatchFull(matchCode: string): boolean {

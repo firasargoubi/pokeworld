@@ -18,7 +18,7 @@ export class MovementService {
     getShortestPath(match: Match, target: Position): ShortestPath {
         const active = match.matchData.players[match.matchData.activePlayer];
         const start = active.currentStats.position;
-        
+
         if (match.matchData.isDebugMode) {
             return { moveCost: 0, path: [start, target] };
         }
@@ -30,17 +30,21 @@ export class MovementService {
 
     getActions(match: Match): Position[] {
         const position = match.matchData.players[match.matchData.activePlayer].currentStats.position;
-        return NEIGHBOR_OFFSETS.filter((delta) => {
-            const neighbor: Position = { x: position.x + delta.x, y: position.y + delta.y };
+        const neighborActions = NEIGHBOR_OFFSETS.map((delta) => ({ x: position.x + delta.x, y: position.y + delta.y })).filter((neighbor) => {
             const hasPlayer = this.isTileOccupiedByPlayer(neighbor, match);
             const hasBridge = this.isTileABridge(neighbor, match);
             return hasPlayer || hasBridge;
         });
+        return [...neighborActions, position];
     }
 
     private isTileABridge(position: Position, match: Match): boolean {
-        const tile = match.gameData.mapData.tiles[position.x][position.y];
-        return tile === TileType.Bridge || tile === TileType.BrokenBridge;
+        let isBridge = false;
+        if (!this.isOutOfBounds(position, match.gameData.mapData.size)) {
+            const tile = match.gameData.mapData.tiles[position.x][position.y];
+            isBridge = tile === TileType.Bridge || tile === TileType.BrokenBridge;
+        }
+        return isBridge;
     }
 
     private getPossibleMovesStandard(currentPos: Position, movementRange: number, match: Match): Position[] {

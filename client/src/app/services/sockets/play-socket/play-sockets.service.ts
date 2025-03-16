@@ -34,8 +34,25 @@ export class PlaySocketsService {
         this.coreSocket.emit(PlayEvent.EndTurn);
     }
 
-    move(position: Position): void {
-        this.coreSocket.emit(PlayEvent.Move, position);
+    clickTile(position: Position): void {
+        const playerPosition = this.matchDataService.getPlayerPosition();
+        const clickedItself = playerPosition.x === position.x && playerPosition.y === position.y;
+
+        if (!clickedItself) {
+            if (this.mapService.hasActionOverlay()) {
+                this.coreSocket.emit(PlayEvent.Action, position);
+            } else {
+                this.coreSocket.emit(PlayEvent.Move, position);
+            }
+        }
+
+        this.mapService.clearActions();
+    }
+
+    displayActions() {
+        this.coreSocket.emit(PlayEvent.GetActions, null, (actions: Position[]) => {
+            this.mapService.setActions(actions, this.matchDataService.getPlayerPosition());
+        });
     }
 
     changeDebugMode(): void {
@@ -60,6 +77,12 @@ export class PlaySocketsService {
         this.coreSocket.on(LobbyEvent.PlayerLeft, this.onPlayerLeft.bind(this));
         this.coreSocket.on(PlayEvent.PlayerMoved, this.onPlayerMoved.bind(this));
         this.coreSocket.on(PlayEvent.DebugModeChanged, this.onDebugModeChanged.bind(this));
+        this.coreSocket.on(PlayEvent.BridgeChanged, this.onBridgeChanged.bind(this));
+    }
+
+    private onBridgeChanged(match: Match) {
+        this.matchDataService.updateMatch(match);
+        this.setActivePlayerPossibleMoves();
     }
 
     private onDebugModeChanged(match: Match) {

@@ -27,14 +27,19 @@ export class PlayGateway {
         return this.playService.getHoverMoves(socket.id, position);
     }
 
-    @SubscribeMessage(PlayEvent.GetActionMoves)
-    getActionMoves(socket: Socket): Position[] {
-        return this.playService.getActionMoves(socket.id);
+    @SubscribeMessage(PlayEvent.GetActions)
+    getActions(socket: Socket): Position[] {
+        return this.playService.getActions(socket.id);
     }
 
     @SubscribeMessage(PlayEvent.Move)
     move(socket: Socket, position: Position) {
         this.playService.move(socket.id, position);
+    }
+
+    @SubscribeMessage(PlayEvent.Action)
+    action(socket: Socket, position: Position) {
+        this.playService.action(socket.id, position);
     }
 
     @SubscribeMessage(PlayEvent.ChangeDebugMode)
@@ -48,6 +53,10 @@ export class PlayGateway {
 
     emitMatchStarted(matchCode: string, match: Match) {
         this.server.to(matchCode).emit(PlayEvent.MatchStarted, match);
+    }
+
+    emitBridgeChanged(matchCode: string, match: Match) {
+        this.server.to(matchCode).emit(PlayEvent.BridgeChanged, match);
     }
 
     emitTurnStarted(matchCode: string, match: Match) {

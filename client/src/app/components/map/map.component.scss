@@ -121,6 +121,7 @@ app-item,
     background-color: rgba(104, 165, 255, 0.45);
 }
 
+.action-overlay,
 .possible-move-overlay,
 .hover-move-overlay {
     cursor: pointer;
@@ -128,4 +129,8 @@ app-item,
 
 .possible-move-overlay:hover .tile-overlay {
     background-color: rgba(104, 165, 255, 0.45);
+}
+
+.action-overlay .tile-overlay {
+    background-color: rgba(255, 104, 104, 0.56);
 }
