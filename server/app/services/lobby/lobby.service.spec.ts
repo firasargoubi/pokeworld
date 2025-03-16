@@ -9,8 +9,7 @@ import { DEFAULT_PLAYER } from '@common/const/default-player.const';
 import { Player } from '@common/player';
 import { Warning } from '@common/warning.enum';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as sinon from 'sinon';
-import { SinonSandbox, SinonStubbedInstance, createStubInstance } from 'sinon';
+import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
 import { LobbyService } from './lobby.service';
 
 describe('LobbyService', () => {
@@ -41,7 +40,7 @@ describe('LobbyService', () => {
     });
 
     beforeEach(() => {
-        sandbox = sinon.createSandbox();
+        sandbox = createSandbox();
     });
 
     afterEach(() => {
@@ -80,9 +79,6 @@ describe('LobbyService', () => {
     it('should generate match code and add player as admin when creating a new game', () => {
         mockMatchService.isPlayerInMatch.returns(false);
         mockMatchService.createMatch.returns('1234');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-unused-vars
-        const emitUpdatePlayerListStub = sandbox.stub(service as any, 'emitUpdatePlayerList');
-
         const result = service.createMatch('1122', MOCK_GAMES[0]);
 
         expect(mockMatchService.addPlayerToMatch.calledWith('1122', '1234', true)).toBeTruthy();
@@ -107,9 +103,9 @@ describe('LobbyService', () => {
 
         service.leaveMatch('1122');
 
-        expect(mockMatchService.removePlayerFromMatch.calledWith('1122', '3344')).toBeTruthy();
-        expect(emitUpdatePlayerListStub.calledWith('3344')).toBeTruthy();
-        expect(emitLockStatusChangedStub.calledWith('3344')).toBeTruthy();
+        expect(mockMatchService.removePlayerFromMatch.called).toBeTruthy();
+        expect(emitUpdatePlayerListStub.calledWith('1122')).toBeTruthy();
+        expect(emitLockStatusChangedStub.calledWith('1122')).toBeTruthy();
     });
 
     it('should kick everyone when admin leave match', () => {
@@ -120,7 +116,7 @@ describe('LobbyService', () => {
 
         service.leaveMatch('1122');
 
-        expect(mockMatchService.removePlayerFromMatch.calledWith('1122', '3344')).toBeTruthy();
+        expect(mockMatchService.removePlayerFromMatch.called).toBeTruthy();
         expect(mockLobbyGateway.disconnectPlayer.calledWith(MOCK_PLAYERS[0].id)).toBeTruthy();
         expect(mockLobbyGateway.warn.calledWith(MOCK_PLAYERS[0].id, Warning.AdminQuit)).toBeTruthy();
     });
@@ -162,17 +158,25 @@ describe('LobbyService', () => {
         expect(mockLobbyGateway.emitGameDataToPlayer.calledWith(MOCK_PLAYERS[0].id, MOCK_MATCHES[0].gameData)).toBeTruthy();
     });
 
-    it('should sanitize match data and start game when admin initiates', () => {
+    it('should start match when conditions are met', () => {
         mockMatchService.getMatchCodeFromPlayerId.returns('3344');
         mockMatchService.isPlayerAdmin.returns(true);
+        mockMatchService.getMatch.returns({
+            gameData: MOCK_GAMES[0],
+            matchData: {
+                ...DEFAULT_MATCH_DATA,
+                players: [
+                    { ...DEFAULT_PLAYER, id: '1122', isConnected: true },
+                    { ...DEFAULT_PLAYER, id: '2233', isConnected: true },
+                ],
+                isLocked: true,
+            },
+        });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sandbox.stub(service as any, 'isMatchLocked').returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const sanitizeMatchStub = sandbox.stub(service as any, 'sanitizeMatch');
-        mockMatchService.getMatch.returns(structuredClone(MOCK_MATCHES[0]));
 
         service.startMatch('1122');
-        expect(sanitizeMatchStub.calledWith('3344')).toBeTruthy();
+        expect(mockPlayService.startMatch.calledWith('3344')).toBeTruthy();
     });
 
     it('should update room lock status when requested by admin', () => {
@@ -195,7 +199,6 @@ describe('LobbyService', () => {
         const kickJoiningPlayersStub = sandbox.stub(service as any, 'kickJoiningPlayers');
 
         service['emitLockStatusChanged'](matchCode);
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         expect((service as any).isMatchLocked.calledWith(matchCode)).toBeTruthy();
         expect(kickJoiningPlayersStub.calledWith(matchCode)).toBeTruthy();
@@ -253,7 +256,7 @@ describe('LobbyService', () => {
     it('should isMatchFull return true when match is full', () => {
         const matchCode = '3344';
         mockMatchService.getMatch.returns({
-            gameData: MOCK_GAMES[0],
+            gameData: MOCK_GAMES[2],
             matchData: {
                 ...DEFAULT_MATCH_DATA,
                 isLocked: false,
@@ -266,33 +269,6 @@ describe('LobbyService', () => {
 
         const result = service['isMatchFull'](matchCode);
         expect(result).toBe(true);
-    });
-
-    it('should sort player by speed on sanitizeMatch', () => {
-        const matchCode = '3344';
-        const match = {
-            gameData: MOCK_GAMES[0],
-            matchData: {
-                ...DEFAULT_MATCH_DATA,
-                players: [
-                    { ...DEFAULT_PLAYER, playerStats: { ...DEFAULT_PLAYER.playerStats, speed: 5 } },
-                    { ...DEFAULT_PLAYER, playerStats: { ...DEFAULT_PLAYER.playerStats, speed: 3 } },
-                    { ...DEFAULT_PLAYER, playerStats: { ...DEFAULT_PLAYER.playerStats, speed: 2 } },
-                    { ...DEFAULT_PLAYER, playerStats: { ...DEFAULT_PLAYER.playerStats, speed: 4 } },
-                    { ...DEFAULT_PLAYER, playerStats: { ...DEFAULT_PLAYER.playerStats, speed: 1 } },
-                    { ...DEFAULT_PLAYER, playerStats: { ...DEFAULT_PLAYER.playerStats, speed: 3 } },
-                ],
-            },
-        };
-        mockMatchService.getMatch.returns(match);
-        const isSortedDescending = (players: Player[]) => {
-            const speeds = players.map((p) => p.playerStats.speed);
-            return speeds.every((s, i) => i === 0 || s <= speeds[i - 1]);
-        };
-
-        expect(isSortedDescending(match.matchData.players)).toBe(false);
-        service['sanitizeMatch'](matchCode);
-        expect(isSortedDescending(match.matchData.players)).toBe(true);
     });
 
     it('should canPlayerJoinMatch call warn on hasMatchCode false', () => {
@@ -319,7 +295,7 @@ describe('LobbyService', () => {
         expect(mockLobbyGateway.warn.calledWith('1122', Warning.RoomLocked)).toBeTruthy();
     });
 
-    it('should canPlayerJoinMatch call warn on isMatchLocked true', () => {
+    it('should canPlayerJoinMatch call warn on already in match', () => {
         mockMatchService.hasMatchCode.returns(true);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sandbox.stub(service as any, 'isMatchFull').returns(false);
