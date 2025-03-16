@@ -3,11 +3,16 @@ import { MapSize } from '@common/map-size.enum';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 
+export const HOVER_MOVE_OVERLAY = 'hover-move-overlay';
+export const POSSIBLE_MOVE_OVERLAY = 'possible-move-overlay';
+export const PLAYER_OVERLAY = 'player-overlay';
+
 export const DEFAULT_TILE_VISUAL: TileVisualData = {
     tile: '',
     underlay: null,
     item: null,
     player: null,
+    overlay: null,
 };
 
 export const PATH_SIMILAR_TILES = [TileType.Path, TileType.None, TileType.Bridge, TileType.BrokenBridge];

@@ -1,15 +1,21 @@
 import { MOCK_MATCHES } from '@app/consts/tests/mock-matches';
 import { MapData } from '@common/map-data';
 import { Match } from '@common/match';
+import { ShortestPath } from '@common/movement';
 import { Position } from '@common/position';
-import { TileType } from '@common/tile-type.enum';
+import { TILE_COST, TileType } from '@common/tile-type.enum';
 import { Test, TestingModule } from '@nestjs/testing';
+import { createSandbox, SinonSandbox } from 'sinon';
 import { MovementService } from './movement.service';
+import { MOCK_NEW_SECTION } from './movement.service.const';
 
 describe('MovementService', () => {
     let service: MovementService;
+    let sandbox: SinonSandbox;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
+        sandbox = createSandbox();
+
         const module: TestingModule = await Test.createTestingModule({
             providers: [MovementService],
         }).compile();
@@ -17,24 +23,39 @@ describe('MovementService', () => {
         service = module.get<MovementService>(MovementService);
     });
 
-    it('should return reachable moves excluding the starting position (Standard)', () => {
-        const movementRange = 3;
-        const currentPos: Position = { x: 0, y: 0 };
+    afterEach(() => {
+        sandbox.restore();
+    });
 
-        // On part d'un match issu de MOCK_MATCHES en vidant la liste des joueurs
+    it('should return reachable moves excluding the starting position (Standard)', () => {
+        const currentPos: Position = { x: 0, y: 0 };
         const match: Match = structuredClone(MOCK_MATCHES[0]);
-        match.matchData.players = [];
-        const moves = service.getPossibleMoves(movementRange, currentPos, match, false);
+        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
+        match.matchData.activePlayer = 0;
+        match.matchData.players[0].currentStats.position = currentPos;
+        match.matchData.players[0].currentStats.movement = 2;
+        const moves = service.getPossibleMoves(match);
         expect(moves).not.toContainEqual(currentPos);
         expect(moves.length).toBeGreaterThan(0);
     });
 
-    it('should return accessible tiles excluding water, broken bridges and occupied positions (Debug)', () => {
-        // On clone la map issue de MOCK_MATCHES[0].gameData.mapData (taille 15x15)
+    it('should exclude tiles of type Water and BrokenBridge', () => {
         const dummyMap: MapData = structuredClone(MOCK_MATCHES[0].gameData.mapData);
+        for (let row = 0; row < MOCK_NEW_SECTION.length; row++) {
+            dummyMap.tiles[row] = MOCK_NEW_SECTION[row];
+        }
+        const matchNoPlayers: Match = structuredClone(MOCK_MATCHES[0]);
+        matchNoPlayers.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
+        matchNoPlayers.matchData.activePlayer = 0;
+        matchNoPlayers.gameData.mapData = dummyMap;
+        const debugMoves = service['getPossibleMovesDebug'](matchNoPlayers);
+        expect(debugMoves).not.toContainEqual({ x: 0, y: 1 });
+        expect(debugMoves).not.toContainEqual({ x: 1, y: 1 });
+    });
 
-        // Pour le test, on redéfinit uniquement une section de la map (les 4 premières lignes)
-        const newSection = [
+    it('should exclude positions occupied by players', () => {
+        const dummyMap: MapData = structuredClone(MOCK_MATCHES[0].gameData.mapData);
+        const newSection: TileType[][] = [
             [TileType.Grass, TileType.Water, TileType.Grass, TileType.Grass],
             [TileType.Grass, TileType.BrokenBridge, TileType.Grass, TileType.Grass],
             [TileType.Grass, TileType.Grass, TileType.Grass, TileType.Grass],
@@ -43,72 +64,189 @@ describe('MovementService', () => {
         for (let row = 0; row < newSection.length; row++) {
             dummyMap.tiles[row] = newSection[row];
         }
-        // On part d'un match sans joueurs, basé sur MOCK_MATCHES[0]
-        const matchNoPlayers: Match = structuredClone(MOCK_MATCHES[0]);
-        matchNoPlayers.gameData.mapData = dummyMap;
-        matchNoPlayers.matchData.players = [];
-        const debugMoves = service['getPossibleMovesDebug'](matchNoPlayers);
-        // On s'assure que les tuiles de type Water et BrokenBridge dans la section modifiée sont exclues
-        expect(debugMoves).not.toContainEqual({ x: 0, y: 1 });
-        expect(debugMoves).not.toContainEqual({ x: 1, y: 1 });
-
-        // On ajoute une position occupée obtenue à partir de MOCK_MATCHES
         const occupiedPos: Position = { x: 2, y: 2 };
         const matchWithPlayers: Match = structuredClone(MOCK_MATCHES[0]);
         matchWithPlayers.gameData.mapData = dummyMap;
-        // On remplace la liste des joueurs par un tableau contenant un unique joueur, dont currentStats.position est occupiedPos
         matchWithPlayers.matchData.players = [
             {
-                ...matchWithPlayers.matchData.players[0],
+                ...structuredClone(MOCK_MATCHES[0].matchData.players[0]),
                 currentStats: {
-                    ...matchWithPlayers.matchData.players[0].currentStats,
+                    ...MOCK_MATCHES[0].matchData.players[0].currentStats,
                     position: occupiedPos,
                 },
             },
         ];
+        matchWithPlayers.matchData.activePlayer = 0;
         const debugMovesWithPlayers = service['getPossibleMovesDebug'](matchWithPlayers);
         expect(debugMovesWithPlayers).not.toContainEqual(occupiedPos);
     });
 
     it('should return a valid shortest path and cost in an unobstructed grid', () => {
         const match: Match = structuredClone(MOCK_MATCHES[0]);
+
         const start: Position = { x: 0, y: 0 };
         const target: Position = { x: 4, y: 4 };
-        const result = service.getShortestPath(start, target, match);
+        const result: ShortestPath = service.getShortestPath(match, target);
         const cost = target.x + target.y;
+
+        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
+        match.matchData.activePlayer = 0;
+        match.matchData.players[0].currentStats.position = start;
         expect(result.moveCost).toEqual(cost);
         expect(result.path[0]).toEqual(start);
         expect(result.path[result.path.length - 1]).toEqual(target);
     });
 
-    // it('should return an infinite moveCost and an empty path if the target is unreachable', () => {
-    //     // On part d'une map issue de MOCK_GAMES[2] (taille Small) pour respecter les constantes
-    //     const dummyMap: MapData = structuredClone(MOCK_GAMES[2].mapData);
-    //     // On modifie la section tiles pour créer une situation bloquée
-    //     dummyMap.tiles = [
-    //         [TileType.Grass, TileType.Water, TileType.Grass],
-    //         [TileType.Water, TileType.Water, TileType.Water],
-    //         [TileType.Grass, TileType.Water, TileType.Grass],
-    //     ];
-    //     const match: Match = structuredClone(MOCK_MATCHES[2]);
-    //     match.gameData.mapData = dummyMap;
-    //     match.matchData.players = [];
-    //     const start: Position = { x: 0, y: 0 };
-    //     const target: Position = { x: 2, y: 2 };
-    //     const result = service.getShortestPath(start, target, match);
-    //     expect(result.moveCost).toEqual(Infinity);
-    //     expect(result.path).toEqual([]);
-    // });
+    it('should return an infinite moveCost and an empty path if the target is unreachable', () => {
+        const dummyMatch: Match = structuredClone(MOCK_MATCHES[1]);
+        dummyMatch.matchData.players = [structuredClone(MOCK_MATCHES[1].matchData.players[0])];
+        dummyMatch.matchData.activePlayer = 0;
+        dummyMatch.matchData.players[0].currentStats.position = { x: 0, y: 0 };
+        dummyMatch.gameData.mapData.tiles = [
+            [TileType.Grass, TileType.Water, TileType.Grass],
+            [TileType.Water, TileType.Water, TileType.Water],
+            [TileType.Grass, TileType.Water, TileType.Grass],
+        ];
+        const target: Position = { x: 4, y: 4 };
+        const result: ShortestPath = service.getShortestPath(dummyMatch, target);
+        expect(result.moveCost).toEqual(Infinity);
+        expect(result.path).toEqual([]);
+    });
 
-    // it('should correctly determine if movement is possible (canMove)', () => {
-    //     const movementRange = 5;
-    //     const currentPos: Position = { x: 0, y: 0 };
-    //     const reachableTarget: Position = { x: 1, y: 1 };
-    //     const unreachableTarget: Position = { x: 3, y: 3 };
-    //     const match: Match = structuredClone(MOCK_MATCHES[0]);
-    //     // Pour ce test, on vide la liste des joueurs
-    //     match.matchData.players = [];
-    //     expect(service.canMove(movementRange, currentPos, reachableTarget, match)).toBe(true);
-    //     expect(service.canMove(1, currentPos, unreachableTarget, match)).toBe(false);
-    // });
+    it('should correctly determine if movement is possible (canMove)', () => {
+        const match: Match = structuredClone(MOCK_MATCHES[0]);
+        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
+        match.matchData.activePlayer = 0;
+        match.matchData.players[0].currentStats.position = { x: 0, y: 0 };
+        match.matchData.players[0].currentStats.movement = 5;
+        const reachableTarget: Position = { x: 1, y: 1 };
+        const unreachableTarget: Position = { x: 3, y: 3 };
+        expect(service.canMove(match, reachableTarget)).toBe(true);
+        expect(service.canMove(match, unreachableTarget)).toBe(false);
+    });
+
+    // Nouveaux tests
+    it('should return an empty array if movementRange is 0', () => {
+        const match: Match = structuredClone(MOCK_MATCHES[0]);
+        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
+        match.matchData.activePlayer = 0;
+        match.matchData.players[0].currentStats.position = { x: 0, y: 0 };
+        match.matchData.players[0].currentStats.movement = 0;
+        const moves = service.getPossibleMoves(match);
+        expect(moves).toEqual([]);
+    });
+
+    it('should handle out-of-bounds positions gracefully', () => {
+        const match: Match = structuredClone(MOCK_MATCHES[0]);
+        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
+        match.matchData.activePlayer = 0;
+        match.matchData.players[0].currentStats.position = { x: -1, y: -1 }; // Hors limites
+        match.matchData.players[0].currentStats.movement = 2;
+        const moves = service.getPossibleMoves(match);
+        expect(moves).toEqual([]);
+    });
+
+    it('should return an empty path if start and target are the same', () => {
+        const match: Match = structuredClone(MOCK_MATCHES[0]);
+        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
+        match.matchData.activePlayer = 0;
+        match.matchData.players[0].currentStats.position = { x: 0, y: 0 };
+        const target: Position = { x: 0, y: 0 };
+        const result: ShortestPath = service.getShortestPath(match, target);
+        expect(result.moveCost).toEqual(0);
+        expect(result.path).toEqual([]);
+    });
+    it('should correctly calculate distances and predecessors in an unobstructed grid', () => {
+        const match: Match = structuredClone(MOCK_MATCHES[0]);
+        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
+        match.matchData.activePlayer = 0;
+        match.matchData.players[0].currentStats.position = { x: 0, y: 0 };
+
+        const startPos: Position = { x: 0, y: 0 };
+        const { distances, predecessors } = service['calculateDistancesAndPredecessors'](startPos, match, Infinity);
+
+        // Vérifie les distances
+        expect(distances[0][0]).toEqual(0); // Position de départ
+        expect(distances[0][1]).toEqual(TILE_COST[TileType.Grass]); // Case adjacente
+        expect(distances[1][0]).toEqual(TILE_COST[TileType.Grass]); // Case adjacente
+
+        // Vérifie les prédécesseurs
+        expect(service['reconstructPath']({ x: 0, y: 1 }, predecessors)[0]).toEqual(startPos);
+        expect(service['reconstructPath']({ x: 1, y: 0 }, predecessors)[0]).toEqual(startPos);
+    });
+
+    it('should handle blocked tiles (players) correctly', () => {
+        const match: Match = structuredClone(MOCK_MATCHES[0]);
+        const startPos: Position = { x: 0, y: 0 };
+        const otherPlayerPos = { x: 0, y: 1 };
+        match.matchData.players = [MOCK_MATCHES[0].matchData.players[0], MOCK_MATCHES[0].matchData.players[1]];
+        match.matchData.activePlayer = 0;
+        match.matchData.players[0].currentStats.position = startPos;
+        match.matchData.players[1].currentStats.position = otherPlayerPos;
+
+        const { distances } = service['calculateDistancesAndPredecessors'](startPos, match, Infinity);
+
+        expect(distances[0][1]).toEqual(Infinity);
+    });
+
+    it('should handle out-of-bounds positions', () => {
+        const match: Match = structuredClone(MOCK_MATCHES[0]);
+        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
+        match.matchData.activePlayer = 0;
+        match.matchData.players[0].currentStats.position = { x: 0, y: 0 };
+
+        const startPos: Position = { x: 0, y: 0 };
+        const { distances } = service['calculateDistancesAndPredecessors'](startPos, match, Infinity);
+
+        // Les cases hors limites ne sont pas accessibles
+        expect(distances[-1]?.[0]).toBeUndefined(); // Hors limites
+        expect(distances[0]?.[-1]).toBeUndefined(); // Hors limites
+    });
+    it('should correctly reconstruct the path from start to target', () => {
+        const predecessors = new Map<Position, Position>();
+        predecessors.set({ x: 1, y: 0 }, { x: 0, y: 0 });
+        predecessors.set({ x: 1, y: 1 }, { x: 1, y: 0 });
+        predecessors.set({ x: 2, y: 1 }, { x: 1, y: 1 });
+
+        const target: Position = { x: 2, y: 1 };
+        const path = service['reconstructPath'](target, predecessors);
+
+        expect(path).toEqual([
+            { x: 0, y: 0 },
+            { x: 1, y: 0 },
+            { x: 1, y: 1 },
+            { x: 2, y: 1 },
+        ]);
+    });
+
+    it('should return null if no path exists', () => {
+        const predecessors = new Map<Position, Position>();
+        const target: Position = { x: 2, y: 1 };
+        const path = service['reconstructPath'](target, predecessors);
+
+        expect(path).toBeNull();
+    });
+
+    it('should handle a single-point path (start = target)', () => {
+        const predecessors = new Map<Position, Position>();
+        const target: Position = { x: 0, y: 0 };
+        const path = service['reconstructPath'](target, predecessors);
+
+        expect(path).toBeNull();
+    });
+    it('should return accessible moves in Debug mode, excluding Players, Water and BrokenBridge', () => {
+        const match = structuredClone(MOCK_MATCHES[0]);
+        match.matchData.isDebugMode = true;
+        const possibleMoves = [{ x: 4, y: 4 }];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const getPossibleMovesDebugStub = sandbox.stub(service as any, 'getPossibleMovesDebug').returns(possibleMoves);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const getPossibleMovesStandardStub = sandbox.stub(service as any, 'getPossibleMovesStandard').returns(possibleMoves);
+
+        const result = service['getPossibleMoves'](match);
+
+        expect(result).toEqual(possibleMoves);
+        expect(getPossibleMovesStandardStub.notCalled).toBeTruthy();
+        expect(getPossibleMovesDebugStub.called).toBeTruthy();
+    });
 });

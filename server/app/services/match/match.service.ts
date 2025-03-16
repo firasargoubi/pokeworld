@@ -20,6 +20,18 @@ export class MatchService {
         return matchCode;
     }
 
+    isActivePlayer(playerId: string): boolean {
+        let isActivePlayer = false;
+        const matchCode = this.getMatchCodeFromPlayerId(playerId);
+        if (matchCode) {
+            const activePlayerId = this.getActivePlayerId(matchCode);
+            if (playerId === activePlayerId) {
+                isActivePlayer = true;
+            }
+        }
+        return isActivePlayer;
+    }
+
     isPlayerInMatch(playerId: string): boolean {
         return this.playerToMatchCode.has(playerId);
     }
@@ -72,6 +84,15 @@ export class MatchService {
 
     getMatch(matchCode: string): Match {
         return this.matches.get(matchCode);
+    }
+
+    getActivePlayerId(matchCode: string): string {
+        let activePlayerId = '';
+        const match = this.getMatch(matchCode);
+        if (match) {
+            activePlayerId = match.matchData.players[match.matchData.activePlayer].id;
+        }
+        return activePlayerId;
     }
 
     getTurnData(matchCode: string): TurnData {

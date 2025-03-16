@@ -6,6 +6,7 @@ export interface TileVisualData {
     underlay: string | null;
     item: ItemType | null;
     player: string | null;
+    overlay: string | null;
 }
 
 export interface MapVisualData {

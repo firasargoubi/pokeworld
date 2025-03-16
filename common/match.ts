@@ -1,5 +1,6 @@
 import { GameData } from './game-data';
 import { Player } from './player';
+import { Position } from './position';
 
 export interface Match {
     matchData: MatchData;
@@ -23,3 +24,9 @@ export enum TurnPhase {
     Turn = 'turn',
     WaitingForCombat = 'waitingForCombat',
 }
+
+export interface PlayerMovementData {
+    playerIndex: number,
+    movement: Position[],
+    match: Match,
+};

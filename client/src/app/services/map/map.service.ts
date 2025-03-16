@@ -1,10 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
+import { MOVE_ANIMATION_DURATION } from '@app/consts/default-player.const';
 import { IMAGE_SUFIX, TILE_IMAGES_PREFIX, UNDERLAY_IMAGES_PREFIX } from '@app/consts/images.const';
 import { MapVisualData, TileVisualData } from '@app/interfaces/map-visual-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { ItemType } from '@common/item-type.enum';
 import { MapData } from '@common/map-data';
+import { PlayerMovementData } from '@common/match';
 import { Player } from '@common/player';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
@@ -13,9 +15,12 @@ import {
     BRIDGE_VARIANTS,
     DEFAULT_MAP_VISUAL_DATA,
     DEFAULT_TILE_VISUAL,
+    HOVER_MOVE_OVERLAY,
     MAX_GRASS_VARIANT,
     MAX_UNDERLAY_VARIANT,
     PATH_SIMILAR_TILES,
+    PLAYER_OVERLAY,
+    POSSIBLE_MOVE_OVERLAY,
     RANDOM_NUMBER_BASE,
     RANDOM_NUMBER_MULTIPLIER,
     SURROUNDING_POSITIONS_DONUT,
@@ -31,15 +36,56 @@ export class MapService {
     visualMapData: MapVisualData = DEFAULT_MAP_VISUAL_DATA;
     gameDataService: GameDataService = inject(GameDataService);
     private players: Player[] = [];
+    private possibleMoves: Position[] = [];
+    private hoverMoves: Position[] = [];
+    private playerPosition: Position = { x: -1, y: -1 };
 
     constructor() {
         this.updateAllTiles();
         this.gameDataService.mapUpdate.subscribe((x) => this.onMapUpdate(x));
     }
 
+    setHoverMoves(hoverMoves: Position[]) {
+        const oldhoverMoves = this.hoverMoves;
+        this.hoverMoves = hoverMoves;
+        oldhoverMoves.forEach((pos) => this.updateTile(pos));
+        hoverMoves.forEach((pos) => this.updateTile(pos));
+    }
+
+    setPossibleMoves(possibleMoves: Position[], playerPosition: Position) {
+        const oldPlayerPosition = this.playerPosition;
+        const oldPossibleMoves = this.possibleMoves;
+
+        this.playerPosition = playerPosition;
+        this.possibleMoves = possibleMoves;
+
+        this.updateTile(oldPlayerPosition);
+        this.updateTile(playerPosition)
+        oldPossibleMoves.forEach((pos) => this.updateTile(pos));
+        possibleMoves.forEach((pos) => this.updateTile(pos));
+    }
+
+    clearOverlays() {
+        this.setPossibleMoves([], { x: -1, y: -1 });
+    }
+
     setPlayers(players: Player[]) {
         this.players = players;
-        players.forEach((p) => this.updateTile(p.currentStats.position));
+        this.updateAllTiles();
+    }
+
+    movePlayer(playerMovementData: PlayerMovementData) {
+        if (playerMovementData.match.matchData.isDebugMode) {
+            this.players = playerMovementData.match.matchData.players;
+            this.updateAllTiles();
+        } else {
+            for (let i = 1; i < playerMovementData.movement.length; i++) {
+                setTimeout(() => {
+                    this.players[playerMovementData.playerIndex].currentStats.position = playerMovementData.movement[i];
+                    this.updateAllTiles();
+                }, MOVE_ANIMATION_DURATION * i);
+            }
+        }
     }
 
     getTileImage(tiles: TileType[][], position: Position): string {
@@ -56,7 +102,21 @@ export class MapService {
             underlay: this.getUnderlayImage(mapData.tiles, position),
             item: this.getItem(mapData.items, position),
             player: this.getPlayerAvatar(position),
+            overlay: this.getOverlay(position),
         };
+    }
+
+    private getOverlay(position: Position): string | null {
+        let overlay = null;
+        
+        if (this.hoverMoves.find((pos) => pos.x === position.x && pos.y === position.y)) {
+            overlay = HOVER_MOVE_OVERLAY;
+        } else if (this.playerPosition.x === position.x && this.playerPosition.y === position.y) {
+            overlay = PLAYER_OVERLAY;
+        } else if (this.possibleMoves.find((pos) => pos.x === position.x && pos.y === position.y)) {
+            overlay = POSSIBLE_MOVE_OVERLAY;
+        }
+        return overlay;
     }
 
     private getPlayerAvatar(position: Position): string | null {
@@ -126,21 +186,15 @@ export class MapService {
         const newData = this.getTileVisualData(mapData, position);
         const oldData = this.visualMapData.tiles[position.x][position.y];
 
-        if (oldData.tile !== newData.tile) {
-            this.visualMapData.tiles[position.x][position.y].tile = newData.tile;
-        }
+        this.updateTileData(oldData, newData);
+    }
 
-        if (oldData.underlay !== newData.underlay) {
-            this.visualMapData.tiles[position.x][position.y].underlay = newData.underlay;
-        }
-
-        if (oldData.item !== newData.item) {
-            this.visualMapData.tiles[position.x][position.y].item = newData.item;
-        }
-
-        if (oldData.item !== newData.player) {
-            this.visualMapData.tiles[position.x][position.y].player = newData.player;
-        }
+    private updateTileData(oldData: TileVisualData, newData: TileVisualData) {
+        if (oldData.tile !== newData.tile) { oldData.tile = newData.tile; }
+        if (oldData.underlay !== newData.underlay) { oldData.underlay = newData.underlay; }
+        if (oldData.item !== newData.item) { oldData.item = newData.item; }
+        if (oldData.item !== newData.player) { oldData.player = newData.player; }
+        if (oldData.overlay !== newData.overlay) { oldData.overlay = newData.overlay; }
     }
 
     private getItem(items: Record<ItemType, Position[]>, position: Position): ItemType | null {

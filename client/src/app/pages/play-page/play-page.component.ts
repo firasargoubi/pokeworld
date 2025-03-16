@@ -151,11 +151,11 @@ export class PlayPageComponent {
     private verifySocketConnection(isConnected: boolean) {
         if (!isConnected || this.matchDataService.matchData.players.length <= 0) {
             if (this.timerService) {
+                this.popupService.clearMessages();
                 this.popupService.showPopup('Erreur de connection avec le serveur');
                 this.popupService.keepMessages();
             }
             this.router.navigate(['/']);
-            window.console.log('redirect');
         }
     }
 }

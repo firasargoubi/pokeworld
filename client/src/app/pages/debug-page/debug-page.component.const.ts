@@ -14,7 +14,18 @@ export const DEBUG_GAMES = [
         description: 'Description 1 Small',
         lastEdited: new Date(),
         mapData: {
-            tiles: Array.from({ length: MapSize.Small }, () => Array(MapSize.Small).fill(TileType.Grass)),
+            tiles: [
+                [TileType.Grass, TileType.Grass, TileType.Path, TileType.Grass, TileType.Grass, TileType.Bush, TileType.Bush, TileType.Grass, TileType.Water, TileType.Grass],
+                [TileType.Grass, TileType.Grass, TileType.Path, TileType.Grass, TileType.Grass, TileType.Bush, TileType.Bush, TileType.Grass, TileType.Water, TileType.Grass],
+                [TileType.Grass, TileType.Grass, TileType.Path, TileType.Grass, TileType.Grass, TileType.Bush, TileType.Bush, TileType.Grass, TileType.Water, TileType.Grass],
+                [TileType.Grass, TileType.Grass, TileType.Path, TileType.Grass, TileType.Grass, TileType.Bush, TileType.Bush, TileType.Grass, TileType.Water, TileType.Grass],
+                [TileType.Grass, TileType.Grass, TileType.Path, TileType.Grass, TileType.Grass, TileType.Bush, TileType.Bush, TileType.Grass, TileType.Water, TileType.Grass],
+                [TileType.Grass, TileType.Grass, TileType.Path, TileType.Grass, TileType.Grass, TileType.Grass, TileType.Grass, TileType.Grass, TileType.BrokenBridge, TileType.Grass],
+                [TileType.Grass, TileType.Grass, TileType.Path, TileType.Grass, TileType.Grass, TileType.Bush, TileType.Bush, TileType.Grass, TileType.Water, TileType.Grass],
+                [TileType.Grass, TileType.Grass, TileType.Path, TileType.Grass, TileType.Grass, TileType.Bush, TileType.Bush, TileType.Grass, TileType.Water, TileType.Grass],
+                [TileType.Grass, TileType.Grass, TileType.Path, TileType.Grass, TileType.Grass, TileType.Bush, TileType.Bush, TileType.Grass, TileType.Water, TileType.Grass],
+                [TileType.Grass, TileType.Grass, TileType.Path, TileType.Grass, TileType.Grass, TileType.Bush, TileType.Bush, TileType.Grass, TileType.Water, TileType.Grass],
+            ],
             items: {
                 [ItemType.Item1]: [],
                 [ItemType.Item2]: [],

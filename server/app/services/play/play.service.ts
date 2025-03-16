@@ -1,7 +1,9 @@
 import { PlayGateway } from '@app/gateways/play/play.gateway';
 import { MatchService } from '@app/services/match/match.service';
+import { MovementService } from '@app/services/movement/movement.service';
 import { Match, TurnPhase } from '@common/match';
 import { Player } from '@common/player';
+import { Position } from '@common/position';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { HALF_POINT, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
 
@@ -9,6 +11,40 @@ import { HALF_POINT, PRE_TURN_DURATION, TURN_DURATION } from './play.service.con
 export class PlayService {
     @Inject(forwardRef(() => PlayGateway)) private readonly playGateway: PlayGateway;
     @Inject(MatchService) private readonly matchService: MatchService;
+    @Inject(MovementService) private readonly movementService: MovementService;
+
+    getPossibleMoves(playerId: string): Position[] {
+        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+        return this.movementService.getPossibleMoves(this.matchService.getMatch(matchCode));
+    }
+
+    move(playerId: string, position: Position) {
+        if (this.matchService.isActivePlayer(playerId)) {
+            const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+            const player = this.matchService.getPlayer(playerId);
+            const match = this.matchService.getMatch(matchCode);
+            const shortestPath = this.movementService.getShortestPath(match, position);
+            if (shortestPath.moveCost <= player.currentStats.movement) {
+                player.currentStats.position = position;
+                player.currentStats.movement -= shortestPath.moveCost;
+                const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
+                this.playGateway.emitPlayerMoved(matchCode, { match, movement: shortestPath.path, playerIndex });
+            }
+        }
+    }
+
+    getHoverMoves(playerId: string, position: Position): Position[] {
+        let moves = [];
+        if (position.x >= 0 && position.y >= 0 && this.matchService.isActivePlayer(playerId)) {
+            const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+            const player = this.matchService.getPlayer(playerId);
+            const shortestPath = this.movementService.getShortestPath(this.matchService.getMatch(matchCode), position);
+            if (shortestPath.moveCost <= player.currentStats.movement) {
+                moves = shortestPath.path;
+            }
+        }
+        return moves;
+    }
 
     startMatch(matchCode: string) {
         const match = this.matchService.getMatch(matchCode);
@@ -119,6 +155,7 @@ export class PlayService {
     private assignSpawnPoints(match: Match) {
         const spawnPoints = match.gameData.mapData.items.Spawn;
         const shuffledSpawnPoints = spawnPoints.sort(() => Math.random() - 0.5).slice(0, match.matchData.players.length);
+        match.gameData.mapData.items.Spawn = spawnPoints.filter((s) => shuffledSpawnPoints.includes(s));
         
         shuffledSpawnPoints.forEach((spawnPoint, i) => {
             match.matchData.players[i].spawnPoint = spawnPoint;

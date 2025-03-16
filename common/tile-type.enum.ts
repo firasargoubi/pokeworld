@@ -8,12 +8,12 @@ export enum TileType {
     None = 'None',
 }
 
-export enum TileCost {
-    Path = 0,
-    Grass = 1,
-    Bush = 2,
-    Water = Infinity,
-    Bridge = 1,
-    BrokenBridge = Infinity,
-    None = Infinity,
-}
+export const TILE_COST: Record<TileType, number> = {
+    [TileType.Path]: 0,
+    [TileType.Grass]: 1,
+    [TileType.Bush]: 2,
+    [TileType.Water]: Infinity,
+    [TileType.Bridge]: 1,
+    [TileType.BrokenBridge]: Infinity,
+    [TileType.None]: Infinity,
+};

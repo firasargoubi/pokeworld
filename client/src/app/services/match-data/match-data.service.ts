@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { DEFAULT_GAME } from '@app/consts/default-game.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { Match, MatchData } from '@common/match';
+import { Position } from '@common/position';
 import { Subject } from 'rxjs';
 import { MapService } from '../map/map.service';
 import { DEFAULT_MATCH } from './match-data.service.const';
@@ -33,5 +34,13 @@ export class MatchDataService {
         this.gameDataService.setGameData(match.gameData);
         this.matchData = match.matchData;
         this.matchUpdate.next(null);
+    }
+
+    isActivePlayer(): boolean {
+        return this.selfIndex === this.matchData.activePlayer;
+    }
+
+    getPlayerPosition(): Position {
+        return this.matchData.players[this.selfIndex].currentStats.position;
     }
 }

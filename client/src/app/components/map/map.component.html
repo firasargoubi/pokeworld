@@ -1,15 +1,18 @@
-<div class="map-wrapper" [style.--size]="mapService.visualMapData.size">
-    <div class="map-container">
+<div class="map-wrapper" [style.--size]="mapService.visualMapData.size" [class.is-editor]="isEditor">
+    <div class="map-container" (mouseout)="onHover(-1, -1)">
         <div class="map">
             @for (tileRow of mapService.visualMapData.tiles; track tileRow; let x = $index) {
                 @for (tile of tileRow; track tile; let y = $index) {
-                    <div class="tile" [attr.x]="x" [attr.y]="y" [attr.tile]="mapService.gameDataService.getTileFromPosition({ x, y })">
+                    <div (mouseover)="onHover(x, y)" (click)="onClick(x, y, tile.overlay)" class="tile" [attr.x]="x" [attr.y]="y" [class]="tile.overlay" [attr.tile]="mapService.gameDataService.getTileFromPosition({ x, y })">
                         @if (tile.underlay) {
                             <div class="tile-image" [style.backgroundImage]="'url(' + tile.underlay + ')'"></div>
                         }
                         <div class="tile-image" [style.backgroundImage]="'url(' + tile.tile + ')'"></div>
                         @if (tile.item) {
                             <app-item [itemType]="tile.item" [x]="x" [y]="y" [showDescription]="isEditor"></app-item>
+                        }
+                        @if (tile.overlay) {
+                            <div class="tile-image tile-overlay"></div>
                         }
                         @if (tile.player) {
                             <div class="tile-image player" [style.backgroundImage]="'url(' + tile.player + ')'"></div>
