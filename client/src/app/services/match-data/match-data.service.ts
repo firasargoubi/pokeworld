@@ -1,10 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { DEFAULT_GAME } from '@app/consts/default-game.const';
+import { MapService } from '@app/services/map/map.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { Match, MatchData } from '@common/match';
 import { Position } from '@common/position';
 import { Subject } from 'rxjs';
-import { MapService } from '../map/map.service';
 import { DEFAULT_MATCH } from './match-data.service.const';
 
 @Injectable({
