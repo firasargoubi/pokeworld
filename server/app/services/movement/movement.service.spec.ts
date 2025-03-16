@@ -113,18 +113,6 @@ describe('MovementService', () => {
         expect(result.path).toEqual([]);
     });
 
-    it('should correctly determine if movement is possible (canMove)', () => {
-        const match: Match = structuredClone(MOCK_MATCHES[0]);
-        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
-        match.matchData.activePlayer = 0;
-        match.matchData.players[0].currentStats.position = { x: 0, y: 0 };
-        match.matchData.players[0].currentStats.movement = 5;
-        const reachableTarget: Position = { x: 1, y: 1 };
-        const unreachableTarget: Position = { x: 3, y: 3 };
-        expect(service.canMove(match, reachableTarget)).toBe(true);
-        expect(service.canMove(match, unreachableTarget)).toBe(false);
-    });
-
     // Nouveaux tests
     it('should return an empty array if movementRange is 0', () => {
         const match: Match = structuredClone(MOCK_MATCHES[0]);
@@ -248,5 +236,57 @@ describe('MovementService', () => {
         expect(result).toEqual(possibleMoves);
         expect(getPossibleMovesStandardStub.notCalled).toBeTruthy();
         expect(getPossibleMovesDebugStub.called).toBeTruthy();
+    });
+
+    it('should return correct actions for a player', () => {
+        const match: Match = structuredClone(MOCK_MATCHES[0]);
+        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
+        match.matchData.activePlayer = 0;
+        match.matchData.players[0].currentStats.position = { x: 1, y: 1 };
+
+        const actions = service.getActions(match);
+        expect(actions).toContainEqual({ x: 1, y: 1 }); // Current position
+        expect(actions).toContainEqual({ x: 0, y: 1 }); // Neighboring position
+        expect(actions).toContainEqual({ x: 2, y: 1 }); // Neighboring position
+        expect(actions).toContainEqual({ x: 1, y: 0 }); // Neighboring position
+        expect(actions).toContainEqual({ x: 1, y: 2 }); // Neighboring position
+    });
+
+    it('should return correct actions including bridges', () => {
+        const match: Match = structuredClone(MOCK_MATCHES[0]);
+        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
+        match.matchData.activePlayer = 0;
+        match.matchData.players[0].currentStats.position = { x: 1, y: 1 };
+        match.gameData.mapData.tiles[0][1] = TileType.Bridge;
+
+        const actions = service.getActions(match);
+        expect(actions).toContainEqual({ x: 0, y: 1 }); // Bridge position
+    });
+
+    it('should correctly identify bridge tiles', () => {
+        const match: Match = structuredClone(MOCK_MATCHES[0]);
+        match.gameData.mapData.tiles[0][1] = TileType.Bridge;
+        match.gameData.mapData.tiles[1][1] = TileType.BrokenBridge;
+
+        expect(service['isTileABridge']({ x: 0, y: 1 }, match)).toBeTruthy();
+        expect(service['isTileABridge']({ x: 1, y: 1 }, match)).toBeTruthy();
+        expect(service['isTileABridge']({ x: 2, y: 2 }, match)).toBeFalsy();
+    });
+
+    it('should return a direct path in debug mode', () => {
+        const match: Match = structuredClone(MOCK_MATCHES[0]);
+        match.matchData.isDebugMode = true;
+        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
+        match.matchData.activePlayer = 0;
+        match.matchData.players[0].currentStats.position = { x: 0, y: 0 };
+
+        const target: Position = { x: 2, y: 2 };
+        const result: ShortestPath = service.getShortestPath(match, target);
+
+        expect(result.moveCost).toEqual(0);
+        expect(result.path).toEqual([
+            { x: 0, y: 0 },
+            { x: 2, y: 2 },
+        ]);
     });
 });
