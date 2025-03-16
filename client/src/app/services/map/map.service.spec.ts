@@ -53,12 +53,16 @@ describe('MapService', () => {
             tile: 'newTile.png',
             underlay: 'oldUnderlay.png',
             item: 'oldItem.png' as ItemType,
+            player: 'P11',
+            overlay: 'oldOverlay.png',
         });
 
         service.visualMapData.tiles[1][1] = {
             tile: 'oldTile.png',
             underlay: 'oldUnderlay.png',
             item: 'oldItem.png' as ItemType,
+            player: 'P11',
+            overlay: 'oldOverlay.png',
         };
 
         service['updateTile'](position);
@@ -78,6 +82,8 @@ describe('MapService', () => {
             tile: 'oldTile.png',
             underlay: 'oldUnderlay.png',
             item: 'oldItem.png' as ItemType,
+            player: 'P11',
+            overlay: 'oldOverlay.png',
         };
 
         service['updateTile'](position);
@@ -91,12 +97,16 @@ describe('MapService', () => {
             tile: 'oldTile.png',
             underlay: 'oldUnderlay.png',
             item: 'newItem.png',
+            player: 'P11',
+            overlay: 'oldOverlay.png',
         });
 
         service.visualMapData.tiles[1][1] = {
             tile: 'oldTile.png',
             underlay: 'oldUnderlay.png',
             item: 'oldItem.png' as ItemType,
+            player: 'P11',
+            overlay: 'oldOverlay.png',
         };
 
         service['updateTile'](position);

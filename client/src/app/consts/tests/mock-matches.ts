@@ -1,6 +1,6 @@
 import { Avatars } from '@common/avatars.enum';
 import { DiceType } from '@common/dice';
-import { Match, MatchData } from '@common/match';
+import { Match, MatchData, TurnPhase } from '@common/match';
 import { CurrentStats, Player, PlayertStats } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
 import { MOCK_GAMES } from './mock-games';
@@ -69,6 +69,7 @@ export const MOCK_PLAYERS: Player[] = [
         isAdmin: true,
         isConnected: true,
         isBot: false,
+        spawnPoint: { x: 1, y: 2 },
     },
     {
         id: '',
@@ -79,6 +80,7 @@ export const MOCK_PLAYERS: Player[] = [
         isAdmin: false,
         isConnected: true,
         isBot: false,
+        spawnPoint: { x: 1, y: 2 },
     },
 ];
 
@@ -90,6 +92,9 @@ export const MOCK_MATCH_DATAS: MatchData[] = [
         isLocked: false,
         activePlayer: 0,
         players: structuredClone(MOCK_PLAYERS),
+        phase: TurnPhase.PreTurn,
+        currentTimer: 0,
+        maxTimer: 0,
     },
     {
         code: '2222',
@@ -98,6 +103,9 @@ export const MOCK_MATCH_DATAS: MatchData[] = [
         isLocked: true,
         activePlayer: 0,
         players: structuredClone(MOCK_PLAYERS),
+        phase: TurnPhase.PreTurn,
+        currentTimer: 0,
+        maxTimer: 0,
     },
     {
         code: '3333',
@@ -106,6 +114,9 @@ export const MOCK_MATCH_DATAS: MatchData[] = [
         isLocked: true,
         activePlayer: 0,
         players: structuredClone(MOCK_PLAYERS),
+        phase: TurnPhase.PreTurn,
+        currentTimer: 0,
+        maxTimer: 0,
     },
 ];
 

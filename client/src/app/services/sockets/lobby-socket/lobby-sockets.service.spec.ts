@@ -1,17 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MOCK_GAMES } from '@app/consts/tests/mock-games';
-import { MOCK_MATCHES } from '@app/consts/tests/mock-matches';
+import { MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { Avatars } from '@common/avatars.enum';
-import { DiceType } from '@common/dice';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
-import { TileType } from '@common/tile-type.enum';
 import { Warning } from '@common/warning.enum';
 import { LobbySocketsService } from './lobby-sockets.service';
 
@@ -23,38 +20,7 @@ describe('LobbySocketsService', () => {
     let gameDataServiceSpy: jasmine.SpyObj<GameDataService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
 
-    const mockPlayer: Player = {
-        id: 'player1',
-        name: 'Player One',
-        avatar: Avatars.Avatar1,
-        playerStats: {
-            health: 4,
-            speed: 4,
-            attack: 4,
-            defense: 4,
-            attackDice: DiceType.D6,
-            defenseDice: DiceType.D6,
-            escapes: 2,
-        },
-        currentStats: {
-            items: [],
-            position: { x: 0, y: 0 },
-            movement: 0,
-            hasAction: true,
-            fightsWon: 0,
-            health: 4,
-            attack: 4,
-            defense: 4,
-            speed: 4,
-            attackBonus: 0,
-            defenseBonus: 0,
-            escapes: 2,
-            standingTile: 'Grass' as TileType,
-        },
-        isAdmin: false,
-        isConnected: true,
-        isBot: false,
-    };
+    const mockPlayer: Player = structuredClone(MOCK_PLAYERS[0]);
 
     const mockMatch: Match = structuredClone(MOCK_MATCHES[0]);
 
@@ -148,7 +114,7 @@ describe('LobbySocketsService', () => {
     });
 
     it('should emit KickPlayer event with playerId', () => {
-        const playerId = 'player456';
+        const playerId = 'P111';
         service.kickPlayer(playerId);
         expect(coreSocketSpy.emit).toHaveBeenCalledWith(LobbyEvent.KickPlayer, playerId);
     });
