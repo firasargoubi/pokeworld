@@ -22,7 +22,6 @@ export interface MatchData {
 export enum TurnPhase {
     PreTurn = 'preTurn',
     Turn = 'turn',
-    WaitingForCombat = 'waitingForCombat',
 }
 
 export interface PlayerMovementData {
