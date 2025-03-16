@@ -38,11 +38,7 @@ export class CombatService {
         }
 
         const combatData: CombatData = { combatRoomCode, players: [initiatingPlayer, targetPlayer] };
-        // eslint-disable-next-line no-console
-        console.log('BEFORE emit CombatStarted');
         this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.CombatStarted, combatData);
-        // eslint-disable-next-line no-console
-        console.log('AFTER emit CombatStarted');
 
         this.updatePlayersStatsByCurrentTile([initiatingPlayer, targetPlayer]);
         this.startTurnSystem(combatRoomCode, [initiatingPlayer, targetPlayer]);

@@ -8,6 +8,7 @@ export enum PlayEvent {
     GetActions = 'getActions',
     Action = 'action',
 
+    PauseTurn = 'pauseTurn',
     BridgeChanged = 'bridgeChanged',
     DebugModeChanged = 'debugModeChanged',
     TurnStarted = 'turnStarted',
