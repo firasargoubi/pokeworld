@@ -83,7 +83,12 @@ export class PlaySocketsService {
         this.coreSocket.on(PlayEvent.BridgeChanged, this.onBridgeChanged.bind(this));
         this.coreSocket.on(LobbyEvent.PlayerLeft, this.onPlayerLeft.bind(this));
         this.coreSocket.on(CombatEvent.CombatStarted, this.onCombatStarted.bind(this));
-        this.coreSocket.on(PlayEvent.PauseTurn, this.onCombatStarted.bind(this));
+        this.coreSocket.on(PlayEvent.PauseTurn, this.onPauseTurn.bind(this));
+    }
+
+    private onPauseTurn(match: Match) {
+        this.matchDataService.updateMatch(match);
+        this.timerService.pauseTimer(match.matchData.currentTimer);
     }
 
     private onCombatStarted(combatData: CombatData) {

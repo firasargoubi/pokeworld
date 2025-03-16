@@ -6,19 +6,30 @@ import { DEFAULT_MAX_TIME, DEFAULT_TIME, ONE_SECOND, TIMER_START_DELAY } from '.
 })
 export class TimerService {
     maxTime: number = DEFAULT_MAX_TIME;
+    lastUnpauseTime: number = DEFAULT_MAX_TIME;
     currentTime: number = DEFAULT_TIME;
     interval: number | null = null;
 
     startTimer(time: number) {
         this.stopInterval();
         this.maxTime = time;
+        this.lastUnpauseTime = time;
         this.currentTime = time + 1;
+        this.startInterval();
+        window.setTimeout(this.intervalTrigger.bind(this), TIMER_START_DELAY);
+    }
+
+    pauseTimer(remainingTime: number) {
+        this.stopInterval();
+        this.lastUnpauseTime = remainingTime;
+    }
+
+    unPauseTimer() {
         this.startInterval();
     }
 
     private startInterval() {
         this.interval = window.setInterval(this.intervalTrigger.bind(this), ONE_SECOND);
-        window.setTimeout(this.intervalTrigger.bind(this), TIMER_START_DELAY);
     }
 
     private stopInterval() {

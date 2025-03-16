@@ -23,9 +23,13 @@ export class CombatGateway implements OnGatewayDisconnect {
     }
 
     handleDisconnect(socket: Socket) {
+        const socketId = socket.id;
         for (const [combatRoomCode, state] of this.combatService.getCombatTurnSystems()) {
-            if (state.players.some((player) => player.id === socket.id)) {
-                this.combatService.endCombat(combatRoomCode);
+            const players = state.players;
+            if (players.some((player) => player.id === socketId)) {
+                const winnerId = players.find((player) => player.id !== socketId)?.id;
+                this.combatService.endCombat(combatRoomCode, winnerId);
+                break;
             }
         }
     }

@@ -7,7 +7,7 @@ import { Player } from '@common/player';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { HALF_POINT, ONE_SECOND, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
+import { HALF_POINT, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
 
 @Injectable()
 export class PlayService {
@@ -117,8 +117,15 @@ export class PlayService {
             clearTimeout(turnData.phaseTimeout);
             turnData.phaseTimeout = null;
         }
-        const elapsedTime = Math.floor(Math.abs(new Date().getTime() - turnData.lastPhaseStartTime.getTime()) / ONE_SECOND);
+        const elapsedTime = Math.abs(new Date().getTime() - turnData.lastPhaseStartTime.getTime());
         match.matchData.currentTimer = match.matchData.currentTimer - elapsedTime;
+
+        // eslint-disable-next-line no-console, @typescript-eslint/no-magic-numbers
+        console.log('maxTimer', match.matchData.maxTimer / 1000);
+        // eslint-disable-next-line no-console, @typescript-eslint/no-magic-numbers
+        console.log('remainingTime', match.matchData.currentTimer / 1000);
+        // eslint-disable-next-line no-console, @typescript-eslint/no-magic-numbers
+        console.log('elapsedTime', elapsedTime / 1000);
 
         this.playGateway.emitPauseTurn(matchCode, match);
 
