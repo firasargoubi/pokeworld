@@ -74,7 +74,7 @@
                     @for(avatar of avatarList ; track avatarData[avatar].name ; ){
                     <div
                         [ngClass]="['avatar-container', getAvatarBtnStyle(avatar).class]"
-                        (click)="handleAvatarSelection(avatar)"
+                        (click)="this.playerSelectionService.handleAvatarSelection(avatar)"
                         title="{{ avatarData[avatar].name }}"
                     >
                         <img src="{{ avatarData[avatar].image }}" class="avatar-select" />

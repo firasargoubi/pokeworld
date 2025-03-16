@@ -2,6 +2,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HeaderComponent } from '@app/components/header/header.component';
+import { PlayerSelectionService } from '@app/services/player-selection/player-selection.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { of } from 'rxjs';
 import { JoinPageComponent } from './join-page.component';
@@ -10,25 +12,25 @@ describe('JoinPageComponent', () => {
     let component: JoinPageComponent;
     let fixture: ComponentFixture<JoinPageComponent>;
     let routerSpy: jasmine.SpyObj<Router>;
-    let lobbySocketServiceSpy: jasmine.SpyObj<LobbySocketsService>;
+    let lobbySocketsServiceSpy: jasmine.SpyObj<LobbySocketsService>;
+    let playerSelectionServiceSpy: jasmine.SpyObj<PlayerSelectionService>;
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-        lobbySocketServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['joinMatch']);
+        lobbySocketsServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['joinMatch']);
+        playerSelectionServiceSpy = jasmine.createSpyObj('PlayerSelectionService', ['matchCode']);
 
         await TestBed.configureTestingModule({
-            imports: [FormsModule],
+            imports: [FormsModule, HeaderComponent],
             providers: [
                 { provide: Router, useValue: routerSpy },
-                { provide: LobbySocketsService, useValue: lobbySocketServiceSpy },
+                { provide: LobbySocketsService, useValue: lobbySocketsServiceSpy },
+                { provide: PlayerSelectionService, useValue: playerSelectionServiceSpy },
             ],
         }).compileComponents();
-    });
 
-    beforeEach(() => {
         fixture = TestBed.createComponent(JoinPageComponent);
         component = fixture.componentInstance;
-        component.gameCode = '1234';
         fixture.detectChanges();
     });
 
@@ -36,19 +38,32 @@ describe('JoinPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should navigate to player selection if joinGame returns true', () => {
+    it('should navigate to player-selection on successful join', () => {
         const event = new KeyboardEvent('keydown', { key: 'Enter' });
-        lobbySocketServiceSpy.joinMatch.and.returnValue(of(true));
+        component.gameCode = 'ABC123';
+        lobbySocketsServiceSpy.joinMatch.and.returnValue(of(true));
 
         component.joinMatch(event);
 
-        expect(lobbySocketServiceSpy.joinMatch).toHaveBeenCalledWith('1234');
+        expect(playerSelectionServiceSpy.matchCode).toBe('ABC123');
+        expect(lobbySocketsServiceSpy.joinMatch).toHaveBeenCalledWith('ABC123');
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/player-selection']);
     });
 
-    it('should navigate to menu', () => {
-        component.navigateToMenu();
+    it('should not navigate on unsuccessful join', () => {
+        const event = new KeyboardEvent('keydown', { key: 'Enter' });
+        component.gameCode = 'ABC123';
+        lobbySocketsServiceSpy.joinMatch.and.returnValue(of(false));
 
+        component.joinMatch(event);
+
+        expect(playerSelectionServiceSpy.matchCode).toBe('ABC123');
+        expect(lobbySocketsServiceSpy.joinMatch).toHaveBeenCalledWith('ABC123');
+        expect(routerSpy.navigate).not.toHaveBeenCalled();
+    });
+
+    it('should navigate to menu when navigateToMenu is called', () => {
+        component.navigateToMenu();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
     });
 });

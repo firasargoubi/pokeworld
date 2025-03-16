@@ -5,6 +5,7 @@ import { MAX_PLAYERS } from '@common/max-players.const';
 import { Player } from '@common/player';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { HALF_POINT, MIN_PLAYERS } from './lobby.service.const';
+import { Warning } from '@common/warning.enum';
 
 @Injectable()
 export class LobbyService {
@@ -63,15 +64,15 @@ export class LobbyService {
         const isTryingToKickThemselve = currentPlayerId === targetPlayerId;
 
         if (isAdmin && !isTryingToKickThemselve) {
-            this.removePlayer(targetPlayerId);
+            this.removePlayer(targetPlayerId, Warning.Kick);
         }
     }
 
-    removePlayer(targetPlayerId: string) {
+    removePlayer(targetPlayerId: string, removalReason: Warning) {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(targetPlayerId);
 
         this.matchService.removePlayerFromMatch(targetPlayerId, matchCode);
-        this.lobbyGateway.emitRemovedFromMatch(targetPlayerId);
+        this.lobbyGateway.emitRemovedFromMatch(targetPlayerId, removalReason);
         this.lobbyGateway.disconnectPlayer(targetPlayerId);
         this.emitUpdatePlayerList(matchCode);
         this.emitLockStatusChanged(matchCode);
@@ -121,7 +122,7 @@ export class LobbyService {
         players.forEach((player) => {
             this.matchService.removePlayerFromMatch(player.id, matchCode);
             this.lobbyGateway.disconnectPlayer(player.id);
-            this.lobbyGateway.emitRemovedFromMatch(player.id);
+            this.lobbyGateway.emitRemovedFromMatch(player.id, Warning.AdminQuit);
         });
     }
 
@@ -129,16 +130,16 @@ export class LobbyService {
         let result = true;
 
         if (!this.matchService.hasMatchCode(matchCode)) {
-            this.lobbyGateway.warn(playerId, "La partie n'existe pas");
+            this.lobbyGateway.warn(playerId, Warning.NotExistGame);
             result = false;
         } else if (this.isMatchFull(matchCode)) {
-            this.lobbyGateway.warn(playerId, 'La partie est pleine');
+            this.lobbyGateway.warn(playerId, Warning.RoomFull);
             result = false;
         } else if (this.isMatchLocked(matchCode)) {
-            this.lobbyGateway.warn(playerId, 'La partie est verouillée');
+            this.lobbyGateway.warn(playerId, Warning.RoomLocked);
             result = false;
         } else if (this.matchService.isPlayerInMatch(playerId)) {
-            this.lobbyGateway.warn(playerId, 'Vous êtes déjà dans une partie');
+            this.lobbyGateway.warn(playerId, Warning.AlreadyInGame);
             result = false;
         }
 
@@ -157,7 +158,7 @@ export class LobbyService {
         const players = this.matchService.getPlayers(matchCode);
         players.forEach((player) => {
             if (!player.isConnected) {
-                this.removePlayer(player.id);
+                this.removePlayer(player.id, Warning.RoomLocked);
             }
         });
     }
