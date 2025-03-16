@@ -1,5 +1,5 @@
-import { EMPTY_IMAGE } from "@app/consts/images.const";
-import { PlayVisualData } from "@app/interfaces/play-visual-data";
+import { EMPTY_IMAGE } from '@app/consts/images.const';
+import { PlayVisualData } from '@app/interfaces/play-visual-data';
 
 export const DEFAULT_PLAY_VISUAL_DATA: PlayVisualData = {
     mapSize: '',

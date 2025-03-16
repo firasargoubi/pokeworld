@@ -27,7 +27,7 @@ import {
     SURROUNDING_POSITIONS_DONUT,
     SURROUNDING_POSITIONS_PLUS,
     SURROUNDING_POSITIONS_SQUARE,
-    WATER_SIMILAR_TILES
+    WATER_SIMILAR_TILES,
 } from './map.service.const';
 
 @Injectable({
@@ -93,7 +93,6 @@ export class MapService {
         return `${imagePrefix}${tileVariant}${IMAGE_SUFIX}`;
     }
 
-    
     hasActionOverlay(): boolean {
         return this.overlayTiles.actions.length > 0;
     }
@@ -129,7 +128,7 @@ export class MapService {
 
         return overlay;
     }
-    
+
     private getMoveOverlay(position: Position): string | null {
         let overlay = null;
 
@@ -147,7 +146,7 @@ export class MapService {
     private hasPossibleMove(): boolean {
         return this.overlayTiles.possibleMoves.length > 0;
     }
-    
+
     private isPossibleMove(position: Position): boolean {
         return Boolean(this.overlayTiles.possibleMoves.find((pos) => pos.x === position.x && pos.y === position.y));
     }
@@ -235,11 +234,21 @@ export class MapService {
     }
 
     private updateTileData(oldData: TileVisualData, newData: TileVisualData) {
-        if (oldData.tile !== newData.tile) { oldData.tile = newData.tile; }
-        if (oldData.underlay !== newData.underlay) { oldData.underlay = newData.underlay; }
-        if (oldData.item !== newData.item) { oldData.item = newData.item; }
-        if (oldData.item !== newData.player) { oldData.player = newData.player; }
-        if (oldData.overlay !== newData.overlay) { oldData.overlay = newData.overlay; }
+        if (oldData.tile !== newData.tile) {
+            oldData.tile = newData.tile;
+        }
+        if (oldData.underlay !== newData.underlay) {
+            oldData.underlay = newData.underlay;
+        }
+        if (oldData.item !== newData.item) {
+            oldData.item = newData.item;
+        }
+        if (oldData.item !== newData.player) {
+            oldData.player = newData.player;
+        }
+        if (oldData.overlay !== newData.overlay) {
+            oldData.overlay = newData.overlay;
+        }
     }
 
     private getItem(items: Record<ItemType, Position[]>, position: Position): ItemType | null {
