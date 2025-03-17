@@ -71,6 +71,9 @@ export class LobbyService {
                 this.matchService.removePlayerFromMatch(p.id, matchCode);
             });
         } else {
+            if (player.isAdmin) {
+                // this.matchService.
+            }
             this.lobbyGateway.emitPlayerLeft(matchCode, match);
             this.playService.endTurn(playerId);
         }

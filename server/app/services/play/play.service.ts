@@ -40,6 +40,7 @@ export class PlayService {
                 player.currentStats.movement -= shortestPath.moveCost;
                 const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
                 this.playGateway.emitPlayerMoved(matchCode, { match, movement: shortestPath.path, playerIndex });
+                this.tryEndTurn(playerId);
             }
         }
     }
@@ -124,6 +125,7 @@ export class PlayService {
         if (combatResult.loserId && this.canEndTurn(combatResult.loserId)) {
             this.nextTurnPhase(this.matchService.getMatchCodeFromPlayerId(playerId));
         } else {
+            this.tryEndTurn(playerId);
             this.unfreezeMatch(match);
         }
     }
@@ -161,6 +163,7 @@ export class PlayService {
             this.startFight(playerId, player.id);
         } else {
             this.toggleBridgeTile(match, position);
+            this.tryEndTurn(playerId);
         }
     }
 
@@ -291,5 +294,21 @@ export class PlayService {
             match.matchData.players[i].spawnPoint = spawnPoint;
             match.matchData.players[i].currentStats.position = spawnPoint;
         });
+    }
+
+    private tryEndTurn(playerId: string): boolean {
+        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+        const match = this.matchService.getMatch(matchCode);
+        const activePlayerId = match.matchData.players[match.matchData.activePlayer].id;
+        const player = this.matchService.getPlayer(activePlayerId);
+
+        const canMove = this.movementService.getPossibleMoves(match).length > 0;
+        const canAct = this.movementService.getActions(match).length > 1 && player.currentStats.hasAction;
+
+        if (!canMove && !canAct) {
+            this.endTurn(activePlayerId);
+            return true;
+        }
+        return false;
     }
 }
