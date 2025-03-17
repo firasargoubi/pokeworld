@@ -12,6 +12,7 @@ import { PlaySocketsService } from '@app/services/sockets/play-socket/play-socke
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { MapSize } from '@common/map-size.enum';
+import { TurnPhase } from '@common/match';
 import { BehaviorSubject } from 'rxjs';
 import { PlayPageComponent } from './play-page.component';
 
@@ -104,5 +105,63 @@ describe('PlayPageComponent', () => {
         const expectedSelfIndex = 0;
         expect(component.selfIndex).toBe(expectedSelfIndex);
         expect(component.selfIndex).toBe(mockMatchDataService.selfIndex);
+    });
+
+    it('should toggle debug mode on "d" or "D" key press', () => {
+        const debugSpy = mockPlaySocketsService.changeDebugMode;
+
+        const eventD = new KeyboardEvent('keydown', { key: 'd' });
+        component.onKeyDown(eventD);
+        expect(debugSpy).toHaveBeenCalledTimes(1);
+
+        const eventUpperD = new KeyboardEvent('keydown', { key: 'D' });
+        component.onKeyDown(eventUpperD);
+        expect(debugSpy).toHaveBeenCalledTimes(2);
+
+        const eventX = new KeyboardEvent('keydown', { key: 'x' });
+        component.onKeyDown(eventX);
+        expect(debugSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('should handle useAction based on conditions', () => {
+        mockMapService.hasActionOverlay.and.returnValue(true);
+        component.useAction();
+        expect(mockMapService.clearActions).toHaveBeenCalled();
+        expect(mockPlaySocketsService.displayActions).not.toHaveBeenCalled();
+        mockMapService.hasActionOverlay.and.returnValue(false);
+
+        mockMatchDataService.matchData.activePlayer = 0;
+        mockMatchDataService.matchData.phase = TurnPhase.Turn;
+        mockMatchDataService.matchData.players[0].currentStats.hasAction = true;
+        component.useAction();
+        expect(mockPlaySocketsService.displayActions).toHaveBeenCalled();
+        expect(mockMapService.clearActions).toHaveBeenCalledTimes(1);
+
+        mockMatchDataService.matchData.players[0].currentStats.hasAction = false;
+        component.useAction();
+        expect(mockPlaySocketsService.displayActions).toHaveBeenCalledTimes(1);
+    });
+
+    it('should end turn if canEndTurn is true', () => {
+        mockMatchDataService.matchData.activePlayer = 0;
+        mockMatchDataService.matchData.phase = TurnPhase.Turn;
+        component.endTurn();
+        expect(mockPlaySocketsService.endTurn).toHaveBeenCalled();
+        mockMatchDataService.matchData.phase = TurnPhase.PreTurn;
+        component.endTurn();
+        expect(mockPlaySocketsService.endTurn).toHaveBeenCalledTimes(1);
+    });
+
+    it('should show surrender popup with leaveMatch callback', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(component, 'leaveMatch');
+        component.surrender();
+        expect(mockPopupService.showPopup).toHaveBeenCalledWith('Voulez-vous vraiment abandonner ?', true, jasmine.any(Function));
+    });
+
+    it('should leave match and navigate to home', () => {
+        component['leaveMatch']();
+        expect(mockPlaySocketsService.leaveMatch).toHaveBeenCalled();
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
     });
 });
