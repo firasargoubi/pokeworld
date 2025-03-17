@@ -1,11 +1,17 @@
+/* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
+import { MOVE_ANIMATION_DURATION } from '@app/consts/default-player.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
+import { Avatars } from '@common/avatars.enum';
 import { ItemType } from '@common/item-type.enum';
 import { MapSize } from '@common/map-size.enum';
+import { Match, PlayerMovementData } from '@common/match';
+import { Player } from '@common/player';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import { BehaviorSubject } from 'rxjs';
 import { MapService } from './map.service';
+import { ACTION_OVERLAY, DEFAULT_OVERLAY_TILES, HOVER_MOVE_OVERLAY, POSSIBLE_MOVE_OVERLAY, SURROUNDING_POSITIONS_PLUS } from './map.service.const';
 
 describe('MapService', () => {
     let service: MapService;
@@ -216,12 +222,7 @@ describe('MapService', () => {
 
     it('should return correct tile similarity string', () => {
         const position: Position = { x: 2, y: 2 };
-        const deltaPositions: Position[] = [
-            { x: -1, y: 0 },
-            { x: 1, y: 0 },
-            { x: 0, y: -1 },
-            { x: 0, y: 1 },
-        ];
+        const deltaPositions: Position[] = SURROUNDING_POSITIONS_PLUS;
         const tileTypes: TileType[] = [TileType.Grass, TileType.Path];
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -232,7 +233,9 @@ describe('MapService', () => {
     });
 
     it('should correctly check if an item is in a tile', () => {
-        const position: Position = { x: 2, y: 2 };
+        const positionIn: Position = { x: 2, y: 2 };
+        const positionOut: Position = { x: 5, y: 5 };
+
         const items: Record<ItemType, Position[]> = {
             [ItemType.Item1]: [{ x: 2, y: 2 }],
             [ItemType.Item2]: [{ x: 1, y: 1 }],
@@ -248,30 +251,12 @@ describe('MapService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'getItem').and.callThrough();
 
-        const result = service['getItem'](items, position);
-        expect(result).toBe(ItemType.Item1);
+        const resultIn = service['getItem'](items, positionIn);
+        expect(resultIn).toBe(ItemType.Item1);
+        const resultOut = service['getItem'](items, positionOut);
+        expect(resultOut).toBeNull();
     });
 
-    it('should return null if no item exists in tile', () => {
-        const position: Position = { x: 5, y: 5 };
-        const items: Record<ItemType, Position[]> = {
-            [ItemType.Item1]: [{ x: 2, y: 2 }],
-            [ItemType.Item2]: [{ x: 1, y: 1 }],
-            [ItemType.Item3]: [],
-            [ItemType.Item4]: [],
-            [ItemType.Item5]: [],
-            [ItemType.Item6]: [],
-            [ItemType.Random]: [],
-            [ItemType.Spawn]: [],
-            [ItemType.Flag]: [],
-        };
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(service, 'getItem').and.callThrough();
-
-        const result = service['getItem'](items, position);
-        expect(result).toBeNull();
-    });
     it('should call updateAllTiles when position is null', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'updateAllTiles');
@@ -331,12 +316,7 @@ describe('MapService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'compareTile').and.returnValue(true);
         const position: Position = { x: 2, y: 2 };
-        const deltaPositions: Position[] = [
-            { x: -1, y: 0 },
-            { x: 1, y: 0 },
-            { x: 0, y: -1 },
-            { x: 0, y: 1 },
-        ];
+        const deltaPositions: Position[] = SURROUNDING_POSITIONS_PLUS;
         const tileTypes: TileType[] = [TileType.Grass];
         const result = service['compareTiles'](mockGameDataService.gameData.mapData.tiles, position, deltaPositions, tileTypes);
         expect(result).toEqual([true, true, true, true]);
@@ -348,5 +328,161 @@ describe('MapService', () => {
         const position: Position = { x: 3, y: 3 };
         const result = service['getBridgeVariant'](mockGameDataService.gameData.mapData.tiles, position);
         expect(result).toBe('1');
+    });
+
+    it('should return correct overlay based on conditions', () => {
+        const position: Position = { x: 1, y: 1 };
+
+        service['overlayTiles'].actions = [{ x: 1, y: 1 }];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(service, 'getActionOverlay').and.returnValue(ACTION_OVERLAY);
+        let result = service['getOverlay'](position);
+        expect(result).toBe(ACTION_OVERLAY);
+
+        service['overlayTiles'].actions = [];
+        service['overlayTiles'].possibleMoves = [{ x: 1, y: 1 }];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(service, 'getMoveOverlay').and.returnValue(POSSIBLE_MOVE_OVERLAY);
+        result = service['getOverlay'](position);
+        expect(result).toBe(POSSIBLE_MOVE_OVERLAY);
+
+        service['overlayTiles'].possibleMoves = [];
+        result = service['getOverlay'](position);
+        expect(result).toBeNull();
+    });
+
+    it('should return correct move overlay based on position conditions', () => {
+        const position: Position = { x: 1, y: 1 };
+
+        service['overlayTiles'].playerPosition = { x: 1, y: 1 };
+        service['overlayTiles'].hoverMoves = [{ x: 1, y: 1 }];
+        let result = service['getMoveOverlay'](position);
+        expect(result).toBe(HOVER_MOVE_OVERLAY);
+
+        service['overlayTiles'].playerPosition = { x: 2, y: 2 };
+        service['overlayTiles'].hoverMoves = [];
+        service['overlayTiles'].possibleMoves = [{ x: 1, y: 1 }];
+        result = service['getMoveOverlay'](position);
+        expect(result).toBe(POSSIBLE_MOVE_OVERLAY);
+
+        service['overlayTiles'].possibleMoves = [];
+        result = service['getMoveOverlay'](position);
+        expect(result).toBeNull();
+    });
+
+    it('should return correct action overlay based on position conditions', () => {
+        const position: Position = { x: 1, y: 1 };
+
+        service['overlayTiles'].playerPosition = { x: 1, y: 1 };
+        let result = service['getActionOverlay'](position);
+        expect(result).toBe(ACTION_OVERLAY);
+
+        service['overlayTiles'].playerPosition = { x: 2, y: 2 };
+        service['overlayTiles'].actions = [{ x: 1, y: 1 }];
+        result = service['getActionOverlay'](position);
+        expect(result).toBe(ACTION_OVERLAY);
+
+        service['overlayTiles'].playerPosition = { x: 2, y: 2 };
+        service['overlayTiles'].actions = [];
+        result = service['getActionOverlay'](position);
+        expect(result).toBeNull();
+    });
+
+    it('should return correct player avatar or null based on position', () => {
+        const position: Position = { x: 1, y: 1 };
+        const mockPlayer = { id: '1', name: 'Player', avatar: Avatars.Avatar1, currentStats: { position: { x: 1, y: 1 } } } as Player;
+
+        service['players'] = [mockPlayer];
+        const result = service['getPlayerAvatar'](position);
+        expect(result).toBe('../../../assets/images/game/avatars/face/bulbasaur.png');
+
+        service['players'] = [
+            {
+                ...mockPlayer,
+                currentStats: {
+                    position: { x: 2, y: 2 },
+                    items: [],
+                    movement: 0,
+                    hasAction: false,
+                    fightsWon: 0,
+                    health: 0,
+                    attack: 0,
+                    defense: 0,
+                    speed: 0,
+                    attackBonus: 0,
+                    defenseBonus: 0,
+                    escapes: 0,
+                    standingTile: TileType.Grass,
+                },
+            },
+        ];
+        const resultNoPlayer = service['getPlayerAvatar'](position);
+        expect(resultNoPlayer).toBeNull();
+
+        service['players'] = [];
+        const resultEmpty = service['getPlayerAvatar'](position);
+        expect(resultEmpty).toBeNull();
+    });
+
+    it('should handle overlay-related methods correctly', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(service, 'updateAllTiles');
+        const pos: Position = { x: 1, y: 1 };
+        const pos2: Position = { x: 2, y: 2 };
+
+        service.setHoverMoves([pos]);
+        expect(service['overlayTiles'].hoverMoves).toEqual([pos]);
+        expect(service['updateAllTiles']).toHaveBeenCalledTimes(1);
+
+        service.setPossibleMoves([pos], pos2);
+        expect(service['overlayTiles'].possibleMoves).toEqual([pos]);
+        expect(service['overlayTiles'].playerPosition).toEqual(pos2);
+        expect(service['updateAllTiles']).toHaveBeenCalledTimes(2);
+
+        service.setActions([pos], pos2);
+        expect(service['overlayTiles'].actions).toEqual([pos]);
+        expect(service['overlayTiles'].playerPosition).toEqual(pos2);
+        expect(service['updateAllTiles']).toHaveBeenCalledTimes(3);
+
+        service.clearOverlays();
+        expect(service['overlayTiles']).toEqual(DEFAULT_OVERLAY_TILES);
+        expect(service['updateAllTiles']).toHaveBeenCalledTimes(4);
+
+        service['overlayTiles'].actions = [pos];
+        service.clearActions();
+        expect(service['overlayTiles'].actions).toEqual([]);
+        expect(service['updateAllTiles']).toHaveBeenCalledTimes(5);
+    });
+
+    it('should handle player-related methods correctly', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(service, 'updateAllTiles');
+        const mockPlayer: Player = { id: '1', name: 'Player', avatar: Avatars.Avatar1, currentStats: { position: { x: 1, y: 1 } } } as Player;
+
+        service.setPlayers([mockPlayer]);
+        expect(service['players']).toEqual([mockPlayer]);
+        expect(service['updateAllTiles']).toHaveBeenCalledTimes(1);
+
+        jasmine.clock().install();
+        const movementData: PlayerMovementData = {
+            playerIndex: 0,
+            movement: [
+                { x: 0, y: 0 },
+                { x: 2, y: 2 },
+                { x: 3, y: 3 },
+            ],
+            match: {} as Match,
+        };
+        service.movePlayer(movementData);
+
+        jasmine.clock().tick(MOVE_ANIMATION_DURATION);
+        expect(service['players'][0].currentStats.position).toEqual({ x: 2, y: 2 });
+        expect(service['updateAllTiles']).toHaveBeenCalledTimes(2);
+
+        jasmine.clock().tick(MOVE_ANIMATION_DURATION);
+        expect(service['players'][0].currentStats.position).toEqual({ x: 3, y: 3 });
+        expect(service['updateAllTiles']).toHaveBeenCalledTimes(3);
+
+        jasmine.clock().uninstall();
     });
 });
