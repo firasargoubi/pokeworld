@@ -96,13 +96,13 @@ export class PlayService {
         }
     }
 
-    changeDebugMode(playerId: string) {
+    changeDebugMode(playerId: string, forceMode?: boolean) {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
         if (matchCode) {
             const isAdmin = this.matchService.isPlayerAdmin(playerId);
             if (isAdmin) {
                 const match = this.matchService.getMatch(matchCode);
-                match.matchData.isDebugMode = !match.matchData.isDebugMode;
+                match.matchData.isDebugMode = forceMode !== undefined ? forceMode : !match.matchData.isDebugMode;
                 this.playGateway.emitDebugModeChanged(matchCode, match);
             }
         }
