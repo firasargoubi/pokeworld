@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { MOVE_ANIMATION_DURATION } from '@common/consts/default-player.const';
+import { Router } from '@angular/router';
 import { MOCK_MATCH_DATAS, MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { MapService } from '@app/services/map/map.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
@@ -7,14 +7,15 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { CombatData, CombatDataBroadcast } from '@common/combat';
+import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/combat';
 import { CombatEvent } from '@common/combat-event.enum';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/default-player.const';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match, PlayerMovementData } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';
 import { Player } from '@common/player';
 import { Position } from '@common/position';
-import { ONE_SECOND } from './play-sockets.const';
+import { END_GAME_DELAY, ONE_SECOND } from './play-sockets.const';
 import { PlaySocketsService } from './play-sockets.service';
 
 describe('PlaySocketsService', () => {
@@ -25,6 +26,7 @@ describe('PlaySocketsService', () => {
     let mapServiceSpy: jasmine.SpyObj<MapService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let combatSocketServiceSpy: jasmine.SpyObj<CombatSocketService>;
+    let routerSpy: jasmine.SpyObj<Router>;
 
     const mockMatch = structuredClone(MOCK_MATCHES[0]);
 
@@ -34,7 +36,7 @@ describe('PlaySocketsService', () => {
             matchData: structuredClone(MOCK_MATCH_DATAS[0]),
             selfIndex: 0,
         });
-        timerServiceSpy = jasmine.createSpyObj('TimerService', ['startTimer', 'pauseTimer']);
+        timerServiceSpy = jasmine.createSpyObj('TimerService', ['startTimer', 'pauseTimer', 'unPauseTimer']);
         mapServiceSpy = jasmine.createSpyObj('MapService', [
             'setHoverMoves',
             'setPossibleMoves',
@@ -48,6 +50,7 @@ describe('PlaySocketsService', () => {
         ]);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'clearMessages']);
         combatSocketServiceSpy = jasmine.createSpyObj('CombatSocketService', ['startCombat']);
+        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
         TestBed.configureTestingModule({
             providers: [
@@ -57,6 +60,7 @@ describe('PlaySocketsService', () => {
                 { provide: MapService, useValue: mapServiceSpy },
                 { provide: PopupService, useValue: popupServiceSpy },
                 { provide: CombatSocketService, useValue: combatSocketServiceSpy },
+                { provide: Router, useValue: routerSpy },
             ],
         });
 
@@ -306,5 +310,74 @@ describe('PlaySocketsService', () => {
         expect(matchDataServiceSpy.updateMatch).toHaveBeenCalledWith(combatDataBroadcast.match);
         expect(timerServiceSpy.pauseTimer).toHaveBeenCalledWith(combatDataBroadcast.match.matchData.currentTimer / ONE_SECOND);
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Player2 et P3 entrent en combat!');
+    });
+
+    it('should handle CombatDataBroadcast event and show popup if not involved', () => {
+        const initialMatchData = structuredClone(MOCK_MATCH_DATAS[1]);
+        matchDataServiceSpy.matchData = initialMatchData;
+
+        const combatDataBroadcast: CombatDataBroadcast = {
+            match: { matchData: initialMatchData } as Match,
+            playerOneIndex: 1,
+            playerTwoIndex: 2,
+        };
+
+        matchDataServiceSpy.matchData = combatDataBroadcast.match.matchData;
+        service['onCombatDataBroadcast'](combatDataBroadcast);
+
+        expect(matchDataServiceSpy.updateMatch).toHaveBeenCalledWith(combatDataBroadcast.match);
+        expect(timerServiceSpy.pauseTimer).toHaveBeenCalledWith(combatDataBroadcast.match.matchData.currentTimer / ONE_SECOND);
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Player2 et P3 entrent en combat!');
+    });
+
+    it('should handle combatResultBroadcast event and show popup if not involved', () => {
+        const initialMatchData = structuredClone(MOCK_MATCH_DATAS[1]);
+        matchDataServiceSpy.matchData = initialMatchData;
+
+        const combatResultBroadcast: CombatResultBroadcast = {
+            match: { matchData: initialMatchData } as Match,
+            combatResult: {
+                winnerId: 'P111',
+                loserId: 'P222',
+            },
+        };
+
+        matchDataServiceSpy.matchData = combatResultBroadcast.match.matchData;
+        service['onCombatResultBroadcast'](combatResultBroadcast);
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Player1 a gagné le combat');
+
+        const combatResultBroadcastN: CombatResultBroadcast = {
+            match: { matchData: initialMatchData } as Match,
+            combatResult: {
+                winnerId: '',
+                loserId: 'P222',
+            },
+        };
+
+        matchDataServiceSpy.matchData = combatResultBroadcastN.match.matchData;
+        service['onCombatResultBroadcast'](combatResultBroadcastN);
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith("Personne n'a gagné le combat");
+    });
+
+    it('should handle MatchEnded event and navigate after delay with both reduce branches', () => {
+        jasmine.clock().install();
+
+        const mockMatchData = structuredClone(MOCK_MATCH_DATAS[1]);
+        mockMatchData.players[0].currentStats.fightsWon = 3;
+        mockMatchData.players[1].currentStats.fightsWon = 0;
+        mockMatchData.players[2].currentStats.fightsWon = 2;
+        const matchCase1: Match = { matchData: mockMatchData } as Match;
+        matchDataServiceSpy.matchData = mockMatchData;
+
+        service['onMatchEnded'](matchCase1);
+
+        expect(matchDataServiceSpy.updateMatch).toHaveBeenCalledWith(matchCase1);
+        expect(mapServiceSpy.clearOverlays).toHaveBeenCalled();
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(`${mockMatchData.players[0].name} a remporté la partie`);
+
+        jasmine.clock().tick(END_GAME_DELAY);
+        expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
+
+        jasmine.clock().uninstall();
     });
 });

@@ -73,9 +73,7 @@ describe('PlayPageComponent', () => {
                 { provide: PlaySocketsService, useValue: mockPlaySocketsService },
             ],
         }).compileComponents();
-    });
 
-    beforeEach(() => {
         fixture = TestBed.createComponent(PlayPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
