@@ -24,8 +24,8 @@ export class LobbyPageComponent {
     players$: Observable<Player[]>;
     isRoomLocked: boolean;
     isSelfAdmin: boolean = false;
-    selfId: string | undefined;
-    availebelPlayers: null[];
+    selfId: string | undefined = undefined;
+    availebelPlayers: null[] = [];
 
     private lobbySocketsService: LobbySocketsService = inject(LobbySocketsService);
     private coreSocket: CoreSocketService = inject(CoreSocketService);

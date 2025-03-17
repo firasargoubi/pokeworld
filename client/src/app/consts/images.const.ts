@@ -20,7 +20,6 @@ export const TILE_IMAGES_PREFIX: Map<TileType, string> = new Map([
     [TileType.Bush, './assets/images/game/tiles/bush/bush-'],
     [TileType.Water, './assets/images/game/tiles/water/water-'],
     [TileType.Bridge, './assets/images/game/tiles/bridge/bridge-'],
-    [TileType.Bridge, './assets/images/game/tiles/bridge/bridge-'],
     [TileType.BrokenBridge, './assets/images/game/tiles/broken-bridge/broken-bridge-'],
 ]);
 

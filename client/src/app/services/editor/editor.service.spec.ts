@@ -1,9 +1,11 @@
+/* eslint-disable max-lines */
+// exceeds max-lines by 4 lines
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { ITEM_IMAGES } from '@app/consts/images.const';
 import { MOCK_GAMES } from '@app/consts/tests/mock-games';
-import { ErrorCode } from '@app/interfaces/error-code.enum';
+import { ErrorMessage } from '@app/interfaces/error-message.enum';
 import { EventProperty } from '@app/interfaces/event-property';
 import { ValidationResult } from '@app/interfaces/game-validation-result';
 import { GameDataService } from '@app/services/game-data/game-data.service';
@@ -147,9 +149,15 @@ describe('EditorService', () => {
     });
     it('should format validation errors correctly', () => {
         const messages = service['getValidationErrorMessage'](MOCK_VALIDATION_RESULTS[1]);
-        const expectedList = [ErrorCode.TooLong, ErrorCode.TerrainCoverage, ErrorCode.TilesAccessibility, ErrorCode.BridgeAtEdge, ErrorCode.Items];
-        expectedList.forEach((errorCode) => {
-            expect(messages).toContain(errorCode);
+        const expectedList = [
+            ErrorMessage.TooLong,
+            ErrorMessage.TerrainCoverage,
+            ErrorMessage.TilesAccessibility,
+            ErrorMessage.BridgeAtEdge,
+            ErrorMessage.Items,
+        ];
+        expectedList.forEach((errorMessage) => {
+            expect(messages).toContain(errorMessage);
         });
     });
 

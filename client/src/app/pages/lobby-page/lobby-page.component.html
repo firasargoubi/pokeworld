@@ -8,7 +8,6 @@
             <div class="access-code-container">
                 <p class="access-title">Votre code d'accès</p>
                 <p class="access-code">{{ this.matchCode }}</p>
-                <!-- <div class="access-instruction">Partagez ce code avec les autres joueurs pour jouer</div> -->
                 @if (this.isSelfAdmin) {
                 <div class="access-instruction">
                     <div class="lock-container" (click)="this.toggleLockRoom()">
