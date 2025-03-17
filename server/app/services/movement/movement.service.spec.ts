@@ -7,7 +7,7 @@ import { TILE_COST, TileType } from '@common/tile-type.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createSandbox, SinonSandbox } from 'sinon';
 import { MovementService } from './movement.service';
-import { MOCK_NEW_SECTION } from './movement.service.const.spec';
+import { MOCK_NEW_SECTION } from './movement.service.spec.const';
 
 describe('MovementService', () => {
     let service: MovementService;

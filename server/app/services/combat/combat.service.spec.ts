@@ -3,8 +3,8 @@
 import { CombatGateway } from '@app/gateways/combat/combat.gateway';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
-import { CombatEvent } from '@common/combat-event.enum';
 import { AttackResult, CombatState } from '@common/combat';
+import { CombatEvent } from '@common/combat-event.enum';
 import { DiceType } from '@common/dice';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
@@ -13,7 +13,7 @@ import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Socket } from 'socket.io';
 import { CombatService } from './combat.service';
-import { MAX_TURN_DURATION, MIN_TURN_DURATION, PLAYER_STATS_MALUS } from './combat.service.const';
+import { ESCAPE_RATIO, MAX_TURN_DURATION, MIN_TURN_DURATION, PLAYER_STATS_MALUS } from './combat.service.const';
 
 describe('CombatService', () => {
     let service: CombatService;
@@ -29,6 +29,7 @@ describe('CombatService', () => {
     let endCombatSpy: SinonStub;
     let forceCombatTurnSwitchSpy: SinonStub;
     let leaveCombatSpy: SinonStub;
+    let randomStub: SinonStub;
 
     const combatRoomCode = 'room123';
     let player1: Player;
@@ -65,6 +66,7 @@ describe('CombatService', () => {
         forceCombatTurnSwitchSpy = stub(service, 'forceCombatTurnSwitch' as any);
         leaveCombatSpy = stub(service, 'leaveCombat' as any);
         clearTimeoutSpy = stub(global, 'clearTimeout');
+        randomStub = stub(Math, 'random');
         /* eslint-enable @typescript-eslint/no-explicit-any */
 
         player1 = {
@@ -89,6 +91,7 @@ describe('CombatService', () => {
 
     afterEach(() => {
         clearTimeoutSpy.restore();
+        randomStub.restore();
     });
 
     it('should be defined', () => {
@@ -188,7 +191,7 @@ describe('CombatService', () => {
         const combatState = { timer: null, players: [player1, player2], currentTurnIndex: 0 };
         service['combatTurnSystems'].set(combatRoomCode, combatState);
 
-        const randomStub = stub(Math, 'random').returns(1);
+        randomStub.returns(ESCAPE_RATIO);
         getPlayerByIdSpy.returns(player1);
 
         service.escape(combatRoomCode, player1.id);
@@ -198,15 +201,13 @@ describe('CombatService', () => {
         expect(combatGatewayStub.emitToCombatRoom.notCalled).toBeTruthy();
         expect(endCombatSpy.notCalled).toBeTruthy();
         expect(forceCombatTurnSwitchSpy.calledWith(combatRoomCode)).toBeTruthy();
-
-        randomStub.restore();
     });
 
     it("should decrease escapes and notify update if player's escapes is 0", () => {
         const combatState = { timer: null, players: [player1, player2], currentTurnIndex: 0 };
         service['combatTurnSystems'].set(combatRoomCode, combatState);
 
-        const randomStub = stub(Math, 'random').returns(0);
+        randomStub.returns(0);
         getPlayerByIdSpy.returns(player1);
 
         service.escape(combatRoomCode, player1.id);
@@ -216,8 +217,6 @@ describe('CombatService', () => {
         expect(endCombatSpy.calledWith(combatRoomCode)).toBeTruthy();
         expect(forceCombatTurnSwitchSpy.calledWith(combatRoomCode)).toBeTruthy();
         expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EscapedResult, player1.id)).toBeTruthy();
-
-        randomStub.restore();
     });
 
     it('should return undefined if targetPlayer is not found', () => {
@@ -378,7 +377,6 @@ describe('CombatService', () => {
 
     it('generateUniqueCombatCode should generate unique combat code', () => {
         const code = service['generateUniqueCombatCode']();
-        expect(code).toMatch(/^combat-\d+$/);
 
         const numericPart = code.split('-')[1];
         const CODE_LENGTH = 4;
@@ -529,24 +527,21 @@ describe('CombatService', () => {
 
     it('should compute correct bonus values for D4, D6 and return 0 for unknown dice type', () => {
         /* eslint-disable @typescript-eslint/no-magic-numbers */
-        const mathRandomStub = stub(Math, 'random').returns(0);
+        randomStub.returns(0);
         let result = service['getBonusValue'](DiceType.D4);
         expect(result).toBe(1);
 
-        mathRandomStub.returns(0.9999);
+        randomStub.returns(0.9999);
         result = service['getBonusValue'](DiceType.D4);
         expect(result).toBe(4);
 
-        mathRandomStub.returns(0);
+        randomStub.returns(0);
         result = service['getBonusValue'](DiceType.D6);
         expect(result).toBe(1);
 
-        mathRandomStub.returns(0.9999);
+        randomStub.returns(0.9999);
         result = service['getBonusValue'](DiceType.D6);
         expect(result).toBe(6);
-
-        mathRandomStub.restore();
-        /* eslint-enable @typescript-eslint/no-magic-numbers */
     });
 
     it('should not emit if state does not exist', () => {

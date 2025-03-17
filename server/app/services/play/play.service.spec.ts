@@ -84,6 +84,7 @@ describe('PlayService', () => {
         mockMatchService.getPlayer.returns(players[0]);
         mockMatchService.getMatch.returns(match);
         mockMovementService.getShortestPath.returns(shortestPath);
+        mockMovementService.getActions.returns([position]);
 
         service.move(playerId, position);
 
@@ -415,7 +416,11 @@ describe('PlayService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const nextTurnPhaseStub = sandbox.stub(service as any, 'nextTurnPhase');
 
-        mockMatchService.getPlayers.returns(players);
+        mockMatchService.getPlayer.returns(players[0]);
+        mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'canEndTurn').returns(true);
+
         service.endOfCombat(combatResult, players[0].id);
 
         expect(players[0].currentStats.fightsWon).toBe(1);
@@ -438,15 +443,18 @@ describe('PlayService', () => {
     });
 
     it('respawnPlayer should update player position using movementService.getNearestEmptyTile', () => {
-        players[1].spawnPoint = { x: 2, y: 2 };
+        const player = players[1];
+        player.spawnPoint = { x: 2, y: 2 };
         const newPosition = { x: 3, y: 3 };
         mockMovementService.getNearestEmptyTile.returns(newPosition);
+        mockMatchService.getMatch.returns(match);
+        mockMatchService.getPlayer.returns(player);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).respawnPlayer(players[1].id, matchCode);
+        (service as any).respawnPlayer(player.id, matchCode);
 
-        expect(mockMovementService.getNearestEmptyTile.calledWith(players[1].spawnPoint, match)).toBeTruthy();
-        expect(players[1].currentStats.position).toEqual(newPosition);
+        expect(mockMovementService.getNearestEmptyTile.calledWith(player.spawnPoint, match)).toBeTruthy();
+        expect(player.currentStats.position).toEqual(newPosition);
     });
 
     it('endMatch should emit match ended and remove then disconnect all players', () => {

@@ -1,6 +1,6 @@
 import { CombatService } from '@app/services/combat/combat.service';
-import { CombatEvent } from '@common/combat-event.enum';
 import { CombatState } from '@common/combat';
+import { CombatEvent } from '@common/combat-event.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
@@ -65,6 +65,17 @@ describe('CombatGateway', () => {
         expect(mockCombatService.endCombat.calledWith(combatRoomCode)).toBeTruthy();
     });
 
+    it('should call endCombat with the correct winner when two players are present', () => {
+        const combatRoomCode = 'room456';
+        const fakeCombatState = {
+            timer: null,
+            players: [{ id: socket1.id }, { id: socket2.id }],
+            currentTurnIndex: 0,
+        } as CombatState;
+        mockCombatService.getCombatTurnSystems.returns(new Map([[combatRoomCode, fakeCombatState]]));
+        gateway.handleDisconnect(socket1);
+        expect(mockCombatService.endCombat.calledWith(combatRoomCode, socket2.id)).toBeTruthy();
+    });
     it('should return a socket by id using getSocketById', () => {
         const socket = gateway.getSocketById('test-socket-id');
         expect(socket).toEqual(socket1);
