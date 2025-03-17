@@ -33,8 +33,13 @@ export interface AttackAttempt {
 
 }
 
-export interface CombatBroadcastData {
+export interface CombatDataBroadcast {
     match: Match,
     playerOneIndex: number,
     playerTwoIndex: number,
+}
+
+export interface CombatResultBroadcast {
+    match: Match,
+    combatResult: CombatResult,
 }

@@ -87,7 +87,6 @@ export class CombatPageComponent implements OnDestroy, OnInit {
     }
 
     private attackAnimation(attackResult: AttackResult): void {
-        window.console.log(attackResult);
         if (attackResult.targetId === this.selfPlayer.id) {
             this.animation.selfattack = false;
             this.animation.ennemyattack = true;

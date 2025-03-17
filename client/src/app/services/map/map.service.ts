@@ -49,6 +49,21 @@ export class MapService {
         this.updateAllTiles();
     }
 
+    updateAllTiles(): void {
+        const mapSize = this.gameDataService.gameData.mapData.size;
+
+        this.visualMapData = {
+            tiles: Array.from({ length: mapSize }, () => Array.from({ length: mapSize }, () => ({ ...DEFAULT_TILE_VISUAL }))),
+            size: mapSize,
+        };
+
+        for (let x = 0; x < mapSize; x++) {
+            for (let y = 0; y < mapSize; y++) {
+                this.updateTile({ x, y });
+            }
+        }
+    }
+
     setPossibleMoves(possibleMoves: Position[], playerPosition: Position) {
         this.overlayTiles.playerPosition = playerPosition;
         this.overlayTiles.possibleMoves = possibleMoves;
@@ -203,21 +218,6 @@ export class MapService {
         SURROUNDING_POSITIONS_SQUARE.forEach((deltaPosition) => {
             this.updateTile({ x: position.x + deltaPosition.x, y: position.y + deltaPosition.y });
         });
-    }
-
-    private updateAllTiles(): void {
-        const mapSize = this.gameDataService.gameData.mapData.size;
-
-        this.visualMapData = {
-            tiles: Array.from({ length: mapSize }, () => Array.from({ length: mapSize }, () => ({ ...DEFAULT_TILE_VISUAL }))),
-            size: mapSize,
-        };
-
-        for (let x = 0; x < mapSize; x++) {
-            for (let y = 0; y < mapSize; y++) {
-                this.updateTile({ x, y });
-            }
-        }
     }
 
     private updateTile(position: Position): void {
