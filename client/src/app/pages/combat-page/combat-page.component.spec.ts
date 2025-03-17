@@ -1,17 +1,22 @@
 import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { PopupService } from '@app/services/popup/popup.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
+import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { AttackResult, CombatResult } from '@common/combat';
 import { Player } from '@common/player';
 import { BehaviorSubject } from 'rxjs';
 import { CombatPageComponent } from './combat-page.component';
+import { MatchDataService } from '@app/services/match-data/match-data.service';
 
 describe('CombatPageComponent', () => {
     let component: CombatPageComponent;
     let fixture: ComponentFixture<CombatPageComponent>;
     let routerSpy: jasmine.SpyObj<Router>;
-
+    let mockCoreSocketService: jasmine.SpyObj<CoreSocketService>;
+    let mockMatchDataService: jasmine.SpyObj<MatchDataService>;
+    let mockPopupService: jasmine.SpyObj<PopupService>;
     let selfPlayerSubject: BehaviorSubject<Player | null>;
     let ennemyPlayerSubject: BehaviorSubject<Player | null>;
     let currentTurnSubject: BehaviorSubject<boolean>;
@@ -19,6 +24,7 @@ describe('CombatPageComponent', () => {
     let attackResultSubject: BehaviorSubject<AttackResult | null>;
     let escapeResultSubject: BehaviorSubject<string | null>;
     let combatResultSubject: BehaviorSubject<CombatResult | null>;
+    let connectionStatusSubject: BehaviorSubject<boolean>;
 
     const ONE_SEC = 1000;
     let combatSocketServiceMock: Partial<CombatSocketService>;
@@ -31,7 +37,14 @@ describe('CombatPageComponent', () => {
         attackResultSubject = new BehaviorSubject<AttackResult | null>(null);
         escapeResultSubject = new BehaviorSubject<string | null>(null);
         combatResultSubject = new BehaviorSubject<CombatResult | null>(null);
-
+        connectionStatusSubject = new BehaviorSubject<boolean>(true);
+        mockCoreSocketService = jasmine.createSpyObj('CoreSocketService', ['emit'], {
+            connectionStatus: connectionStatusSubject.asObservable(),
+        });
+        mockMatchDataService = jasmine.createSpyObj('MatchDataService', [], {
+            matchData: { players: [{ id: 'player1' }, { id: 'player2' }] },
+        });
+        mockPopupService = jasmine.createSpyObj('PopupService', ['showPopup', 'clearMessages', 'keepMessages']);
         combatSocketServiceMock = {
             selfPlayer$: selfPlayerSubject.asObservable(),
             ennemyPlayer$: ennemyPlayerSubject.asObservable(),
@@ -51,6 +64,9 @@ describe('CombatPageComponent', () => {
             providers: [
                 { provide: CombatSocketService, useValue: combatSocketServiceMock },
                 { provide: Router, useValue: routerSpy },
+                { provide: PopupService, useValue: mockPopupService },
+                { provide: CoreSocketService, useValue: mockCoreSocketService },
+                { provide: MatchDataService, useValue: mockMatchDataService },
             ],
         })
             .overrideTemplate(CombatPageComponent, '')
@@ -225,11 +241,6 @@ describe('CombatPageComponent', () => {
         expect(combatSocketServiceMock.attackAttempt).toHaveBeenCalled();
     });
 
-    it('should navigate to "/" on beforeunload event', () => {
-        component['handleBeforeUnload']();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
-    });
-
     it('should clear interval when timer reaches zero', () => {
         jasmine.clock().install();
 
@@ -244,5 +255,21 @@ describe('CombatPageComponent', () => {
         expect(initialInterval).not.toBe(component['timerInterval']);
 
         jasmine.clock().uninstall();
+    });
+
+    it('should verify socket connection and do nothing if connected', () => {
+        connectionStatusSubject.next(true);
+        expect(mockPopupService.clearMessages).not.toHaveBeenCalled();
+        expect(mockPopupService.showPopup).not.toHaveBeenCalled();
+        expect(mockPopupService.keepMessages).not.toHaveBeenCalled();
+        expect(routerSpy.navigate).not.toHaveBeenCalled();
+    });
+
+    it('should show popup, keep messages, and navigate if socket disconnects', () => {
+        connectionStatusSubject.next(false);
+        expect(mockPopupService.clearMessages).toHaveBeenCalled();
+        expect(mockPopupService.showPopup).toHaveBeenCalledWith('Erreur de connection avec le serveur');
+        expect(mockPopupService.keepMessages).toHaveBeenCalled();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
     });
 });
