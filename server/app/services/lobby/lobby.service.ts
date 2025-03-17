@@ -3,7 +3,7 @@ import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { GameData } from '@common/game-data';
 import { Player } from '@common/player';
-import { MAX_PLAYERS, MIN_PLAYERS } from '@common/player-count.const';
+import { MAX_PLAYERS, MIN_PLAYERS } from '@common/consts/player-count.const';
 import { Warning } from '@common/warning.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 

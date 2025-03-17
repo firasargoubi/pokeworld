@@ -3,7 +3,7 @@
 import { CombatGateway } from '@app/gateways/combat/combat.gateway';
 import { MatchService } from '@app/services/match/match.service';
 import { CombatEvent } from '@common/combat-event.enum';
-import { AttackResult, CombatState } from '@common/combat-interfaces';
+import { AttackResult, CombatState } from '@common/combat';
 import { DiceType } from '@common/dice';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
@@ -149,7 +149,7 @@ describe('CombatService', () => {
 
         combatGatewayStub.getSocketById.returns(socket2);
 
-        service['initiateCombat'](socket1, 'player-2');
+        service['initiateCombat'](socket1.id, 'player-2');
 
         expect(matchServiceStub['getPlayer'].calledTwice).toBeTruthy();
         expect(generateUniqueCombatCodeSpy.calledOnce).toBeTruthy();

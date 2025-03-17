@@ -5,7 +5,7 @@ import { GameService } from '@app/services/game/game.service';
 import { MatchService } from '@app/services/match/match.service';
 import { DEFAULT_MATCH_DATA } from '@app/services/match/match.service.const';
 import { PlayService } from '@app/services/play/play.service';
-import { DEFAULT_PLAYER } from '@common/const/default-player.const';
+import { DEFAULT_PLAYER } from '@common/consts/default-player.const';
 import { Player } from '@common/player';
 import { Warning } from '@common/warning.enum';
 import { Test, TestingModule } from '@nestjs/testing';

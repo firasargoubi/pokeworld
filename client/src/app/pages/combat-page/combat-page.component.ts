@@ -6,7 +6,7 @@ import { BATTLE_PLATFORM_DATA } from '@app/consts/battle-platforms.const';
 import { DEFAULT_COMBAT_ANIMATIONS } from '@app/consts/combat-animations.const';
 import { CombatAnimations } from '@app/interfaces/combat-animations';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
-import { AttackResult } from '@common/combat-interfaces';
+import { AttackResult } from '@common/combat';
 import { Player } from '@common/player';
 import { COMBAT_TIME_SCALE } from './combat-page.component.const';
 

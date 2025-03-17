@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { DEFAULT_PLAYER } from '@common/const/default-player.const';
+import { DEFAULT_PLAYER } from '@common/consts/default-player.const';
 import { Player } from '@common/player';
 
 @Component({

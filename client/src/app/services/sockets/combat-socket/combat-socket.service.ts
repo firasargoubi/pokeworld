@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { CombatEvent } from '@common/combat-event.enum';
-import { AttackAttempt, AttackResult, CombatData, CombatResult, EscapeAttempt } from '@common/combat-interfaces';
+import { AttackAttempt, AttackResult, CombatData, CombatResult, EscapeAttempt } from '@common/combat';
 import { Player } from '@common/player';
 import { BehaviorSubject, Observable } from 'rxjs';
 

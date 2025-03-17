@@ -8,7 +8,7 @@ import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { CombatEvent } from '@common/combat-event.enum';
-import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/combat-interfaces';
+import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/combat';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match, PlayerMovementData } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';

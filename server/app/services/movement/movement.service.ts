@@ -4,37 +4,40 @@ import { ShortestPath } from '@common/movement';
 import { Position } from '@common/position';
 import { TILE_COST, TileType } from '@common/tile-type.enum';
 import { Injectable } from '@nestjs/common';
-import { DistancesAndPredecessors, NEIGHBOR_OFFSETS, NeighborContext, QueueNode } from './movement.service.const';
+import { DistancesAndPredecessors, NeighborContext, QueueNode } from '@app/interfaces/movement';
+import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/surrounding-positions.const';
 
 @Injectable()
 export class MovementService {
     getPossibleMoves(match: Match): Position[] {
-        const active = match.matchData.players[match.matchData.activePlayer];
-        const currentPos = active.currentStats.position;
-        const movementRange = active.currentStats.movement;
+        const activePlayer = match.matchData.players[match.matchData.activePlayer];
+        const currentPos = activePlayer.currentStats.position;
+        const movementRange = activePlayer.currentStats.movement;
         return match.matchData.isDebugMode ? this.getPossibleMovesDebug(match) : this.getPossibleMovesStandard(currentPos, movementRange, match);
     }
 
     getShortestPath(match: Match, target: Position): ShortestPath {
-        const active = match.matchData.players[match.matchData.activePlayer];
-        const start = active.currentStats.position;
+        const activePlayer = match.matchData.players[match.matchData.activePlayer];
+        const startPos = activePlayer.currentStats.position;
 
         if (match.matchData.isDebugMode) {
-            return { moveCost: 0, path: [start, target] };
+            return { moveCost: 0, path: [startPos, target] };
         }
 
-        const { distances, predecessors } = this.calculateDistancesAndPredecessors(start, match, Infinity);
+        const { distances, predecessors } = this.calculateDistancesAndPredecessors(startPos, match, Infinity);
         const path = this.reconstructPath(target, predecessors);
         return { moveCost: distances[target.x][target.y], path: path || [] };
     }
 
     getActions(match: Match): Position[] {
         const position = match.matchData.players[match.matchData.activePlayer].currentStats.position;
-        const neighborActions = NEIGHBOR_OFFSETS.map((delta) => ({ x: position.x + delta.x, y: position.y + delta.y })).filter((neighbor) => {
-            const hasPlayer = this.isTileOccupiedByPlayer(neighbor, match);
-            const hasBridge = this.isTileABridge(neighbor, match);
-            return hasPlayer || hasBridge;
-        });
+        const neighborActions = SURROUNDING_POSITIONS_PLUS.map((delta) => ({ x: position.x + delta.x, y: position.y + delta.y })).filter(
+            (neighbor) => {
+                const hasPlayer = this.isTileOccupiedByPlayer(neighbor, match);
+                const hasBridge = this.isTileABridge(neighbor, match);
+                return hasPlayer || hasBridge;
+            },
+        );
         return [...neighborActions, position];
     }
 
@@ -45,6 +48,7 @@ export class MovementService {
 
         queue.push(currentPos);
         visited[currentPos.x][currentPos.y] = true;
+
         while (queue.length > 0) {
             const pos = queue.shift();
             if (this.isTileValidForMovement(pos, match)) {
@@ -61,7 +65,7 @@ export class MovementService {
 
     private enqueueValidNeighbors(position: Position, match: Match, visited: boolean[][], queue: Position[]): void {
         const size = match.gameData.mapData.size;
-        for (const offset of NEIGHBOR_OFFSETS) {
+        for (const offset of SURROUNDING_POSITIONS_PLUS) {
             const neighbor = { x: position.x + offset.x, y: position.y + offset.y };
             if (!this.isOutOfBounds(neighbor, size) && !visited[neighbor.x][neighbor.y]) {
                 visited[neighbor.x][neighbor.y] = true;
@@ -116,11 +120,14 @@ export class MovementService {
 
     private processNeighbor(context: NeighborContext): void {
         const neighbor: Position = { x: context.pos.x + context.offset.x, y: context.pos.y + context.offset.y };
+
         if (this.isOutOfBounds(neighbor, context.size) || this.isTileOccupiedByPlayer(neighbor, context.match)) {
             return;
         }
+
         const moveCost = this.getMovementCost(neighbor, context.match.gameData.mapData);
         const newCost = context.cost + moveCost;
+
         if (newCost <= context.maxCost && newCost < context.distances[neighbor.x][neighbor.y]) {
             context.distances[neighbor.x][neighbor.y] = newCost;
             context.predecessors.set(neighbor, context.pos);
@@ -137,23 +144,28 @@ export class MovementService {
 
         while (queue.length) {
             const { pos, cost } = queue.shift();
-            NEIGHBOR_OFFSETS.forEach((offset) => this.processNeighbor({ pos, cost, offset, maxCost, size, match, distances, predecessors, queue }));
+            SURROUNDING_POSITIONS_PLUS.forEach((offset) =>
+                this.processNeighbor({ pos, cost, offset, maxCost, size, match, distances, predecessors, queue }),
+            );
         }
         return { distances, predecessors };
     }
 
     private reconstructPath(target: Position, predecessors: Map<Position, Position>): Position[] | null {
-        const stringPred: Map<string, string> = new Map();
+        const stringPredecessor: Map<string, string> = new Map();
+
         for (const [key, value] of predecessors.entries()) {
-            stringPred.set(this.posToKey(key), this.posToKey(value));
+            stringPredecessor.set(this.posToKey(key), this.posToKey(value));
         }
+
         const path: Position[] = [];
         let currentKey: string = this.posToKey(target);
-        while (stringPred.has(currentKey)) {
+        while (stringPredecessor.has(currentKey)) {
             path.unshift(this.keyToPos(currentKey));
-            currentKey = stringPred.get(currentKey);
+            currentKey = stringPredecessor.get(currentKey);
         }
         path.unshift(this.keyToPos(currentKey));
+
         return path.length > 1 ? path : null;
     }
 
@@ -173,7 +185,9 @@ export class MovementService {
     }
 
     private isOutOfBounds(position: Position, size: number): boolean {
-        return position.x < 0 || position.x >= size || position.y < 0 || position.y >= size;
+        const isXOutOfBounds: boolean = position.x < 0 || position.x >= size;
+        const isYOutOfBounds: boolean = position.y < 0 || position.y >= size;
+        return isXOutOfBounds || isYOutOfBounds;
     }
 
     private getMovementCost(position: Position, mapData: MapData): number {
@@ -187,7 +201,9 @@ export class MovementService {
         const tile = match.gameData.mapData.tiles[position.x][position.y];
         return tile !== TileType.Water && tile !== TileType.BrokenBridge;
     }
+
     private posToKey = (p: Position): string => `${p.x}-${p.y}`;
+
     private keyToPos = (key: string): Position => {
         const [x, y] = key.split('-').map(Number);
         return { x, y };
