@@ -219,3 +219,13 @@ $text-shadow-color: rgb(112, 112, 112);
     margin: 0 0 2% 0;
     overflow: visible;
 }
+
+.chat-container {
+    position: absolute;
+    width: 38%;
+    height: 40%;
+    z-index: 1;
+    margin: 0 0 2% 0;
+    bottom: 5%;
+    left: 6%;
+}

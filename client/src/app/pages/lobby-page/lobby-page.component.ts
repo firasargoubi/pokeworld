@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PlayerCardComponent } from '@app/components/player-card/player-card.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
@@ -16,7 +17,7 @@ import { Observable } from 'rxjs';
     selector: 'app-lobby-page',
     templateUrl: './lobby-page.component.html',
     styleUrls: ['./lobby-page.component.scss'],
-    imports: [CommonModule, HeaderComponent, PlayerCardComponent, PokeballButtonComponent],
+    imports: [CommonModule, HeaderComponent, PlayerCardComponent, PokeballButtonComponent, ChatComponent],
     standalone: true,
 })
 export class LobbyPageComponent {
