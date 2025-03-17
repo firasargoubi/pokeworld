@@ -182,8 +182,19 @@ describe('LobbySocketsService', () => {
         const warningCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === LobbyEvent.Warning);
         warningCall?.[1](Warning.RoomLocked);
 
+        expect(popupServiceSpy.keepMessages).not.toHaveBeenCalled();
         expect(popupServiceSpy.clearMessages).toHaveBeenCalled();
-        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(Warning.RoomLocked, true, jasmine.any(Function));
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(Warning.RoomLocked);
+        expect(service.matchRoomCode).toBe('');
+    });
+
+    it('should handle LockedFromLobby warning with popup and goToMenu callback', () => {
+        const warningCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === LobbyEvent.Warning);
+        warningCall?.[1](Warning.LockedFromLobby);
+
+        expect(popupServiceSpy.clearMessages).toHaveBeenCalled();
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(Warning.LockedFromLobby, true, jasmine.any(Function));
+        expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         const callback = popupServiceSpy.showPopup.calls.mostRecent().args[2] as () => void;
         callback();
         expect(service.matchRoomCode).toBe('');

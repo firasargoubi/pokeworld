@@ -57,7 +57,6 @@ describe('JoinPageComponent', () => {
 
         component.joinMatch(event);
 
-        expect(playerSelectionServiceSpy.matchCode).toBe('ABC123');
         expect(lobbySocketsServiceSpy.joinMatch).toHaveBeenCalledWith('ABC123');
         expect(routerSpy.navigate).not.toHaveBeenCalled();
     });

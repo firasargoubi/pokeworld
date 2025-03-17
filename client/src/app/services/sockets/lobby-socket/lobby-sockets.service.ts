@@ -109,20 +109,19 @@ export class LobbySocketsService {
 
     private onWarning(warning: Warning) {
         this.popupService.clearMessages();
-        if ([Warning.RoomLocked].includes(warning)) {
-            this.popupService.showPopup(warning, true, this.goToMenu.bind(this));
-        } else if ([Warning.Kick, Warning.AdminQuit, Warning.LastPlayerRemaining].includes(warning)) {
-            this.popupService.showPopup(warning);
+        if (warning === Warning.LockedFromLobby) {
+            this.popupService.showPopup(warning, true, () => {
+                this.router.navigate(['/']);
+            });
+            this.router.navigate(['/join']);
             this.popupService.keepMessages();
-            this.goToMenu();
         } else {
             this.popupService.showPopup(warning);
+            if ([Warning.Kick, Warning.AdminQuit, Warning.LastPlayerRemaining].includes(warning)) {
+                this.router.navigate(['/']);
+                this.popupService.keepMessages();
+            }
         }
-    }
-
-    private goToMenu() {
-        this.matchCode = '';
-        this.router.navigate(['/']);
     }
 
     private onEmitGameData(gameData: GameData) {

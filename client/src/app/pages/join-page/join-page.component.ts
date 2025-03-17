@@ -23,9 +23,9 @@ export class JoinPageComponent {
         const isJoinKey = event.key === 'Enter';
 
         if (isJoinKey) {
-            this.playerSelectionService.matchCode = this.gameCode;
             this.lobbySocketService.joinMatch(this.gameCode).subscribe((joinStatus) => {
                 if (joinStatus) {
+                    this.playerSelectionService.matchCode = this.gameCode;
                     this.router.navigate(['/player-selection']);
                 }
             });
