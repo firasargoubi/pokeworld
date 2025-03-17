@@ -1,8 +1,8 @@
 import { CombatGateway } from '@app/gateways/combat/combat.gateway';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
-import { CombatEvent } from '@common/combat-event.enum';
 import { AttackResult, CombatData, CombatResult, CombatState } from '@common/combat';
+import { CombatEvent } from '@common/combat-event.enum';
 import { DICE_MAX_VALUE, DiceType } from '@common/dice';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
@@ -202,10 +202,20 @@ export class CombatService {
     }
 
     private updatePlayerBonusStats(combatRoomCode: string, player: Player, updateAttack: boolean): void {
+        const matchCode = this.matchService.getMatchCodeFromPlayerId(player.id);
+        const match = this.matchService.getMatch(matchCode);
         if (updateAttack) {
-            player.currentStats.attackBonus = this.getBonusValue(player.playerStats.attackDice);
+            if (match.matchData.isDebugMode) {
+                player.currentStats.attackBonus = DICE_MAX_VALUE[player.playerStats.attackDice];
+            } else {
+                player.currentStats.attackBonus = this.getBonusValue(player.playerStats.attackDice);
+            }
         } else {
-            player.currentStats.defenseBonus = this.getBonusValue(player.playerStats.defenseDice);
+            if (match.matchData.isDebugMode) {
+                player.currentStats.defenseBonus = 1;
+            } else {
+                player.currentStats.defenseBonus = this.getBonusValue(player.playerStats.defenseDice);
+            }
         }
 
         this.notifyPlayersStatsUpdate(combatRoomCode);
