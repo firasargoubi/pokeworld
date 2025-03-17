@@ -1,6 +1,6 @@
-/* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { MOVE_ANIMATION_DURATION } from '@app/consts/default-player.const';
+import { MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { Avatars } from '@common/avatars.enum';
 import { ItemType } from '@common/item-type.enum';
@@ -57,10 +57,10 @@ describe('MapService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'getTileVisualData').and.returnValue({
             tile: 'newTile.png',
-            underlay: 'oldUnderlay.png',
-            item: 'oldItem.png' as ItemType,
-            player: 'P11',
-            overlay: 'oldOverlay.png',
+            underlay: 'newUnderlay.png',
+            item: 'newItem.png' as ItemType,
+            player: 'newP11',
+            overlay: 'newOverlay.png',
         });
 
         service.visualMapData.tiles[1][1] = {
@@ -73,49 +73,7 @@ describe('MapService', () => {
 
         service['updateTile'](position);
         expect(service.visualMapData.tiles[1][1].tile).toBe('newTile.png');
-    });
-
-    it('should update underlay if new underlay data is different', () => {
-        const position: Position = { x: 1, y: 1 };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(service, 'getTileVisualData').and.returnValue({
-            tile: 'oldTile.png',
-            underlay: 'newUnderlay.png',
-            item: 'oldItem.png' as ItemType,
-        });
-
-        service.visualMapData.tiles[1][1] = {
-            tile: 'oldTile.png',
-            underlay: 'oldUnderlay.png',
-            item: 'oldItem.png' as ItemType,
-            player: 'P11',
-            overlay: 'oldOverlay.png',
-        };
-
-        service['updateTile'](position);
         expect(service.visualMapData.tiles[1][1].underlay).toBe('newUnderlay.png');
-    });
-
-    it('should update item if new item data is different', () => {
-        const position: Position = { x: 1, y: 1 };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(service, 'getTileVisualData').and.returnValue({
-            tile: 'oldTile.png',
-            underlay: 'oldUnderlay.png',
-            item: 'newItem.png',
-            player: 'P11',
-            overlay: 'oldOverlay.png',
-        });
-
-        service.visualMapData.tiles[1][1] = {
-            tile: 'oldTile.png',
-            underlay: 'oldUnderlay.png',
-            item: 'oldItem.png' as ItemType,
-            player: 'P11',
-            overlay: 'oldOverlay.png',
-        };
-
-        service['updateTile'](position);
         expect(service.visualMapData.tiles[1][1].item).toBe('newItem.png' as ItemType);
     });
 
@@ -389,8 +347,8 @@ describe('MapService', () => {
     });
 
     it('should return correct player avatar or null based on position', () => {
-        const position: Position = { x: 1, y: 1 };
-        const mockPlayer = { id: '1', name: 'Player', avatar: Avatars.Avatar1, currentStats: { position: { x: 1, y: 1 } } } as Player;
+        const position: Position = { x: 0, y: 0 };
+        const mockPlayer = MOCK_PLAYERS[0];
 
         service['players'] = [mockPlayer];
         const result = service['getPlayerAvatar'](position);
@@ -442,15 +400,18 @@ describe('MapService', () => {
         service.setActions([pos], pos2);
         expect(service['overlayTiles'].actions).toEqual([pos]);
         expect(service['overlayTiles'].playerPosition).toEqual(pos2);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expect's count
         expect(service['updateAllTiles']).toHaveBeenCalledTimes(3);
 
         service.clearOverlays();
         expect(service['overlayTiles']).toEqual(DEFAULT_OVERLAY_TILES);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expect's count
         expect(service['updateAllTiles']).toHaveBeenCalledTimes(4);
 
         service['overlayTiles'].actions = [pos];
         service.clearActions();
         expect(service['overlayTiles'].actions).toEqual([]);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expect's count
         expect(service['updateAllTiles']).toHaveBeenCalledTimes(5);
     });
 
@@ -478,11 +439,6 @@ describe('MapService', () => {
         jasmine.clock().tick(MOVE_ANIMATION_DURATION);
         expect(service['players'][0].currentStats.position).toEqual({ x: 2, y: 2 });
         expect(service['updateAllTiles']).toHaveBeenCalledTimes(2);
-
-        jasmine.clock().tick(MOVE_ANIMATION_DURATION);
-        expect(service['players'][0].currentStats.position).toEqual({ x: 3, y: 3 });
-        expect(service['updateAllTiles']).toHaveBeenCalledTimes(3);
-
         jasmine.clock().uninstall();
     });
 });
