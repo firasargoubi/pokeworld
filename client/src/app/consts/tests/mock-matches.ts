@@ -72,8 +72,8 @@ export const MOCK_PLAYERS: Player[] = [
         spawnPoint: { x: 1, y: 2 },
     },
     {
-        id: '',
-        name: '',
+        id: 'P222',
+        name: 'Player2',
         avatar: Avatars.Avatar2,
         playerStats: structuredClone(MOCK_PLAYER_STATS[1]),
         currentStats: structuredClone(MOCK_CURRENT_STATS[1]),
@@ -81,6 +81,17 @@ export const MOCK_PLAYERS: Player[] = [
         isConnected: true,
         isBot: false,
         spawnPoint: { x: 1, y: 2 },
+    },
+    {
+        id: 'P333',
+        name: 'P3',
+        avatar: Avatars.Avatar3,
+        playerStats: structuredClone(MOCK_PLAYER_STATS[1]),
+        currentStats: structuredClone(MOCK_CURRENT_STATS[1]),
+        isAdmin: false,
+        isConnected: true,
+        isBot: false,
+        spawnPoint: { x: 2, y: 2 },
     },
 ];
 

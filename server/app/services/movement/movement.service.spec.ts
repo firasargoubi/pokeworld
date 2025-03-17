@@ -240,6 +240,9 @@ describe('MovementService', () => {
         match.matchData.activePlayer = 0;
         match.matchData.players[0].currentStats.position = { x: 1, y: 1 };
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'isTileOccupiedByPlayer').returns(true);
+
         const actions = service.getActions(match);
         expect(actions).toContainEqual({ x: 1, y: 1 });
         expect(actions).toContainEqual({ x: 0, y: 1 });
