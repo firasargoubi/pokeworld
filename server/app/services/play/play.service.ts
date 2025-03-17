@@ -9,7 +9,7 @@ import { Player } from '@common/player';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { HALF_POINT, MATCH_END_DELAY, MINIMUM_FIGHTS_TO_WIN, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
+import { HALF_POINT, MINIMUM_FIGHTS_TO_WIN, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
 
 @Injectable()
 export class PlayService {
@@ -20,8 +20,12 @@ export class PlayService {
     @Inject(forwardRef(() => LobbyGateway)) private readonly lobbyGateway: LobbyGateway;
 
     getPossibleMoves(playerId: string): Position[] {
+        let positions = [];
         const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-        return this.movementService.getPossibleMoves(this.matchService.getMatch(matchCode));
+        if (matchCode) {
+            positions = this.movementService.getPossibleMoves(this.matchService.getMatch(matchCode));
+        }
+        return positions;
     }
 
     move(playerId: string, position: Position) {
@@ -105,24 +109,31 @@ export class PlayService {
 
     endOfCombat(combatResult: CombatResult, playerId: string) {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-        if (combatResult.loserId) {
-            this.respawnPlayer(combatResult.loserId, matchCode);
-        }
+        const match = this.matchService.getMatch(matchCode);
         if (combatResult.winnerId) {
-            const player = this.matchService.getPlayer(combatResult.winnerId);
-            player.currentStats.fightsWon += 1;
-            if (player.currentStats.fightsWon >= MINIMUM_FIGHTS_TO_WIN) {
-                this.playerWinGame(matchCode);
+            this.respawnPlayer(combatResult.loserId, matchCode);
+            const winnerPlayer = this.matchService.getPlayer(combatResult.winnerId);
+            winnerPlayer.currentStats.fightsWon += 1;
+            if (winnerPlayer.currentStats.fightsWon >= MINIMUM_FIGHTS_TO_WIN) {
+                this.endMatch(matchCode);
                 return;
             }
         }
-        const match = this.matchService.getMatch(matchCode);
+
         this.playGateway.emitCombatResultBroadcast(matchCode, { match, combatResult });
-        this.unfreezeMatch(match);
+        if (combatResult.loserId && this.canEndTurn(combatResult.loserId)) {
+            this.nextTurnPhase(this.matchService.getMatchCodeFromPlayerId(playerId));
+        } else {
+            this.unfreezeMatch(match);
+        }
     }
 
     private unfreezeMatch(match: Match) {
         const turnData = this.matchService.getTurnData(match.matchData.code);
+        if (turnData.phaseTimeout) {
+            clearTimeout(turnData.phaseTimeout);
+            turnData.phaseTimeout = null;
+        }
         turnData.phaseTimeout = setTimeout(() => {
             this.nextTurnPhase(match.matchData.code);
         }, match.matchData.currentTimer);
@@ -133,12 +144,6 @@ export class PlayService {
         const player = this.matchService.getPlayer(playerId);
         const position = this.movementService.getNearestEmptyTile(player.spawnPoint, match);
         player.currentStats.position = position;
-    }
-
-    private playerWinGame(matchCode: string) {
-        setTimeout(() => {
-            this.endMatch(matchCode);
-        }, MATCH_END_DELAY);
     }
 
     private endMatch(matchCode: string) {

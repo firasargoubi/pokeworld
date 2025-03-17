@@ -13,7 +13,6 @@ export class TimerService {
 
     startTimer(time: number) {
         this.isStarted = false;
-        this.stopInterval();
         this.maxTime = time;
         this.lastUnpauseTime = time;
         this.currentTime = time;
@@ -33,6 +32,7 @@ export class TimerService {
     }
 
     private startInterval() {
+        this.stopInterval();
         this.interval = window.setInterval(this.intervalTrigger.bind(this), ONE_SECOND);
     }
 

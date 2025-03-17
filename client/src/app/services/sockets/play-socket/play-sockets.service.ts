@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { MOVE_ANIMATION_DURATION } from '@app/consts/default-player.const';
 import { MapService } from '@app/services/map/map.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
@@ -13,7 +14,7 @@ import { Match, PlayerMovementData } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';
 import { Player } from '@common/player';
 import { Position } from '@common/position';
-import { ONE_SECOND } from './play-sockets.const';
+import { END_GAME_DELAY, ONE_SECOND } from './play-sockets.const';
 
 @Injectable({
     providedIn: 'root',
@@ -25,6 +26,7 @@ export class PlaySocketsService {
     private mapService: MapService = inject(MapService);
     private popupService: PopupService = inject(PopupService);
     private combatSocketService: CombatSocketService = inject(CombatSocketService);
+    private router: Router = inject(Router);
 
     constructor() {
         this.setupPlayListeners();
@@ -91,12 +93,22 @@ export class PlaySocketsService {
 
     private onMatchEnded(match: Match) {
         this.matchDataService.updateMatch(match);
-        this.setActivePlayerPossibleMoves();
+        this.mapService.clearOverlays();
+        const winningPlayerName = this.matchDataService.matchData.players.reduce((p1, p2) =>
+            p2.currentStats.fightsWon > p1.currentStats.fightsWon ? p2 : p1,
+        ).name;
+        this.popupService.showPopup(`${winningPlayerName} a remporté la partie`);
+        setTimeout(() => {
+            this.router.navigate(['/']);
+        }, END_GAME_DELAY);
     }
 
     private onCombatResultBroadcast(combatResultBroadcast: CombatResultBroadcast) {
         this.matchDataService.updateMatch(combatResultBroadcast.match);
+        this.mapService.setPlayers(combatResultBroadcast.match.matchData.players);
+        this.setActivePlayerPossibleMoves();
         this.mapService.updateAllTiles();
+
         if (combatResultBroadcast.combatResult.winnerId) {
             const player = (this.matchDataService.matchData.players.find((p) => p.id === combatResultBroadcast.combatResult.winnerId) as Player).name;
             this.popupService.showPopup(`${player} a gagné le combat`);
