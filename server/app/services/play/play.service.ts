@@ -103,13 +103,13 @@ export class PlayService {
     private executeAction(position: Position, match: Match, playerId: string) {
         const player = match.matchData.players.find((p) => p.currentStats.position.x === position.x && p.currentStats.position.y === position.y);
         if (player) {
-            this.startFight(playerId, player.id);
+            this.startFight(playerId);
         } else {
             this.toggleBridgeTile(match, position);
         }
     }
 
-    private startFight(playerId: string, tragetPlayerId: string) {
+    private startFight(playerId: string) {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
         const match = this.matchService.getMatch(matchCode);
         const turnData = this.matchService.getTurnData(matchCode);

@@ -149,7 +149,7 @@ describe('CombatService', () => {
 
         combatGatewayStub.getSocketById.returns(socket2);
 
-        service['initiateCombat'](socket1, 'player-2');
+        service['initiateCombat'](socket1.id, 'player-2');
 
         expect(matchServiceStub['getPlayer'].calledTwice).toBeTruthy();
         expect(generateUniqueCombatCodeSpy.calledOnce).toBeTruthy();

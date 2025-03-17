@@ -42,12 +42,6 @@ describe('CombatGateway', () => {
         expect(gateway).toBeDefined();
     });
 
-    it('should call initiateCombat on startCombat event', () => {
-        const targetPlayerId = 'player-2';
-        gateway.startCombat(socket1, targetPlayerId);
-        expect(mockCombatService.initiateCombat.calledWith(socket1, targetPlayerId)).toBeTruthy();
-    });
-
     it('should call escape on escapeAttempt event', () => {
         const payload = { combatRoomCode: 'room123', playerId: 'player-1' };
         gateway.escapeAttempt(null, payload);
