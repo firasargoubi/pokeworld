@@ -238,7 +238,7 @@ describe('PlayService', () => {
     });
 
     it('unfreezeMatch should clear existing timeout and set a new one', () => {
-        const fakeTimeout = setTimeout(() => undefined);
+        const fakeTimeout = sandbox.useFakeTimers() as unknown as NodeJS.Timeout;
         const turnData = { phaseTimeout: fakeTimeout, lastPhaseStartTime: new Date() };
         mockMatchService.getTurnData.returns(turnData);
         const clearTimeoutSpy = sandbox.spy(global, 'clearTimeout');
@@ -248,7 +248,7 @@ describe('PlayService', () => {
         expect(clearTimeoutSpy.calledWith(fakeTimeout)).toBeTruthy();
         expect(turnData.phaseTimeout).not.toBeNull();
         clearTimeoutSpy.restore();
-        fakeTimeout.unref();
+        clearTimeout(fakeTimeout);
     });
 
     it('unfreezeMatch should call nextTurnPhase when timer expires', () => {
@@ -320,11 +320,12 @@ describe('PlayService', () => {
         player1.currentStats.position = { x: 1, y: 0 };
         player2.currentStats.position = { x: 2, y: 0 };
 
-        const fakeTimeout = setTimeout(() => undefined);
+        const fakeTimeout = sandbox.useFakeTimers() as unknown as NodeJS.Timeout;
+
         const now = new Date();
         const turnData = {
             phaseTimeout: fakeTimeout,
-            lastPhaseStartTime: new Date(now.getTime()),
+            lastPhaseStartTime: new Date(now.getTime() - 1),
         };
 
         match.gameData.mapData.tiles = [
