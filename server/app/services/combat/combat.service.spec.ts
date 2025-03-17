@@ -4,7 +4,7 @@ import { CombatGateway } from '@app/gateways/combat/combat.gateway';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { CombatEvent } from '@common/combat-event.enum';
-import { AttackResult, CombatState } from '@common/combat-interfaces';
+import { AttackResult, CombatState } from '@common/combat';
 import { DiceType } from '@common/dice';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';

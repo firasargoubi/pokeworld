@@ -1,5 +1,5 @@
 import { PlayService } from '@app/services/play/play.service';
-import { CombatDataBroadcast, CombatResultBroadcast } from '@common/combat-interfaces';
+import { CombatDataBroadcast, CombatResultBroadcast } from '@common/combat';
 import { Match, PlayerMovementData } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';
 import { Position } from '@common/position';

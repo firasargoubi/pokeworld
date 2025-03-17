@@ -11,7 +11,8 @@ import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import { BehaviorSubject } from 'rxjs';
 import { MapService } from './map.service';
-import { ACTION_OVERLAY, DEFAULT_OVERLAY_TILES, HOVER_MOVE_OVERLAY, POSSIBLE_MOVE_OVERLAY, SURROUNDING_POSITIONS_PLUS } from './map.service.const';
+import { ACTION_OVERLAY, DEFAULT_OVERLAY_TILES, HOVER_MOVE_OVERLAY, POSSIBLE_MOVE_OVERLAY } from './map.service.const';
+import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/surrounding-positions.const';
 
 describe('MapService', () => {
     let service: MapService;

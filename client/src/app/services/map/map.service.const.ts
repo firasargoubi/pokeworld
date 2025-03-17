@@ -61,13 +61,6 @@ export const SURROUNDING_POSITIONS_DONUT: Position[] = [
     { x: 1, y: 1 },
 ];
 
-export const SURROUNDING_POSITIONS_PLUS: Position[] = [
-    { x: -1, y: 0 },
-    { x: 0, y: -1 },
-    { x: 0, y: 1 },
-    { x: 1, y: 0 },
-];
-
 export const DEFAULT_MAP_VISUAL_DATA: MapVisualData = {
     tiles: Array.from({ length: MapSize.Small }, () => Array(MapSize.Small).fill(DEFAULT_TILE_VISUAL)),
     size: MapSize.Small,

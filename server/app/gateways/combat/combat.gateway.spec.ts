@@ -1,6 +1,6 @@
 import { CombatService } from '@app/services/combat/combat.service';
 import { CombatEvent } from '@common/combat-event.enum';
-import { CombatState } from '@common/combat-interfaces';
+import { CombatState } from '@common/combat';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';

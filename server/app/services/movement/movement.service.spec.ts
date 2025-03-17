@@ -7,7 +7,7 @@ import { TILE_COST, TileType } from '@common/tile-type.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createSandbox, SinonSandbox } from 'sinon';
 import { MovementService } from './movement.service';
-import { MOCK_NEW_SECTION } from './movement.service.const';
+import { MOCK_NEW_SECTION } from './movement.service.const.spec';
 
 describe('MovementService', () => {
     let service: MovementService;
@@ -113,7 +113,6 @@ describe('MovementService', () => {
         expect(result.path).toEqual([]);
     });
 
-    // Nouveaux tests
     it('should return an empty array if movementRange is 0', () => {
         const match: Match = structuredClone(MOCK_MATCHES[0]);
         match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
@@ -128,7 +127,7 @@ describe('MovementService', () => {
         const match: Match = structuredClone(MOCK_MATCHES[0]);
         match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
         match.matchData.activePlayer = 0;
-        match.matchData.players[0].currentStats.position = { x: -1, y: -1 }; // Hors limites
+        match.matchData.players[0].currentStats.position = { x: -1, y: -1 };
         match.matchData.players[0].currentStats.movement = 2;
         const moves = service.getPossibleMoves(match);
         expect(moves).toEqual([]);
@@ -153,12 +152,10 @@ describe('MovementService', () => {
         const startPos: Position = { x: 0, y: 0 };
         const { distances, predecessors } = service['calculateDistancesAndPredecessors'](startPos, match, Infinity);
 
-        // Vérifie les distances
-        expect(distances[0][0]).toEqual(0); // Position de départ
-        expect(distances[0][1]).toEqual(TILE_COST[TileType.Grass]); // Case adjacente
-        expect(distances[1][0]).toEqual(TILE_COST[TileType.Grass]); // Case adjacente
+        expect(distances[0][0]).toEqual(0);
+        expect(distances[0][1]).toEqual(TILE_COST[TileType.Grass]);
+        expect(distances[1][0]).toEqual(TILE_COST[TileType.Grass]);
 
-        // Vérifie les prédécesseurs
         expect(service['reconstructPath']({ x: 0, y: 1 }, predecessors)[0]).toEqual(startPos);
         expect(service['reconstructPath']({ x: 1, y: 0 }, predecessors)[0]).toEqual(startPos);
     });
@@ -186,9 +183,8 @@ describe('MovementService', () => {
         const startPos: Position = { x: 0, y: 0 };
         const { distances } = service['calculateDistancesAndPredecessors'](startPos, match, Infinity);
 
-        // Les cases hors limites ne sont pas accessibles
-        expect(distances[-1]?.[0]).toBeUndefined(); // Hors limites
-        expect(distances[0]?.[-1]).toBeUndefined(); // Hors limites
+        expect(distances[-1]?.[0]).toBeUndefined();
+        expect(distances[0]?.[-1]).toBeUndefined();
     });
     it('should correctly reconstruct the path from start to target', () => {
         const predecessors = new Map<Position, Position>();
@@ -263,7 +259,7 @@ describe('MovementService', () => {
         match.gameData.mapData.tiles[0][1] = TileType.Bridge;
 
         const actions = service.getActions(match);
-        expect(actions).toContainEqual({ x: 0, y: 1 }); // Bridge position
+        expect(actions).toContainEqual({ x: 0, y: 1 });
     });
 
     it('should correctly identify bridge tiles', () => {
@@ -340,9 +336,9 @@ describe('MovementService', () => {
         const match = structuredClone(MOCK_MATCHES[0]);
         const position = { x: 1, y: 1 };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isTileOccupiedByPlayer').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isTileAccessible').returns(true);
 
         const result = service['isTileValidForMovement'](position, match);
@@ -352,7 +348,7 @@ describe('MovementService', () => {
         const match = structuredClone(MOCK_MATCHES[0]);
         const position = { x: 1, y: 1 };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isOutOfBounds').returns(true);
 
         const result = service['isTileAccessible'](position, match);
