@@ -50,13 +50,6 @@ describe('CombatSocketService', () => {
         service['ennemyPlayerSubject'].next(expectedPlayer);
     });
 
-    // it('should call coreSocket.emit with the correct event and targetPlayerId', () => {
-    //     const targetPlayerId = 'player123';
-    //     service.initFight(targetPlayerId);
-
-    //     expect(coreSocketSpy.emit).toHaveBeenCalledOnceWith(CombatEvent.StartCombat, targetPlayerId);
-    // });
-
     it('should call coreSocket.emit with EscapeAttempt event and correct data', () => {
         const combatRoomCode = 'room123';
         service['combatRoomCode'] = combatRoomCode;
@@ -86,77 +79,6 @@ describe('CombatSocketService', () => {
             targetId: enemyPlayer.id,
         });
     });
-
-    // it('should set players and navigate to /combat on CombatStarted event when selfPlayer is the first player', () => {
-    //     const combatDataSelfFirst: CombatData = {
-    //         combatRoomCode: 'room123',
-    //         players: [{ id: coreSocketSpy.selfId } as Player, { id: 'enemyId' } as Player],
-    //     };
-
-    //     spyOn(service['router'], 'navigate').and.stub();
-
-    //     coreSocketSpy.on.calls.argsFor(0)[1](combatDataSelfFirst);
-
-    //     expect(service['combatRoomCode']).toBe(combatDataSelfFirst.combatRoomCode);
-    //     expect(service['selfPlayerSubject'].value?.id).toBe(coreSocketSpy.selfId);
-    //     expect(service['ennemyPlayerSubject'].value?.id).toBe('enemyId');
-    //     expect(service['router'].navigate).toHaveBeenCalledWith(['/combat']);
-    //     expect(coreSocketSpy.on).toHaveBeenCalledWith(PlayEvent.CombatStarted, jasmine.any(Function));
-    // });
-
-    // it('should set players and navigate to /combat on CombatStarted event when selfPlayer is the second player', () => {
-    //     const combatDataSelfSecond: CombatData = {
-    //         combatRoomCode: 'room456',
-    //         players: [{ id: 'enemyId' } as Player, { id: coreSocketSpy.selfId } as Player],
-    //     };
-
-    //     spyOn(service['router'], 'navigate');
-
-    //     coreSocketSpy.on.calls.argsFor(0)[1](combatDataSelfSecond);
-
-    //     expect(service['combatRoomCode']).toBe(combatDataSelfSecond.combatRoomCode);
-    //     expect(service['selfPlayerSubject'].value?.id).toBe(coreSocketSpy.selfId);
-    //     expect(service['ennemyPlayerSubject'].value?.id).toBe('enemyId');
-    //     expect(service['router'].navigate).toHaveBeenCalledWith(['/combat']);
-    //     expect(coreSocketSpy.on).toHaveBeenCalledWith(PlayEvent.CombatStarted, jasmine.any(Function));
-    // });
-
-    // it('should update escapeResult on EscapedResult event', () => {
-    //     const ESCAPED_RESULT_EVENT_INDEX = 1;
-    //     const playerId = 'escapedPlayer';
-
-    //     coreSocketSpy.on.calls.argsFor(ESCAPED_RESULT_EVENT_INDEX)[1](playerId);
-
-    //     expect(service['escapeResult'].value).toBe(playerId);
-    //     expect(coreSocketSpy.on).toHaveBeenCalledWith(CombatEvent.EscapedResult, jasmine.any(Function));
-    // });
-
-    // it('should update attackResult on AttackResult event', () => {
-    //     const ATTACK_RESULT_EVENT_INDEX = 2;
-    //     const attackResult: AttackResult = { targetId: 'targetId', attackDamage: 2 };
-
-    //     coreSocketSpy.on.calls.argsFor(ATTACK_RESULT_EVENT_INDEX)[1](attackResult);
-
-    //     expect(service['attackResult'].value).toEqual(attackResult);
-    //     expect(coreSocketSpy.on).toHaveBeenCalledWith(CombatEvent.AttackResult, jasmine.any(Function));
-    // });
-
-    // it('should update combatResult and navigate to /join on EndCombat event', (done) => {
-    //     const END_COMBAT_EVENT_INDEX = 3;
-    //     const NAVIGATION_DELAY_MS = 2000;
-    //     const combatResult: CombatResult = { winnerId: 'winner123' } as CombatResult;
-
-    //     spyOn(service['router'], 'navigate');
-
-    //     coreSocketSpy.on.calls.argsFor(END_COMBAT_EVENT_INDEX)[1](combatResult);
-
-    //     expect(service['combatResult'].value).toEqual(combatResult);
-
-    //     setTimeout(() => {
-    //         expect(service['router'].navigate).toHaveBeenCalled();
-    //         done();
-    //     }, NAVIGATION_DELAY_MS);
-    // });
 
     it('should update currentTurn to true when CombatTurnStarted event is received', () => {
         const turnStartedCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvent.CombatTurnStarted);
@@ -222,5 +144,78 @@ describe('CombatSocketService', () => {
 
         expect(service['selfPlayerSubject'].value).toEqual(playerTwo);
         expect(service['ennemyPlayerSubject'].value).toEqual(playerOne);
+    });
+
+    it('should set players and navigate to /combat when startCombat is called with self as first player', () => {
+        const routerSpy = spyOn(service['router'], 'navigate');
+        const combatData = {
+            combatRoomCode: 'testRoom123',
+            players: [{ id: coreSocketSpy.selfId, name: 'Self' } as Player, { id: 'enemyId', name: 'Enemy' } as Player],
+        };
+
+        service.startCombat(combatData);
+
+        expect(service['combatRoomCode']).toBe('testRoom123');
+        expect(service['selfPlayerSubject'].value).toEqual(combatData.players[0]);
+        expect(service['ennemyPlayerSubject'].value).toEqual(combatData.players[1]);
+        expect(routerSpy).toHaveBeenCalledWith(['/combat']);
+    });
+
+    it('should set players and navigate to /combat when startCombat is called with self as second player', () => {
+        const routerSpy = spyOn(service['router'], 'navigate');
+        const combatData = {
+            combatRoomCode: 'testRoom456',
+            players: [{ id: 'enemyId', name: 'Enemy' } as Player, { id: coreSocketSpy.selfId, name: 'Self' } as Player],
+        };
+
+        service.startCombat(combatData);
+
+        expect(service['combatRoomCode']).toBe('testRoom456');
+        expect(service['selfPlayerSubject'].value).toEqual(combatData.players[1]);
+        expect(service['ennemyPlayerSubject'].value).toEqual(combatData.players[0]);
+        expect(routerSpy).toHaveBeenCalledWith(['/combat']);
+    });
+
+    it('should navigate to /play when EndCombat event is received', () => {
+        const routerSpy = spyOn(service['router'], 'navigate');
+
+        const endCombatCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvent.EndCombat);
+        expect(endCombatCall).toBeDefined();
+        const endCombatCallback = endCombatCall?.[1];
+
+        if (endCombatCallback) {
+            endCombatCallback();
+        }
+
+        expect(routerSpy).toHaveBeenCalledWith(['/play']);
+    });
+
+    it('should update escapeResult when EscapedResult event is received', () => {
+        const playerId = 'escapedPlayer123';
+
+        const escapedResultCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvent.EscapedResult);
+        expect(escapedResultCall).toBeDefined();
+        const escapedResultCallback = escapedResultCall?.[1];
+
+        if (escapedResultCallback) {
+            escapedResultCallback(playerId);
+        }
+        expect(service.escapeResult.value).toBe(playerId);
+    });
+
+    it('should update attackResult when AttackResult event is received', () => {
+        const attackResult = {
+            targetId: 'targetPlayer456',
+            attackDamage: 25,
+        };
+
+        const attackResultCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvent.AttackResult);
+        expect(attackResultCall).toBeDefined();
+        const attackResultCallback = attackResultCall?.[1];
+
+        if (attackResultCallback) {
+            attackResultCallback(attackResult);
+        }
+        expect(service.attackResult.value).toEqual(attackResult);
     });
 });
