@@ -10,6 +10,7 @@ import { PlayerMovementData } from '@common/match';
 import { Player } from '@common/player';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
+import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/surrounding-positions.const';
 import {
     ACTION_OVERLAY,
     BRIDGE_SIMILAR_TILES,
@@ -25,7 +26,6 @@ import {
     RANDOM_NUMBER_BASE,
     RANDOM_NUMBER_MULTIPLIER,
     SURROUNDING_POSITIONS_DONUT,
-    SURROUNDING_POSITIONS_PLUS,
     SURROUNDING_POSITIONS_SQUARE,
     WATER_SIMILAR_TILES,
 } from './map.service.const';
