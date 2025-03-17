@@ -1,4 +1,4 @@
-export enum ErrorCode {
+export enum ErrorMessage {
     Empty = 'Le champ ne peut pas être vide',
     TooLong = 'La valeur dépasse la longueur maximale autorisée',
     Bridge = 'Problème de pont en',

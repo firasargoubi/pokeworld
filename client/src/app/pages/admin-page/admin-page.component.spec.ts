@@ -1,14 +1,14 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { MOCK_GAMES } from '@app/consts/tests/mock-games';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { GameData } from '@common/game-data';
 import { of, throwError } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
-import { GameCardComponent } from '@app/components/game-card/game-card.component';
-import { Component } from '@angular/core';
 @Component({
     selector: 'app-game-card',
     standalone: true,
@@ -58,7 +58,9 @@ describe('AdminPageComponent', () => {
     });
 
     it('should call loadGames on init', () => {
-        const loadGamesSpy = spyOn(component, 'loadGames');
+        // private method
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const loadGamesSpy = spyOn<any>(component, 'loadGames');
         component.ngOnInit();
         expect(loadGamesSpy).toHaveBeenCalled();
     });
@@ -66,7 +68,7 @@ describe('AdminPageComponent', () => {
     it('should load games successfully', () => {
         gameSaveServiceSpy.getAllGames.and.returnValue(of(MOCK_GAMES));
 
-        component.loadGames();
+        component['loadGames']();
 
         expect(gameSaveServiceSpy.getAllGames).toHaveBeenCalled();
         expect(component.games).toEqual(MOCK_GAMES);
@@ -76,7 +78,7 @@ describe('AdminPageComponent', () => {
         const errorResponse = new HttpErrorResponse({ error: 'Server error', status: 500 });
         gameSaveServiceSpy.getAllGames.and.returnValue(throwError(() => errorResponse));
 
-        component.loadGames();
+        component['loadGames']();
 
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Échec lors du chargement des jeux');
     });
@@ -162,7 +164,9 @@ describe('AdminPageComponent', () => {
     });
 
     it('should call loadGames when handleNotFoundError is called', () => {
-        const loadGamesSpy = spyOn(component, 'loadGames');
+        // private method
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const loadGamesSpy = spyOn<any>(component, 'loadGames');
         const error = new HttpErrorResponse({ error: 'Game not found', status: 404 });
 
         component['handleNotFoundError'](error);
@@ -177,7 +181,9 @@ describe('AdminPageComponent', () => {
 
     it('should add a message and call loadGames when the error is 404', () => {
         const error = new HttpErrorResponse({ error: 'Not Found', status: 404 });
-        const loadGamesSpy = spyOn(component, 'loadGames');
+        // private method
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const loadGamesSpy = spyOn<any>(component, 'loadGames');
         component['handleNotFoundError'](error);
         expect(loadGamesSpy).toHaveBeenCalled();
     });
