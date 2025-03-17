@@ -229,8 +229,7 @@ export class CombatService {
         }
     }
 
-    // TODO: objet anoyme
-    private leaveCombat(combatRoomCode: string, state: { timer: NodeJS.Timeout; players: Player[]; currentTurnIndex: number }): void {
+    private leaveCombat(combatRoomCode: string, state: CombatState): void {
         for (const player of state.players) {
             const socket = this.combatGateway.getSocketById(player.id);
 
