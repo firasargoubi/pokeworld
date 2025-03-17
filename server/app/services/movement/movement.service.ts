@@ -4,7 +4,7 @@ import { ShortestPath } from '@common/movement';
 import { Position } from '@common/position';
 import { TILE_COST, TileType } from '@common/tile-type.enum';
 import { Injectable } from '@nestjs/common';
-import { DistancesAndPredecessors, keyToPos, NEIGHBOR_OFFSETS, NeighborContext, posToKey, QueueNode } from './movement.service.const';
+import { DistancesAndPredecessors, NEIGHBOR_OFFSETS, NeighborContext, QueueNode } from './movement.service.const';
 
 @Injectable()
 export class MovementService {
@@ -52,8 +52,7 @@ export class MovementService {
             }
             this.enqueueValidNeighbors(pos, match, visited, queue);
         }
-
-        return currentPos;
+        return undefined;
     }
 
     private isTileValidForMovement(position: Position, match: Match): boolean {
@@ -146,15 +145,15 @@ export class MovementService {
     private reconstructPath(target: Position, predecessors: Map<Position, Position>): Position[] | null {
         const stringPred: Map<string, string> = new Map();
         for (const [key, value] of predecessors.entries()) {
-            stringPred.set(posToKey(key), posToKey(value));
+            stringPred.set(this.posToKey(key), this.posToKey(value));
         }
         const path: Position[] = [];
-        let currentKey: string = posToKey(target);
+        let currentKey: string = this.posToKey(target);
         while (stringPred.has(currentKey)) {
-            path.unshift(keyToPos(currentKey));
+            path.unshift(this.keyToPos(currentKey));
             currentKey = stringPred.get(currentKey);
         }
-        path.unshift(keyToPos(currentKey));
+        path.unshift(this.keyToPos(currentKey));
         return path.length > 1 ? path : null;
     }
 
@@ -188,4 +187,9 @@ export class MovementService {
         const tile = match.gameData.mapData.tiles[position.x][position.y];
         return tile !== TileType.Water && tile !== TileType.BrokenBridge;
     }
+    private posToKey = (p: Position): string => `${p.x}-${p.y}`;
+    private keyToPos = (key: string): Position => {
+        const [x, y] = key.split('-').map(Number);
+        return { x, y };
+    };
 }
