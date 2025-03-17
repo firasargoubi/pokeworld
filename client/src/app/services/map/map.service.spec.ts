@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { MOVE_ANIMATION_DURATION } from '@app/consts/default-player.const';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/default-player.const';
 import { MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { Avatars } from '@common/avatars.enum';

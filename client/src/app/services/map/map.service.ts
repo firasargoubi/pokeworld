@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { MOVE_ANIMATION_DURATION } from '@app/consts/default-player.const';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/default-player.const';
 import { IMAGE_SUFIX, TILE_IMAGES_PREFIX, UNDERLAY_IMAGES_PREFIX } from '@app/consts/images.const';
 import { MapVisualData, OverlayTiles, TileVisualData } from '@app/interfaces/map-visual-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';

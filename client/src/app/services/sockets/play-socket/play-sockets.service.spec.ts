@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { MOVE_ANIMATION_DURATION } from '@app/consts/default-player.const';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/default-player.const';
 import { MOCK_MATCH_DATAS, MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { MapService } from '@app/services/map/map.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
@@ -31,7 +31,7 @@ describe('PlaySocketsService', () => {
     beforeEach(() => {
         coreSocketSpy = jasmine.createSpyObj('CoreSocketService', ['emit', 'on']);
         matchDataServiceSpy = jasmine.createSpyObj('MatchDataService', ['updateMatch', 'getPlayerPosition', 'isActivePlayer', 'resetMatch'], {
-            matchData: MOCK_MATCH_DATAS[0],
+            matchData: structuredClone(MOCK_MATCH_DATAS[0]),
             selfIndex: 0,
         });
         timerServiceSpy = jasmine.createSpyObj('TimerService', ['startTimer', 'pauseTimer']);

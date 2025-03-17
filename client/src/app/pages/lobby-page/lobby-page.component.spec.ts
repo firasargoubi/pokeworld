@@ -40,6 +40,18 @@ describe('LobbyPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('should navigate to home when matchCode is empty', () => {
+        fixture.destroy();
+
+        Object.defineProperty(lobbySocketsServiceSpy, 'matchCode', { get: () => '', configurable: true });
+
+        fixture = TestBed.createComponent(LobbyPageComponent);
+        component = fixture.componentInstance;
+
+        fixture.detectChanges();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+    });
+
     it('should call startMatch when startMatchButton is called', () => {
         component.startMatchButton();
         expect(lobbySocketsServiceSpy.startMatch).toHaveBeenCalled();

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { MOVE_ANIMATION_DURATION } from '@app/consts/default-player.const';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/default-player.const';
 import { MapService } from '@app/services/map/map.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
