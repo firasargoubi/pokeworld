@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */
+// Test is 100 lines longer than limit
 import { MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { PlayGateway } from '@app/gateways/play/play.gateway';
@@ -12,7 +14,6 @@ import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance }
 import { PlayService } from './play.service';
 import { MINIMUM_FIGHTS_TO_WIN, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
 import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@common/consts/default-player.const';
-import { CombatResultBroadcast } from '@common/combat';
 
 describe('PlayService', () => {
     let service: PlayService;
@@ -215,13 +216,90 @@ describe('PlayService', () => {
         expect(nextTurnPhaseStub.calledWith(matchCode)).toBeTruthy();
     });
 
+    it('should call tryEndTurn and unfreezeMatch in endOfCombat when loser cannot end turn', () => {
+        players[0].currentStats.fightsWon = 0;
+        const combatResult = { winnerId: players[0].id, loserId: players[1].id };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const tryEndTurnStub = sandbox.stub(service as any, 'tryEndTurn');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const unfreezeMatchStub = sandbox.stub(service as any, 'unfreezeMatch');
+
+        mockMatchService.getPlayer.returns(players[0]);
+        mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
+        mockMatchService.getMatch.returns(match);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'canEndTurn').returns(false);
+
+        service.endOfCombat(combatResult, players[0].id);
+
+        expect(tryEndTurnStub.calledWith(players[0].id)).toBe(true);
+        expect(unfreezeMatchStub.calledWith(match)).toBe(true);
+    });
+
+    it('unfreezeMatch should clear existing timeout and set a new one', () => {
+        const fakeTimeout = setTimeout(() => undefined);
+        const turnData = { phaseTimeout: fakeTimeout, lastPhaseStartTime: new Date() };
+        mockMatchService.getTurnData.returns(turnData);
+        const clearTimeoutSpy = sandbox.spy(global, 'clearTimeout');
+
+        service['unfreezeMatch'](match);
+
+        expect(clearTimeoutSpy.calledWith(fakeTimeout)).toBeTruthy();
+        expect(turnData.phaseTimeout).not.toBeNull();
+        clearTimeoutSpy.restore();
+        fakeTimeout.unref();
+    });
+
+    it('unfreezeMatch should call nextTurnPhase when timer expires', () => {
+        match.matchData.currentTimer = 1000;
+        const turnData = { phaseTimeout: null, lastPhaseStartTime: new Date() };
+        mockMatchService.getTurnData.returns(turnData);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const nextTurnPhaseSpy = sandbox.spy(service as any, 'nextTurnPhase');
+
+        const clock = sandbox.useFakeTimers();
+        service['unfreezeMatch'](match);
+
+        expect(nextTurnPhaseSpy.called).toBe(false);
+        clock.tick(match.matchData.currentTimer);
+        expect(nextTurnPhaseSpy.calledOnceWith(match.matchData.code)).toBe(true);
+        clock.restore();
+    });
+
+    it('respawnPlayer should update player position using movementService.getNearestEmptyTile', () => {
+        const player = players[1];
+        player.spawnPoint = { x: 2, y: 2 };
+        const newPosition = { x: 3, y: 3 };
+        mockMovementService.getNearestEmptyTile.returns(newPosition);
+        mockMatchService.getMatch.returns(match);
+        mockMatchService.getPlayer.returns(player);
+
+        service['respawnPlayer'](player.id, matchCode);
+
+        expect(mockMovementService.getNearestEmptyTile.calledWith(player.spawnPoint, match)).toBeTruthy();
+        expect(player.currentStats.position).toEqual(newPosition);
+    });
+
+    it('endMatch should emit match ended and remove then disconnect all players', () => {
+        mockMatchService.getPlayers.returns(players);
+        mockMatchService.getMatch.returns(match);
+
+        service['endMatch'](matchCode);
+
+        expect(mockPlayGateway.emitMatchEnded.calledWith(matchCode, match)).toBeTruthy();
+        players.forEach((player) => {
+            expect(mockMatchService.removePlayerFromMatch.calledWith(player.id, matchCode)).toBeTruthy();
+            expect(mockLobbyGateway.disconnectPlayer.calledWith(player.id)).toBeTruthy();
+        });
+    });
+
     it('executeAction should start a fight if a players is at the position', () => {
         const position = { x: 0, y: 0 };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const startFightStub = sandbox.stub(service as any, 'startFight');
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).executeAction(position, match, playerId);
+        service['executeAction'](position, match, playerId);
 
         expect(startFightStub.calledWith(playerId)).toBeTruthy();
     });
@@ -231,10 +309,55 @@ describe('PlayService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const toggleBridgeTileStub = sandbox.stub(service as any, 'toggleBridgeTile');
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).executeAction(position, match, playerId);
+        service['executeAction'](position, match, playerId);
 
         expect(toggleBridgeTileStub.calledWith(match, position)).toBeTruthy();
+    });
+
+    it('startFight should properly setup combat between initiator and target', () => {
+        const player1 = players[0];
+        const player2 = players[1];
+        player1.currentStats.position = { x: 1, y: 0 };
+        player2.currentStats.position = { x: 2, y: 0 };
+
+        const fakeTimeout = setTimeout(() => undefined);
+        const now = new Date();
+        const turnData = {
+            phaseTimeout: fakeTimeout,
+            lastPhaseStartTime: new Date(now.getTime()),
+        };
+
+        match.gameData.mapData.tiles = [
+            [TileType.Grass, TileType.Grass],
+            [TileType.Grass, TileType.Water],
+            [TileType.Bridge, TileType.Grass],
+        ];
+
+        mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
+        mockMatchService.getMatch.returns(match);
+        mockMatchService.getTurnData.returns(turnData);
+        mockMatchService.getPlayer.withArgs(player1.id).returns(player1);
+        mockMatchService.getPlayer.withArgs(player2.id).returns(player2);
+        mockMatchService.getPlayerIndex.withArgs(player1.id).returns(0);
+        mockMatchService.getPlayerIndex.withArgs(player2.id).returns(1);
+
+        service['startFight'](player1.id, player2.id);
+
+        expect(turnData.phaseTimeout).not.toBe(fakeTimeout);
+
+        expect(player1.currentStats.standingTile).toBe(TileType.Grass);
+        expect(player2.currentStats.standingTile).toBe(TileType.Bridge);
+        expect(match.matchData.currentTimer).toBeLessThan(match.matchData.maxTimer);
+        expect(
+            mockPlayGateway.emitCombatDataBroadcast.calledWith(matchCode, {
+                match,
+                playerOneIndex: 0,
+                playerTwoIndex: 1,
+            }),
+        ).toBe(true);
+
+        expect(mockCombatService.initiateCombat.calledWith(player1.id, player2.id)).toBe(true);
+        clearTimeout(fakeTimeout);
     });
 
     it('toggleBridgeTile should toggle bridge tile to broken bridge', () => {
@@ -242,8 +365,7 @@ describe('PlayService', () => {
         match.gameData.mapData.tiles[position.x] = [];
         match.gameData.mapData.tiles[position.x][position.y] = TileType.Bridge;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).toggleBridgeTile(match, position);
+        service['toggleBridgeTile'](match, position);
 
         expect(match.gameData.mapData.tiles[position.x][position.y]).toBe(TileType.BrokenBridge);
         expect(mockPlayGateway.emitBridgeChanged.calledWith(matchCode, match)).toBeTruthy();
@@ -254,8 +376,7 @@ describe('PlayService', () => {
         match.gameData.mapData.tiles[position.x] = [];
         match.gameData.mapData.tiles[position.x][position.y] = TileType.BrokenBridge;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).toggleBridgeTile(match, position);
+        service['toggleBridgeTile'](match, position);
 
         expect(match.gameData.mapData.tiles[position.x][position.y]).toBe(TileType.Bridge);
         expect(mockPlayGateway.emitBridgeChanged.calledWith(matchCode, match)).toBeTruthy();
@@ -267,7 +388,7 @@ describe('PlayService', () => {
         match.matchData.phase = TurnPhase.Turn;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const result = (service as any).canEndTurn(playerId);
+        const result = service['canEndTurn'](playerId);
 
         expect(result).toBe(true);
     });
@@ -278,7 +399,7 @@ describe('PlayService', () => {
         mockMatchService.getMatch.returns(match);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const result = (service as any).canEndTurn(playerId);
+        const result = service['canEndTurn'](playerId);
 
         expect(result).toBe(false);
     });
@@ -292,7 +413,7 @@ describe('PlayService', () => {
         const startTurnTimerStub = sandbox.stub(service as any, 'startTurnTimer');
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).nextTurnPhase(matchCode);
+        service['nextTurnPhase'](matchCode);
 
         expect(match.matchData.phase).toBe(TurnPhase.Turn);
         expect(startTurnStub.calledWith(match)).toBeTruthy();
@@ -308,28 +429,32 @@ describe('PlayService', () => {
         const startTurnTimerStub = sandbox.stub(service as any, 'startTurnTimer');
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).nextTurnPhase(matchCode);
+        service['nextTurnPhase'](matchCode);
 
         expect(match.matchData.phase).toBe(TurnPhase.PreTurn);
         expect(startPreTurnStub.calledWith(match)).toBeTruthy();
         expect(startTurnTimerStub.calledWith(match, PRE_TURN_DURATION)).toBeTruthy();
     });
 
-    it('startTurnTimer should start turn timer and set timeout', () => {
+    it('startTurnTimer should call nextTurnPhase when timer expires', () => {
+        const duration = 2000;
         const turnData = { phaseTimeout: null, lastPhaseStartTime: new Date() };
         mockMatchService.getTurnData.returns(turnData);
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).startTurnTimer(match, TURN_DURATION);
+        const nextTurnPhaseSpy = sandbox.spy(service as any, 'nextTurnPhase');
 
-        expect(turnData.phaseTimeout).not.toBeNull();
-        expect(match.matchData.currentTimer).toBe(TURN_DURATION);
-        expect(match.matchData.maxTimer).toBe(TURN_DURATION);
+        const clock = sandbox.useFakeTimers();
+
+        service['startTurnTimer'](match, duration);
+
+        expect(nextTurnPhaseSpy.called).toBe(false);
+        clock.tick(duration);
+        expect(nextTurnPhaseSpy.calledOnceWith(match.matchData.code)).toBe(true);
+        clock.restore();
     });
 
     it('resetCurrentStats should reset players stats', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).resetCurrentStats(players[0]);
+        service['resetCurrentStats'](players[0]);
 
         expect(players[0].currentStats.hasAction).toBe(true);
         expect(players[0].currentStats.health).toBe(players[0].playerStats.health);
@@ -337,8 +462,7 @@ describe('PlayService', () => {
     });
 
     it('depleteCurrentStats should deplete players stats', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).depleteCurrentStats(players[0]);
+        service['depleteCurrentStats'](players[0]);
 
         expect(players[0].currentStats.hasAction).toBe(false);
         expect(players[0].currentStats.movement).toBe(0);
@@ -351,7 +475,7 @@ describe('PlayService', () => {
         players[2].isConnected = true;
         const currentIndex = 0;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const result = (service as any).getNextCurrentIndex(players, currentIndex);
+        const result = service['getNextCurrentIndex'](players, currentIndex);
 
         expect(result).toBe(2);
     });
@@ -362,8 +486,7 @@ describe('PlayService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const assignSpawnPointsStub = sandbox.stub(service as any, 'assignSpawnPoints');
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).reorganizeMatch(match);
+        service['reorganizeMatch'](match);
 
         expect(match.matchData.activePlayer).toBe(match.matchData.players.length - 1);
         expect(match.matchData.isStarted).toBe(true);
@@ -378,8 +501,7 @@ describe('PlayService', () => {
         players[2].playerStats.speed = DEFAULT_STAT_POINTS;
         players[3].playerStats.speed = DEFAULT_STAT_POINTS + BONUS_POINTS;
         match.matchData.players = structuredClone(players);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).sortPlayers(match);
+        service['sortPlayers'](match);
 
         expect(match.matchData.players[0].playerStats.speed).toBe(DEFAULT_STAT_POINTS + BONUS_POINTS);
         expect(match.matchData.players[1].playerStats.speed).toBe(DEFAULT_STAT_POINTS + BONUS_POINTS);
@@ -393,9 +515,7 @@ describe('PlayService', () => {
             { x: 1, y: 1 },
         ];
         match.gameData.mapData.items.Spawn = spawnPoints;
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).assignSpawnPoints(match);
+        service['assignSpawnPoints'](match);
 
         expect(match.matchData.players[0].spawnPoint).toEqual(spawnPoints[0]);
         expect(match.matchData.players[0].currentStats.position).toEqual(spawnPoints[0]);
@@ -410,8 +530,7 @@ describe('PlayService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sandbox.stub(service as any, 'getNextCurrentIndex').returns(1);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).startPreTurn(match);
+        service['startPreTurn'](match);
 
         expect(depleteCurrentStatsStub.calledWith(currentPlayer)).toBeTruthy();
         expect(match.matchData.activePlayer).toBe(1);
@@ -423,54 +542,26 @@ describe('PlayService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const resetCurrentStatsStub = sandbox.stub(service as any, 'resetCurrentStats');
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).startTurn(match);
+        service['startTurn'](match);
 
         expect(resetCurrentStatsStub.calledWith(currentPlayer)).toBeTruthy();
         expect(mockPlayGateway.emitTurnStarted.calledWith(matchCode, match)).toBeTruthy();
     });
 
-    it('unfreezeMatch should clear existing timeout and set a new one', () => {
-        const fakeTimeout = setTimeout(() => {}, 100);
-        fakeTimeout.unref();
-        const turnData = { phaseTimeout: fakeTimeout, lastPhaseStartTime: new Date() };
-        mockMatchService.getTurnData.returns(turnData);
-        const clearTimeoutSpy = sandbox.spy(global, 'clearTimeout');
+    it('tryEndTurn should call endTurn when no moves or actions available', () => {
+        players[0].currentStats.hasAction = false;
+        match.matchData.players = players;
+        match.matchData.activePlayer = 0;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).unfreezeMatch(match);
-
-        expect(clearTimeoutSpy.calledWith(fakeTimeout)).toBeTruthy();
-        expect(turnData.phaseTimeout).not.toBeNull();
-        clearTimeoutSpy.restore();
-    });
-
-    it('respawnPlayer should update player position using movementService.getNearestEmptyTile', () => {
-        const player = players[1];
-        player.spawnPoint = { x: 2, y: 2 };
-        const newPosition = { x: 3, y: 3 };
-        mockMovementService.getNearestEmptyTile.returns(newPosition);
+        mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
         mockMatchService.getMatch.returns(match);
-        mockMatchService.getPlayer.returns(player);
+        mockMatchService.getPlayer.returns(players[0]);
+        mockMovementService.getPossibleMoves.returns([]);
+        mockMovementService.getActions.returns([]);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).respawnPlayer(player.id, matchCode);
+        const endTurnStub = sandbox.stub(service, 'endTurn');
 
-        expect(mockMovementService.getNearestEmptyTile.calledWith(player.spawnPoint, match)).toBeTruthy();
-        expect(player.currentStats.position).toEqual(newPosition);
-    });
-
-    it('endMatch should emit match ended and remove then disconnect all players', () => {
-        mockMatchService.getPlayers.returns(players);
-        mockMatchService.getMatch.returns(match);
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).endMatch(matchCode);
-
-        expect(mockPlayGateway.emitMatchEnded.calledWith(matchCode, match)).toBeTruthy();
-        players.forEach((player) => {
-            expect(mockMatchService.removePlayerFromMatch.calledWith(player.id, matchCode)).toBeTruthy();
-            expect(mockLobbyGateway.disconnectPlayer.calledWith(player.id)).toBeTruthy();
-        });
+        expect(service['tryEndTurn'](playerId)).toBe(true);
+        expect(endTurnStub.calledWith(playerId)).toBeTruthy();
     });
 });
