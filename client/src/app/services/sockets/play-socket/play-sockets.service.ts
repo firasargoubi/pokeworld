@@ -86,10 +86,17 @@ export class PlaySocketsService {
         this.coreSocket.on(CombatEvent.CombatStarted, this.onCombatStarted.bind(this));
         this.coreSocket.on(PlayEvent.CombatDataBroadcast, this.onCombatDataBroadcast.bind(this));
         this.coreSocket.on(PlayEvent.CombatResultBroadcast, this.onCombatResultBroadcast.bind(this));
+        this.coreSocket.on(PlayEvent.MatchEnded, this.onMatchEnded.bind(this));
+    }
+
+    private onMatchEnded(match: Match) {
+        this.matchDataService.updateMatch(match);
+        this.setActivePlayerPossibleMoves();
     }
 
     private onCombatResultBroadcast(combatResultBroadcast: CombatResultBroadcast) {
         this.matchDataService.updateMatch(combatResultBroadcast.match);
+        this.mapService.updateAllTiles();
         if (combatResultBroadcast.combatResult.winnerId) {
             const player = (this.matchDataService.matchData.players.find((p) => p.id === combatResultBroadcast.combatResult.winnerId) as Player).name;
             this.popupService.showPopup(`${player} a gagné le combat`);

@@ -9,7 +9,7 @@ import { Player } from '@common/player';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { HALF_POINT, MINIMUM_FIGHTS_TO_WIN, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
+import { HALF_POINT, MATCH_END_DELAY, MINIMUM_FIGHTS_TO_WIN, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
 
 @Injectable()
 export class PlayService {
@@ -128,13 +128,20 @@ export class PlayService {
         }, match.matchData.currentTimer);
     }
 
-    // eslint-disable-next-line no-unused-vars
     private respawnPlayer(playerId: string, matchCode: string) {
-        // eslint-disable-next-line no-console
-        console.log('TODO respawnPlayer');
+        const match = this.matchService.getMatch(matchCode);
+        const player = this.matchService.getPlayer(playerId);
+        const position = this.movementService.getNearestEmptyTile(player.spawnPoint, match);
+        player.currentStats.position = position;
     }
 
     private playerWinGame(matchCode: string) {
+        setTimeout(() => {
+            this.endMatch(matchCode);
+        }, MATCH_END_DELAY);
+    }
+
+    private endMatch(matchCode: string) {
         const players = this.matchService.getPlayers(matchCode);
         this.playGateway.emitMatchEnded(matchCode, this.matchService.getMatch(matchCode));
         players.forEach((player) => {
