@@ -164,7 +164,7 @@ export class PlayService {
         }
     }
 
-    private startFight(playerId: string, tragetPlayerId: string) {
+    private startFight(playerId: string, targetPlayerId: string) {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
         const match = this.matchService.getMatch(matchCode);
         const turnData = this.matchService.getTurnData(matchCode);
@@ -177,9 +177,9 @@ export class PlayService {
         this.playGateway.emitCombatDataBroadcast(matchCode, {
             match,
             playerOneIndex: this.matchService.getPlayerIndex(playerId),
-            playerTwoIndex: this.matchService.getPlayerIndex(tragetPlayerId),
+            playerTwoIndex: this.matchService.getPlayerIndex(targetPlayerId),
         });
-        this.combatService.initiateCombat(playerId, tragetPlayerId);
+        this.combatService.initiateCombat(playerId, targetPlayerId);
     }
 
     private toggleBridgeTile(match: Match, position: Position) {
