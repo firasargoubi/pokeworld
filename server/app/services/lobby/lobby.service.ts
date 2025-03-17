@@ -1,9 +1,9 @@
 import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
+import { MAX_PLAYERS, MIN_PLAYERS } from '@common/consts/player-count.const';
 import { GameData } from '@common/game-data';
 import { Player } from '@common/player';
-import { MAX_PLAYERS, MIN_PLAYERS } from '@common/consts/player-count.const';
 import { Warning } from '@common/warning.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
@@ -71,6 +71,9 @@ export class LobbyService {
                 this.matchService.removePlayerFromMatch(p.id, matchCode);
             });
         } else {
+            if (player.isAdmin) {
+                this.playService.changeDebugMode(playerId, false);
+            }
             this.lobbyGateway.emitPlayerLeft(matchCode, match);
             this.playService.endTurn(playerId);
         }
