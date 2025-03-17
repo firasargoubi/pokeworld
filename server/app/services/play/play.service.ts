@@ -1,24 +1,31 @@
+import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { PlayGateway } from '@app/gateways/play/play.gateway';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
+import { CombatResult } from '@common/combat-interfaces';
 import { Match, TurnPhase } from '@common/match';
 import { Player } from '@common/player';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { HALF_POINT, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
+import { HALF_POINT, MINIMUM_FIGHTS_TO_WIN, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
 
 @Injectable()
 export class PlayService {
     @Inject(forwardRef(() => PlayGateway)) private readonly playGateway: PlayGateway;
     @Inject(MatchService) private readonly matchService: MatchService;
     @Inject(MovementService) private readonly movementService: MovementService;
-    @Inject(CombatService) private readonly combatService: CombatService;
+    @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
+    @Inject(forwardRef(() => LobbyGateway)) private readonly lobbyGateway: LobbyGateway;
 
     getPossibleMoves(playerId: string): Position[] {
+        let positions = [];
         const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-        return this.movementService.getPossibleMoves(this.matchService.getMatch(matchCode));
+        if (matchCode) {
+            positions = this.movementService.getPossibleMoves(this.matchService.getMatch(matchCode));
+        }
+        return positions;
     }
 
     move(playerId: string, position: Position) {
@@ -100,6 +107,54 @@ export class PlayService {
         }
     }
 
+    endOfCombat(combatResult: CombatResult, playerId: string) {
+        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+        const match = this.matchService.getMatch(matchCode);
+        if (combatResult.winnerId) {
+            this.respawnPlayer(combatResult.loserId, matchCode);
+            const winnerPlayer = this.matchService.getPlayer(combatResult.winnerId);
+            winnerPlayer.currentStats.fightsWon += 1;
+            if (winnerPlayer.currentStats.fightsWon >= MINIMUM_FIGHTS_TO_WIN) {
+                this.endMatch(matchCode);
+                return;
+            }
+        }
+
+        this.playGateway.emitCombatResultBroadcast(matchCode, { match, combatResult });
+        if (combatResult.loserId && this.canEndTurn(combatResult.loserId)) {
+            this.nextTurnPhase(this.matchService.getMatchCodeFromPlayerId(playerId));
+        } else {
+            this.unfreezeMatch(match);
+        }
+    }
+
+    private unfreezeMatch(match: Match) {
+        const turnData = this.matchService.getTurnData(match.matchData.code);
+        if (turnData.phaseTimeout) {
+            clearTimeout(turnData.phaseTimeout);
+            turnData.phaseTimeout = null;
+        }
+        turnData.phaseTimeout = setTimeout(() => {
+            this.nextTurnPhase(match.matchData.code);
+        }, match.matchData.currentTimer);
+    }
+
+    private respawnPlayer(playerId: string, matchCode: string) {
+        const match = this.matchService.getMatch(matchCode);
+        const player = this.matchService.getPlayer(playerId);
+        const position = this.movementService.getNearestEmptyTile(player.spawnPoint, match);
+        player.currentStats.position = position;
+    }
+
+    private endMatch(matchCode: string) {
+        const players = this.matchService.getPlayers(matchCode);
+        this.playGateway.emitMatchEnded(matchCode, this.matchService.getMatch(matchCode));
+        players.forEach((player) => {
+            this.matchService.removePlayerFromMatch(player.id, matchCode);
+            this.lobbyGateway.disconnectPlayer(player.id);
+        });
+    }
+
     private executeAction(position: Position, match: Match, playerId: string) {
         const player = match.matchData.players.find((p) => p.currentStats.position.x === position.x && p.currentStats.position.y === position.y);
         if (player) {
@@ -119,17 +174,12 @@ export class PlayService {
         }
         const elapsedTime = Math.abs(new Date().getTime() - turnData.lastPhaseStartTime.getTime());
         match.matchData.currentTimer = match.matchData.currentTimer - elapsedTime;
-
-        // eslint-disable-next-line no-console, @typescript-eslint/no-magic-numbers
-        console.log('maxTimer', match.matchData.maxTimer / 1000);
-        // eslint-disable-next-line no-console, @typescript-eslint/no-magic-numbers
-        console.log('remainingTime', match.matchData.currentTimer / 1000);
-        // eslint-disable-next-line no-console, @typescript-eslint/no-magic-numbers
-        console.log('elapsedTime', elapsedTime / 1000);
-
-        this.playGateway.emitPauseTurn(matchCode, match);
-
-        // this.combatService.initiateCombat(playerId, tragetPlayerId);
+        this.playGateway.emitCombatDataBroadcast(matchCode, {
+            match,
+            playerOneIndex: this.matchService.getPlayerIndex(playerId),
+            playerTwoIndex: this.matchService.getPlayerIndex(tragetPlayerId),
+        });
+        this.combatService.initiateCombat(playerId, tragetPlayerId);
     }
 
     private toggleBridgeTile(match: Match, position: Position) {
@@ -165,17 +215,14 @@ export class PlayService {
 
     private nextTurnPhase(matchCode: string) {
         const match = this.matchService.getMatch(matchCode);
-        switch (match.matchData.phase) {
-            case TurnPhase.PreTurn:
-                match.matchData.phase = TurnPhase.Turn;
-                this.startTurnTimer(match, TURN_DURATION);
-                this.startTurn(match);
-                break;
-            case TurnPhase.Turn:
-                match.matchData.phase = TurnPhase.PreTurn;
-                this.startTurnTimer(match, PRE_TURN_DURATION);
-                this.startPreTurn(match);
-                break;
+        if (match.matchData.phase === TurnPhase.PreTurn) {
+            match.matchData.phase = TurnPhase.Turn;
+            this.startTurnTimer(match, TURN_DURATION);
+            this.startTurn(match);
+        } else if (match.matchData.phase === TurnPhase.Turn) {
+            match.matchData.phase = TurnPhase.PreTurn;
+            this.startTurnTimer(match, PRE_TURN_DURATION);
+            this.startPreTurn(match);
         }
     }
 

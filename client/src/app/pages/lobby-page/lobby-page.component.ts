@@ -8,10 +8,9 @@ import { GameDataService } from '@app/services/game-data/game-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-import { MAX_PLAYERS } from '@common/max-players.const';
 import { Player } from '@common/player';
+import { MAX_PLAYERS } from '@common/player-count.const';
 import { Observable } from 'rxjs';
-// import { PopupService } from '@app/services/popup/popup.service';
 
 @Component({
     selector: 'app-lobby-page',
@@ -24,8 +23,8 @@ export class LobbyPageComponent {
     players$: Observable<Player[]>;
     isRoomLocked: boolean;
     isSelfAdmin: boolean = false;
-    selfId: string | undefined;
-    availebelPlayers: null[];
+    selfId: string | undefined = undefined;
+    availebelPlayers: null[] = [];
 
     private lobbySocketsService: LobbySocketsService = inject(LobbySocketsService);
     private coreSocket: CoreSocketService = inject(CoreSocketService);

@@ -3,15 +3,15 @@ import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { GameData } from '@common/game-data';
 import { Player } from '@common/player';
+import { MAX_PLAYERS, MIN_PLAYERS } from '@common/player-count.const';
 import { Warning } from '@common/warning.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { MAX_PLAYERS, MIN_PLAYERS } from './lobby.service.const';
 
 @Injectable()
 export class LobbyService {
     @Inject(forwardRef(() => LobbyGateway)) private readonly lobbyGateway: LobbyGateway;
-    @Inject(MatchService) private readonly matchService: MatchService;
-    @Inject(PlayService) private readonly playService: PlayService;
+    @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
+    @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
 
     createMatch(playerId: string, gameData: GameData): string {
         let matchCode = '';

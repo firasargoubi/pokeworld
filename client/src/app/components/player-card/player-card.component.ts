@@ -11,7 +11,7 @@ import { Player } from '@common/player';
     imports: [CommonModule],
 })
 export class PlayerCardComponent {
-    @Input() player: Player = DEFAULT_PLAYER;
+    @Input() player: Player = structuredClone(DEFAULT_PLAYER);
     @Input() isAdmin: boolean = false;
     @Input() isSelfPlayer: boolean = false;
     @Input() isDisconeected: boolean = false;

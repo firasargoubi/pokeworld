@@ -1,34 +1,38 @@
 import { Injectable } from '@angular/core';
-import { DEFAULT_MAX_TIME, DEFAULT_TIME, ONE_SECOND, TIMER_START_DELAY } from './timer.service.const';
+import { DEFAULT_TIME, ONE_SECOND, TIMER_START_DELAY } from './timer.service.const';
 
 @Injectable({
     providedIn: 'root',
 })
 export class TimerService {
-    maxTime: number = DEFAULT_MAX_TIME;
-    lastUnpauseTime: number = DEFAULT_MAX_TIME;
+    maxTime: number = DEFAULT_TIME;
+    lastUnpauseTime: number = DEFAULT_TIME;
     currentTime: number = DEFAULT_TIME;
     interval: number | null = null;
+    isStarted: boolean = false;
 
     startTimer(time: number) {
-        this.stopInterval();
+        this.isStarted = false;
         this.maxTime = time;
         this.lastUnpauseTime = time;
-        this.currentTime = time + 1;
+        this.currentTime = time;
         this.startInterval();
         window.setTimeout(this.intervalTrigger.bind(this), TIMER_START_DELAY);
     }
 
     pauseTimer(remainingTime: number) {
+        this.isStarted = false;
         this.stopInterval();
         this.lastUnpauseTime = remainingTime;
     }
 
     unPauseTimer() {
+        this.isStarted = true;
         this.startInterval();
     }
 
     private startInterval() {
+        this.stopInterval();
         this.interval = window.setInterval(this.intervalTrigger.bind(this), ONE_SECOND);
     }
 
@@ -40,6 +44,7 @@ export class TimerService {
     }
 
     private intervalTrigger() {
+        this.isStarted = true;
         this.currentTime--;
 
         if (this.currentTime === 0) {

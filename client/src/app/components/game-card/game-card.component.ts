@@ -26,17 +26,16 @@ export class GameCardComponent implements OnInit {
     private thumbnailService: ThumbnailService = inject(ThumbnailService);
     private gameDataService: GameDataService = inject(GameDataService);
 
-    onEdit() {
-        this.gameDataService.setGameData(this.game);
-        this.edit.emit(this.game._id);
-    }
-
     ngOnInit() {
         this.thumbnailService.getThumbnail(this.game.mapData, true).then((url) => {
             this.thumbnailUrl = url;
         });
     }
 
+    onEdit() {
+        this.gameDataService.setGameData(this.game);
+        this.edit.emit(this.game._id);
+    }
     onDelete() {
         this.delete.emit(this.game._id);
     }

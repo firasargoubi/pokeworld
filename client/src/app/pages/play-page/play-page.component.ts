@@ -113,7 +113,25 @@ export class PlayPageComponent {
         }
     }
 
-    computeVisualData() {
+    useAction() {
+        if (this.mapService.hasActionOverlay()) {
+            this.mapService.clearActions();
+        } else if (this.canUseAction) {
+            this.playSocketsService.displayActions();
+        }
+    }
+
+    endTurn() {
+        if (this.canEndTurn) {
+            this.playSocketsService.endTurn();
+        }
+    }
+
+    surrender() {
+        this.popupService.showPopup('Voulez-vous vraiment abandonner ?', true, this.leaveMatch.bind(this));
+    }
+
+    private computeVisualData() {
         this.playVisualData = {
             mapSize: this.mapSize,
             gameMode: this.gameMode,
@@ -132,27 +150,9 @@ export class PlayPageComponent {
         };
     }
 
-    async generateThumbnail() {
+    private async generateThumbnail() {
         const url = await this.thumbnailService.getThumbnail(this.gameDataService.gameData.mapData, false);
         this.playVisualData.thumbnailUrl = url;
-    }
-
-    useAction() {
-        if (this.mapService.hasActionOverlay()) {
-            this.mapService.clearActions();
-        } else if (this.canUseAction) {
-            this.playSocketsService.displayActions();
-        }
-    }
-
-    endTurn() {
-        if (this.canEndTurn) {
-            this.playSocketsService.endTurn();
-        }
-    }
-
-    surrender() {
-        this.popupService.showPopup('Voulez-vous vraiment abandonner ?', true, this.leaveMatch.bind(this));
     }
 
     private leaveMatch() {

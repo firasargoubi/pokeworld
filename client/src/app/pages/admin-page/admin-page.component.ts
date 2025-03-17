@@ -31,17 +31,6 @@ export class AdminPageComponent implements OnInit {
         this.loadGames();
     }
 
-    loadGames() {
-        this.gameSaveService.getAllGames().subscribe({
-            next: (games) => {
-                this.games = games;
-            },
-            error: () => {
-                this.popupService.showPopup('Échec lors du chargement des jeux');
-            },
-        });
-    }
-
     editGame(id: string) {
         this.gameSaveService.getGame(id).subscribe({
             next: () => {
@@ -73,6 +62,17 @@ export class AdminPageComponent implements OnInit {
         const classes = ['blue-card', 'green-card', 'pink-card'];
         const classIndex = index % classes.length;
         return classes[classIndex];
+    }
+
+    private loadGames() {
+        this.gameSaveService.getAllGames().subscribe({
+            next: (games) => {
+                this.games = games;
+            },
+            error: () => {
+                this.popupService.showPopup('Échec lors du chargement des jeux');
+            },
+        });
     }
 
     private confirmDeleteGame(id: string) {

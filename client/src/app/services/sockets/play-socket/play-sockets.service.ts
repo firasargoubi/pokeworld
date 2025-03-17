@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { MOVE_ANIMATION_DURATION } from '@app/consts/default-player.const';
 import { MapService } from '@app/services/map/map.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
@@ -7,12 +8,13 @@ import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { CombatEvent } from '@common/combat-event.enum';
-import { CombatData } from '@common/combat-interfaces';
+import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/combat-interfaces';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match, PlayerMovementData } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';
+import { Player } from '@common/player';
 import { Position } from '@common/position';
-import { ONE_SECOND } from './play-sockets.const';
+import { END_GAME_DELAY, ONE_SECOND } from './play-sockets.const';
 
 @Injectable({
     providedIn: 'root',
@@ -24,6 +26,7 @@ export class PlaySocketsService {
     private mapService: MapService = inject(MapService);
     private popupService: PopupService = inject(PopupService);
     private combatSocketService: CombatSocketService = inject(CombatSocketService);
+    private router: Router = inject(Router);
 
     constructor() {
         this.setupPlayListeners();
@@ -83,12 +86,46 @@ export class PlaySocketsService {
         this.coreSocket.on(PlayEvent.BridgeChanged, this.onBridgeChanged.bind(this));
         this.coreSocket.on(LobbyEvent.PlayerLeft, this.onPlayerLeft.bind(this));
         this.coreSocket.on(CombatEvent.CombatStarted, this.onCombatStarted.bind(this));
-        this.coreSocket.on(PlayEvent.PauseTurn, this.onPauseTurn.bind(this));
+        this.coreSocket.on(PlayEvent.CombatDataBroadcast, this.onCombatDataBroadcast.bind(this));
+        this.coreSocket.on(PlayEvent.CombatResultBroadcast, this.onCombatResultBroadcast.bind(this));
+        this.coreSocket.on(PlayEvent.MatchEnded, this.onMatchEnded.bind(this));
     }
 
-    private onPauseTurn(match: Match) {
+    private onMatchEnded(match: Match) {
         this.matchDataService.updateMatch(match);
-        this.timerService.pauseTimer(match.matchData.currentTimer);
+        this.mapService.clearOverlays();
+        const winningPlayerName = this.matchDataService.matchData.players.reduce((p1, p2) =>
+            p2.currentStats.fightsWon > p1.currentStats.fightsWon ? p2 : p1,
+        ).name;
+        this.popupService.showPopup(`${winningPlayerName} a remporté la partie`);
+        setTimeout(() => {
+            this.router.navigate(['/']);
+        }, END_GAME_DELAY);
+    }
+
+    private onCombatResultBroadcast(combatResultBroadcast: CombatResultBroadcast) {
+        this.matchDataService.updateMatch(combatResultBroadcast.match);
+        this.mapService.setPlayers(combatResultBroadcast.match.matchData.players);
+        this.setActivePlayerPossibleMoves();
+        this.mapService.updateAllTiles();
+
+        if (combatResultBroadcast.combatResult.winnerId) {
+            const player = (this.matchDataService.matchData.players.find((p) => p.id === combatResultBroadcast.combatResult.winnerId) as Player).name;
+            this.popupService.showPopup(`${player} a gagné le combat`);
+        } else {
+            this.popupService.showPopup("Personne n'a gagné le combat");
+        }
+        this.timerService.unPauseTimer();
+    }
+
+    private onCombatDataBroadcast(combatDataBroadcast: CombatDataBroadcast) {
+        this.matchDataService.updateMatch(combatDataBroadcast.match);
+        this.timerService.pauseTimer(combatDataBroadcast.match.matchData.currentTimer / ONE_SECOND);
+        if (![combatDataBroadcast.playerOneIndex, combatDataBroadcast.playerTwoIndex].includes(this.matchDataService.selfIndex)) {
+            const player1 = this.matchDataService.matchData.players[combatDataBroadcast.playerOneIndex].name;
+            const player2 = this.matchDataService.matchData.players[combatDataBroadcast.playerTwoIndex].name;
+            this.popupService.showPopup(`${player1} et ${player2} entrent en combat!`);
+        }
     }
 
     private onCombatStarted(combatData: CombatData) {
@@ -124,7 +161,7 @@ export class PlaySocketsService {
         const playerName = match.matchData.players[match.matchData.activePlayer].name;
         this.timerService.startTimer(match.matchData.maxTimer / ONE_SECOND);
         this.mapService.clearOverlays();
-        this.popupService.showPopup(`Début du tour de ${playerName}`);
+        this.popupService.showPopup(`Tour de ${playerName}`);
     }
 
     private onTurnStarted(match: Match) {

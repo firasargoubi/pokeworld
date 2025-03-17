@@ -58,9 +58,10 @@
             <button (click)="useAction()" class="action-button" [class.active]="playVisualData.canUseAction">Action</button>
             <button (click)="endTurn()" class="endturn-button" [class.active]="playVisualData.canEndTurn">Terminer le tour</button>
         </div>
-        <div class="timer" [class.active]="timerService.currentTime <= timerService.maxTime" [ngStyle]="{
+        <div class="timer" [class.active]="timerService.isStarted" [ngStyle]="{
             '--max-time': timerService.maxTime,
             '--current-time':  timerService.currentTime,
+            '--pause-time':  timerService.lastUnpauseTime,
         }">
             <div class="timer-bar">
                 <div class="timer-image"></div>

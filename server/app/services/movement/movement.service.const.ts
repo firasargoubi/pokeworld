@@ -34,12 +34,6 @@ export interface NeighborContext {
     queue: { pos: Position; cost: number }[];
 }
 
-export const posToKey = (p: Position): string => `${p.x}-${p.y}`;
-export const keyToPos = (key: string): Position => {
-    const [x, y] = key.split('-').map(Number);
-    return { x, y };
-};
-
 export interface QueueNode {
     pos: Position;
     cost: number;

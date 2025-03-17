@@ -1,5 +1,6 @@
 import { CombatGateway } from '@app/gateways/combat/combat.gateway';
 import { MatchService } from '@app/services/match/match.service';
+import { PlayService } from '@app/services/play/play.service';
 import { CombatEvent } from '@common/combat-event.enum';
 import { AttackResult, CombatData, CombatResult, CombatState } from '@common/combat-interfaces';
 import { DICE_MAX_VALUE, DiceType } from '@common/dice';
@@ -18,6 +19,7 @@ import {
 @Injectable()
 export class CombatService {
     @Inject(forwardRef(() => CombatGateway)) private readonly combatGateway: CombatGateway;
+    @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
     @Inject(MatchService) private readonly matchService: MatchService;
     private combatTurnSystems: Map<string, CombatState> = new Map(); // combatRoomCode -> CombatState
 
@@ -40,6 +42,7 @@ export class CombatService {
         const combatData: CombatData = { combatRoomCode, players: [initiatingPlayer, targetPlayer] };
         this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.CombatStarted, combatData);
 
+        this.resetPlayers([initiatingPlayer, targetPlayer]);
         this.updatePlayersStatsByCurrentTile([initiatingPlayer, targetPlayer]);
         this.startTurnSystem(combatRoomCode, [initiatingPlayer, targetPlayer]);
     }
@@ -91,28 +94,23 @@ export class CombatService {
 
     endCombat(combatRoomCode: string, winnerId: string = null): void {
         const state = this.combatTurnSystems.get(combatRoomCode);
-
         if (state.timer) {
             clearTimeout(state.timer);
         }
 
         const player1 = this.combatTurnSystems.get(combatRoomCode).players[0];
         const player2 = this.combatTurnSystems.get(combatRoomCode).players[1];
-
         const combatResult: CombatResult = { winnerId: null, loserId: null };
-
         this.resetPlayers([player1, player2]);
 
         if (winnerId) {
             combatResult.winnerId = winnerId;
             combatResult.loserId = player1.id === winnerId ? player2.id : player1.id;
         }
-
-        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.EndCombat, combatResult);
-
+        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.EndCombat, null);
         this.combatTurnSystems.delete(combatRoomCode);
-
         this.leaveCombat(combatRoomCode, state);
+        this.playService.endOfCombat(combatResult, player1.id);
     }
 
     forceCombatTurnSwitch(combatRoomCode: string): void {
