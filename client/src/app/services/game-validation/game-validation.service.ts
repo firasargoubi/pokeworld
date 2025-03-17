@@ -1,7 +1,15 @@
 import { Injectable } from '@angular/core';
-import { BRIDGE_TYPES, MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH, MIN_TERRAIN_RATIO } from './game-validation.const';
-import { ErrorCode } from '@app/interfaces/error-code.enum';
-import { BridgeValidationError, ValidationResult, ValidationStatus } from '@app/interfaces/game-validation-result';
+import { MAX_ITEM_COUNT } from '@app/consts/items.const';
+import { ErrorMessage } from '@app/interfaces/error-message.enum';
+import {
+    BridgeValidationError,
+    ItemsValidation,
+    TerrainCoverageValidation,
+    TileHandler,
+    TilesAccessibilityValidation,
+    ValidationResult,
+    ValidationStatus,
+} from '@app/interfaces/game-validation-result';
 import { TilesCount } from '@app/interfaces/tiles-count';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
@@ -9,7 +17,7 @@ import { ItemType } from '@common/item-type.enum';
 import { MapData } from '@common/map-data';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
-import { MAX_ITEM_COUNT } from '@app/consts/items.const';
+import { BRIDGE_TYPES, MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH, MIN_TERRAIN_RATIO } from './game-validation.const';
 
 @Injectable({
     providedIn: 'root',
@@ -35,14 +43,14 @@ export class GameValidationService {
     }
 
     private validateField(value: string, maxLength: number): ValidationStatus {
-        const validationStatus: ValidationStatus = { isValid: true, errorCode: null };
+        const validationStatus: ValidationStatus = { isValid: true, errorMessage: null };
 
         if (!value || !value.trim()) {
             validationStatus.isValid = false;
-            validationStatus.errorCode = ErrorCode.Empty;
+            validationStatus.errorMessage = ErrorMessage.Empty;
         } else if (value.length > maxLength) {
             validationStatus.isValid = false;
-            validationStatus.errorCode = ErrorCode.TooLong;
+            validationStatus.errorMessage = ErrorMessage.TooLong;
         }
         return validationStatus;
     }
@@ -59,30 +67,27 @@ export class GameValidationService {
         for (let x = 0; x < map.tiles.length; x++) {
             for (let y = 0; y < map.tiles[x].length; y++) {
                 const position: Position = { x, y };
-                this.handleTile(position, map, tilesCount, bridgeStatus);
+                const tileHandler: TileHandler = { position, map, tilesCount, bridgeStatus };
+                this.handleTile(tileHandler);
             }
         }
 
         const mapValidationResult: ValidationResult = {
-            name: { isValid: true, errorCode: null },
-            description: { isValid: true, errorCode: null },
+            name: { isValid: true, errorMessage: null },
+            description: { isValid: true, errorMessage: null },
             terrainCoverage: this.validateTerrainCoverage(tilesCount),
             tilesAccessibility: this.validateTilesAccessibility(map, tilesCount),
             spawnPoint: this.validateSpawnPoints(map),
             items: this.validateItemPlacement(map),
-            mode: map.gameMode === GameMode.CTF ? this.validateFlags(map) : { isValid: true, errorCode: null },
+            mode: map.gameMode === GameMode.CTF ? this.validateFlags(map) : { isValid: true, errorMessage: null },
             bridge: bridgeStatus,
         };
 
         return mapValidationResult;
     }
 
-    private handleTile(
-        position: Position,
-        map: MapData,
-        tilesCount: TilesCount,
-        bridgeStatus: { isValid: boolean; errors: BridgeValidationError[] },
-    ): void {
+    private handleTile(tileHandler: TileHandler): void {
+        const { position, map, tilesCount, bridgeStatus } = tileHandler;
         const tileType = map.tiles[position.x][position.y];
         tilesCount.nbTilesTotal++;
 
@@ -104,9 +109,9 @@ export class GameValidationService {
         let error: BridgeValidationError | null = null;
 
         if (this.isOnMapEdge(position, map)) {
-            error = { x: position.x, y: position.y, errorCode: ErrorCode.BridgeAtEdge };
+            error = { x: position.x, y: position.y, errorMessage: ErrorMessage.BridgeAtEdge };
         } else if (!this.isCorrectlyPlacedBridge(position, map)) {
-            error = { x: position.x, y: position.y, errorCode: ErrorCode.BridgeNotBetweenWalls };
+            error = { x: position.x, y: position.y, errorMessage: ErrorMessage.BridgeNotBetweenWalls };
         }
         return error;
     }
@@ -130,25 +135,41 @@ export class GameValidationService {
         return isBetweenHorizontalWater || isBetweenVerticalWater;
     }
 
-    private validateTerrainCoverage(tilesCount: TilesCount): { isValid: boolean; coveragePercentage: number } {
+    private validateTerrainCoverage(tilesCount: TilesCount): TerrainCoverageValidation {
         const PERCENTAGE_MULTIPLIER = 100;
         const currentTerrainRatio = tilesCount.nbTerrain / tilesCount.nbTilesTotal;
 
-        const validationStatus = {
+        const terrainCoverageValidation = {
             isValid: currentTerrainRatio > MIN_TERRAIN_RATIO,
             coveragePercentage: parseFloat((currentTerrainRatio * PERCENTAGE_MULTIPLIER).toFixed(2)),
         };
 
-        return validationStatus;
+        return terrainCoverageValidation;
     }
 
-    private validateTilesAccessibility(map: MapData, tilesCount: TilesCount): { isValid: boolean; nonAccessibleTileCount: number } {
+    private validateTilesAccessibility(map: MapData, tilesCount: TilesCount): TilesAccessibilityValidation {
         const validationStatus = { isValid: true, nonAccessibleTileCount: 0 };
 
         const rows = map.tiles.length;
         const cols = map.tiles[0].length;
         const visited: boolean[][] = Array.from({ length: rows }, () => Array(cols).fill(false));
 
+        const findStartTile = this.findStartTile(map);
+
+        this.dfs(map, findStartTile, visited);
+        const visitedCount = ([] as boolean[]).concat(...visited).reduce((count, tile) => count + (tile ? 1 : 0), 0);
+
+        if (visitedCount < tilesCount.nbTerrain + tilesCount.nbBridge) {
+            validationStatus.isValid = false;
+            validationStatus.nonAccessibleTileCount = tilesCount.nbBridge + tilesCount.nbTerrain - visitedCount;
+        }
+
+        return validationStatus;
+    }
+
+    private findStartTile(map: MapData): Position {
+        const rows = map.tiles.length;
+        const cols = map.tiles[0].length;
         let startX = -1;
         let startY = -1;
         for (let x = 0; x < rows; x++) {
@@ -161,19 +182,11 @@ export class GameValidationService {
             }
             if (startX !== -1) break;
         }
-
-        this.dfs(map, startX, startY, visited);
-        const visitedCount = ([] as boolean[]).concat(...visited).reduce((count, tile) => count + (tile ? 1 : 0), 0);
-
-        if (visitedCount < tilesCount.nbTerrain + tilesCount.nbBridge) {
-            validationStatus.isValid = false;
-            validationStatus.nonAccessibleTileCount = tilesCount.nbBridge + tilesCount.nbTerrain - visitedCount;
-        }
-
-        return validationStatus;
+        return { x: startX, y: startY };
     }
 
-    private dfs(map: MapData, x: number, y: number, visited: boolean[][]): void {
+    private dfs(map: MapData, position: Position, visited: boolean[][]): void {
+        const { x, y } = position;
         const xOutOfBounds = x < 0 || x >= map.tiles.length;
         const yOutOfBounds = y < 0 || y >= map.tiles[0].length;
 
@@ -188,10 +201,10 @@ export class GameValidationService {
 
         visited[x][y] = true;
 
-        this.dfs(map, x + 1, y, visited);
-        this.dfs(map, x - 1, y, visited);
-        this.dfs(map, x, y + 1, visited);
-        this.dfs(map, x, y - 1, visited);
+        this.dfs(map, { x: x + 1, y }, visited);
+        this.dfs(map, { x: x - 1, y }, visited);
+        this.dfs(map, { x, y: y + 1 }, visited);
+        this.dfs(map, { x, y: y - 1 }, visited);
     }
 
     private canTraverseTile(tileType: TileType, isBridgeTraversable: boolean): boolean {
@@ -202,7 +215,7 @@ export class GameValidationService {
         }
     }
 
-    private validateItemPlacement(map: MapData): { isValid: boolean; misplacedItems: Position[] } {
+    private validateItemPlacement(map: MapData): ItemsValidation {
         const validationStatus = { isValid: true, misplacedItems: [] as Position[] };
 
         for (const [, positions] of Object.entries(map.items)) {
@@ -226,13 +239,13 @@ export class GameValidationService {
     }
 
     private validateItemCount(map: MapData, itemType: ItemType, requiredCount: number): ValidationStatus {
-        const validationStatus: ValidationStatus = { isValid: true, errorCode: null };
+        const validationStatus: ValidationStatus = { isValid: true, errorMessage: null };
 
         const placedCount = map.items[itemType]?.length || 0;
 
         validationStatus.isValid = placedCount === requiredCount;
         if (!validationStatus.isValid) {
-            validationStatus.errorCode = placedCount > requiredCount ? ErrorCode.TooManyItems : ErrorCode.MissingRequiredItems;
+            validationStatus.errorMessage = placedCount > requiredCount ? ErrorMessage.TooManyItems : ErrorMessage.MissingRequiredItems;
         }
 
         return validationStatus;

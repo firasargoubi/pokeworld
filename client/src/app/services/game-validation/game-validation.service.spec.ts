@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
-import { ErrorCode } from '@app/interfaces/error-code.enum';
-import { BridgeValidationError, ValidationResult } from '@app/interfaces/game-validation-result';
+import { ErrorMessage } from '@app/interfaces/error-message.enum';
+import { BridgeValidationError, TileHandler, ValidationResult } from '@app/interfaces/game-validation-result';
 import { TilesCount } from '@app/interfaces/tiles-count';
 import { GameData } from '@common/game-data';
 import { GameMode } from '@common/game-mode.enum';
 import { MapData } from '@common/map-data';
 import { MapSize } from '@common/map-size.enum';
 import { TileType } from '@common/tile-type.enum';
-import { GameValidationService } from './game-validation.service';
 import { VALIDATION_TESTS_CASES } from './game-validation.const.spec';
+import { GameValidationService } from './game-validation.service';
 
 describe('GameValidationService', () => {
     let service: GameValidationService;
@@ -37,13 +37,13 @@ describe('GameValidationService', () => {
     it('should invoke validateName, validateDescription, and validateMap with the correct parameters', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'validateMap').and.returnValue({
-            name: { isValid: true, errorCode: null },
-            description: { isValid: true, errorCode: null },
+            name: { isValid: true, errorMessage: null },
+            description: { isValid: true, errorMessage: null },
         } as Partial<ValidationResult>);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        spyOn<any>(service, 'validateName').and.returnValue({ isValid: true, errorCode: null });
+        spyOn<any>(service, 'validateName').and.returnValue({ isValid: true, errorMessage: null });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        spyOn<any>(service, 'validateDescription').and.returnValue({ isValid: true, errorCode: null });
+        spyOn<any>(service, 'validateDescription').and.returnValue({ isValid: true, errorMessage: null });
 
         const result = service.validateGame(game);
 
@@ -56,8 +56,8 @@ describe('GameValidationService', () => {
     it('should return an error when validateMap detects an invalid description', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'validateMap').and.returnValue({
-            name: { isValid: true, errorCode: null },
-            spawnPoint: { isValid: false, errorCode: ErrorCode.Empty },
+            name: { isValid: true, errorMessage: null },
+            spawnPoint: { isValid: false, errorMessage: ErrorMessage.Empty },
         } as Partial<ValidationResult>);
 
         const result = service.validateGame(game);
@@ -67,34 +67,34 @@ describe('GameValidationService', () => {
 
     it('validateName should validate a correct game name', () => {
         const result = service['validateName'](game.name);
-        expect(result).toEqual({ isValid: true, errorCode: null });
+        expect(result).toEqual({ isValid: true, errorMessage: null });
     });
 
     it('validateName should return false for an empty or overly long game name', () => {
         let gameName = '';
         let result = service['validateName'](gameName);
-        expect(result).toEqual({ isValid: false, errorCode: ErrorCode.Empty });
+        expect(result).toEqual({ isValid: false, errorMessage: ErrorMessage.Empty });
 
         const longGameName = 100;
         gameName = 'A'.repeat(longGameName);
         result = service['validateName'](gameName);
-        expect(result).toEqual({ isValid: false, errorCode: ErrorCode.TooLong });
+        expect(result).toEqual({ isValid: false, errorMessage: ErrorMessage.TooLong });
     });
 
     it('validateDescription should validate a correct game description', () => {
         const result = service['validateDescription'](game.description);
-        expect(result).toEqual({ isValid: true, errorCode: null });
+        expect(result).toEqual({ isValid: true, errorMessage: null });
     });
 
     it('validateDescription should invalidate an empty or excessively long game description', () => {
         let gameDescription = '';
         let result = service['validateDescription'](gameDescription);
-        expect(result).toEqual({ isValid: false, errorCode: ErrorCode.Empty });
+        expect(result).toEqual({ isValid: false, errorMessage: ErrorMessage.Empty });
 
         const GAME_DESCRIPTION_TOO_LONG = 400;
         gameDescription = 'A'.repeat(GAME_DESCRIPTION_TOO_LONG);
         result = service['validateDescription'](gameDescription);
-        expect(result).toEqual({ isValid: false, errorCode: ErrorCode.TooLong });
+        expect(result).toEqual({ isValid: false, errorMessage: ErrorMessage.TooLong });
     });
 
     it('validateMap should process tiles and validate terrain, spawn points, items, and flags', () => {
@@ -155,7 +155,7 @@ describe('GameValidationService', () => {
             const invalidBridgeMap = { tiles } as MapData;
 
             const result = service['validateBridge'](position, invalidBridgeMap);
-            expect(result).toEqual({ x: position.x, y: position.y, errorCode: expectedError });
+            expect(result).toEqual({ x: position.x, y: position.y, errorMessage: expectedError });
         });
     });
 
@@ -163,17 +163,17 @@ describe('GameValidationService', () => {
         const testCase = VALIDATION_TESTS_CASES.validSpawnPointCase;
 
         const result = service['validateSpawnPoints'](testCase);
-        expect(result).toEqual({ isValid: true, errorCode: null });
+        expect(result).toEqual({ isValid: true, errorMessage: null });
     });
 
     it('validateSpawnPoints should return false when the number of spawn points is incorrect', () => {
         const testCases = VALIDATION_TESTS_CASES.invalidSpawnPointCases;
 
-        testCases.forEach(({ items, size, errorCode }) => {
+        testCases.forEach(({ items, size, errorMessage }) => {
             const mapCase = { items, size } as MapData;
 
             const result = service['validateSpawnPoints'](mapCase);
-            expect(result).toEqual({ isValid: false, errorCode });
+            expect(result).toEqual({ isValid: false, errorMessage });
         });
     });
 
@@ -181,17 +181,17 @@ describe('GameValidationService', () => {
         const testCases = VALIDATION_TESTS_CASES.validFalgCase;
 
         const result = service['validateFlags'](testCases);
-        expect(result).toEqual({ isValid: true, errorCode: null });
+        expect(result).toEqual({ isValid: true, errorMessage: null });
     });
 
     it('validateFlags should invalidate flags when the number of flags is incorrect', () => {
         const testCases = VALIDATION_TESTS_CASES.invalidFlagCases;
 
-        testCases.forEach(({ items, size, errorCode }) => {
+        testCases.forEach(({ items, size, errorMessage }) => {
             const mapCase = { items, size } as MapData;
 
             const result = service['validateFlags'](mapCase);
-            expect(result).toEqual({ isValid: false, errorCode });
+            expect(result).toEqual({ isValid: false, errorMessage });
         });
     });
 
@@ -254,7 +254,7 @@ describe('GameValidationService', () => {
 
     it('handleTile should correctly increment tile counters based on tile type', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        spyOn<any>(service, 'validateBridge').and.returnValue({ x: 0, y: 0, errorCode: ErrorCode.BridgeAtEdge });
+        spyOn<any>(service, 'validateBridge').and.returnValue({ x: 0, y: 0, errorMessage: ErrorMessage.BridgeAtEdge });
 
         let testCases = VALIDATION_TESTS_CASES.handleTileNoBridgeCases;
         const bridgeStatus = { isValid: true, errors: [] } as { isValid: boolean; errors: BridgeValidationError[] };
@@ -268,7 +268,13 @@ describe('GameValidationService', () => {
                 nbTilesTotal: 0,
             };
 
-            service['handleTile']({ x: 0, y: 0 }, testMap, initialtilesCount, bridgeStatus);
+            const tileHandler: TileHandler = {
+                position: { x: 0, y: 0 },
+                map: testMap,
+                tilesCount: initialtilesCount,
+                bridgeStatus,
+            };
+            service['handleTile'](tileHandler);
 
             expect(initialtilesCount.nbWater).toBe(expectedCounts.nbWater);
             expect(initialtilesCount.nbBridge).toBe(expectedCounts.nbBridge);
@@ -289,7 +295,13 @@ describe('GameValidationService', () => {
                 nbTilesTotal: 0,
             };
 
-            service['handleTile']({ x: 0, y: 0 }, testMap, initialtilesCount, bridgeStatus);
+            const tileHandler: TileHandler = {
+                position: { x: 0, y: 0 },
+                map: testMap,
+                tilesCount: initialtilesCount,
+                bridgeStatus,
+            };
+            service['handleTile'](tileHandler);
 
             expect(initialtilesCount.nbWater).toBe(expectedCounts.nbWater);
             expect(initialtilesCount.nbBridge).toBe(expectedCounts.nbBridge);
@@ -298,7 +310,7 @@ describe('GameValidationService', () => {
 
             expect(service['validateBridge']).toHaveBeenCalledWith({ x: 0, y: 0 }, testMap);
             expect(bridgeStatus.isValid).toBeFalse();
-            expect(bridgeStatus.errors).toContain({ x: 0, y: 0, errorCode: ErrorCode.BridgeAtEdge });
+            expect(bridgeStatus.errors).toContain({ x: 0, y: 0, errorMessage: ErrorMessage.BridgeAtEdge });
         });
     });
 });

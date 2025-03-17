@@ -1,4 +1,4 @@
-import { ErrorCode } from '@app/interfaces/error-code.enum';
+import { ErrorMessage } from '@app/interfaces/error-message.enum';
 import { ItemType } from '@common/item-type.enum';
 import { MapData } from '@common/map-data';
 import { MapSize } from '@common/map-size.enum';
@@ -38,7 +38,7 @@ export const VALIDATION_TESTS_CASES = {
                 [GRASS, BUSH, GRASS],
             ],
             position: { x: 0, y: 0 },
-            expectedError: ErrorCode.BridgeAtEdge,
+            expectedError: ErrorMessage.BridgeAtEdge,
         },
         {
             tiles: [
@@ -47,7 +47,7 @@ export const VALIDATION_TESTS_CASES = {
                 [GRASS, BUSH, GRASS],
             ],
             position: { x: 1, y: 1 },
-            expectedError: ErrorCode.BridgeNotBetweenWalls,
+            expectedError: ErrorMessage.BridgeNotBetweenWalls,
         },
         {
             tiles: [
@@ -56,7 +56,7 @@ export const VALIDATION_TESTS_CASES = {
                 [GRASS, WATER, GRASS],
             ],
             position: { x: 1, y: 1 },
-            expectedError: ErrorCode.BridgeNotBetweenWalls,
+            expectedError: ErrorMessage.BridgeNotBetweenWalls,
         },
         {
             tiles: [
@@ -65,7 +65,7 @@ export const VALIDATION_TESTS_CASES = {
                 [GRASS, WATER, GRASS],
             ],
             position: { x: 1, y: 1 },
-            expectedError: ErrorCode.BridgeNotBetweenWalls,
+            expectedError: ErrorMessage.BridgeNotBetweenWalls,
         },
     ],
     validSpawnPointCase: {
@@ -78,17 +78,17 @@ export const VALIDATION_TESTS_CASES = {
         {
             items: { [ItemType.Spawn]: Array(REQUIRED_SPAWN_POINTS[MapSize.Small] - 1).fill({}) },
             size: MapSize.Small,
-            errorCode: ErrorCode.MissingRequiredItems,
+            errorMessage: ErrorMessage.MissingRequiredItems,
         },
         {
             items: { [ItemType.Spawn]: Array(REQUIRED_SPAWN_POINTS[MapSize.Medium] + 2).fill({}) },
             size: MapSize.Medium,
-            errorCode: ErrorCode.TooManyItems,
+            errorMessage: ErrorMessage.TooManyItems,
         },
         {
             items: { [ItemType.Spawn]: [] },
             size: MapSize.Large,
-            errorCode: ErrorCode.MissingRequiredItems,
+            errorMessage: ErrorMessage.MissingRequiredItems,
         },
     ],
     validFalgCase: {
@@ -101,7 +101,7 @@ export const VALIDATION_TESTS_CASES = {
         {
             items: { [ItemType.Flag]: [] },
             size: MapSize.Small,
-            errorCode: ErrorCode.MissingRequiredItems,
+            errorMessage: ErrorMessage.MissingRequiredItems,
         },
         {
             items: {
@@ -111,7 +111,7 @@ export const VALIDATION_TESTS_CASES = {
                 ],
             },
             size: MapSize.Medium,
-            errorCode: ErrorCode.TooManyItems,
+            errorMessage: ErrorMessage.TooManyItems,
         },
     ],
     validItemsCase: {
