@@ -97,6 +97,22 @@ describe('MovementService', () => {
         expect(result.path[result.path.length - 1]).toEqual(target);
     });
 
+    it('should return an empty path in debug mode for inaccessible tiles', () => {
+        const match: Match = structuredClone(MOCK_MATCHES[0]);
+        match.matchData.isDebugMode = true;
+        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
+        match.matchData.activePlayer = 0;
+        match.matchData.players[0].currentStats.position = { x: 0, y: 0 };
+        const inaccessibleTarget: Position = { x: 2, y: 2 };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'isTileAccessible').returns(false);
+
+        const result: ShortestPath = service.getShortestPath(match, inaccessibleTarget);
+        expect(result.moveCost).toEqual(0);
+        expect(result.path).toEqual([]);
+    });
+
     it('should return an infinite moveCost and an empty path if the target is unreachable', () => {
         const dummyMatch: Match = structuredClone(MOCK_MATCHES[1]);
         dummyMatch.matchData.players = [structuredClone(MOCK_MATCHES[1].matchData.players[0])];

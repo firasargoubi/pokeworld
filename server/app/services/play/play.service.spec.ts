@@ -12,6 +12,7 @@ import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance }
 import { PlayService } from './play.service';
 import { MINIMUM_FIGHTS_TO_WIN, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
 import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@common/consts/default-player.const';
+import { CombatResultBroadcast } from '@common/combat';
 
 describe('PlayService', () => {
     let service: PlayService;
@@ -44,13 +45,13 @@ describe('PlayService', () => {
             ],
         }).compile();
         service = module.get<PlayService>(PlayService);
-    });
-
-    beforeEach(() => {
         players = structuredClone(MOCK_PLAYERS);
         playerId = MOCK_PLAYERS[0].id;
         match = structuredClone(MOCK_MATCHES[0]);
         matchCode = match.matchData.code;
+    });
+
+    beforeEach(() => {
         sandbox = createSandbox();
     });
 
@@ -176,6 +177,42 @@ describe('PlayService', () => {
 
         expect(match.matchData.isDebugMode).toBe(true);
         expect(mockPlayGateway.emitDebugModeChanged.calledWith(matchCode, match)).toBeTruthy();
+    });
+
+    it('endOfCombat should call respawnPlayer and endMatch when winner reaches threshold', () => {
+        players[0].currentStats.fightsWon = MINIMUM_FIGHTS_TO_WIN - 1;
+        const combatResult = { winnerId: players[0].id, loserId: players[1].id };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const respawnStub = sandbox.stub(service as any, 'respawnPlayer');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const endMatchStub = sandbox.stub(service as any, 'endMatch');
+        mockMatchService.getPlayer.returns(players[0]);
+
+        service.endOfCombat(combatResult, players[0].id);
+
+        expect(respawnStub.calledWith(players[1].id, matchCode)).toBeTruthy();
+        expect(players[0].currentStats.fightsWon).toBe(MINIMUM_FIGHTS_TO_WIN);
+        expect(endMatchStub.calledWith(matchCode)).toBeTruthy();
+    });
+
+    it('endOfCombat should emit combat result and call nextTurnPhase when winner has not reached threshold', () => {
+        players[0].currentStats.fightsWon = 0;
+        const combatResult = { winnerId: players[0].id, loserId: players[1].id };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const nextTurnPhaseStub = sandbox.stub(service as any, 'nextTurnPhase');
+
+        mockMatchService.getPlayer.returns(players[0]);
+        mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'canEndTurn').returns(true);
+
+        service.endOfCombat(combatResult, players[0].id);
+
+        expect(players[0].currentStats.fightsWon).toBe(1);
+        expect(mockPlayGateway.emitCombatResultBroadcast.calledWith(matchCode, { match, combatResult })).toBeTruthy();
+        expect(nextTurnPhaseStub.calledWith(matchCode)).toBeTruthy();
     });
 
     it('executeAction should start a fight if a players is at the position', () => {
@@ -392,44 +429,10 @@ describe('PlayService', () => {
         expect(resetCurrentStatsStub.calledWith(currentPlayer)).toBeTruthy();
         expect(mockPlayGateway.emitTurnStarted.calledWith(matchCode, match)).toBeTruthy();
     });
-    it('endOfCombat should call respawnPlayer and endMatch when winner reaches threshold', () => {
-        players[0].currentStats.fightsWon = MINIMUM_FIGHTS_TO_WIN - 1;
-        const combatResult = { winnerId: players[0].id, loserId: players[1].id };
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const respawnStub = sandbox.stub(service as any, 'respawnPlayer');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const endMatchStub = sandbox.stub(service as any, 'endMatch');
-        mockMatchService.getPlayer.returns(players[0]);
-
-        service.endOfCombat(combatResult, players[0].id);
-
-        expect(respawnStub.calledWith(players[1].id, matchCode)).toBeTruthy();
-        expect(players[0].currentStats.fightsWon).toBe(MINIMUM_FIGHTS_TO_WIN);
-        expect(endMatchStub.calledWith(matchCode)).toBeTruthy();
-    });
-
-    it('endOfCombat should emit combat result and call nextTurnPhase when winner has not reached threshold', () => {
-        players[0].currentStats.fightsWon = 0;
-        const combatResult = { winnerId: players[0].id, loserId: players[1].id };
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const nextTurnPhaseStub = sandbox.stub(service as any, 'nextTurnPhase');
-
-        mockMatchService.getPlayer.returns(players[0]);
-        mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        sandbox.stub(service as any, 'canEndTurn').returns(true);
-
-        service.endOfCombat(combatResult, players[0].id);
-
-        expect(players[0].currentStats.fightsWon).toBe(1);
-        expect(mockPlayGateway.emitCombatResultBroadcast.calledWith(matchCode, { match, combatResult })).toBeTruthy();
-        expect(nextTurnPhaseStub.calledWith(matchCode)).toBeTruthy();
-    });
 
     it('unfreezeMatch should clear existing timeout and set a new one', () => {
         const fakeTimeout = setTimeout(() => {}, 100);
+        fakeTimeout.unref();
         const turnData = { phaseTimeout: fakeTimeout, lastPhaseStartTime: new Date() };
         mockMatchService.getTurnData.returns(turnData);
         const clearTimeoutSpy = sandbox.spy(global, 'clearTimeout');

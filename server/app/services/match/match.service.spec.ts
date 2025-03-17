@@ -44,6 +44,18 @@ describe('MatchService', () => {
         expect(result).toBe(matchCode);
     });
 
+    it('should getPlayerIndex correctly', () => {
+        const playerId = PLAYER_IDS[0];
+        const getMatchCodeFromPlayerIdSpy = sandbox.spy(service, 'getMatchCodeFromPlayerId');
+        const getPlayersSpy = sandbox.spy(service, 'getPlayers');
+
+        const result = service.getPlayerIndex(playerId);
+
+        expect(result).toBe(0);
+        expect(getMatchCodeFromPlayerIdSpy.calledWith(playerId)).toBe(true);
+        expect(getPlayersSpy.calledWith(MATCH_CODES[0])).toBe(true);
+    });
+
     it('should detect isPlayerInMatch correctly', () => {
         const playerId = '7777';
         expect(service.isPlayerInMatch(playerId)).toBe(false);
