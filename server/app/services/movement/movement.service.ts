@@ -38,6 +38,39 @@ export class MovementService {
         return [...neighborActions, position];
     }
 
+    getNearestEmptyTile(currentPos: Position, match: Match): Position {
+        const size = match.gameData.mapData.size;
+        const visited: boolean[][] = Array.from({ length: size }, () => Array(size).fill(false));
+        const queue: Position[] = [];
+
+        queue.push(currentPos);
+        visited[currentPos.x][currentPos.y] = true;
+        while (queue.length > 0) {
+            const pos = queue.shift();
+            if (this.isTileValidForMovement(pos, match)) {
+                return pos;
+            }
+            this.enqueueValidNeighbors(pos, match, visited, queue);
+        }
+
+        return currentPos;
+    }
+
+    private isTileValidForMovement(position: Position, match: Match): boolean {
+        return !this.isTileOccupiedByPlayer(position, match) && this.isTileAccessible(position, match);
+    }
+
+    private enqueueValidNeighbors(position: Position, match: Match, visited: boolean[][], queue: Position[]): void {
+        const size = match.gameData.mapData.size;
+        for (const offset of NEIGHBOR_OFFSETS) {
+            const neighbor = { x: position.x + offset.x, y: position.y + offset.y };
+            if (!this.isOutOfBounds(neighbor, size) && !visited[neighbor.x][neighbor.y]) {
+                visited[neighbor.x][neighbor.y] = true;
+                queue.push(neighbor);
+            }
+        }
+    }
+
     private isTileABridge(position: Position, match: Match): boolean {
         let isBridge = false;
         if (!this.isOutOfBounds(position, match.gameData.mapData.size)) {
@@ -72,21 +105,21 @@ export class MovementService {
 
         for (let x = 0; x < size; x++) {
             for (let y = 0; y < size; y++) {
-                const tile: TileType = match.gameData.mapData.tiles[x][y];
-                if (tile !== TileType.Water && tile !== TileType.BrokenBridge) {
-                    tiles.push({ x, y });
+                const position: Position = { x, y };
+                if (this.isTileAccessible(position, match)) {
+                    tiles.push(position);
                 }
             }
         }
 
-        const occupied: Position[] = match.matchData.players.map((p) => p.currentStats.position);
-        return tiles.filter((t) => !occupied.some((o) => o.x === t.x && o.y === t.y));
+        return tiles.filter((pos) => !this.isTileOccupiedByPlayer(pos, match) && !this.isTileOccupiedByObject(pos, match));
     }
 
     private processNeighbor(context: NeighborContext): void {
         const neighbor: Position = { x: context.pos.x + context.offset.x, y: context.pos.y + context.offset.y };
-        if (this.isOutOfBounds(neighbor, context.size)) return;
-        if (this.isTileOccupiedByPlayer(neighbor, context.match)) return;
+        if (this.isOutOfBounds(neighbor, context.size) || this.isTileOccupiedByPlayer(neighbor, context.match)) {
+            return;
+        }
         const moveCost = this.getMovementCost(neighbor, context.match.gameData.mapData);
         const newCost = context.cost + moveCost;
         if (newCost <= context.maxCost && newCost < context.distances[neighbor.x][neighbor.y]) {
@@ -129,11 +162,30 @@ export class MovementService {
         return match.matchData.players.some((p) => p.currentStats.position.x === position.x && p.currentStats.position.y === position.y);
     }
 
+    private isTileOccupiedByObject(position: Position, match: Match): boolean {
+        for (const items of Object.values(match.gameData.mapData.items)) {
+            for (const item of items) {
+                if (item.x === position.x && item.y === position.y) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private isOutOfBounds(position: Position, size: number): boolean {
         return position.x < 0 || position.x >= size || position.y < 0 || position.y >= size;
     }
 
     private getMovementCost(position: Position, mapData: MapData): number {
         return TILE_COST[mapData.tiles[position.x][position.y]];
+    }
+
+    private isTileAccessible(position: Position, match: Match): boolean {
+        if (this.isOutOfBounds(position, match.gameData.mapData.size)) {
+            return false;
+        }
+        const tile = match.gameData.mapData.tiles[position.x][position.y];
+        return tile !== TileType.Water && tile !== TileType.BrokenBridge;
     }
 }
