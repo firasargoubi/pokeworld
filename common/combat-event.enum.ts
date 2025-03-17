@@ -1,12 +1,11 @@
-export enum CombatEvents {
-    StartCombat = 'startCombat',
-    CombatStarted = 'CombatStarted',
+export enum CombatEvent {
+    CombatStarted = 'combatStarted',
     CombatTurnStarted = 'combatTurnStarted',
     CombatTurnStopped = 'combatTurnStopped',
     StartTimer = 'startTimer',
     EscapeAttempt = 'escapeAttempt',
     EscapedResult = 'escapedResult',
-    AttackAttempt = 'attack',
+    AttackAttempt = 'attackAttempt',
     AttackResult = 'attackResult',
     UpdatePlayers = 'updatePlayers',
     EndCombat = 'endCombat',

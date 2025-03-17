@@ -1,7 +1,5 @@
-export const DEFAULT_MAX_TIME = 29;
+export const DEFAULT_TIME = 3;
 
-export const DEFAULT_TIME = 30;
-
-export const TIMER_START_DELAY = 10;
+export const TIMER_START_DELAY = 100;
 
 export const ONE_SECOND = 1000;

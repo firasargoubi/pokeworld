@@ -15,7 +15,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
     providedIn: 'root',
 })
 export class LobbySocketsService {
-    matchCode: string;
+    matchCode: string = '';
     private gameDataService: GameDataService = inject(GameDataService);
     private playersSubject: BehaviorSubject<Player[]> = new BehaviorSubject<Player[]>([]);
     private roomLockedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -90,7 +90,6 @@ export class LobbySocketsService {
         this.coreSocket.on(LobbyEvent.UpdatePlayerList, this.onUpdatePlayersLists.bind(this));
         this.coreSocket.on(LobbyEvent.LockStatusChanged, this.onLockStatusChanged.bind(this));
         this.coreSocket.on(LobbyEvent.MatchStarted, this.onMatchStarted.bind(this));
-        this.coreSocket.on(LobbyEvent.RemovedFromMatch, this.onRemovedFromMatch.bind(this));
         this.coreSocket.on(LobbyEvent.Warning, this.onWarning.bind(this));
         this.coreSocket.on(LobbyEvent.EmitGameData, this.onEmitGameData.bind(this));
     }
@@ -103,31 +102,27 @@ export class LobbySocketsService {
         this.playersSubject.next(players);
     }
 
-    private onRemovedFromMatch(removalReason: Warning) {
-        this.matchCode = '';
-        this.onWarning(removalReason);
-    }
-
     private onMatchStarted(match: Match) {
         this.matchDataService.startMatch(match, this.coreSocket.selfId);
         this.router.navigate(['/play']);
     }
 
-    private onWarning(removalReason: Warning) {
-        if (!this.popupService.isDisplayed) {
-            const goToMenu = () => {
-                this.router.navigate(['/']);
-            };
-            if (removalReason === Warning.RoomLocked) {
-                this.popupService.showPopup(removalReason, true, goToMenu);
-                return;
-            }
-            this.popupService.showPopup(removalReason);
+    private onWarning(warning: Warning) {
+        this.popupService.clearMessages();
+        if ([Warning.RoomLocked].includes(warning)) {
+            this.popupService.showPopup(warning, true, this.goToMenu.bind(this));
+        } else if ([Warning.Kick, Warning.AdminQuit, Warning.LastPlayerRemaining].includes(warning)) {
+            this.popupService.showPopup(warning);
             this.popupService.keepMessages();
-            if ([Warning.Kick, Warning.AdminQuit].includes(removalReason)) {
-                goToMenu();
-            }
+            this.goToMenu();
+        } else {
+            this.popupService.showPopup(warning);
         }
+    }
+
+    private goToMenu() {
+        this.matchCode = '';
+        this.router.navigate(['/']);
     }
 
     private onEmitGameData(gameData: GameData) {

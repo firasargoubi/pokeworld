@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/consts/default-player.const';
+import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/default-player.const';
 import { BonusDice, DiceType } from '@app/consts/dice.const';
 import { StatType } from '@app/interfaces/player-stats.enum';
 import { PlayerSelectionService } from '@app/services/player-selection/player-selection.service';

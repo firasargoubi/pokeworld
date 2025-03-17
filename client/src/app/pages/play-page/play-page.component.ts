@@ -1,16 +1,19 @@
-import { Component, inject } from '@angular/core';
-import { MapComponent } from '@app/components/map/map.component';
-import { EMPTY_IMAGE } from '@app/consts/images.const';
-import { PlayerVisualData } from '@app/interfaces/player-visual-data';
-import { GameDataService } from '@app/services/game-data/game-data.service';
-import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { CommonModule } from '@angular/common';
-import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { TimerService } from '@app/services/timer/timer.service';
-import { MatchDataService } from '@app/services/match-data/match-data.service';
-import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
+import { Component, HostListener, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { MapComponent } from '@app/components/map/map.component';
+import { AVATAR_DATA } from '@app/consts/avatars.const';
+import { PlayerVisualData, PlayVisualData } from '@app/interfaces/play-visual-data';
+import { GameDataService } from '@app/services/game-data/game-data.service';
+import { MapService } from '@app/services/map/map.service';
+import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
+import { PlaySocketsService } from '@app/services/sockets/play-socket/play-sockets.service';
+import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
+import { TimerService } from '@app/services/timer/timer.service';
+import { TurnPhase } from '@common/match';
+import { DEFAULT_PLAY_VISUAL_DATA } from './play-page.component.const';
 
 @Component({
     selector: 'app-play-page',
@@ -19,32 +22,26 @@ import { PopupService } from '@app/services/popup/popup.service';
     imports: [MapComponent, CommonModule],
 })
 export class PlayPageComponent {
-    thumbnailUrl: string;
-    timerService: TimerService;
-    private matchDataService: MatchDataService;
-    private gameDataService: GameDataService;
-    private coreSocketService: CoreSocketService;
-    private popupService: PopupService;
-    private thumbnailService: ThumbnailService;
-    private router: Router;
+    playVisualData: PlayVisualData = structuredClone(DEFAULT_PLAY_VISUAL_DATA);
+    timerService: TimerService = inject(TimerService);
+    private playSocketsService: PlaySocketsService = inject(PlaySocketsService);
+    private matchDataService: MatchDataService = inject(MatchDataService);
+    private gameDataService: GameDataService = inject(GameDataService);
+    private coreSocketService: CoreSocketService = inject(CoreSocketService);
+    private popupService: PopupService = inject(PopupService);
+    private thumbnailService: ThumbnailService = inject(ThumbnailService);
+    private mapService: MapService = inject(MapService);
+    private router: Router = inject(Router);
 
     constructor() {
-        this.coreSocketService = inject(CoreSocketService);
-        this.popupService = inject(PopupService);
-        this.router = inject(Router);
         this.coreSocketService.connectionStatus.subscribe((status) => this.verifySocketConnection(status));
-
-        this.timerService = inject(TimerService);
-        this.matchDataService = inject(MatchDataService);
-        this.gameDataService = inject(GameDataService);
-        this.thumbnailService = inject(ThumbnailService);
-
-        this.thumbnailUrl = EMPTY_IMAGE;
+        this.computeVisualData();
+        this.matchDataService.matchUpdate.subscribe(this.computeVisualData.bind(this));
         this.generateThumbnail();
     }
 
-    get mapSize(): number {
-        return this.gameDataService.gameData.mapData.size;
+    get mapSize(): string {
+        return this.gameDataService.gameData.mapData.size.toString();
     }
 
     get gameMode(): string {
@@ -53,12 +50,17 @@ export class PlayPageComponent {
 
     get canUseAction(): boolean {
         const isActivePlayer = this.matchDataService.matchData.activePlayer === this.matchDataService.selfIndex;
+        const isATurnPhase = this.matchDataService.matchData.phase === TurnPhase.Turn;
         const canUseAction = this.matchDataService.matchData.players[this.matchDataService.selfIndex].currentStats.hasAction;
-        return isActivePlayer && canUseAction;
+
+        return isActivePlayer && isATurnPhase && canUseAction;
     }
 
     get canEndTurn(): boolean {
-        return this.matchDataService.matchData.activePlayer === this.matchDataService.selfIndex;
+        const isActivePlayer = this.matchDataService.matchData.activePlayer === this.matchDataService.selfIndex;
+        const isATurnPhase = this.matchDataService.matchData.phase === TurnPhase.Turn;
+
+        return isActivePlayer && isATurnPhase;
     }
 
     get selfIndex(): number {
@@ -79,6 +81,7 @@ export class PlayPageComponent {
 
     get players(): PlayerVisualData[] {
         return this.matchDataService.matchData.players.map((player) => ({
+            id: player.id,
             name: player.name,
             avatarUrl: AVATAR_DATA[player.avatar].imageCentered,
             fightsWon: player.currentStats.fightsWon,
@@ -103,32 +106,64 @@ export class PlayPageComponent {
     get maxMovement(): number {
         return this.matchDataService.matchData.players[this.matchDataService.selfIndex].playerStats.speed;
     }
-
-    async generateThumbnail() {
-        this.thumbnailUrl = await this.thumbnailService.getThumbnail(this.gameDataService.gameData.mapData, false);
+    @HostListener('document:keydown', ['$event'])
+    onKeyDown(event: KeyboardEvent) {
+        if (event.key === 'd' || event.key === 'D') {
+            this.playSocketsService.changeDebugMode();
+        }
     }
 
-    surrender() {
-        const navigate = async () => this.router.navigate(['/']);
-        this.popupService.showPopup('Voulez-vous vraiment abandonner? ', true, navigate);
-    }
-
-    action() {
-        // TODO logique d'action
+    useAction() {
+        if (this.mapService.hasActionOverlay()) {
+            this.mapService.clearActions();
+        } else if (this.canUseAction) {
+            this.playSocketsService.displayActions();
+        }
     }
 
     endTurn() {
-        // TODO logique de fin de tour
-        // window.console.log('endTurn');
-        // // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        // this.matchVisualData.currentPlayerTurn = (this.matchVisualData.currentPlayerTurn + 1) % this.matchVisualData.players.length;
-        // // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        // this.timerService.startTimer(30);
+        if (this.canEndTurn) {
+            this.playSocketsService.endTurn();
+        }
+    }
+
+    surrender() {
+        this.popupService.showPopup('Voulez-vous vraiment abandonner ?', true, this.leaveMatch.bind(this));
+    }
+
+    private computeVisualData() {
+        this.playVisualData = {
+            mapSize: this.mapSize,
+            gameMode: this.gameMode,
+            canUseAction: this.canUseAction,
+            canEndTurn: this.canEndTurn,
+            selfIndex: this.selfIndex,
+            currentPlayerCount: this.currentPlayerCount,
+            maxPlayerCount: this.maxPlayerCount,
+            activePlayer: this.activePlayer,
+            players: this.players,
+            selfAvatarUrl: this.selfAvatarUrl,
+            selfName: this.selfName,
+            currentMovement: this.currentMovement,
+            maxMovement: this.maxMovement,
+            thumbnailUrl: this.playVisualData.thumbnailUrl,
+        };
+    }
+
+    private async generateThumbnail() {
+        const url = await this.thumbnailService.getThumbnail(this.gameDataService.gameData.mapData, false);
+        this.playVisualData.thumbnailUrl = url;
+    }
+
+    private leaveMatch() {
+        this.playSocketsService.leaveMatch();
+        this.router.navigate(['/']);
     }
 
     private verifySocketConnection(isConnected: boolean) {
-        if (!isConnected) {
+        if (!isConnected || this.matchDataService.matchData.players.length <= 0) {
             if (this.timerService) {
+                this.popupService.clearMessages();
                 this.popupService.showPopup('Erreur de connection avec le serveur');
                 this.popupService.keepMessages();
             }

@@ -4,6 +4,7 @@ export const AVATAR_DATA = {
     [Avatars.Default]: {
         name: 'Default',
         image: './assets/images/game/avatars/default.png',
+        imageFace: '../../../assets/images/game/avatars/face/default.png',
         imageCentered: '../../../assets/images/game/avatars/centered/default.png',
         htmlImageCentred: './assets/images/game/avatars/centered/default.png',
         frontGif: './assets/images/game/avatars-gifs/bulbasaur.gif',
@@ -12,6 +13,7 @@ export const AVATAR_DATA = {
     [Avatars.Avatar1]: {
         name: 'Bulbizarre', // #001
         image: './assets/images/game/avatars/bulbasaur.png',
+        imageFace: '../../../assets/images/game/avatars/face/bulbasaur.png',
         imageCentered: '../../../assets/images/game/avatars/centered/bulbasaur.png',
         htmlImageCentred: './assets/images/game/avatars/centered/bulbasaur.png',
         frontGif: './assets/images/game/avatars-gifs/bulbasaur.gif',
@@ -20,6 +22,7 @@ export const AVATAR_DATA = {
     [Avatars.Avatar2]: {
         name: 'Carapuce', // #007
         image: './assets/images/game/avatars/squirtle.png',
+        imageFace: '../../../assets/images/game/avatars/face/squirtle.png',
         imageCentered: '../../../assets/images/game/avatars/centered/squirtle.png',
         htmlImageCentred: './assets/images/game/avatars/centered/squirtle.png',
         frontGif: './assets/images/game/avatars-gifs/squirtle.gif',
@@ -28,6 +31,7 @@ export const AVATAR_DATA = {
     [Avatars.Avatar3]: {
         name: 'Salamèche', // #004
         image: './assets/images/game/avatars/charmander.png',
+        imageFace: '../../../assets/images/game/avatars/face/charmander.png',
         imageCentered: '../../../assets/images/game/avatars/centered/charmander.png',
         htmlImageCentred: './assets/images/game/avatars/centered/charmander.png',
         frontGif: './assets/images/game/avatars-gifs/charmander.gif',
@@ -36,6 +40,7 @@ export const AVATAR_DATA = {
     [Avatars.Avatar4]: {
         name: 'Pikachu', // #025
         image: './assets/images/game/avatars/pikachu.png',
+        imageFace: '../../../assets/images/game/avatars/face/pikachu.png',
         imageCentered: '../../../assets/images/game/avatars/centered/pikachu.png',
         htmlImageCentred: './assets/images/game/avatars/centered/pikachu.png',
         frontGif: './assets/images/game/avatars-gifs/pikachu.gif',
@@ -44,6 +49,7 @@ export const AVATAR_DATA = {
     [Avatars.Avatar5]: {
         name: 'Rondoudou', // #039
         image: './assets/images/game/avatars/jigglypuff.png',
+        imageFace: '../../../assets/images/game/avatars/face/jigglypuff.png',
         imageCentered: '../../../assets/images/game/avatars/centered/jigglypuff.png',
         htmlImageCentred: './assets/images/game/avatars/centered/jigglypuff.png',
         frontGif: './assets/images/game/avatars-gifs/jigglypuff.gif',
@@ -52,6 +58,7 @@ export const AVATAR_DATA = {
     [Avatars.Avatar6]: {
         name: 'Psykokwak', // #054
         image: './assets/images/game/avatars/psyduck.png',
+        imageFace: '../../../assets/images/game/avatars/face/psyduck.png',
         imageCentered: '../../../assets/images/game/avatars/centered/psyduck.png',
         htmlImageCentred: './assets/images/game/avatars/centered/psyduck.png',
         frontGif: './assets/images/game/avatars-gifs/psyduck.gif',
@@ -60,6 +67,7 @@ export const AVATAR_DATA = {
     [Avatars.Avatar7]: {
         name: 'Goupix', // #037
         image: './assets/images/game/avatars/vulpix.png',
+        imageFace: '../../../assets/images/game/avatars/face/vulpix.png',
         imageCentered: '../../../assets/images/game/avatars/centered/vulpix.png',
         htmlImageCentred: './assets/images/game/avatars/centered/vulpix.png',
         frontGif: './assets/images/game/avatars-gifs/vulpix.gif',
@@ -68,6 +76,7 @@ export const AVATAR_DATA = {
     [Avatars.Avatar8]: {
         name: 'Évoli', // #133
         image: './assets/images/game/avatars/eevee.png',
+        imageFace: '../../../assets/images/game/avatars/face/eevee.png',
         imageCentered: '../../../assets/images/game/avatars/centered/eevee.png',
         htmlImageCentred: './assets/images/game/avatars/centered/eevee.png',
         frontGif: './assets/images/game/avatars-gifs/eevee.gif',
@@ -76,6 +85,7 @@ export const AVATAR_DATA = {
     [Avatars.Avatar9]: {
         name: 'Osselait', // #104
         image: './assets/images/game/avatars/cubone.png',
+        imageFace: '../../../assets/images/game/avatars/face/cubone.png',
         imageCentered: '../../../assets/images/game/avatars/centered/cubone.png',
         htmlImageCentred: './assets/images/game/avatars/centered/cubone.png',
         frontGif: './assets/images/game/avatars-gifs/cubone.gif',
@@ -83,15 +93,17 @@ export const AVATAR_DATA = {
     },
     [Avatars.Avatar10]: {
         name: 'Magicarpe', // #129
-        image: './assets/images/game/avatars/magikarp-f.png',
-        imageCentered: '../../../assets/images/game/avatars/centered/magikarp-f.png',
-        htmlImageCentred: './assets/images/game/avatars/centered/magikarp-f.png',
+        image: './assets/images/game/avatars/magikarp.png',
+        imageFace: '../../../assets/images/game/avatars/face/magikarp.png',
+        imageCentered: '../../../assets/images/game/avatars/centered/magikarp.png',
+        htmlImageCentred: './assets/images/game/avatars/centered/magikarp.png',
         frontGif: './assets/images/game/avatars-gifs/magikarp.gif',
         backGif: './assets/images/game/avatars-gifs/magikarp-back.gif',
     },
     [Avatars.Avatar11]: {
-        name: 'Draco', // #143
+        name: 'Draco', // #148
         image: './assets/images/game/avatars/dragonair.png',
+        imageFace: '../../../assets/images/game/avatars/face/dragonair.png',
         imageCentered: '../../../assets/images/game/avatars/centered/dragonair.png',
         htmlImageCentred: './assets/images/game/avatars/centered/dragonair.png',
         frontGif: './assets/images/game/avatars-gifs/dragonair.gif',
@@ -100,6 +112,7 @@ export const AVATAR_DATA = {
     [Avatars.Avatar12]: {
         name: 'Mew', // #151
         image: './assets/images/game/avatars/mew.png',
+        imageFace: '../../../assets/images/game/avatars/face/mew.png',
         imageCentered: '../../../assets/images/game/avatars/centered/mew.png',
         htmlImageCentred: './assets/images/game/avatars/centered/mew.png',
         frontGif: './assets/images/game/avatars-gifs/mew.gif',

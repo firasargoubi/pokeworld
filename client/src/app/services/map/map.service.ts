@@ -1,22 +1,31 @@
 import { inject, Injectable } from '@angular/core';
+import { AVATAR_DATA } from '@app/consts/avatars.const';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/default-player.const';
 import { IMAGE_SUFIX, TILE_IMAGES_PREFIX, UNDERLAY_IMAGES_PREFIX } from '@app/consts/images.const';
-import { MapVisualData, TileVisualData } from '@app/interfaces/map-visual-data';
+import { MapVisualData, OverlayTiles, TileVisualData } from '@app/interfaces/map-visual-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { ItemType } from '@common/item-type.enum';
 import { MapData } from '@common/map-data';
+import { PlayerMovementData } from '@common/match';
+import { Player } from '@common/player';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
+import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/surrounding-positions.const';
 import {
+    ACTION_OVERLAY,
     BRIDGE_SIMILAR_TILES,
     BRIDGE_VARIANTS,
+    DEFAULT_MAP_VISUAL_DATA,
+    DEFAULT_OVERLAY_TILES,
     DEFAULT_TILE_VISUAL,
+    HOVER_MOVE_OVERLAY,
     MAX_GRASS_VARIANT,
     MAX_UNDERLAY_VARIANT,
     PATH_SIMILAR_TILES,
+    POSSIBLE_MOVE_OVERLAY,
     RANDOM_NUMBER_BASE,
     RANDOM_NUMBER_MULTIPLIER,
     SURROUNDING_POSITIONS_DONUT,
-    SURROUNDING_POSITIONS_PLUS,
     SURROUNDING_POSITIONS_SQUARE,
     WATER_SIMILAR_TILES,
 } from './map.service.const';
@@ -25,13 +34,70 @@ import {
     providedIn: 'root',
 })
 export class MapService {
-    visualMapData: MapVisualData;
-    gameDataService: GameDataService;
+    visualMapData: MapVisualData = structuredClone(DEFAULT_MAP_VISUAL_DATA);
+    gameDataService: GameDataService = inject(GameDataService);
+    private overlayTiles: OverlayTiles = structuredClone(DEFAULT_OVERLAY_TILES);
+    private players: Player[] = [];
 
     constructor() {
-        this.gameDataService = inject(GameDataService);
         this.updateAllTiles();
         this.gameDataService.mapUpdate.subscribe((x) => this.onMapUpdate(x));
+    }
+
+    setHoverMoves(hoverMoves: Position[]) {
+        this.overlayTiles.hoverMoves = hoverMoves;
+        this.updateAllTiles();
+    }
+
+    updateAllTiles(): void {
+        const mapSize = this.gameDataService.gameData.mapData.size;
+
+        this.visualMapData = {
+            tiles: Array.from({ length: mapSize }, () => Array.from({ length: mapSize }, () => ({ ...DEFAULT_TILE_VISUAL }))),
+            size: mapSize,
+        };
+
+        for (let x = 0; x < mapSize; x++) {
+            for (let y = 0; y < mapSize; y++) {
+                this.updateTile({ x, y });
+            }
+        }
+    }
+
+    setPossibleMoves(possibleMoves: Position[], playerPosition: Position) {
+        this.overlayTiles.playerPosition = playerPosition;
+        this.overlayTiles.possibleMoves = possibleMoves;
+        this.updateAllTiles();
+    }
+
+    setActions(actions: Position[], playerPosition: Position) {
+        this.overlayTiles.actions = actions;
+        this.overlayTiles.playerPosition = playerPosition;
+        this.updateAllTiles();
+    }
+
+    clearOverlays() {
+        this.overlayTiles = structuredClone(DEFAULT_OVERLAY_TILES);
+        this.updateAllTiles();
+    }
+
+    clearActions() {
+        this.overlayTiles.actions = [];
+        this.updateAllTiles();
+    }
+
+    setPlayers(players: Player[]) {
+        this.players = players;
+        this.updateAllTiles();
+    }
+
+    movePlayer(playerMovementData: PlayerMovementData) {
+        for (let i = 1; i < playerMovementData.movement.length; i++) {
+            setTimeout(() => {
+                this.players[playerMovementData.playerIndex].currentStats.position = playerMovementData.movement[i];
+                this.updateAllTiles();
+            }, MOVE_ANIMATION_DURATION * i);
+        }
     }
 
     getTileImage(tiles: TileType[][], position: Position): string {
@@ -42,12 +108,86 @@ export class MapService {
         return `${imagePrefix}${tileVariant}${IMAGE_SUFIX}`;
     }
 
+    hasActionOverlay(): boolean {
+        return this.overlayTiles.actions.length > 0;
+    }
+
     private getTileVisualData(mapData: MapData, position: Position): TileVisualData {
         return {
             tile: this.getTileImage(mapData.tiles, position),
             underlay: this.getUnderlayImage(mapData.tiles, position),
             item: this.getItem(mapData.items, position),
+            player: this.getPlayerAvatar(position),
+            overlay: this.getOverlay(position),
         };
+    }
+
+    private getOverlay(position: Position): string | null {
+        let overlay = null;
+
+        if (this.hasActionOverlay()) {
+            overlay = this.getActionOverlay(position);
+        } else if (this.hasPossibleMove()) {
+            overlay = this.getMoveOverlay(position);
+        }
+
+        return overlay;
+    }
+
+    private getActionOverlay(position: Position): string | null {
+        let overlay = null;
+
+        if (this.isOnPlayer(position) || this.isAction(position)) {
+            overlay = ACTION_OVERLAY;
+        }
+
+        return overlay;
+    }
+
+    private getMoveOverlay(position: Position): string | null {
+        let overlay = null;
+
+        if (this.isOnPlayer(position) || this.isPossibleMove(position)) {
+            if (this.isHoveringPosition(position)) {
+                overlay = HOVER_MOVE_OVERLAY;
+            } else {
+                overlay = POSSIBLE_MOVE_OVERLAY;
+            }
+        }
+
+        return overlay;
+    }
+
+    private hasPossibleMove(): boolean {
+        return this.overlayTiles.possibleMoves.length > 0;
+    }
+
+    private isPossibleMove(position: Position): boolean {
+        return Boolean(this.overlayTiles.possibleMoves.find((pos) => pos.x === position.x && pos.y === position.y));
+    }
+
+    private isAction(position: Position): boolean {
+        return Boolean(this.overlayTiles.actions.find((pos) => pos.x === position.x && pos.y === position.y));
+    }
+
+    private isOnPlayer(position: Position): boolean {
+        return this.overlayTiles.playerPosition.x === position.x && this.overlayTiles.playerPosition.y === position.y;
+    }
+
+    private isHoveringPosition(position: Position): boolean {
+        return Boolean(this.overlayTiles.hoverMoves.find((pos) => pos.x === position.x && pos.y === position.y));
+    }
+
+    private getPlayerAvatar(position: Position): string | null {
+        let playerAvatar: string | null = null;
+
+        this.players.forEach((player) => {
+            if (player.currentStats.position.x === position.x && player.currentStats.position.y === position.y) {
+                playerAvatar = AVATAR_DATA[player.avatar].imageFace;
+            }
+        });
+
+        return playerAvatar;
     }
 
     private getTileVariant(tile: TileType, tiles: TileType[][], position: Position): string {
@@ -80,21 +220,6 @@ export class MapService {
         });
     }
 
-    private updateAllTiles(): void {
-        const mapSize = this.gameDataService.gameData.mapData.size;
-
-        this.visualMapData = {
-            tiles: Array.from({ length: mapSize }, () => Array.from({ length: mapSize }, () => ({ ...DEFAULT_TILE_VISUAL }))),
-            size: mapSize,
-        };
-
-        for (let x = 0; x < mapSize; x++) {
-            for (let y = 0; y < mapSize; y++) {
-                this.updateTile({ x, y });
-            }
-        }
-    }
-
     private updateTile(position: Position): void {
         const mapData = this.gameDataService.gameData.mapData;
 
@@ -105,16 +230,24 @@ export class MapService {
         const newData = this.getTileVisualData(mapData, position);
         const oldData = this.visualMapData.tiles[position.x][position.y];
 
+        this.updateTileData(oldData, newData);
+    }
+
+    private updateTileData(oldData: TileVisualData, newData: TileVisualData) {
         if (oldData.tile !== newData.tile) {
-            this.visualMapData.tiles[position.x][position.y].tile = newData.tile;
+            oldData.tile = newData.tile;
         }
-
         if (oldData.underlay !== newData.underlay) {
-            this.visualMapData.tiles[position.x][position.y].underlay = newData.underlay;
+            oldData.underlay = newData.underlay;
         }
-
         if (oldData.item !== newData.item) {
-            this.visualMapData.tiles[position.x][position.y].item = newData.item;
+            oldData.item = newData.item;
+        }
+        if (oldData.player !== newData.player) {
+            oldData.player = newData.player;
+        }
+        if (oldData.overlay !== newData.overlay) {
+            oldData.overlay = newData.overlay;
         }
     }
 

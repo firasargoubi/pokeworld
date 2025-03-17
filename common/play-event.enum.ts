@@ -1,8 +1,21 @@
 export enum PlayEvent {
     EndTurn = 'endTurn',
-    StartCombat = 'endTurn',
+    StartCombat = 'startCombat',
+    GetPossibleMoves = 'getPossibleMoves',
+    GetHoverMoves = 'getHoverMoves',
+    Move = 'move',
+    ChangeDebugMode = 'changeDebugMode',
+    GetActions = 'getActions',
+    Action = 'action',
 
-    TurnStarted = 'turnStart',
-    PreTurnStarted = 'preTurnStart',
-    CombatStarted = 'CombatStarted'
+    MatchEnded = 'matchEnded',
+    CombatDataBroadcast = 'combatDataBroadcast',
+    CombatResultBroadcast = 'combatResultBroadcast',
+    BridgeChanged = 'bridgeChanged',
+    DebugModeChanged = 'debugModeChanged',
+    TurnStarted = 'turnStarted',
+    PreTurnStarted = 'preTurnStarted',
+    CombatStarted = 'combatStarted',
+    MatchStarted = 'matchStarted',
+    PlayerMoved = 'playerMoved',
 }

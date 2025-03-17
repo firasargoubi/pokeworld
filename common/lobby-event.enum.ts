@@ -6,9 +6,9 @@ export enum LobbyEvent {
     KickPlayer = 'kickPlayer',
     ChangeLockStatus = 'shangeLockStatus',
     StartMatch = 'startMatch',
-    EmitGameData = 'updateMatch',
+    EmitGameData = 'emitGameData',
 
-    RemovedFromMatch = 'removedFromMatch',
+    PlayerLeft = 'playerLeft',
     UpdatePlayerList = 'updatePlayerList',
     LockStatusChanged = 'lockStatusChanged',
     MatchStarted = 'matchStarted',

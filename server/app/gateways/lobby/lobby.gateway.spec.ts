@@ -5,11 +5,11 @@ import { GameData } from '@common/game-data';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
+import { Warning } from '@common/warning.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { LobbyGateway } from './lobby.gateway';
-import { Warning } from '@common/warning.enum';
 
 describe('LobbyGateway', () => {
     let gateway: LobbyGateway;
@@ -27,13 +27,16 @@ describe('LobbyGateway', () => {
         emitStub = stub();
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [LobbyGateway, { provide: Server, useValue: mockServer }, { provide: LobbyService, useValue: mockLobbyService }],
+            providers: [LobbyGateway, { provide: LobbyService, useValue: mockLobbyService }, { provide: Server, useValue: mockServer }],
         }).compile();
 
         gateway = module.get<LobbyGateway>(LobbyGateway);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        gateway['server'] = { to: () => ({ emit: emitStub }), sockets: { sockets: { get: () => mockSocket } } } as any;
+        gateway['server'] = {
+            to: () => ({ emit: emitStub }),
+            sockets: { sockets: { get: () => mockSocket } },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any;
         mockGame = structuredClone(MOCK_GAMES[0]);
         mockMatch = structuredClone(MOCK_MATCHES[0]);
     });
@@ -83,7 +86,7 @@ describe('LobbyGateway', () => {
 
     it('should leaveMatch on handleDisconnect', () => {
         gateway.handleDisconnect(mockSocket);
-        expect(mockLobbyService.leaveMatch.called).toBeTruthy();
+        expect(mockLobbyService.leaveMatch.calledWith(mockSocket.id)).toBeTruthy();
     });
 
     it('should join room on connectPlayer', () => {
@@ -93,7 +96,7 @@ describe('LobbyGateway', () => {
         expect(mockSocket.join.calledWith(matchCode)).toBeTruthy();
     });
 
-    it('should leave room on disconnectPlayer', () => {
+    it('should leave all rooms on disconnectPlayer', () => {
         const playerId = '1234';
         const matchCode = '5678';
         Object.defineProperty(mockSocket, 'rooms', { value: [matchCode] });
@@ -121,27 +124,23 @@ describe('LobbyGateway', () => {
         expect(emitStub.calledWith(LobbyEvent.UpdatePlayerList, players)).toBeTruthy();
     });
 
-    it('should emit RemovedFromMatch on emitRemovedFromMatch', () => {
-        const clientId = '1234';
-        gateway.emitRemovedFromMatch(clientId, Warning.AdminQuit);
-        expect(mockSocket.emit.calledWith(LobbyEvent.RemovedFromMatch)).toBeTruthy();
+    it('should emit PlayerLeft on emitPlayerLeft', () => {
+        const matchCode = '1234';
+        gateway.emitPlayerLeft(matchCode, mockMatch);
+        expect(emitStub.calledWith(LobbyEvent.PlayerLeft, mockMatch)).toBeTruthy();
     });
 
     it('should emit Warning on warn', () => {
         const playerId = '1234';
-        const warningMessage = 'Ceci est un avertissement';
-
+        const warningMessage = Warning.RoomLocked;
         gateway.warn(playerId, warningMessage);
-
         expect(mockSocket.emit.calledWith(LobbyEvent.Warning, warningMessage)).toBeTruthy();
     });
 
     it('should emit GameData on emitGameDataToPlayer', () => {
         const clientId = '1234';
-        const gameData = { _id: '1234' } as GameData;
-
+        const gameData = structuredClone(MOCK_GAMES[0]);
         gateway.emitGameDataToPlayer(clientId, gameData);
-
         expect(mockSocket.emit.calledWith(LobbyEvent.EmitGameData, gameData)).toBeTruthy();
     });
 });

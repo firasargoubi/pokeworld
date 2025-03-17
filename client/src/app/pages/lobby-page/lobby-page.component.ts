@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PlayerCardComponent } from '@app/components/player-card/player-card.component';
@@ -8,8 +9,8 @@ import { GameDataService } from '@app/services/game-data/game-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-import { MAX_PLAYERS } from '@common/max-players.const';
 import { Player } from '@common/player';
+import { MAX_PLAYERS } from '@common/consts/player-count.const';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -20,9 +21,8 @@ import { Observable } from 'rxjs';
     standalone: true,
 })
 export class LobbyPageComponent {
-    isAdmin: boolean = false;
-    players$: Observable<Player[]> = new Observable();
-    isRoomLocked: boolean = false;
+    players$: Observable<Player[]>;
+    isRoomLocked: boolean;
     isSelfAdmin: boolean = false;
     selfId: string | undefined = undefined;
     availebelPlayers: null[] = [];
@@ -30,9 +30,13 @@ export class LobbyPageComponent {
     private lobbySocketsService: LobbySocketsService = inject(LobbySocketsService);
     private coreSocket: CoreSocketService = inject(CoreSocketService);
     private popupService: PopupService = inject(PopupService);
-    private gameDataService = inject(GameDataService);
+    private gameDataService: GameDataService = inject(GameDataService);
+    private router: Router = inject(Router);
 
     constructor() {
+        if (this.lobbySocketsService.matchCode === '') {
+            this.router.navigate(['/']);
+        }
         this.players$ = this.lobbySocketsService.players$;
         this.selfId = this.coreSocket.selfId;
 

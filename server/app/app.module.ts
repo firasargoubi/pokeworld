@@ -10,6 +10,7 @@ import { CombatService } from './services/combat/combat.service';
 import { GameService } from './services/game/game.service';
 import { LobbyService } from './services/lobby/lobby.service';
 import { MatchService } from './services/match/match.service';
+import { MovementService } from './services/movement/movement.service';
 import { PlayService } from './services/play/play.service';
 
 @Module({
@@ -25,6 +26,17 @@ import { PlayService } from './services/play/play.service';
         MongooseModule.forFeature([{ name: Game.name, schema: gameSchema }]),
     ],
     controllers: [GameController],
-    providers: [Logger, GameService, MatchService, LobbyGateway, LobbyService, PlayGateway, PlayService, CombatGateway, CombatService],
+    providers: [
+        Logger,
+        GameService,
+        MatchService,
+        MovementService,
+        LobbyGateway,
+        LobbyService,
+        PlayGateway,
+        PlayService,
+        CombatGateway,
+        CombatService,
+    ],
 })
 export class AppModule {}

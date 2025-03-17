@@ -34,4 +34,14 @@ export const DEFAULT_PLAYER: Player = {
     isAdmin: false,
     isConnected: false,
     isBot: false,
+    spawnPoint: { x: 0, y: 0 },
 };
+
+const MIN_NAME_LENGTH = 3;
+const MAX_NAME_LENGTH = 20;
+const DEFAULT_STAT_POINTS = 4;
+const DEFAULT_ESCAPE_POINTS = 2;
+const BONUS_POINTS = 2;
+
+export { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH };
+export const MOVE_ANIMATION_DURATION = 150;

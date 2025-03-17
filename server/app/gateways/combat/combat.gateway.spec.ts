@@ -1,6 +1,6 @@
 import { CombatService } from '@app/services/combat/combat.service';
-import { CombatEvents } from '@common/combat-event.enum';
-import { CombatState } from '@common/combat-interfaces';
+import { CombatState } from '@common/combat';
+import { CombatEvent } from '@common/combat-event.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
@@ -42,12 +42,6 @@ describe('CombatGateway', () => {
         expect(gateway).toBeDefined();
     });
 
-    it('should call initiateCombat on startCombat event', () => {
-        const targetPlayerId = 'player-2';
-        gateway.startCombat(socket1, targetPlayerId);
-        expect(mockCombatService.initiateCombat.calledWith(socket1, targetPlayerId)).toBeTruthy();
-    });
-
     it('should call escape on escapeAttempt event', () => {
         const payload = { combatRoomCode: 'room123', playerId: 'player-1' };
         gateway.escapeAttempt(null, payload);
@@ -71,6 +65,17 @@ describe('CombatGateway', () => {
         expect(mockCombatService.endCombat.calledWith(combatRoomCode)).toBeTruthy();
     });
 
+    it('should call endCombat with the correct winner when two players are present', () => {
+        const combatRoomCode = 'room456';
+        const fakeCombatState = {
+            timer: null,
+            players: [{ id: socket1.id }, { id: socket2.id }],
+            currentTurnIndex: 0,
+        } as CombatState;
+        mockCombatService.getCombatTurnSystems.returns(new Map([[combatRoomCode, fakeCombatState]]));
+        gateway.handleDisconnect(socket1);
+        expect(mockCombatService.endCombat.calledWith(combatRoomCode, socket2.id)).toBeTruthy();
+    });
     it('should return a socket by id using getSocketById', () => {
         const socket = gateway.getSocketById('test-socket-id');
         expect(socket).toEqual(socket1);
@@ -78,7 +83,7 @@ describe('CombatGateway', () => {
 
     it('should emit an event to a combat room using emitToCombatRoom', () => {
         const combatRoomCode = 'room123';
-        const event = CombatEvents.EscapeAttempt;
+        const event = CombatEvent.EscapeAttempt;
         const payload = { test: 'data' };
         gateway.emitToCombatRoom(combatRoomCode, event, payload);
         expect(emitStub.calledWith(event, payload)).toBeTruthy();
@@ -86,13 +91,13 @@ describe('CombatGateway', () => {
 
     it('should emit an event to a player using emitToPlayer when socket exists', () => {
         socket1.emit = stub();
-        gateway.emitToPlayer('test-socket-id', CombatEvents.AttackAttempt, { data: 123 });
-        expect(socket1.emit.calledWith(CombatEvents.AttackAttempt, { data: 123 })).toBeTruthy();
+        gateway.emitToPlayer('test-socket-id', CombatEvent.AttackAttempt, { data: 123 });
+        expect(socket1.emit.calledWith(CombatEvent.AttackAttempt, { data: 123 })).toBeTruthy();
     });
 
     it('should not emit an event in emitToPlayer if socket is not found', () => {
         stub(gateway, 'getSocketById').returns(null);
-        gateway.emitToPlayer('non-existent-socket', CombatEvents.AttackAttempt, { data: 123 });
+        gateway.emitToPlayer('non-existent-socket', CombatEvent.AttackAttempt, { data: 123 });
         expect(socket1.emit.notCalled).toBeTruthy();
     });
 });

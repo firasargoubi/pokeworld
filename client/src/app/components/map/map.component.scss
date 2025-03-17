@@ -2,8 +2,8 @@ $map-padding-x: 0.86%;
 $map-padding-y: 1.38%;
 $overlay: '../../../assets/images/menu/map/overlay.png';
 
-$border-width: 1px;
-$border-color: rgba(255, 255, 255, 0.15);
+$border-width: 0.01px;
+$border-color: rgba(255, 255, 255, 0.11);
 $hover-border-color: rgba(255, 255, 255, 0.35);
 $hover-overlay-color: rgba(255, 255, 255, 0.095);
 
@@ -95,15 +95,42 @@ app-item,
     border: $border-width solid $border-color;
 }
 
-.tile:hover .tile-border {
+.is-editor .tile:hover .tile-border {
     border-color: $hover-border-color;
     background-color: $hover-overlay-color;
 }
 
-.tile:has(.item) {
+.is-editor .tile:has(.item) {
     cursor: grab;
 }
 
-::ng-deep .grab .tile:has(.item) {
+::ng-deep .is-editor .grab .tile:has(.item) {
     cursor: grabbing;
+}
+
+.player {
+    background-size: contain;
+}
+
+.player-overlay .tile-overlay,
+.possible-move-overlay .tile-overlay {
+    background-color: rgba(232, 253, 255, 0.28);
+}
+
+.hover-move-overlay .tile-overlay {
+    background-color: rgba(104, 165, 255, 0.45);
+}
+
+.action-overlay,
+.possible-move-overlay,
+.hover-move-overlay {
+    cursor: pointer;
+}
+
+.possible-move-overlay:hover .tile-overlay {
+    background-color: rgba(104, 165, 255, 0.45);
+}
+
+.action-overlay .tile-overlay {
+    background-color: rgba(255, 104, 104, 0.56);
 }

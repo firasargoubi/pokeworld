@@ -1,21 +1,41 @@
-import { DEFAULT_PLAYER } from '@common/const/default-player.const';
+import { TurnData } from '@app/interfaces/turn-data';
 import { GameData } from '@common/game-data';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
 import { Injectable } from '@nestjs/common';
-import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA } from './match.service.const';
+import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA, DEFAULT_PLAYER, DEFAULT_TURN_DATA } from './match.service.const';
 
 @Injectable()
 export class MatchService {
     private matches: Map<string, Match> = new Map();
+    private turnDatas: Map<string, TurnData> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
+
+    getPlayerIndex(playerId: string): number {
+        const gameCode = this.getMatchCodeFromPlayerId(playerId);
+        const players = this.getPlayers(gameCode);
+        return players.findIndex((p) => p.id === playerId);
+    }
 
     createMatch(gameData: GameData): string {
         const matchCode = this.getNewMatchCode();
         const match: Match = { gameData, matchData: structuredClone(DEFAULT_MATCH_DATA) };
         match.matchData.code = matchCode;
         this.matches.set(matchCode, match);
+        this.turnDatas.set(matchCode, DEFAULT_TURN_DATA);
         return matchCode;
+    }
+
+    isActivePlayer(playerId: string): boolean {
+        let isActivePlayer = false;
+        const matchCode = this.getMatchCodeFromPlayerId(playerId);
+        if (matchCode) {
+            const activePlayerId = this.getActivePlayerId(matchCode);
+            if (playerId === activePlayerId) {
+                isActivePlayer = true;
+            }
+        }
+        return isActivePlayer;
     }
 
     isPlayerInMatch(playerId: string): boolean {
@@ -72,12 +92,31 @@ export class MatchService {
         return this.matches.get(matchCode);
     }
 
+    getActivePlayerId(matchCode: string): string {
+        let activePlayerId = '';
+        const match = this.getMatch(matchCode);
+        if (match) {
+            activePlayerId = match.matchData.players[match.matchData.activePlayer].id;
+        }
+        return activePlayerId;
+    }
+
+    getTurnData(matchCode: string): TurnData {
+        return this.turnDatas.get(matchCode);
+    }
+
     removePlayerFromMatch(playerId: string, matchCode: string): void {
-        const match = this.matches.get(matchCode);
+        const match = this.getMatch(matchCode);
         if (match) {
             match.matchData.players = match.matchData.players.filter((p) => p.id !== playerId);
             if (match.matchData.players.length <= 0) {
                 this.matches.delete(matchCode);
+                const turnData = this.turnDatas.get(matchCode);
+                if (turnData.phaseTimeout) {
+                    clearTimeout(turnData.phaseTimeout);
+                    turnData.phaseTimeout = null;
+                }
+                this.turnDatas.delete(matchCode);
             }
         }
         this.playerToMatchCode.delete(playerId);
@@ -92,10 +131,8 @@ export class MatchService {
     }
 
     addPlayerToMatch(playerId: string, matchCode: string, isAdmin: boolean): void {
-        const newPlayer = structuredClone(DEFAULT_PLAYER);
-        newPlayer.id = playerId;
-        newPlayer.isAdmin = isAdmin;
-        this.matches.get(matchCode).matchData.players.push(newPlayer);
+        const newPlayer = { ...structuredClone(DEFAULT_PLAYER), id: playerId, isAdmin };
+        this.getMatch(matchCode).matchData.players.push(newPlayer);
         this.playerToMatchCode.set(playerId, matchCode);
     }
 

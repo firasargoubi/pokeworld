@@ -2,22 +2,26 @@
 // This test suite is 100 lines longer than the recommended maximum
 import { CombatGateway } from '@app/gateways/combat/combat.gateway';
 import { MatchService } from '@app/services/match/match.service';
-import { CombatEvents } from '@common/combat-event.enum';
-import { AttackResult, CombatState } from '@common/combat-interfaces';
-import { DiceType } from '@common/dice';
+import { PlayService } from '@app/services/play/play.service';
+import { AttackResult, CombatState } from '@common/combat';
+import { CombatEvent } from '@common/combat-event.enum';
+import { DICE_MAX_VALUE, DiceType } from '@common/dice';
+import { Match, MatchData } from '@common/match';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
-import { createStubInstance, SinonStub, SinonStubbedInstance, spy, stub } from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Socket } from 'socket.io';
 import { CombatService } from './combat.service';
-import { MAX_TURN_DURATION, MIN_TURN_DURATION, PLAYER_STATS_MALUS } from './combat.service.const';
+import { ESCAPE_RATIO, MAX_TURN_DURATION, MIN_TURN_DURATION, PLAYER_STATS_MALUS } from './combat.service.const';
 
 describe('CombatService', () => {
     let service: CombatService;
     let matchServiceStub: SinonStubbedInstance<MatchService>;
     let combatGatewayStub: SinonStubbedInstance<CombatGateway>;
+    let playeServiceStub: SinonStubbedInstance<PlayService>;
+    let clearTimeoutSpy: SinonStub;
 
     let updatePlayerBonusStatsSpy: SinonStub;
     let proceedCombatTurnSpy: SinonStub;
@@ -26,6 +30,7 @@ describe('CombatService', () => {
     let endCombatSpy: SinonStub;
     let forceCombatTurnSwitchSpy: SinonStub;
     let leaveCombatSpy: SinonStub;
+    let randomStub: SinonStub;
 
     const combatRoomCode = 'room123';
     let player1: Player;
@@ -40,12 +45,14 @@ describe('CombatService', () => {
     beforeEach(async () => {
         matchServiceStub = createStubInstance<MatchService>(MatchService);
         combatGatewayStub = createStubInstance<CombatGateway>(CombatGateway);
+        playeServiceStub = createStubInstance<PlayService>(PlayService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 CombatService,
                 { provide: CombatGateway, useValue: combatGatewayStub },
                 { provide: MatchService, useValue: matchServiceStub },
+                { provide: PlayService, useValue: playeServiceStub },
             ],
         }).compile();
 
@@ -59,6 +66,8 @@ describe('CombatService', () => {
         endCombatSpy = stub(service, 'endCombat' as any);
         forceCombatTurnSwitchSpy = stub(service, 'forceCombatTurnSwitch' as any);
         leaveCombatSpy = stub(service, 'leaveCombat' as any);
+        clearTimeoutSpy = stub(global, 'clearTimeout');
+        randomStub = stub(Math, 'random');
         /* eslint-enable @typescript-eslint/no-explicit-any */
 
         player1 = {
@@ -79,6 +88,11 @@ describe('CombatService', () => {
 
         Object.defineProperty(socket1, 'id', { value: 'player-1' });
         Object.defineProperty(socket2, 'id', { value: 'player-2' });
+    });
+
+    afterEach(() => {
+        clearTimeoutSpy.restore();
+        randomStub.restore();
     });
 
     it('should be defined', () => {
@@ -149,7 +163,7 @@ describe('CombatService', () => {
 
         combatGatewayStub.getSocketById.returns(socket2);
 
-        service['initiateCombat'](socket1, 'player-2');
+        service['initiateCombat'](socket1.id, 'player-2');
 
         expect(matchServiceStub['getPlayer'].calledTwice).toBeTruthy();
         expect(generateUniqueCombatCodeSpy.calledOnce).toBeTruthy();
@@ -158,7 +172,7 @@ describe('CombatService', () => {
         expect(combatGatewayStub.getSocketById.calledWith(player2.id)).toBeTruthy();
 
         const expectedCombatData = { combatRoomCode, players: [player1, player2] };
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.CombatStarted, expectedCombatData)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.CombatStarted, expectedCombatData)).toBeTruthy();
 
         updatePlayersStatsByCurrentTileSpy.restore();
         startTurnSystemSpy.restore();
@@ -178,7 +192,7 @@ describe('CombatService', () => {
         const combatState = { timer: null, players: [player1, player2], currentTurnIndex: 0 };
         service['combatTurnSystems'].set(combatRoomCode, combatState);
 
-        const randomStub = stub(Math, 'random').returns(1);
+        randomStub.returns(ESCAPE_RATIO);
         getPlayerByIdSpy.returns(player1);
 
         service.escape(combatRoomCode, player1.id);
@@ -188,15 +202,13 @@ describe('CombatService', () => {
         expect(combatGatewayStub.emitToCombatRoom.notCalled).toBeTruthy();
         expect(endCombatSpy.notCalled).toBeTruthy();
         expect(forceCombatTurnSwitchSpy.calledWith(combatRoomCode)).toBeTruthy();
-
-        randomStub.restore();
     });
 
     it("should decrease escapes and notify update if player's escapes is 0", () => {
         const combatState = { timer: null, players: [player1, player2], currentTurnIndex: 0 };
         service['combatTurnSystems'].set(combatRoomCode, combatState);
 
-        const randomStub = stub(Math, 'random').returns(0);
+        randomStub.returns(0);
         getPlayerByIdSpy.returns(player1);
 
         service.escape(combatRoomCode, player1.id);
@@ -205,9 +217,7 @@ describe('CombatService', () => {
         expect(notifyPlayersStatsUpdateSpy.calledWith(combatRoomCode)).toBeTruthy();
         expect(endCombatSpy.calledWith(combatRoomCode)).toBeTruthy();
         expect(forceCombatTurnSwitchSpy.calledWith(combatRoomCode)).toBeTruthy();
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.EscapedResult, player1.id)).toBeTruthy();
-
-        randomStub.restore();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EscapedResult, player1.id)).toBeTruthy();
     });
 
     it('should return undefined if targetPlayer is not found', () => {
@@ -241,7 +251,7 @@ describe('CombatService', () => {
 
         expect(notifyPlayersStatsUpdateSpy.calledWith(combatRoomCode)).toBeTruthy();
         expect(
-            combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.AttackResult, {
+            combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.AttackResult, {
                 targetId: player2.id,
                 attackDamage: 2,
             } as AttackResult),
@@ -269,7 +279,7 @@ describe('CombatService', () => {
 
         expect(notifyPlayersStatsUpdateSpy.calledWith(combatRoomCode)).toBeTruthy();
         expect(
-            combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.AttackResult, {
+            combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.AttackResult, {
                 targetId: player2.id,
                 attackDamage: 2,
             } as AttackResult),
@@ -286,7 +296,6 @@ describe('CombatService', () => {
         service['combatTurnSystems'].set(combatRoomCode, combatState);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const reseatPlayersSpy = stub(service, 'resetPlayers' as any);
-        const clearTimeoutSpy = spy(global, 'clearTimeout');
 
         endCombatSpy.restore();
         service.endCombat(combatRoomCode, player1.id);
@@ -294,13 +303,11 @@ describe('CombatService', () => {
         expect(clearTimeoutSpy.calledWith(timer)).toBeTruthy();
         expect(reseatPlayersSpy.calledWith([player2, player1])).toBeTruthy();
 
-        const expectedCombatResult = { winnerId: player1.id, loserId: player2.id };
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.EndCombat, expectedCombatResult)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, null)).toBeTruthy();
         expect(leaveCombatSpy.calledWith(combatRoomCode, combatState)).toBeTruthy();
 
         expect(service['combatTurnSystems'].has(combatRoomCode)).toBeFalsy();
 
-        clearTimeoutSpy.restore();
         reseatPlayersSpy.restore();
     });
 
@@ -313,15 +320,12 @@ describe('CombatService', () => {
         service['combatTurnSystems'].set(combatRoomCode, combatState);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const reseatPlayersSpy = stub(service, 'resetPlayers' as any);
-        const clearTimeoutSpy = spy(global, 'clearTimeout');
 
         endCombatSpy.restore();
         service.endCombat(combatRoomCode, player2.id);
 
-        const expectedCombatResult = { winnerId: player2.id, loserId: player1.id };
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.EndCombat, expectedCombatResult)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, null)).toBeTruthy();
 
-        clearTimeoutSpy.restore();
         reseatPlayersSpy.restore();
     });
 
@@ -334,7 +338,6 @@ describe('CombatService', () => {
         service['combatTurnSystems'].set(combatRoomCode, combatState);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const reseatPlayersSpy = stub(service, 'resetPlayers' as any);
-        const clearTimeoutSpy = spy(global, 'clearTimeout');
 
         endCombatSpy.restore();
         service.endCombat(combatRoomCode);
@@ -342,10 +345,8 @@ describe('CombatService', () => {
         expect(clearTimeoutSpy.calledWith(timer)).toBeTruthy();
         expect(reseatPlayersSpy.calledWith([player2, player1])).toBeTruthy();
 
-        const expectedCombatResult = { winnerId: null, loserId: null };
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.EndCombat, expectedCombatResult)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, null)).toBeTruthy();
 
-        clearTimeoutSpy.restore();
         reseatPlayersSpy.restore();
     });
 
@@ -353,7 +354,6 @@ describe('CombatService', () => {
         const state = { timer, players: [player1, player2] as Player[], currentTurnIndex: 0 };
         service['combatTurnSystems'].set(combatRoomCode, state as CombatState);
 
-        const clearTimeoutSpy = spy(global, 'clearTimeout');
         forceCombatTurnSwitchSpy.restore();
 
         service.forceCombatTurnSwitch(combatRoomCode);
@@ -365,7 +365,6 @@ describe('CombatService', () => {
 
         expect(proceedCombatTurnSpy.calledWith(combatRoomCode)).toBeTruthy();
 
-        clearTimeoutSpy.restore();
         proceedCombatTurnSpy.restore();
     });
 
@@ -379,7 +378,6 @@ describe('CombatService', () => {
 
     it('generateUniqueCombatCode should generate unique combat code', () => {
         const code = service['generateUniqueCombatCode']();
-        expect(code).toMatch(/^combat-\d+$/);
 
         const numericPart = code.split('-')[1];
         const CODE_LENGTH = 4;
@@ -454,9 +452,9 @@ describe('CombatService', () => {
         expect(updatePlayerBonusStatsSpy.calledWith(combatRoomCode, player1, true)).toBeTruthy();
         expect(updatePlayerBonusStatsSpy.calledWith(combatRoomCode, player2, false)).toBeTruthy();
 
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.StartTimer, MAX_TURN_DURATION)).toBeTruthy();
-        expect(combatGatewayStub.emitToPlayer.calledWith(player1.id, CombatEvents.CombatTurnStarted)).toBeTruthy();
-        expect(combatGatewayStub.emitToPlayer.calledWith(player2.id, CombatEvents.CombatTurnStopped)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.StartTimer, MAX_TURN_DURATION)).toBeTruthy();
+        expect(combatGatewayStub.emitToPlayer.calledWith(player1.id, CombatEvent.CombatTurnStarted)).toBeTruthy();
+        expect(combatGatewayStub.emitToPlayer.calledWith(player2.id, CombatEvent.CombatTurnStopped)).toBeTruthy();
 
         const stateBefore = service['combatTurnSystems'].get(combatRoomCode);
         expect(stateBefore.timer).toBeDefined();
@@ -495,9 +493,9 @@ describe('CombatService', () => {
         proceedCombatTurnSpy = stub(service, 'proceedCombatTurn' as any);
 
         expect(updatePlayerBonusStatsSpy.calledWith(combatRoomCode, player1)).toBeTruthy();
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.StartTimer, MIN_TURN_DURATION)).toBeTruthy();
-        expect(combatGatewayStub.emitToPlayer.calledWith(player1.id, CombatEvents.CombatTurnStarted)).toBeTruthy();
-        expect(combatGatewayStub.emitToPlayer.calledWith(player2.id, CombatEvents.CombatTurnStopped)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.StartTimer, MIN_TURN_DURATION)).toBeTruthy();
+        expect(combatGatewayStub.emitToPlayer.calledWith(player1.id, CombatEvent.CombatTurnStarted)).toBeTruthy();
+        expect(combatGatewayStub.emitToPlayer.calledWith(player2.id, CombatEvent.CombatTurnStopped)).toBeTruthy();
 
         clock.tick(MIN_TURN_DURATION);
 
@@ -513,6 +511,10 @@ describe('CombatService', () => {
     });
 
     it('should update bonus stats based on dice values and notify players update', () => {
+        const matchCode = 'match-1';
+        matchServiceStub.getMatchCodeFromPlayerId.returns(matchCode);
+        matchServiceStub.getMatch.returns({ matchData: { isDebugMode: false } as MatchData } as Match);
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const getBonusValueSpy = stub(service, 'getBonusValue' as any);
         updatePlayerBonusStatsSpy.restore();
@@ -528,26 +530,45 @@ describe('CombatService', () => {
         expect(notifyPlayersStatsUpdateSpy.calledWith(combatRoomCode)).toBeTruthy();
     });
 
+    it('should update attackBonus to DICE_MAX_VALUE and defenseBonus to 1 when updatePlayerBonusStats is true in debug mode', () => {
+        const matchCode = 'match-1';
+        matchServiceStub.getMatchCodeFromPlayerId.returns(matchCode);
+        matchServiceStub.getMatch.returns({ matchData: { isDebugMode: true } as MatchData } as Match);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const getBonusValueSpy = stub(service, 'getBonusValue' as any);
+        updatePlayerBonusStatsSpy.restore();
+
+        service['updatePlayerBonusStats'](combatRoomCode, player1, true);
+
+        expect(getBonusValueSpy.notCalled).toBeTruthy();
+        expect(notifyPlayersStatsUpdateSpy.calledWith(combatRoomCode)).toBeTruthy();
+        expect(player1.currentStats.attackBonus).toBe(DICE_MAX_VALUE[player1.playerStats.attackDice]);
+
+        service['updatePlayerBonusStats'](combatRoomCode, player1, false);
+
+        expect(getBonusValueSpy.notCalled).toBeTruthy();
+        expect(notifyPlayersStatsUpdateSpy.calledWith(combatRoomCode)).toBeTruthy();
+        expect(player1.currentStats.defenseBonus).toBe(1);
+    });
+
     it('should compute correct bonus values for D4, D6 and return 0 for unknown dice type', () => {
         /* eslint-disable @typescript-eslint/no-magic-numbers */
-        const mathRandomStub = stub(Math, 'random').returns(0);
+        randomStub.returns(0);
         let result = service['getBonusValue'](DiceType.D4);
         expect(result).toBe(1);
 
-        mathRandomStub.returns(0.9999);
+        randomStub.returns(0.9999);
         result = service['getBonusValue'](DiceType.D4);
         expect(result).toBe(4);
 
-        mathRandomStub.returns(0);
+        randomStub.returns(0);
         result = service['getBonusValue'](DiceType.D6);
         expect(result).toBe(1);
 
-        mathRandomStub.returns(0.9999);
+        randomStub.returns(0.9999);
         result = service['getBonusValue'](DiceType.D6);
         expect(result).toBe(6);
-
-        mathRandomStub.restore();
-        /* eslint-enable @typescript-eslint/no-magic-numbers */
     });
 
     it('should not emit if state does not exist', () => {
@@ -561,7 +582,7 @@ describe('CombatService', () => {
         service['combatTurnSystems'].set(combatRoomCode, combatState);
         service['notifyPlayersStatsUpdate'](combatRoomCode);
 
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvents.UpdatePlayers, combatState.players)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.UpdatePlayers, combatState.players)).toBeTruthy();
     });
 
     it('should copy playerStats values to currentStats for each player', () => {

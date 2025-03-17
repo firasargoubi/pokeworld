@@ -1,6 +1,6 @@
 import { CombatService } from '@app/services/combat/combat.service';
-import { CombatEvents } from '@common/combat-event.enum';
-import { AttackAttempt, EscapeAttempt } from '@common/combat-interfaces';
+import { CombatEvent } from '@common/combat-event.enum';
+import { AttackAttempt, EscapeAttempt } from '@common/combat';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -11,26 +11,25 @@ export class CombatGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
     @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
 
-    @SubscribeMessage(CombatEvents.StartCombat)
-    startCombat(socket: Socket, targetPlayerId: string): void {
-        this.combatService.initiateCombat(socket, targetPlayerId);
-    }
-
-    @SubscribeMessage(CombatEvents.EscapeAttempt)
-    escapeAttempt(_, escapeAttempt: EscapeAttempt): void {
+    @SubscribeMessage(CombatEvent.EscapeAttempt)
+    escapeAttempt(_: Socket, escapeAttempt: EscapeAttempt): void {
         this.combatService.escape(escapeAttempt.combatRoomCode, escapeAttempt.playerId);
     }
 
-    @SubscribeMessage(CombatEvents.AttackAttempt)
-    attackAttempt(_, attackAttempt: AttackAttempt): void {
+    @SubscribeMessage(CombatEvent.AttackAttempt)
+    attackAttempt(_: Socket, attackAttempt: AttackAttempt): void {
         this.combatService.executeAttackAndCheckVictory(attackAttempt.combatRoomCode, attackAttempt.targetId);
         this.combatService.forceCombatTurnSwitch(attackAttempt.combatRoomCode);
     }
 
     handleDisconnect(socket: Socket) {
+        const socketId = socket.id;
         for (const [combatRoomCode, state] of this.combatService.getCombatTurnSystems()) {
-            if (state.players.some((player) => player.id === socket.id)) {
-                this.combatService.endCombat(combatRoomCode);
+            const players = state.players;
+            if (players.some((player) => player.id === socketId)) {
+                const winnerId = players.find((player) => player.id !== socketId)?.id;
+                this.combatService.endCombat(combatRoomCode, winnerId);
+                break;
             }
         }
     }

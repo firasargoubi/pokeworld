@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { BONUS_POINTS, DEFAULT_STAT_POINTS, DEFAULT_ESCAPE_POINTS } from '@app/consts/default-player.const';
+import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS } from '@common/consts/default-player.const';
 import { StatType } from '@app/interfaces/player-stats.enum';
 import { PlayerSelectionService } from '@app/services/player-selection/player-selection.service';
 import { PopupService } from '@app/services/popup/popup.service';

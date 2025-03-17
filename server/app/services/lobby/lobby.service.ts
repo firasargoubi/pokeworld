@@ -1,16 +1,17 @@
 import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { MatchService } from '@app/services/match/match.service';
+import { PlayService } from '@app/services/play/play.service';
+import { MAX_PLAYERS, MIN_PLAYERS } from '@common/consts/player-count.const';
 import { GameData } from '@common/game-data';
-import { MAX_PLAYERS } from '@common/max-players.const';
 import { Player } from '@common/player';
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { HALF_POINT, MIN_PLAYERS } from './lobby.service.const';
 import { Warning } from '@common/warning.enum';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class LobbyService {
     @Inject(forwardRef(() => LobbyGateway)) private readonly lobbyGateway: LobbyGateway;
-    @Inject(MatchService) private readonly matchService: MatchService;
+    @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
+    @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
 
     createMatch(playerId: string, gameData: GameData): string {
         let matchCode = '';
@@ -42,20 +43,51 @@ export class LobbyService {
     }
 
     leaveMatch(playerId: string) {
+        this.lobbyGateway.disconnectPlayer(playerId);
+
         const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
         const isMatchStarted = this.matchService.getIsMatchStarted(matchCode);
-        const isAdmin = this.matchService.isPlayerAdmin(playerId);
 
-        this.lobbyGateway.disconnectPlayer(playerId);
+        if (matchCode) {
+            if (isMatchStarted) {
+                this.leaveStartedMatch(playerId, matchCode);
+            } else {
+                this.leaveNotStartedMatch(playerId, matchCode);
+            }
+        }
+    }
+
+    leaveStartedMatch(playerId: string, matchCode: string) {
+        const match = this.matchService.getMatch(matchCode);
+        const player = match.matchData.players.find((p) => p.id === playerId);
+        if (player) {
+            player.isConnected = false;
+        }
+        const connectedPlayers = match.matchData.players.filter((p) => p.isConnected);
+        if (connectedPlayers.length <= 1) {
+            this.lobbyGateway.disconnectPlayer(connectedPlayers[0].id);
+            this.lobbyGateway.warn(connectedPlayers[0].id, Warning.LastPlayerRemaining);
+            match.matchData.players.forEach((p) => {
+                this.matchService.removePlayerFromMatch(p.id, matchCode);
+            });
+        } else {
+            if (player.isAdmin) {
+                this.playService.changeDebugMode(playerId, false);
+            }
+            this.lobbyGateway.emitPlayerLeft(matchCode, match);
+            this.playService.endTurn(playerId);
+        }
+    }
+
+    leaveNotStartedMatch(playerId: string, matchCode: string) {
+        const isAdmin = this.matchService.isPlayerAdmin(playerId);
         this.matchService.removePlayerFromMatch(playerId, matchCode);
 
-        if (matchCode && !isMatchStarted) {
-            if (isAdmin) {
-                this.kickAllPlayers(matchCode);
-            } else {
-                this.emitUpdatePlayerList(matchCode);
-                this.emitLockStatusChanged(matchCode);
-            }
+        if (isAdmin) {
+            this.kickAllPlayers(matchCode);
+        } else {
+            this.emitUpdatePlayerList(matchCode);
+            this.emitLockStatusChanged(matchCode);
         }
     }
 
@@ -68,11 +100,10 @@ export class LobbyService {
         }
     }
 
-    removePlayer(targetPlayerId: string, removalReason: Warning) {
+    removePlayer(targetPlayerId: string, warning: Warning) {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(targetPlayerId);
-
         this.matchService.removePlayerFromMatch(targetPlayerId, matchCode);
-        this.lobbyGateway.emitRemovedFromMatch(targetPlayerId, removalReason);
+        this.lobbyGateway.warn(targetPlayerId, warning);
         this.lobbyGateway.disconnectPlayer(targetPlayerId);
         this.emitUpdatePlayerList(matchCode);
         this.emitLockStatusChanged(matchCode);
@@ -101,9 +132,7 @@ export class LobbyService {
         const canStartMatch = this.canStartMatch(playerId);
         if (canStartMatch) {
             const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-            this.sanitizeMatch(matchCode);
-            const match = this.matchService.getMatch(matchCode);
-            this.lobbyGateway.emitMatchStarted(matchCode, match);
+            this.playService.startMatch(matchCode);
         }
     }
 
@@ -122,7 +151,7 @@ export class LobbyService {
         players.forEach((player) => {
             this.matchService.removePlayerFromMatch(player.id, matchCode);
             this.lobbyGateway.disconnectPlayer(player.id);
-            this.lobbyGateway.emitRemovedFromMatch(player.id, Warning.AdminQuit);
+            this.lobbyGateway.warn(player.id, Warning.AdminQuit);
         });
     }
 
@@ -169,16 +198,18 @@ export class LobbyService {
     }
 
     private canStartMatch(playerId: string): boolean {
+        let canStartMatch = false;
         const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-        const match = this.matchService.getMatch(matchCode);
-        const currentPlayerCount = match.matchData.players.length;
-
-        const isAdmin = this.matchService.isPlayerAdmin(playerId);
-        const isMatchLocked = !this.canJoinMatch(matchCode);
-        const hasEnoughPlayers = currentPlayerCount >= MIN_PLAYERS;
-        const areAllPlayersConnected = match.matchData.players.every((p) => p.isConnected);
-
-        return isAdmin && isMatchLocked && hasEnoughPlayers && areAllPlayersConnected;
+        if (matchCode) {
+            const match = this.matchService.getMatch(matchCode);
+            const currentPlayerCount = match.matchData.players.length;
+            const isAdmin = this.matchService.isPlayerAdmin(playerId);
+            const isMatchLocked = !this.canJoinMatch(matchCode);
+            const hasEnoughPlayers = currentPlayerCount >= MIN_PLAYERS;
+            const areAllPlayersConnected = match.matchData.players.every((p) => p.isConnected);
+            canStartMatch = isAdmin && isMatchLocked && hasEnoughPlayers && areAllPlayersConnected;
+        }
+        return canStartMatch;
     }
 
     private isMatchFull(matchCode: string): boolean {
@@ -203,16 +234,5 @@ export class LobbyService {
 
     private canJoinMatch(matchCode: string): boolean {
         return !this.isMatchFull(matchCode) && !this.isMatchLocked(matchCode);
-    }
-
-    private sanitizeMatch(matchCode: string) {
-        const match = this.matchService.getMatch(matchCode);
-        match.matchData.isStarted = true;
-        match.matchData.players = match.matchData.players.sort((a: Player, b: Player) => {
-            if (a.playerStats.speed !== b.playerStats.speed) {
-                return b.playerStats.speed - a.playerStats.speed;
-            }
-            return Math.random() - HALF_POINT;
-        });
     }
 }

@@ -2,74 +2,75 @@
     <!-- Partie gauche : Créer une room -->
     <div class="left-panel">
         @if (!matchCode) {
-        <h2>Créer une Room</h2>
-        <button (click)="createMatch(0)">Créer une partie SMALL</button>
-        <br />
-        <button (click)="createMatch(1)">Créer une partie MEDIUM</button>
-        <br />
-        <button (click)="createMatch(2)">Créer une partie LARGE</button>
-        } @if (matchCode) {
-        <p>
-            Code de la room : <strong>{{ matchCode }}</strong>
-        </p>
-
-        <!-- Afficher l'état de verrouillage -->
-        <div class="lock-status">
-            <p>
-                Statut Room : <strong>{{ (isRoomLocked$ | async) ? 'Verrouillée' : 'Ouverte' }}</strong>
-            </p>
-
-            <div class="lock-controls">
-                <button (click)="lockRoom()" [disabled]="isRoomLocked$ | async">🔒 Verrouiller</button>
-                <button (click)="unlockRoom()" [disabled]="(isRoomLocked$ | async) === false">🔓 Déverrouiller</button>
-            </div>
-        </div>
-        } @if (matchCode) {
-        <h3>Joueurs dans la room :</h3>
-        <ul>
-            @for (player of players$ | async; track player.id) {
-            <li>
-                {{ player.name }} ({{ player.isAdmin ? 'Admin' : 'Joueur' }}) ({{ player.isConnected ? 'connected' : 'Not Connected' }}) @if
-                (this.displayCombatButton(player.id)) {
-                <button (click)="this.startCombat(player.id)">Combat</button>
-                }
-            </li>
-            }
-        </ul>
-        } @if (matchCode) {
-        <button (click)="leaveMatch()">Quitter la Room</button>
+            <h2>Créer une Room</h2>
+            <button (click)="createMatch(0)">Créer une partie SMALL</button>
+            <br>
+            <button (click)="createMatch(1)">Créer une partie MEDIUM</button>
+            <br>
+            <button (click)="createMatch(2)">Créer une partie LARGE</button>
         }
-        <br />
         @if (matchCode) {
-        <button (click)="startMatch()">Lancer la partie</button>
+            <p>Code de la room : <strong>{{ matchCode }}</strong></p>
+
+            <!-- Afficher l'état de verrouillage -->
+            <div class="lock-status">
+                <p>Statut Room : <strong>{{ (isRoomLocked$ | async) ? 'Verrouillée' : 'Ouverte' }}</strong></p>
+
+                <div class="lock-controls">
+                    <button (click)="lockRoom()" [disabled]="(isRoomLocked$ | async)">
+                        🔒 Verrouiller
+                    </button>
+                    <button (click)="unlockRoom()" [disabled]="(isRoomLocked$ | async) === false">
+                        🔓 Déverrouiller
+                    </button>
+                </div>
+            </div>
+        }
+
+        @if (matchCode) {
+            <h3>Joueurs dans la room :</h3>
+            <ul>
+                @for (player of players$ | async; track player.id) {
+                    <li>{{ player.name }} ({{ player.isAdmin ? 'Admin' : 'Joueur' }}) ({{ player.isConnected ? 'connected' : 'Not Connected' }})</li>
+                }
+            </ul>
+        }
+        
+        @if (matchCode) {
+            <button (click)="leaveMatch()">Quitter la Room</button>
+        }
+        <br>
+        @if (matchCode) {
+            <button (click)="startMatch()">Lancer la partie</button>
         }
     </div>
 
     <!-- Partie droite : Rejoindre une room -->
     <div class="right-panel">
         @if (!matchCode) {
-        <h2>Rejoindre une Room</h2>
-        <input type="text" placeholder="Code de la room" [(ngModel)]="joinRoomCode" />
-        <br />
-        <button (click)="joinMatch()">Rejoindre</button>
+            <h2>Rejoindre une Room</h2>
+            <input type="text" placeholder="Code de la room" [(ngModel)]="joinRoomCode" />
+            <br>
+            <button (click)="joinMatch()">Rejoindre</button>
 
-        <!-- Message d'erreur si la salle est verrouillée -->
-        @if (isRoomLocked$ | async) {
-        <p class="error-message">Salle verrouillée</p>
-        } }
+            <!-- Message d'erreur si la salle est verrouillée -->
+            @if (isRoomLocked$ | async) {
+                <p class="error-message">Salle verrouillée</p>
+            }
+        }
     </div>
 
     <!-- Formulaire pour mettre à jour les informations du joueur -->
     @if (matchCode) {
-    <div class="update-player-form">
-        <h2>Modifier player data</h2>
-        <button (click)="selectDebugPlayer(0)">Select debug player 1</button>
-        <br />
-        <button (click)="selectDebugPlayer(1)">Select debug player 2</button>
-        <br />
-        <button (click)="selectDebugPlayer(2)">Select debug player 3</button>
-        <br />
-        <button (click)="selectDebugPlayer(3)">Select debug player 4</button>
-    </div>
+        <div class="update-player-form">
+            <h2>Modifier player data</h2>
+            <button (click)="selectDebugPlayer(0)">Select debug player 1</button>
+            <br>
+            <button (click)="selectDebugPlayer(1)">Select debug player 2</button>
+            <br>
+            <button (click)="selectDebugPlayer(2)">Select debug player 3</button>
+            <br>
+            <button (click)="selectDebugPlayer(3)">Select debug player 4</button>
+        </div>
     }
 </div>
