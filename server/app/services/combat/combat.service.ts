@@ -40,6 +40,7 @@ export class CombatService {
         const combatData: CombatData = { combatRoomCode, players: [initiatingPlayer, targetPlayer] };
         this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.CombatStarted, combatData);
 
+        this.resetPlayers([initiatingPlayer, targetPlayer]);
         this.updatePlayersStatsByCurrentTile([initiatingPlayer, targetPlayer]);
         this.startTurnSystem(combatRoomCode, [initiatingPlayer, targetPlayer]);
     }
@@ -91,27 +92,21 @@ export class CombatService {
 
     endCombat(combatRoomCode: string, winnerId: string = null): void {
         const state = this.combatTurnSystems.get(combatRoomCode);
-
         if (state.timer) {
             clearTimeout(state.timer);
         }
 
         const player1 = this.combatTurnSystems.get(combatRoomCode).players[0];
         const player2 = this.combatTurnSystems.get(combatRoomCode).players[1];
-
         const combatResult: CombatResult = { winnerId: null, loserId: null };
-
         this.resetPlayers([player1, player2]);
 
         if (winnerId) {
             combatResult.winnerId = winnerId;
             combatResult.loserId = player1.id === winnerId ? player2.id : player1.id;
         }
-
         this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.EndCombat, combatResult);
-
         this.combatTurnSystems.delete(combatRoomCode);
-
         this.leaveCombat(combatRoomCode, state);
     }
 

@@ -1,3 +1,4 @@
+import { Match } from './match';
 import { Player } from './player';
 
 export interface CombatData {
@@ -30,4 +31,10 @@ export interface AttackAttempt {
     combatRoomCode: string;
     targetId: string | undefined;
 
+}
+
+export interface CombatBroadcastData {
+    match: Match,
+    playerOneIndex: number,
+    playerTwoIndex: number,
 }

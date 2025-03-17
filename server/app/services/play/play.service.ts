@@ -119,17 +119,12 @@ export class PlayService {
         }
         const elapsedTime = Math.abs(new Date().getTime() - turnData.lastPhaseStartTime.getTime());
         match.matchData.currentTimer = match.matchData.currentTimer - elapsedTime;
-
-        // eslint-disable-next-line no-console, @typescript-eslint/no-magic-numbers
-        console.log('maxTimer', match.matchData.maxTimer / 1000);
-        // eslint-disable-next-line no-console, @typescript-eslint/no-magic-numbers
-        console.log('remainingTime', match.matchData.currentTimer / 1000);
-        // eslint-disable-next-line no-console, @typescript-eslint/no-magic-numbers
-        console.log('elapsedTime', elapsedTime / 1000);
-
-        this.playGateway.emitPauseTurn(matchCode, match);
-
-        // this.combatService.initiateCombat(playerId, tragetPlayerId);
+        this.playGateway.emitCombatBroadcast(matchCode, {
+            match,
+            playerOneIndex: this.matchService.getPlayerIndex(playerId),
+            playerTwoIndex: this.matchService.getPlayerIndex(tragetPlayerId),
+        });
+        this.combatService.initiateCombat(playerId, tragetPlayerId);
     }
 
     private toggleBridgeTile(match: Match, position: Position) {
@@ -165,17 +160,14 @@ export class PlayService {
 
     private nextTurnPhase(matchCode: string) {
         const match = this.matchService.getMatch(matchCode);
-        switch (match.matchData.phase) {
-            case TurnPhase.PreTurn:
-                match.matchData.phase = TurnPhase.Turn;
-                this.startTurnTimer(match, TURN_DURATION);
-                this.startTurn(match);
-                break;
-            case TurnPhase.Turn:
-                match.matchData.phase = TurnPhase.PreTurn;
-                this.startTurnTimer(match, PRE_TURN_DURATION);
-                this.startPreTurn(match);
-                break;
+        if (match.matchData.phase === TurnPhase.PreTurn) {
+            match.matchData.phase = TurnPhase.Turn;
+            this.startTurnTimer(match, TURN_DURATION);
+            this.startTurn(match);
+        } else if (match.matchData.phase === TurnPhase.Turn) {
+            match.matchData.phase = TurnPhase.PreTurn;
+            this.startTurnTimer(match, PRE_TURN_DURATION);
+            this.startPreTurn(match);
         }
     }
 

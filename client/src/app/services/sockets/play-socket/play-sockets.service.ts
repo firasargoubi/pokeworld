@@ -7,7 +7,7 @@ import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { CombatEvent } from '@common/combat-event.enum';
-import { CombatData } from '@common/combat-interfaces';
+import { CombatBroadcastData, CombatData } from '@common/combat-interfaces';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match, PlayerMovementData } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';
@@ -83,12 +83,17 @@ export class PlaySocketsService {
         this.coreSocket.on(PlayEvent.BridgeChanged, this.onBridgeChanged.bind(this));
         this.coreSocket.on(LobbyEvent.PlayerLeft, this.onPlayerLeft.bind(this));
         this.coreSocket.on(CombatEvent.CombatStarted, this.onCombatStarted.bind(this));
-        this.coreSocket.on(PlayEvent.PauseTurn, this.onPauseTurn.bind(this));
+        this.coreSocket.on(PlayEvent.CombatBroadcast, this.onCombatBroadcast.bind(this));
     }
 
-    private onPauseTurn(match: Match) {
-        this.matchDataService.updateMatch(match);
-        this.timerService.pauseTimer(match.matchData.currentTimer);
+    private onCombatBroadcast(combatBroadcastData: CombatBroadcastData) {
+        this.matchDataService.updateMatch(combatBroadcastData.match);
+        this.timerService.pauseTimer(combatBroadcastData.match.matchData.currentTimer / ONE_SECOND);
+        if (![combatBroadcastData.playerOneIndex, combatBroadcastData.playerTwoIndex].includes(this.matchDataService.selfIndex)) {
+            const player1 = this.matchDataService.matchData.players[combatBroadcastData.playerOneIndex].name;
+            const player2 = this.matchDataService.matchData.players[combatBroadcastData.playerTwoIndex].name;
+            this.popupService.showPopup(`${player1} et ${player2} entrent en combat!`);
+        }
     }
 
     private onCombatStarted(combatData: CombatData) {
@@ -124,7 +129,7 @@ export class PlaySocketsService {
         const playerName = match.matchData.players[match.matchData.activePlayer].name;
         this.timerService.startTimer(match.matchData.maxTimer / ONE_SECOND);
         this.mapService.clearOverlays();
-        this.popupService.showPopup(`Début du tour de ${playerName}`);
+        this.popupService.showPopup(`Tour de ${playerName}`);
     }
 
     private onTurnStarted(match: Match) {

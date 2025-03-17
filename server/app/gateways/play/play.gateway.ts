@@ -1,4 +1,5 @@
 import { PlayService } from '@app/services/play/play.service';
+import { CombatBroadcastData } from '@common/combat-interfaces';
 import { Match, PlayerMovementData } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';
 import { Position } from '@common/position';
@@ -71,7 +72,7 @@ export class PlayGateway {
         this.server.to(matchCode).emit(PlayEvent.DebugModeChanged, match);
     }
 
-    emitPauseTurn(matchCode: string, match: Match) {
-        this.server.to(matchCode).emit(PlayEvent.PauseTurn, match);
+    emitCombatBroadcast(matchCode: string, combatBroadcastData: CombatBroadcastData) {
+        this.server.to(matchCode).emit(PlayEvent.CombatBroadcast, combatBroadcastData);
     }
 }
