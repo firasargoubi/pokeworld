@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+// Magic numbers are used to define the maximum number of items for each map size 
 
 import { ItemType } from '@common/item-type.enum';
 import { MapSize } from '@common/map-size.enum';
