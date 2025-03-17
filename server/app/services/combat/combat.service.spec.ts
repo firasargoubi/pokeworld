@@ -5,7 +5,8 @@ import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { AttackResult, CombatState } from '@common/combat';
 import { CombatEvent } from '@common/combat-event.enum';
-import { DiceType } from '@common/dice';
+import { DICE_MAX_VALUE, DiceType } from '@common/dice';
+import { Match, MatchData } from '@common/match';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -510,6 +511,10 @@ describe('CombatService', () => {
     });
 
     it('should update bonus stats based on dice values and notify players update', () => {
+        const matchCode = 'match-1';
+        matchServiceStub.getMatchCodeFromPlayerId.returns(matchCode);
+        matchServiceStub.getMatch.returns({ matchData: { isDebugMode: false } as MatchData } as Match);
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const getBonusValueSpy = stub(service, 'getBonusValue' as any);
         updatePlayerBonusStatsSpy.restore();
@@ -523,6 +528,28 @@ describe('CombatService', () => {
 
         expect(getBonusValueSpy.calledWith(player1.playerStats.defenseDice)).toBeTruthy();
         expect(notifyPlayersStatsUpdateSpy.calledWith(combatRoomCode)).toBeTruthy();
+    });
+
+    it('should update attackBonus to DICE_MAX_VALUE and defenseBonus to 1 when updatePlayerBonusStats is true in debug mode', () => {
+        const matchCode = 'match-1';
+        matchServiceStub.getMatchCodeFromPlayerId.returns(matchCode);
+        matchServiceStub.getMatch.returns({ matchData: { isDebugMode: true } as MatchData } as Match);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const getBonusValueSpy = stub(service, 'getBonusValue' as any);
+        updatePlayerBonusStatsSpy.restore();
+
+        service['updatePlayerBonusStats'](combatRoomCode, player1, true);
+
+        expect(getBonusValueSpy.notCalled).toBeTruthy();
+        expect(notifyPlayersStatsUpdateSpy.calledWith(combatRoomCode)).toBeTruthy();
+        expect(player1.currentStats.attackBonus).toBe(DICE_MAX_VALUE[player1.playerStats.attackDice]);
+
+        service['updatePlayerBonusStats'](combatRoomCode, player1, false);
+
+        expect(getBonusValueSpy.notCalled).toBeTruthy();
+        expect(notifyPlayersStatsUpdateSpy.calledWith(combatRoomCode)).toBeTruthy();
+        expect(player1.currentStats.defenseBonus).toBe(1);
     });
 
     it('should compute correct bonus values for D4, D6 and return 0 for unknown dice type', () => {
