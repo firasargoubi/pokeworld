@@ -1,20 +1,23 @@
+import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { PlayGateway } from '@app/gateways/play/play.gateway';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
+import { CombatResult } from '@common/combat-interfaces';
 import { Match, TurnPhase } from '@common/match';
 import { Player } from '@common/player';
 import { Position } from '@common/position';
 import { TileType } from '@common/tile-type.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { HALF_POINT, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
+import { HALF_POINT, MINIMUM_FIGHTS_TO_WIN, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
 
 @Injectable()
 export class PlayService {
     @Inject(forwardRef(() => PlayGateway)) private readonly playGateway: PlayGateway;
     @Inject(MatchService) private readonly matchService: MatchService;
     @Inject(MovementService) private readonly movementService: MovementService;
-    @Inject(CombatService) private readonly combatService: CombatService;
+    @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
+    @Inject(forwardRef(() => LobbyGateway)) private readonly lobbyGateway: LobbyGateway;
 
     getPossibleMoves(playerId: string): Position[] {
         const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
@@ -100,6 +103,46 @@ export class PlayService {
         }
     }
 
+    endOfCombat(combatResult: CombatResult, playerId: string) {
+        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+        if (combatResult.loserId) {
+            this.respawnPlayer(combatResult.loserId, matchCode);
+        }
+        if (combatResult.winnerId) {
+            const player = this.matchService.getPlayer(combatResult.winnerId);
+            player.currentStats.fightsWon += 1;
+            if (player.currentStats.fightsWon >= MINIMUM_FIGHTS_TO_WIN) {
+                this.playerWinGame(matchCode);
+                return;
+            }
+        }
+        const match = this.matchService.getMatch(matchCode);
+        this.playGateway.emitCombatResultBroadcast(matchCode, { match, combatResult });
+        this.unfreezeMatch(match);
+    }
+
+    private unfreezeMatch(match: Match) {
+        const turnData = this.matchService.getTurnData(match.matchData.code);
+        turnData.phaseTimeout = setTimeout(() => {
+            this.nextTurnPhase(match.matchData.code);
+        }, match.matchData.currentTimer);
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    private respawnPlayer(playerId: string, matchCode: string) {
+        // eslint-disable-next-line no-console
+        console.log('TODO respawnPlayer');
+    }
+
+    private playerWinGame(matchCode: string) {
+        const players = this.matchService.getPlayers(matchCode);
+        this.playGateway.emitMatchEnded(matchCode, this.matchService.getMatch(matchCode));
+        players.forEach((player) => {
+            this.matchService.removePlayerFromMatch(player.id, matchCode);
+            this.lobbyGateway.disconnectPlayer(player.id);
+        });
+    }
+
     private executeAction(position: Position, match: Match, playerId: string) {
         const player = match.matchData.players.find((p) => p.currentStats.position.x === position.x && p.currentStats.position.y === position.y);
         if (player) {
@@ -119,7 +162,7 @@ export class PlayService {
         }
         const elapsedTime = Math.abs(new Date().getTime() - turnData.lastPhaseStartTime.getTime());
         match.matchData.currentTimer = match.matchData.currentTimer - elapsedTime;
-        this.playGateway.emitCombatBroadcast(matchCode, {
+        this.playGateway.emitCombatDataBroadcast(matchCode, {
             match,
             playerOneIndex: this.matchService.getPlayerIndex(playerId),
             playerTwoIndex: this.matchService.getPlayerIndex(tragetPlayerId),

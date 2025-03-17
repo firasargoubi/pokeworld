@@ -7,10 +7,11 @@ import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { CombatEvent } from '@common/combat-event.enum';
-import { CombatBroadcastData, CombatData } from '@common/combat-interfaces';
+import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/combat-interfaces';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match, PlayerMovementData } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';
+import { Player } from '@common/player';
 import { Position } from '@common/position';
 import { ONE_SECOND } from './play-sockets.const';
 
@@ -83,15 +84,27 @@ export class PlaySocketsService {
         this.coreSocket.on(PlayEvent.BridgeChanged, this.onBridgeChanged.bind(this));
         this.coreSocket.on(LobbyEvent.PlayerLeft, this.onPlayerLeft.bind(this));
         this.coreSocket.on(CombatEvent.CombatStarted, this.onCombatStarted.bind(this));
-        this.coreSocket.on(PlayEvent.CombatBroadcast, this.onCombatBroadcast.bind(this));
+        this.coreSocket.on(PlayEvent.CombatDataBroadcast, this.onCombatDataBroadcast.bind(this));
+        this.coreSocket.on(PlayEvent.CombatResultBroadcast, this.onCombatResultBroadcast.bind(this));
     }
 
-    private onCombatBroadcast(combatBroadcastData: CombatBroadcastData) {
-        this.matchDataService.updateMatch(combatBroadcastData.match);
-        this.timerService.pauseTimer(combatBroadcastData.match.matchData.currentTimer / ONE_SECOND);
-        if (![combatBroadcastData.playerOneIndex, combatBroadcastData.playerTwoIndex].includes(this.matchDataService.selfIndex)) {
-            const player1 = this.matchDataService.matchData.players[combatBroadcastData.playerOneIndex].name;
-            const player2 = this.matchDataService.matchData.players[combatBroadcastData.playerTwoIndex].name;
+    private onCombatResultBroadcast(combatResultBroadcast: CombatResultBroadcast) {
+        this.matchDataService.updateMatch(combatResultBroadcast.match);
+        if (combatResultBroadcast.combatResult.winnerId) {
+            const player = (this.matchDataService.matchData.players.find((p) => p.id === combatResultBroadcast.combatResult.winnerId) as Player).name;
+            this.popupService.showPopup(`${player} a gagné le combat`);
+        } else {
+            this.popupService.showPopup("Personne n'a gagné le combat");
+        }
+        this.timerService.unPauseTimer();
+    }
+
+    private onCombatDataBroadcast(combatDataBroadcast: CombatDataBroadcast) {
+        this.matchDataService.updateMatch(combatDataBroadcast.match);
+        this.timerService.pauseTimer(combatDataBroadcast.match.matchData.currentTimer / ONE_SECOND);
+        if (![combatDataBroadcast.playerOneIndex, combatDataBroadcast.playerTwoIndex].includes(this.matchDataService.selfIndex)) {
+            const player1 = this.matchDataService.matchData.players[combatDataBroadcast.playerOneIndex].name;
+            const player2 = this.matchDataService.matchData.players[combatDataBroadcast.playerTwoIndex].name;
             this.popupService.showPopup(`${player1} et ${player2} entrent en combat!`);
         }
     }

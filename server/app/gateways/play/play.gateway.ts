@@ -1,5 +1,5 @@
 import { PlayService } from '@app/services/play/play.service';
-import { CombatBroadcastData } from '@common/combat-interfaces';
+import { CombatDataBroadcast, CombatResultBroadcast } from '@common/combat-interfaces';
 import { Match, PlayerMovementData } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';
 import { Position } from '@common/position';
@@ -72,7 +72,15 @@ export class PlayGateway {
         this.server.to(matchCode).emit(PlayEvent.DebugModeChanged, match);
     }
 
-    emitCombatBroadcast(matchCode: string, combatBroadcastData: CombatBroadcastData) {
-        this.server.to(matchCode).emit(PlayEvent.CombatBroadcast, combatBroadcastData);
+    emitCombatDataBroadcast(matchCode: string, combatDataBroadcast: CombatDataBroadcast) {
+        this.server.to(matchCode).emit(PlayEvent.CombatDataBroadcast, combatDataBroadcast);
+    }
+
+    emitCombatResultBroadcast(matchCode: string, combatResultBroadcast: CombatResultBroadcast) {
+        this.server.to(matchCode).emit(PlayEvent.CombatResultBroadcast, combatResultBroadcast);
+    }
+
+    emitMatchEnded(matchCode: string, match: Match) {
+        this.server.to(matchCode).emit(PlayEvent.MatchEnded, match);
     }
 }

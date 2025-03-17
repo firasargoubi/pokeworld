@@ -8,7 +8,9 @@ export enum PlayEvent {
     GetActions = 'getActions',
     Action = 'action',
 
-    CombatBroadcast = 'combatBroadcast',
+    MatchEnded = 'matchEnded',
+    CombatDataBroadcast = 'combatDataBroadcast',
+    CombatResultBroadcast = 'combatResultBroadcast',
     BridgeChanged = 'bridgeChanged',
     DebugModeChanged = 'debugModeChanged',
     TurnStarted = 'turnStarted',
