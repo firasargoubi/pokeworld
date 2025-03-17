@@ -54,6 +54,9 @@
             </div>
         </div>
     </div>
+    <div class="chat-container">
+        <app-chat></app-chat>
+    </div>
     @if (this.isSelfAdmin) {
     <div id="poke-button">
         <app-pokeball-button [buttonContent]="'LANCER PARTIE'" [onClickAction]="this.startMatchButton.bind(this)"></app-pokeball-button>

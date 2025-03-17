@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PlayerCardComponent } from '@app/components/player-card/player-card.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
@@ -10,13 +11,12 @@ import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-so
 import { MAX_PLAYERS } from '@common/max-players.const';
 import { Player } from '@common/player';
 import { Observable } from 'rxjs';
-// import { PopupService } from '@app/services/popup/popup.service';
 
 @Component({
     selector: 'app-lobby-page',
     templateUrl: './lobby-page.component.html',
     styleUrls: ['./lobby-page.component.scss'],
-    imports: [CommonModule, HeaderComponent, PlayerCardComponent, PokeballButtonComponent],
+    imports: [CommonModule, HeaderComponent, PlayerCardComponent, PokeballButtonComponent, ChatComponent],
     standalone: true,
 })
 export class LobbyPageComponent {
