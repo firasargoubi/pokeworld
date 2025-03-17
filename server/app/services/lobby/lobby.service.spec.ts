@@ -306,4 +306,65 @@ describe('LobbyService', () => {
         service['canPlayerJoinMatch']('1122', '3344');
         expect(mockLobbyGateway.warn.calledWith('1122', 'Vous êtes déjà dans une partie')).toBeTruthy();
     });
+
+    it('should disconnect the remaining player and remove all players when connected players count <= 1', () => {
+        const match = structuredClone(MOCK_MATCHES[0]);
+        const matchCode = match.matchData.code;
+        const leavingPlayer = MOCK_PLAYERS[0];
+        const remainingPlayer = MOCK_PLAYERS[1];
+        match.matchData.players = [leavingPlayer, remainingPlayer];
+        mockMatchService.getMatch.returns(match);
+
+        service.leaveStartedMatch(leavingPlayer.id, matchCode);
+
+        expect(mockLobbyGateway.disconnectPlayer.calledWith(remainingPlayer.id)).toBeTruthy();
+        expect(mockLobbyGateway.warn.calledWith(remainingPlayer.id, Warning.LastPlayerRemaining)).toBeTruthy();
+        expect(mockMatchService.removePlayerFromMatch.calledWith(leavingPlayer.id, matchCode)).toBeTruthy();
+        expect(mockMatchService.removePlayerFromMatch.calledWith(remainingPlayer.id, matchCode)).toBeTruthy();
+        expect(mockPlayService.endTurn.notCalled).toBeTruthy();
+    });
+
+    it('should emit player left and end turn when connected players > 1 and leaving player is non-admin', () => {
+        const match = structuredClone(MOCK_MATCHES[0]);
+        const matchCode = match.matchData.code;
+        const leavingPlayer = MOCK_PLAYERS[0];
+        leavingPlayer.isAdmin = false;
+        match.matchData.players = MOCK_PLAYERS;
+        mockMatchService.getMatch.returns(match);
+
+        service.leaveStartedMatch(leavingPlayer.id, matchCode);
+
+        expect(mockPlayService.changeDebugMode.notCalled).toBeTruthy();
+        expect(mockLobbyGateway.emitPlayerLeft.calledWith(matchCode, match)).toBeTruthy();
+        expect(mockPlayService.endTurn.calledWith(leavingPlayer.id)).toBeTruthy();
+    });
+
+    it('should change debug mode if leaving player is admin and then emit player left and end turn', () => {
+        const match = structuredClone(MOCK_MATCHES[0]);
+        const matchCode = match.matchData.code;
+        const leavingPlayer = MOCK_PLAYERS[0];
+        leavingPlayer.isAdmin = true;
+        match.matchData.players = MOCK_PLAYERS;
+        mockMatchService.getMatch.returns(match);
+
+        service.leaveStartedMatch(leavingPlayer.id, matchCode);
+
+        expect(mockPlayService.changeDebugMode.calledWith(leavingPlayer.id, false)).toBeTruthy();
+        expect(mockLobbyGateway.emitPlayerLeft.calledWith(matchCode, match)).toBeTruthy();
+        expect(mockPlayService.endTurn.calledWith(leavingPlayer.id)).toBeTruthy();
+    });
+
+    it('should call leaveStartedMatch when match is started (covering line 53)', () => {
+        const match = structuredClone(MOCK_MATCHES[0]);
+        const playerId = match.matchData.players[0].id;
+        const matchCode = match.matchData.code;
+
+        mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
+        mockMatchService.getIsMatchStarted.returns(true);
+        const leaveStartedMatchSpy = sandbox.spy(service, 'leaveStartedMatch');
+
+        service.leaveMatch(playerId);
+
+        expect(leaveStartedMatchSpy.calledWith(playerId, matchCode)).toBeTruthy();
+    });
 });
