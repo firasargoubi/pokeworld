@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/consts/avatars.const';
 import { BATTLE_PLATFORM_DATA } from '@app/consts/battle-platforms.const';
 import { DEFAULT_COMBAT_ANIMATIONS } from '@app/consts/combat-animations.const';
 import { CombatAnimations } from '@app/interfaces/combat-animations';
+import { MatchDataService } from '@app/services/match-data/match-data.service';
+import { PopupService } from '@app/services/popup/popup.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
+import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { AttackResult } from '@common/combat';
 import { Player } from '@common/player';
 import { COMBAT_TIME_SCALE } from './combat-page.component.const';
@@ -16,7 +19,7 @@ import { COMBAT_TIME_SCALE } from './combat-page.component.const';
     styleUrls: ['./combat-page.component.scss'],
     imports: [CommonModule],
 })
-export class CombatPageComponent implements OnDestroy, OnInit {
+export class CombatPageComponent implements OnInit {
     avatarsData = AVATAR_DATA;
     battlePlatformData = BATTLE_PLATFORM_DATA;
 
@@ -31,6 +34,9 @@ export class CombatPageComponent implements OnDestroy, OnInit {
     private combatSocketService: CombatSocketService = inject(CombatSocketService);
     private timerInterval: number | null = null;
     private router = inject(Router);
+    private popupService: PopupService = inject(PopupService);
+    private matchDataService: MatchDataService = inject(MatchDataService);
+    private coreSocketService: CoreSocketService = inject(CoreSocketService);
 
     constructor() {
         if (this.combatSocketService) {
@@ -65,17 +71,12 @@ export class CombatPageComponent implements OnDestroy, OnInit {
                     this.deathAnimation();
                 }
             });
+            this.coreSocketService.connectionStatus.subscribe((status) => this.verifySocketConnection(status));
         }
-
-        window.addEventListener('beforeunload', this.handleBeforeUnload.bind(this));
     }
 
     ngOnInit(): void {
         this.animation = structuredClone(DEFAULT_COMBAT_ANIMATIONS);
-    }
-
-    ngOnDestroy(): void {
-        window.removeEventListener('beforeunload', this.handleBeforeUnload.bind(this));
     }
 
     escapeAttempt(): void {
@@ -162,7 +163,13 @@ export class CombatPageComponent implements OnDestroy, OnInit {
         }, COMBAT_TIME_SCALE);
     }
 
-    private handleBeforeUnload(): void {
-        this.router.navigate(['/']);
+    private verifySocketConnection(isConnected: boolean) {
+        if (!isConnected || this.matchDataService.matchData.players.length <= 0) {
+            this.popupService.clearMessages();
+            this.popupService.showPopup('Erreur de connection avec le serveur');
+            this.popupService.keepMessages();
+
+            this.router.navigate(['/']);
+        }
     }
 }

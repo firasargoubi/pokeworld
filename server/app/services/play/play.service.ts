@@ -175,6 +175,12 @@ export class PlayService {
             clearTimeout(turnData.phaseTimeout);
             turnData.phaseTimeout = null;
         }
+        const player = this.matchService.getPlayer(playerId);
+        const targetPlayer = this.matchService.getPlayer(targetPlayerId);
+        const tiles = match.gameData.mapData.tiles;
+        player.currentStats.standingTile = tiles[player.currentStats.position.x][player.currentStats.position.y];
+        targetPlayer.currentStats.standingTile = tiles[targetPlayer.currentStats.position.x][targetPlayer.currentStats.position.y];
+
         const elapsedTime = Math.abs(new Date().getTime() - turnData.lastPhaseStartTime.getTime());
         match.matchData.currentTimer = match.matchData.currentTimer - elapsedTime;
         this.playGateway.emitCombatDataBroadcast(matchCode, {

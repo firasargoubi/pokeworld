@@ -1,11 +1,11 @@
+import { DistancesAndPredecessors, NeighborContext, QueueNode } from '@app/interfaces/movement';
+import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/surrounding-positions.const';
 import { MapData } from '@common/map-data';
 import { Match } from '@common/match';
 import { ShortestPath } from '@common/movement';
 import { Position } from '@common/position';
 import { TILE_COST, TileType } from '@common/tile-type.enum';
 import { Injectable } from '@nestjs/common';
-import { DistancesAndPredecessors, NeighborContext, QueueNode } from '@app/interfaces/movement';
-import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/surrounding-positions.const';
 
 @Injectable()
 export class MovementService {
@@ -21,7 +21,11 @@ export class MovementService {
         const startPos = activePlayer.currentStats.position;
 
         if (match.matchData.isDebugMode) {
-            return { moveCost: 0, path: [startPos, target] };
+            if (this.isTileAccessible(target, match) && !this.isTileOccupiedByPlayer(target, match) && !this.isTileOccupiedByObject(target, match)) {
+                return { moveCost: 0, path: [startPos, target] };
+            } else {
+                return { moveCost: 0, path: [] };
+            }
         }
 
         const { distances, predecessors } = this.calculateDistancesAndPredecessors(startPos, match, Infinity);
