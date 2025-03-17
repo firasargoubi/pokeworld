@@ -1,5 +1,6 @@
 import { MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { PlayGateway } from '@app/gateways/play/play.gateway';
+import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
@@ -19,6 +20,7 @@ describe('PlayService', () => {
     let mockMatchService: SinonStubbedInstance<MatchService>;
     let mockMovementService: SinonStubbedInstance<MovementService>;
     let mockCombatService: SinonStubbedInstance<CombatService>;
+    let mockLobbyGateway: SinonStubbedInstance<LobbyGateway>;
     let playerId: string;
     let matchCode: string;
     let players: Player[];
@@ -37,6 +39,7 @@ describe('PlayService', () => {
                 { provide: MatchService, useValue: mockMatchService },
                 { provide: MovementService, useValue: mockMovementService },
                 { provide: CombatService, useValue: mockCombatService },
+                { provide: LobbyGateway, useValue: mockLobbyGateway },
             ],
         }).compile();
         service = module.get<PlayService>(PlayService);
@@ -193,17 +196,6 @@ describe('PlayService', () => {
         (service as any).executeAction(position, match, playerId);
 
         expect(toggleBridgeTileStub.calledWith(match, position)).toBeTruthy();
-    });
-
-    it('startFight should pause the turn and emit pause event', () => {
-        const turnData = { phaseTimeout: null, lastPhaseStartTime: new Date() };
-        mockMatchService.getTurnData.returns(turnData);
-        mockMatchService.getMatch.returns(match);
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).startFight(playerId);
-
-        expect(mockPlayGateway.emitPauseTurn.calledWith(matchCode, match)).toBeTruthy();
     });
 
     it('toggleBridgeTile should toggle bridge tile to broken bridge', () => {

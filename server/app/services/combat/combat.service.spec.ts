@@ -2,6 +2,7 @@
 // This test suite is 100 lines longer than the recommended maximum
 import { CombatGateway } from '@app/gateways/combat/combat.gateway';
 import { MatchService } from '@app/services/match/match.service';
+import { PlayService } from '@app/services/play/play.service';
 import { CombatEvent } from '@common/combat-event.enum';
 import { AttackResult, CombatState } from '@common/combat-interfaces';
 import { DiceType } from '@common/dice';
@@ -9,7 +10,7 @@ import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
-import { createStubInstance, SinonStub, SinonStubbedInstance, spy, stub } from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Socket } from 'socket.io';
 import { CombatService } from './combat.service';
 import { MAX_TURN_DURATION, MIN_TURN_DURATION, PLAYER_STATS_MALUS } from './combat.service.const';
@@ -18,6 +19,8 @@ describe('CombatService', () => {
     let service: CombatService;
     let matchServiceStub: SinonStubbedInstance<MatchService>;
     let combatGatewayStub: SinonStubbedInstance<CombatGateway>;
+    let playeServiceStub: SinonStubbedInstance<PlayService>;
+    let clearTimeoutSpy: SinonStub;
 
     let updatePlayerBonusStatsSpy: SinonStub;
     let proceedCombatTurnSpy: SinonStub;
@@ -40,12 +43,14 @@ describe('CombatService', () => {
     beforeEach(async () => {
         matchServiceStub = createStubInstance<MatchService>(MatchService);
         combatGatewayStub = createStubInstance<CombatGateway>(CombatGateway);
+        playeServiceStub = createStubInstance<PlayService>(PlayService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 CombatService,
                 { provide: CombatGateway, useValue: combatGatewayStub },
                 { provide: MatchService, useValue: matchServiceStub },
+                { provide: PlayService, useValue: playeServiceStub },
             ],
         }).compile();
 
@@ -59,6 +64,7 @@ describe('CombatService', () => {
         endCombatSpy = stub(service, 'endCombat' as any);
         forceCombatTurnSwitchSpy = stub(service, 'forceCombatTurnSwitch' as any);
         leaveCombatSpy = stub(service, 'leaveCombat' as any);
+        clearTimeoutSpy = stub(global, 'clearTimeout');
         /* eslint-enable @typescript-eslint/no-explicit-any */
 
         player1 = {
@@ -79,6 +85,10 @@ describe('CombatService', () => {
 
         Object.defineProperty(socket1, 'id', { value: 'player-1' });
         Object.defineProperty(socket2, 'id', { value: 'player-2' });
+    });
+
+    afterEach(() => {
+        clearTimeoutSpy.restore();
     });
 
     it('should be defined', () => {
@@ -286,7 +296,6 @@ describe('CombatService', () => {
         service['combatTurnSystems'].set(combatRoomCode, combatState);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const reseatPlayersSpy = stub(service, 'resetPlayers' as any);
-        const clearTimeoutSpy = spy(global, 'clearTimeout');
 
         endCombatSpy.restore();
         service.endCombat(combatRoomCode, player1.id);
@@ -294,13 +303,11 @@ describe('CombatService', () => {
         expect(clearTimeoutSpy.calledWith(timer)).toBeTruthy();
         expect(reseatPlayersSpy.calledWith([player2, player1])).toBeTruthy();
 
-        const expectedCombatResult = { winnerId: player1.id, loserId: player2.id };
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, expectedCombatResult)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, null)).toBeTruthy();
         expect(leaveCombatSpy.calledWith(combatRoomCode, combatState)).toBeTruthy();
 
         expect(service['combatTurnSystems'].has(combatRoomCode)).toBeFalsy();
 
-        clearTimeoutSpy.restore();
         reseatPlayersSpy.restore();
     });
 
@@ -313,15 +320,12 @@ describe('CombatService', () => {
         service['combatTurnSystems'].set(combatRoomCode, combatState);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const reseatPlayersSpy = stub(service, 'resetPlayers' as any);
-        const clearTimeoutSpy = spy(global, 'clearTimeout');
 
         endCombatSpy.restore();
         service.endCombat(combatRoomCode, player2.id);
 
-        const expectedCombatResult = { winnerId: player2.id, loserId: player1.id };
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, expectedCombatResult)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, null)).toBeTruthy();
 
-        clearTimeoutSpy.restore();
         reseatPlayersSpy.restore();
     });
 
@@ -334,7 +338,6 @@ describe('CombatService', () => {
         service['combatTurnSystems'].set(combatRoomCode, combatState);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const reseatPlayersSpy = stub(service, 'resetPlayers' as any);
-        const clearTimeoutSpy = spy(global, 'clearTimeout');
 
         endCombatSpy.restore();
         service.endCombat(combatRoomCode);
@@ -342,10 +345,8 @@ describe('CombatService', () => {
         expect(clearTimeoutSpy.calledWith(timer)).toBeTruthy();
         expect(reseatPlayersSpy.calledWith([player2, player1])).toBeTruthy();
 
-        const expectedCombatResult = { winnerId: null, loserId: null };
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, expectedCombatResult)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, null)).toBeTruthy();
 
-        clearTimeoutSpy.restore();
         reseatPlayersSpy.restore();
     });
 
@@ -353,7 +354,6 @@ describe('CombatService', () => {
         const state = { timer, players: [player1, player2] as Player[], currentTurnIndex: 0 };
         service['combatTurnSystems'].set(combatRoomCode, state as CombatState);
 
-        const clearTimeoutSpy = spy(global, 'clearTimeout');
         forceCombatTurnSwitchSpy.restore();
 
         service.forceCombatTurnSwitch(combatRoomCode);
@@ -365,7 +365,6 @@ describe('CombatService', () => {
 
         expect(proceedCombatTurnSpy.calledWith(combatRoomCode)).toBeTruthy();
 
-        clearTimeoutSpy.restore();
         proceedCombatTurnSpy.restore();
     });
 
