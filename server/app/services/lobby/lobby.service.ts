@@ -23,7 +23,7 @@ export class LobbyService {
             this.lobbyGateway.connectPlayer(playerId, matchCode);
             this.emitUpdatePlayerList(matchCode);
         } else {
-            this.lobbyGateway.warn(playerId, 'Vous êtes déjà dans une partie');
+            this.lobbyGateway.warn(playerId, Warning.AlreadyInGame);
         }
 
         return matchCode;
@@ -187,7 +187,7 @@ export class LobbyService {
         const players = this.matchService.getPlayers(matchCode);
         players.forEach((player) => {
             if (!player.isConnected) {
-                this.removePlayer(player.id, Warning.RoomLocked);
+                this.removePlayer(player.id, Warning.LockedFromLobby);
             }
         });
     }

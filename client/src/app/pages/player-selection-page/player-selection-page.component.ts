@@ -71,7 +71,6 @@ export class PlayerSelectionPageComponent implements OnInit {
 
     goToMenu() {
         this.popupService.showPopup('Voulez-vous vraiment quitter ?', true, this.lobbySocketService.leaveMatch.bind(this.lobbySocketService));
-        this.playerSelectionService.matchCode = '';
     }
 
     isFormValid() {

@@ -16,7 +16,6 @@ interface PopupMessage {
     providedIn: 'root',
 })
 export class PopupService {
-    isDisplayed: boolean = false;
     private messages: PopupMessage[] = [];
     private overlayRefs: { overlayRef: OverlayRef; componentRef: ComponentRef<WarningConfirmationPopupComponent> }[] = [];
     private keepMessagesOnNavigation: boolean = false;
@@ -56,7 +55,6 @@ export class PopupService {
     private displayPopup() {
         const currentMessage = this.messages.shift();
         if (!currentMessage) return;
-        this.isDisplayed = true;
 
         const overlayConfig = new OverlayConfig();
         const overlayRef = this.overlay.create(overlayConfig);
@@ -84,7 +82,6 @@ export class PopupService {
             message.action();
         }
 
-        this.isDisplayed = false;
         overlayRef.dispose();
         this.overlayRefs = this.overlayRefs.filter(({ overlayRef: ref }) => ref !== overlayRef);
 
