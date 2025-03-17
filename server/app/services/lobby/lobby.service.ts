@@ -5,7 +5,7 @@ import { GameData } from '@common/game-data';
 import { Player } from '@common/player';
 import { Warning } from '@common/warning.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { MAX_PLAYERS, MIN_PLAYERS } from './lobby.service.const';
+import { MAX_PLAYERS, MIN_PLAYERS } from '@common/player-count.const';
 
 @Injectable()
 export class LobbyService {
