@@ -3,7 +3,7 @@ import { PlayGateway } from '@app/gateways/play/play.gateway';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
-import { CombatResult } from '@common/combat-interfaces';
+import { CombatResult } from '@common/combat';
 import { Match, TurnPhase } from '@common/match';
 import { Player } from '@common/player';
 import { Position } from '@common/position';

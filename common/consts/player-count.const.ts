@@ -1,4 +1,4 @@
-import { MapSize } from './map-size.enum';
+import { MapSize } from '../map-size.enum';
 
 export const MIN_PLAYERS = 2;
 

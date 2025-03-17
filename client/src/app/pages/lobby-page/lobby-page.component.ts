@@ -9,7 +9,7 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { Player } from '@common/player';
-import { MAX_PLAYERS } from '@common/player-count.const';
+import { MAX_PLAYERS } from '@common/consts/player-count.const';
 import { Observable } from 'rxjs';
 
 @Component({

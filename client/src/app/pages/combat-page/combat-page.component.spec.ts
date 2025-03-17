@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
-import { AttackResult, CombatResult } from '@common/combat-interfaces';
+import { AttackResult, CombatResult } from '@common/combat';
 import { Player } from '@common/player';
 import { BehaviorSubject } from 'rxjs';
 import { CombatPageComponent } from './combat-page.component';
