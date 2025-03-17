@@ -289,4 +289,80 @@ describe('MovementService', () => {
             { x: 2, y: 2 },
         ]);
     });
+    it('should return the current position if it is valid for movement', () => {
+        const match = structuredClone(MOCK_MATCHES[0]);
+        const position = { x: 1, y: 1 };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'isTileValidForMovement').returns(true);
+
+        const result = service.getNearestEmptyTile(position, match);
+        expect(result).toEqual(position);
+    });
+    it('should find the nearest valid tile when current position is not valid', () => {
+        const match = structuredClone(MOCK_MATCHES[0]);
+        const currentPos = { x: 1, y: 1 };
+        const validPos = { x: 2, y: 1 };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'isTileValidForMovement').callsFake((pos: Position) => {
+            return pos.x === validPos.x && pos.y === validPos.y;
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'enqueueValidNeighbors').callsFake((_pos, _match, _visited, queue: Position[]) => {
+            queue.push(validPos);
+        });
+
+        const result = service.getNearestEmptyTile(currentPos, match);
+        expect(result).toEqual(validPos);
+    });
+    it('shoud return undefined if no valid tile is found', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'isTileValidForMovement').returns(false);
+
+        const result = service.getNearestEmptyTile({ x: 1, y: 1 }, structuredClone(MOCK_MATCHES[0]));
+        expect(result).toBeUndefined();
+    });
+    it('should return true when tile contains an object', () => {
+        const match = structuredClone(MOCK_MATCHES[0]);
+        const position = { x: 1, y: 2 };
+
+        match.gameData.mapData.items.Item2 = [position];
+
+        const result = service['isTileOccupiedByObject'](position, match);
+        expect(result).toBe(true);
+    });
+    it('should return true when tile is not occupied and is accessible', () => {
+        const match = structuredClone(MOCK_MATCHES[0]);
+        const position = { x: 1, y: 1 };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private
+        sandbox.stub(service as any, 'isTileOccupiedByPlayer').returns(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private
+        sandbox.stub(service as any, 'isTileAccessible').returns(true);
+
+        const result = service['isTileValidForMovement'](position, match);
+        expect(result).toBe(true);
+    });
+    it('should return false if out of bounds', () => {
+        const match = structuredClone(MOCK_MATCHES[0]);
+        const position = { x: 1, y: 1 };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private
+        sandbox.stub(service as any, 'isOutOfBounds').returns(true);
+
+        const result = service['isTileAccessible'](position, match);
+        expect(result).toBe(false);
+    });
+    it('should convert a key to a position object', () => {
+        const key = '3-4';
+        const position = service['keyToPos'](key);
+        expect(position).toEqual({ x: 3, y: 4 });
+    });
+    it('should convert a position object to a key', () => {
+        const position = { x: 2, y: 3 };
+        const key = service['posToKey'](position);
+        expect(key).toEqual('2-3');
+    });
 });
