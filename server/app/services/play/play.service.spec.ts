@@ -1,17 +1,17 @@
 import { MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
-import { PlayGateway } from '@app/gateways/play/play.gateway';
 import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
+import { PlayGateway } from '@app/gateways/play/play.gateway';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
-import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@common/const/default-player.const';
 import { Match, TurnPhase } from '@common/match';
 import { Player } from '@common/player';
 import { TileType } from '@common/tile-type.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
 import { PlayService } from './play.service';
-import { PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
+import { MINIMUM_FIGHTS_TO_WIN, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
+import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@common/consts/default-player.const';
 
 describe('PlayService', () => {
     let service: PlayService;
@@ -31,6 +31,7 @@ describe('PlayService', () => {
         mockMatchService = createStubInstance<MatchService>(MatchService);
         mockMovementService = createStubInstance<MovementService>(MovementService);
         mockCombatService = createStubInstance<CombatService>(CombatService);
+        mockLobbyGateway = createStubInstance<LobbyGateway>(LobbyGateway);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -43,13 +44,13 @@ describe('PlayService', () => {
             ],
         }).compile();
         service = module.get<PlayService>(PlayService);
+    });
+
+    beforeEach(() => {
         players = structuredClone(MOCK_PLAYERS);
         playerId = MOCK_PLAYERS[0].id;
         match = structuredClone(MOCK_MATCHES[0]);
         matchCode = match.matchData.code;
-    });
-
-    beforeEach(() => {
         sandbox = createSandbox();
     });
 
@@ -389,5 +390,76 @@ describe('PlayService', () => {
 
         expect(resetCurrentStatsStub.calledWith(currentPlayer)).toBeTruthy();
         expect(mockPlayGateway.emitTurnStarted.calledWith(matchCode, match)).toBeTruthy();
+    });
+    it('endOfCombat should call respawnPlayer and endMatch when winner reaches threshold', () => {
+        players[0].currentStats.fightsWon = MINIMUM_FIGHTS_TO_WIN - 1;
+        const combatResult = { winnerId: players[0].id, loserId: players[1].id };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const respawnStub = sandbox.stub(service as any, 'respawnPlayer');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const endMatchStub = sandbox.stub(service as any, 'endMatch');
+        mockMatchService.getPlayer.returns(players[0]);
+
+        service.endOfCombat(combatResult, players[0].id);
+
+        expect(respawnStub.calledWith(players[1].id, matchCode)).toBeTruthy();
+        expect(players[0].currentStats.fightsWon).toBe(MINIMUM_FIGHTS_TO_WIN);
+        expect(endMatchStub.calledWith(matchCode)).toBeTruthy();
+    });
+
+    it('endOfCombat should emit combat result and call nextTurnPhase when winner has not reached threshold', () => {
+        players[0].currentStats.fightsWon = 0;
+        const combatResult = { winnerId: players[0].id, loserId: players[1].id };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const nextTurnPhaseStub = sandbox.stub(service as any, 'nextTurnPhase');
+
+        mockMatchService.getPlayers.returns(players);
+        service.endOfCombat(combatResult, players[0].id);
+
+        expect(players[0].currentStats.fightsWon).toBe(1);
+        expect(mockPlayGateway.emitCombatResultBroadcast.calledWith(matchCode, { match, combatResult })).toBeTruthy();
+        expect(nextTurnPhaseStub.calledWith(matchCode)).toBeTruthy();
+    });
+
+    it('unfreezeMatch should clear existing timeout and set a new one', () => {
+        const fakeTimeout = setTimeout(() => {}, 100);
+        const turnData = { phaseTimeout: fakeTimeout, lastPhaseStartTime: new Date() };
+        mockMatchService.getTurnData.returns(turnData);
+        const clearTimeoutSpy = sandbox.spy(global, 'clearTimeout');
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (service as any).unfreezeMatch(match);
+
+        expect(clearTimeoutSpy.calledWith(fakeTimeout)).toBeTruthy();
+        expect(turnData.phaseTimeout).not.toBeNull();
+        clearTimeoutSpy.restore();
+    });
+
+    it('respawnPlayer should update player position using movementService.getNearestEmptyTile', () => {
+        players[1].spawnPoint = { x: 2, y: 2 };
+        const newPosition = { x: 3, y: 3 };
+        mockMovementService.getNearestEmptyTile.returns(newPosition);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (service as any).respawnPlayer(players[1].id, matchCode);
+
+        expect(mockMovementService.getNearestEmptyTile.calledWith(players[1].spawnPoint, match)).toBeTruthy();
+        expect(players[1].currentStats.position).toEqual(newPosition);
+    });
+
+    it('endMatch should emit match ended and remove then disconnect all players', () => {
+        mockMatchService.getPlayers.returns(players);
+        mockMatchService.getMatch.returns(match);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (service as any).endMatch(matchCode);
+
+        expect(mockPlayGateway.emitMatchEnded.calledWith(matchCode, match)).toBeTruthy();
+        players.forEach((player) => {
+            expect(mockMatchService.removePlayerFromMatch.calledWith(player.id, matchCode)).toBeTruthy();
+            expect(mockLobbyGateway.disconnectPlayer.calledWith(player.id)).toBeTruthy();
+        });
     });
 });
