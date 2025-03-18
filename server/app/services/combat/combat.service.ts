@@ -1,6 +1,11 @@
 import { CombatGateway } from '@app/gateways/combat/combat.gateway';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
+import { AttackResult, CombatData, CombatResult, CombatState } from '@common/interfaces/combat';
+import { DICE_MAX_VALUE, DiceType } from '@common/interfaces/dice';
+import { Player } from '@common/interfaces/player';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { CombatEvent } from '@common/interfaces/websocket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import {
     COMBAT_CODE_LENGTH,
@@ -10,11 +15,6 @@ import {
     MIN_TURN_DURATION,
     PLAYER_STATS_MALUS,
 } from './combat.service.const';
-import { CombatState, CombatData, AttackResult, CombatResult } from '@common/interfaces/combat';
-import { DiceType, DICE_MAX_VALUE } from '@common/interfaces/dice';
-import { Player } from '@common/interfaces/player';
-import { TileType } from '@common/interfaces/tile-type.enum';
-import { CombatEvent } from '@common/interfaces/websocket-event.enum';
 
 @Injectable()
 export class CombatService {
@@ -27,9 +27,9 @@ export class CombatService {
         return this.combatTurnSystems;
     }
 
-    initiateCombat(playerId: string, targetPlayerId: string): void {
-        const targetPlayer = this.matchService.getPlayer(targetPlayerId);
-        const initiatingPlayer = this.matchService.getPlayer(playerId);
+    initiateCombat(playerId: string, targetPlayerId: string, matchCode: string): void {
+        const targetPlayer = this.matchService.getPlayer(matchCode, targetPlayerId);
+        const initiatingPlayer = this.matchService.getPlayer(matchCode, playerId);
 
         const combatRoomCode = this.generateUniqueCombatCode();
 
@@ -44,7 +44,7 @@ export class CombatService {
 
         this.resetPlayers([initiatingPlayer, targetPlayer]);
         this.updatePlayersStatsByCurrentTile([initiatingPlayer, targetPlayer]);
-        this.startTurnSystem(combatRoomCode, [initiatingPlayer, targetPlayer]);
+        this.startTurnSystem(combatRoomCode, [initiatingPlayer, targetPlayer], matchCode);
     }
 
     escape(combatRoomCode: string, playerId: string): void {
@@ -110,7 +110,7 @@ export class CombatService {
         this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.EndCombat, null);
         this.combatTurnSystems.delete(combatRoomCode);
         this.leaveCombat(combatRoomCode, state);
-        this.playService.endOfCombat(combatResult, player1.id);
+        this.playService.endOfCombat(state.matchCode, combatResult, player1.id);
     }
 
     forceCombatTurnSwitch(combatRoomCode: string): void {
@@ -147,7 +147,7 @@ export class CombatService {
         }
     }
 
-    private startTurnSystem(combatRoomCode: string, players: Player[]): void {
+    private startTurnSystem(combatRoomCode: string, players: Player[], matchCode: string): void {
         const player1 = players[0];
         const player2 = players[1];
 
@@ -156,6 +156,7 @@ export class CombatService {
         }
 
         this.combatTurnSystems.set(combatRoomCode, {
+            matchCode,
             timer: null,
             players,
             currentTurnIndex: 0,
@@ -202,8 +203,8 @@ export class CombatService {
     }
 
     private updatePlayerBonusStats(combatRoomCode: string, player: Player, updateAttack: boolean): void {
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(player.id);
-        const match = this.matchService.getMatch(matchCode);
+        const state = this.combatTurnSystems.get(combatRoomCode);
+        const match = this.matchService.getMatch(state.matchCode);
         if (updateAttack) {
             if (match.matchData.isDebugMode) {
                 player.currentStats.attackBonus = DICE_MAX_VALUE[player.playerStats.attackDice];

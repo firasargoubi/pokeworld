@@ -29,3 +29,8 @@ export interface PlayerMovementData {
     movement: Position[],
     match: Match,
 };
+
+export interface PlayerLeftData {
+    playerName: string,
+    match: Match,
+}

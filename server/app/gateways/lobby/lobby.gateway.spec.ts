@@ -1,6 +1,6 @@
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { GameData } from '@common/interfaces/game-data';
-import { Match } from '@common/interfaces/match';
+import { Match, PlayerLeftData } from '@common/interfaces/match';
 import { Player } from '@common/interfaces/player';
 import { Warning } from '@common/interfaces/warning.enum';
 import { LobbyEvent } from '@common/interfaces/websocket-event.enum';
@@ -127,8 +127,10 @@ describe('LobbyGateway', () => {
 
     it('should emit PlayerLeft on emitPlayerLeft', () => {
         const matchCode = '1234';
-        gateway.emitPlayerLeft(matchCode, mockMatch);
-        expect(emitStub.calledWith(LobbyEvent.PlayerLeft, mockMatch)).toBeTruthy();
+        const playerLeftData = { match: mockMatch } as PlayerLeftData;
+
+        gateway.emitPlayerLeft(matchCode, playerLeftData);
+        expect(emitStub.calledWith(LobbyEvent.PlayerLeft, playerLeftData)).toBeTruthy();
     });
 
     it('should emit Warning on warn', () => {

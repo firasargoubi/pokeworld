@@ -282,11 +282,12 @@ describe('PlaySocketsService', () => {
 
         const updatedPlayers = [{ name: 'Alice', isConnected: true } as Player, { name: 'Bob', isConnected: false } as Player];
         const updatedMatch = { matchData: { players: updatedPlayers } } as Match;
+        const updatedPlayerLeftData = { match: updatedMatch, playerName: 'Bob' };
 
-        service['onPlayerLeft'](updatedMatch);
+        service['onPlayerLeft'](updatedPlayerLeftData);
 
-        expect(service['onPlayerLeft']).toHaveBeenCalledWith(updatedMatch);
-        expect(matchDataServiceSpy.updateMatch).toHaveBeenCalledWith(updatedMatch);
+        expect(service['onPlayerLeft']).toHaveBeenCalledWith(updatedPlayerLeftData);
+        expect(matchDataServiceSpy.updateMatch).toHaveBeenCalledWith(updatedPlayerLeftData.match);
         expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { MapComponent } from '@app/components/map/map.component';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { EMPTY_IMAGE } from '@app/consts/images.const';
@@ -23,7 +24,7 @@ import { Player } from '@common/interfaces/player';
     selector: 'app-play-page',
     templateUrl: './play-page.component.html',
     styleUrls: ['./play-page.component.scss'],
-    imports: [MapComponent, CommonModule],
+    imports: [MapComponent, CommonModule, ChatComponent],
 })
 export class PlayPageComponent {
     playVisualData: PlayVisualData = structuredClone(DEFAULT_PLAY_VISUAL_DATA);
@@ -43,6 +44,7 @@ export class PlayPageComponent {
         this.computeVisualData();
         this.matchDataService.matchUpdate.subscribe(this.computeVisualData.bind(this));
         this.generateThumbnail();
+        this.mapService.clearOverlays();
     }
 
     get mapSize(): string {
@@ -211,11 +213,6 @@ export class PlayPageComponent {
 
     private verifySocketConnection(isConnected: boolean) {
         if (!isConnected || this.matchDataService.matchData.players.length <= 0) {
-            if (this.timerService) {
-                this.popupService.clearMessages();
-                this.popupService.showPopup('Erreur de connection avec le serveur');
-                this.popupService.keepMessages();
-            }
             this.router.navigate([PageEndpoint.Menu]);
         }
     }

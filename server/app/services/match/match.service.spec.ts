@@ -1,11 +1,11 @@
 import { CODE_LENGTH } from '@common/consts/match.const';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MATCH_CODES, MATCHES, MOCK_MATCHES, PLAYER_TO_MATCH_CODE } from '@common/test-consts/mock-matches';
+import { PLAYER_IDS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createSandbox, SinonSandbox } from 'sinon';
 import { MatchService } from './match.service';
 import { DEFAULT_TURN_DATA } from './match.service.const';
-import { PLAYER_IDS } from '@common/test-consts/mock-players';
 
 describe('MatchService', () => {
     let service: MatchService;
@@ -47,14 +47,13 @@ describe('MatchService', () => {
 
     it('should getPlayerIndex correctly', () => {
         const playerId = PLAYER_IDS[0];
-        const getMatchCodeFromPlayerIdSpy = sandbox.spy(service, 'getMatchCodeFromPlayerId');
+        const matchCode = MATCH_CODES[0];
         const getPlayersSpy = sandbox.spy(service, 'getPlayers');
 
-        const result = service.getPlayerIndex(playerId);
+        const result = service.getPlayerIndex(matchCode, playerId);
 
         expect(result).toBe(0);
-        expect(getMatchCodeFromPlayerIdSpy.calledWith(playerId)).toBe(true);
-        expect(getPlayersSpy.calledWith(MATCH_CODES[0])).toBe(true);
+        expect(getPlayersSpy.calledWith(matchCode)).toBe(true);
     });
 
     it('should detect isPlayerInMatch correctly', () => {
@@ -70,20 +69,22 @@ describe('MatchService', () => {
 
     it('should detect isPlayerAdmin correctly', () => {
         const playerIdAdmin = '1122';
-        service.addPlayerToMatch(playerIdAdmin, structuredClone(MATCH_CODES[0]), true);
-        expect(service.isPlayerAdmin(playerIdAdmin)).toBe(true);
+        const matchCode = MATCH_CODES[0];
+        service.addPlayerToMatch(playerIdAdmin, matchCode, true);
+        expect(service.isPlayerAdmin(playerIdAdmin, matchCode)).toBe(true);
         const playerIdNonAdmin = '3344';
-        service.addPlayerToMatch(playerIdNonAdmin, structuredClone(MATCH_CODES[0]), false);
-        expect(service.isPlayerAdmin(playerIdNonAdmin)).toBe(false);
+        service.addPlayerToMatch(playerIdNonAdmin, matchCode, false);
+        expect(service.isPlayerAdmin(playerIdNonAdmin, matchCode)).toBe(false);
     });
 
     it('should getUniqueName correctly', () => {
         const name = 'bob';
         const newPlayerId = '4111';
-        service.addPlayerToMatch(newPlayerId, structuredClone(MATCH_CODES[0]), false);
-        expect(service.getUniqueName(name, newPlayerId)).toBe(name);
-        service.getPlayer(structuredClone(PLAYER_IDS[0])).name = name;
-        expect(service.getUniqueName(name, newPlayerId)).toBe(`${name}-2`);
+        const matchCode = MATCH_CODES[0];
+        service.addPlayerToMatch(newPlayerId, matchCode, false);
+        expect(service.getUniqueName(name, newPlayerId, matchCode)).toBe(name);
+        service.getPlayer(matchCode, structuredClone(PLAYER_IDS[0])).name = name;
+        expect(service.getUniqueName(name, newPlayerId, matchCode)).toBe(`${name}-2`);
     });
 
     it('should getNewMatchCode correctly', () => {
@@ -99,9 +100,10 @@ describe('MatchService', () => {
 
     it('should removePlayerFromMatch correctly', () => {
         const playerId = '9090';
-        service.addPlayerToMatch(playerId, structuredClone(MATCH_CODES[0]), false);
+        const matchCode = MATCH_CODES[0];
+        service.addPlayerToMatch(playerId, matchCode, false);
         expect(service.isPlayerInMatch(playerId)).toBe(true);
-        service.removePlayerFromMatch(playerId, structuredClone(MATCH_CODES[0]));
+        service.removePlayerFromMatch(playerId, matchCode, true);
         expect(service.isPlayerInMatch(playerId)).toBe(false);
     });
 
@@ -109,14 +111,14 @@ describe('MatchService', () => {
         const matchCode = MATCH_CODES[0];
         expect(service.hasMatchCode(matchCode)).toBe(true);
         [PLAYER_IDS[0], PLAYER_IDS[1], PLAYER_IDS[2], PLAYER_IDS[3]].forEach((playerId) => {
-            service.removePlayerFromMatch(playerId, matchCode);
+            service.removePlayerFromMatch(playerId, matchCode, true);
         });
         expect(service.hasMatchCode(matchCode)).toBe(false);
         expect(service['turnDatas'].has(matchCode)).toBe(false);
     });
 
-    it('should getMatchCodeFromPlayerId correctly', () => {
-        const result = service.getMatchCodeFromPlayerId(structuredClone(PLAYER_IDS[0]));
+    it('should getMatchCode correctly', () => {
+        const result = service.getMatchCode(structuredClone(PLAYER_IDS[0]));
         expect(result).toBe(structuredClone(MATCH_CODES[0]));
     });
 
@@ -146,13 +148,8 @@ describe('MatchService', () => {
         expect(result).toEqual(MATCHES.get(structuredClone(MATCH_CODES[0])).matchData.players);
     });
 
-    it('should getPlayer correctly', () => {
-        const result = service.getPlayer(structuredClone(PLAYER_IDS[0]));
-        expect(result.id).toBe(structuredClone(PLAYER_IDS[0]));
-    });
-
-    it('should getPlayersFromPlayerId correctly', () => {
-        const result = service.getPlayersFromPlayerId(structuredClone(PLAYER_IDS[0]));
+    it('should getPlayers correctly', () => {
+        const result = service.getPlayers(structuredClone(MATCH_CODES[0]));
         expect(result).toEqual(MATCHES.get(structuredClone(MATCH_CODES[0])).matchData.players);
     });
 
@@ -161,9 +158,9 @@ describe('MatchService', () => {
         const match = service['matches'].get(matchCode);
         match.matchData.activePlayer = 0;
         const activePlayerId = match.matchData.players[0].id;
-        expect(service.isActivePlayer(activePlayerId)).toBe(true);
-        expect(service.isActivePlayer(PLAYER_IDS[1])).toBe(false);
-        expect(service.isActivePlayer('unknown')).toBe(false);
+        expect(service.isActivePlayer(matchCode, activePlayerId)).toBe(true);
+        expect(service.isActivePlayer(matchCode, PLAYER_IDS[1])).toBe(false);
+        expect(service.isActivePlayer(matchCode, 'unknown')).toBe(false);
     });
 
     it('should get turn data correctly', () => {
@@ -181,7 +178,7 @@ describe('MatchService', () => {
         const clearTimeoutSpy = sandbox.spy(global, 'clearTimeout');
 
         [PLAYER_IDS[0], PLAYER_IDS[1], PLAYER_IDS[2], PLAYER_IDS[3]].forEach((playerId) => {
-            service.removePlayerFromMatch(playerId, matchCode);
+            service.removePlayerFromMatch(playerId, matchCode, true);
         });
 
         expect(service.hasMatchCode(matchCode)).toBe(false);

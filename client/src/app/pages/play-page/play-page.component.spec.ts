@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MapComponent } from '@app/components/map/map.component';
+import { DEFAULT_TILE_DESCRIPTION } from '@app/consts/default-tile-description.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
@@ -14,10 +15,9 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MapSize } from '@common/interfaces/map-data';
 import { TurnPhase } from '@common/interfaces/match';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
+import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { BehaviorSubject } from 'rxjs';
 import { PlayPageComponent } from './play-page.component';
-import { DEFAULT_TILE_DESCRIPTION } from '@app/consts/default-tile-description.const';
-import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 
 describe('PlayPageComponent', () => {
     let component: PlayPageComponent;
@@ -46,7 +46,7 @@ describe('PlayPageComponent', () => {
             tileDescriptionPos: { x: 0, y: 0 },
             isPlayerDescription: false,
         });
-        mockMapService = jasmine.createSpyObj('MapService', ['getTileImage', 'hasActionOverlay', 'clearActions'], {
+        mockMapService = jasmine.createSpyObj('MapService', ['getTileImage', 'hasActionOverlay', 'clearActions', 'clearOverlays'], {
             visualMapData: { size: MapSize.Small },
         });
         mockThumbnailService = jasmine.createSpyObj('ThumbnailService', ['getThumbnail']);
@@ -104,9 +104,7 @@ describe('PlayPageComponent', () => {
 
     it('should show popup, keep messages, and navigate if socket disconnects', () => {
         connectionStatusSubject.next(false);
-
-        expect(mockPopupService.showPopup).toHaveBeenCalledWith('Erreur de connection avec le serveur');
-        expect(mockPopupService.keepMessages).toHaveBeenCalled();
+        expect(mockPopupService.keepMessages).not.toHaveBeenCalled();
         expect(mockRouter.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 

@@ -95,7 +95,7 @@ describe('LobbyService', () => {
     });
 
     it('should remove player from match and update room when player leaves', () => {
-        mockMatchService.getMatchCodeFromPlayerId.returns('3344');
+        mockMatchService.getMatchCode.returns('3344');
         mockMatchService.getIsMatchStarted.returns(false);
         mockMatchService.isPlayerAdmin.returns(false);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
@@ -111,7 +111,7 @@ describe('LobbyService', () => {
     });
 
     it('should kick everyone when admin leave match', () => {
-        mockMatchService.getMatchCodeFromPlayerId.returns('3344');
+        mockMatchService.getMatchCode.returns('3344');
         mockMatchService.getIsMatchStarted.returns(false);
         mockMatchService.isPlayerAdmin.returns(true);
         mockMatchService.getPlayers.returns([structuredClone(MOCK_PLAYERS[0])]);
@@ -124,21 +124,23 @@ describe('LobbyService', () => {
     });
 
     it('should KickPlayer correctly', () => {
+        const matchCode = '3344';
         mockMatchService.isPlayerAdmin.returns(true);
+        mockMatchService.getMatchCode.returns(matchCode);
         const removePlayerStub = sandbox.stub(service, 'removePlayer');
 
         service.kickPlayer('admin1', '1122');
-        expect(removePlayerStub.calledWith('1122', Warning.Kick)).toBeTruthy();
+        expect(removePlayerStub.calledWith(matchCode, '1122', Warning.Kick)).toBeTruthy();
     });
 
     it('should remove player correctly', () => {
-        mockMatchService.getMatchCodeFromPlayerId.returns('3344');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        const matchCode = '3344';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const emitUpdatePlayerListStub = sandbox.stub(service as any, 'emitUpdatePlayerList');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const emitLockStatusChangedStub = sandbox.stub(service as any, 'emitLockStatusChanged');
 
-        service.removePlayer('1122', Warning.AdminQuit);
+        service.removePlayer(matchCode, '1122', Warning.AdminQuit);
 
         expect(mockMatchService.removePlayerFromMatch.calledWith('1122', '3344')).toBeTruthy();
         expect(mockLobbyGateway.warn.calledWith('1122', Warning.AdminQuit)).toBeTruthy();
@@ -148,7 +150,7 @@ describe('LobbyService', () => {
     });
 
     it('should update player information and notify all room members', () => {
-        mockMatchService.getMatchCodeFromPlayerId.returns('3344');
+        mockMatchService.getMatchCode.returns('3344');
         mockMatchService.getPlayers.returns(MOCK_PLAYERS);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const emitUpdatePlayerListStub = sandbox.stub(service as any, 'emitUpdatePlayerList');
@@ -161,7 +163,7 @@ describe('LobbyService', () => {
     });
 
     it('should start match when conditions are met', () => {
-        mockMatchService.getMatchCodeFromPlayerId.returns('3344');
+        mockMatchService.getMatchCode.returns('3344');
         mockMatchService.isPlayerAdmin.returns(true);
         mockMatchService.getMatch.returns({
             gameData: MOCK_GAME_DATAS[0],
@@ -182,7 +184,7 @@ describe('LobbyService', () => {
     });
 
     it('should update room lock status when requested by admin', () => {
-        mockMatchService.getMatchCodeFromPlayerId.returns('3344');
+        mockMatchService.getMatchCode.returns('3344');
         mockMatchService.isPlayerAdmin.returns(true);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const emitLockStatusChangedStub = sandbox.stub(service as any, 'emitLockStatusChanged');
@@ -219,9 +221,9 @@ describe('LobbyService', () => {
 
         service['kickJoiningPlayers'](matchCode);
 
-        expect(removePlayerStub.calledWith('2233')).toBeTruthy();
-        expect(removePlayerStub.calledWith('3344')).toBeTruthy();
-        expect(removePlayerStub.calledWith('1122')).toBeFalsy();
+        expect(removePlayerStub.calledWith(matchCode, '2233', Warning.LockedFromLobby)).toBeTruthy();
+        expect(removePlayerStub.calledWith(matchCode, '3344', Warning.LockedFromLobby)).toBeTruthy();
+        expect(removePlayerStub.calledWith(matchCode, '1122')).toBeFalsy();
     });
 
     it('should broadcast updated player list to all room members', () => {
@@ -236,7 +238,7 @@ describe('LobbyService', () => {
     it('should canStartMatch return true when conditions are met', () => {
         const playerId = '1122';
         const matchCode = '3344';
-        mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
+        mockMatchService.getMatchCode.returns(matchCode);
         mockMatchService.getMatch.returns({
             gameData: MOCK_GAME_DATAS[0],
             matchData: {
@@ -251,7 +253,7 @@ describe('LobbyService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isMatchLocked').returns(true);
 
-        const result = service['canStartMatch'](playerId);
+        const result = service['canStartMatch'](matchCode, playerId);
         expect(result).toBe(true);
     });
 
@@ -332,12 +334,14 @@ describe('LobbyService', () => {
         leavingPlayer.isAdmin = false;
         match.matchData.players = MOCK_PLAYERS;
         mockMatchService.getMatch.returns(match);
+        mockPlayService.canEndTurn.returns(true);
 
+        const expectedPlayerLeftData = { match, playerName: leavingPlayer.name };
         service.leaveStartedMatch(leavingPlayer.id, matchCode);
 
         expect(mockPlayService.changeDebugMode.notCalled).toBeTruthy();
-        expect(mockLobbyGateway.emitPlayerLeft.calledWith(matchCode, match)).toBeTruthy();
-        expect(mockPlayService.endTurn.calledWith(leavingPlayer.id)).toBeTruthy();
+        expect(mockLobbyGateway.emitPlayerLeft.calledWith(matchCode, expectedPlayerLeftData)).toBeTruthy();
+        expect(mockPlayService.nextTurnPhase.calledWith(matchCode)).toBeTruthy();
     });
 
     it('should change debug mode if leaving player is admin and then emit player left and end turn', () => {
@@ -349,11 +353,12 @@ describe('LobbyService', () => {
         match.matchData.players = MOCK_PLAYERS;
         mockMatchService.getMatch.returns(match);
 
+        const expectedPlayerLeftData = { match, playerName: leavingPlayer.name };
         service.leaveStartedMatch(leavingPlayer.id, matchCode);
 
         expect(mockPlayService.changeDebugMode.calledWith(leavingPlayer.id, false)).toBeTruthy();
-        expect(mockLobbyGateway.emitPlayerLeft.calledWith(matchCode, match)).toBeTruthy();
-        expect(mockPlayService.endTurn.calledWith(leavingPlayer.id)).toBeTruthy();
+        expect(mockLobbyGateway.emitPlayerLeft.calledWith(matchCode, expectedPlayerLeftData)).toBeTruthy();
+        expect(mockPlayService.nextTurnPhase.calledWith(matchCode)).toBeTruthy();
     });
 
     it('should call leaveStartedMatch when match is started', () => {
@@ -361,8 +366,8 @@ describe('LobbyService', () => {
         const playerId = match.matchData.players[0].id;
         const matchCode = match.matchData.code;
 
-        mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
         mockMatchService.getIsMatchStarted.returns(true);
+        mockMatchService.getMatchCode.returns(matchCode);
         const leaveStartedMatchSpy = sandbox.spy(service, 'leaveStartedMatch');
 
         service.leaveMatch(playerId);

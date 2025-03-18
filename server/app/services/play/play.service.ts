@@ -3,7 +3,7 @@ import { PlayGateway } from '@app/gateways/play/play.gateway';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
-import { MINIMUM_FIGHTS_TO_WIN, TURN_DURATION, PRE_TURN_DURATION, HALF_POINT } from '@common/consts/match.const';
+import { HALF_POINT, MINIMUM_FIGHTS_TO_WIN, PRE_TURN_DURATION, TURN_DURATION } from '@common/consts/match.const';
 import { CombatResult } from '@common/interfaces/combat';
 import { Match, TurnPhase } from '@common/interfaces/match';
 import { Player } from '@common/interfaces/player';
@@ -21,7 +21,7 @@ export class PlayService {
 
     getPossibleMoves(playerId: string): Position[] {
         let positions = [];
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+        const matchCode = this.matchService.getMatchCode(playerId);
         if (matchCode) {
             positions = this.movementService.getPossibleMoves(this.matchService.getMatch(matchCode));
         }
@@ -29,9 +29,9 @@ export class PlayService {
     }
 
     move(playerId: string, position: Position) {
-        if (this.matchService.isActivePlayer(playerId)) {
-            const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-            const player = this.matchService.getPlayer(playerId);
+        const matchCode = this.matchService.getMatchCode(playerId);
+        if (this.matchService.isActivePlayer(matchCode, playerId)) {
+            const player = this.matchService.getPlayer(matchCode, playerId);
             const match = this.matchService.getMatch(matchCode);
             const shortestPath = this.movementService.getShortestPath(match, position);
 
@@ -40,29 +40,29 @@ export class PlayService {
                 player.currentStats.movement -= shortestPath.moveCost;
                 const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
                 this.playGateway.emitPlayerMoved(matchCode, { match, movement: shortestPath.path, playerIndex });
-                this.tryEndTurn(playerId);
+                this.tryEndTurn(matchCode, playerId);
             }
         }
     }
 
     action(playerId: string, position: Position) {
-        if (this.matchService.isActivePlayer(playerId)) {
-            const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+        const matchCode = this.matchService.getMatchCode(playerId);
+        if (this.matchService.isActivePlayer(matchCode, playerId)) {
             const match = this.matchService.getMatch(matchCode);
             const actions = this.movementService.getActions(match);
 
             if (actions.some((a) => a.x === position.x && a.y === position.y)) {
                 match.matchData.players.find((p) => p.id === playerId).currentStats.hasAction = false;
-                this.executeAction(position, match, playerId);
+                this.executeAction(matchCode, position, match, playerId);
             }
         }
     }
 
     getHoverMoves(playerId: string, position: Position): Position[] {
+        const matchCode = this.matchService.getMatchCode(playerId);
         let moves = [];
-        if (position.x >= 0 && position.y >= 0 && this.matchService.isActivePlayer(playerId)) {
-            const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-            const player = this.matchService.getPlayer(playerId);
+        if (position.x >= 0 && position.y >= 0 && this.matchService.isActivePlayer(matchCode, playerId)) {
+            const player = this.matchService.getPlayer(matchCode, playerId);
             const shortestPath = this.movementService.getShortestPath(this.matchService.getMatch(matchCode), position);
             if (shortestPath.moveCost <= player.currentStats.movement) {
                 moves = shortestPath.path;
@@ -72,10 +72,9 @@ export class PlayService {
     }
 
     getActions(playerId: string): Position[] {
+        const matchCode = this.matchService.getMatchCode(playerId);
         let actions = [];
-
-        if (this.matchService.isActivePlayer(playerId)) {
-            const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+        if (this.matchService.isActivePlayer(matchCode, playerId)) {
             const match = this.matchService.getMatch(matchCode);
             actions = this.movementService.getActions(match);
         }
@@ -91,15 +90,16 @@ export class PlayService {
     }
 
     endTurn(playerId: string) {
-        if (this.canEndTurn(playerId)) {
-            this.nextTurnPhase(this.matchService.getMatchCodeFromPlayerId(playerId));
+        const matchCode = this.matchService.getMatchCode(playerId);
+        if (this.canEndTurn(playerId, matchCode)) {
+            this.nextTurnPhase(matchCode);
         }
     }
 
     changeDebugMode(playerId: string, forceMode?: boolean) {
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+        const matchCode = this.matchService.getMatchCode(playerId);
         if (matchCode) {
-            const isAdmin = this.matchService.isPlayerAdmin(playerId);
+            const isAdmin = this.matchService.isPlayerAdmin(playerId, matchCode);
             if (isAdmin) {
                 const match = this.matchService.getMatch(matchCode);
                 match.matchData.isDebugMode = forceMode !== undefined ? forceMode : !match.matchData.isDebugMode;
@@ -108,25 +108,47 @@ export class PlayService {
         }
     }
 
-    endOfCombat(combatResult: CombatResult, playerId: string) {
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+    canEndTurn(playerId: string, matchCode: string): boolean {
         const match = this.matchService.getMatch(matchCode);
-        if (combatResult.winnerId) {
-            this.respawnPlayer(combatResult.loserId, matchCode);
-            const winnerPlayer = this.matchService.getPlayer(combatResult.winnerId);
-            winnerPlayer.currentStats.fightsWon += 1;
-            if (winnerPlayer.currentStats.fightsWon >= MINIMUM_FIGHTS_TO_WIN) {
-                this.endMatch(matchCode);
-                return;
-            }
-        }
+        const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
+        const isActivePlayer = match.matchData.activePlayer === playerIndex;
 
-        this.playGateway.emitCombatResultBroadcast(matchCode, { match, combatResult });
-        if (combatResult.loserId && this.canEndTurn(combatResult.loserId)) {
-            this.nextTurnPhase(this.matchService.getMatchCodeFromPlayerId(playerId));
-        } else {
-            this.tryEndTurn(playerId);
-            this.unfreezeMatch(match);
+        return isActivePlayer;
+    }
+
+    nextTurnPhase(matchCode: string) {
+        const match = this.matchService.getMatch(matchCode);
+        if (match.matchData.phase === TurnPhase.PreTurn) {
+            match.matchData.phase = TurnPhase.Turn;
+            this.startTurnTimer(match, TURN_DURATION);
+            this.startTurn(match);
+        } else if (match.matchData.phase === TurnPhase.Turn) {
+            match.matchData.phase = TurnPhase.PreTurn;
+            this.startTurnTimer(match, PRE_TURN_DURATION);
+            this.startPreTurn(match);
+        }
+    }
+
+    endOfCombat(matchCode: string, combatResult: CombatResult, playerId: string) {
+        const match = this.matchService.getMatch(matchCode);
+        if (match) {
+            if (combatResult.winnerId) {
+                this.respawnPlayer(combatResult.loserId, matchCode);
+                const winnerPlayer = match.matchData.players.find((p) => p.id === combatResult.winnerId);
+                winnerPlayer.currentStats.fightsWon += 1;
+                if (winnerPlayer.currentStats.fightsWon >= MINIMUM_FIGHTS_TO_WIN) {
+                    this.endMatch(matchCode);
+                    return;
+                }
+            }
+
+            this.playGateway.emitCombatResultBroadcast(matchCode, { match, combatResult });
+            if (combatResult.loserId && this.canEndTurn(combatResult.loserId, matchCode)) {
+                this.nextTurnPhase(matchCode);
+            } else {
+                this.tryEndTurn(matchCode, playerId);
+                this.unfreezeMatch(match);
+            }
         }
     }
 
@@ -144,10 +166,12 @@ export class PlayService {
     private respawnPlayer(playerId: string, matchCode: string) {
         const match = this.matchService.getMatch(matchCode);
         if (match) {
-            const player = this.matchService.getPlayer(playerId);
+            const player = this.matchService.getPlayer(match.matchData.code, playerId);
             if (player && player.isConnected) {
-                const position = this.movementService.getNearestEmptyTile(player.spawnPoint, match);
-                player.currentStats.position = position;
+                if (player.spawnPoint !== player.currentStats.position) {
+                    const position = this.movementService.getNearestEmptyTile(player.spawnPoint, match);
+                    player.currentStats.position = position;
+                }
             }
         }
     }
@@ -156,31 +180,30 @@ export class PlayService {
         const players = this.matchService.getPlayers(matchCode);
         this.playGateway.emitMatchEnded(matchCode, this.matchService.getMatch(matchCode));
         players.forEach((player) => {
-            this.matchService.removePlayerFromMatch(player.id, matchCode);
+            this.matchService.removePlayerFromMatch(player.id, matchCode, true);
             this.lobbyGateway.disconnectPlayer(player.id);
         });
     }
 
-    private executeAction(position: Position, match: Match, playerId: string) {
+    private executeAction(matchCode: string, position: Position, match: Match, playerId: string) {
         const player = match.matchData.players.find((p) => p.currentStats.position.x === position.x && p.currentStats.position.y === position.y);
         if (player) {
-            this.startFight(playerId, player.id);
+            this.startFight(matchCode, playerId, player.id);
         } else {
             this.toggleBridgeTile(match, position);
-            this.tryEndTurn(playerId);
+            this.tryEndTurn(matchCode, playerId);
         }
     }
 
-    private startFight(playerId: string, targetPlayerId: string) {
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+    private startFight(matchCode: string, playerId: string, targetPlayerId: string) {
         const match = this.matchService.getMatch(matchCode);
         const turnData = this.matchService.getTurnData(matchCode);
         if (turnData.phaseTimeout) {
             clearTimeout(turnData.phaseTimeout);
             turnData.phaseTimeout = null;
         }
-        const player = this.matchService.getPlayer(playerId);
-        const targetPlayer = this.matchService.getPlayer(targetPlayerId);
+        const player = this.matchService.getPlayer(matchCode, playerId);
+        const targetPlayer = this.matchService.getPlayer(matchCode, targetPlayerId);
         const tiles = match.gameData.mapData.tiles;
         player.currentStats.standingTile = tiles[player.currentStats.position.x][player.currentStats.position.y];
         targetPlayer.currentStats.standingTile = tiles[targetPlayer.currentStats.position.x][targetPlayer.currentStats.position.y];
@@ -189,10 +212,10 @@ export class PlayService {
         match.matchData.currentTimer = match.matchData.currentTimer - elapsedTime;
         this.playGateway.emitCombatDataBroadcast(matchCode, {
             match,
-            playerOneIndex: this.matchService.getPlayerIndex(playerId),
-            playerTwoIndex: this.matchService.getPlayerIndex(targetPlayerId),
+            playerOneIndex: this.matchService.getPlayerIndex(matchCode, playerId),
+            playerTwoIndex: this.matchService.getPlayerIndex(matchCode, targetPlayerId),
         });
-        this.combatService.initiateCombat(playerId, targetPlayerId);
+        this.combatService.initiateCombat(playerId, targetPlayerId, matchCode);
     }
 
     private toggleBridgeTile(match: Match, position: Position) {
@@ -205,16 +228,6 @@ export class PlayService {
         this.playGateway.emitBridgeChanged(match.matchData.code, match);
     }
 
-    private canEndTurn(playerId: string): boolean {
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
-        const match = this.matchService.getMatch(matchCode);
-        const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
-        const isActivePlayer = match.matchData.activePlayer === playerIndex;
-        const isDuringTurnPhase = match.matchData.phase === TurnPhase.Turn;
-
-        return isActivePlayer && isDuringTurnPhase;
-    }
-
     private startPreTurn(match: Match) {
         this.depleteCurrentStats(match.matchData.players[match.matchData.activePlayer]);
         match.matchData.activePlayer = this.getNextCurrentIndex(match.matchData.players, match.matchData.activePlayer);
@@ -224,19 +237,6 @@ export class PlayService {
     private startTurn(match: Match) {
         this.resetCurrentStats(match.matchData.players[match.matchData.activePlayer]);
         this.playGateway.emitTurnStarted(match.matchData.code, match);
-    }
-
-    private nextTurnPhase(matchCode: string) {
-        const match = this.matchService.getMatch(matchCode);
-        if (match.matchData.phase === TurnPhase.PreTurn) {
-            match.matchData.phase = TurnPhase.Turn;
-            this.startTurnTimer(match, TURN_DURATION);
-            this.startTurn(match);
-        } else if (match.matchData.phase === TurnPhase.Turn) {
-            match.matchData.phase = TurnPhase.PreTurn;
-            this.startTurnTimer(match, PRE_TURN_DURATION);
-            this.startPreTurn(match);
-        }
     }
 
     private startTurnTimer(match: Match, duration: number) {
@@ -306,11 +306,10 @@ export class PlayService {
         });
     }
 
-    private tryEndTurn(playerId: string): boolean {
-        const matchCode = this.matchService.getMatchCodeFromPlayerId(playerId);
+    private tryEndTurn(matchCode: string, playerId: string): boolean {
         const match = this.matchService.getMatch(matchCode);
         const activePlayerId = match.matchData.players[match.matchData.activePlayer].id;
-        const player = this.matchService.getPlayer(activePlayerId);
+        const player = this.matchService.getPlayer(matchCode, activePlayerId);
 
         const isCurrentTurn = activePlayerId === playerId;
         const canMove = this.movementService.getPossibleMoves(match).length > 0;

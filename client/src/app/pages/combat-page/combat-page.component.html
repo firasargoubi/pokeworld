@@ -23,9 +23,9 @@
                     <p class="hp-value">{{ this.ennemyPlayer.currentStats.health }}/{{ this.ennemyPlayer.playerStats.health }}</p>
                 </div>
                 @if(!this.iscurrentTurn) {
-                    <p class="dice-bonus">Dé de défense: +{{ this.ennemyPlayer.currentStats.defenseBonus }}</p>
+                    <p class="dice-bonus">Dé défense: +{{ this.ennemyPlayer.currentStats.defenseBonus }}</p>
                 } @else {
-                    <p class="dice-bonus">Dé d'attaque: +{{ this.ennemyPlayer.currentStats.attackBonus }}</p>
+                    <p class="dice-bonus">Dé attaque: +{{ this.ennemyPlayer.currentStats.attackBonus }}</p>
                 }
             </div>
         </div>
@@ -69,7 +69,7 @@
                             'orange-hp':
                                 this.selfPlayer.currentStats.health / this.selfPlayer.playerStats.health >= 0.33 &&
                                 this.selfPlayer.currentStats.health / this.selfPlayer.playerStats.health < 0.75,
-                            'red-hp': this.selfPlayer.currentStats.health / this.selfPlayer.playerStats.health < 0.33
+                            'red-hp': this.selfPlayer.currentStats.health / this.selfPlayer.playerStats.health < 0.4
                         }"
                     ></div>
                 </div>
