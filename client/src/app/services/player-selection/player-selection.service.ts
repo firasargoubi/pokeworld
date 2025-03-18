@@ -3,29 +3,16 @@ import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { Avatar, AvatarStatus } from '@common/interfaces/avatar.enum';
-import { DiceType } from '@common/interfaces/dice';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Player } from '@common/interfaces/player';
+import { DEFAULT_PARTIAL_PLAYER } from './player-selection.service.const';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayerSelectionService {
     matchCode: string = '';
-    playerData: Partial<Player> = {
-        name: '',
-        avatar: Avatar.Default,
-        playerStats: {
-            health: 0,
-            speed: 0,
-            attack: 0,
-            defense: 0,
-            attackDice: DiceType.D4,
-            defenseDice: DiceType.D6,
-            escapes: 0,
-        },
-        isConnected: true,
-    };
+    playerData: Partial<Player> = DEFAULT_PARTIAL_PLAYER;
     readonly avatarData = AVATAR_DATA;
     readonly avatarList = Object.keys(AVATAR_DATA).slice(1) as Avatar[];
     private lobbySocketService: LobbySocketsService = inject(LobbySocketsService);

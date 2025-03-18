@@ -238,9 +238,9 @@ describe('MovementService', () => {
         const match = structuredClone(MOCK_MATCHES[0]);
         match.matchData.isDebugMode = true;
         const possibleMoves = [{ x: 4, y: 4 }];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const getPossibleMovesDebugStub = sandbox.stub(service as any, 'getPossibleMovesDebug').returns(possibleMoves);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const getPossibleMovesStandardStub = sandbox.stub(service as any, 'getPossibleMovesStandard').returns(possibleMoves);
 
         const result = service['getPossibleMoves'](match);
@@ -256,7 +256,7 @@ describe('MovementService', () => {
         match.matchData.activePlayer = 0;
         match.matchData.players[0].currentStats.position = { x: 1, y: 1 };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isTileOccupiedByPlayer').returns(true);
 
         const actions = service.getActions(match);
@@ -325,7 +325,7 @@ describe('MovementService', () => {
         });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'enqueueValidNeighbors').callsFake((_pos, _match, _visited, queue: Position[]) => {
+        sandbox.stub(service as any, 'enqueueValidNeighbors').callsFake((_pos, _match, { queue }) => {
             queue.push(validPos);
         });
 

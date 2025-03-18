@@ -6,17 +6,17 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { END_GAME_DELAY, ONE_SECOND } from './play-sockets.const';
-import { PlaySocketsService } from './play-sockets.service';
 import { MOVE_ANIMATION_DURATION } from '@common/consts/player.const';
 import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/interfaces/combat';
-import { PlayerMovementData, Match } from '@common/interfaces/match';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { Match, PlayerMovementData } from '@common/interfaces/match';
 import { Player } from '@common/interfaces/player';
 import { Position } from '@common/interfaces/position';
-import { LobbyEvent, PlayEvent, CombatEvent } from '@common/interfaces/websocket-event.enum';
+import { CombatEvent, LobbyEvent, PlayEvent } from '@common/interfaces/websocket-event.enum';
 import { MOCK_MATCHES, MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYERS, PLAYER_IDS } from '@common/test-consts/mock-players';
-import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { END_GAME_DELAY, TIME_SCALE } from './play-sockets.const';
+import { PlaySocketsService } from './play-sockets.service';
 
 describe('PlaySocketsService', () => {
     let service: PlaySocketsService;
@@ -239,7 +239,7 @@ describe('PlaySocketsService', () => {
         eventCall?.[1](updatedMatch);
 
         expect(matchDataServiceSpy.updateMatch).toHaveBeenCalledWith(updatedMatch);
-        expect(timerServiceSpy.startTimer).toHaveBeenCalledWith(updatedMatch.matchData.maxTimer / ONE_SECOND);
+        expect(timerServiceSpy.startTimer).toHaveBeenCalledWith(updatedMatch.matchData.maxTimer / TIME_SCALE);
         expect(mapServiceSpy.clearOverlays).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(`Tour de ${playerName}`);
     });
@@ -254,7 +254,7 @@ describe('PlaySocketsService', () => {
 
         expect(matchDataServiceSpy.updateMatch).toHaveBeenCalledWith(updatedMatch);
         expect(popupServiceSpy.clearMessages).toHaveBeenCalled();
-        expect(timerServiceSpy.startTimer).toHaveBeenCalledWith(updatedMatch.matchData.maxTimer / ONE_SECOND);
+        expect(timerServiceSpy.startTimer).toHaveBeenCalledWith(updatedMatch.matchData.maxTimer / TIME_SCALE);
         expect(service['setActivePlayerPossibleMoves']).toHaveBeenCalled();
     });
 
@@ -304,7 +304,7 @@ describe('PlaySocketsService', () => {
         service['onCombatDataBroadcast'](combatDataBroadcast);
 
         expect(matchDataServiceSpy.updateMatch).toHaveBeenCalledWith(combatDataBroadcast.match);
-        expect(timerServiceSpy.pauseTimer).toHaveBeenCalledWith(combatDataBroadcast.match.matchData.currentTimer / ONE_SECOND);
+        expect(timerServiceSpy.pauseTimer).toHaveBeenCalledWith(combatDataBroadcast.match.matchData.currentTimer / TIME_SCALE);
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Player2 et P3 entrent en combat!');
     });
 
@@ -322,7 +322,7 @@ describe('PlaySocketsService', () => {
         service['onCombatDataBroadcast'](combatDataBroadcast);
 
         expect(matchDataServiceSpy.updateMatch).toHaveBeenCalledWith(combatDataBroadcast.match);
-        expect(timerServiceSpy.pauseTimer).toHaveBeenCalledWith(combatDataBroadcast.match.matchData.currentTimer / ONE_SECOND);
+        expect(timerServiceSpy.pauseTimer).toHaveBeenCalledWith(combatDataBroadcast.match.matchData.currentTimer / TIME_SCALE);
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Player2 et P3 entrent en combat!');
     });
 

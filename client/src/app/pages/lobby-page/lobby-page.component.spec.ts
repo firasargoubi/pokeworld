@@ -2,12 +2,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-import { of } from 'rxjs';
-import { LobbyPageComponent } from './lobby-page.component';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MapSize } from '@common/interfaces/map-data';
 import { Player } from '@common/interfaces/player';
 import { MOCK_PLAYERS } from '@common/test-consts/mock-players';
+import { of } from 'rxjs';
+import { LobbyPageComponent } from './lobby-page.component';
 
 describe('LobbyPageComponent', () => {
     let component: LobbyPageComponent;
@@ -47,7 +47,7 @@ describe('LobbyPageComponent', () => {
     it('should navigate to home when matchCode is empty', () => {
         fixture.destroy();
 
-        Object.defineProperty(lobbySocketsServiceSpy, 'matchCode', { get: () => '', configurable: true });
+        Object.defineProperty(lobbySocketsServiceSpy, 'matchCode', { value: '', configurable: true });
 
         fixture = TestBed.createComponent(LobbyPageComponent);
         component = fixture.componentInstance;
@@ -77,7 +77,7 @@ describe('LobbyPageComponent', () => {
     });
 
     it('should return correct match code', () => {
-        lobbySocketsServiceSpy.matchRoomCode = 'ABC123';
+        lobbySocketsServiceSpy.matchCode = 'ABC123';
         expect(component.matchCode).toBe('ABC123');
     });
 
@@ -96,11 +96,11 @@ describe('LobbyPageComponent', () => {
         const originalClipboard = navigator.clipboard;
         Object.defineProperty(navigator, 'clipboard', { value: clipboardSpy, writable: true, configurable: true });
 
-        lobbySocketsServiceSpy.matchRoomCode = '1234';
+        lobbySocketsServiceSpy.matchCode = '1234';
         component.copyMatchCode();
         expect(clipboardSpy.writeText).toHaveBeenCalledWith('1234');
 
-        lobbySocketsServiceSpy.matchRoomCode = '';
+        lobbySocketsServiceSpy.matchCode = '';
         component.copyMatchCode();
         expect(clipboardSpy.writeText).toHaveBeenCalledWith('');
 

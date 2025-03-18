@@ -36,7 +36,7 @@ describe('LobbyGateway', () => {
         gateway['server'] = {
             to: () => ({ emit: emitStub }),
             sockets: { sockets: { get: () => mockSocket } },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 'any' used to mock a partial Server object
         } as any;
         mockGame = structuredClone(MOCK_GAME_DATAS[0]);
         mockMatch = structuredClone(MOCK_MATCHES[0]);

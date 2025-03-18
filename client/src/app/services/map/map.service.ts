@@ -1,8 +1,17 @@
 import { inject, Injectable } from '@angular/core';
+import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { IMAGE_SUFIX, TILE_IMAGES_PREFIX, UNDERLAY_IMAGES_PREFIX } from '@app/consts/images.const';
 import { MapVisualData, OverlayTiles, TileVisualData } from '@app/interfaces/map-visual-data';
+import { TileComparisonData } from '@app/interfaces/tile-comparison-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/player.const';
 import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/surrounding-positions.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MapData } from '@common/interfaces/map-data';
+import { PlayerMovementData } from '@common/interfaces/match';
+import { Player } from '@common/interfaces/player';
+import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
 import {
     ACTION_OVERLAY,
     BRIDGE_SIMILAR_TILES,
@@ -21,14 +30,6 @@ import {
     SURROUNDING_POSITIONS_SQUARE,
     WATER_SIMILAR_TILES,
 } from './map.service.const';
-import { Player } from '@common/interfaces/player';
-import { Position } from '@common/interfaces/position';
-import { PlayerMovementData } from '@common/interfaces/match';
-import { MOVE_ANIMATION_DURATION } from '@common/consts/player.const';
-import { TileType } from '@common/interfaces/tile-type.enum';
-import { MapData } from '@common/interfaces/map-data';
-import { AVATAR_DATA } from '@app/consts/avatar-data.const';
-import { ItemType } from '@common/interfaces/item-type.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -280,15 +281,15 @@ export class MapService {
     }
 
     private getWaterVariant(tiles: TileType[][], position: Position): string {
-        return this.getSimilarTiles(tiles, position, SURROUNDING_POSITIONS_DONUT, WATER_SIMILAR_TILES);
+        return this.getSimilarTiles({ tiles, position, deltaPositions: SURROUNDING_POSITIONS_DONUT, tileTypes: WATER_SIMILAR_TILES });
     }
 
     private getPathVariant(tiles: TileType[][], position: Position): string {
-        return this.getSimilarTiles(tiles, position, SURROUNDING_POSITIONS_DONUT, PATH_SIMILAR_TILES);
+        return this.getSimilarTiles({ tiles, position, deltaPositions: SURROUNDING_POSITIONS_DONUT, tileTypes: PATH_SIMILAR_TILES });
     }
 
     private getBridgeVariant(tiles: TileType[][], position: Position): string {
-        const similarTiles = this.getSimilarTiles(tiles, position, SURROUNDING_POSITIONS_PLUS, BRIDGE_SIMILAR_TILES);
+        const similarTiles = this.getSimilarTiles({ tiles, position, deltaPositions: SURROUNDING_POSITIONS_PLUS, tileTypes: BRIDGE_SIMILAR_TILES });
         return BRIDGE_VARIANTS.get(similarTiles) || '0';
     }
 
@@ -305,15 +306,15 @@ export class MapService {
         return (randomNumber % (max + 1)).toString();
     }
 
-    private getSimilarTiles(tiles: TileType[][], position: Position, deltaPositions: Position[], tileTypes: TileType[]): string {
-        const similarTiles = this.compareTiles(tiles, position, deltaPositions, tileTypes);
+    private getSimilarTiles(tileCompare: TileComparisonData): string {
+        const similarTiles = this.compareTiles(tileCompare);
         return similarTiles.map((b) => (b ? '0' : '1')).join('');
     }
 
-    private compareTiles(tiles: TileType[][], position: Position, deltaPositions: Position[], tileTypes: TileType[]): boolean[] {
-        return deltaPositions.map((deltaPos) => {
-            const newPosition = { x: position.x + deltaPos.x, y: position.y + deltaPos.y };
-            return this.compareTile(tiles, newPosition, tileTypes);
+    private compareTiles(tileCompare: TileComparisonData): boolean[] {
+        return tileCompare.deltaPositions.map((deltaPos) => {
+            const newPosition = { x: tileCompare.position.x + deltaPos.x, y: tileCompare.position.y + deltaPos.y };
+            return this.compareTile(tileCompare.tiles, newPosition, tileCompare.tileTypes);
         });
     }
 

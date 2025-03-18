@@ -46,10 +46,10 @@ describe('LobbySocketsService', () => {
         service['setupLobbyListeners']();
     });
 
-    it('should set and get matchRoomCode', () => {
+    it('should set and get matchCode', () => {
         const newCode = '5678';
-        service.matchRoomCode = newCode;
-        expect(service.matchRoomCode).toBe(newCode);
+        service['matchCode'] = newCode;
+        expect(service.matchCode).toBe(newCode);
     });
 
     it('should expose players$ as an observable and emit updated players', (done) => {
@@ -96,7 +96,7 @@ describe('LobbySocketsService', () => {
 
         const result = await promise;
         expect(result).toBe(true);
-        expect(service.matchRoomCode).toBe(matchCode);
+        expect(service.matchCode).toBe(matchCode);
         expect(coreSocketSpy.emit).toHaveBeenCalledWith(LobbyEvent.CreateMatch, MOCK_GAME_DATAS[0], jasmine.any(Function));
     });
 
@@ -110,7 +110,7 @@ describe('LobbySocketsService', () => {
 
         const result = await promise;
         expect(result).toBe(false);
-        expect(service.matchRoomCode).toBe('');
+        expect(service.matchCode).toBe('');
         expect(coreSocketSpy.emit).toHaveBeenCalledWith(LobbyEvent.CreateMatch, MOCK_GAME_DATAS[0], jasmine.any(Function));
     });
 
@@ -126,7 +126,7 @@ describe('LobbySocketsService', () => {
 
         service.joinMatch(matchCode).subscribe((success) => {
             expect(success).toBe(true);
-            expect(service.matchRoomCode).toBe(matchCode);
+            expect(service.matchCode).toBe(matchCode);
             expect(coreSocketSpy.emit).toHaveBeenCalledWith(LobbyEvent.JoinMatch, matchCode, jasmine.any(Function));
             done();
         });
@@ -139,7 +139,7 @@ describe('LobbySocketsService', () => {
     it('should emit LeaveMatch and navigate to / on leaveMatch', () => {
         service.leaveMatch();
         expect(coreSocketSpy.emit).toHaveBeenCalledWith(LobbyEvent.LeaveMatch);
-        expect(service.matchRoomCode).toBe('');
+        expect(service.matchCode).toBe('');
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 
@@ -187,7 +187,7 @@ describe('LobbySocketsService', () => {
         expect(popupServiceSpy.keepMessages).not.toHaveBeenCalled();
         expect(popupServiceSpy.clearMessages).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(Warning.RoomLocked);
-        expect(service.matchRoomCode).toBe('');
+        expect(service.matchCode).toBe('');
     });
 
     it('should handle LockedFromLobby warning with popup and goToMenu callback', () => {
@@ -199,7 +199,7 @@ describe('LobbySocketsService', () => {
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         const callback = popupServiceSpy.showPopup.calls.mostRecent().args[2] as () => void;
         callback();
-        expect(service.matchRoomCode).toBe('');
+        expect(service.matchCode).toBe('');
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 
@@ -210,7 +210,7 @@ describe('LobbySocketsService', () => {
         expect(popupServiceSpy.clearMessages).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(Warning.Kick);
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
-        expect(service.matchRoomCode).toBe('');
+        expect(service.matchCode).toBe('');
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 
@@ -221,7 +221,7 @@ describe('LobbySocketsService', () => {
         expect(popupServiceSpy.clearMessages).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(Warning.AdminQuit);
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
-        expect(service.matchRoomCode).toBe('');
+        expect(service.matchCode).toBe('');
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 
@@ -232,7 +232,7 @@ describe('LobbySocketsService', () => {
         expect(popupServiceSpy.clearMessages).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(Warning.LastPlayerRemaining);
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
-        expect(service.matchRoomCode).toBe('');
+        expect(service.matchCode).toBe('');
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 

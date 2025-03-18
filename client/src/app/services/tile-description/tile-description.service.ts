@@ -36,9 +36,11 @@ export class TileDescriptionService {
             this.showTileDescription = true;
         }
     }
+
     hideTileDescription(): void {
         this.showTileDescription = false;
     }
+
     private calculateTileCoordinates(event: MouseEvent, mapRect: DOMRect, mapSize: number): Position {
         const relativeX = event.clientX - mapRect.left;
         const relativeY = event.clientY - mapRect.top;

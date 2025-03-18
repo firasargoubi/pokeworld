@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DEFAULT_TIME, ONE_SECOND, TIMER_START_DELAY } from './timer.service.const';
+import { DEFAULT_TIME, TIME_SCALE, TIMER_START_DELAY } from './timer.service.const';
 
 @Injectable({
     providedIn: 'root',
@@ -33,7 +33,7 @@ export class TimerService {
 
     private startInterval() {
         this.stopInterval();
-        this.interval = window.setInterval(this.intervalTrigger.bind(this), ONE_SECOND);
+        this.interval = window.setInterval(this.intervalTrigger.bind(this), TIME_SCALE);
     }
 
     private stopInterval() {

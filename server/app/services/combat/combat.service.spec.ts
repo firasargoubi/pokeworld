@@ -224,7 +224,6 @@ describe('CombatService', () => {
 
         getPlayerByIdSpy.callsFake((room: string, id: string) => {
             if (id === player1.id) return player1;
-            return undefined;
         });
 
         const result = service['executeAttackAndCheckVictory'](combatRoomCode, 'targetId');
@@ -243,9 +242,9 @@ describe('CombatService', () => {
         const result = service['executeAttackAndCheckVictory'](combatRoomCode, player2.id);
         expect(result).toBeFalsy();
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expected health
         expect(service['combatTurnSystems'].get(combatRoomCode).players[0].currentStats.health).toBe(4);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expected health
         expect(service['combatTurnSystems'].get(combatRoomCode).players[1].currentStats.health).toBe(2);
 
         expect(notifyPlayersStatsUpdateSpy.calledWith(combatRoomCode)).toBeTruthy();
@@ -293,7 +292,7 @@ describe('CombatService', () => {
             currentTurnIndex: 1,
         };
         service['combatTurnSystems'].set(combatRoomCode, combatState);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const reseatPlayersSpy = stub(service, 'resetPlayers' as any);
 
         endCombatSpy.restore();
@@ -317,7 +316,7 @@ describe('CombatService', () => {
             currentTurnIndex: 1,
         };
         service['combatTurnSystems'].set(combatRoomCode, combatState);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const reseatPlayersSpy = stub(service, 'resetPlayers' as any);
 
         endCombatSpy.restore();
@@ -335,7 +334,7 @@ describe('CombatService', () => {
             currentTurnIndex: 1,
         };
         service['combatTurnSystems'].set(combatRoomCode, combatState);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const reseatPlayersSpy = stub(service, 'resetPlayers' as any);
 
         endCombatSpy.restore();
@@ -436,7 +435,7 @@ describe('CombatService', () => {
             currentTurnIndex: 0,
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const executeAttackStub = stub(service, 'executeAttackAndCheckVictory' as any).returns(false);
 
         proceedCombatTurnSpy.restore();
@@ -445,7 +444,7 @@ describe('CombatService', () => {
 
         service['proceedCombatTurn'](combatRoomCode);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         proceedCombatTurnSpy = stub(service, 'proceedCombatTurn' as any);
 
         expect(updatePlayerBonusStatsSpy.calledWith(combatRoomCode, player1, true)).toBeTruthy();
@@ -480,7 +479,7 @@ describe('CombatService', () => {
             currentTurnIndex: 0,
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const executeAttackStub = stub(service, 'executeAttackAndCheckVictory' as any).returns(true);
 
         proceedCombatTurnSpy.restore();
@@ -488,7 +487,7 @@ describe('CombatService', () => {
 
         service['proceedCombatTurn'](combatRoomCode);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         proceedCombatTurnSpy = stub(service, 'proceedCombatTurn' as any);
 
         expect(updatePlayerBonusStatsSpy.calledWith(combatRoomCode, player1)).toBeTruthy();
@@ -514,7 +513,7 @@ describe('CombatService', () => {
         matchServiceStub.getMatchCodeFromPlayerId.returns(matchCode);
         matchServiceStub.getMatch.returns({ matchData: { isDebugMode: false } as MatchData } as Match);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const getBonusValueSpy = stub(service, 'getBonusValue' as any);
         updatePlayerBonusStatsSpy.restore();
 
@@ -534,7 +533,7 @@ describe('CombatService', () => {
         matchServiceStub.getMatchCodeFromPlayerId.returns(matchCode);
         matchServiceStub.getMatch.returns({ matchData: { isDebugMode: true } as MatchData } as Match);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const getBonusValueSpy = stub(service, 'getBonusValue' as any);
         updatePlayerBonusStatsSpy.restore();
 
@@ -605,7 +604,7 @@ describe('CombatService', () => {
         combatGatewayStub.getSocketById.withArgs(player1.id).returns(socket1);
         combatGatewayStub.getSocketById.withArgs(player2.id).returns(socket2);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         service['leaveCombat']('combat-room-test', state);
 
         expect(socket1.leave.calledOnceWith('combat-room-test')).toBeTruthy();

@@ -3,7 +3,7 @@ import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { Game } from '@app/model/schema/game.schema';
 import { GameService } from '@app/services/game/game.service';
 import { ApiEndpoint } from '@common/interfaces/endpoint.enum';
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Inject, Param, Patch, Post, Put, Query, Res } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
     ApiCreatedResponse,
@@ -18,7 +18,7 @@ import { Response } from 'express';
 @ApiTags('Games')
 @Controller(ApiEndpoint.Games)
 export class GameController {
-    constructor(private readonly gameService: GameService) {}
+    @Inject(GameService) private readonly gameService: GameService;
 
     @ApiOkResponse({
         description: 'Returns all games',

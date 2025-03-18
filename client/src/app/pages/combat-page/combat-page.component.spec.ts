@@ -122,7 +122,7 @@ describe('CombatPageComponent', () => {
         expect(component['currentTime']).toBe(testTime / ONE_SEC);
 
         jasmine.clock().tick(ONE_SEC);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expected result
         expect(component['currentTime']).toBe(4);
 
         jasmine.clock().uninstall();

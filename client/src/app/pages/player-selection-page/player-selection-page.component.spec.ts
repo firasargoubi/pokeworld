@@ -167,7 +167,7 @@ describe('PlayerSelectionPageComponent', () => {
     });
 
     it('should set player data and join lobby when form is valid', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(component, 'getWarnings').and.returnValue([]);
         component.goToLobby();
         expect(playerSelectionServiceSpy.setPlayerData).toHaveBeenCalled();
@@ -175,7 +175,7 @@ describe('PlayerSelectionPageComponent', () => {
     });
 
     it('should not join lobby when form is invalid', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(component, 'getWarnings').and.returnValue(['Warning']);
         component.goToLobby();
         expect(playerSelectionServiceSpy.joinLobby).not.toHaveBeenCalled();

@@ -1,13 +1,13 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, isValidObjectId } from 'mongoose';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { Game } from '@app/model/schema/game.schema';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 
 @Injectable()
 export class GameService {
-    constructor(@InjectModel(Game.name) private gameModel: Model<Game>) {}
+    @InjectModel(Game.name) private gameModel: Model<Game>;
     async getAllGames(): Promise<Game[]> {
         return this.gameModel.find().exec();
     }

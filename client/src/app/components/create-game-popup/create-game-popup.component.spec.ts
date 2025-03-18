@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { CreateGamePopupComponent } from './create-game-popup.component';
-import { GameMode, MapSize } from '@common/interfaces/map-data';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { GameMode, MapSize } from '@common/interfaces/map-data';
+import { CreateGamePopupComponent } from './create-game-popup.component';
 
 describe('CreateGamePopupComponent', () => {
     let component: CreateGamePopupComponent;
@@ -36,7 +36,7 @@ describe('CreateGamePopupComponent', () => {
         expect(component.mapSize).toBe(MapSize.Large);
     });
 
-    // NOT FOR SPRINT 1, TO BE UNCOMMENTED LATER (FUNCTIONAL)
+    // NOT FOR SPRINT 2, TO BE UNCOMMENTED LATER (FUNCTIONAL)
     // it('should update gameMode on onModeSelection', () => {
     //     component.onModeSelection(GameMode.CTF);
     //     expect(component.gameMode).toBe(GameMode.CTF);

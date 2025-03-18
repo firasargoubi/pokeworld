@@ -28,7 +28,7 @@ describe('CombatGateway', () => {
 
         gateway = module.get<CombatGateway>(CombatGateway);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 'any' used to mock a partial Server object
         gateway['server'] = { to: () => ({ emit: emitStub }), sockets: { sockets: { get: () => socket1 } } } as any;
 
         socket1 = createStubInstance<Socket>(Socket);

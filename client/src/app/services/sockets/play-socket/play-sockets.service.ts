@@ -6,14 +6,14 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { END_GAME_DELAY, ONE_SECOND } from './play-sockets.const';
-import { CombatEvent, LobbyEvent, PlayEvent } from '@common/interfaces/websocket-event.enum';
-import { Position } from '@common/interfaces/position';
 import { MOVE_ANIMATION_DURATION } from '@common/consts/player.const';
-import { CombatResultBroadcast, CombatDataBroadcast, CombatData } from '@common/interfaces/combat';
+import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/interfaces/combat';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Match, PlayerMovementData } from '@common/interfaces/match';
 import { Player } from '@common/interfaces/player';
+import { Position } from '@common/interfaces/position';
+import { CombatEvent, LobbyEvent, PlayEvent } from '@common/interfaces/websocket-event.enum';
+import { END_GAME_DELAY, TIME_SCALE } from './play-sockets.const';
 
 @Injectable({
     providedIn: 'root',
@@ -120,7 +120,7 @@ export class PlaySocketsService {
 
     private onCombatDataBroadcast(combatDataBroadcast: CombatDataBroadcast) {
         this.matchDataService.updateMatch(combatDataBroadcast.match);
-        this.timerService.pauseTimer(combatDataBroadcast.match.matchData.currentTimer / ONE_SECOND);
+        this.timerService.pauseTimer(combatDataBroadcast.match.matchData.currentTimer / TIME_SCALE);
         if (![combatDataBroadcast.playerOneIndex, combatDataBroadcast.playerTwoIndex].includes(this.matchDataService.selfIndex)) {
             const player1 = this.matchDataService.matchData.players[combatDataBroadcast.playerOneIndex].name;
             const player2 = this.matchDataService.matchData.players[combatDataBroadcast.playerTwoIndex].name;
@@ -160,7 +160,7 @@ export class PlaySocketsService {
     private onPreTurnStarted(match: Match) {
         this.matchDataService.updateMatch(match);
         const playerName = match.matchData.players[match.matchData.activePlayer].name;
-        this.timerService.startTimer(match.matchData.maxTimer / ONE_SECOND);
+        this.timerService.startTimer(match.matchData.maxTimer / TIME_SCALE);
         this.mapService.clearOverlays();
         this.popupService.showPopup(`Tour de ${playerName}`);
     }
@@ -168,7 +168,7 @@ export class PlaySocketsService {
     private onTurnStarted(match: Match) {
         this.matchDataService.updateMatch(match);
         this.popupService.clearMessages();
-        this.timerService.startTimer(match.matchData.maxTimer / ONE_SECOND);
+        this.timerService.startTimer(match.matchData.maxTimer / TIME_SCALE);
         this.setActivePlayerPossibleMoves();
     }
 

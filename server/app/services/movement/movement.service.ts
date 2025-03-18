@@ -1,11 +1,11 @@
-import { DistancesAndPredecessors, NeighborContext, QueueNode } from '@app/interfaces/movement';
+import { DistancesAndPredecessors, NeighborContext, QueueNode, VisitedQueue } from '@app/interfaces/movement';
 import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/surrounding-positions.const';
 import { MapData } from '@common/interfaces/map-data';
 import { Match } from '@common/interfaces/match';
-import { Position } from '@common/interfaces/position';
-import { TileType, TILE_COST } from '@common/interfaces/tile-type.enum';
-import { Injectable } from '@nestjs/common';
 import { ShortestPath } from '@common/interfaces/movement';
+import { Position } from '@common/interfaces/position';
+import { TILE_COST, TileType } from '@common/interfaces/tile-type.enum';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MovementService {
@@ -58,7 +58,7 @@ export class MovementService {
             if (this.isTileValidForMovement(pos, match)) {
                 return pos;
             }
-            this.enqueueValidNeighbors(pos, match, visited, queue);
+            this.enqueueValidNeighbors(pos, match, { visited, queue });
         }
         return undefined;
     }
@@ -67,13 +67,13 @@ export class MovementService {
         return !this.isTileOccupiedByPlayer(position, match) && this.isTileAccessible(position, match);
     }
 
-    private enqueueValidNeighbors(position: Position, match: Match, visited: boolean[][], queue: Position[]): void {
+    private enqueueValidNeighbors(position: Position, match: Match, visitedQueue: VisitedQueue): void {
         const size = match.gameData.mapData.size;
         for (const offset of SURROUNDING_POSITIONS_PLUS) {
             const neighbor = { x: position.x + offset.x, y: position.y + offset.y };
-            if (!this.isOutOfBounds(neighbor, size) && !visited[neighbor.x][neighbor.y]) {
-                visited[neighbor.x][neighbor.y] = true;
-                queue.push(neighbor);
+            if (!this.isOutOfBounds(neighbor, size) && !visitedQueue.visited[neighbor.x][neighbor.y]) {
+                visitedQueue.visited[neighbor.x][neighbor.y] = true;
+                visitedQueue.queue.push(neighbor);
             }
         }
     }
@@ -97,7 +97,8 @@ export class MovementService {
 
         for (let x = 0; x < size; x++) {
             for (let y = 0; y < size; y++) {
-                if (distances[x][y] <= movementRange && (x !== currentPos.x || y !== currentPos.y)) {
+                const isDifferentPosition = x !== currentPos.x || y !== currentPos.y;
+                if (distances[x][y] <= movementRange && isDifferentPosition) {
                     tiles.push({ x, y });
                 }
             }

@@ -10,7 +10,7 @@ import { PokeballButtonComponent } from './pokeball-button.component';
 })
 class TestHostComponent {
     testContent = 'Test Button';
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- delay test
     delay = 300;
 }
 

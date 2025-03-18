@@ -59,13 +59,13 @@ describe('LobbyService', () => {
         mockMatchService.hasMatchCode.returns(true);
         mockMatchService.getMatch.returns({ gameData: MOCK_GAME_DATAS[0], matchData: { ...DEFAULT_MATCH_DATA, players: [] } });
         mockMatchService.isPlayerInMatch.returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isMatchFull').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isMatchLocked').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const emitUpdatePlayerListStub = sandbox.stub(service as any, 'emitUpdatePlayerList');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const emitLockStatusChangedStub = sandbox.stub(service as any, 'emitLockStatusChanged');
 
         const result = service.joinMatch(playerId, matchCode);
@@ -98,9 +98,9 @@ describe('LobbyService', () => {
         mockMatchService.getMatchCodeFromPlayerId.returns('3344');
         mockMatchService.getIsMatchStarted.returns(false);
         mockMatchService.isPlayerAdmin.returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const emitUpdatePlayerListStub = sandbox.stub(service as any, 'emitUpdatePlayerList');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const emitLockStatusChangedStub = sandbox.stub(service as any, 'emitLockStatusChanged');
 
         service.leaveMatch('3344');
@@ -133,9 +133,9 @@ describe('LobbyService', () => {
 
     it('should remove player correctly', () => {
         mockMatchService.getMatchCodeFromPlayerId.returns('3344');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const emitUpdatePlayerListStub = sandbox.stub(service as any, 'emitUpdatePlayerList');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const emitLockStatusChangedStub = sandbox.stub(service as any, 'emitLockStatusChanged');
 
         service.removePlayer('1122', Warning.AdminQuit);
@@ -150,7 +150,7 @@ describe('LobbyService', () => {
     it('should update player information and notify all room members', () => {
         mockMatchService.getMatchCodeFromPlayerId.returns('3344');
         mockMatchService.getPlayers.returns(MOCK_PLAYERS);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const emitUpdatePlayerListStub = sandbox.stub(service as any, 'emitUpdatePlayerList');
         mockMatchService.getMatch.returns(MOCK_MATCHES[0]);
 
@@ -174,7 +174,7 @@ describe('LobbyService', () => {
                 isLocked: true,
             },
         });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isMatchLocked').returns(true);
 
         service.startMatch('1122');
@@ -184,7 +184,7 @@ describe('LobbyService', () => {
     it('should update room lock status when requested by admin', () => {
         mockMatchService.getMatchCodeFromPlayerId.returns('3344');
         mockMatchService.isPlayerAdmin.returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const emitLockStatusChangedStub = sandbox.stub(service as any, 'emitLockStatusChanged');
 
         service.changeLockStatus('1122', true);
@@ -195,13 +195,13 @@ describe('LobbyService', () => {
 
     it('should broadcast lock status change and handle joining players', () => {
         const matchCode = '3344';
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isMatchLocked').returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const kickJoiningPlayersStub = sandbox.stub(service as any, 'kickJoiningPlayers');
 
         service['emitLockStatusChanged'](matchCode);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         expect((service as any).isMatchLocked.calledWith(matchCode)).toBeTruthy();
         expect(kickJoiningPlayersStub.calledWith(matchCode)).toBeTruthy();
         expect(mockLobbyGateway.emitLockStatusChanged.calledWith(matchCode, true)).toBeTruthy();
@@ -248,7 +248,7 @@ describe('LobbyService', () => {
             },
         });
         mockMatchService.isPlayerAdmin.returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isMatchLocked').returns(true);
 
         const result = service['canStartMatch'](playerId);
@@ -281,7 +281,7 @@ describe('LobbyService', () => {
 
     it('should canPlayerJoinMatch call warn on isMatchFull true', () => {
         mockMatchService.hasMatchCode.returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isMatchFull').returns(true);
         service['canPlayerJoinMatch']('1122', '3344');
         expect(mockLobbyGateway.warn.calledWith('1122', 'La partie est pleine')).toBeTruthy();
@@ -289,9 +289,9 @@ describe('LobbyService', () => {
 
     it('should canPlayerJoinMatch call warn on isMatchLocked true', () => {
         mockMatchService.hasMatchCode.returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isMatchFull').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isMatchLocked').returns(true);
         service['canPlayerJoinMatch']('1122', '3344');
         expect(mockLobbyGateway.warn.calledWith('1122', Warning.RoomLocked)).toBeTruthy();
@@ -299,9 +299,9 @@ describe('LobbyService', () => {
 
     it('should canPlayerJoinMatch call warn on already in match', () => {
         mockMatchService.hasMatchCode.returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isMatchFull').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isMatchLocked').returns(false);
         mockMatchService.isPlayerInMatch.returns(true);
         service['canPlayerJoinMatch']('1122', '3344');
