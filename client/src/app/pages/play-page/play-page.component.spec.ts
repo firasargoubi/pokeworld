@@ -179,4 +179,16 @@ describe('PlayPageComponent', () => {
         component.hideTileDescription();
         expect(mockTileDescriptionService.hideTileDescription).toHaveBeenCalled();
     });
+    it('should ignore repeated key events', () => {
+        mockPlaySocketsService.changeDebugMode.calls.reset();
+
+        const repeatedKeyEvent = new KeyboardEvent('keydown', {
+            key: 'd',
+            repeat: true,
+        });
+
+        component.onKeyDown(repeatedKeyEvent);
+
+        expect(mockPlaySocketsService.changeDebugMode).not.toHaveBeenCalled();
+    });
 });

@@ -1,7 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
+import { MapSize } from '@common/map-size.enum';
+import { Player } from '@common/player';
 import { of } from 'rxjs';
 import { LobbyPageComponent } from './lobby-page.component';
 
@@ -101,5 +104,21 @@ describe('LobbyPageComponent', () => {
         expect(clipboardSpy.writeText).toHaveBeenCalledWith('');
 
         Object.defineProperty(navigator, 'clipboard', { value: originalClipboard, writable: true, configurable: true });
+    });
+
+    it('should calculate availebelPlayers correctly based on connected players', () => {
+        const mockPlayers: Player[] = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
+
+        Object.defineProperty(lobbySocketsServiceSpy, 'players$', {
+            value: of(mockPlayers),
+            writable: true,
+        });
+        spyOn(component['gameDataService'], 'getMapSize').and.returnValue(MapSize.Small);
+
+        fixture = TestBed.createComponent(LobbyPageComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+
+        expect(component.availebelPlayers.length).toBe(0);
     });
 });

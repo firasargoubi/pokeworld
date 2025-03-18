@@ -44,7 +44,7 @@ describe('PlaySocketsService', () => {
             'setPlayers',
             'updateAllTiles',
         ]);
-        popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'clearMessages']);
+        popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'clearMessages', 'removeMessagesByFilter']);
         combatSocketServiceSpy = jasmine.createSpyObj('CombatSocketService', ['startCombat']);
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -277,7 +277,7 @@ describe('PlaySocketsService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'onPlayerLeft').and.callThrough();
 
-        const initialPlayers = [{ name: 'Alice', isConnected: true } as Player, { name: 'Bob', isConnected: true } as Player];
+        const initialPlayers = [{ name: 'Alice', isConnected: true } as Player, { name: 'Bob', isConnected: false } as Player];
         matchDataServiceSpy.matchData = { ...mockMatch.matchData, players: initialPlayers };
 
         const updatedPlayers = [{ name: 'Alice', isConnected: true } as Player, { name: 'Bob', isConnected: false } as Player];
@@ -382,5 +382,16 @@ describe('PlaySocketsService', () => {
         jasmine.clock().tick(END_GAME_DELAY);
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
         jasmine.clock().uninstall();
+    });
+    it('should filter debug messages correctly', () => {
+        let capturedPredicate: (message: string) => boolean = () => false;
+        popupServiceSpy.removeMessagesByFilter.and.callFake((predicate) => {
+            capturedPredicate = predicate;
+        });
+
+        service['onDebugModeChanged']({ matchData: { isDebugMode: true } } as Match);
+
+        expect(capturedPredicate('Message avec DEBUG')).toBeTrue();
+        expect(capturedPredicate('message normal')).toBeFalse();
     });
 });
