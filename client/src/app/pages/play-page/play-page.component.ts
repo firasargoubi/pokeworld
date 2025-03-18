@@ -11,6 +11,7 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { PlaySocketsService } from '@app/services/sockets/play-socket/play-sockets.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
+import { TileDescriptionService } from '@app/services/tile-description/tile-description.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { TurnPhase } from '@common/match';
 import { DEFAULT_PLAY_VISUAL_DATA } from './play-page.component.const';
@@ -24,6 +25,7 @@ import { DEFAULT_PLAY_VISUAL_DATA } from './play-page.component.const';
 export class PlayPageComponent {
     playVisualData: PlayVisualData = structuredClone(DEFAULT_PLAY_VISUAL_DATA);
     timerService: TimerService = inject(TimerService);
+    tileDescriptionService: TileDescriptionService = inject(TileDescriptionService);
     private playSocketsService: PlaySocketsService = inject(PlaySocketsService);
     private matchDataService: MatchDataService = inject(MatchDataService);
     private gameDataService: GameDataService = inject(GameDataService);
@@ -108,6 +110,9 @@ export class PlayPageComponent {
     }
     @HostListener('document:keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
+        if (event.repeat) {
+            return;
+        }
         if (event.key === 'd' || event.key === 'D') {
             this.playSocketsService.changeDebugMode();
         }
@@ -129,6 +134,13 @@ export class PlayPageComponent {
 
     surrender() {
         this.popupService.showPopup('Voulez-vous vraiment abandonner ?', true, this.leaveMatch.bind(this));
+    }
+
+    showTileDescription(event: MouseEvent): void {
+        this.tileDescriptionService.displayTileDescription(event);
+    }
+    hideTileDescription(): void {
+        this.tileDescriptionService.hideTileDescription();
     }
 
     private computeVisualData() {

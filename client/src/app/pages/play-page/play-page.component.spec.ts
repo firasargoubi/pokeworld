@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MapComponent } from '@app/components/map/map.component';
+import { DEFAULT_TILE_DESCRIPTION } from '@app/consts/default-tile-description.const';
 import { MOCK_GAMES } from '@app/consts/tests/mock-games';
 import { MOCK_MATCH_DATAS } from '@app/consts/tests/mock-matches';
 import { GameDataService } from '@app/services/game-data/game-data.service';
@@ -10,6 +11,7 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { PlaySocketsService } from '@app/services/sockets/play-socket/play-sockets.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
+import { TileDescriptionService } from '@app/services/tile-description/tile-description.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { MapSize } from '@common/map-size.enum';
 import { TurnPhase } from '@common/match';
@@ -30,12 +32,19 @@ describe('PlayPageComponent', () => {
     let mockRouter: jasmine.SpyObj<Router>;
     let mockPlaySocketsService: jasmine.SpyObj<PlaySocketsService>;
     let connectionStatusSubject: BehaviorSubject<boolean>;
+    let mockTileDescriptionService: jasmine.SpyObj<TileDescriptionService>;
 
     beforeEach(() => {
         mockTimerService = jasmine.createSpyObj('TimerService', ['startTimer']);
         mockGameDataService = jasmine.createSpyObj('GameDataService', ['getMapSize'], { gameData: structuredClone(MOCK_GAMES[2]) });
         mockPopupService = jasmine.createSpyObj('PopupService', ['showPopup', 'clearMessages', 'keepMessages']);
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+        mockTileDescriptionService = jasmine.createSpyObj('TileDescriptionService', ['displayTileDescription', 'hideTileDescription'], {
+            showTileDescription: false,
+            tileDescription: DEFAULT_TILE_DESCRIPTION,
+            tileDescriptionPos: { x: 0, y: 0 },
+            isPlayerDescription: false,
+        });
         mockMapService = jasmine.createSpyObj('MapService', ['getTileImage', 'hasActionOverlay', 'clearActions'], {
             visualMapData: { size: MapSize.Small },
         });
@@ -71,6 +80,7 @@ describe('PlayPageComponent', () => {
                 { provide: PopupService, useValue: mockPopupService },
                 { provide: Router, useValue: mockRouter },
                 { provide: PlaySocketsService, useValue: mockPlaySocketsService },
+                { provide: TileDescriptionService, useValue: mockTileDescriptionService },
             ],
         }).compileComponents();
 
@@ -161,5 +171,12 @@ describe('PlayPageComponent', () => {
         component['leaveMatch']();
         expect(mockPlaySocketsService.leaveMatch).toHaveBeenCalled();
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
+    });
+    it('should call displayTileDescription and hideTileDescription', () => {
+        const event = new MouseEvent('click');
+        component.showTileDescription(event);
+        expect(mockTileDescriptionService.displayTileDescription).toHaveBeenCalledWith(event);
+        component.hideTileDescription();
+        expect(mockTileDescriptionService.hideTileDescription).toHaveBeenCalled();
     });
 });

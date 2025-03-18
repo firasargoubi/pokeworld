@@ -53,25 +53,25 @@ $hover-overlay-color: rgba(255, 255, 255, 0.095);
     display: grid;
 }
 
-.tile[tile="Grass"] {
-    background-color: #72C37A;
+.tile[tile='Grass'] {
+    background-color: #72c37a;
 }
 
-.tile[tile="Path"] {
-    background-color: #F1D599;
+.tile[tile='Path'] {
+    background-color: #f1d599;
 }
 
-.tile[tile="Water"] {
-    background-color: #6AB7D7;
+.tile[tile='Water'] {
+    background-color: #6ab7d7;
 }
 
-.tile[tile="Bush"] {
+.tile[tile='Bush'] {
     background-color: #108239;
 }
 
-.tile[tile="BrokenBridge"],
-.tile[tile="Bridge"] {
-    background-color: #BA8348;
+.tile[tile='BrokenBridge'],
+.tile[tile='Bridge'] {
+    background-color: #ba8348;
 }
 
 app-item,
