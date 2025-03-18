@@ -27,15 +27,11 @@ describe('PlaySocketsService', () => {
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let combatSocketServiceSpy: jasmine.SpyObj<CombatSocketService>;
     let routerSpy: jasmine.SpyObj<Router>;
-
     const mockMatch = structuredClone(MOCK_MATCHES[0]);
 
     beforeEach(() => {
         coreSocketSpy = jasmine.createSpyObj('CoreSocketService', ['emit', 'on']);
-        matchDataServiceSpy = jasmine.createSpyObj('MatchDataService', ['updateMatch', 'getPlayerPosition', 'isActivePlayer', 'resetMatch'], {
-            matchData: structuredClone(MOCK_MATCH_DATAS[0]),
-            selfIndex: 0,
-        });
+        matchDataServiceSpy = jasmine.createSpyObj('MatchDataService', ['updateMatch', 'getPlayerPosition', 'isActivePlayer', 'resetMatch']);
         timerServiceSpy = jasmine.createSpyObj('TimerService', ['startTimer', 'pauseTimer', 'unPauseTimer']);
         mapServiceSpy = jasmine.createSpyObj('MapService', [
             'setHoverMoves',
@@ -282,7 +278,7 @@ describe('PlaySocketsService', () => {
         spyOn<any>(service, 'onPlayerLeft').and.callThrough();
 
         const initialPlayers = [{ name: 'Alice', isConnected: true } as Player, { name: 'Bob', isConnected: true } as Player];
-        matchDataServiceSpy.matchData.players = initialPlayers;
+        matchDataServiceSpy.matchData = { ...mockMatch.matchData, players: initialPlayers };
 
         const updatedPlayers = [{ name: 'Alice', isConnected: true } as Player, { name: 'Bob', isConnected: false } as Player];
         const updatedMatch = { matchData: { players: updatedPlayers } } as Match;
@@ -359,25 +355,32 @@ describe('PlaySocketsService', () => {
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith("Personne n'a gagné le combat");
     });
 
-    it('should handle MatchEnded event and navigate after delay with both reduce branches', () => {
+    it('should handle MatchEnded event and navigate after delay', () => {
         jasmine.clock().install();
 
-        const mockMatchData = structuredClone(MOCK_MATCH_DATAS[1]);
+        const mockMatchData = structuredClone(MOCK_MATCH_DATAS[0]);
         mockMatchData.players[0].currentStats.fightsWon = 3;
         mockMatchData.players[1].currentStats.fightsWon = 0;
         mockMatchData.players[2].currentStats.fightsWon = 2;
         const matchCase1: Match = { matchData: mockMatchData } as Match;
-        matchDataServiceSpy.matchData = mockMatchData;
+        matchDataServiceSpy.matchData = structuredClone(mockMatchData);
 
         service['onMatchEnded'](matchCase1);
-
         expect(matchDataServiceSpy.updateMatch).toHaveBeenCalledWith(matchCase1);
         expect(mapServiceSpy.clearOverlays).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(`${mockMatchData.players[0].name} a remporté la partie`);
 
-        jasmine.clock().tick(END_GAME_DELAY);
-        expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
+        mockMatchData.players[0].currentStats.fightsWon = 1;
+        mockMatchData.players[1].currentStats.fightsWon = 3;
+        mockMatchData.players[2].currentStats.fightsWon = 2;
+        const matchCase2: Match = { matchData: mockMatchData } as Match;
+        matchDataServiceSpy.matchData = structuredClone(mockMatchData);
 
+        service['onMatchEnded'](matchCase2);
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(`${mockMatchData.players[1].name} a remporté la partie`);
+
+        jasmine.clock().tick(END_GAME_DELAY);
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
         jasmine.clock().uninstall();
     });
 });

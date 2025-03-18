@@ -102,10 +102,10 @@ export const MOCK_MATCH_DATAS: MatchData[] = [
         isStarted: false,
         isLocked: false,
         activePlayer: 0,
-        players: structuredClone(MOCK_PLAYERS),
         phase: TurnPhase.PreTurn,
         currentTimer: 0,
-        maxTimer: 0,
+        maxTimer: 60,
+        players: structuredClone(MOCK_PLAYERS),
     },
     {
         code: '2222',
@@ -113,10 +113,10 @@ export const MOCK_MATCH_DATAS: MatchData[] = [
         isStarted: true,
         isLocked: true,
         activePlayer: 0,
-        players: structuredClone(MOCK_PLAYERS),
         phase: TurnPhase.PreTurn,
         currentTimer: 0,
-        maxTimer: 0,
+        maxTimer: 60,
+        players: structuredClone(MOCK_PLAYERS),
     },
     {
         code: '3333',
@@ -124,10 +124,10 @@ export const MOCK_MATCH_DATAS: MatchData[] = [
         isStarted: true,
         isLocked: true,
         activePlayer: 0,
-        players: structuredClone(MOCK_PLAYERS),
         phase: TurnPhase.PreTurn,
         currentTimer: 0,
-        maxTimer: 0,
+        maxTimer: 60,
+        players: structuredClone(MOCK_PLAYERS),
     },
 ];
 

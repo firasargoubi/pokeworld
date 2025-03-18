@@ -2,7 +2,7 @@
 $main-height: 100vh;
 $main-width: 100vw;
 $main-border-width: 0.005;
-$side-width: 0.50;
+$side-width: 0.5;
 $margin-top: 0.07;
 $margin-top-2: 0.035;
 $margin-bot: 0.04;
@@ -25,7 +25,7 @@ $main-border-color1: #636776;
 $main-border-color2: #e9f6f7;
 $stripes-color1: hsl(225, 6%, 15%);
 $stripes-color2: hsl(220, 6%, 17%);
-$light-text-color:  hsl(220, 1%, 100%);
+$light-text-color: hsl(220, 1%, 100%);
 $light-text-shadow: hsl(220, 6%, 60%);
 $dark-text-color: hsl(220, 6%, 12%);
 $dark-text-shadow: hsl(220, 6%, 50%);
@@ -68,18 +68,20 @@ $final-margin-top: min($final-margin-top-1, $final-margin-top-2);
 $final-margin-bot: calc($main-height - $map-size - $final-margin-top);
 $timer-current-ratio: calc(0.48 - var(--current-time) / var(--max-time));
 $timer-half-true: calc(max($timer-current-ratio, -1 * $timer-current-ratio) / $timer-current-ratio * 0.5 + 0.5);
-$timer-half-false: calc(1.0 - $timer-half-true);
+$timer-half-false: calc(1 - $timer-half-true);
 $total-player-cards-height: calc(($player-card-height * var(--player-count) + $player-card-margin * (var(--player-count) - 1)) * $final-side-width);
 $shadow: drop-shadow(0 0 calc(0.005 * $map-size) rgba(0, 0, 0, 0.15));
 
 .play-page {
     height: 100vh;
     width: 100vw;
-    background: repeating-linear-gradient(0deg,
-            $stripes-color1,
-            $stripes-color1 $bg-stripes-size,
-            $stripes-color2 $bg-stripes-size,
-            $stripes-color2 $bg-stripes-size * 2);
+    background: repeating-linear-gradient(
+        0deg,
+        $stripes-color1,
+        $stripes-color1 $bg-stripes-size,
+        $stripes-color2 $bg-stripes-size,
+        $stripes-color2 $bg-stripes-size * 2
+    );
     background-size: 100% ($bg-stripes-size * 2);
     animation: fall $stripes-animation-duration linear infinite;
 }
@@ -97,7 +99,7 @@ $shadow: drop-shadow(0 0 calc(0.005 * $map-size) rgba(0, 0, 0, 0.15));
     width: $main-width;
     background-image: var(--bg-url);
     background-size: cover;
-    filter: blur(calc(0.006 * $map-size)) brightness(0.70) saturate(0.95) contrast(0.95);
+    filter: blur(calc(0.006 * $map-size)) brightness(0.7) saturate(0.95) contrast(0.95);
 }
 
 main {
@@ -173,7 +175,7 @@ app-map {
     display: inline-block;
     vertical-align: top;
     width: calc($player-arrow-width * $final-side-width);
-    margin-right: calc((1.0 - $player-arrow-width - $player-card-width) * $final-side-width);
+    margin-right: calc((1 - $player-arrow-width - $player-card-width) * $final-side-width);
     height: $total-player-cards-height;
     filter: $shadow;
 }
@@ -199,12 +201,12 @@ app-map {
     flex: 1;
 }
 
-*[style*="--current-player-turn: 0"] .player-card:nth-child(1),
-*[style*="--current-player-turn: 1"] .player-card:nth-child(2),
-*[style*="--current-player-turn: 2"] .player-card:nth-child(3),
-*[style*="--current-player-turn: 3"] .player-card:nth-child(4),
-*[style*="--current-player-turn: 4"] .player-card:nth-child(5),
-*[style*="--current-player-turn: 5"] .player-card:nth-child(6) {
+*[style*='--current-player-turn: 0'] .player-card:nth-child(1),
+*[style*='--current-player-turn: 1'] .player-card:nth-child(2),
+*[style*='--current-player-turn: 2'] .player-card:nth-child(3),
+*[style*='--current-player-turn: 3'] .player-card:nth-child(4),
+*[style*='--current-player-turn: 4'] .player-card:nth-child(5),
+*[style*='--current-player-turn: 5'] .player-card:nth-child(6) {
     background-image: url($card-orange);
 }
 
@@ -224,10 +226,10 @@ app-map {
 .player-avatar {
     display: inline-block;
     vertical-align: top;
-    height: calc(0.70 * $player-card-height * $final-side-width);
-    width: calc(0.70 * $player-card-height * $final-side-width);
+    height: calc(0.7 * $player-card-height * $final-side-width);
+    width: calc(0.7 * $player-card-height * $final-side-width);
     margin: calc(0.15 * $player-card-height * $final-side-width);
-    margin-left: calc(0.20 * $player-card-height * $final-side-width);
+    margin-left: calc(0.2 * $player-card-height * $final-side-width);
     margin-right: calc(0.13 * $player-card-height * $final-side-width);
 }
 
@@ -236,24 +238,24 @@ app-map {
     vertical-align: top;
     position: relative;
     white-space: pre;
-    height: calc(1.3750191307 * 0.60 * $player-card-height * $final-side-width);
+    height: calc(1.3750191307 * 0.6 * $player-card-height * $final-side-width);
     width: auto;
     max-width: calc(3.14 * $player-card-height * $final-side-width);
 
-    height: calc(1.0 * $player-card-height * $final-side-width);
-    line-height: calc(1.0 * $player-card-height * $final-side-width);
+    height: calc(1 * $player-card-height * $final-side-width);
+    line-height: calc(1 * $player-card-height * $final-side-width);
     font-size: calc(0.55 * $player-card-height * $final-side-width);
 
     color: $dark-text-color;
     text-shadow:
         calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
-        calc(0.0150 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.015 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
         calc(0.0225 * $player-card-height * $final-side-width) calc(0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
-        calc(0.0300 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
+        calc(0.03 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
 }
 
 .is-bot:not(.is-admin) .player-name {
-    max-width: calc(2.70 * $player-card-height * $final-side-width);
+    max-width: calc(2.7 * $player-card-height * $final-side-width);
 }
 
 .is-admin .player-name {
@@ -286,16 +288,20 @@ app-map {
     text-align: right;
     width: calc(0.75 * $player-card-height * $final-side-width);
 
-    height: calc(1.0 * $player-card-height * $final-side-width);
-    line-height: calc(1.0 * $player-card-height * $final-side-width);
-    font-size: calc(0.50 * $player-card-height * $final-side-width);
+    height: calc(1 * $player-card-height * $final-side-width);
+    line-height: calc(1 * $player-card-height * $final-side-width);
+    font-size: calc(0.5 * $player-card-height * $final-side-width);
 
     color: $dark-text-color;
     text-shadow:
-        calc(0.45 * 1.6666666 * 0.0075 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
-        calc(0.45 * 1.6666666 * 0.0150 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
-        calc(0.45 * 1.6666666 * 0.0225 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
-        calc(0.45 * 1.6666666 * 0.0300 * $player-card-height * $final-side-width) calc(0.45 * 1.6666666 * 0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
+        calc(0.45 * 1.6666666 * 0.0075 * $player-card-height * $final-side-width)
+            calc(0.45 * 1.6666666 * 0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.45 * 1.6666666 * 0.015 * $player-card-height * $final-side-width)
+            calc(0.45 * 1.6666666 * 0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.45 * 1.6666666 * 0.0225 * $player-card-height * $final-side-width)
+            calc(0.45 * 1.6666666 * 0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.45 * 1.6666666 * 0.03 * $player-card-height * $final-side-width)
+            calc(0.45 * 1.6666666 * 0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
 }
 
 .sword-icon {
@@ -328,12 +334,11 @@ app-map {
     display: inline-block;
     vertical-align: top;
     background-image: url($icon-bot);
-    height: calc(0.40 * $player-card-height * $final-side-width);
-    width: calc(0.40 * $player-card-height * $final-side-width);
+    height: calc(0.4 * $player-card-height * $final-side-width);
+    width: calc(0.4 * $player-card-height * $final-side-width);
     margin-top: calc(0.32 * $player-card-height * $final-side-width);
     margin-bottom: calc(0.28 * $player-card-height * $final-side-width);
 }
-
 
 .is-admin .info-icon {
     display: inline-block;
@@ -342,7 +347,7 @@ app-map {
 }
 
 .map-info-card {
-    height: calc(0.30 * $map-size);
+    height: calc(0.3 * $map-size);
     width: $final-side-width;
     background-image: url($card-game-info);
     padding: calc(0.018 * $map-size) calc(0.035 * $map-size);
@@ -354,13 +359,13 @@ app-map {
     height: calc(1.3750191307 * 0.04 * $map-size);
     line-height: calc(1.3750191307 * 0.04 * $map-size);
     font-size: calc(0.04 * $map-size);
-    
+
     color: $dark-text-color;
     text-shadow:
         calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
-        calc(0.0150 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.015 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
         calc(0.0225 * $player-card-height * $final-side-width) calc(0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
-        calc(0.0300 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
+        calc(0.03 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
 }
 
 .surrender-button {
@@ -368,10 +373,10 @@ app-map {
     margin-top: calc(0.013 * $map-size);
     height: calc(1.2 * 1.3750191307 * 0.045 * $map-size);
     padding-bottom: calc(0.01 * 1.3750191307 * 0.045 * $map-size);
-    
+
     line-height: calc(1.3750191307 * 0.045 * $map-size);
     font-size: calc(0.045 * $map-size);
-    
+
     text-decoration: none;
     outline: none;
     outline: none;
@@ -381,9 +386,9 @@ app-map {
     color: $dark-text-color;
     text-shadow:
         calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
-        calc(0.0150 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.015 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
         calc(0.0225 * $player-card-height * $final-side-width) calc(0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
-        calc(0.0300 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
+        calc(0.03 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
     background: transparent;
     font-family: 'pixel';
     cursor: pointer;
@@ -424,50 +429,46 @@ app-map {
     letter-spacing: calc($timer-height * 0.12);
     transform: translateX(calc($timer-height * 0.145));
     text-shadow:
-        calc($timer-height *  0.100) calc($timer-height *  0.000) #000000,
-        calc($timer-height * -0.100) calc($timer-height *  0.000) #000000,
-        calc($timer-height *  0.000) calc($timer-height *  0.100) #000000,
-        calc($timer-height *  0.000) calc($timer-height * -0.100) #000000,
-
-        calc($timer-height *  0.100) calc($timer-height *  0.100) #000000,
-        calc($timer-height * -0.100) calc($timer-height *  0.100) #000000,
-        calc($timer-height *  0.100) calc($timer-height * -0.100) #000000,
-        calc($timer-height * -0.100) calc($timer-height * -0.100) #000000,
-        
-        calc($timer-height *  0.220 * $timer-half-false) calc($timer-height *  0.000 * $timer-half-false) #BF6639,
-        calc($timer-height * -0.200 * $timer-half-false) calc($timer-height *  0.000 * $timer-half-false) #BF6639,
-        calc($timer-height *  0.000 * $timer-half-false) calc($timer-height *  0.220 * $timer-half-false) #BF6639,
-        calc($timer-height *  0.000 * $timer-half-false) calc($timer-height * -0.220 * $timer-half-false) #BF6639,
-        calc($timer-height *  0.110 * $timer-half-false) calc($timer-height *  0.220 * $timer-half-false) #BF6639,
-        calc($timer-height * -0.110 * $timer-half-false) calc($timer-height *  0.220 * $timer-half-false) #BF6639,
-        calc($timer-height *  0.110 * $timer-half-false) calc($timer-height * -0.220 * $timer-half-false) #BF6639,
-        calc($timer-height * -0.110 * $timer-half-false) calc($timer-height * -0.220 * $timer-half-false) #BF6639,
-        calc($timer-height *  0.220 * $timer-half-false) calc($timer-height *  0.110 * $timer-half-false) #BF6639,
-        calc($timer-height * -0.220 * $timer-half-false) calc($timer-height *  0.110 * $timer-half-false) #BF6639,
-        calc($timer-height *  0.220 * $timer-half-false) calc($timer-height * -0.110 * $timer-half-false) #BF6639,
-        calc($timer-height * -0.220 * $timer-half-false) calc($timer-height * -0.110 * $timer-half-false) #BF6639,
-        calc($timer-height *  0.220 * $timer-half-false) calc($timer-height *  0.220 * $timer-half-false) #BF6639,
-        calc($timer-height * -0.220 * $timer-half-false) calc($timer-height *  0.220 * $timer-half-false) #BF6639,
-        calc($timer-height *  0.220 * $timer-half-false) calc($timer-height * -0.220 * $timer-half-false) #BF6639,
-        calc($timer-height * -0.220 * $timer-half-false) calc($timer-height * -0.220 * $timer-half-false) #BF6639,
-
-        calc($timer-height *  0.220 * $timer-half-true) calc($timer-height *  0.000 * $timer-half-true) #6F6F6F,
-        calc($timer-height * -0.200 * $timer-half-true) calc($timer-height *  0.000 * $timer-half-true) #6F6F6F,
-        calc($timer-height *  0.000 * $timer-half-true) calc($timer-height *  0.220 * $timer-half-true) #6F6F6F,
-        calc($timer-height *  0.000 * $timer-half-true) calc($timer-height * -0.220 * $timer-half-true) #6F6F6F,
-        calc($timer-height *  0.110 * $timer-half-true) calc($timer-height *  0.220 * $timer-half-true) #6F6F6F,
-        calc($timer-height * -0.110 * $timer-half-true) calc($timer-height *  0.220 * $timer-half-true) #6F6F6F,
-        calc($timer-height *  0.110 * $timer-half-true) calc($timer-height * -0.220 * $timer-half-true) #6F6F6F,
-        calc($timer-height * -0.110 * $timer-half-true) calc($timer-height * -0.220 * $timer-half-true) #6F6F6F,
-        calc($timer-height *  0.220 * $timer-half-true) calc($timer-height *  0.110 * $timer-half-true) #6F6F6F,
-        calc($timer-height * -0.220 * $timer-half-true) calc($timer-height *  0.110 * $timer-half-true) #6F6F6F,
-        calc($timer-height *  0.220 * $timer-half-true) calc($timer-height * -0.110 * $timer-half-true) #6F6F6F,
-        calc($timer-height * -0.220 * $timer-half-true) calc($timer-height * -0.110 * $timer-half-true) #6F6F6F,
-        calc($timer-height *  0.220 * $timer-half-true) calc($timer-height *  0.220 * $timer-half-true) #6F6F6F,
-        calc($timer-height * -0.220 * $timer-half-true) calc($timer-height *  0.220 * $timer-half-true) #6F6F6F,
-        calc($timer-height *  0.220 * $timer-half-true) calc($timer-height * -0.220 * $timer-half-true) #6F6F6F,
-        calc($timer-height * -0.220 * $timer-half-true) calc($timer-height * -0.220 * $timer-half-true) #6F6F6F,
-    ;
+        calc($timer-height * 0.1) calc($timer-height * 0) #000000,
+        calc($timer-height * -0.1) calc($timer-height * 0) #000000,
+        calc($timer-height * 0) calc($timer-height * 0.1) #000000,
+        calc($timer-height * 0) calc($timer-height * -0.1) #000000,
+        calc($timer-height * 0.1) calc($timer-height * 0.1) #000000,
+        calc($timer-height * -0.1) calc($timer-height * 0.1) #000000,
+        calc($timer-height * 0.1) calc($timer-height * -0.1) #000000,
+        calc($timer-height * -0.1) calc($timer-height * -0.1) #000000,
+        calc($timer-height * 0.22 * $timer-half-false) calc($timer-height * 0 * $timer-half-false) #bf6639,
+        calc($timer-height * -0.2 * $timer-half-false) calc($timer-height * 0 * $timer-half-false) #bf6639,
+        calc($timer-height * 0 * $timer-half-false) calc($timer-height * 0.22 * $timer-half-false) #bf6639,
+        calc($timer-height * 0 * $timer-half-false) calc($timer-height * -0.22 * $timer-half-false) #bf6639,
+        calc($timer-height * 0.11 * $timer-half-false) calc($timer-height * 0.22 * $timer-half-false) #bf6639,
+        calc($timer-height * -0.11 * $timer-half-false) calc($timer-height * 0.22 * $timer-half-false) #bf6639,
+        calc($timer-height * 0.11 * $timer-half-false) calc($timer-height * -0.22 * $timer-half-false) #bf6639,
+        calc($timer-height * -0.11 * $timer-half-false) calc($timer-height * -0.22 * $timer-half-false) #bf6639,
+        calc($timer-height * 0.22 * $timer-half-false) calc($timer-height * 0.11 * $timer-half-false) #bf6639,
+        calc($timer-height * -0.22 * $timer-half-false) calc($timer-height * 0.11 * $timer-half-false) #bf6639,
+        calc($timer-height * 0.22 * $timer-half-false) calc($timer-height * -0.11 * $timer-half-false) #bf6639,
+        calc($timer-height * -0.22 * $timer-half-false) calc($timer-height * -0.11 * $timer-half-false) #bf6639,
+        calc($timer-height * 0.22 * $timer-half-false) calc($timer-height * 0.22 * $timer-half-false) #bf6639,
+        calc($timer-height * -0.22 * $timer-half-false) calc($timer-height * 0.22 * $timer-half-false) #bf6639,
+        calc($timer-height * 0.22 * $timer-half-false) calc($timer-height * -0.22 * $timer-half-false) #bf6639,
+        calc($timer-height * -0.22 * $timer-half-false) calc($timer-height * -0.22 * $timer-half-false) #bf6639,
+        calc($timer-height * 0.22 * $timer-half-true) calc($timer-height * 0 * $timer-half-true) #6f6f6f,
+        calc($timer-height * -0.2 * $timer-half-true) calc($timer-height * 0 * $timer-half-true) #6f6f6f,
+        calc($timer-height * 0 * $timer-half-true) calc($timer-height * 0.22 * $timer-half-true) #6f6f6f,
+        calc($timer-height * 0 * $timer-half-true) calc($timer-height * -0.22 * $timer-half-true) #6f6f6f,
+        calc($timer-height * 0.11 * $timer-half-true) calc($timer-height * 0.22 * $timer-half-true) #6f6f6f,
+        calc($timer-height * -0.11 * $timer-half-true) calc($timer-height * 0.22 * $timer-half-true) #6f6f6f,
+        calc($timer-height * 0.11 * $timer-half-true) calc($timer-height * -0.22 * $timer-half-true) #6f6f6f,
+        calc($timer-height * -0.11 * $timer-half-true) calc($timer-height * -0.22 * $timer-half-true) #6f6f6f,
+        calc($timer-height * 0.22 * $timer-half-true) calc($timer-height * 0.11 * $timer-half-true) #6f6f6f,
+        calc($timer-height * -0.22 * $timer-half-true) calc($timer-height * 0.11 * $timer-half-true) #6f6f6f,
+        calc($timer-height * 0.22 * $timer-half-true) calc($timer-height * -0.11 * $timer-half-true) #6f6f6f,
+        calc($timer-height * -0.22 * $timer-half-true) calc($timer-height * -0.11 * $timer-half-true) #6f6f6f,
+        calc($timer-height * 0.22 * $timer-half-true) calc($timer-height * 0.22 * $timer-half-true) #6f6f6f,
+        calc($timer-height * -0.22 * $timer-half-true) calc($timer-height * 0.22 * $timer-half-true) #6f6f6f,
+        calc($timer-height * 0.22 * $timer-half-true) calc($timer-height * -0.22 * $timer-half-true) #6f6f6f,
+        calc($timer-height * -0.22 * $timer-half-true) calc($timer-height * -0.22 * $timer-half-true) #6f6f6f;
 }
 
 .timer-text::after {
@@ -478,8 +479,8 @@ app-map {
     left: calc((100vw - $timer-height * 0.6) * 0.5 - $timer-height * 0.115);
     width: calc($timer-height * 0.6);
     height: calc($timer-height * 1.2);
-    background: linear-gradient(to bottom, #BF6639 calc(100% * $timer-half-false), #6F6F6F calc(100% * $timer-half-false));
-  }
+    background: linear-gradient(to bottom, #bf6639 calc(100% * $timer-half-false), #6f6f6f calc(100% * $timer-half-false));
+}
 
 .timer-bar {
     display: flex;
@@ -518,13 +519,13 @@ app-map {
     color: $dark-text-color;
     text-shadow:
         calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
-        calc(0.0150 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.015 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
         calc(0.0225 * $player-card-height * $final-side-width) calc(0.006 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
-        calc(0.0300 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
+        calc(0.03 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
 }
 
 .self-info-container {
-    width: calc($final-side-width - 0.070 * $map-size);
+    width: calc($final-side-width - 0.07 * $map-size);
     margin-top: calc(0.014 * $map-size);
     height: calc(0.068 * $map-size);
     font-size: calc(0.04 * $map-size);
@@ -543,7 +544,7 @@ app-map {
 .self-info-name {
     display: inline-block;
     vertical-align: top;
-    font-size: calc(0.60 * $player-card-height * $final-side-width);
+    font-size: calc(0.6 * $player-card-height * $final-side-width);
     height: calc(0.068 * $map-size);
     line-height: calc(0.068 * $map-size);
     padding-bottom: calc(0.05 * 0.04 * $map-size);
@@ -566,10 +567,10 @@ app-map {
     height: calc(1.4 * 1.3750191307 * 0.045 * $map-size);
     padding-bottom: calc(0.01 * 1.3750191307 * 0.045 * $map-size);
     border-radius: calc(0.005 * $map-size);
-    
+
     line-height: calc(1.3750191307 * 0.045 * $map-size);
-    font-size: calc(0.050 * $map-size);
-    
+    font-size: calc(0.05 * $map-size);
+
     text-decoration: none;
     outline: none;
     outline: none;
@@ -579,14 +580,14 @@ app-map {
     color: $light-text-color;
     text-shadow:
         calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $light-text-shadow,
-        calc(0.0150 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $light-text-shadow,
+        calc(0.015 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $light-text-shadow,
         calc(0.0225 * $player-card-height * $final-side-width) calc(0.006 * $player-card-height * $final-side-width) 0 $light-text-shadow,
-        calc(0.0300 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $light-text-shadow;
+        calc(0.03 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $light-text-shadow;
     font-family: 'pixel';
     cursor: not-allowed;
     background-color: transparent;
     background-image: url($action-button);
-    filter: grayscale(1.00) brightness(1.08) $shadow;
+    filter: grayscale(1) brightness(1.08) $shadow;
 }
 
 .endturn-button {
@@ -611,24 +612,24 @@ app-map {
 }
 
 .movement-container {
-    width: calc($final-side-width - 0.070 * $map-size);
+    width: calc($final-side-width - 0.07 * $map-size);
     margin-top: calc(0.0125 * $map-size);
-    height: calc(0.090 * $map-size);
+    height: calc(0.09 * $map-size);
 }
 
 .movement-text {
-    width: calc($final-side-width - 0.070 * $map-size);
+    width: calc($final-side-width - 0.07 * $map-size);
     height: calc(0.045 * $map-size);
     text-shadow:
         calc(0.0075 * 0.7 * $player-card-height * $final-side-width) calc(0.002 * 0.7 * $player-card-height * $final-side-width) 0 $light-text-shadow,
-        calc(0.0150 * 0.7 * $player-card-height * $final-side-width) calc(0.004 * 0.7 * $player-card-height * $final-side-width) 0 $light-text-shadow,
+        calc(0.015 * 0.7 * $player-card-height * $final-side-width) calc(0.004 * 0.7 * $player-card-height * $final-side-width) 0 $light-text-shadow,
         calc(0.0225 * 0.7 * $player-card-height * $final-side-width) calc(0.006 * 0.7 * $player-card-height * $final-side-width) 0 $light-text-shadow,
-        calc(0.0300 * 0.7 * $player-card-height * $final-side-width) calc(0.008 * 0.7 * $player-card-height * $final-side-width) 0 $light-text-shadow;
+        calc(0.03 * 0.7 * $player-card-height * $final-side-width) calc(0.008 * 0.7 * $player-card-height * $final-side-width) 0 $light-text-shadow;
 }
 
 .movement-bar {
-    height: calc(0.040 * $map-size);
-    width: calc($final-side-width - 0.070 * $map-size);
+    height: calc(0.04 * $map-size);
+    width: calc($final-side-width - 0.07 * $map-size);
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
@@ -639,8 +640,8 @@ app-map {
 .movement-bar-bot {
     grid-column: 1 / 2;
     grid-row: 1 / 2;
-    height: calc(0.040 * $map-size);
-    width: calc($final-side-width - 0.070 * $map-size);
+    height: calc(0.04 * $map-size);
+    width: calc($final-side-width - 0.07 * $map-size);
 }
 
 .movement-bar-top {
@@ -648,17 +649,17 @@ app-map {
 }
 
 .movement-bar-mid {
-    margin: calc(0.040 * $map-size * 0.22222222222) calc(($final-side-width - 0.070 * $map-size) * 0.0206185567 );
-    width: calc(var(--cur-move) / var(--max-move) * ($final-side-width - 0.070 * $map-size) * 0.95876288659);
-    height: calc(0.040 * $map-size * 0.55555555555);
+    margin: calc(0.04 * $map-size * 0.22222222222) calc(($final-side-width - 0.07 * $map-size) * 0.0206185567);
+    width: calc(var(--cur-move) / var(--max-move) * ($final-side-width - 0.07 * $map-size) * 0.95876288659);
+    height: calc(0.04 * $map-size * 0.55555555555);
     background-image: url($movement-bar-full);
     transition: width $movement-bar-transition-time ease-in-out;
 }
 
 .movement-bar-bot {
-    margin: calc(0.040 * $map-size * 0.22222222222) calc(($final-side-width - 0.070 * $map-size) * 0.0206185567 );
-    width: calc(($final-side-width - 0.070 * $map-size) * 0.95876288659);
-    height: calc(0.040 * $map-size * 0.55555555555);
+    margin: calc(0.04 * $map-size * 0.22222222222) calc(($final-side-width - 0.07 * $map-size) * 0.0206185567);
+    width: calc(($final-side-width - 0.07 * $map-size) * 0.95876288659);
+    height: calc(0.04 * $map-size * 0.55555555555);
     background-image: url($movement-bar-empty);
 }
 
@@ -693,7 +694,7 @@ app-map {
 }
 
 .items-container {
-    width: calc($final-side-width - 0.070 * $map-size);
+    width: calc($final-side-width - 0.07 * $map-size);
     height: calc(0.195 * $map-size);
     margin-top: calc(0.032 * $map-size);
 }
@@ -707,7 +708,7 @@ app-map {
 }
 
 .item-slot:nth-child(2) {
-    margin-left: calc($final-side-width - 0.070 * $map-size - 2 * 0.195 * $map-size);
+    margin-left: calc($final-side-width - 0.07 * $map-size - 2 * 0.195 * $map-size);
 }
 
 .item-slot {
@@ -721,4 +722,32 @@ app-map {
 .item-icon {
     width: calc(0.195 * $map-size);
     height: calc(0.195 * $map-size);
+}
+
+#tool-description {
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+    width: auto;
+    height: auto;
+    min-width: calc($map-size * 0.12);
+    max-width: calc($map-size * 0.4);
+    margin: 0;
+    font-size: calc($map-size * 0.03);
+    padding: calc($map-size * 0.024) calc($map-size * 0.024);
+    background: url('../../../assets/images/menu/containers/description-container.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    text-align: center;
+    color: black;
+    text-transform: none;
+    white-space: normal;
+    box-sizing: border-box;
+}
+
+#player-avatar {
+    width: 35.484px;
+    height: 35.484px;
+    margin: 0 auto;
 }
