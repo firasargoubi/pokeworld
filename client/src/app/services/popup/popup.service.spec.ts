@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Overlay, OverlayContainer } from '@angular/cdk/overlay';
 import { Component, ComponentRef } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
@@ -79,7 +78,7 @@ describe('PopupService', () => {
         const actionSpy = jasmine.createSpy('action');
         service.showPopup('Confirmation', true, actionSpy);
 
-        tick(); // Laisser le popup s'afficher
+        tick();
 
         const popupComponent = service.popupComponents[0];
         expect(popupComponent).toBeDefined();
@@ -200,6 +199,7 @@ describe('PopupService', () => {
             },
         ];
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'setOverlayZIndexLow');
 
         service.removeMessagesByFilter((msg) => msg.includes('debug'));

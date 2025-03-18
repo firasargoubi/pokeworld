@@ -1,6 +1,6 @@
 import { Overlay, OverlayConfig, OverlayContainer, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { ComponentRef, Injectable } from '@angular/core';
+import { ComponentRef, inject, Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
 import { filter } from 'rxjs/operators';
@@ -19,12 +19,11 @@ export class PopupService {
     private messages: PopupMessage[] = [];
     private overlayRefs: { overlayRef: OverlayRef; componentRef: ComponentRef<WarningConfirmationPopupComponent> }[] = [];
     private keepMessagesOnNavigation: boolean = false;
+    private overlay: Overlay = inject(Overlay);
+    private overlayContainer: OverlayContainer = inject(OverlayContainer);
+    private router: Router = inject(Router);
 
-    constructor(
-        private overlay: Overlay,
-        private overlayContainer: OverlayContainer,
-        private router: Router,
-    ) {
+    constructor() {
         this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
             if (!this.keepMessagesOnNavigation) {
                 this.clearMessages();
@@ -94,7 +93,8 @@ export class PopupService {
     }
 
     private handlePopupClose(confirmed: boolean, overlayRef: OverlayRef, message: PopupMessage | null) {
-        if (message && message.isConfirmation && confirmed && message.action) {
+        const isMessageConfirmed = message && message.isConfirmation;
+        if (isMessageConfirmed && confirmed && message.action) {
             message.action();
         }
 

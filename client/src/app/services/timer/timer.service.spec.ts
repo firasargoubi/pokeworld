@@ -19,9 +19,9 @@ describe('TimerService', () => {
 
     it('should start timer', () => {
         const initialTime = 12;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const stopIntervalSpy = spyOn<any>(service, 'stopInterval').and.callThrough();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const startIntervalSpy = spyOn<any>(service, 'startInterval').and.callThrough();
         const setTimeoutSpy = spyOn(window, 'setTimeout');
 
@@ -50,7 +50,7 @@ describe('TimerService', () => {
 
     it('should stop interval when currentTime reaches 0', () => {
         service.startTimer(2);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const stopIntervalSpy = spyOn<any>(service, 'stopInterval');
 
         expect(service.currentTime).toBe(2);
@@ -66,7 +66,7 @@ describe('TimerService', () => {
 
     it('should pause timer', () => {
         const remainingTime = 42;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const stopIntervalSpy = spyOn<any>(service, 'stopInterval');
 
         service.pauseTimer(remainingTime);
@@ -77,7 +77,7 @@ describe('TimerService', () => {
     });
 
     it('should unpause timer', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const startIntervalSpy = spyOn<any>(service, 'startInterval');
 
         service.unPauseTimer();

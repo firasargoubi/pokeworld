@@ -90,7 +90,7 @@ describe('PlayerSelectionService', () => {
     });
 
     it('should join lobby if player is already in lobby', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'isPlayerInLobby').and.returnValue(true);
         service.joinLobby();
         expect(lobbySocketServiceSpy.updatePlayer).toHaveBeenCalledWith(service.playerData);
@@ -100,7 +100,7 @@ describe('PlayerSelectionService', () => {
     it('should join match and then join lobby if player is not in lobby', () => {
         lobbySocketServiceSpy.matchCode = '';
         let isPlayerInLobby = false;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'isPlayerInLobby').and.callFake(() => isPlayerInLobby);
         const joinMatchSubject = new Subject<boolean>();
         lobbySocketServiceSpy.joinMatch.and.returnValue(joinMatchSubject.asObservable());
@@ -108,17 +108,17 @@ describe('PlayerSelectionService', () => {
         const joinLobbySpy = spyOn(service, 'joinLobby').and.callThrough();
 
         service.joinLobby();
-        isPlayerInLobby = true; // Update the condition to simulate successful join
+        isPlayerInLobby = true;
         joinMatchSubject.next(true);
 
         expect(lobbySocketServiceSpy.joinMatch).toHaveBeenCalledWith(service.matchCode);
-        expect(joinLobbySpy).toHaveBeenCalledTimes(2); // Ensure joinLobby is called again
+        expect(joinLobbySpy).toHaveBeenCalledTimes(2);
         expect(lobbySocketServiceSpy.updatePlayer).toHaveBeenCalledWith(service.playerData);
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Lobby]);
     });
 
     it('should not join lobby if join match fails', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'isPlayerInLobby').and.returnValue(false);
         const joinMatchSubject = new Subject<boolean>();
         lobbySocketServiceSpy.joinMatch.and.returnValue(joinMatchSubject.asObservable());

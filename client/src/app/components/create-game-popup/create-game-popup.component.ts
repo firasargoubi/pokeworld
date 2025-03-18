@@ -15,19 +15,20 @@ import { GameMode, MapSize } from '@common/interfaces/map-data';
 export class CreateGamePopupComponent {
     gameMode: GameMode = GameMode.FFA;
     mapSize: MapSize = MapSize.Small;
-    gameDataService: GameDataService = inject(GameDataService);
-    router: Router = inject(Router);
 
     possibleModes = Object.entries(GameMode).map(([key, value]) => ({ key, value }));
     possibleSizes = Object.entries(MapSize)
         .filter(([, value]) => typeof value === 'number')
         .map(([key, value]) => ({ key, value: value as number }));
 
+    private gameDataService: GameDataService = inject(GameDataService);
+    private router: Router = inject(Router);
+
     onSizeSelection(sizeKey: MapSize) {
         this.mapSize = sizeKey;
     }
 
-    // NOT FOR SPRINT 1, TO BE UNCOMMENTED LATER (FUNCTIONAL)
+    // NOT FOR SPRINT 2, TO BE UNCOMMENTED LATER (FUNCTIONAL)
     // onModeSelection(modeKey: GameMode) {
     //     this.gameMode = modeKey;
     // }

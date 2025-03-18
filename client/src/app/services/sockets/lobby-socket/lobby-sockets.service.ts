@@ -29,20 +29,12 @@ export class LobbySocketsService {
         this.setupLobbyListeners();
     }
 
-    get matchRoomCode(): string {
-        return this.matchCode;
-    }
-
     get players$(): Observable<Player[]> {
         return this.playersSubject.asObservable();
     }
 
     get roomLocked$(): Observable<boolean> {
         return this.roomLockedSubject.asObservable();
-    }
-
-    set matchRoomCode(code: string) {
-        this.matchCode = code;
     }
 
     async createMatch(gameData: GameData): Promise<boolean> {

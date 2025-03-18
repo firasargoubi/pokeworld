@@ -143,11 +143,11 @@ describe('PlayService', () => {
 
     it('startMatch should start the match and emit match started event', () => {
         mockMatchService.getMatch.returns(match);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const reorganizeMatchStub = sandbox.stub(service as any, 'reorganizeMatch');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const nextTurnPhaseStub = sandbox.stub(service as any, 'nextTurnPhase');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'assignSpawnPoints');
 
         service.startMatch(matchCode);
@@ -158,9 +158,9 @@ describe('PlayService', () => {
     });
 
     it('endTurn should end the turn if the player can end turn', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'canEndTurn').returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const nextTurnPhaseStub = sandbox.stub(service as any, 'nextTurnPhase');
 
         mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
@@ -198,9 +198,9 @@ describe('PlayService', () => {
         players[0].currentStats.fightsWon = MINIMUM_FIGHTS_TO_WIN - 1;
         const combatResult = { winnerId: players[0].id, loserId: players[1].id };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const respawnStub = sandbox.stub(service as any, 'respawnPlayer');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const endMatchStub = sandbox.stub(service as any, 'endMatch');
         mockMatchService.getPlayer.returns(players[0]);
 
@@ -215,12 +215,12 @@ describe('PlayService', () => {
         players[0].currentStats.fightsWon = 0;
         const combatResult = { winnerId: players[0].id, loserId: players[1].id };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const nextTurnPhaseStub = sandbox.stub(service as any, 'nextTurnPhase');
 
         mockMatchService.getPlayer.returns(players[0]);
         mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'canEndTurn').returns(true);
 
         service.endOfCombat(combatResult, players[0].id);
@@ -234,15 +234,15 @@ describe('PlayService', () => {
         players[0].currentStats.fightsWon = 0;
         const combatResult = { winnerId: players[0].id, loserId: players[1].id };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const tryEndTurnStub = sandbox.stub(service as any, 'tryEndTurn');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const unfreezeMatchStub = sandbox.stub(service as any, 'unfreezeMatch');
 
         mockMatchService.getPlayer.returns(players[0]);
         mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
         mockMatchService.getMatch.returns(match);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'canEndTurn').returns(false);
 
         service.endOfCombat(combatResult, players[0].id);
@@ -269,7 +269,7 @@ describe('PlayService', () => {
         match.matchData.currentTimer = 1000;
         const turnData = { phaseTimeout: null, lastPhaseStartTime: new Date() };
         mockMatchService.getTurnData.returns(turnData);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const nextTurnPhaseSpy = sandbox.spy(service as any, 'nextTurnPhase');
 
         const clock = sandbox.useFakeTimers({ shouldClearNativeTimers: true });
@@ -310,7 +310,7 @@ describe('PlayService', () => {
 
     it('executeAction should start a fight if a players is at the position', () => {
         const position = { x: 0, y: 0 };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const startFightStub = sandbox.stub(service as any, 'startFight');
 
         service['executeAction'](position, match, playerId);
@@ -320,7 +320,7 @@ describe('PlayService', () => {
 
     it('executeAction should toggle bridge tile if no players is at the position', () => {
         const position = { x: 1, y: 1 };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const toggleBridgeTileStub = sandbox.stub(service as any, 'toggleBridgeTile');
 
         service['executeAction'](position, match, playerId);
@@ -402,7 +402,7 @@ describe('PlayService', () => {
         mockMatchService.getMatch.returns(match);
         match.matchData.phase = TurnPhase.Turn;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const result = service['canEndTurn'](playerId);
 
         expect(result).toBe(true);
@@ -413,7 +413,7 @@ describe('PlayService', () => {
         mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
         mockMatchService.getMatch.returns(match);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const result = service['canEndTurn'](playerId);
 
         expect(result).toBe(false);
@@ -422,12 +422,12 @@ describe('PlayService', () => {
     it('nextTurnPhase should start turn phase if current phase is PreTurn', () => {
         match.matchData.phase = TurnPhase.PreTurn;
         mockMatchService.getMatch.returns(match);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const startTurnStub = sandbox.stub(service as any, 'startTurn');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const startTurnTimerStub = sandbox.stub(service as any, 'startTurnTimer');
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         service['nextTurnPhase'](matchCode);
 
         expect(match.matchData.phase).toBe(TurnPhase.Turn);
@@ -438,12 +438,12 @@ describe('PlayService', () => {
     it('nextTurnPhase should start pre-turn phase if current phase is Turn', () => {
         match.matchData.phase = TurnPhase.Turn;
         mockMatchService.getMatch.returns(match);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const startPreTurnStub = sandbox.stub(service as any, 'startPreTurn');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const startTurnTimerStub = sandbox.stub(service as any, 'startTurnTimer');
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         service['nextTurnPhase'](matchCode);
 
         expect(match.matchData.phase).toBe(TurnPhase.PreTurn);
@@ -455,7 +455,7 @@ describe('PlayService', () => {
         const duration = 2000;
         const turnData = { phaseTimeout: null, lastPhaseStartTime: new Date() };
         mockMatchService.getTurnData.returns(turnData);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const nextTurnPhaseSpy = sandbox.spy(service as any, 'nextTurnPhase');
 
         const clock = sandbox.useFakeTimers({ shouldClearNativeTimers: true });
@@ -489,16 +489,16 @@ describe('PlayService', () => {
         players[1].isConnected = false;
         players[2].isConnected = true;
         const currentIndex = 0;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const result = service['getNextCurrentIndex'](players, currentIndex);
 
         expect(result).toBe(2);
     });
 
     it('reorganizeMatch should reorganize match and set active players', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const sortPlayersStub = sandbox.stub(service as any, 'sortPlayers');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const assignSpawnPointsStub = sandbox.stub(service as any, 'assignSpawnPoints');
 
         service['reorganizeMatch'](match);
@@ -541,9 +541,9 @@ describe('PlayService', () => {
 
     it('startPreTurn should deplete current player stats and set next active player', () => {
         const currentPlayer = match.matchData.players[match.matchData.activePlayer];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const depleteCurrentStatsStub = sandbox.stub(service as any, 'depleteCurrentStats');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getNextCurrentIndex').returns(1);
 
         service['startPreTurn'](match);
@@ -555,7 +555,7 @@ describe('PlayService', () => {
 
     it('startTurn should reset current player stats and emit turn started', () => {
         const currentPlayer = match.matchData.players[match.matchData.activePlayer];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const resetCurrentStatsStub = sandbox.stub(service as any, 'resetCurrentStats');
 
         service['startTurn'](match);

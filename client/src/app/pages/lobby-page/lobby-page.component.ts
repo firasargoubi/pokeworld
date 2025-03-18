@@ -56,7 +56,7 @@ export class LobbyPageComponent {
     }
 
     get matchCode(): string | null {
-        return this.lobbySocketsService.matchRoomCode;
+        return this.lobbySocketsService.matchCode;
     }
 
     startMatchButton(): void {

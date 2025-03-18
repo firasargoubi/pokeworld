@@ -60,9 +60,7 @@ describe('EditPageComponent', () => {
         ]);
         gameDataServiceSpy = jasmine.createSpyObj('GameDataService', ['isMapValid', 'isModified', 'getItem', 'setGameData', 'removeItem'], {
             itemUpdate: {
-                subscribe: () => {
-                    //
-                },
+                subscribe: () => undefined,
             },
             gameData: MOCK_GAME_DATAS[0],
             isOutOfBound: () => false,
@@ -260,7 +258,7 @@ describe('EditPageComponent', () => {
 
     it('should handle click events based on editorEvent properties and isLeftClick', () => {
         const mockEvent: EditorEvent = { tilePosition: { x: 1, y: 1 }, mousePosition: null, tile: TileType.Bush, item: ItemType.Item1 };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(component, 'getEventProperty').and.returnValue(mockEvent);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const clickOnMapSpy = spyOn<any>(component, 'clickOnMap');
@@ -351,9 +349,9 @@ describe('EditPageComponent', () => {
     });
 
     it('should handle map click based on dragItem, tileHasItem, and isLeftClick', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const clickOnMapItemSpy = spyOn<any>(component, 'clickOnMapItem');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const updatePaintingTileSpy = spyOn<any>(component, 'updatePaintingTile');
         const editorEvent = { tilePosition: { x: 1, y: 1 }, mousePosition: null, tile: null, item: null };
 

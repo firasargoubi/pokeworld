@@ -33,7 +33,7 @@ describe('PlayGateway', () => {
         gateway['server'] = {
             to: () => ({ emit: emitStub }),
             sockets: { sockets: { get: () => mockSocket } },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 'any' used to mock a partial Server object
         } as any;
         mockMatch = structuredClone(MOCK_MATCHES[0]);
         matchCode = 'match123';

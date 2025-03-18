@@ -21,7 +21,7 @@ export class CombatService {
     @Inject(forwardRef(() => CombatGateway)) private readonly combatGateway: CombatGateway;
     @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
     @Inject(MatchService) private readonly matchService: MatchService;
-    private combatTurnSystems: Map<string, CombatState> = new Map(); // combatRoomCode -> CombatState
+    private combatTurnSystems: Map<string, CombatState> = new Map();
 
     getCombatTurnSystems(): Map<string, CombatState> {
         return this.combatTurnSystems;

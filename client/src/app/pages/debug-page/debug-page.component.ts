@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
+import { Player } from '@common/interfaces/player';
 import { Observable } from 'rxjs';
 import { DEBUG_GAMES, DEBUG_PLAYERS } from './debug-page.component.const';
-import { Player } from '@common/interfaces/player';
 
 @Component({
     selector: 'app-game-lobby',
@@ -26,7 +26,7 @@ export class DebugPageComponent {
     }
 
     get matchCode(): string | null {
-        return this.lobbySocketsService.matchRoomCode;
+        return this.lobbySocketsService.matchCode;
     }
 
     createMatch(index: number): void {

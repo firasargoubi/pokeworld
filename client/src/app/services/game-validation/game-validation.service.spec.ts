@@ -212,7 +212,7 @@ describe('GameValidationService', () => {
             const result = service['validateTerrainCoverage'](tilesCount);
             expect(result).toEqual({
                 isValid: true,
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- convert to percentage
                 coveragePercentage: (tilesCount.nbTerrain / tilesCount.nbTilesTotal) * 100,
             });
         });
@@ -226,7 +226,7 @@ describe('GameValidationService', () => {
 
             expect(result).toEqual({
                 isValid: false,
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- convert to percentage
                 coveragePercentage: (tilesCount.nbTerrain / tilesCount.nbTilesTotal) * 100,
             });
         });

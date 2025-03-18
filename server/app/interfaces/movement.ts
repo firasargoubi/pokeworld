@@ -22,3 +22,8 @@ export interface DistancesAndPredecessors {
     distances: number[][];
     predecessors: Map<Position, Position>;
 }
+
+export interface VisitedQueue {
+    visited: boolean[][];
+    queue: Position[];
+}
