@@ -180,6 +180,18 @@ describe('PlayService', () => {
         expect(mockPlayGateway.emitDebugModeChanged.calledWith(matchCode, match)).toBeTruthy();
     });
 
+    it('changeDebugMode should set debug mode to forced value when provided', () => {
+        match.matchData.isDebugMode = true;
+        mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
+        mockMatchService.isPlayerAdmin.returns(true);
+        mockMatchService.getMatch.returns(match);
+
+        service.changeDebugMode(playerId, false);
+
+        expect(match.matchData.isDebugMode).toBe(false);
+        expect(mockPlayGateway.emitDebugModeChanged.calledWith(matchCode, match)).toBeTruthy();
+    });
+
     it('endOfCombat should call respawnPlayer and endMatch when winner reaches threshold', () => {
         players[0].currentStats.fightsWon = MINIMUM_FIGHTS_TO_WIN - 1;
         const combatResult = { winnerId: players[0].id, loserId: players[1].id };
@@ -564,5 +576,25 @@ describe('PlayService', () => {
 
         expect(service['tryEndTurn'](playerId)).toBe(true);
         expect(endTurnStub.calledWith(playerId)).toBeTruthy();
+    });
+
+    it('tryEndTurn should not end turn when player has actions available', () => {
+        players[0].currentStats.hasAction = true;
+        match.matchData.players = players;
+        match.matchData.activePlayer = 0;
+
+        mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
+        mockMatchService.getMatch.returns(match);
+        mockMatchService.getPlayer.returns(players[0]);
+        mockMovementService.getPossibleMoves.returns([]);
+        mockMovementService.getActions.returns([
+            { x: 1, y: 1 },
+            { x: 2, y: 2 },
+        ]);
+
+        const endTurnStub = sandbox.stub(service, 'endTurn');
+
+        expect(service['tryEndTurn'](playerId)).toBe(false);
+        expect(endTurnStub.called).toBe(false);
     });
 });

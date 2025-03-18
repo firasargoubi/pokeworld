@@ -52,6 +52,22 @@ export class PopupService {
         this.keepMessagesOnNavigation = true;
     }
 
+    removeMessagesByFilter(filterFn: (message: string) => boolean): void {
+        this.messages = this.messages.filter((popup) => !filterFn(popup.message));
+
+        const popupsToRemove = this.overlayRefs.filter(({ componentRef }) => filterFn(componentRef.instance.message));
+
+        popupsToRemove.forEach(({ overlayRef }) => {
+            overlayRef.dispose();
+        });
+
+        this.overlayRefs = this.overlayRefs.filter((ref) => !popupsToRemove.includes(ref));
+
+        if (this.overlayRefs.length === 0) {
+            this.setOverlayZIndexLow();
+        }
+    }
+
     private displayPopup() {
         const currentMessage = this.messages.shift();
         if (!currentMessage) return;

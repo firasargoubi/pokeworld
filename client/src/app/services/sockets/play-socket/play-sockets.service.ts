@@ -1,14 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { MOVE_ANIMATION_DURATION } from '@common/consts/default-player.const';
 import { MapService } from '@app/services/map/map.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { CombatEvent } from '@common/combat-event.enum';
 import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/combat';
+import { CombatEvent } from '@common/combat-event.enum';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/default-player.const';
 import { LobbyEvent } from '@common/lobby-event.enum';
 import { Match, PlayerMovementData } from '@common/match';
 import { PlayEvent } from '@common/play-event.enum';
@@ -138,6 +138,7 @@ export class PlaySocketsService {
     }
 
     private onDebugModeChanged(match: Match) {
+        this.popupService.removeMessagesByFilter((message) => message.toLowerCase().includes('debug'));
         this.matchDataService.updateMatch(match);
         if (match.matchData.isDebugMode) {
             this.popupService.showPopup('Mode de debug activé');

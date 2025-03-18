@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Overlay, OverlayContainer } from '@angular/cdk/overlay';
-import { Component } from '@angular/core';
+import { Component, ComponentRef } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
@@ -172,6 +172,46 @@ describe('PopupService', () => {
     it('should do nothing when no message is queued', () => {
         service['messages'] = [];
         service['displayPopup']();
+        expect(service['overlayRefs'].length).toBe(0);
+    });
+    it('should remove messages by filter', () => {
+        service['messages'] = [
+            { message: 'debug info', isConfirmation: false },
+            { message: 'other message', isConfirmation: false },
+        ];
+
+        const mockOverlayRef1 = jasmine.createSpyObj('OverlayRef', ['dispose']);
+        const mockOverlayRef2 = jasmine.createSpyObj('OverlayRef', ['dispose']);
+
+        service['overlayRefs'] = [
+            {
+                overlayRef: mockOverlayRef1,
+                componentRef: {
+                    instance: { message: 'debug info' } as WarningConfirmationPopupComponent,
+                } as ComponentRef<WarningConfirmationPopupComponent>,
+            },
+            {
+                overlayRef: mockOverlayRef2,
+                componentRef: {
+                    instance: { message: 'other message' } as WarningConfirmationPopupComponent,
+                } as ComponentRef<WarningConfirmationPopupComponent>,
+            },
+        ];
+
+        spyOn<any>(service, 'setOverlayZIndexLow');
+
+        service.removeMessagesByFilter((msg) => msg.includes('debug'));
+
+        expect(service['messages'].length).toBe(1);
+        expect(service['messages'][0].message).toBe('other message');
+        expect(mockOverlayRef1.dispose).toHaveBeenCalled();
+        expect(mockOverlayRef2.dispose).not.toHaveBeenCalled();
+        expect(service['overlayRefs'].length).toBe(1);
+        expect(service['setOverlayZIndexLow']).not.toHaveBeenCalled();
+
+        service['overlayRefs'][0].componentRef.instance.message = 'debug too';
+        service.removeMessagesByFilter((msg) => msg.includes('debug') || msg.includes('other'));
+        expect(service['setOverlayZIndexLow']).toHaveBeenCalled();
         expect(service['overlayRefs'].length).toBe(0);
     });
 });
