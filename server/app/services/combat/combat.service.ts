@@ -1,11 +1,6 @@
 import { CombatGateway } from '@app/gateways/combat/combat.gateway';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
-import { AttackResult, CombatData, CombatResult, CombatState } from '@common/combat';
-import { CombatEvent } from '@common/combat-event.enum';
-import { DICE_MAX_VALUE, DiceType } from '@common/dice';
-import { Player } from '@common/player';
-import { TileType } from '@common/tile-type.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import {
     COMBAT_CODE_LENGTH,
@@ -15,6 +10,11 @@ import {
     MIN_TURN_DURATION,
     PLAYER_STATS_MALUS,
 } from './combat.service.const';
+import { CombatState, CombatData, AttackResult, CombatResult } from '@common/interfaces/combat';
+import { DiceType, DICE_MAX_VALUE } from '@common/interfaces/dice';
+import { Player } from '@common/interfaces/player';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { CombatEvent } from '@common/interfaces/websocket-event.enum';
 
 @Injectable()
 export class CombatService {

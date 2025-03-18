@@ -1,11 +1,10 @@
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MapSize, GameMode } from '@common/interfaces/map-data';
+import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
-import { TileType } from '@common/tile-type.enum';
-import { ItemType } from '@common/item-type.enum';
-import { MapSize } from '@common/map-size.enum';
-import { GameMode } from '@common/game-mode.enum';
-import { Position } from '@common/position';
 
 export type GameDocument = Game & Document;
 

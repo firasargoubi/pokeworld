@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { GameMode } from '@common/game-mode.enum';
-import { MapSize } from '@common/map-size.enum';
 import { CreateGamePopupComponent } from './create-game-popup.component';
+import { GameMode, MapSize } from '@common/interfaces/map-data';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 
 describe('CreateGamePopupComponent', () => {
     let component: CreateGamePopupComponent;
@@ -42,8 +42,8 @@ describe('CreateGamePopupComponent', () => {
     //     expect(component.gameMode).toBe(GameMode.CTF);
     // });
 
-    it('should navigate to /edit on onValiderSelection', () => {
+    it('should navigate to edit page on onValiderSelection', () => {
         component.onValiderSelection();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/edit']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Edit]);
     });
 });

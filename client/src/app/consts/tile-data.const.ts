@@ -1,4 +1,4 @@
-import { TileType } from '@common/tile-type.enum';
+import { TileType } from '@common/interfaces/tile-type.enum';
 
 export const TILE_DESCRIPTION: Map<TileType, string> = new Map([
     [TileType.Path, '<b>Chemin</b>Accélère la vitesse des joueurs'],

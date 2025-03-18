@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { GameCardComponent } from './game-card.component';
 
 describe('GameCardComponent', () => {
@@ -20,7 +20,7 @@ describe('GameCardComponent', () => {
 
         fixture = TestBed.createComponent(GameCardComponent);
         component = fixture.componentInstance;
-        component.game = structuredClone(MOCK_GAMES[0]);
+        component.game = structuredClone(MOCK_GAME_DATAS[0]);
         fixture.detectChanges();
     });
 
@@ -31,27 +31,27 @@ describe('GameCardComponent', () => {
     it('should emit edit event when onEdit is called', () => {
         spyOn(component.edit, 'emit');
         component.onEdit();
-        expect(component.edit.emit).toHaveBeenCalledWith(MOCK_GAMES[0]._id);
+        expect(component.edit.emit).toHaveBeenCalledWith(MOCK_GAME_DATAS[0]._id);
     });
 
     it('should emit delete event when onDelete is confirmed', () => {
         spyOn(window, 'confirm').and.returnValue(true);
         spyOn(component.delete, 'emit');
         component.onDelete();
-        expect(component.delete.emit).toHaveBeenCalledWith(MOCK_GAMES[0]._id);
+        expect(component.delete.emit).toHaveBeenCalledWith(MOCK_GAME_DATAS[0]._id);
     });
 
     it('should toggle visibility and emit event when onToggleVisibility is called', () => {
         spyOn(component.toggleVisibility, 'emit');
         component.onToggleVisibility();
-        expect(component.toggleVisibility.emit).toHaveBeenCalledWith({ id: MOCK_GAMES[0]._id, isVisible: MOCK_GAMES[0].isVisible });
+        expect(component.toggleVisibility.emit).toHaveBeenCalledWith({ id: MOCK_GAME_DATAS[0]._id, isVisible: MOCK_GAME_DATAS[0].isVisible });
         expect(component.game.isVisible).toBeFalse();
     });
 
     it('should emit join event when onJoin is called', () => {
         spyOn(component.join, 'emit');
         component.onJoin();
-        expect(component.join.emit).toHaveBeenCalledWith(MOCK_GAMES[0]._id);
+        expect(component.join.emit).toHaveBeenCalledWith(MOCK_GAME_DATAS[0]._id);
     });
 
     it('should set isHovered to true onMouseEnter', () => {
@@ -74,7 +74,7 @@ describe('GameCardComponent', () => {
     it('should apply correct class for game mode', () => {
         fixture.detectChanges();
         const modeElement = fixture.debugElement.query(By.css('.mode-name'));
-        expect(modeElement.nativeElement.textContent.trim()).toBe(MOCK_GAMES[0].mapData.gameMode);
+        expect(modeElement.nativeElement.textContent.trim()).toBe(MOCK_GAME_DATAS[0].mapData.gameMode);
     });
 
     it('should display edition-buttons only when isAdminView is true', () => {

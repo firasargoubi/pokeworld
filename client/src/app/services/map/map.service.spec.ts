@@ -1,18 +1,19 @@
 import { TestBed } from '@angular/core/testing';
-import { MOVE_ANIMATION_DURATION } from '@common/consts/default-player.const';
-import { MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { GameDataService } from '@app/services/game-data/game-data.service';
-import { Avatars } from '@common/avatars.enum';
-import { ItemType } from '@common/item-type.enum';
-import { MapSize } from '@common/map-size.enum';
-import { Match, PlayerMovementData } from '@common/match';
-import { Player } from '@common/player';
-import { Position } from '@common/position';
-import { TileType } from '@common/tile-type.enum';
 import { BehaviorSubject } from 'rxjs';
 import { MapService } from './map.service';
 import { ACTION_OVERLAY, DEFAULT_OVERLAY_TILES, HOVER_MOVE_OVERLAY, POSSIBLE_MOVE_OVERLAY } from './map.service.const';
 import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/surrounding-positions.const';
+import { Position } from '@common/interfaces/position';
+import { MapSize } from '@common/interfaces/map-data';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { MOCK_PLAYERS } from '@common/test-consts/mock-players';
+import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { Avatar } from '@common/interfaces/avatar.enum';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/player.const';
+import { Match, PlayerMovementData } from '@common/interfaces/match';
+import { Player } from '@common/interfaces/player';
 
 describe('MapService', () => {
     let service: MapService;
@@ -195,17 +196,11 @@ describe('MapService', () => {
         const positionIn: Position = { x: 2, y: 2 };
         const positionOut: Position = { x: 5, y: 5 };
 
-        const items: Record<ItemType, Position[]> = {
-            [ItemType.Item1]: [{ x: 2, y: 2 }],
-            [ItemType.Item2]: [{ x: 1, y: 1 }],
-            [ItemType.Item3]: [],
-            [ItemType.Item4]: [],
-            [ItemType.Item5]: [],
-            [ItemType.Item6]: [],
-            [ItemType.Random]: [],
-            [ItemType.Spawn]: [],
-            [ItemType.Flag]: [],
-        };
+        const items: Record<ItemType, Position[]> = Object.fromEntries(
+            (Object.keys(ItemType) as (keyof typeof ItemType)[]).map((key) => [ItemType[key], [] as Position[]]),
+        ) as Record<ItemType, Position[]>;
+        items.Item1 = [{ x: 2, y: 2 }];
+        items.Item2 = [{ x: 2, y: 2 }];
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'getItem').and.callThrough();
@@ -353,7 +348,7 @@ describe('MapService', () => {
 
         service['players'] = [mockPlayer];
         const result = service['getPlayerAvatar'](position);
-        expect(result).toBe('../../../assets/images/game/avatars/face/bulbasaur.png');
+        expect(result).toBe(AVATAR_DATA[Avatar.Avatar1].imageFace);
 
         service['players'] = [
             {
@@ -419,7 +414,7 @@ describe('MapService', () => {
     it('should handle player-related methods correctly', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'updateAllTiles');
-        const mockPlayer: Player = { id: '1', name: 'Player', avatar: Avatars.Avatar1, currentStats: { position: { x: 1, y: 1 } } } as Player;
+        const mockPlayer: Player = { id: '1', name: 'Player', avatar: Avatar.Avatar1, currentStats: { position: { x: 1, y: 1 } } } as Player;
 
         service.setPlayers([mockPlayer]);
         expect(service['players']).toEqual([mockPlayer]);

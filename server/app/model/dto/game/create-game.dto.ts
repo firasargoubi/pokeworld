@@ -1,11 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsEnum, IsObject, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
-import { MapSize } from '@common/map-size.enum';
-import { GameMode } from '@common/game-mode.enum';
-import { TileType } from '@common/tile-type.enum';
-import { ItemType } from '@common/item-type.enum';
-import { Position } from '@common/position';
 import { GAME_NAME_MAX_LENGTH, GAME_DESCRIPTION_MAX_LENGTH } from './game.dto.constants';
+import { Position } from '@common/interfaces/position';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MapSize, GameMode } from '@common/interfaces/map-data';
+import { TileType } from '@common/interfaces/tile-type.enum';
 
 export class MapData {
     @ApiProperty()

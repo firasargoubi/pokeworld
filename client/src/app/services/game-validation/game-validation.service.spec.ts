@@ -1,14 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { ErrorMessage } from '@app/interfaces/error-message.enum';
-import { BridgeValidationError, TileHandler, ValidationResult } from '@app/interfaces/game-validation-result';
-import { TilesCount } from '@app/interfaces/tiles-count';
-import { GameData } from '@common/game-data';
-import { GameMode } from '@common/game-mode.enum';
-import { MapData } from '@common/map-data';
-import { MapSize } from '@common/map-size.enum';
-import { TileType } from '@common/tile-type.enum';
 import { VALIDATION_TESTS_CASES } from './game-validation.const.spec';
 import { GameValidationService } from './game-validation.service';
+import { GameMode, MapData, MapSize } from '@common/interfaces/map-data';
+import { GameData } from '@common/interfaces/game-data';
+import { BridgeValidationError, ErrorMessage, TileHandler, TilesCount, ValidationResult } from '@app/interfaces/game-validation';
+import { TileType } from '@common/interfaces/tile-type.enum';
 
 describe('GameValidationService', () => {
     let service: GameValidationService;
@@ -312,5 +308,51 @@ describe('GameValidationService', () => {
             expect(bridgeStatus.isValid).toBeFalse();
             expect(bridgeStatus.errors).toContain({ x: 0, y: 0, errorMessage: ErrorMessage.BridgeAtEdge });
         });
+    });
+
+    it('should return correct validation error message for various validation results', () => {
+        const validResult: ValidationResult = {
+            name: { isValid: true, errorMessage: null },
+            description: { isValid: true, errorMessage: null },
+            terrainCoverage: { isValid: true, coveragePercentage: 50 },
+            tilesAccessibility: { isValid: true, nonAccessibleTileCount: 0 },
+            spawnPoint: { isValid: true, errorMessage: null },
+            items: { isValid: true, misplacedItems: [] },
+            bridge: { isValid: true, errors: [] },
+            mode: { isValid: true, errorMessage: null },
+        };
+        expect(service.getValidationErrorMessage(validResult)).toBe('Aucune erreur de validation');
+
+        const invalidResult: ValidationResult = {
+            name: { isValid: false, errorMessage: ErrorMessage.Empty },
+            description: { isValid: true, errorMessage: null },
+            terrainCoverage: { isValid: false, coveragePercentage: 20 },
+            tilesAccessibility: { isValid: false, nonAccessibleTileCount: 5 },
+            spawnPoint: { isValid: true, errorMessage: null },
+            items: {
+                isValid: false,
+                misplacedItems: [
+                    { x: 1, y: 1 },
+                    { x: 2, y: 2 },
+                ],
+            },
+            bridge: {
+                isValid: false,
+                errors: [
+                    { x: 0, y: 0, errorMessage: ErrorMessage.BridgeAtEdge },
+                    { x: 1, y: 1, errorMessage: ErrorMessage.BridgeNotBetweenWalls },
+                ],
+            },
+            mode: { isValid: false, errorMessage: ErrorMessage.MissingRequiredItems },
+        };
+        const expectedMessage = `Carte invalide :
+  - name: Le champ ne peut pas être vide
+  - Couverture du terrain insuffisante (20%)
+  - Tuiles inaccessibles
+  - Objets mal placés (2)
+  - Problème de pont en [0,0]: Le pont ne peut pas être placé au bord de la carte
+  - Problème de pont en [1,1]: Le pont doit être placé entre deux tuiles d'eau
+  - mode: Pas assez d'éléments requis placés sur la carte`;
+        expect(service.getValidationErrorMessage(invalidResult)).toBe(expectedMessage);
     });
 });

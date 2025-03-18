@@ -1,12 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { ITEM_IMAGES } from '@app/consts/images.const';
 import { MapService } from '@app/services/map/map.service';
-import { GameMode } from '@common/game-mode.enum';
-import { ItemType } from '@common/item-type.enum';
-import { MapData } from '@common/map-data';
-import { MapSize } from '@common/map-size.enum';
-import { TileType } from '@common/tile-type.enum';
 import { ThumbnailService } from './thumbnail.service';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MapData, MapSize, GameMode } from '@common/interfaces/map-data';
+import { TileType } from '@common/interfaces/tile-type.enum';
 
 describe('ThumbnailService', () => {
     let service: ThumbnailService;

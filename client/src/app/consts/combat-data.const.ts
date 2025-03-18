@@ -13,3 +13,5 @@ export const DEFAULT_COMBAT_ANIMATIONS: CombatAnimations = {
     selfDeath: false,
     ennemyDeath: false,
 };
+
+export const COMBAT_TIME_SCALE = 1000;

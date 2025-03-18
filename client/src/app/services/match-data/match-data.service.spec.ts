@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { DEFAULT_GAME } from '@app/consts/default-game.const';
-import { MOCK_MATCHES } from '@app/consts/tests/mock-matches';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
-import { Match } from '@common/match';
-import { Position } from '@common/position';
 import { MatchDataService } from './match-data.service';
-import { DEFAULT_MATCH } from './match-data.service.const';
+import { Match } from '@common/interfaces/match';
+import { MOCK_MATCHES } from '@common/test-consts/mock-matches';
+import { DEFAULT_MATCH_DATA } from '@common/consts/match.const';
+import { DEFAULT_GAME_DATA } from '@app/consts/game-data.const';
+import { Position } from '@common/interfaces/position';
 
 describe('MatchDataService', () => {
     let service: MatchDataService;
@@ -60,8 +60,8 @@ describe('MatchDataService', () => {
 
         service.resetMatch();
 
-        expect(mockGameDataService.setGameData).toHaveBeenCalledWith(structuredClone(DEFAULT_GAME));
-        expect(service.matchData).toEqual(structuredClone(DEFAULT_MATCH));
+        expect(mockGameDataService.setGameData).toHaveBeenCalledWith(structuredClone(DEFAULT_GAME_DATA));
+        expect(service.matchData).toEqual(structuredClone(DEFAULT_MATCH_DATA));
         expect(service.selfIndex).toBe(1);
     });
 

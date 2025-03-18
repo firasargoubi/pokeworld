@@ -1,4 +1,4 @@
-import { TileType } from '@common/tile-type.enum';
+import { TileType } from '@common/interfaces/tile-type.enum';
 
 export const MAX_NAME_LENGTH = 20;
 export const MAX_DESCRIPTION_LENGTH = 350;

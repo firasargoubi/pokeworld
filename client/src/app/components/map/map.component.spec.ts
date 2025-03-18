@@ -3,9 +3,9 @@ import { MapComponent } from '@app/components/map/map.component';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
 import { PlaySocketsService } from '@app/services/sockets/play-socket/play-sockets.service';
-import { TileType } from '@common/tile-type.enum';
 import { MapVisualData } from '@app/interfaces/map-visual-data';
-import { MapSize } from '@common/map-size.enum';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { MapSize } from '@common/interfaces/map-data';
 
 describe('MapComponent', () => {
     let component: MapComponent;

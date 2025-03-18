@@ -2,7 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MapComponent } from '@app/components/map/map.component';
-import { AVATAR_DATA } from '@app/consts/avatars.const';
+import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { EMPTY_IMAGE } from '@app/consts/images.const';
+import { DEFAULT_PLAY_VISUAL_DATA } from '@app/consts/play-data.const';
 import { PlayerVisualData, PlayVisualData } from '@app/interfaces/play-visual-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
@@ -13,8 +15,9 @@ import { PlaySocketsService } from '@app/services/sockets/play-socket/play-socke
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { TileDescriptionService } from '@app/services/tile-description/tile-description.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { TurnPhase } from '@common/match';
-import { DEFAULT_PLAY_VISUAL_DATA } from './play-page.component.const';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { TurnPhase } from '@common/interfaces/match';
+import { Player } from '@common/interfaces/player';
 
 @Component({
     selector: 'app-play-page',
@@ -50,12 +53,21 @@ export class PlayPageComponent {
         return this.gameDataService.gameData.mapData.gameMode;
     }
 
-    get canUseAction(): boolean {
-        const isActivePlayer = this.matchDataService.matchData.activePlayer === this.matchDataService.selfIndex;
-        const isATurnPhase = this.matchDataService.matchData.phase === TurnPhase.Turn;
-        const canUseAction = this.matchDataService.matchData.players[this.matchDataService.selfIndex].currentStats.hasAction;
+    get selfPlayer(): Player | undefined {
+        return this.matchDataService.matchData.players[this.matchDataService.selfIndex];
+    }
 
-        return isActivePlayer && isATurnPhase && canUseAction;
+    get canUseAction(): boolean {
+        let canUseAction = false;
+
+        if (this.selfPlayer) {
+            const isActivePlayer = this.matchDataService.matchData.activePlayer === this.matchDataService.selfIndex;
+            const isATurnPhase = this.matchDataService.matchData.phase === TurnPhase.Turn;
+            const hasAction = this.selfPlayer.currentStats.hasAction;
+            canUseAction = isActivePlayer && isATurnPhase && hasAction;
+        }
+
+        return canUseAction;
     }
 
     get canEndTurn(): boolean {
@@ -70,7 +82,7 @@ export class PlayPageComponent {
     }
 
     get currentPlayerCount(): number {
-        return this.matchDataService.matchData.players.filter((p) => p.isConnected).length;
+        return this.matchDataService.matchData.players.filter((p: Player) => p.isConnected).length;
     }
 
     get maxPlayerCount(): number {
@@ -82,7 +94,7 @@ export class PlayPageComponent {
     }
 
     get players(): PlayerVisualData[] {
-        return this.matchDataService.matchData.players.map((player) => ({
+        return this.matchDataService.matchData.players.map((player: Player) => ({
             id: player.id,
             name: player.name,
             avatarUrl: AVATAR_DATA[player.avatar].imageCentered,
@@ -94,20 +106,45 @@ export class PlayPageComponent {
     }
 
     get selfAvatarUrl(): string {
-        return this.players[this.matchDataService.selfIndex].avatarUrl;
+        let selfAvatarUrl = EMPTY_IMAGE;
+
+        if (this.selfPlayer) {
+            selfAvatarUrl = AVATAR_DATA[this.selfPlayer.avatar].imageCentered;
+        }
+
+        return selfAvatarUrl;
     }
 
     get selfName(): string {
-        return this.players[this.matchDataService.selfIndex].name;
+        let selfName = '';
+
+        if (this.selfPlayer) {
+            selfName = this.selfPlayer.name;
+        }
+
+        return selfName;
     }
 
     get currentMovement(): number {
-        return this.matchDataService.matchData.players[this.matchDataService.selfIndex].currentStats.movement;
+        let currentMovement = 0;
+
+        if (this.selfPlayer) {
+            currentMovement = this.selfPlayer.currentStats.movement;
+        }
+
+        return currentMovement;
     }
 
     get maxMovement(): number {
-        return this.matchDataService.matchData.players[this.matchDataService.selfIndex].playerStats.speed;
+        let maxMovement = 0;
+
+        if (this.selfPlayer) {
+            maxMovement = this.selfPlayer.playerStats.speed;
+        }
+
+        return maxMovement;
     }
+
     @HostListener('document:keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
         if (event.repeat) {
@@ -169,7 +206,7 @@ export class PlayPageComponent {
 
     private leaveMatch() {
         this.playSocketsService.leaveMatch();
-        this.router.navigate(['/']);
+        this.router.navigate([PageEndpoint.Menu]);
     }
 
     private verifySocketConnection(isConnected: boolean) {
@@ -179,7 +216,7 @@ export class PlayPageComponent {
                 this.popupService.showPopup('Erreur de connection avec le serveur');
                 this.popupService.keepMessages();
             }
-            this.router.navigate(['/']);
+            this.router.navigate([PageEndpoint.Menu]);
         }
     }
 }

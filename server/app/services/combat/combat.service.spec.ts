@@ -3,18 +3,18 @@
 import { CombatGateway } from '@app/gateways/combat/combat.gateway';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
-import { AttackResult, CombatState } from '@common/combat';
-import { CombatEvent } from '@common/combat-event.enum';
-import { DICE_MAX_VALUE, DiceType } from '@common/dice';
-import { Match, MatchData } from '@common/match';
-import { Player } from '@common/player';
-import { TileType } from '@common/tile-type.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Socket } from 'socket.io';
 import { CombatService } from './combat.service';
 import { ESCAPE_RATIO, MAX_TURN_DURATION, MIN_TURN_DURATION, PLAYER_STATS_MALUS } from './combat.service.const';
+import { AttackResult, CombatState } from '@common/interfaces/combat';
+import { DiceType, DICE_MAX_VALUE } from '@common/interfaces/dice';
+import { MatchData, Match } from '@common/interfaces/match';
+import { Player } from '@common/interfaces/player';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { CombatEvent } from '@common/interfaces/websocket-event.enum';
 
 describe('CombatService', () => {
     let service: CombatService;
@@ -68,7 +68,6 @@ describe('CombatService', () => {
         leaveCombatSpy = stub(service, 'leaveCombat' as any);
         clearTimeoutSpy = stub(global, 'clearTimeout');
         randomStub = stub(Math, 'random');
-        /* eslint-enable @typescript-eslint/no-explicit-any */
 
         player1 = {
             id: 'player-1',

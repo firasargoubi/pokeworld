@@ -3,8 +3,8 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { GameDataService } from '@app/services/game-data/game-data.service';
-import { GameMode } from '@common/game-mode.enum';
-import { MapSize } from '@common/map-size.enum';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { GameMode, MapSize } from '@common/interfaces/map-data';
 
 @Component({
     selector: 'app-create-game-popup',
@@ -34,6 +34,6 @@ export class CreateGamePopupComponent {
 
     onValiderSelection() {
         this.gameDataService.createNewGame(this.mapSize, this.gameMode);
-        this.router.navigate(['/edit']);
+        this.router.navigate([PageEndpoint.Edit]);
     }
 }

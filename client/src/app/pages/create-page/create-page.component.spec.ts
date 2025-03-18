@@ -3,12 +3,13 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-import { GameData } from '@common/game-data';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { GameData } from '@common/interfaces/game-data';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { of, throwError } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 
@@ -58,7 +59,7 @@ describe('CreatePageComponent', () => {
         fixture = TestBed.createComponent(CreatePageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
-        mockGames = structuredClone(MOCK_GAMES);
+        mockGames = structuredClone(MOCK_GAME_DATAS);
     });
 
     it('should create', () => {
@@ -73,7 +74,7 @@ describe('CreatePageComponent', () => {
 
     it('should navigate to menu when navigateToMenu is called', () => {
         component.navigateToMenu();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 
     it('should return correct card color', () => {
@@ -97,13 +98,13 @@ describe('CreatePageComponent', () => {
 
     it('should handle createMatch success and failure', async () => {
         lobbySocketServiceSpy.createMatch.and.returnValue(Promise.resolve(true));
-        await component.createMatch(MOCK_GAMES[0]);
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/player-selection']);
+        await component.createMatch(MOCK_GAME_DATAS[0]);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.PlayerSelection]);
         expect(popupServiceSpy.showPopup).not.toHaveBeenCalled();
 
         lobbySocketServiceSpy.createMatch.and.returnValue(Promise.resolve(false));
         spyOn(component as CreatePageComponent & { loadGames: () => void }, 'loadGames');
-        await component.createMatch(MOCK_GAMES[0]);
+        await component.createMatch(MOCK_GAME_DATAS[0]);
         expect(component['loadGames']).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith("Ce jeu n'est plus disponible");
     });

@@ -119,12 +119,15 @@ $text-shadow-color: rgb(112, 112, 112);
 }
 
 .access-code {
+    font-family: 'pokemon-narrow';
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 6vw;
     margin: 0 0 4% 0;
     color: #aae7f7;
+    overflow: visible;
+    transform: scaleY(0.9);
 }
 
 .access-instruction {
@@ -139,6 +142,7 @@ $text-shadow-color: rgb(112, 112, 112);
 }
 
 .copy-container,
+.empty-lock-container,
 .lock-container {
     height: 75%;
     aspect-ratio: 25/10;
@@ -154,6 +158,10 @@ $text-shadow-color: rgb(112, 112, 112);
 
 .copy-container {
     background-image: url('../../../assets/images/menu/buttons/admin-button/green-background-highlight.png');
+}
+
+.empty-lock-container {
+    background-image: none;
 }
 
 .copy-container img {
@@ -182,6 +190,7 @@ $text-shadow-color: rgb(112, 112, 112);
 }
 
 #poke-button {
+    z-index: 999;
     position: absolute;
     right: 5%;
     bottom: 4%;
@@ -225,7 +234,27 @@ $text-shadow-color: rgb(112, 112, 112);
     width: 38%;
     height: 40%;
     z-index: 1;
-    margin: 0 0 2% 0;
-    bottom: 5%;
+    margin: 0 0 1.8% 0;
+    bottom: 1%;
     left: 6%;
+}
+
+.lock-icon {
+    height: 72%;
+    width: 72%;
+    margin: 14%;
+    background-image: url('../../../assets/images/menu/icons/lock.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.unlock-icon {
+    height: 70%;
+    width: 70%;
+    margin: 15%;
+    background-image: url('../../../assets/images/menu/icons/unlock.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
 }

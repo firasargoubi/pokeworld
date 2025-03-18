@@ -1,9 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { CombatEvent } from '@common/combat-event.enum';
-import { AttackAttempt, AttackResult, CombatData, CombatResult, EscapeAttempt } from '@common/combat';
-import { Player } from '@common/player';
+import { AttackAttempt, AttackResult, CombatData, CombatResult, EscapeAttempt } from '@common/interfaces/combat';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { Player } from '@common/interfaces/player';
+import { CombatEvent } from '@common/interfaces/websocket-event.enum';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -60,7 +61,7 @@ export class CombatSocketService {
 
         this.selfPlayerSubject.next(selfPlayer);
         this.ennemyPlayerSubject.next(ennemyPlayer);
-        this.router.navigate(['/combat']);
+        this.router.navigate([PageEndpoint.Combat]);
     }
 
     private setupCombatListeners(): void {
@@ -100,6 +101,6 @@ export class CombatSocketService {
     }
 
     private onEndCombat() {
-        this.router.navigate(['/play']);
+        this.router.navigate([PageEndpoint.Play]);
     }
 }

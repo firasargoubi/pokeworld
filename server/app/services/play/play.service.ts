@@ -3,13 +3,13 @@ import { PlayGateway } from '@app/gateways/play/play.gateway';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
-import { CombatResult } from '@common/combat';
-import { Match, TurnPhase } from '@common/match';
-import { Player } from '@common/player';
-import { Position } from '@common/position';
-import { TileType } from '@common/tile-type.enum';
+import { MINIMUM_FIGHTS_TO_WIN, TURN_DURATION, PRE_TURN_DURATION, HALF_POINT } from '@common/consts/match.const';
+import { CombatResult } from '@common/interfaces/combat';
+import { Match, TurnPhase } from '@common/interfaces/match';
+import { Player } from '@common/interfaces/player';
+import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { HALF_POINT, MINIMUM_FIGHTS_TO_WIN, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
 
 @Injectable()
 export class PlayService {
@@ -143,9 +143,13 @@ export class PlayService {
 
     private respawnPlayer(playerId: string, matchCode: string) {
         const match = this.matchService.getMatch(matchCode);
-        const player = this.matchService.getPlayer(playerId);
-        const position = this.movementService.getNearestEmptyTile(player.spawnPoint, match);
-        player.currentStats.position = position;
+        if (match) {
+            const player = this.matchService.getPlayer(playerId);
+            if (player && player.isConnected) {
+                const position = this.movementService.getNearestEmptyTile(player.spawnPoint, match);
+                player.currentStats.position = position;
+            }
+        }
     }
 
     private endMatch(matchCode: string) {
@@ -308,10 +312,11 @@ export class PlayService {
         const activePlayerId = match.matchData.players[match.matchData.activePlayer].id;
         const player = this.matchService.getPlayer(activePlayerId);
 
+        const isCurrentTurn = activePlayerId === playerId;
         const canMove = this.movementService.getPossibleMoves(match).length > 0;
         const canAct = this.movementService.getActions(match).length > 1 && player.currentStats.hasAction;
 
-        if (!canMove && !canAct) {
+        if (!canMove && !canAct && isCurrentTurn) {
             this.endTurn(activePlayerId);
             return true;
         }

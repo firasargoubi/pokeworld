@@ -1,10 +1,10 @@
 import { CombatService } from '@app/services/combat/combat.service';
-import { CombatState } from '@common/combat';
-import { CombatEvent } from '@common/combat-event.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { CombatGateway } from './combat.gateway';
+import { CombatState } from '@common/interfaces/combat';
+import { CombatEvent } from '@common/interfaces/websocket-event.enum';
 
 describe('CombatGateway', () => {
     let gateway: CombatGateway;

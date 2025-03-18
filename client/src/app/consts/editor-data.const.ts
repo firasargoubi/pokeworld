@@ -1,15 +1,16 @@
-import { EMPTY_IMAGE, TILE_IMAGES } from '@app/consts/images.const';
-import { TILE_DESCRIPTION } from '@app/consts/tiles.const';
-import { EditorData, EditorTile } from '@app/interfaces/editor-data';
-import { ItemType } from '@common/item-type.enum';
-import { TileType } from '@common/tile-type.enum';
+import { EMPTY_IMAGE, ITEM_IMAGES, TILE_IMAGES } from './images.const';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { TILE_DESCRIPTION } from './tile-data.const';
+import { ITEM_DESCRIPTION } from './item-data.const';
+import { EditorTile, EditorVisualData } from '@app/interfaces/editor';
 
 export const DEFAULT_EDITOR_TILES: EditorTile[] = [
     {
         tile: TileType.Path,
         image: TILE_IMAGES.get(TileType.Path) as string,
         description: TILE_DESCRIPTION.get(TileType.Path) as string,
-        isActive: false,
+        isActive: true,
     },
     {
         tile: TileType.Bush,
@@ -31,15 +32,20 @@ export const DEFAULT_EDITOR_TILES: EditorTile[] = [
     },
 ];
 
-export const DEFAULT_EDITOR_DATA: EditorData = {
+export const DEFAULT_EDITOR_DATA: EditorVisualData = {
     tiles: DEFAULT_EDITOR_TILES,
-    items: [],
-    selectedTile: null,
-    activeTile: null,
-    activeTilePosition: { x: -1, y: -1 },
-    activeItem: null,
-    activeItemImage: EMPTY_IMAGE,
-    activeItemPosition: { x: -1, y: -1 },
+    items: Object.values(ItemType).map((i: ItemType) => ({
+        item: i,
+        image: ITEM_IMAGES.get(i) as string,
+        description: ITEM_DESCRIPTION.get(i) as string,
+        count: 0,
+    })),
+    selectedTile: DEFAULT_EDITOR_TILES[0].tile,
+    paintingTile: null,
+    lastPaintedPosition: { x: -1, y: -1 },
+    dragItem: null,
+    dragItemImage: EMPTY_IMAGE,
+    dragPosition: { x: -1, y: -1 },
 };
 
 export const EDITOR_ERASE_TILE: TileType = TileType.Grass;
@@ -53,4 +59,5 @@ export const SHARED_ITEM_POOL: ItemType[] = [
     ItemType.Item6,
     ItemType.Random,
 ];
+
 export const ITEM_POOL_HIGHEST_ITEM: ItemType = ItemType.Random;

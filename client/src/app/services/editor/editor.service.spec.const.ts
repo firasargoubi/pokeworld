@@ -1,8 +1,7 @@
-import { ErrorMessage } from '@app/interfaces/error-message.enum';
-import { EventProperty } from '@app/interfaces/event-property';
-import { ValidationResult } from '@app/interfaces/game-validation-result';
+import { ErrorMessage, ValidationResult } from '@app/interfaces/game-validation';
+import { EditorEvent } from '@app/interfaces/editor';
 
-export const MOCK_EVENT_PROPERTY: EventProperty = {
+export const MOCK_EVENT_PROPERTY: EditorEvent = {
     tilePosition: null,
     mousePosition: null,
     tile: null,

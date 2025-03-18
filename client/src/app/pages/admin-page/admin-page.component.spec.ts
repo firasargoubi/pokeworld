@@ -3,10 +3,11 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
-import { GameData } from '@common/game-data';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { GameData } from '@common/interfaces/game-data';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { of, throwError } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
 @Component({
@@ -66,12 +67,12 @@ describe('AdminPageComponent', () => {
     });
 
     it('should load games successfully', () => {
-        gameSaveServiceSpy.getAllGames.and.returnValue(of(MOCK_GAMES));
+        gameSaveServiceSpy.getAllGames.and.returnValue(of(MOCK_GAME_DATAS));
 
         component['loadGames']();
 
         expect(gameSaveServiceSpy.getAllGames).toHaveBeenCalled();
-        expect(component.games).toEqual(MOCK_GAMES);
+        expect(component.games).toEqual(MOCK_GAME_DATAS);
     });
 
     it('should handle error when loadGames fails', () => {
@@ -90,7 +91,7 @@ describe('AdminPageComponent', () => {
 
         component.editGame(gameId);
 
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/edit']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Edit]);
     });
 
     it('should handle error when editGame fails', () => {
@@ -112,34 +113,34 @@ describe('AdminPageComponent', () => {
         const errorResponse = new HttpErrorResponse({ error: 'Server error', status: 500 });
         gameSaveServiceSpy.toggleVisibility.and.returnValue(throwError(() => errorResponse));
 
-        component.toggleVisibility({ id: MOCK_GAMES[0]._id, isVisible: true });
+        component.toggleVisibility({ id: MOCK_GAME_DATAS[0]._id, isVisible: true });
 
         expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 
     it('should add a confirmation message when deleteGame is called', () => {
-        component.deleteGame(MOCK_GAMES[0]._id, '');
+        component.deleteGame(MOCK_GAME_DATAS[0]._id, '');
         expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 
     it('should delete game when confirmation is accepted', () => {
         gameSaveServiceSpy.deleteGame.and.returnValue(of(undefined));
 
-        component.deleteGame(MOCK_GAMES[0]._id, '');
+        component.deleteGame(MOCK_GAME_DATAS[0]._id, '');
 
         const deleteAction = popupServiceSpy.showPopup.calls.mostRecent().args[2];
         if (deleteAction) {
             deleteAction();
         }
 
-        expect(gameSaveServiceSpy.deleteGame).toHaveBeenCalledWith(MOCK_GAMES[0]._id);
+        expect(gameSaveServiceSpy.deleteGame).toHaveBeenCalledWith(MOCK_GAME_DATAS[0]._id);
     });
 
     it('should handle error when deleteGame fails', () => {
         const errorResponse = new HttpErrorResponse({ error: 'Delete failed', status: 500 });
         gameSaveServiceSpy.deleteGame.and.returnValue(throwError(() => errorResponse));
 
-        component.deleteGame(MOCK_GAMES[0]._id, '');
+        component.deleteGame(MOCK_GAME_DATAS[0]._id, '');
 
         const deleteAction = popupServiceSpy.showPopup.calls.mostRecent().args[2];
         if (deleteAction) {
@@ -176,7 +177,7 @@ describe('AdminPageComponent', () => {
 
     it('should navigate to menu', () => {
         component.navigateToMenu();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 
     it('should add a message and call loadGames when the error is 404', () => {
@@ -189,7 +190,7 @@ describe('AdminPageComponent', () => {
     });
 
     it('should delete the game and update the games list', () => {
-        const initialGames = structuredClone(MOCK_GAMES);
+        const initialGames = structuredClone(MOCK_GAME_DATAS);
         const gameId = initialGames[0]._id;
 
         component.games = initialGames;

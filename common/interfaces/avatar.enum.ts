@@ -1,4 +1,4 @@
-export enum Avatars {
+export enum Avatar {
     Default = 'default',
     Avatar1 = 'avatar1',
     Avatar2 = 'avatar2',
@@ -12,4 +12,10 @@ export enum Avatars {
     Avatar10 = 'avatar10',
     Avatar11 = 'avatar11',
     Avatar12 = 'avatar12',
+}
+
+export enum AvatarStatus {
+    UNSELECTED = 'unselected',
+    LOCKED = 'locked',
+    SELECTED = 'selected',
 }

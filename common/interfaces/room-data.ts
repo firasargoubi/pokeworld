@@ -1,4 +1,4 @@
-import { MapSize } from './map-size.enum';
+import { MapSize } from './map-data';
 import { Player } from './player';
 
 export interface RoomData {

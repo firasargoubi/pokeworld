@@ -1,11 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { AvatarStatus } from '@common/avatar-status.enum';
-import { Avatars } from '@common/avatars.enum';
-import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { Player } from '@common/player';
-import { DiceType } from '@common/dice';
 import { Router } from '@angular/router';
+import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
+import { Avatar, AvatarStatus } from '@common/interfaces/avatar.enum';
+import { DiceType } from '@common/interfaces/dice';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { Player } from '@common/interfaces/player';
 
 @Injectable({
     providedIn: 'root',
@@ -14,7 +14,7 @@ export class PlayerSelectionService {
     matchCode: string = '';
     playerData: Partial<Player> = {
         name: '',
-        avatar: Avatars.Default,
+        avatar: Avatar.Default,
         playerStats: {
             health: 0,
             speed: 0,
@@ -27,7 +27,7 @@ export class PlayerSelectionService {
         isConnected: true,
     };
     readonly avatarData = AVATAR_DATA;
-    readonly avatarList = Object.keys(AVATAR_DATA).slice(1) as Avatars[];
+    readonly avatarList = Object.keys(AVATAR_DATA).slice(1) as Avatar[];
     private lobbySocketService: LobbySocketsService = inject(LobbySocketsService);
     private playerList: Player[];
     private router: Router = inject(Router);
@@ -40,10 +40,10 @@ export class PlayerSelectionService {
     }
 
     get selectedAvatar() {
-        return this.playerData.avatar as Avatars;
+        return this.playerData.avatar as Avatar;
     }
 
-    handleAvatarSelection(avatar: Avatars) {
+    handleAvatarSelection(avatar: Avatar) {
         const isAvatarAvailable = this.isAvatarAvailable(avatar);
         if (isAvatarAvailable) {
             this.playerData.avatar = avatar;
@@ -56,9 +56,8 @@ export class PlayerSelectionService {
     joinLobby() {
         if (this.isPlayerInLobby()) {
             this.lobbySocketService.updatePlayer(this.playerData);
-            this.router.navigate(['/lobby']);
+            this.router.navigate([PageEndpoint.Lobby]);
         } else {
-            // if the game has been locked while in player selection
             const matchCode = this.matchCode;
             this.lobbySocketService.joinMatch(matchCode).subscribe((joinStatus: boolean) => {
                 if (joinStatus) {
@@ -72,11 +71,11 @@ export class PlayerSelectionService {
         Object.assign(this.playerData, playerUpdates);
     }
 
-    updatePlayerAvatar(avatar: Avatars) {
+    updatePlayerAvatar(avatar: Avatar) {
         this.lobbySocketService.updatePlayer({ avatar });
     }
 
-    getAvatarStatus(targetAvatar: Avatars): AvatarStatus {
+    getAvatarStatus(targetAvatar: Avatar): AvatarStatus {
         if (targetAvatar === this.playerData.avatar) {
             return AvatarStatus.SELECTED;
         }
@@ -90,10 +89,10 @@ export class PlayerSelectionService {
     }
 
     resetAvatar() {
-        this.playerData.avatar = Avatars.Default;
+        this.playerData.avatar = Avatar.Default;
     }
 
-    isAvatarAvailable(targetAvatar: Avatars) {
+    isAvatarAvailable(targetAvatar: Avatar) {
         return this.getAvatarStatus(targetAvatar) === AvatarStatus.UNSELECTED;
     }
 

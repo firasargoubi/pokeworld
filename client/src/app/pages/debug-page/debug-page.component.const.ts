@@ -1,10 +1,9 @@
-import { Avatars } from '@common/avatars.enum';
-import { DiceType } from '@common/dice';
-import { GameMode } from '@common/game-mode.enum';
-import { ItemType } from '@common/item-type.enum';
-import { MapSize } from '@common/map-size.enum';
-import { Player } from '@common/player';
-import { TileType } from '@common/tile-type.enum';
+import { Avatar } from '@common/interfaces/avatar.enum';
+import { DiceType } from '@common/interfaces/dice';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MapSize, GameMode } from '@common/interfaces/map-data';
+import { Player } from '@common/interfaces/player';
+import { TileType } from '@common/interfaces/tile-type.enum';
 
 export const DEBUG_GAMES = [
     {
@@ -217,12 +216,12 @@ export const DEBUG_GAMES = [
 export const DEBUG_PLAYERS: Partial<Player>[] = [
     {
         name: 'Aziz',
-        avatar: Avatars.Avatar1,
+        avatar: Avatar.Avatar1,
         isConnected: true,
     },
     {
         name: 'Selim',
-        avatar: Avatars.Avatar2,
+        avatar: Avatar.Avatar2,
         isConnected: true,
         playerStats: {
             health: 4,
@@ -236,12 +235,12 @@ export const DEBUG_PLAYERS: Partial<Player>[] = [
     },
     {
         name: 'Mathieu',
-        avatar: Avatars.Avatar3,
+        avatar: Avatar.Avatar3,
         isConnected: true,
     },
     {
         name: 'Omar',
-        avatar: Avatars.Avatar4,
+        avatar: Avatar.Avatar4,
         isConnected: true,
     },
 ];

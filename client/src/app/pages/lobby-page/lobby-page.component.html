@@ -12,10 +12,9 @@
                 <div class="access-instruction">
                     <div class="lock-container" (click)="this.toggleLockRoom()">
                         @if (this.isRoomLocked) {
-                        <p>🔒</p>
+                            <div class="lock-icon"></div>
                         } @else {
-                        <p>🔓</p>
-
+                            <div class="unlock-icon"></div>
                         }
                     </div>
                     <div class="copy-container" (click)="this.copyMatchCode()">
@@ -24,11 +23,13 @@
                 </div>
                 } @else{
                 <div class="access-instruction">
-                    @if (this.isRoomLocked) {
-                    <p>🔒</p>
-                    } @else {
-                    <p>🔓</p>
-                    }
+                    <div class="empty-lock-container" (click)="this.toggleLockRoom()">
+                        @if (this.isRoomLocked) {
+                            <div class="lock-icon"></div>
+                        } @else {
+                            <div class="unlock-icon"></div>
+                        }
+                    </div>
                     <div class="copy-container" (click)="this.copyMatchCode()">
                         <img src="./assets/images/menu/icons/copy.png" />
                     </div>

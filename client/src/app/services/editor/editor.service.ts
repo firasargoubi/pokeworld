@@ -1,376 +1,110 @@
 import { inject, Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
-import { ITEM_DESCRIPTION, MAX_ITEM_COUNT } from '@app/consts/items.const';
-import { EditorData, EditorItem } from '@app/interfaces/editor-data';
-import { ErrorMessage } from '@app/interfaces/error-message.enum';
-import { EventProperty } from '@app/interfaces/event-property';
-import { BridgeValidationError, ValidationResult, ValidationStatus } from '@app/interfaces/game-validation-result';
+import { ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from '@app/consts/editor-data.const';
+import { MAX_ITEM_COUNT } from '@app/consts/item-data.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
 import { PopupService } from '@app/services/popup/popup.service';
-import { GameData } from '@common/game-data';
-import { GameMode } from '@common/game-mode.enum';
-import { ItemType } from '@common/item-type.enum';
-import { Position } from '@common/position';
-import { TileType } from '@common/tile-type.enum';
-import { DEFAULT_EDITOR_DATA, EDITOR_ERASE_TILE, ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from './editor.service.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { GameMode } from '@common/interfaces/map-data';
+import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class EditorService {
-    router: Router = inject(Router);
-    gameDataService: GameDataService = inject(GameDataService);
-    editorData: EditorData = this.getEditorData();
-    initialGameData: GameData;
+    private lastPickPosition: Position | null = null;
+    private gameDataService: GameDataService = inject(GameDataService);
     private gameValidationService: GameValidationService = inject(GameValidationService);
     private gameSaveService: GameSaveService = inject(GameSaveService);
     private popupService: PopupService = inject(PopupService);
 
-    redirectToAdminPage(needsConfirmation: boolean = true): void {
-        const navigate = async () => this.router.navigate(['/admin']);
-        if (needsConfirmation && this.gameDataService.isModified(this.initialGameData)) {
-            this.popupService.showPopup('Voulez-vous vraiment quitter la page? Les modifications non sauvegardées seront perdues.', true, navigate);
-        } else {
-            navigate();
-        }
+    pickItem(position: Position) {
+        this.gameDataService.removeItem(position);
+        this.lastPickPosition = position;
     }
 
-    saveButton(): void {
-        const validationResult = this.gameValidationService.validateGame(this.gameDataService.gameData);
-
-        if (validationResult) {
-            const errorMessage = this.getValidationErrorMessage(validationResult);
-            this.popupService.showPopup(errorMessage, false);
-            return;
-        }
-
-        this.gameDataService.gameData.name = this.gameDataService.gameData.name.trim();
-        this.gameSaveService.isNameUnique(this.gameDataService.gameData.name, this.gameDataService.gameData._id).subscribe((isUnique) => {
-            if (!isUnique) {
-                this.popupService.showPopup('Le nom est déjà utilisé. Veuillez en choisir un autre.', false);
-                return;
-            }
-            this.gameDataService.gameData.isVisible = false;
-            this.gameDataService.gameData.lastEdited = new Date();
-            this.saveGame();
-        });
+    resetLastPicked() {
+        this.lastPickPosition = null;
     }
 
-    resetButton(): void {
-        const action = () => {
-            const oldGameData = structuredClone(this.initialGameData);
-            this.gameDataService.setGameData(oldGameData);
-        };
-        if (this.gameDataService.isModified(this.initialGameData)) {
-            this.popupService.showPopup('Voulez-vous vraiment réinitialiser la partie?', true, action);
-        } else {
-            action();
+    placeItem(item: ItemType, position: Position) {
+        const tile = this.gameDataService.getTileFromPosition(position);
+
+        const canPlaceItem = ![TileType.Water, TileType.Bridge, TileType.BrokenBridge].includes(tile);
+        if (canPlaceItem) {
+            this.gameDataService.addItem(item, position);
+        } else if (this.lastPickPosition) {
+            this.gameDataService.addItem(item, this.lastPickPosition);
         }
+
+        this.resetLastPicked();
     }
 
-    onMouseDown(event: MouseEvent): void {
-        const isLeftClick = event.button === 0;
-        this.onClick(event, isLeftClick);
+    getRemainingItemCount(item: ItemType, activeItem: ItemType | null): number {
+        let currentItemCount = this.gameDataService.getItemCount(item);
+        const maxItemCount = this.getMaxItemCount(item);
+
+        if (item === activeItem) {
+            currentItemCount++;
+        }
+
+        if (maxItemCount === 1 && currentItemCount === 0) {
+            return -1;
+        }
+
+        return maxItemCount - currentItemCount;
     }
 
-    onRightClick(event: MouseEvent): void {
-        const eventProperty = this.getEventProperty(event);
-
-        if (eventProperty.tilePosition) {
-            event.preventDefault();
-        }
-    }
-
-    onMouseUp(event: MouseEvent): void {
-        this.editorData.activeTile = null;
-        this.editorData.activeTilePosition = { x: -1, y: -1 };
-
-        if (this.editorData.activeItem) {
-            const eventProperty = this.getEventProperty(event);
-            this.dropItem(eventProperty);
-        }
-    }
-
-    onMouseMove(event: MouseEvent): void {
-        if (this.editorData.activeItem) {
-            const position: Position = { x: event.clientX, y: event.clientY };
-
-            if (position.x !== this.editorData.activeItemPosition.x) {
-                this.editorData.activeItemPosition.x = position.x;
-            }
-
-            if (position.y !== this.editorData.activeItemPosition.y) {
-                this.editorData.activeItemPosition.y = position.y;
-            }
-        }
-    }
-
-    onMouseOver(event: Event): void {
-        if (!this.editorData.activeTile) {
-            return;
-        }
-
-        const eventProperty = this.getEventProperty(event);
-
-        if (!eventProperty.tilePosition) {
-            return;
-        }
-
-        this.paintTile(eventProperty.tilePosition);
-    }
-
-    private getValidationErrorMessage(validationResult: ValidationResult): string {
-        const errors: string[] = [];
-
-        for (const [key, value] of Object.entries(validationResult)) {
-            if (!value.isValid) {
-                if (key === 'terrainCoverage') {
-                    errors.push(`  - ${ErrorMessage.TerrainCoverage} (${value.coveragePercentage}%)`);
-                } else if (key === 'tilesAccessibility') {
-                    errors.push(`  - ${ErrorMessage.TilesAccessibility}`);
-                } else if (key === 'items') {
-                    errors.push(`  - ${ErrorMessage.Items} (${value.misplacedItems.length})`);
-                } else if (key === 'bridge') {
-                    value.errors.forEach((error: BridgeValidationError) => {
-                        errors.push(`  - ${ErrorMessage.Bridge} [${error.x},${error.y}]: ${error.errorMessage}`);
-                    });
-                } else if (typeof value === 'object' && value !== null && 'isValid' in value) {
-                    const errorMessage: ValidationStatus = value;
-                    errors.push(`  - ${key}: ${errorMessage.errorMessage}`);
-                }
-            }
-        }
-
-        return errors.length ? 'Erreurs de validation :\n' + errors.join('\n') : 'Aucune erreur de validation';
-    }
-
-    private getEventProperty(event: Event): EventProperty {
-        const target = event.target as HTMLElement;
-        const tileXString = target.getAttribute('x');
-        const tileYString = target.getAttribute('y');
-        const tileString = target.getAttribute('tile');
-        const itemString = target.getAttribute('item');
-
-        const tileX = tileXString ? Number(tileXString) : null;
-        const tileY = tileYString ? Number(tileYString) : null;
-        const tilePosition = tileX !== null && tileY !== null ? { x: tileX, y: tileY } : null;
-
-        const mouseX = (event as MouseEvent).clientX as number | undefined;
-        const mouseY = (event as MouseEvent).clientY as number | undefined;
-        const mousePosition = mouseX && mouseY ? { x: mouseX, y: mouseY } : null;
-
-        return {
-            tilePosition,
-            mousePosition,
-            tile: tileString ? (tileString as TileType) : null,
-            item: itemString ? (itemString as ItemType) : null,
-        };
-    }
-
-    private saveGame(): void {
-        this.gameSaveService.saveGame(this.gameDataService.gameData).subscribe({
-            next: () => {
-                this.popupService.showPopup('Jeu sauvegardé avec succès', false);
-                this.popupService.keepMessages();
-                this.redirectToAdminPage(false);
-            },
-            error: () => {
-                this.popupService.showPopup('Erreur lors de la sauvegarde du jeu', false);
-            },
-        });
-    }
-
-    private dropItem(eventProperty: EventProperty): void {
-        const newItem = this.editorData.activeItem as ItemType;
-
-        this.setActiveItem(null, eventProperty);
-
-        if (eventProperty.tilePosition) {
-            const tile = this.gameDataService.getTileFromPosition(eventProperty.tilePosition);
-
-            const canPlaceItem = ![TileType.Water, TileType.Bridge, TileType.BrokenBridge].includes(tile);
-            if (canPlaceItem) {
-                return this.gameDataService.addItem(newItem, eventProperty.tilePosition);
-            }
-        }
-
-        this.updateItem(newItem);
-    }
-
-    private setActiveItem(item: ItemType | null, eventProperty: EventProperty) {
-        this.editorData.activeItem = item;
-
-        if (item) {
-            this.editorData.activeItemImage = ITEM_IMAGES.get(item) as string;
-        } else {
-            this.editorData.activeItemImage = EMPTY_IMAGE;
-        }
-
-        if (eventProperty.mousePosition) {
-            this.editorData.activeItemPosition = eventProperty.mousePosition;
-        }
-    }
-
-    private onClick(event: MouseEvent, isLeftClick: boolean): void {
-        const eventProperty = this.getEventProperty(event);
-
-        if (eventProperty.tilePosition) {
-            this.clickOnMap(eventProperty, isLeftClick);
-            return event.preventDefault();
-        }
-
-        if (eventProperty.tile && isLeftClick) {
-            this.clickOnTile(eventProperty.tile as TileType);
-            return event.preventDefault();
-        }
-
-        if (eventProperty.item && isLeftClick) {
-            this.clickOnItem(eventProperty);
-            return event.preventDefault();
-        }
-    }
-
-    private clickOnItem(eventProperty: EventProperty): void {
-        if (this.getRemainingItemCount(eventProperty.item as ItemType) === 0) {
-            return;
-        }
-
-        this.setActiveItem(eventProperty.item, eventProperty);
-        this.updateItem(eventProperty.item as ItemType);
-    }
-
-    private clickOnMap(eventProperty: EventProperty, isLeftClick: boolean): void {
-        const tileHasItem = Boolean(this.gameDataService.getItem(eventProperty.tilePosition as Position));
-
-        if (!this.editorData.activeItem && tileHasItem) {
-            this.clickOnMapItem(eventProperty, isLeftClick);
-        }
-
-        if (!this.editorData.activeItem) {
-            this.editorData.activeTile = this.getSelectedTile(isLeftClick);
-            return this.paintTile(eventProperty.tilePosition as Position);
-        }
-    }
-
-    private clickOnMapItem(eventProperty: EventProperty, isLeftClick: boolean): void {
-        if (isLeftClick) {
-            this.pickItem(eventProperty);
-        } else {
-            this.gameDataService.removeItem(eventProperty.tilePosition as Position);
-        }
-    }
-
-    private getSelectedTile(isLeftClick: boolean): TileType | null {
-        if (isLeftClick) {
-            return this.editorData.selectedTile;
-        }
-        return EDITOR_ERASE_TILE;
-    }
-
-    private clickOnTile(tile: TileType): void {
-        this.editorData.selectedTile = tile;
-
-        for (const tileData of this.editorData.tiles) {
-            if (tileData.tile === tile) {
-                tileData.isActive = true;
-            } else if (tileData.isActive) {
-                tileData.isActive = false;
-            }
-        }
-    }
-
-    private paintTile(position: Position): void {
-        if (!this.editorData.activeTile) {
-            return;
-        }
-
-        if (this.editorData.activeTilePosition.x === position.x && this.editorData.activeTilePosition.y === position.y) {
-            return;
-        }
-
-        let newTile = this.editorData.activeTile as TileType;
+    paintTile(tile: TileType, position: Position) {
         const oldTile = this.gameDataService.getTileFromPosition(position);
 
-        if (newTile === TileType.BrokenBridge && oldTile === TileType.BrokenBridge) {
-            newTile = TileType.Bridge;
+        if (tile === TileType.BrokenBridge && oldTile === TileType.BrokenBridge) {
+            tile = TileType.Bridge;
         }
 
-        if (newTile === oldTile) {
-            return;
-        }
-
-        this.editorData.activeTilePosition = position;
-        this.gameDataService.editTile(newTile, position);
-
-        const tileCannotHaveItem = [TileType.Water, TileType.Bridge, TileType.BrokenBridge].includes(newTile);
-        if (tileCannotHaveItem) {
-            this.gameDataService.removeItem(position);
-        }
-    }
-
-    private pickItem(eventProperty: EventProperty): void {
-        const item = this.gameDataService.getItem(eventProperty.tilePosition as Position) as ItemType;
-        this.setActiveItem(item, eventProperty);
-        this.gameDataService.removeItem(eventProperty.tilePosition as Position);
-    }
-
-    private getEditorData(): EditorData {
-        this.verifyMapData();
-        this.gameDataService.itemUpdate.subscribe(this.onItemUpdate.bind(this));
-        return { ...DEFAULT_EDITOR_DATA, items: this.getEditorItems() };
-    }
-
-    private onItemUpdate(item: ItemType | null): void {
-        if (!item) {
-            this.updateAllItems();
-        } else {
-            this.updateItem(item);
-        }
-    }
-
-    private updateAllItems(): void {
-        this.editorData.items = this.getEditorItems();
-    }
-
-    private verifyMapData(): void {
-        if (!this.gameDataService.isMapValid()) {
-            this.router.navigate(['/admin']);
-        }
-    }
-
-    private updateItem(item: ItemType): void {
-        let itemsToUpdate = [item];
-
-        if (SHARED_ITEM_POOL.includes(item)) {
-            itemsToUpdate = SHARED_ITEM_POOL;
-        }
-
-        for (let i = 0; i < this.editorData.items.length; i++) {
-            if (itemsToUpdate.includes(this.editorData.items[i].item)) {
-                const editorItem = this.getEditorItem(this.editorData.items[i].item);
-
-                if (editorItem.count !== this.editorData.items[i].count) {
-                    this.editorData.items[i] = editorItem;
-                }
+        if (tile !== oldTile) {
+            this.gameDataService.editTile(tile, position);
+            const tileCannotHaveItem = [TileType.Water, TileType.Bridge, TileType.BrokenBridge].includes(tile);
+            if (tileCannotHaveItem) {
+                this.gameDataService.removeItem(position);
             }
         }
     }
 
-    private getEditorItems(): EditorItem[] {
-        const items = Object.values(ItemType);
-        return items.map(this.getEditorItem.bind(this));
+    async saveGame(): Promise<boolean> {
+        const gameData = this.gameDataService.gameData;
+        gameData.name = gameData.name.trim();
+
+        const validationResult = this.gameValidationService.validateGame(this.gameDataService.gameData);
+        if (validationResult) {
+            this.popupService.showPopup(this.gameValidationService.getValidationErrorMessage(validationResult), false);
+            return false;
+        }
+
+        const isNameUnique = await firstValueFrom(this.gameSaveService.isNameUnique(gameData.name, gameData._id));
+        if (!isNameUnique) {
+            this.popupService.showPopup('Le nom est déjà utilisé. Veuillez en choisir un autre.', false);
+            return false;
+        }
+
+        return await this.saveGameOnServer();
     }
 
-    private getEditorItem(item: ItemType): EditorItem {
-        return {
-            item,
-            image: ITEM_IMAGES.get(item) as string,
-            description: ITEM_DESCRIPTION.get(item) as string,
-            count: this.getRemainingItemCount(item),
-        };
+    private async saveGameOnServer(): Promise<boolean> {
+        this.gameDataService.gameData.isVisible = false;
+        this.gameDataService.gameData.lastEdited = new Date();
+
+        try {
+            await firstValueFrom(this.gameSaveService.saveGame(this.gameDataService.gameData));
+        } catch {
+            this.popupService.showPopup('Erreur lors de la sauvegarde du jeu');
+            return false;
+        }
+
+        return true;
     }
 
     private getMaxItemCount(item: ItemType): number {
@@ -392,32 +126,11 @@ export class EditorService {
         return maxItemCount;
     }
 
-    private getRemainingItemCount(item: ItemType): number {
-        const currentItemCount = this.getCurrentItemCount(item);
-        const maxItemCount = this.getMaxItemCount(item);
-
-        if (maxItemCount === 1 && currentItemCount === 0) {
-            return -1;
-        }
-
-        return maxItemCount - currentItemCount;
-    }
-
-    private getCurrentItemCount(item: ItemType): number {
-        let currentItemCount = this.gameDataService.getItemCount(item);
-
-        if (this.editorData?.activeItem === item) {
-            currentItemCount++;
-        }
-
-        return currentItemCount;
-    }
-
     private getMaxSharedItemCount(item: ItemType): number {
         let sharedCount = 0;
         SHARED_ITEM_POOL.forEach((sharedItem) => {
             if (sharedItem !== item) {
-                sharedCount += this.getCurrentItemCount(sharedItem);
+                sharedCount += this.gameDataService.getItemCount(item);
             }
         });
         const highestMaxItemCount = MAX_ITEM_COUNT[this.gameDataService.getMapSize()][ITEM_POOL_HIGHEST_ITEM];

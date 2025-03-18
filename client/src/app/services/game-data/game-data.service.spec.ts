@@ -1,9 +1,8 @@
-import { DEFAULT_GAME } from '@app/consts/default-game.const';
-import { GameMode } from '@common/game-mode.enum';
-import { ItemType } from '@common/item-type.enum';
-import { MapSize } from '@common/map-size.enum';
-import { Position } from '@common/position';
-import { TileType } from '@common/tile-type.enum';
+import { DEFAULT_GAME_DATA } from '@app/consts/game-data.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { GameMode, MapSize } from '@common/interfaces/map-data';
+import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
 import { GameDataService } from './game-data.service';
 
 describe('GameDataService', () => {
@@ -92,8 +91,8 @@ describe('GameDataService', () => {
     });
 
     it('should return the correct game properties', () => {
-        expect(service.getMapSize()).toBe(DEFAULT_GAME.mapData.size);
-        expect(service.getGameMode()).toBe(DEFAULT_GAME.mapData.gameMode);
+        expect(service.getMapSize()).toBe(DEFAULT_GAME_DATA.mapData.size);
+        expect(service.getGameMode()).toBe(DEFAULT_GAME_DATA.mapData.gameMode);
     });
 
     it('should return the correct map size string', () => {
@@ -167,7 +166,7 @@ describe('GameDataService', () => {
         expect(service.isMapValid()).toBeFalse();
     });
     it('should return false if the gameData is different from the initialGameData', () => {
-        const initialGameData = structuredClone(DEFAULT_GAME);
+        const initialGameData = structuredClone(DEFAULT_GAME_DATA);
         initialGameData.name = 'Test';
         expect(service.isModified(initialGameData)).toBeTrue();
     });

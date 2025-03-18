@@ -2,7 +2,7 @@ import { Component, inject, Input } from '@angular/core';
 import { ItemComponent } from '@app/components/item/item.component';
 import { MapService } from '@app/services/map/map.service';
 import { PlaySocketsService } from '@app/services/sockets/play-socket/play-sockets.service';
-import { Position } from '@common/position';
+import { Position } from '@common/interfaces/position';
 
 @Component({
     selector: 'app-map',
@@ -12,9 +12,9 @@ import { Position } from '@common/position';
     imports: [ItemComponent],
 })
 export class MapComponent {
-    @Input() isEditor = false;
+    @Input() isEditor: boolean = false;
     mapService: MapService = inject(MapService);
-    playSocketsService: PlaySocketsService = inject(PlaySocketsService);
+    private playSocketsService: PlaySocketsService = inject(PlaySocketsService);
     private lastHover: Position = { x: -1, y: -1 };
 
     onHover(position: Position) {

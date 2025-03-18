@@ -1,11 +1,12 @@
-import { MOCK_GAMES } from '@app/consts/tests/mock-games';
-import { MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { LobbyService } from '@app/services/lobby/lobby.service';
-import { GameData } from '@common/game-data';
-import { LobbyEvent } from '@common/lobby-event.enum';
-import { Match } from '@common/match';
-import { Player } from '@common/player';
-import { Warning } from '@common/warning.enum';
+import { GameData } from '@common/interfaces/game-data';
+import { Match } from '@common/interfaces/match';
+import { Player } from '@common/interfaces/player';
+import { Warning } from '@common/interfaces/warning.enum';
+import { LobbyEvent } from '@common/interfaces/websocket-event.enum';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
+import { MOCK_MATCHES } from '@common/test-consts/mock-matches';
+import { MOCK_PLAYERS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
@@ -37,7 +38,7 @@ describe('LobbyGateway', () => {
             sockets: { sockets: { get: () => mockSocket } },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any;
-        mockGame = structuredClone(MOCK_GAMES[0]);
+        mockGame = structuredClone(MOCK_GAME_DATAS[0]);
         mockMatch = structuredClone(MOCK_MATCHES[0]);
     });
 
@@ -139,7 +140,7 @@ describe('LobbyGateway', () => {
 
     it('should emit GameData on emitGameDataToPlayer', () => {
         const clientId = '1234';
-        const gameData = structuredClone(MOCK_GAMES[0]);
+        const gameData = structuredClone(MOCK_GAME_DATAS[0]);
         gateway.emitGameDataToPlayer(clientId, gameData);
         expect(mockSocket.emit.calledWith(LobbyEvent.EmitGameData, gameData)).toBeTruthy();
     });

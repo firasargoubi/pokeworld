@@ -33,7 +33,7 @@
             <div class="chat-container"></div>
         </div>
         <div class="main-center" (contextmenu)="showTileDescription($event)">
-            <app-map></app-map>
+            <app-map [isEditor]="false"></app-map>
             <div
                 id="tool-description"
                 [style.display]="tileDescriptionService.showTileDescription ? 'block' : 'none'"

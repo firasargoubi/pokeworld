@@ -1,4 +1,4 @@
-import { Position } from '../position';
+import { Position } from "../interfaces/position";
 
 export const SURROUNDING_POSITIONS_PLUS: Position[] = [
     { x: -1, y: 0 },

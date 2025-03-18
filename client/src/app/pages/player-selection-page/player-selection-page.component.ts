@@ -2,14 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/default-player.const';
-import { BonusDice, DiceType } from '@app/consts/dice.const';
-import { StatType } from '@app/interfaces/player-stats.enum';
 import { PlayerSelectionService } from '@app/services/player-selection/player-selection.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-import { Avatars } from '@common/avatars.enum';
-import { Player } from '@common/player';
+import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/player.const';
+import { Avatar } from '@common/interfaces/avatar.enum';
+import { BonusDice, DiceType } from '@common/interfaces/dice';
+import { Player, StatType } from '@common/interfaces/player';
 
 @Component({
     selector: 'app-player-selection-page',
@@ -37,7 +36,7 @@ export class PlayerSelectionPageComponent implements OnInit {
     }
 
     get selectedAvatar() {
-        return this.playerSelectionService.playerData.avatar as Avatars;
+        return this.playerSelectionService.playerData.avatar as Avatar;
     }
 
     ngOnInit(): void {
@@ -52,7 +51,7 @@ export class PlayerSelectionPageComponent implements OnInit {
         [this.bonusDice.attack, this.bonusDice.defense] = [this.bonusDice.defense, this.bonusDice.attack];
     }
 
-    getAvatarBtnStyle(avatar: Avatars) {
+    getAvatarBtnStyle(avatar: Avatar) {
         const avatarStatus = this.playerSelectionService.getAvatarStatus(avatar);
         return { class: avatarStatus };
     }
@@ -113,6 +112,6 @@ export class PlayerSelectionPageComponent implements OnInit {
     }
 
     private isAvatarChosen() {
-        return this.selectedAvatar !== Avatars.Default;
+        return this.selectedAvatar !== Avatar.Default;
     }
 }

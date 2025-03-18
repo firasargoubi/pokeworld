@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ItemComponent } from '@app/components/item/item.component';
 import { ITEM_IMAGES } from '@app/consts/images.const';
-import { ITEM_DESCRIPTION } from '@app/consts/items.const';
-import { ItemType } from '@common/item-type.enum';
+import { ITEM_DESCRIPTION } from '@app/consts/item-data.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
 
 describe('ItemComponent', () => {
     let component: ItemComponent;

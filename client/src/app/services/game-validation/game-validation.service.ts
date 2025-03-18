@@ -1,23 +1,22 @@
 import { Injectable } from '@angular/core';
-import { MAX_ITEM_COUNT } from '@app/consts/items.const';
-import { ErrorMessage } from '@app/interfaces/error-message.enum';
+import { BRIDGE_TYPES, MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH, MIN_TERRAIN_RATIO } from './game-validation.const';
+import { GameData } from '@common/interfaces/game-data';
+import { GameMode, MapData } from '@common/interfaces/map-data';
+import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { MAX_ITEM_COUNT } from '@app/consts/item-data.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import {
     BridgeValidationError,
+    ErrorMessage,
     ItemsValidation,
     TerrainCoverageValidation,
     TileHandler,
     TilesAccessibilityValidation,
+    TilesCount,
     ValidationResult,
     ValidationStatus,
-} from '@app/interfaces/game-validation-result';
-import { TilesCount } from '@app/interfaces/tiles-count';
-import { GameData } from '@common/game-data';
-import { GameMode } from '@common/game-mode.enum';
-import { ItemType } from '@common/item-type.enum';
-import { MapData } from '@common/map-data';
-import { Position } from '@common/position';
-import { TileType } from '@common/tile-type.enum';
-import { BRIDGE_TYPES, MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH, MIN_TERRAIN_RATIO } from './game-validation.const';
+} from '@app/interfaces/game-validation';
 
 @Injectable({
     providedIn: 'root',
@@ -32,6 +31,31 @@ export class GameValidationService {
         const hasInvalidField = Object.values(validationResult).some((field) => field?.isValid === false);
 
         return hasInvalidField ? validationResult : null;
+    }
+
+    getValidationErrorMessage(validationResult: ValidationResult): string {
+        const errors: string[] = [];
+
+        for (const [key, value] of Object.entries(validationResult)) {
+            if (!value.isValid) {
+                if (key === 'terrainCoverage') {
+                    errors.push(`  - ${ErrorMessage.TerrainCoverage} (${value.coveragePercentage}%)`);
+                } else if (key === 'tilesAccessibility') {
+                    errors.push(`  - ${ErrorMessage.TilesAccessibility}`);
+                } else if (key === 'items') {
+                    errors.push(`  - ${ErrorMessage.Items} (${value.misplacedItems.length})`);
+                } else if (key === 'bridge') {
+                    value.errors.forEach((error: BridgeValidationError) => {
+                        errors.push(`  - ${ErrorMessage.Bridge} [${error.x},${error.y}]: ${error.errorMessage}`);
+                    });
+                } else {
+                    const errorMessage: ValidationStatus = value;
+                    errors.push(`  - ${key}: ${errorMessage.errorMessage}`);
+                }
+            }
+        }
+
+        return errors.length ? 'Carte invalide :\n' + errors.join('\n') : 'Aucune erreur de validation';
     }
 
     private validateName(gameName: string): ValidationStatus {

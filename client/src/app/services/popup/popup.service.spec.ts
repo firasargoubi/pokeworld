@@ -4,9 +4,10 @@ import { Component, ComponentRef } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
-import { POPUP_DELAY } from '@app/consts/popup.const';
 import { Subject } from 'rxjs';
 import { PopupService } from './popup.service';
+import { POPUP_DELAY } from './popup.service.const';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 
 @Component({
     selector: 'app-warning-confirmation-popup',
@@ -70,7 +71,7 @@ describe('PopupService', () => {
         service.showPopup('Test message');
         service.keepMessages();
 
-        routerEventsSubject.next(new NavigationEnd(1, '/edit', '/admin'));
+        routerEventsSubject.next(new NavigationEnd(1, PageEndpoint.Edit, PageEndpoint.Admin));
         expect(service['overlayRefs'].length).toBe(1);
     });
 
@@ -174,6 +175,7 @@ describe('PopupService', () => {
         service['displayPopup']();
         expect(service['overlayRefs'].length).toBe(0);
     });
+
     it('should remove messages by filter', () => {
         service['messages'] = [
             { message: 'debug info', isConfirmation: false },

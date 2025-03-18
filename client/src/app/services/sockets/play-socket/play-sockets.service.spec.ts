@@ -1,22 +1,22 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { MOCK_MATCH_DATAS, MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { MapService } from '@app/services/map/map.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/combat';
-import { CombatEvent } from '@common/combat-event.enum';
-import { MOVE_ANIMATION_DURATION } from '@common/consts/default-player.const';
-import { LobbyEvent } from '@common/lobby-event.enum';
-import { Match, PlayerMovementData } from '@common/match';
-import { PlayEvent } from '@common/play-event.enum';
-import { Player } from '@common/player';
-import { Position } from '@common/position';
 import { END_GAME_DELAY, ONE_SECOND } from './play-sockets.const';
 import { PlaySocketsService } from './play-sockets.service';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/player.const';
+import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/interfaces/combat';
+import { PlayerMovementData, Match } from '@common/interfaces/match';
+import { Player } from '@common/interfaces/player';
+import { Position } from '@common/interfaces/position';
+import { LobbyEvent, PlayEvent, CombatEvent } from '@common/interfaces/websocket-event.enum';
+import { MOCK_MATCHES, MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { MOCK_PLAYERS, PLAYER_IDS } from '@common/test-consts/mock-players';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 
 describe('PlaySocketsService', () => {
     let service: PlaySocketsService;
@@ -327,30 +327,25 @@ describe('PlaySocketsService', () => {
     });
 
     it('should handle combatResultBroadcast event and show popup if not involved', () => {
-        const initialMatchData = structuredClone(MOCK_MATCH_DATAS[1]);
-        matchDataServiceSpy.matchData = initialMatchData;
-
         const combatResultBroadcast: CombatResultBroadcast = {
-            match: { matchData: initialMatchData } as Match,
+            match: structuredClone(MOCK_MATCHES[0]),
             combatResult: {
-                winnerId: 'P111',
-                loserId: 'P222',
+                winnerId: PLAYER_IDS[0],
+                loserId: PLAYER_IDS[0],
             },
         };
 
-        matchDataServiceSpy.matchData = combatResultBroadcast.match.matchData;
         service['onCombatResultBroadcast'](combatResultBroadcast);
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Player1 a gagné le combat');
 
         const combatResultBroadcastN: CombatResultBroadcast = {
-            match: { matchData: initialMatchData } as Match,
+            match: structuredClone(MOCK_MATCHES[0]),
             combatResult: {
                 winnerId: '',
-                loserId: 'P222',
+                loserId: PLAYER_IDS[0],
             },
         };
 
-        matchDataServiceSpy.matchData = combatResultBroadcastN.match.matchData;
         service['onCombatResultBroadcast'](combatResultBroadcastN);
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith("Personne n'a gagné le combat");
     });
@@ -380,9 +375,10 @@ describe('PlaySocketsService', () => {
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(`${mockMatchData.players[1].name} a remporté la partie`);
 
         jasmine.clock().tick(END_GAME_DELAY);
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
         jasmine.clock().uninstall();
     });
+
     it('should filter debug messages correctly', () => {
         let capturedPredicate: (message: string) => boolean = () => false;
         popupServiceSpy.removeMessagesByFilter.and.callFake((predicate) => {

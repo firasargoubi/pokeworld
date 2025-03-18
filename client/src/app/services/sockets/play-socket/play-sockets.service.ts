@@ -6,15 +6,14 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/combat';
-import { CombatEvent } from '@common/combat-event.enum';
-import { MOVE_ANIMATION_DURATION } from '@common/consts/default-player.const';
-import { LobbyEvent } from '@common/lobby-event.enum';
-import { Match, PlayerMovementData } from '@common/match';
-import { PlayEvent } from '@common/play-event.enum';
-import { Player } from '@common/player';
-import { Position } from '@common/position';
 import { END_GAME_DELAY, ONE_SECOND } from './play-sockets.const';
+import { CombatEvent, LobbyEvent, PlayEvent } from '@common/interfaces/websocket-event.enum';
+import { Position } from '@common/interfaces/position';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/player.const';
+import { CombatResultBroadcast, CombatDataBroadcast, CombatData } from '@common/interfaces/combat';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { Match, PlayerMovementData } from '@common/interfaces/match';
+import { Player } from '@common/interfaces/player';
 
 @Injectable({
     providedIn: 'root',
@@ -99,7 +98,7 @@ export class PlaySocketsService {
         ).name;
         this.popupService.showPopup(`${winningPlayerName} a remporté la partie`);
         setTimeout(() => {
-            this.router.navigate(['/']);
+            this.router.navigate([PageEndpoint.Menu]);
         }, END_GAME_DELAY);
     }
 
@@ -110,7 +109,8 @@ export class PlaySocketsService {
         this.mapService.updateAllTiles();
 
         if (combatResultBroadcast.combatResult.winnerId) {
-            const player = (this.matchDataService.matchData.players.find((p) => p.id === combatResultBroadcast.combatResult.winnerId) as Player).name;
+            const player = (combatResultBroadcast.match.matchData.players.find((p) => p.id === combatResultBroadcast.combatResult.winnerId) as Player)
+                .name;
             this.popupService.showPopup(`${player} a gagné le combat`);
         } else {
             this.popupService.showPopup("Personne n'a gagné le combat");
@@ -181,7 +181,8 @@ export class PlaySocketsService {
     private onPlayerLeft(match: Match) {
         const connectedPlayers = this.matchDataService.matchData.players.filter((p) => p.isConnected).map((p) => p.name);
         this.matchDataService.updateMatch(match);
-        const disconnectedPlayers = this.matchDataService.matchData.players.filter((p) => !p.isConnected).map((p) => p.name);
+        this.mapService.setPlayers(match.matchData.players);
+        const disconnectedPlayers = match.matchData.players.filter((p) => !p.isConnected).map((p) => p.name);
         const disconnectedPlayer = connectedPlayers.find((p) => disconnectedPlayers.includes(p));
         this.popupService.showPopup(`${disconnectedPlayer} a quitté la partie`);
     }

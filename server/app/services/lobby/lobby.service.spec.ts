@@ -1,13 +1,14 @@
-import { MOCK_GAMES } from '@app/consts/tests/mock-games';
-import { MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { GameService } from '@app/services/game/game.service';
 import { MatchService } from '@app/services/match/match.service';
-import { DEFAULT_MATCH_DATA } from '@app/services/match/match.service.const';
 import { PlayService } from '@app/services/play/play.service';
-import { DEFAULT_PLAYER } from '@common/consts/default-player.const';
-import { Player } from '@common/player';
-import { Warning } from '@common/warning.enum';
+import { DEFAULT_MATCH_DATA } from '@common/consts/match.const';
+import { DEFAULT_PLAYER } from '@common/consts/player.const';
+import { Player } from '@common/interfaces/player';
+import { Warning } from '@common/interfaces/warning.enum';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
+import { MOCK_MATCHES } from '@common/test-consts/mock-matches';
+import { MOCK_PLAYERS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
 import { LobbyService } from './lobby.service';
@@ -56,7 +57,7 @@ describe('LobbyService', () => {
         const matchCode = '3344';
 
         mockMatchService.hasMatchCode.returns(true);
-        mockMatchService.getMatch.returns({ gameData: MOCK_GAMES[0], matchData: { ...DEFAULT_MATCH_DATA, players: [] } });
+        mockMatchService.getMatch.returns({ gameData: MOCK_GAME_DATAS[0], matchData: { ...DEFAULT_MATCH_DATA, players: [] } });
         mockMatchService.isPlayerInMatch.returns(false);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sandbox.stub(service as any, 'isMatchFull').returns(false);
@@ -80,7 +81,7 @@ describe('LobbyService', () => {
         mockMatchService.isPlayerInMatch.returns(false);
         mockMatchService.createMatch.returns('1234');
 
-        const result = service.createMatch('1122', MOCK_GAMES[0]);
+        const result = service.createMatch('1122', MOCK_GAME_DATAS[0]);
 
         expect(mockMatchService.addPlayerToMatch.calledWith('1122', '1234', true)).toBeTruthy();
         expect(mockLobbyGateway.connectPlayer.calledWith('1122', '1234')).toBeTruthy();
@@ -89,7 +90,7 @@ describe('LobbyService', () => {
 
     it('should not createMatch if player is in match', () => {
         mockMatchService.isPlayerInMatch.returns(true);
-        const result = service.createMatch('1122', MOCK_GAMES[0]);
+        const result = service.createMatch('1122', MOCK_GAME_DATAS[0]);
         expect(result).toBe('');
     });
 
@@ -163,7 +164,7 @@ describe('LobbyService', () => {
         mockMatchService.getMatchCodeFromPlayerId.returns('3344');
         mockMatchService.isPlayerAdmin.returns(true);
         mockMatchService.getMatch.returns({
-            gameData: MOCK_GAMES[0],
+            gameData: MOCK_GAME_DATAS[0],
             matchData: {
                 ...DEFAULT_MATCH_DATA,
                 players: [
@@ -237,7 +238,7 @@ describe('LobbyService', () => {
         const matchCode = '3344';
         mockMatchService.getMatchCodeFromPlayerId.returns(matchCode);
         mockMatchService.getMatch.returns({
-            gameData: MOCK_GAMES[0],
+            gameData: MOCK_GAME_DATAS[0],
             matchData: {
                 ...DEFAULT_MATCH_DATA,
                 players: [
@@ -257,7 +258,7 @@ describe('LobbyService', () => {
     it('should isMatchFull return true when match is full', () => {
         const matchCode = '3344';
         mockMatchService.getMatch.returns({
-            gameData: MOCK_GAMES[2],
+            gameData: MOCK_GAME_DATAS[2],
             matchData: {
                 ...DEFAULT_MATCH_DATA,
                 isLocked: false,
@@ -343,6 +344,7 @@ describe('LobbyService', () => {
         const match = structuredClone(MOCK_MATCHES[0]);
         const matchCode = match.matchData.code;
         const leavingPlayer = MOCK_PLAYERS[0];
+        match.matchData.isDebugMode = true;
         leavingPlayer.isAdmin = true;
         match.matchData.players = MOCK_PLAYERS;
         mockMatchService.getMatch.returns(match);
@@ -354,7 +356,7 @@ describe('LobbyService', () => {
         expect(mockPlayService.endTurn.calledWith(leavingPlayer.id)).toBeTruthy();
     });
 
-    it('should call leaveStartedMatch when match is started (covering line 53)', () => {
+    it('should call leaveStartedMatch when match is started', () => {
         const match = structuredClone(MOCK_MATCHES[0]);
         const playerId = match.matchData.players[0].id;
         const matchCode = match.matchData.code;
@@ -366,5 +368,18 @@ describe('LobbyService', () => {
         service.leaveMatch(playerId);
 
         expect(leaveStartedMatchSpy.calledWith(playerId, matchCode)).toBeTruthy();
+    });
+
+    it('should return match lock state', () => {
+        const mockMatch = structuredClone(MOCK_MATCHES[0]);
+        mockMatchService.getMatch.returns(mockMatch);
+
+        mockMatch.matchData.isLocked = true;
+        const result1 = service['isMatchLocked']('');
+        expect(result1).toEqual(true);
+
+        mockMatch.matchData.isLocked = false;
+        const result2 = service['isMatchLocked']('');
+        expect(result2).toEqual(false);
     });
 });

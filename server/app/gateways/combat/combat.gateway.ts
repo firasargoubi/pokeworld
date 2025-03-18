@@ -1,9 +1,9 @@
 import { CombatService } from '@app/services/combat/combat.service';
-import { CombatEvent } from '@common/combat-event.enum';
-import { AttackAttempt, EscapeAttempt } from '@common/combat';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { CombatEvent } from '@common/interfaces/websocket-event.enum';
+import { AttackAttempt, EscapeAttempt } from '@common/interfaces/combat';
 
 @WebSocketGateway({ cors: true })
 @Injectable()

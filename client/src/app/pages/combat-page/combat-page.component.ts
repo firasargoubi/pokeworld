@@ -1,17 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { BATTLE_PLATFORM_DATA } from '@app/consts/battle-platforms.const';
-import { DEFAULT_COMBAT_ANIMATIONS } from '@app/consts/combat-animations.const';
+import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { COMBAT_TIME_SCALE, DEFAULT_COMBAT_ANIMATIONS } from '@app/consts/combat-data.const';
+import { BATTLE_PLATFORM_IMAGES } from '@app/consts/images.const';
 import { CombatAnimations } from '@app/interfaces/combat-animations';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { AttackResult } from '@common/combat';
-import { Player } from '@common/player';
-import { COMBAT_TIME_SCALE } from './combat-page.component.const';
+import { Player } from '@common/interfaces/player';
+import { AttackResult } from '@common/interfaces/combat';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 
 @Component({
     selector: 'app-combat-page',
@@ -21,7 +21,7 @@ import { COMBAT_TIME_SCALE } from './combat-page.component.const';
 })
 export class CombatPageComponent implements OnInit {
     avatarsData = AVATAR_DATA;
-    battlePlatformData = BATTLE_PLATFORM_DATA;
+    battlePlatformData = BATTLE_PLATFORM_IMAGES;
 
     animation: CombatAnimations = structuredClone(DEFAULT_COMBAT_ANIMATIONS);
     selfPlayer: Player;
@@ -169,7 +169,7 @@ export class CombatPageComponent implements OnInit {
             this.popupService.showPopup('Erreur de connection avec le serveur');
             this.popupService.keepMessages();
 
-            this.router.navigate(['/']);
+            this.router.navigate([PageEndpoint.Menu]);
         }
     }
 }
