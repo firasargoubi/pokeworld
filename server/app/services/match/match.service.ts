@@ -13,9 +13,8 @@ export class MatchService {
     private turnDatas: Map<string, TurnData> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
 
-    getPlayerIndex(playerId: string): number {
-        const gameCode = this.getMatchCodeFromPlayerId(playerId);
-        const players = this.getPlayers(gameCode);
+    getPlayerIndex(matchCode: string, playerId: string): number {
+        const players = this.getPlayers(matchCode);
         return players.findIndex((p) => p.id === playerId);
     }
 
@@ -28,16 +27,9 @@ export class MatchService {
         return matchCode;
     }
 
-    isActivePlayer(playerId: string): boolean {
-        let isActivePlayer = false;
-        const matchCode = this.getMatchCodeFromPlayerId(playerId);
-        if (matchCode) {
-            const activePlayerId = this.getActivePlayerId(matchCode);
-            if (playerId === activePlayerId) {
-                isActivePlayer = true;
-            }
-        }
-        return isActivePlayer;
+    isActivePlayer(matchCode: string, playerId: string): boolean {
+        const activePlayerId = this.getActivePlayerId(matchCode);
+        return playerId === activePlayerId;
     }
 
     isPlayerInMatch(playerId: string): boolean {
@@ -53,9 +45,9 @@ export class MatchService {
         return isStarted;
     }
 
-    isPlayerAdmin(playerId: string): boolean {
+    isPlayerAdmin(playerId: string, matchCode: string): boolean {
         let isAdmin = false;
-        const players = this.getPlayersFromPlayerId(playerId);
+        const players = this.getPlayers(matchCode);
         if (players) {
             const player = players.find((p) => p.id === playerId);
             if (player) {
@@ -65,8 +57,8 @@ export class MatchService {
         return isAdmin;
     }
 
-    getUniqueName(name: string, playerId: string): string {
-        const players = this.getPlayersFromPlayerId(playerId);
+    getUniqueName(name: string, playerId: string, matchCode: string): string {
+        const players = this.getPlayers(matchCode);
         let newName = name;
         let suffix = 2;
 
@@ -107,24 +99,26 @@ export class MatchService {
         return this.turnDatas.get(matchCode);
     }
 
-    removePlayerFromMatch(playerId: string, matchCode: string): void {
+    removePlayerFromMatch(playerId: string, matchCode: string, changePlayerList: boolean): void {
         const match = this.getMatch(matchCode);
         if (match) {
-            match.matchData.players = match.matchData.players.filter((p) => p.id !== playerId);
-            if (match.matchData.players.length <= 0) {
-                this.matches.delete(matchCode);
-                const turnData = this.turnDatas.get(matchCode);
-                if (turnData.phaseTimeout) {
-                    clearTimeout(turnData.phaseTimeout);
-                    turnData.phaseTimeout = null;
+            if (changePlayerList) {
+                match.matchData.players = match.matchData.players.filter((p) => p.id !== playerId);
+                if (match.matchData.players.length <= 0) {
+                    this.matches.delete(matchCode);
+                    const turnData = this.turnDatas.get(matchCode);
+                    if (turnData.phaseTimeout) {
+                        clearTimeout(turnData.phaseTimeout);
+                        turnData.phaseTimeout = null;
+                    }
+                    this.turnDatas.delete(matchCode);
                 }
-                this.turnDatas.delete(matchCode);
             }
         }
         this.playerToMatchCode.delete(playerId);
     }
 
-    getMatchCodeFromPlayerId(playerId: string): string {
+    getMatchCode(playerId: string): string {
         return this.playerToMatchCode.get(playerId);
     }
 
@@ -151,14 +145,9 @@ export class MatchService {
         return players;
     }
 
-    getPlayer(playerId: string): Player {
-        const players = this.getPlayersFromPlayerId(playerId);
+    getPlayer(matchCode: string, playerId: string): Player {
+        const players = this.getPlayers(matchCode);
         const player = players.find((p) => p.id === playerId);
         return player;
-    }
-
-    getPlayersFromPlayerId(playerId: string): Player[] {
-        const matchCode = this.getMatchCodeFromPlayerId(playerId);
-        return this.getPlayers(matchCode);
     }
 }

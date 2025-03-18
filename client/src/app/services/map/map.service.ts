@@ -138,7 +138,7 @@ export class MapService {
     private getActionOverlay(position: Position): string | null {
         let overlay = null;
 
-        if (this.isOnPlayer(position) || this.isAction(position)) {
+        if (this.isAction(position) && !this.isOnPlayer(position)) {
             overlay = ACTION_OVERLAY;
         }
 

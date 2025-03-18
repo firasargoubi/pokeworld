@@ -6,7 +6,6 @@ import { COMBAT_TIME_SCALE, DEFAULT_COMBAT_ANIMATIONS } from '@app/consts/combat
 import { BATTLE_PLATFORM_IMAGES } from '@app/consts/images.const';
 import { CombatAnimations } from '@app/interfaces/combat-animations';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
-import { PopupService } from '@app/services/popup/popup.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { Player } from '@common/interfaces/player';
@@ -34,7 +33,6 @@ export class CombatPageComponent implements OnInit {
     private combatSocketService: CombatSocketService = inject(CombatSocketService);
     private timerInterval: number | null = null;
     private router = inject(Router);
-    private popupService: PopupService = inject(PopupService);
     private matchDataService: MatchDataService = inject(MatchDataService);
     private coreSocketService: CoreSocketService = inject(CoreSocketService);
 
@@ -165,10 +163,6 @@ export class CombatPageComponent implements OnInit {
 
     private verifySocketConnection(isConnected: boolean) {
         if (!isConnected || this.matchDataService.matchData.players.length <= 0) {
-            this.popupService.clearMessages();
-            this.popupService.showPopup('Erreur de connection avec le serveur');
-            this.popupService.keepMessages();
-
             this.router.navigate([PageEndpoint.Menu]);
         }
     }

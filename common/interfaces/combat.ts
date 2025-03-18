@@ -17,6 +17,7 @@ export interface AttackResult {
 }
 
 export interface CombatState {
+    matchCode: string;
     timer: ReturnType<typeof setTimeout>;
     players: Player[];
     currentTurnIndex: number;

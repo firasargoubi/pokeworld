@@ -30,7 +30,9 @@
                     }
                 </div>
             </div>
-            <div class="chat-container"></div>
+            <div class="chat-container">
+                <app-chat></app-chat>
+            </div>
         </div>
         <div class="main-center" (contextmenu)="showTileDescription($event)">
             <app-map [isEditor]="false"></app-map>

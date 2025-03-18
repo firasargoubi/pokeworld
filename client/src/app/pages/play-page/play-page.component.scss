@@ -557,6 +557,7 @@ app-map {
     margin-top: calc(0.027 * $map-size);
     background: rgba(255, 255, 255, 0.15);
     border-radius: calc(0.005 * $map-size);
+    position: relative;
 }
 
 .action-button,

@@ -339,17 +339,12 @@ describe('MapService', () => {
 
         service['overlayTiles'].playerPosition = { x: 1, y: 1 };
         let result = service['getActionOverlay'](position);
-        expect(result).toBe(ACTION_OVERLAY);
+        expect(result).toBeNull();
 
         service['overlayTiles'].playerPosition = { x: 2, y: 2 };
         service['overlayTiles'].actions = [{ x: 1, y: 1 }];
         result = service['getActionOverlay'](position);
         expect(result).toBe(ACTION_OVERLAY);
-
-        service['overlayTiles'].playerPosition = { x: 2, y: 2 };
-        service['overlayTiles'].actions = [];
-        result = service['getActionOverlay'](position);
-        expect(result).toBeNull();
     });
 
     it('should return correct player avatar or null based on position', () => {

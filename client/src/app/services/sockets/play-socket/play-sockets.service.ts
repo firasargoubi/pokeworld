@@ -5,11 +5,12 @@ import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
+import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { MOVE_ANIMATION_DURATION } from '@common/consts/player.const';
 import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/interfaces/combat';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
-import { Match, PlayerMovementData } from '@common/interfaces/match';
+import { Match, PlayerLeftData, PlayerMovementData } from '@common/interfaces/match';
 import { Player } from '@common/interfaces/player';
 import { Position } from '@common/interfaces/position';
 import { CombatEvent, LobbyEvent, PlayEvent } from '@common/interfaces/websocket-event.enum';
@@ -25,6 +26,7 @@ export class PlaySocketsService {
     private mapService: MapService = inject(MapService);
     private popupService: PopupService = inject(PopupService);
     private combatSocketService: CombatSocketService = inject(CombatSocketService);
+    private lobbySocketsService: LobbySocketsService = inject(LobbySocketsService);
     private router: Router = inject(Router);
 
     constructor() {
@@ -32,7 +34,7 @@ export class PlaySocketsService {
     }
 
     leaveMatch(): void {
-        this.coreSocket.emit(LobbyEvent.LeaveMatch);
+        this.lobbySocketsService.leaveMatch();
         this.matchDataService.resetMatch();
     }
 
@@ -178,12 +180,9 @@ export class PlaySocketsService {
         }
     }
 
-    private onPlayerLeft(match: Match) {
-        const connectedPlayers = this.matchDataService.matchData.players.filter((p) => p.isConnected).map((p) => p.name);
-        this.matchDataService.updateMatch(match);
-        this.mapService.setPlayers(match.matchData.players);
-        const disconnectedPlayers = match.matchData.players.filter((p) => !p.isConnected).map((p) => p.name);
-        const disconnectedPlayer = connectedPlayers.find((p) => disconnectedPlayers.includes(p));
-        this.popupService.showPopup(`${disconnectedPlayer} a quitté la partie`);
+    private onPlayerLeft(playerLeftData: PlayerLeftData) {
+        this.matchDataService.updateMatch(playerLeftData.match);
+        this.mapService.setPlayers(playerLeftData.match.matchData.players);
+        this.popupService.showPopup(`${playerLeftData.playerName} a quitté la partie`);
     }
 }

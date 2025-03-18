@@ -1,6 +1,6 @@
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { GameData } from '@common/interfaces/game-data';
-import { Match } from '@common/interfaces/match';
+import { Match, PlayerLeftData } from '@common/interfaces/match';
 import { Player } from '@common/interfaces/player';
 import { LobbyEvent } from '@common/interfaces/websocket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -87,8 +87,8 @@ export class LobbyGateway implements OnGatewayDisconnect {
         }
     }
 
-    emitPlayerLeft(matchCode: string, match: Match) {
-        this.server.to(matchCode).emit(LobbyEvent.PlayerLeft, match);
+    emitPlayerLeft(matchCode: string, playerLeftData: PlayerLeftData) {
+        this.server.to(matchCode).emit(LobbyEvent.PlayerLeft, playerLeftData);
     }
 
     warn(playerId: string, message: string) {

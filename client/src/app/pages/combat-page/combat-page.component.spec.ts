@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { BehaviorSubject } from 'rxjs';
-import { CombatPageComponent } from './combat-page.component';
-import { MatchDataService } from '@app/services/match-data/match-data.service';
-import { Player } from '@common/interfaces/player';
 import { AttackResult, CombatResult } from '@common/interfaces/combat';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { Player } from '@common/interfaces/player';
+import { BehaviorSubject } from 'rxjs';
+import { CombatPageComponent } from './combat-page.component';
 
 describe('CombatPageComponent', () => {
     let component: CombatPageComponent;
@@ -268,9 +268,7 @@ describe('CombatPageComponent', () => {
 
     it('should show popup, keep messages, and navigate if socket disconnects', () => {
         connectionStatusSubject.next(false);
-        expect(mockPopupService.clearMessages).toHaveBeenCalled();
-        expect(mockPopupService.showPopup).toHaveBeenCalledWith('Erreur de connection avec le serveur');
-        expect(mockPopupService.keepMessages).toHaveBeenCalled();
+        expect(mockPopupService.keepMessages).not.toHaveBeenCalled();
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 });
