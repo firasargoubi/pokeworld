@@ -1,19 +1,21 @@
 /* eslint-disable max-lines */
 // Test is 100 lines longer than limit
-import { MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
+
 import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { PlayGateway } from '@app/gateways/play/play.gateway';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
-import { Match, TurnPhase } from '@common/match';
-import { Player } from '@common/player';
-import { TileType } from '@common/tile-type.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
 import { PlayService } from './play.service';
-import { MINIMUM_FIGHTS_TO_WIN, PRE_TURN_DURATION, TURN_DURATION } from './play.service.const';
-import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@common/consts/default-player.const';
+import { MINIMUM_FIGHTS_TO_WIN, TURN_DURATION, PRE_TURN_DURATION } from '@common/consts/match.const';
+import { DEFAULT_STAT_POINTS, BONUS_POINTS } from '@common/consts/player.const';
+import { Match, TurnPhase } from '@common/interfaces/match';
+import { Player } from '@common/interfaces/player';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { MOCK_MATCHES } from '@common/test-consts/mock-matches';
+import { MOCK_PLAYERS } from '@common/test-consts/mock-players';
 
 describe('PlayService', () => {
     let service: PlayService;
@@ -250,7 +252,7 @@ describe('PlayService', () => {
     });
 
     it('unfreezeMatch should clear existing timeout and set a new one', () => {
-        const fakeTimeout = sandbox.useFakeTimers() as unknown as NodeJS.Timeout;
+        const fakeTimeout = sandbox.useFakeTimers({ shouldClearNativeTimers: true }) as unknown as NodeJS.Timeout;
         const turnData = { phaseTimeout: fakeTimeout, lastPhaseStartTime: new Date() };
         mockMatchService.getTurnData.returns(turnData);
         const clearTimeoutSpy = sandbox.spy(global, 'clearTimeout');
@@ -270,7 +272,7 @@ describe('PlayService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const nextTurnPhaseSpy = sandbox.spy(service as any, 'nextTurnPhase');
 
-        const clock = sandbox.useFakeTimers();
+        const clock = sandbox.useFakeTimers({ shouldClearNativeTimers: true });
         service['unfreezeMatch'](match);
 
         expect(nextTurnPhaseSpy.called).toBe(false);
@@ -332,7 +334,7 @@ describe('PlayService', () => {
         player1.currentStats.position = { x: 1, y: 0 };
         player2.currentStats.position = { x: 2, y: 0 };
 
-        const fakeTimeout = sandbox.useFakeTimers() as unknown as NodeJS.Timeout;
+        const fakeTimeout = sandbox.useFakeTimers({ shouldClearNativeTimers: true }) as unknown as NodeJS.Timeout;
 
         const now = new Date();
         const turnData = {
@@ -456,7 +458,7 @@ describe('PlayService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const nextTurnPhaseSpy = sandbox.spy(service as any, 'nextTurnPhase');
 
-        const clock = sandbox.useFakeTimers();
+        const clock = sandbox.useFakeTimers({ shouldClearNativeTimers: true });
 
         service['startTurnTimer'](match, duration);
 
@@ -513,6 +515,7 @@ describe('PlayService', () => {
         players[1].playerStats.speed = DEFAULT_STAT_POINTS + BONUS_POINTS;
         players[2].playerStats.speed = DEFAULT_STAT_POINTS;
         players[3].playerStats.speed = DEFAULT_STAT_POINTS + BONUS_POINTS;
+
         match.matchData.players = structuredClone(players);
         service['sortPlayers'](match);
 

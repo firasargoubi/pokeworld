@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
-import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games';
-import { MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { TILE_EFFECT } from '@app/consts/tile-effect.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
-import { Player } from '@common/player';
-import { Position } from '@common/position';
-import { TILE_COST, TileType } from '@common/tile-type.enum';
 import { TileDescriptionService } from './tile-description.service';
+import { MOCK_PLAYERS } from '@common/test-consts/mock-players';
+import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { Player } from '@common/interfaces/player';
+import { Position } from '@common/interfaces/position';
+import { TileType, TILE_COST } from '@common/interfaces/tile-type.enum';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 
 describe('TileDescriptionService', () => {
     let service: TileDescriptionService;
@@ -35,7 +35,7 @@ describe('TileDescriptionService', () => {
         });
         service = TestBed.inject(TileDescriptionService);
 
-        mockGameDataService.gameData = structuredClone(MOCK_GAMES[0]);
+        mockGameDataService.gameData = structuredClone(MOCK_GAME_DATAS[0]);
 
         mockGameDataService.getTileFromPosition.and.returnValue(TileType.Grass);
     });

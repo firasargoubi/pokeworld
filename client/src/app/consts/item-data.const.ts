@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 // Magic numbers are used to define the maximum number of items for each map size
-import { ItemType } from '@common/item-type.enum';
-import { MapSize } from '@common/map-size.enum';
+
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MapSize } from '@common/interfaces/map-data';
 
 export const ITEM_DESCRIPTION: Map<ItemType, string> = new Map([
     [ItemType.Item1, '<b>Item 1</b>Description de item 1'],

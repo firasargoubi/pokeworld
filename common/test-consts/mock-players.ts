@@ -1,9 +1,7 @@
-import { Avatars } from '@common/avatars.enum';
-import { DiceType } from '@common/dice';
-import { Match, MatchData, TurnPhase } from '@common/match';
-import { CurrentStats, Player, PlayertStats } from '@common/player';
-import { TileType } from '@common/tile-type.enum';
-import { MOCK_GAMES } from './mock-games';
+import { Avatar } from '../interfaces/avatar.enum';
+import { DiceType } from '../interfaces/dice';
+import { CurrentStats, Player, PlayertStats } from '../interfaces/player';
+import { TileType } from '../interfaces/tile-type.enum';
 
 export const MOCK_PLAYER_STATS: PlayertStats[] = [
     {
@@ -59,11 +57,13 @@ export const MOCK_CURRENT_STATS: CurrentStats[] = [
     },
 ];
 
+export const PLAYER_IDS = ['3333', '4444', '5555', '6666'];
+
 export const MOCK_PLAYERS: Player[] = [
     {
-        id: 'P111',
+        id: structuredClone(PLAYER_IDS[0]),
         name: 'Player1',
-        avatar: Avatars.Avatar1,
+        avatar: Avatar.Avatar1,
         playerStats: structuredClone(MOCK_PLAYER_STATS[0]),
         currentStats: structuredClone(MOCK_CURRENT_STATS[0]),
         isAdmin: true,
@@ -72,9 +72,9 @@ export const MOCK_PLAYERS: Player[] = [
         spawnPoint: { x: 1, y: 2 },
     },
     {
-        id: 'P222',
+        id: structuredClone(PLAYER_IDS[1]),
         name: 'Player2',
-        avatar: Avatars.Avatar2,
+        avatar: Avatar.Avatar2,
         playerStats: structuredClone(MOCK_PLAYER_STATS[1]),
         currentStats: structuredClone(MOCK_CURRENT_STATS[1]),
         isAdmin: false,
@@ -83,9 +83,9 @@ export const MOCK_PLAYERS: Player[] = [
         spawnPoint: { x: 1, y: 2 },
     },
     {
-        id: 'P333',
+        id: structuredClone(PLAYER_IDS[2]),
         name: 'P3',
-        avatar: Avatars.Avatar3,
+        avatar: Avatar.Avatar3,
         playerStats: structuredClone(MOCK_PLAYER_STATS[1]),
         currentStats: structuredClone(MOCK_CURRENT_STATS[1]),
         isAdmin: false,
@@ -93,55 +93,15 @@ export const MOCK_PLAYERS: Player[] = [
         isBot: false,
         spawnPoint: { x: 2, y: 2 },
     },
-];
-
-export const MOCK_MATCH_DATAS: MatchData[] = [
     {
-        code: '1111',
-        isDebugMode: false,
-        isStarted: false,
-        isLocked: false,
-        activePlayer: 0,
-        phase: TurnPhase.PreTurn,
-        currentTimer: 0,
-        maxTimer: 60,
-        players: structuredClone(MOCK_PLAYERS),
-    },
-    {
-        code: '2222',
-        isDebugMode: false,
-        isStarted: true,
-        isLocked: true,
-        activePlayer: 0,
-        phase: TurnPhase.PreTurn,
-        currentTimer: 0,
-        maxTimer: 60,
-        players: structuredClone(MOCK_PLAYERS),
-    },
-    {
-        code: '3333',
-        isDebugMode: true,
-        isStarted: true,
-        isLocked: true,
-        activePlayer: 0,
-        phase: TurnPhase.PreTurn,
-        currentTimer: 0,
-        maxTimer: 60,
-        players: structuredClone(MOCK_PLAYERS),
-    },
-];
-
-export const MOCK_MATCHES: Match[] = [
-    {
-        matchData: structuredClone(MOCK_MATCH_DATAS[0]),
-        gameData: structuredClone(MOCK_GAMES[0]),
-    },
-    {
-        matchData: structuredClone(MOCK_MATCH_DATAS[1]),
-        gameData: structuredClone(MOCK_GAMES[1]),
-    },
-    {
-        matchData: structuredClone(MOCK_MATCH_DATAS[2]),
-        gameData: structuredClone(MOCK_GAMES[2]),
+        id: structuredClone(PLAYER_IDS[3]),
+        name: 'P4',
+        avatar: Avatar.Avatar4,
+        playerStats: structuredClone(MOCK_PLAYER_STATS[1]),
+        currentStats: structuredClone(MOCK_CURRENT_STATS[1]),
+        isAdmin: false,
+        isConnected: true,
+        isBot: false,
+        spawnPoint: { x: 3, y: 3 },
     },
 ];

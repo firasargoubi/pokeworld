@@ -1,8 +1,7 @@
-import { ErrorMessage } from '@app/interfaces/error-message.enum';
-import { ItemType } from '@common/item-type.enum';
-import { MapData } from '@common/map-data';
-import { MapSize } from '@common/map-size.enum';
-import { TileType } from '@common/tile-type.enum';
+import { ErrorMessage } from '@app/interfaces/game-validation';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MapData, MapSize } from '@common/interfaces/map-data';
+import { TileType } from '@common/interfaces/tile-type.enum';
 
 export const GRASS = TileType.Grass;
 export const PATH = TileType.Path;

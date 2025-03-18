@@ -1,8 +1,8 @@
 import { LobbyService } from '@app/services/lobby/lobby.service';
-import { GameData } from '@common/game-data';
-import { LobbyEvent } from '@common/lobby-event.enum';
-import { Match } from '@common/match';
-import { Player } from '@common/player';
+import { GameData } from '@common/interfaces/game-data';
+import { Match } from '@common/interfaces/match';
+import { Player } from '@common/interfaces/player';
+import { LobbyEvent } from '@common/interfaces/websocket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';

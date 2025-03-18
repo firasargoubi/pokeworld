@@ -1,6 +1,5 @@
 export enum Warning {
     AdminQuit = "L'administrateur a quitté la partie !",
-    EveryoneLeft = 'Fin de la partie, tout le monde a quitté !',
     Kick = "Vous avez été exclu par l'administrateur!",
     RoomFull = 'La partie est pleine',
     AlreadyInGame = 'Vous êtes déjà dans une partie',

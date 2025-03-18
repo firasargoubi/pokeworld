@@ -1,7 +1,7 @@
 import { MapVisualData, OverlayTiles, TileVisualData } from '@app/interfaces/map-visual-data';
-import { MapSize } from '@common/map-size.enum';
-import { Position } from '@common/position';
-import { TileType } from '@common/tile-type.enum';
+import { MapSize } from '@common/interfaces/map-data';
+import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
 
 export const ACTION_OVERLAY = 'action-overlay';
 export const HOVER_MOVE_OVERLAY = 'hover-move-overlay';

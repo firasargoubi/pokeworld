@@ -1,10 +1,11 @@
-import { MOCK_GAMES } from '@app/consts/tests/mock-games';
-import { MOCK_MATCHES } from '@app/consts/tests/mock-matches';
+import { CODE_LENGTH } from '@common/consts/match.const';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
+import { MATCH_CODES, MATCHES, MOCK_MATCHES, PLAYER_TO_MATCH_CODE } from '@common/test-consts/mock-matches';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createSandbox, SinonSandbox } from 'sinon';
 import { MatchService } from './match.service';
-import { CODE_LENGTH, DEFAULT_TURN_DATA } from './match.service.const';
-import { MATCH_CODES, MATCHES, PLAYER_IDS, PLAYER_TO_MATCH_CODE } from './match.service.spec.const';
+import { DEFAULT_TURN_DATA } from './match.service.const';
+import { PLAYER_IDS } from '@common/test-consts/mock-players';
 
 describe('MatchService', () => {
     let service: MatchService;
@@ -39,7 +40,7 @@ describe('MatchService', () => {
     it('should createMatch correctly', () => {
         const matchCode = '1234';
         sandbox.stub(service, 'getNewMatchCode').returns(matchCode);
-        const result = service.createMatch(structuredClone(MOCK_GAMES[0]));
+        const result = service.createMatch(structuredClone(MOCK_GAME_DATAS[0]));
         expect(service['matches'].has(matchCode)).toBeTruthy();
         expect(result).toBe(matchCode);
     });
@@ -107,7 +108,7 @@ describe('MatchService', () => {
     it('should delete match if no player is left', () => {
         const matchCode = MATCH_CODES[0];
         expect(service.hasMatchCode(matchCode)).toBe(true);
-        [PLAYER_IDS[0], PLAYER_IDS[1]].forEach((playerId) => {
+        [PLAYER_IDS[0], PLAYER_IDS[1], PLAYER_IDS[2], PLAYER_IDS[3]].forEach((playerId) => {
             service.removePlayerFromMatch(playerId, matchCode);
         });
         expect(service.hasMatchCode(matchCode)).toBe(false);
@@ -136,7 +137,7 @@ describe('MatchService', () => {
         const matchCode = '3300';
         sandbox.stub(service, 'getNewMatchCode').returns(matchCode);
         expect(service.hasMatchCode(matchCode)).toBe(false);
-        service.createMatch(structuredClone(MOCK_GAMES[0]));
+        service.createMatch(structuredClone(MOCK_GAME_DATAS[0]));
         expect(service.hasMatchCode(matchCode)).toBe(true);
     });
 
@@ -179,7 +180,7 @@ describe('MatchService', () => {
 
         const clearTimeoutSpy = sandbox.spy(global, 'clearTimeout');
 
-        [PLAYER_IDS[0], PLAYER_IDS[1]].forEach((playerId) => {
+        [PLAYER_IDS[0], PLAYER_IDS[1], PLAYER_IDS[2], PLAYER_IDS[3]].forEach((playerId) => {
             service.removePlayerFromMatch(playerId, matchCode);
         });
 

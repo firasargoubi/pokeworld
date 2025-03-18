@@ -1,12 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-import { MapSize } from '@common/map-size.enum';
-import { Player } from '@common/player';
 import { of } from 'rxjs';
 import { LobbyPageComponent } from './lobby-page.component';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { MapSize } from '@common/interfaces/map-data';
+import { Player } from '@common/interfaces/player';
+import { MOCK_PLAYERS } from '@common/test-consts/mock-players';
 
 describe('LobbyPageComponent', () => {
     let component: LobbyPageComponent;
@@ -52,7 +53,7 @@ describe('LobbyPageComponent', () => {
         component = fixture.componentInstance;
 
         fixture.detectChanges();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 
     it('should call startMatch when startMatchButton is called', () => {

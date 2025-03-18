@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { AttackResult, CombatResult } from '@common/combat';
-import { Player } from '@common/player';
 import { BehaviorSubject } from 'rxjs';
 import { CombatPageComponent } from './combat-page.component';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
+import { Player } from '@common/interfaces/player';
+import { AttackResult, CombatResult } from '@common/interfaces/combat';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 
 describe('CombatPageComponent', () => {
     let component: CombatPageComponent;
@@ -270,6 +271,6 @@ describe('CombatPageComponent', () => {
         expect(mockPopupService.clearMessages).toHaveBeenCalled();
         expect(mockPopupService.showPopup).toHaveBeenCalledWith('Erreur de connection avec le serveur');
         expect(mockPopupService.keepMessages).toHaveBeenCalled();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 });

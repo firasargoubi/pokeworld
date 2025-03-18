@@ -1,13 +1,13 @@
 import { Injectable, inject } from '@angular/core';
-import { AVATAR_DATA } from '@app/consts/avatars.const';
+import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { DEFAULT_TILE_DESCRIPTION } from '@app/consts/default-tile-description.const';
 import { TILE_EFFECT } from '@app/consts/tile-effect.const';
 import { TileDescriptionInfo } from '@app/interfaces/tile-description';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
-import { Player } from '@common/player';
-import { Position } from '@common/position';
-import { TILE_COST } from '@common/tile-type.enum';
+import { Player } from '@common/interfaces/player';
+import { Position } from '@common/interfaces/position';
+import { TILE_COST } from '@common/interfaces/tile-type.enum';
 
 @Injectable({
     providedIn: 'root',

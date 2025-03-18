@@ -1,8 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { CombatEvent } from '@common/combat-event.enum';
-import { Player } from '@common/player';
 import { CombatSocketService } from './combat-socket.service';
+import { Player } from '@common/interfaces/player';
+import { CombatEvent } from '@common/interfaces/websocket-event.enum';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 
 describe('CombatSocketService', () => {
     let service: CombatSocketService;
@@ -158,7 +159,7 @@ describe('CombatSocketService', () => {
         expect(service['combatRoomCode']).toBe('testRoom123');
         expect(service['selfPlayerSubject'].value).toEqual(combatData.players[0]);
         expect(service['ennemyPlayerSubject'].value).toEqual(combatData.players[1]);
-        expect(routerSpy).toHaveBeenCalledWith(['/combat']);
+        expect(routerSpy).toHaveBeenCalledWith([PageEndpoint.Combat]);
     });
 
     it('should set players and navigate to /combat when startCombat is called with self as second player', () => {
@@ -173,7 +174,7 @@ describe('CombatSocketService', () => {
         expect(service['combatRoomCode']).toBe('testRoom456');
         expect(service['selfPlayerSubject'].value).toEqual(combatData.players[1]);
         expect(service['ennemyPlayerSubject'].value).toEqual(combatData.players[0]);
-        expect(routerSpy).toHaveBeenCalledWith(['/combat']);
+        expect(routerSpy).toHaveBeenCalledWith([PageEndpoint.Combat]);
     });
 
     it('should navigate to /play when EndCombat event is received', () => {
@@ -187,7 +188,7 @@ describe('CombatSocketService', () => {
             endCombatCallback();
         }
 
-        expect(routerSpy).toHaveBeenCalledWith(['/play']);
+        expect(routerSpy).toHaveBeenCalledWith([PageEndpoint.Play]);
     });
 
     it('should update escapeResult when EscapedResult event is received', () => {

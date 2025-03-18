@@ -2,6 +2,7 @@ import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { Game } from '@app/model/schema/game.schema';
 import { GameService } from '@app/services/game/game.service';
+import { ApiEndpoint } from '@common/interfaces/endpoint.enum';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res, Query } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
@@ -15,7 +16,7 @@ import {
 import { Response } from 'express';
 
 @ApiTags('Games')
-@Controller('games')
+@Controller(ApiEndpoint.Games)
 export class GameController {
     constructor(private readonly gameService: GameService) {}
 
@@ -40,7 +41,7 @@ export class GameController {
     @ApiBadRequestResponse({
         description: 'Returns BAD_REQUEST http status when name is not provided',
     })
-    @Get('/is-name-unique')
+    @Get(`/${ApiEndpoint.IsNameUnique}`)
     async isNameUnique(@Query('name') name: string, @Query('id') id: string, @Res() response: Response) {
         const isUnique = await this.gameService.isNameUnique(name, id);
         response.status(HttpStatus.OK).json(isUnique);
@@ -130,7 +131,7 @@ export class GameController {
     @ApiInternalServerErrorResponse({
         description: 'Returns INTERNAL_SERVER_ERROR http status when request fails',
     })
-    @Patch('/:id/toggle')
+    @Patch(`/:id/${ApiEndpoint.Toggle}`)
     async toggleVisibility(@Param('id') id: string, @Res() response: Response) {
         const updatedGame = await this.gameService.toggleVisibility(id);
         response.status(HttpStatus.OK).json(updatedGame);

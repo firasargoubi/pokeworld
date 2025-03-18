@@ -1,11 +1,11 @@
 import { DistancesAndPredecessors, NeighborContext, QueueNode } from '@app/interfaces/movement';
 import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/surrounding-positions.const';
-import { MapData } from '@common/map-data';
-import { Match } from '@common/match';
-import { ShortestPath } from '@common/movement';
-import { Position } from '@common/position';
-import { TILE_COST, TileType } from '@common/tile-type.enum';
+import { MapData } from '@common/interfaces/map-data';
+import { Match } from '@common/interfaces/match';
+import { Position } from '@common/interfaces/position';
+import { TileType, TILE_COST } from '@common/interfaces/tile-type.enum';
 import { Injectable } from '@nestjs/common';
+import { ShortestPath } from '@common/interfaces/movement';
 
 @Injectable()
 export class MovementService {

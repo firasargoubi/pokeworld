@@ -1,9 +1,8 @@
-import { GameData } from '@common/game-data';
-import { GameMode } from '@common/game-mode.enum';
-import { ItemType } from '@common/item-type.enum';
-import { MapSize } from '@common/map-size.enum';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { GameData } from '@common/interfaces/game-data';
+import { GameMode, MapSize } from '@common/interfaces/map-data';
 
-export const DEFAULT_GAME: GameData = {
+export const DEFAULT_GAME_DATA: GameData = {
     _id: '',
     name: '',
     description: '',

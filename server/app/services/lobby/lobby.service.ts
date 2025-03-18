@@ -1,11 +1,11 @@
 import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
-import { MAX_PLAYERS, MIN_PLAYERS } from '@common/consts/player-count.const';
-import { GameData } from '@common/game-data';
-import { Player } from '@common/player';
-import { Warning } from '@common/warning.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { GameData } from '@common/interfaces/game-data';
+import { Warning } from '@common/interfaces/warning.enum';
+import { Player } from '@common/interfaces/player';
+import { MAX_PLAYERS, MIN_PLAYERS } from '@common/consts/player.const';
 
 @Injectable()
 export class LobbyService {
@@ -62,6 +62,8 @@ export class LobbyService {
         const player = match.matchData.players.find((p) => p.id === playerId);
         if (player) {
             player.isConnected = false;
+            player.currentStats.position = { x: -2, y: -2 };
+            player.spawnPoint = { x: -2, y: -2 };
         }
         const connectedPlayers = match.matchData.players.filter((p) => p.isConnected);
         if (connectedPlayers.length <= 1) {
@@ -71,7 +73,7 @@ export class LobbyService {
                 this.matchService.removePlayerFromMatch(p.id, matchCode);
             });
         } else {
-            if (player.isAdmin) {
+            if (player.isAdmin && match.matchData.isDebugMode) {
                 this.playService.changeDebugMode(playerId, false);
             }
             this.lobbyGateway.emitPlayerLeft(matchCode, match);
@@ -206,7 +208,7 @@ export class LobbyService {
             const isAdmin = this.matchService.isPlayerAdmin(playerId);
             const isMatchLocked = !this.canJoinMatch(matchCode);
             const hasEnoughPlayers = currentPlayerCount >= MIN_PLAYERS;
-            const areAllPlayersConnected = match.matchData.players.every((p) => p.isConnected);
+            const areAllPlayersConnected = match.matchData.players.every((p: Player) => p.isConnected);
             canStartMatch = isAdmin && isMatchLocked && hasEnoughPlayers && areAllPlayersConnected;
         }
         return canStartMatch;
@@ -217,7 +219,7 @@ export class LobbyService {
         const match = this.matchService.getMatch(matchCode);
         if (match) {
             const maxPlayerCount = MAX_PLAYERS[match.gameData.mapData.size];
-            const currentPlayerCount = match.matchData.players.filter((player) => player.isConnected).length;
+            const currentPlayerCount = match.matchData.players.filter((player: Player) => player.isConnected).length;
             isMatchFull = currentPlayerCount >= maxPlayerCount;
         }
         return isMatchFull;

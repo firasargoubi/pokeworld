@@ -24,7 +24,7 @@ if (environment.production) {
 const routes: Routes = [
     { path: '', component: MenuPageComponent, pathMatch: 'full' },
     { path: 'play', component: PlayPageComponent },
-    { path: 'debug', component: DebugPageComponent },
+    { path: 'debug', component: DebugPageComponent }, // TODO remove debug page
     { path: 'lobby', component: LobbyPageComponent },
     { path: 'join', component: JoinPageComponent },
     { path: 'admin', component: AdminPageComponent },

@@ -3,8 +3,8 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { ComponentRef, Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
-import { POPUP_DELAY } from '@app/consts/popup.const';
 import { filter } from 'rxjs/operators';
+import { POPUP_DELAY } from './popup.service.const';
 
 interface PopupMessage {
     message: string;

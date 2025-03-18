@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-import { AvatarStatus } from '@common/avatar-status.enum';
-import { Avatars } from '@common/avatars.enum';
-import { DiceType } from '@common/dice';
-import { Player } from '@common/player';
 import { of, Subject } from 'rxjs';
 import { PlayerSelectionService } from './player-selection.service';
+import { Player } from '@common/interfaces/player';
+import { Avatar, AvatarStatus } from '@common/interfaces/avatar.enum';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { DiceType } from '@common/interfaces/dice';
 
 describe('PlayerSelectionService', () => {
     let service: PlayerSelectionService;
@@ -36,57 +36,57 @@ describe('PlayerSelectionService', () => {
 
     it('should reset avatar to default', () => {
         service.resetAvatar();
-        expect(service.playerData.avatar).toBe(Avatars.Default);
+        expect(service.playerData.avatar).toBe(Avatar.Default);
     });
 
     it('should update player avatar', () => {
-        service.updatePlayerAvatar(Avatars.Avatar1);
-        expect(lobbySocketServiceSpy.updatePlayer).toHaveBeenCalledWith({ avatar: Avatars.Avatar1 });
+        service.updatePlayerAvatar(Avatar.Avatar1);
+        expect(lobbySocketServiceSpy.updatePlayer).toHaveBeenCalledWith({ avatar: Avatar.Avatar1 });
     });
 
     it('should return correct avatar status', () => {
-        service.playerData.avatar = Avatars.Avatar1;
-        expect(service.getAvatarStatus(Avatars.Avatar1)).toBe(AvatarStatus.SELECTED);
+        service.playerData.avatar = Avatar.Avatar1;
+        expect(service.getAvatarStatus(Avatar.Avatar1)).toBe(AvatarStatus.SELECTED);
 
-        service['playerList'] = [{ avatar: Avatars.Avatar2 } as Player];
-        expect(service.getAvatarStatus(Avatars.Avatar2)).toBe(AvatarStatus.LOCKED);
+        service['playerList'] = [{ avatar: Avatar.Avatar2 } as Player];
+        expect(service.getAvatarStatus(Avatar.Avatar2)).toBe(AvatarStatus.LOCKED);
 
-        expect(service.getAvatarStatus(Avatars.Avatar3)).toBe(AvatarStatus.UNSELECTED);
+        expect(service.getAvatarStatus(Avatar.Avatar3)).toBe(AvatarStatus.UNSELECTED);
     });
 
     it('should check if avatar is available', () => {
-        service.playerData.avatar = Avatars.Avatar1;
-        expect(service.isAvatarAvailable(Avatars.Avatar1)).toBeFalse();
+        service.playerData.avatar = Avatar.Avatar1;
+        expect(service.isAvatarAvailable(Avatar.Avatar1)).toBeFalse();
 
-        service['playerList'] = [{ avatar: Avatars.Avatar2 } as Player];
-        expect(service.isAvatarAvailable(Avatars.Avatar2)).toBeFalse();
+        service['playerList'] = [{ avatar: Avatar.Avatar2 } as Player];
+        expect(service.isAvatarAvailable(Avatar.Avatar2)).toBeFalse();
 
-        expect(service.isAvatarAvailable(Avatars.Avatar3)).toBeTrue();
+        expect(service.isAvatarAvailable(Avatar.Avatar3)).toBeTrue();
     });
 
     it('should have correct avatar data and list', () => {
         expect(service.avatarData).toBeDefined();
-        expect(service.avatarList).toEqual(Object.keys(service.avatarData).slice(1) as Avatars[]);
+        expect(service.avatarList).toEqual(Object.keys(service.avatarData).slice(1) as Avatar[]);
     });
 
     it('should handle avatar selection correctly', () => {
         const updatePlayerAvatarSpy = spyOn(service, 'updatePlayerAvatar');
         service['isPlayerInLobby'] = () => true;
 
-        service.handleAvatarSelection(Avatars.Avatar1);
-        expect(service.playerData.avatar).toBe(Avatars.Avatar1);
-        expect(updatePlayerAvatarSpy).toHaveBeenCalledWith(Avatars.Avatar1);
+        service.handleAvatarSelection(Avatar.Avatar1);
+        expect(service.playerData.avatar).toBe(Avatar.Avatar1);
+        expect(updatePlayerAvatarSpy).toHaveBeenCalledWith(Avatar.Avatar1);
 
         service['isPlayerInLobby'] = () => false;
-        service.handleAvatarSelection(Avatars.Avatar2);
-        expect(service.playerData.avatar).toBe(Avatars.Avatar2);
-        expect(updatePlayerAvatarSpy).not.toHaveBeenCalledWith(Avatars.Avatar2);
+        service.handleAvatarSelection(Avatar.Avatar2);
+        expect(service.playerData.avatar).toBe(Avatar.Avatar2);
+        expect(updatePlayerAvatarSpy).not.toHaveBeenCalledWith(Avatar.Avatar2);
     });
 
     it('should not select an unavailable avatar', () => {
         spyOn(service, 'isAvatarAvailable').and.returnValue(false);
-        service.handleAvatarSelection(Avatars.Avatar1);
-        expect(service.playerData.avatar).not.toBe(Avatars.Avatar1);
+        service.handleAvatarSelection(Avatar.Avatar1);
+        expect(service.playerData.avatar).not.toBe(Avatar.Avatar1);
     });
 
     it('should join lobby if player is already in lobby', () => {
@@ -94,7 +94,7 @@ describe('PlayerSelectionService', () => {
         spyOn<any>(service, 'isPlayerInLobby').and.returnValue(true);
         service.joinLobby();
         expect(lobbySocketServiceSpy.updatePlayer).toHaveBeenCalledWith(service.playerData);
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/lobby']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Lobby]);
     });
 
     it('should join match and then join lobby if player is not in lobby', () => {
@@ -114,7 +114,7 @@ describe('PlayerSelectionService', () => {
         expect(lobbySocketServiceSpy.joinMatch).toHaveBeenCalledWith(service.matchCode);
         expect(joinLobbySpy).toHaveBeenCalledTimes(2); // Ensure joinLobby is called again
         expect(lobbySocketServiceSpy.updatePlayer).toHaveBeenCalledWith(service.playerData);
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/lobby']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Lobby]);
     });
 
     it('should not join lobby if join match fails', () => {
@@ -134,7 +134,7 @@ describe('PlayerSelectionService', () => {
     it('should set player data correctly', () => {
         const playerUpdates: Partial<Player> = {
             name: 'NewPlayer',
-            avatar: Avatars.Avatar2,
+            avatar: Avatar.Avatar2,
             playerStats: {
                 health: 10,
                 speed: 5,
@@ -150,10 +150,10 @@ describe('PlayerSelectionService', () => {
     });
 
     it('should return the selected avatar', () => {
-        service.playerData.avatar = Avatars.Avatar1;
-        expect(service.selectedAvatar).toBe(Avatars.Avatar1);
+        service.playerData.avatar = Avatar.Avatar1;
+        expect(service.selectedAvatar).toBe(Avatar.Avatar1);
 
-        service.playerData.avatar = Avatars.Avatar2;
-        expect(service.selectedAvatar).toBe(Avatars.Avatar2);
+        service.playerData.avatar = Avatar.Avatar2;
+        expect(service.selectedAvatar).toBe(Avatar.Avatar2);
     });
 });

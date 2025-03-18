@@ -1,5 +1,5 @@
-import { ItemType } from '@common/item-type.enum';
-import { TileType } from '@common/tile-type.enum';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { TileType } from '@common/interfaces/tile-type.enum';
 
 export const IMAGE_SUFIX = '.png';
 
@@ -36,3 +36,34 @@ export const ITEM_IMAGES: Map<ItemType, string> = new Map([
     [ItemType.Spawn, './assets/images/game/items/spawn.png'],
     [ItemType.Flag, './assets/images/game/items/flag.png'],
 ]);
+
+export const BATTLE_PLATFORM_IMAGES = {
+    [TileType.Grass]: {
+        selfPlatform: './assets/images/game/battle-platforms/self-grass.png',
+        enemyPlatform: './assets/images/game/battle-platforms/ennemy-grass.png',
+    },
+    [TileType.Bush]: {
+        selfPlatform: './assets/images/game/battle-platforms/self-bush.png',
+        enemyPlatform: './assets/images/game/battle-platforms/ennemy-bush.png',
+    },
+    [TileType.Path]: {
+        selfPlatform: './assets/images/game/battle-platforms/self-path.png',
+        enemyPlatform: './assets/images/game/battle-platforms/ennemy-path.png',
+    },
+    [TileType.Bridge]: {
+        selfPlatform: './assets/images/game/battle-platforms/self-bridge.png',
+        enemyPlatform: './assets/images/game/battle-platforms/ennemy-bridge.png',
+    },
+    [TileType.BrokenBridge]: {
+        selfPlatform: './assets/images/game/battle-platforms/self-grass.png',
+        enemyPlatform: './assets/images/game/battle-platforms/ennemy-grass.png',
+    },
+    [TileType.Water]: {
+        selfPlatform: './assets/images/game/battle-platforms/self-grass.png',
+        enemyPlatform: './assets/images/game/battle-platforms/ennemy-grass.png',
+    },
+    [TileType.None]: {
+        selfPlatform: './assets/images/game/battle-platforms/self-grass.png',
+        enemyPlatform: './assets/images/game/battle-platforms/ennemy-grass.png',
+    },
+};

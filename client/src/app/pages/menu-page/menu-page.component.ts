@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MenuButtonComponent } from '@app/components/menu-button/menu-button.component';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 
 @Component({
     selector: 'app-menu-page',
@@ -7,4 +8,6 @@ import { MenuButtonComponent } from '@app/components/menu-button/menu-button.com
     styleUrls: ['./menu-page.component.scss'],
     imports: [MenuButtonComponent],
 })
-export class MenuPageComponent {}
+export class MenuPageComponent {
+    pageEndpoint = PageEndpoint;
+}

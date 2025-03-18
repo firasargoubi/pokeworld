@@ -1,6 +1,6 @@
-import { ItemType } from '@common/item-type.enum';
-import { MapSize } from '@common/map-size.enum';
-import { Position } from '@common/position';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MapSize } from '@common/interfaces/map-data';
+import { Position } from '@common/interfaces/position';
 
 export interface TileVisualData {
     tile: string;

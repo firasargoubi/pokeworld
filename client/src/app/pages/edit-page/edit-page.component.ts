@@ -1,9 +1,21 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { ItemComponent } from '@app/components/item/item.component';
 import { MapComponent } from '@app/components/map/map.component';
+import { DEFAULT_EDITOR_DATA, EDITOR_ERASE_TILE } from '@app/consts/editor-data.const';
+import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
+import { ITEM_DESCRIPTION } from '@app/consts/item-data.const';
+import { EditorEvent, EditorItem, EditorVisualData } from '@app/interfaces/editor';
 import { EditorService } from '@app/services/editor/editor.service';
+import { GameDataService } from '@app/services/game-data/game-data.service';
+import { PopupService } from '@app/services/popup/popup.service';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { GameData } from '@common/interfaces/game-data';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
 
 @Component({
     selector: 'app-edit-page',
@@ -11,10 +23,226 @@ import { EditorService } from '@app/services/editor/editor.service';
     styleUrls: ['./edit-page.component.scss'],
     imports: [HeaderComponent, MapComponent, FormsModule, ItemComponent],
 })
-export class EditPageComponent implements OnInit {
-    editorService: EditorService = inject(EditorService);
+export class EditPageComponent {
+    gameDataService: GameDataService = inject(GameDataService);
+    editorVisualData: EditorVisualData = structuredClone(DEFAULT_EDITOR_DATA);
+    private editorService: EditorService = inject(EditorService);
+    private popupService: PopupService = inject(PopupService);
+    private router: Router = inject(Router);
+    private initialGameData: GameData = structuredClone(this.gameDataService.gameData);
 
-    ngOnInit() {
-        this.editorService.initialGameData = structuredClone(this.editorService.gameDataService.gameData);
+    constructor() {
+        if (!this.gameDataService.isMapValid()) {
+            this.goToAdminPage();
+        }
+        this.gameDataService.itemUpdate.subscribe(this.updateItems.bind(this));
+        this.updateItems();
+    }
+
+    backButton() {
+        if (this.gameDataService.isModified(this.initialGameData)) {
+            this.popupService.showPopup(
+                'Voulez-vous vraiment quitter la page? Les modifications non sauvegardées seront perdues.',
+                true,
+                this.goToAdminPage.bind(this),
+            );
+        } else {
+            this.goToAdminPage();
+        }
+    }
+
+    async saveButton() {
+        const isGameSaved = await this.editorService.saveGame();
+        if (isGameSaved) {
+            this.popupService.showPopup('Jeu sauvegardé avec succès');
+            this.popupService.keepMessages();
+            this.goToAdminPage();
+        }
+    }
+
+    resetButton() {
+        if (this.gameDataService.isModified(this.initialGameData)) {
+            this.popupService.showPopup('Voulez-vous vraiment annuler les modifications?', true, this.resetGameData.bind(this));
+        }
+    }
+
+    onMouseDown(event: MouseEvent) {
+        const isLeftClick = event.button === 0;
+        this.onClick(event, isLeftClick);
+    }
+
+    onRightClick(event: MouseEvent) {
+        const editorEvent = this.getEventProperty(event);
+        if (editorEvent.tilePosition) {
+            event.preventDefault();
+        }
+    }
+
+    onMouseUp(event: MouseEvent) {
+        this.editorVisualData.paintingTile = null;
+        this.editorVisualData.lastPaintedPosition = { x: -1, y: -1 };
+
+        if (this.editorVisualData.dragItem) {
+            this.dropItem(this.getEventProperty(event));
+        }
+    }
+
+    onMouseMove(event: MouseEvent) {
+        if (this.editorVisualData.dragItem) {
+            const position: Position = { x: event.clientX, y: event.clientY };
+
+            if (position.x !== this.editorVisualData.dragPosition.x) {
+                this.editorVisualData.dragPosition.x = position.x;
+            }
+
+            if (position.y !== this.editorVisualData.dragPosition.y) {
+                this.editorVisualData.dragPosition.y = position.y;
+            }
+        }
+    }
+
+    onMouseOver(event: Event) {
+        const editorEvent = this.getEventProperty(event);
+        if (editorEvent.tilePosition) {
+            const lastPosition = this.editorVisualData.lastPaintedPosition;
+            const hasAlreadyPainted = lastPosition.x === editorEvent.tilePosition.x && lastPosition.y === editorEvent.tilePosition.y;
+
+            if (!hasAlreadyPainted && this.editorVisualData.paintingTile) {
+                this.editorVisualData.lastPaintedPosition = editorEvent.tilePosition;
+                this.editorService.paintTile(this.editorVisualData.paintingTile, editorEvent.tilePosition);
+            }
+        }
+    }
+
+    private dropItem(editorEvent: EditorEvent) {
+        const item = this.editorVisualData.dragItem as ItemType;
+        this.setActiveItem(null, editorEvent);
+        if (editorEvent.tilePosition) {
+            this.editorService.placeItem(item, editorEvent.tilePosition);
+        }
+        this.updateItems();
+    }
+
+    private goToAdminPage() {
+        this.router.navigate([PageEndpoint.Admin]);
+    }
+
+    private getEditorItems(): EditorItem[] {
+        return Object.values(ItemType).map(this.getEditorItem.bind(this));
+    }
+
+    private getEditorItem(item: ItemType): EditorItem {
+        return {
+            item,
+            image: ITEM_IMAGES.get(item) as string,
+            description: ITEM_DESCRIPTION.get(item) as string,
+            count: this.getRemainingItemCount(item),
+        };
+    }
+
+    private resetGameData() {
+        this.gameDataService.setGameData(structuredClone(this.initialGameData));
+    }
+
+    private onClick(event: MouseEvent, isLeftClick: boolean) {
+        const editorEvent = this.getEventProperty(event);
+
+        if (editorEvent.tilePosition) {
+            this.clickOnMap(editorEvent, isLeftClick);
+            return event.preventDefault();
+        }
+
+        if (editorEvent.tile && isLeftClick) {
+            this.clickOnTile(editorEvent.tile as TileType);
+            return event.preventDefault();
+        }
+
+        if (editorEvent.item && isLeftClick) {
+            this.clickOnItem(editorEvent);
+            return event.preventDefault();
+        }
+    }
+
+    private getEventProperty(event: Event): EditorEvent {
+        const target = event.target as HTMLElement;
+        return {
+            tilePosition: target.hasAttribute('x') ? { x: Number(target.getAttribute('x')), y: Number(target.getAttribute('y')) } : null,
+            mousePosition: event instanceof MouseEvent ? { x: (event as MouseEvent).clientX, y: (event as MouseEvent).clientY } : null,
+            tile: (target.getAttribute('tile') ?? null) as TileType | null,
+            item: (target.getAttribute('item') ?? null) as ItemType | null,
+        };
+    }
+
+    private clickOnItem(editorEvent: EditorEvent) {
+        if (this.getRemainingItemCount(editorEvent.item as ItemType) > 0) {
+            this.editorService.resetLastPicked();
+            this.setActiveItem(editorEvent.item, editorEvent);
+            this.updateItems();
+        }
+    }
+
+    private getRemainingItemCount(item: ItemType): number {
+        return this.editorService.getRemainingItemCount(item, this.editorVisualData.dragItem);
+    }
+
+    private clickOnTile(tile: TileType) {
+        this.editorVisualData.selectedTile = tile;
+
+        for (const tileData of this.editorVisualData.tiles) {
+            if (tileData.tile === tile) {
+                tileData.isActive = true;
+            } else if (tileData.isActive) {
+                tileData.isActive = false;
+            }
+        }
+    }
+
+    private clickOnMap(editorEvent: EditorEvent, isLeftClick: boolean) {
+        const tileHasItem = Boolean(this.gameDataService.getItem(editorEvent.tilePosition as Position));
+
+        if (!this.editorVisualData.dragItem) {
+            if (tileHasItem) {
+                this.clickOnMapItem(editorEvent, isLeftClick);
+            } else {
+                this.updatePaintingTile(isLeftClick);
+                this.editorService.paintTile(this.editorVisualData.paintingTile as TileType, editorEvent.tilePosition as Position);
+            }
+        }
+    }
+
+    private updatePaintingTile(isLeftClick: boolean) {
+        this.editorVisualData.paintingTile = isLeftClick ? this.editorVisualData.selectedTile : EDITOR_ERASE_TILE;
+    }
+
+    private clickOnMapItem(editorEvent: EditorEvent, isLeftClick: boolean) {
+        if (isLeftClick) {
+            this.pickItem(editorEvent);
+        } else {
+            this.gameDataService.removeItem(editorEvent.tilePosition as Position);
+        }
+    }
+
+    private pickItem(editorEvent: EditorEvent) {
+        const item = this.gameDataService.getItem(editorEvent.tilePosition as Position) as ItemType;
+        this.setActiveItem(item, editorEvent);
+        this.editorService.pickItem(editorEvent.tilePosition as Position);
+    }
+
+    private updateItems() {
+        this.editorVisualData.items = this.getEditorItems();
+    }
+
+    private setActiveItem(item: ItemType | null, editorEvent: EditorEvent) {
+        this.editorVisualData.dragItem = item;
+
+        if (item) {
+            this.editorVisualData.dragItemImage = ITEM_IMAGES.get(item) as string;
+        } else {
+            this.editorVisualData.dragItemImage = EMPTY_IMAGE;
+        }
+
+        if (editorEvent.mousePosition) {
+            this.editorVisualData.dragPosition = editorEvent.mousePosition;
+        }
     }
 }

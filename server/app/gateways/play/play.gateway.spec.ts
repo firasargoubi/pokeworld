@@ -1,13 +1,13 @@
-import { MOCK_MATCHES } from '@app/consts/tests/mock-matches';
 import { PlayService } from '@app/services/play/play.service';
-import { CombatDataBroadcast, CombatResultBroadcast } from '@common/combat';
-import { Match, PlayerMovementData } from '@common/match';
-import { PlayEvent } from '@common/play-event.enum';
-import { Position } from '@common/position';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { PlayGateway } from './play.gateway';
+import { CombatDataBroadcast, CombatResultBroadcast } from '@common/interfaces/combat';
+import { Match, PlayerMovementData } from '@common/interfaces/match';
+import { Position } from '@common/interfaces/position';
+import { PlayEvent } from '@common/interfaces/websocket-event.enum';
+import { MOCK_MATCHES } from '@common/test-consts/mock-matches';
 
 describe('PlayGateway', () => {
     let gateway: PlayGateway;

@@ -1,13 +1,13 @@
-import { MOCK_MATCHES } from '@app/consts/tests/mock-matches';
-import { MapData } from '@common/map-data';
-import { Match } from '@common/match';
-import { ShortestPath } from '@common/movement';
-import { Position } from '@common/position';
-import { TILE_COST, TileType } from '@common/tile-type.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createSandbox, SinonSandbox } from 'sinon';
 import { MovementService } from './movement.service';
 import { MOCK_NEW_SECTION } from './movement.service.spec.const';
+import { MapData } from '@common/interfaces/map-data';
+import { Match } from '@common/interfaces/match';
+import { ShortestPath } from '@common/interfaces/movement';
+import { Position } from '@common/interfaces/position';
+import { TileType, TILE_COST } from '@common/interfaces/tile-type.enum';
+import { MOCK_MATCHES } from '@common/test-consts/mock-matches';
 
 describe('MovementService', () => {
     let service: MovementService;

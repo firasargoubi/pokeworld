@@ -1,9 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MapComponent } from '@app/components/map/map.component';
-import { DEFAULT_TILE_DESCRIPTION } from '@app/consts/default-tile-description.const';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games';
-import { MOCK_MATCH_DATAS } from '@app/consts/tests/mock-matches';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
@@ -13,10 +10,14 @@ import { PlaySocketsService } from '@app/services/sockets/play-socket/play-socke
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { TileDescriptionService } from '@app/services/tile-description/tile-description.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { MapSize } from '@common/map-size.enum';
-import { TurnPhase } from '@common/match';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { MapSize } from '@common/interfaces/map-data';
+import { TurnPhase } from '@common/interfaces/match';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { BehaviorSubject } from 'rxjs';
 import { PlayPageComponent } from './play-page.component';
+import { DEFAULT_TILE_DESCRIPTION } from '@app/consts/default-tile-description.const';
+import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 
 describe('PlayPageComponent', () => {
     let component: PlayPageComponent;
@@ -36,7 +37,7 @@ describe('PlayPageComponent', () => {
 
     beforeEach(() => {
         mockTimerService = jasmine.createSpyObj('TimerService', ['startTimer']);
-        mockGameDataService = jasmine.createSpyObj('GameDataService', ['getMapSize'], { gameData: structuredClone(MOCK_GAMES[2]) });
+        mockGameDataService = jasmine.createSpyObj('GameDataService', ['getMapSize'], { gameData: structuredClone(MOCK_GAME_DATAS[2]) });
         mockPopupService = jasmine.createSpyObj('PopupService', ['showPopup', 'clearMessages', 'keepMessages']);
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         mockTileDescriptionService = jasmine.createSpyObj('TileDescriptionService', ['displayTileDescription', 'hideTileDescription'], {
@@ -106,7 +107,7 @@ describe('PlayPageComponent', () => {
 
         expect(mockPopupService.showPopup).toHaveBeenCalledWith('Erreur de connection avec le serveur');
         expect(mockPopupService.keepMessages).toHaveBeenCalled();
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
+        expect(mockRouter.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 
     it('should return selfIndex from matchDataService', () => {
@@ -128,6 +129,10 @@ describe('PlayPageComponent', () => {
 
         const eventX = new KeyboardEvent('keydown', { key: 'x' });
         component.onKeyDown(eventX);
+        expect(debugSpy).toHaveBeenCalledTimes(2);
+
+        const eventRepeat = new KeyboardEvent('keydown', { key: 'd', repeat: true });
+        component.onKeyDown(eventRepeat);
         expect(debugSpy).toHaveBeenCalledTimes(2);
     });
 
@@ -170,8 +175,9 @@ describe('PlayPageComponent', () => {
     it('should leave match and navigate to home', () => {
         component['leaveMatch']();
         expect(mockPlaySocketsService.leaveMatch).toHaveBeenCalled();
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
+        expect(mockRouter.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
+
     it('should call displayTileDescription and hideTileDescription', () => {
         const event = new MouseEvent('click');
         component.showTileDescription(event);
@@ -179,6 +185,7 @@ describe('PlayPageComponent', () => {
         component.hideTileDescription();
         expect(mockTileDescriptionService.hideTileDescription).toHaveBeenCalled();
     });
+
     it('should ignore repeated key events', () => {
         mockPlaySocketsService.changeDebugMode.calls.reset();
 

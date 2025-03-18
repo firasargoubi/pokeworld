@@ -2,9 +2,10 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { CODE_LENGTH } from '@app/consts/join.const';
 import { PlayerSelectionService } from '@app/services/player-selection/player-selection.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
+import { CODE_LENGTH } from '@common/consts/match.const';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 
 @Component({
     selector: 'app-join-page',
@@ -26,13 +27,13 @@ export class JoinPageComponent {
             this.lobbySocketService.joinMatch(this.gameCode).subscribe((joinStatus) => {
                 if (joinStatus) {
                     this.playerSelectionService.matchCode = this.gameCode;
-                    this.router.navigate(['/player-selection']);
+                    this.router.navigate([PageEndpoint.PlayerSelection]);
                 }
             });
         }
     }
 
     navigateToMenu() {
-        this.router.navigate(['/']);
+        this.router.navigate([PageEndpoint.Menu]);
     }
 }

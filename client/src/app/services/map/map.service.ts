@@ -1,15 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { MOVE_ANIMATION_DURATION } from '@common/consts/default-player.const';
 import { IMAGE_SUFIX, TILE_IMAGES_PREFIX, UNDERLAY_IMAGES_PREFIX } from '@app/consts/images.const';
 import { MapVisualData, OverlayTiles, TileVisualData } from '@app/interfaces/map-visual-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
-import { ItemType } from '@common/item-type.enum';
-import { MapData } from '@common/map-data';
-import { PlayerMovementData } from '@common/match';
-import { Player } from '@common/player';
-import { Position } from '@common/position';
-import { TileType } from '@common/tile-type.enum';
 import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/surrounding-positions.const';
 import {
     ACTION_OVERLAY,
@@ -29,6 +21,14 @@ import {
     SURROUNDING_POSITIONS_SQUARE,
     WATER_SIMILAR_TILES,
 } from './map.service.const';
+import { Player } from '@common/interfaces/player';
+import { Position } from '@common/interfaces/position';
+import { PlayerMovementData } from '@common/interfaces/match';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/player.const';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { MapData } from '@common/interfaces/map-data';
+import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
 
 @Injectable({
     providedIn: 'root',

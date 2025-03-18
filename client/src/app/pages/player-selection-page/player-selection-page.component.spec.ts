@@ -1,17 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AVATAR_DATA } from '@app/consts/avatars.const';
-import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS } from '@common/consts/default-player.const';
-import { StatType } from '@app/interfaces/player-stats.enum';
 import { PlayerSelectionService } from '@app/services/player-selection/player-selection.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-import { AvatarStatus } from '@common/avatar-status.enum';
-import { Avatars } from '@common/avatars.enum';
-import { DiceType } from '@common/dice';
 import { Subject } from 'rxjs';
 import { PlayerSelectionPageComponent } from './player-selection-page.component';
+import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { Avatar, AvatarStatus } from '@common/interfaces/avatar.enum';
+import { DiceType } from '@common/interfaces/dice';
+import { StatType } from '@common/interfaces/player';
+import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS } from '@common/consts/player.const';
 
 describe('PlayerSelectionPageComponent', () => {
     let component: PlayerSelectionPageComponent;
@@ -31,10 +30,10 @@ describe('PlayerSelectionPageComponent', () => {
             ['getAvatarStatus', 'isAvatarAvailable', 'updatePlayerAvatar', 'resetAvatar', 'setPlayerData', 'joinLobby', 'handleAvatarSelection'],
             {
                 avatarData: AVATAR_DATA,
-                avatarList: Object.keys(AVATAR_DATA).slice(1) as Avatars[],
+                avatarList: Object.keys(AVATAR_DATA).slice(1) as Avatar[],
                 playerData: {
                     name: '',
-                    avatar: Avatars.Avatar1, // Set a valid avatar value
+                    avatar: Avatar.Avatar1,
                     playerStats: {
                         health: 0,
                         speed: 0,
@@ -89,7 +88,7 @@ describe('PlayerSelectionPageComponent', () => {
 
     it('should return correct avatar button style', () => {
         playerSelectionServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
-        const style = component.getAvatarBtnStyle(Avatars.Avatar1);
+        const style = component.getAvatarBtnStyle(Avatar.Avatar1);
         expect(style).toEqual({ class: AvatarStatus.UNSELECTED });
     });
 
@@ -126,25 +125,25 @@ describe('PlayerSelectionPageComponent', () => {
     it('should return correct warnings', () => {
         component.nameForm.setValue('');
         expect(component['getWarnings']()).toContain('Le nom doit contenir entre 3 et 15 caractères');
-        component['playerSelectionService'].playerData.avatar = Avatars.Default;
+        component['playerSelectionService'].playerData.avatar = Avatar.Default;
         expect(component['getWarnings']()).toContain('Veuillez choisir un avatar');
     });
 
     it('should check if avatar is chosen', () => {
-        component['playerSelectionService'].playerData.avatar = Avatars.Avatar1;
+        component['playerSelectionService'].playerData.avatar = Avatar.Avatar1;
         expect(component['isAvatarChosen']()).toBeTrue();
-        component['playerSelectionService'].playerData.avatar = Avatars.Default;
+        component['playerSelectionService'].playerData.avatar = Avatar.Default;
         expect(component['isAvatarChosen']()).toBeFalse();
     });
 
     it('should return correct avatar button style', () => {
         playerSelectionServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
-        const style = component.getAvatarBtnStyle(Avatars.Avatar1);
+        const style = component.getAvatarBtnStyle(Avatar.Avatar1);
         expect(style).toEqual({ class: AvatarStatus.UNSELECTED });
     });
 
     it('should call getAvatarBtnStyle with correct avatar', () => {
-        const avatar = Avatars.Avatar1;
+        const avatar = Avatar.Avatar1;
         const spy = spyOn(component, 'getAvatarBtnStyle').and.callThrough();
         component.getAvatarBtnStyle(avatar);
         expect(spy).toHaveBeenCalledWith(avatar);
@@ -155,11 +154,11 @@ describe('PlayerSelectionPageComponent', () => {
     });
 
     it('should return correct avatar list', () => {
-        expect(component.avatarList).toEqual(Object.keys(AVATAR_DATA).slice(1) as Avatars[]);
+        expect(component.avatarList).toEqual(Object.keys(AVATAR_DATA).slice(1) as Avatar[]);
     });
 
     it('should return the selected avatar', () => {
-        expect(component.selectedAvatar).toBe(Avatars.Avatar1);
+        expect(component.selectedAvatar).toBe(Avatar.Avatar1);
     });
 
     it('should reset avatar on init', () => {
@@ -193,7 +192,7 @@ describe('PlayerSelectionPageComponent', () => {
         const playerData = component['getPlayerData']();
         expect(playerData).toEqual({
             name: 'TESTPLAYER',
-            avatar: Avatars.Avatar1,
+            avatar: Avatar.Avatar1,
             playerStats: {
                 health: DEFAULT_STAT_POINTS + BONUS_POINTS,
                 speed: DEFAULT_STAT_POINTS,
@@ -216,14 +215,14 @@ describe('PlayerSelectionPageComponent', () => {
     it('should return correct warnings', () => {
         component.nameForm.setValue('');
         expect(component['getWarnings']()).toContain('Le nom doit contenir entre 3 et 15 caractères');
-        component['playerSelectionService'].playerData.avatar = Avatars.Default;
+        component['playerSelectionService'].playerData.avatar = Avatar.Default;
         expect(component['getWarnings']()).toContain('Veuillez choisir un avatar');
     });
 
     it('should check if avatar is chosen', () => {
-        component['playerSelectionService'].playerData.avatar = Avatars.Avatar1;
+        component['playerSelectionService'].playerData.avatar = Avatar.Avatar1;
         expect(component['isAvatarChosen']()).toBeTrue();
-        component['playerSelectionService'].playerData.avatar = Avatars.Default;
+        component['playerSelectionService'].playerData.avatar = Avatar.Default;
         expect(component['isAvatarChosen']()).toBeFalse();
     });
 });

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { GameData } from '@common/game-data';
+import { ApiEndpoint } from '@common/interfaces/endpoint.enum';
+import { GameData } from '@common/interfaces/game-data';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -12,35 +13,35 @@ export class GameSaveService {
     private readonly http: HttpClient = inject(HttpClient);
 
     getAllGames(): Observable<GameData[]> {
-        return this.http.get<GameData[]>(`${this.baseUrl}/games`);
+        return this.http.get<GameData[]>(`${this.baseUrl}/${ApiEndpoint.Games}`);
     }
 
     getGame(gameId: string): Observable<GameData> {
-        return this.http.get<GameData>(`${this.baseUrl}/games/${gameId}`);
+        return this.http.get<GameData>(`${this.baseUrl}/${ApiEndpoint.Games}/${gameId}`);
     }
 
     saveGame(gameData: GameData): Observable<GameData> {
-        return this.http.put<GameData>(`${this.baseUrl}/games`, gameData);
+        return this.http.put<GameData>(`${this.baseUrl}/${ApiEndpoint.Games}`, gameData);
     }
 
     addGame(gameData: GameData): Observable<GameData> {
-        return this.http.post<GameData>(`${this.baseUrl}/games`, gameData);
+        return this.http.post<GameData>(`${this.baseUrl}/${ApiEndpoint.Games}`, gameData);
     }
 
     updateGame(gameId: string, gameData: GameData): Observable<GameData> {
-        return this.http.patch<GameData>(`${this.baseUrl}/games/${gameId}`, gameData);
+        return this.http.patch<GameData>(`${this.baseUrl}/${ApiEndpoint.Games}/${gameId}`, gameData);
     }
 
     toggleVisibility(gameId: string): Observable<GameData> {
-        return this.http.patch<GameData>(`${this.baseUrl}/games/${gameId}/toggle`, {});
+        return this.http.patch<GameData>(`${this.baseUrl}/${ApiEndpoint.Games}/${gameId}/${ApiEndpoint.Toggle}`, {});
     }
 
     deleteGame(gameId: string): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}/games/${gameId}`);
+        return this.http.delete<void>(`${this.baseUrl}/${ApiEndpoint.Games}/${gameId}`);
     }
 
     isNameUnique(name: string, id: string = ''): Observable<boolean> {
-        return this.http.get<boolean>(`${this.baseUrl}/games/is-name-unique`, {
+        return this.http.get<boolean>(`${this.baseUrl}/${ApiEndpoint.Games}/${ApiEndpoint.IsNameUnique}`, {
             params: { name, id },
         });
     }

@@ -1,5 +1,5 @@
-import { Match } from '@common/match';
-import { Position } from '@common/position';
+import { Match } from '@common/interfaces/match';
+import { Position } from '@common/interfaces/position';
 
 export interface NeighborContext {
     pos: Position;

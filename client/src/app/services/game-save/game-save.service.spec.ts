@@ -1,8 +1,8 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games';
-import { GameData } from '@common/game-data';
+import { GameData } from '@common/interfaces/game-data';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { GameSaveService } from './game-save.service';
 
 describe('GameSave', () => {
@@ -28,11 +28,11 @@ describe('GameSave', () => {
     });
 
     it('should return all games', () => {
-        const expectedGames: GameData[] = MOCK_GAMES;
+        const expectedGames: GameData[] = MOCK_GAME_DATAS;
 
         service.getAllGames().subscribe({
             next: (response: GameData[]) => {
-                expect(response.length).toBe(MOCK_GAMES.length);
+                expect(response.length).toBe(MOCK_GAME_DATAS.length);
                 expect(response).toEqual(expectedGames);
             },
             error: fail,
@@ -44,7 +44,7 @@ describe('GameSave', () => {
     });
 
     it('should return a game by ID', () => {
-        const mockGame: GameData = MOCK_GAMES[0];
+        const mockGame: GameData = MOCK_GAME_DATAS[0];
 
         service.getGame(mockGame._id).subscribe({
             next: (response: GameData) => {
@@ -59,7 +59,7 @@ describe('GameSave', () => {
     });
 
     it('should update the game if _id exists', () => {
-        const updatedGame = { ...MOCK_GAMES[0], name: 'Updated Name' };
+        const updatedGame = { ...MOCK_GAME_DATAS[0], name: 'Updated Name' };
 
         service.saveGame(updatedGame).subscribe((game) => {
             expect(game.name).toBe('Updated Name');
@@ -71,7 +71,7 @@ describe('GameSave', () => {
     });
 
     it('should add a new game if _id does not exist', () => {
-        const newGame: GameData = { ...MOCK_GAMES[0], _id: '' };
+        const newGame: GameData = { ...MOCK_GAME_DATAS[0], _id: '' };
 
         service.saveGame(newGame).subscribe((game) => {
             expect(game).toEqual(newGame);
@@ -83,7 +83,7 @@ describe('GameSave', () => {
     });
 
     it('should create a new game', () => {
-        const newGame: GameData = MOCK_GAMES[0];
+        const newGame: GameData = MOCK_GAME_DATAS[0];
 
         service.addGame(newGame).subscribe({
             next: (response: GameData) => {
@@ -99,7 +99,7 @@ describe('GameSave', () => {
     });
 
     it('should update an existing game', () => {
-        const updatedGame: GameData = MOCK_GAMES[0];
+        const updatedGame: GameData = MOCK_GAME_DATAS[0];
 
         service.updateGame(updatedGame._id, updatedGame).subscribe({
             next: (response: GameData) => {
@@ -115,11 +115,11 @@ describe('GameSave', () => {
     });
 
     it('should toggle visibility of a game', () => {
-        const toggledGame = { ...MOCK_GAMES[0], isVisible: !MOCK_GAMES[0].isVisible };
+        const toggledGame = { ...MOCK_GAME_DATAS[0], isVisible: !MOCK_GAME_DATAS[0].isVisible };
 
         service.toggleVisibility(toggledGame._id).subscribe({
             next: (response: GameData) => {
-                expect(response.isVisible).toBe(!MOCK_GAMES[0].isVisible);
+                expect(response.isVisible).toBe(!MOCK_GAME_DATAS[0].isVisible);
             },
             error: fail,
         });
@@ -130,7 +130,7 @@ describe('GameSave', () => {
     });
 
     it('should delete a game', () => {
-        const gameId = MOCK_GAMES[0]._id;
+        const gameId = MOCK_GAME_DATAS[0]._id;
 
         service.deleteGame(gameId).subscribe({
             next: (response) => expect(response).toBeNull(),
@@ -155,12 +155,12 @@ describe('GameSave', () => {
     });
 
     it('should check if name is unique with an ID', () => {
-        service.isNameUnique(MOCK_GAMES[0].name, MOCK_GAMES[0]._id).subscribe((response) => {
+        service.isNameUnique(MOCK_GAME_DATAS[0].name, MOCK_GAME_DATAS[0]._id).subscribe((response) => {
             expect(response).toBe(false);
         });
 
-        const encodedGameName = encodeURIComponent(MOCK_GAMES[0].name);
-        const req = httpMock.expectOne(`${baseUrl}/games/is-name-unique?name=${encodedGameName}&id=${MOCK_GAMES[0]._id}`);
+        const encodedGameName = encodeURIComponent(MOCK_GAME_DATAS[0].name);
+        const req = httpMock.expectOne(`${baseUrl}/games/is-name-unique?name=${encodedGameName}&id=${MOCK_GAME_DATAS[0]._id}`);
         expect(req.request.method).toBe('GET');
         req.flush(false);
     });

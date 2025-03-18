@@ -1,15 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { MOCK_GAMES } from '@app/consts/tests/mock-games';
-import { MOCK_MATCHES, MOCK_PLAYERS } from '@app/consts/tests/mock-matches';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { LobbyEvent } from '@common/lobby-event.enum';
-import { Match } from '@common/match';
-import { Player } from '@common/player';
-import { Warning } from '@common/warning.enum';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { Match } from '@common/interfaces/match';
+import { Player } from '@common/interfaces/player';
+import { Warning } from '@common/interfaces/warning.enum';
+import { LobbyEvent } from '@common/interfaces/websocket-event.enum';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
+import { MOCK_MATCHES } from '@common/test-consts/mock-matches';
+import { MOCK_PLAYERS } from '@common/test-consts/mock-players';
 import { LobbySocketsService } from './lobby-sockets.service';
 
 describe('LobbySocketsService', () => {
@@ -87,7 +89,7 @@ describe('LobbySocketsService', () => {
         const matchCode = '1234';
         coreSocketSpy.emit.and.stub();
 
-        const promise = service.createMatch(MOCK_GAMES[0]);
+        const promise = service.createMatch(MOCK_GAME_DATAS[0]);
         const emitCall = coreSocketSpy.emit.calls.mostRecent();
         const callback = emitCall.args[2] as (matchCode: string) => void;
         callback(matchCode);
@@ -95,13 +97,13 @@ describe('LobbySocketsService', () => {
         const result = await promise;
         expect(result).toBe(true);
         expect(service.matchRoomCode).toBe(matchCode);
-        expect(coreSocketSpy.emit).toHaveBeenCalledWith(LobbyEvent.CreateMatch, MOCK_GAMES[0], jasmine.any(Function));
+        expect(coreSocketSpy.emit).toHaveBeenCalledWith(LobbyEvent.CreateMatch, MOCK_GAME_DATAS[0], jasmine.any(Function));
     });
 
     it('should resolve false when match creation fails', async () => {
         coreSocketSpy.emit.and.stub();
 
-        const promise = service.createMatch(MOCK_GAMES[0]);
+        const promise = service.createMatch(MOCK_GAME_DATAS[0]);
         const emitCall = coreSocketSpy.emit.calls.mostRecent();
         const callback = emitCall.args[2] as (matchCode: string) => void;
         callback('');
@@ -109,7 +111,7 @@ describe('LobbySocketsService', () => {
         const result = await promise;
         expect(result).toBe(false);
         expect(service.matchRoomCode).toBe('');
-        expect(coreSocketSpy.emit).toHaveBeenCalledWith(LobbyEvent.CreateMatch, MOCK_GAMES[0], jasmine.any(Function));
+        expect(coreSocketSpy.emit).toHaveBeenCalledWith(LobbyEvent.CreateMatch, MOCK_GAME_DATAS[0], jasmine.any(Function));
     });
 
     it('should emit KickPlayer event with playerId', () => {
@@ -138,7 +140,7 @@ describe('LobbySocketsService', () => {
         service.leaveMatch();
         expect(coreSocketSpy.emit).toHaveBeenCalledWith(LobbyEvent.LeaveMatch);
         expect(service.matchRoomCode).toBe('');
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 
     it('should emit UpdatePlayer with player updates', () => {
@@ -175,7 +177,7 @@ describe('LobbySocketsService', () => {
         const matchStartedCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === LobbyEvent.MatchStarted);
         matchStartedCall?.[1](mockMatch);
         expect(matchDataServiceSpy.startMatch).toHaveBeenCalledWith(mockMatch, coreSocketSpy.selfId);
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/play']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Play]);
     });
 
     it('should handle RoomLocked warning with popup and goToMenu callback', () => {
@@ -198,7 +200,7 @@ describe('LobbySocketsService', () => {
         const callback = popupServiceSpy.showPopup.calls.mostRecent().args[2] as () => void;
         callback();
         expect(service.matchRoomCode).toBe('');
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 
     it('should handle Kick warning with popup, keep messages, and navigate', () => {
@@ -209,7 +211,7 @@ describe('LobbySocketsService', () => {
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(Warning.Kick);
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(service.matchRoomCode).toBe('');
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 
     it('should handle AdminQuit warning with popup, keep messages, and navigate', () => {
@@ -220,7 +222,7 @@ describe('LobbySocketsService', () => {
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(Warning.AdminQuit);
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(service.matchRoomCode).toBe('');
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 
     it('should handle LastPlayerRemaining warning with popup, keep messages, and navigate', () => {
@@ -231,7 +233,7 @@ describe('LobbySocketsService', () => {
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(Warning.LastPlayerRemaining);
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(service.matchRoomCode).toBe('');
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 
     it('should handle other warnings with popup only', () => {
@@ -246,7 +248,7 @@ describe('LobbySocketsService', () => {
 
     it('should set gameData on EmitGameData event', () => {
         const emitGameDataCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === LobbyEvent.EmitGameData);
-        emitGameDataCall?.[1](MOCK_GAMES[0]);
-        expect(gameDataServiceSpy.gameData).toEqual(MOCK_GAMES[0]);
+        emitGameDataCall?.[1](MOCK_GAME_DATAS[0]);
+        expect(gameDataServiceSpy.gameData).toEqual(MOCK_GAME_DATAS[0]);
     });
 });

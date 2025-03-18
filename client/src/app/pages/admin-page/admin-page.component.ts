@@ -8,7 +8,8 @@ import { HeaderComponent } from '@app/components/header/header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
-import { GameData } from '@common/game-data';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { GameData } from '@common/interfaces/game-data';
 
 @Component({
     selector: 'app-admin-page',
@@ -24,7 +25,7 @@ export class AdminPageComponent implements OnInit {
     private popupService: PopupService = inject(PopupService);
 
     navigateToMenu() {
-        this.router.navigate(['/']);
+        this.router.navigate([PageEndpoint.Menu]);
     }
 
     ngOnInit() {
@@ -34,7 +35,7 @@ export class AdminPageComponent implements OnInit {
     editGame(id: string) {
         this.gameSaveService.getGame(id).subscribe({
             next: () => {
-                this.router.navigate(['/edit']);
+                this.router.navigate([PageEndpoint.Edit]);
             },
             error: (error: HttpErrorResponse) => {
                 this.handleNotFoundError(error);

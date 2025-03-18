@@ -2,12 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 import { GameService } from '@app/services/game/game.service';
-import { MapSize } from '@common/map-size.enum';
-import { GameMode } from '@common/game-mode.enum';
 import { Game, GameDocument, gameSchema } from '@app/model/schema/game.schema';
 import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { ItemType } from '@common/item-type.enum';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MapSize, GameMode } from '@common/interfaces/map-data';
 
 describe('GameService', () => {
     let service: GameService;

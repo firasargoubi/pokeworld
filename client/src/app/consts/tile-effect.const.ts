@@ -1,4 +1,4 @@
-import { TileType } from '@common/tile-type.enum';
+import { TileType } from '@common/interfaces/tile-type.enum';
 
 export const TILE_EFFECT: Record<TileType, string> = {
     [TileType.Grass]: 'Normal',

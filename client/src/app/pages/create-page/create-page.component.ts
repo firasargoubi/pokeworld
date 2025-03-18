@@ -5,7 +5,8 @@ import { HeaderComponent } from '@app/components/header/header.component';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-import { GameData } from '@common/game-data';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { GameData } from '@common/interfaces/game-data';
 
 @Component({
     selector: 'app-create-page',
@@ -21,7 +22,7 @@ export class CreatePageComponent implements OnInit {
     private popupService: PopupService = inject(PopupService);
 
     navigateToMenu() {
-        this.router.navigate(['/']);
+        this.router.navigate([PageEndpoint.Menu]);
     }
 
     ngOnInit() {
@@ -37,7 +38,7 @@ export class CreatePageComponent implements OnInit {
     async createMatch(gameData: GameData) {
         this.lobbySocketService.createMatch(gameData).then((hasCreatedGame) => {
             if (hasCreatedGame) {
-                this.router.navigate(['/player-selection']);
+                this.router.navigate([PageEndpoint.PlayerSelection]);
             } else {
                 this.loadGames();
                 this.popupService.showPopup("Ce jeu n'est plus disponible");

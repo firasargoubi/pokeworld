@@ -1,23 +1,22 @@
 import { Injectable } from '@angular/core';
-import { DEFAULT_GAME } from '@app/consts/default-game.const';
-import { GameData } from '@common/game-data';
-import { GameMode } from '@common/game-mode.enum';
-import { ItemType } from '@common/item-type.enum';
-import { MapSize } from '@common/map-size.enum';
-import { Position } from '@common/position';
-import { TileType } from '@common/tile-type.enum';
+import { DEFAULT_GAME_DATA } from '@app/consts/game-data.const';
+import { GameData } from '@common/interfaces/game-data';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { GameMode, MapSize } from '@common/interfaces/map-data';
+import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
 import { Subject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameDataService {
-    gameData: GameData = DEFAULT_GAME;
+    gameData: GameData = DEFAULT_GAME_DATA;
     mapUpdate: Subject<Position | null> = new Subject();
     itemUpdate: Subject<ItemType | null> = new Subject();
 
     createNewGame(size: MapSize, mode: GameMode) {
-        const newGameData = structuredClone(DEFAULT_GAME);
+        const newGameData = structuredClone(DEFAULT_GAME_DATA);
         newGameData.mapData.size = size;
         newGameData.mapData.gameMode = mode;
         newGameData.mapData.tiles = Array.from({ length: size }, () => {

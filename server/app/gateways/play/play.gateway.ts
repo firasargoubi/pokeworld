@@ -1,8 +1,8 @@
 import { PlayService } from '@app/services/play/play.service';
-import { CombatDataBroadcast, CombatResultBroadcast } from '@common/combat';
-import { Match, PlayerMovementData } from '@common/match';
-import { PlayEvent } from '@common/play-event.enum';
-import { Position } from '@common/position';
+import { CombatDataBroadcast, CombatResultBroadcast } from '@common/interfaces/combat';
+import { PlayerMovementData, Match } from '@common/interfaces/match';
+import { Position } from '@common/interfaces/position';
+import { PlayEvent } from '@common/interfaces/websocket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';

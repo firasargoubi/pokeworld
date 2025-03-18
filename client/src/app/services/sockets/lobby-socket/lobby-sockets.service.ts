@@ -4,11 +4,12 @@ import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { GameData } from '@common/game-data';
-import { LobbyEvent } from '@common/lobby-event.enum';
-import { Match } from '@common/match';
-import { Player } from '@common/player';
-import { Warning } from '@common/warning.enum';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { GameData } from '@common/interfaces/game-data';
+import { Match } from '@common/interfaces/match';
+import { Player } from '@common/interfaces/player';
+import { Warning } from '@common/interfaces/warning.enum';
+import { LobbyEvent } from '@common/interfaces/websocket-event.enum';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -83,7 +84,7 @@ export class LobbySocketsService {
     leaveMatch(): void {
         this.coreSocket.emit(LobbyEvent.LeaveMatch);
         this.matchCode = '';
-        this.router.navigate(['/']);
+        this.router.navigate([PageEndpoint.Menu]);
     }
 
     private setupLobbyListeners(): void {
@@ -104,22 +105,22 @@ export class LobbySocketsService {
 
     private onMatchStarted(match: Match) {
         this.matchDataService.startMatch(match, this.coreSocket.selfId);
-        this.router.navigate(['/play']);
+        this.router.navigate([PageEndpoint.Play]);
     }
 
     private onWarning(warning: Warning) {
         this.popupService.clearMessages();
         if (warning === Warning.LockedFromLobby) {
             this.popupService.showPopup(warning, true, () => {
-                this.router.navigate(['/']);
+                this.router.navigate([PageEndpoint.Menu]);
             });
-            this.router.navigate(['/join']);
             this.popupService.keepMessages();
+            this.router.navigate([PageEndpoint.Join]);
         } else {
             this.popupService.showPopup(warning);
             if ([Warning.Kick, Warning.AdminQuit, Warning.LastPlayerRemaining].includes(warning)) {
-                this.router.navigate(['/']);
                 this.popupService.keepMessages();
+                this.router.navigate([PageEndpoint.Menu]);
             }
         }
     }

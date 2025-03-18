@@ -3,7 +3,7 @@ import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular
 import { FormsModule } from '@angular/forms';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
-import { GameData } from '@common/game-data';
+import { GameData } from '@common/interfaces/game-data';
 
 @Component({
     selector: 'app-game-card',
