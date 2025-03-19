@@ -184,5 +184,6 @@ export class PlaySocketsService {
         this.matchDataService.updateMatch(playerLeftData.match);
         this.mapService.setPlayers(playerLeftData.match.matchData.players);
         this.popupService.showPopup(`${playerLeftData.playerName} a quitté la partie`);
+        this.setActivePlayerPossibleMoves();
     }
 }

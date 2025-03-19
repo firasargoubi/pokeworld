@@ -10,6 +10,7 @@ import { ITEM_DESCRIPTION } from '@app/consts/item-data.const';
 import { EditorEvent, EditorItem, EditorVisualData } from '@app/interfaces/editor';
 import { EditorService } from '@app/services/editor/editor.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
+import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
@@ -28,6 +29,7 @@ export class EditPageComponent {
     editorVisualData: EditorVisualData = structuredClone(DEFAULT_EDITOR_DATA);
     private editorService: EditorService = inject(EditorService);
     private popupService: PopupService = inject(PopupService);
+    private mapService: MapService = inject(MapService);
     private router: Router = inject(Router);
     private initialGameData: GameData = structuredClone(this.gameDataService.gameData);
 
@@ -35,6 +37,8 @@ export class EditPageComponent {
         if (!this.gameDataService.isMapValid()) {
             this.goToAdminPage();
         }
+        this.mapService.clearOverlays();
+        this.mapService.setPlayers([]);
         this.gameDataService.itemUpdate.subscribe(this.updateItems.bind(this));
         this.updateItems();
     }
