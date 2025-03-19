@@ -66,10 +66,10 @@ export class LobbyService {
             player.spawnPoint = { x: -2, y: -2 };
         }
         if (this.hasEnoughPlayer(match)) {
-            this.matchService.removePlayerFromMatch(playerId, matchCode, false);
             if (player.isAdmin && match.matchData.isDebugMode) {
                 this.playService.changeDebugMode(playerId, false);
             }
+            this.matchService.removePlayerFromMatch(playerId, matchCode, false);
             this.lobbyGateway.emitPlayerLeft(matchCode, { match, playerName: player.name });
             if (this.playService.canEndTurn(playerId, matchCode)) {
                 this.playService.nextTurnPhase(match.matchData.code);
