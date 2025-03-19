@@ -11,7 +11,6 @@ import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { MenuPageComponent } from '@app/pages/menu-page/menu-page.component';
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
 import { JoinPageComponent } from '@app/pages/join-page/join-page.component';
-import { DebugPageComponent } from './app/pages/debug-page/debug-page.component';
 import { CreatePageComponent } from '@app/pages/create-page/create-page.component';
 import { PlayerSelectionPageComponent } from '@app/pages/player-selection-page/player-selection-page.component';
 import { environment } from './environments/environment';
@@ -24,7 +23,6 @@ if (environment.production) {
 const routes: Routes = [
     { path: '', component: MenuPageComponent, pathMatch: 'full' },
     { path: 'play', component: PlayPageComponent },
-    { path: 'debug', component: DebugPageComponent }, // TODO remove debug page
     { path: 'lobby', component: LobbyPageComponent },
     { path: 'join', component: JoinPageComponent },
     { path: 'admin', component: AdminPageComponent },
