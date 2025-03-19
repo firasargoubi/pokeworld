@@ -11,7 +11,9 @@ $stripes-size-2: 0.7vw;
 $combat-info-height: 28vh;
 
 * {
-    font-family: 'pokemon-narrow';
+    // after font refont, retablish font-family
+    // font-family: 'pokemon-narrow';
+    font-family: 'pixel';
     color: #585851;
 }
 
@@ -397,6 +399,7 @@ $combat-info-height: 28vh;
 .stat-label {
     text-align: left;
     width: 30%;
+    overflow: visible;
 }
 
 @keyframes attack {

@@ -22,10 +22,10 @@
                     </div>
                     <p class="hp-value">{{ this.ennemyPlayer.currentStats.health }}/{{ this.ennemyPlayer.playerStats.health }}</p>
                 </div>
-                @if(!this.iscurrentTurn) {
-                    <p class="dice-bonus">Dé défense: +{{ this.ennemyPlayer.currentStats.defenseBonus }}</p>
+                @if(this.iscurrentTurn) {
+                <p class="dice-bonus">Dé défense: +{{ this.ennemyPlayer.currentStats.defenseBonus }}</p>
                 } @else {
-                    <p class="dice-bonus">Dé attaque: +{{ this.ennemyPlayer.currentStats.attackBonus }}</p>
+                <p class="dice-bonus">Dé attaque: +{{ this.ennemyPlayer.currentStats.attackBonus }}</p>
                 }
             </div>
         </div>
@@ -87,7 +87,7 @@
                 </div>
                 <div class="action-button" [ngClass]="{ disabled: selfPlayer.currentStats.escapes === 0 }" (click)="this.escapeAttempt()">
                     <img class="container-selection" src="./assets/images/menu/containers/combat-container/container-selection.png" />
-                    <p>Fuire  {{ this.selfPlayer.currentStats.escapes }}/ 2</p>
+                    <p>Fuire {{ this.selfPlayer.currentStats.escapes }}/ 2</p>
                 </div>
             </div>
             <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
@@ -96,22 +96,22 @@
             <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png" />
             <div class="conatiner-body">
                 <div class="stat-container">
-                    <span class="stat-label">Attaque</span>
-                    @if(!this.iscurrentTurn) {
+                    <span class="stat-label">Attaque @if(this.selfPlayer.playerStats.attackDice === this.diceType.D4) { (D4) } @else { (D6) } </span>
+                    @if(this.iscurrentTurn) {
                     <span class="bonus-value">+{{ selfPlayer.currentStats.attackBonus }}</span>
                     }
-                    <span class="stat-value">{{ this.selfPlayer.currentStats.attack }}</span>
+                    <span class="stat-value">{{ this.selfPlayer.currentStats.attack }} /{{ selfPlayer.playerStats.attack }}</span>
                 </div>
                 <div class="stat-container">
-                    <span class="stat-label">Défense</span>
-                    @if(this.iscurrentTurn) {
+                    <span class="stat-label">Défense @if(this.selfPlayer.playerStats.defenseDice === this.diceType.D4) { (D4) } @else { (D6) }</span>
+                    @if(!this.iscurrentTurn) {
                     <span class="bonus-value">+{{ selfPlayer.currentStats.defenseBonus }}</span>
                     }
-                    <span class="stat-value">{{ this.selfPlayer.currentStats.defense }}</span>
+                    <span class="stat-value">{{ this.selfPlayer.currentStats.defense }} /{{ selfPlayer.playerStats.defense }}</span>
                 </div>
                 <div class="stat-container">
                     <span class="stat-label">Vitesse</span>
-                    <span class="stat-value">{{ this.selfPlayer.currentStats.speed }}</span>
+                    <span class="stat-value">{{ this.selfPlayer.currentStats.speed }} /{{ selfPlayer.playerStats.speed }}</span>
                 </div>
             </div>
             <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />

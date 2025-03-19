@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { COMBAT_TIME_SCALE, DEFAULT_COMBAT_ANIMATIONS } from '@app/consts/combat-data.const';
@@ -8,9 +8,11 @@ import { CombatAnimations } from '@app/interfaces/combat-animations';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { Player } from '@common/interfaces/player';
+import { PlaySocketsService } from '@app/services/sockets/play-socket/play-sockets.service';
 import { AttackResult } from '@common/interfaces/combat';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { Player } from '@common/interfaces/player';
+import { DiceType } from '@common/interfaces/dice';
 
 @Component({
     selector: 'app-combat-page',
@@ -21,6 +23,7 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 export class CombatPageComponent implements OnInit {
     avatarsData = AVATAR_DATA;
     battlePlatformData = BATTLE_PLATFORM_IMAGES;
+    diceType = DiceType;
 
     animation: CombatAnimations = structuredClone(DEFAULT_COMBAT_ANIMATIONS);
     selfPlayer: Player;
@@ -35,6 +38,7 @@ export class CombatPageComponent implements OnInit {
     private router = inject(Router);
     private matchDataService: MatchDataService = inject(MatchDataService);
     private coreSocketService: CoreSocketService = inject(CoreSocketService);
+    private playSocketsService: PlaySocketsService = inject(PlaySocketsService);
 
     constructor() {
         if (this.combatSocketService) {
@@ -70,6 +74,16 @@ export class CombatPageComponent implements OnInit {
                 }
             });
             this.coreSocketService.connectionStatus.subscribe((status) => this.verifySocketConnection(status));
+        }
+    }
+
+    @HostListener('document:keydown', ['$event'])
+    onKeyDown(event: KeyboardEvent) {
+        if (event.repeat) {
+            return;
+        }
+        if (event.key === 'd' || event.key === 'D') {
+            this.playSocketsService.changeDebugMode();
         }
     }
 

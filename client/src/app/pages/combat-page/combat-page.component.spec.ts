@@ -5,6 +5,7 @@ import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
+import { PlaySocketsService } from '@app/services/sockets/play-socket/play-sockets.service';
 import { AttackResult, CombatResult } from '@common/interfaces/combat';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Player } from '@common/interfaces/player';
@@ -26,6 +27,7 @@ describe('CombatPageComponent', () => {
     let escapeResultSubject: BehaviorSubject<string | null>;
     let combatResultSubject: BehaviorSubject<CombatResult | null>;
     let connectionStatusSubject: BehaviorSubject<boolean>;
+    let mockPlaySocketsService: jasmine.SpyObj<PlaySocketsService>;
 
     const ONE_SEC = 1000;
     let combatSocketServiceMock: Partial<CombatSocketService>;
@@ -57,6 +59,7 @@ describe('CombatPageComponent', () => {
             escapeAttempt: jasmine.createSpy('escapeAttempt'),
             attackAttempt: jasmine.createSpy('attackAttempt'),
         };
+        mockPlaySocketsService = jasmine.createSpyObj('PlaySocketsService', ['changeDebugMode']);
 
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -68,6 +71,7 @@ describe('CombatPageComponent', () => {
                 { provide: PopupService, useValue: mockPopupService },
                 { provide: CoreSocketService, useValue: mockCoreSocketService },
                 { provide: MatchDataService, useValue: mockMatchDataService },
+                { provide: PlaySocketsService, useValue: mockPlaySocketsService },
             ],
         })
             .overrideTemplate(CombatPageComponent, '')
@@ -270,5 +274,25 @@ describe('CombatPageComponent', () => {
         connectionStatusSubject.next(false);
         expect(mockPopupService.keepMessages).not.toHaveBeenCalled();
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
+    });
+
+    it('should toggle debug mode on "d" or "D" key press', () => {
+        const debugSpy = mockPlaySocketsService.changeDebugMode;
+
+        const eventD = new KeyboardEvent('keydown', { key: 'd' });
+        component.onKeyDown(eventD);
+        expect(debugSpy).toHaveBeenCalledTimes(1);
+
+        const eventUpperD = new KeyboardEvent('keydown', { key: 'D' });
+        component.onKeyDown(eventUpperD);
+        expect(debugSpy).toHaveBeenCalledTimes(2);
+
+        const eventX = new KeyboardEvent('keydown', { key: 'x' });
+        component.onKeyDown(eventX);
+        expect(debugSpy).toHaveBeenCalledTimes(2);
+
+        const eventRepeat = new KeyboardEvent('keydown', { key: 'd', repeat: true });
+        component.onKeyDown(eventRepeat);
+        expect(debugSpy).toHaveBeenCalledTimes(2);
     });
 });
