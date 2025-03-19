@@ -30,4 +30,11 @@ export class MapComponent {
             this.playSocketsService.clickTile(position);
         }
     }
+
+    rightClickTile(event: MouseEvent, position: Position) {
+        if (!this.isEditor) {
+            event.preventDefault();
+            this.playSocketsService.rightClickTile(position);
+        }
+    }
 }

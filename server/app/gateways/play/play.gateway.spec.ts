@@ -1,13 +1,13 @@
 import { PlayService } from '@app/services/play/play.service';
-import { Test, TestingModule } from '@nestjs/testing';
-import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
-import { Server, Socket } from 'socket.io';
-import { PlayGateway } from './play.gateway';
 import { CombatDataBroadcast, CombatResultBroadcast } from '@common/interfaces/combat';
 import { Match, PlayerMovementData } from '@common/interfaces/match';
 import { Position } from '@common/interfaces/position';
 import { PlayEvent } from '@common/interfaces/websocket-event.enum';
 import { MOCK_MATCHES } from '@common/test-consts/mock-matches';
+import { Test, TestingModule } from '@nestjs/testing';
+import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
+import { Server, Socket } from 'socket.io';
+import { PlayGateway } from './play.gateway';
 
 describe('PlayGateway', () => {
     let gateway: PlayGateway;
@@ -86,6 +86,12 @@ describe('PlayGateway', () => {
 
         expect(mockPlayService.getActions.calledWith(mockSocket.id)).toBeTruthy();
         expect(result).toEqual(expectedActions);
+    });
+
+    it('should move on DebugMove event', () => {
+        const position: Position = { x: 5, y: 6 };
+        gateway.debugMove(mockSocket, position);
+        expect(mockPlayService.debugMove.calledWith(mockSocket.id, position)).toBeTruthy();
     });
 
     it('should move on Move event', () => {

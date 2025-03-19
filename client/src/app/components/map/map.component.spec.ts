@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MapComponent } from '@app/components/map/map.component';
+import { MapVisualData } from '@app/interfaces/map-visual-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
 import { PlaySocketsService } from '@app/services/sockets/play-socket/play-sockets.service';
-import { MapVisualData } from '@app/interfaces/map-visual-data';
-import { TileType } from '@common/interfaces/tile-type.enum';
 import { MapSize } from '@common/interfaces/map-data';
+import { TileType } from '@common/interfaces/tile-type.enum';
 
 describe('MapComponent', () => {
     let component: MapComponent;
@@ -36,7 +36,7 @@ describe('MapComponent', () => {
             gameDataService: gameDataServiceSpy,
         });
 
-        playSocketsServiceSpy = jasmine.createSpyObj('PlaySocketsService', ['setHoverMoves', 'clickTile']);
+        playSocketsServiceSpy = jasmine.createSpyObj('PlaySocketsService', ['setHoverMoves', 'clickTile', 'rightClickTile']);
 
         await TestBed.configureTestingModule({
             imports: [MapComponent],
@@ -78,5 +78,16 @@ describe('MapComponent', () => {
         const position = { x: 5, y: 7 };
         component.clickTile(position);
         expect(playSocketsServiceSpy.clickTile).toHaveBeenCalledWith(position);
+    });
+
+    it('should handle rightClickTile correctly', () => {
+        component.isEditor = true;
+        component.rightClickTile(new MouseEvent('click'), { x: 1, y: 1 });
+        expect(playSocketsServiceSpy.rightClickTile).not.toHaveBeenCalled();
+
+        component.isEditor = false;
+        const position = { x: 5, y: 7 };
+        component.rightClickTile(new MouseEvent('click'), position);
+        expect(playSocketsServiceSpy.rightClickTile).toHaveBeenCalledWith(position);
     });
 });
