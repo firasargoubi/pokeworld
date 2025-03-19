@@ -11,7 +11,6 @@ import { MOVE_ANIMATION_DURATION } from '@common/consts/player.const';
 import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/interfaces/combat';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Match, PlayerLeftData, PlayerMovementData } from '@common/interfaces/match';
-import { Player } from '@common/interfaces/player';
 import { Position } from '@common/interfaces/position';
 import { CombatEvent, LobbyEvent, PlayEvent } from '@common/interfaces/websocket-event.enum';
 import { END_GAME_DELAY, TIME_SCALE } from './play-sockets.const';
@@ -115,14 +114,6 @@ export class PlaySocketsService {
         this.mapService.setPlayers(combatResultBroadcast.match.matchData.players);
         this.setActivePlayerPossibleMoves();
         this.mapService.updateAllTiles();
-
-        if (combatResultBroadcast.combatResult.winnerId) {
-            const player = (combatResultBroadcast.match.matchData.players.find((p) => p.id === combatResultBroadcast.combatResult.winnerId) as Player)
-                .name;
-            this.popupService.showPopup(`${player} a gagné le combat`);
-        } else {
-            this.popupService.showPopup("Personne n'a gagné le combat");
-        }
         this.timerService.unPauseTimer();
     }
 

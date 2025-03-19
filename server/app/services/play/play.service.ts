@@ -159,7 +159,7 @@ export class PlayService {
                     return;
                 }
             }
-
+            this.playGateway.emitCombatResultBroadcast(matchCode, { match, combatResult });
             if (combatResult.loserId && this.canEndTurn(combatResult.loserId, matchCode)) {
                 this.nextTurnPhase(matchCode);
             } else {

@@ -335,18 +335,7 @@ describe('PlaySocketsService', () => {
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Player2 et P3 entrent en combat!');
     });
 
-    it('should handle combatResultBroadcast event and show popup if not involved', () => {
-        const combatResultBroadcast: CombatResultBroadcast = {
-            match: structuredClone(MOCK_MATCHES[0]),
-            combatResult: {
-                winnerId: PLAYER_IDS[0],
-                loserId: PLAYER_IDS[0],
-            },
-        };
-
-        service['onCombatResultBroadcast'](combatResultBroadcast);
-        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Player1 a gagné le combat');
-
+    it('should handle combatResultBroadcast timer unfreeze', () => {
         const combatResultBroadcastN: CombatResultBroadcast = {
             match: structuredClone(MOCK_MATCHES[0]),
             combatResult: {
@@ -356,7 +345,7 @@ describe('PlaySocketsService', () => {
         };
 
         service['onCombatResultBroadcast'](combatResultBroadcastN);
-        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith("Personne n'a gagné le combat");
+        expect(timerServiceSpy.unPauseTimer).toHaveBeenCalled();
     });
 
     it('should handle MatchEnded event and navigate after delay', () => {
