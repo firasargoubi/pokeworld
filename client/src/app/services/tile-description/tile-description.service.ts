@@ -22,18 +22,20 @@ export class TileDescriptionService {
     private matchDataService = inject(MatchDataService);
 
     displayTileDescription(event: MouseEvent): void {
-        event.preventDefault();
+        if (!this.matchDataService.matchData.isDebugMode || !this.matchDataService.isActivePlayer()) {
+            event.preventDefault();
 
-        const mapContainer = event.currentTarget as HTMLElement;
-        const mapRect = mapContainer.getBoundingClientRect();
-        const mapSize: number = this.gameDataService.gameData.mapData.size;
+            const mapContainer = event.currentTarget as HTMLElement;
+            const mapRect = mapContainer.getBoundingClientRect();
+            const mapSize: number = this.gameDataService.gameData.mapData.size;
 
-        const tileCoords = this.calculateTileCoordinates(event, mapRect, mapSize);
+            const tileCoords = this.calculateTileCoordinates(event, mapRect, mapSize);
 
-        if (this.isTileInBounds(tileCoords, mapSize)) {
-            this.tileDescriptionPos = this.calculateDescriptionPosition(tileCoords, mapRect, mapSize);
-            this.isPlayerDescription = this.updateDescription(tileCoords);
-            this.showTileDescription = true;
+            if (this.isTileInBounds(tileCoords, mapSize)) {
+                this.tileDescriptionPos = this.calculateDescriptionPosition(tileCoords, mapRect, mapSize);
+                this.isPlayerDescription = this.updateDescription(tileCoords);
+                this.showTileDescription = true;
+            }
         }
     }
 

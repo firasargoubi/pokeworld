@@ -6,15 +6,15 @@ import { PlayGateway } from '@app/gateways/play/play.gateway';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
-import { Test, TestingModule } from '@nestjs/testing';
-import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
-import { PlayService } from './play.service';
-import { MINIMUM_FIGHTS_TO_WIN, TURN_DURATION, PRE_TURN_DURATION } from '@common/consts/match.const';
-import { DEFAULT_STAT_POINTS, BONUS_POINTS } from '@common/consts/player.const';
+import { MINIMUM_FIGHTS_TO_WIN, PRE_TURN_DURATION, TURN_DURATION } from '@common/consts/match.const';
+import { BONUS_POINTS, DEFAULT_STAT_POINTS } from '@common/consts/player.const';
 import { Match, TurnPhase } from '@common/interfaces/match';
 import { Player } from '@common/interfaces/player';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCHES } from '@common/test-consts/mock-matches';
+import { Test, TestingModule } from '@nestjs/testing';
+import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
+import { PlayService } from './play.service';
 
 describe('PlayService', () => {
     let service: PlayService;
@@ -75,6 +75,22 @@ describe('PlayService', () => {
 
         expect(result).toEqual(possibleMoves);
         expect(mockMovementService.getPossibleMoves.called).toBeTruthy();
+    });
+
+    // TODO
+    it('should debug move the players to the specified position', () => {
+        const position = { x: 1, y: 1 };
+        match.matchData.isDebugMode = true;
+
+        mockMatchService.getMatchCode.returns('1234');
+        mockMatchService.isActivePlayer.returns(true);
+        mockMatchService.getPlayer.returns(players[0]);
+        mockMatchService.getMatch.returns(match);
+        mockMovementService.getPossibleMovesDebug.returns([position]);
+
+        service.debugMove(playerId, position);
+
+        expect(mockPlayGateway.emitPlayerMoved.called).toBeTruthy();
     });
 
     it('move should move the players to the specified position', () => {

@@ -21,6 +21,7 @@ export enum PlayEvent {
     GetPossibleMoves = 'getPossibleMoves',
     GetHoverMoves = 'getHoverMoves',
     Move = 'move',
+    DebugMove = 'debugMove',
     ChangeDebugMode = 'changeDebugMode',
     GetActions = 'getActions',
     Action = 'action',

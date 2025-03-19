@@ -74,6 +74,14 @@ describe('PlaySocketsService', () => {
         expect(matchDataServiceSpy.resetMatch).toHaveBeenCalled();
     });
 
+    it('should emit DebugMove event', () => {
+        const position = { x: 2, y: 3 };
+        matchDataServiceSpy.matchData = { ...mockMatch.matchData, isDebugMode: true };
+        matchDataServiceSpy.isActivePlayer.and.returnValue(true);
+        service.rightClickTile(position);
+        expect(coreSocketSpy.emit).toHaveBeenCalledWith(PlayEvent.DebugMove, position);
+    });
+
     it('should emit EndTurn event', () => {
         service.endTurn();
         expect(coreSocketSpy.emit).toHaveBeenCalledWith(PlayEvent.EndTurn);

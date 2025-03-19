@@ -19,6 +19,24 @@ export class PlayService {
     @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
     @Inject(forwardRef(() => LobbyGateway)) private readonly lobbyGateway: LobbyGateway;
 
+    debugMove(playerId: string, position: Position) {
+        const matchCode = this.matchService.getMatchCode(playerId);
+        if (this.matchService.isActivePlayer(matchCode, playerId)) {
+            const player = this.matchService.getPlayer(matchCode, playerId);
+            const match = this.matchService.getMatch(matchCode);
+            if (match.matchData.isDebugMode) {
+                const possibleMoves = this.movementService.getPossibleMovesDebug(match);
+                const isMoveValid = possibleMoves.some((m) => m.x === position.x && m.y === position.y);
+                if (isMoveValid) {
+                    const originalPosition = player.currentStats.position;
+                    player.currentStats.position = position;
+                    const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
+                    this.playGateway.emitPlayerMoved(matchCode, { match, movement: [originalPosition, position], playerIndex });
+                }
+            }
+        }
+    }
+
     getPossibleMoves(playerId: string): Position[] {
         let positions = [];
         const matchCode = this.matchService.getMatchCode(playerId);

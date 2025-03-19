@@ -1,6 +1,6 @@
 import { PlayService } from '@app/services/play/play.service';
 import { CombatDataBroadcast, CombatResultBroadcast } from '@common/interfaces/combat';
-import { PlayerMovementData, Match } from '@common/interfaces/match';
+import { Match, PlayerMovementData } from '@common/interfaces/match';
 import { Position } from '@common/interfaces/position';
 import { PlayEvent } from '@common/interfaces/websocket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -12,6 +12,11 @@ import { Server, Socket } from 'socket.io';
 export class PlayGateway {
     @WebSocketServer() private server: Server;
     @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
+
+    @SubscribeMessage(PlayEvent.DebugMove)
+    debugMove(socket: Socket, position: Position) {
+        this.playService.debugMove(socket.id, position);
+    }
 
     @SubscribeMessage(PlayEvent.EndTurn)
     endTurn(socket: Socket) {

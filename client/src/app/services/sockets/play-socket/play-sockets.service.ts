@@ -33,6 +33,12 @@ export class PlaySocketsService {
         this.setupPlayListeners();
     }
 
+    rightClickTile(position: Position) {
+        if (this.matchDataService.matchData.isDebugMode && this.matchDataService.isActivePlayer()) {
+            this.coreSocket.emit(PlayEvent.DebugMove, position);
+        }
+    }
+
     leaveMatch(): void {
         this.lobbySocketsService.leaveMatch();
         this.matchDataService.resetMatch();

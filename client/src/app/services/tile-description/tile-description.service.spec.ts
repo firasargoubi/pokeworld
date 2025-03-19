@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
+import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { TILE_EFFECT } from '@app/consts/tile-effect.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MatchDataService } from '@app/services/match-data/match-data.service';
-import { TileDescriptionService } from './tile-description.service';
-import { MOCK_PLAYERS } from '@common/test-consts/mock-players';
-import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { Player } from '@common/interfaces/player';
 import { Position } from '@common/interfaces/position';
-import { TileType, TILE_COST } from '@common/interfaces/tile-type.enum';
+import { TILE_COST, TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
+import { MOCK_PLAYERS } from '@common/test-consts/mock-players';
+import { TileDescriptionService } from './tile-description.service';
 
 describe('TileDescriptionService', () => {
     let service: TileDescriptionService;
@@ -20,9 +20,10 @@ describe('TileDescriptionService', () => {
 
     beforeEach(() => {
         mockGameDataService = jasmine.createSpyObj('GameDataService', ['getTileFromPosition']);
-        mockMatchDataService = jasmine.createSpyObj('MatchDataService', [], {
+        mockMatchDataService = jasmine.createSpyObj('MatchDataService', ['isActivePlayer'], {
             matchData: {
                 players: [mockPlayer],
+                isDebugMode: true,
             },
         });
 

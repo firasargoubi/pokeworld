@@ -1,13 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { createSandbox, SinonSandbox } from 'sinon';
-import { MovementService } from './movement.service';
-import { MOCK_NEW_SECTION } from './movement.service.spec.const';
 import { MapData } from '@common/interfaces/map-data';
 import { Match } from '@common/interfaces/match';
 import { ShortestPath } from '@common/interfaces/movement';
 import { Position } from '@common/interfaces/position';
-import { TileType, TILE_COST } from '@common/interfaces/tile-type.enum';
+import { TILE_COST, TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCHES } from '@common/test-consts/mock-matches';
+import { Test, TestingModule } from '@nestjs/testing';
+import { createSandbox, SinonSandbox } from 'sinon';
+import { MovementService } from './movement.service';
+import { MOCK_NEW_SECTION } from './movement.service.spec.const';
 
 describe('MovementService', () => {
     let service: MovementService;
@@ -95,22 +95,6 @@ describe('MovementService', () => {
         expect(result.moveCost).toEqual(cost);
         expect(result.path[0]).toEqual(start);
         expect(result.path[result.path.length - 1]).toEqual(target);
-    });
-
-    it('should return an empty path in debug mode for inaccessible tiles', () => {
-        const match: Match = structuredClone(MOCK_MATCHES[0]);
-        match.matchData.isDebugMode = true;
-        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
-        match.matchData.activePlayer = 0;
-        match.matchData.players[0].currentStats.position = { x: 0, y: 0 };
-        const inaccessibleTarget: Position = { x: 2, y: 2 };
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'isTileAccessible').returns(false);
-
-        const result: ShortestPath = service.getShortestPath(match, inaccessibleTarget);
-        expect(result.moveCost).toEqual(0);
-        expect(result.path).toEqual([]);
     });
 
     it('should return an infinite moveCost and an empty path if the target is unreachable', () => {
@@ -234,21 +218,6 @@ describe('MovementService', () => {
 
         expect(path).toBeNull();
     });
-    it('should return accessible moves in Debug mode, excluding Players, Water and BrokenBridge', () => {
-        const match = structuredClone(MOCK_MATCHES[0]);
-        match.matchData.isDebugMode = true;
-        const possibleMoves = [{ x: 4, y: 4 }];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        const getPossibleMovesDebugStub = sandbox.stub(service as any, 'getPossibleMovesDebug').returns(possibleMoves);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        const getPossibleMovesStandardStub = sandbox.stub(service as any, 'getPossibleMovesStandard').returns(possibleMoves);
-
-        const result = service['getPossibleMoves'](match);
-
-        expect(result).toEqual(possibleMoves);
-        expect(getPossibleMovesStandardStub.notCalled).toBeTruthy();
-        expect(getPossibleMovesDebugStub.called).toBeTruthy();
-    });
 
     it('should return correct actions for a player', () => {
         const match: Match = structuredClone(MOCK_MATCHES[0]);
@@ -288,22 +257,6 @@ describe('MovementService', () => {
         expect(service['isTileABridge']({ x: 2, y: 2 }, match)).toBeFalsy();
     });
 
-    it('should return a direct path in debug mode', () => {
-        const match: Match = structuredClone(MOCK_MATCHES[0]);
-        match.matchData.isDebugMode = true;
-        match.matchData.players = [structuredClone(MOCK_MATCHES[0].matchData.players[0])];
-        match.matchData.activePlayer = 0;
-        match.matchData.players[0].currentStats.position = { x: 0, y: 0 };
-
-        const target: Position = { x: 2, y: 2 };
-        const result: ShortestPath = service.getShortestPath(match, target);
-
-        expect(result.moveCost).toEqual(0);
-        expect(result.path).toEqual([
-            { x: 0, y: 0 },
-            { x: 2, y: 2 },
-        ]);
-    });
     it('should return the current position if it is valid for movement', () => {
         const match = structuredClone(MOCK_MATCHES[0]);
         const position = { x: 1, y: 1 };

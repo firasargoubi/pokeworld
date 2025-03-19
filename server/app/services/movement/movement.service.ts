@@ -13,20 +13,12 @@ export class MovementService {
         const activePlayer = match.matchData.players[match.matchData.activePlayer];
         const currentPos = activePlayer.currentStats.position;
         const movementRange = activePlayer.currentStats.movement;
-        return match.matchData.isDebugMode ? this.getPossibleMovesDebug(match) : this.getPossibleMovesStandard(currentPos, movementRange, match);
+        return this.getPossibleMovesStandard(currentPos, movementRange, match);
     }
 
     getShortestPath(match: Match, target: Position): ShortestPath {
         const activePlayer = match.matchData.players[match.matchData.activePlayer];
         const startPos = activePlayer.currentStats.position;
-
-        if (match.matchData.isDebugMode) {
-            if (this.isTileAccessible(target, match) && !this.isTileOccupiedByPlayer(target, match) && !this.isTileOccupiedByObject(target, match)) {
-                return { moveCost: 0, path: [startPos, target] };
-            } else {
-                return { moveCost: 0, path: [] };
-            }
-        }
 
         const { distances, predecessors } = this.calculateDistancesAndPredecessors(startPos, match, Infinity);
         const path = this.reconstructPath(target, predecessors);
@@ -43,6 +35,22 @@ export class MovementService {
             },
         );
         return [...neighborActions, position];
+    }
+
+    getPossibleMovesDebug(match: Match): Position[] {
+        const size: number = match.gameData.mapData.size;
+        const tiles: Position[] = [];
+
+        for (let x = 0; x < size; x++) {
+            for (let y = 0; y < size; y++) {
+                const position: Position = { x, y };
+                if (this.isTileAccessible(position, match)) {
+                    tiles.push(position);
+                }
+            }
+        }
+
+        return tiles.filter((pos) => !this.isTileOccupiedByPlayer(pos, match) && !this.isTileOccupiedByObject(pos, match));
     }
 
     getNearestEmptyTile(currentPos: Position, match: Match): Position {
@@ -105,22 +113,6 @@ export class MovementService {
         }
 
         return tiles;
-    }
-
-    private getPossibleMovesDebug(match: Match): Position[] {
-        const size: number = match.gameData.mapData.size;
-        const tiles: Position[] = [];
-
-        for (let x = 0; x < size; x++) {
-            for (let y = 0; y < size; y++) {
-                const position: Position = { x, y };
-                if (this.isTileAccessible(position, match)) {
-                    tiles.push(position);
-                }
-            }
-        }
-
-        return tiles.filter((pos) => !this.isTileOccupiedByPlayer(pos, match) && !this.isTileOccupiedByObject(pos, match));
     }
 
     private processNeighbor(context: NeighborContext): void {
