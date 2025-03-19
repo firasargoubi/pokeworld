@@ -103,11 +103,14 @@ export class CombatService {
         const combatResult: CombatResult = { winnerId: null, loserId: null };
         this.resetPlayers([player1, player2]);
 
+        let winner: Player = null;
         if (winnerId) {
             combatResult.winnerId = winnerId;
             combatResult.loserId = player1.id === winnerId ? player2.id : player1.id;
+            winner = player1.id === winnerId ? player1 : player2;
         }
-        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.EndCombat, null);
+        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.EndCombat, winner);
+
         this.combatTurnSystems.delete(combatRoomCode);
         this.leaveCombat(combatRoomCode, state);
         this.playService.endOfCombat(state.matchCode, combatResult, player1.id);

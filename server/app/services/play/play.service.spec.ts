@@ -239,7 +239,6 @@ describe('PlayService', () => {
         service.endOfCombat(matchCode, combatResult, players[0].id);
 
         expect(players[0].currentStats.fightsWon).toBe(1);
-        expect(mockPlayGateway.emitCombatResultBroadcast.calledWith(matchCode, { match, combatResult })).toBeTruthy();
         expect(nextTurnPhaseStub.calledWith(matchCode)).toBeTruthy();
     });
 
@@ -328,7 +327,7 @@ describe('PlayService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const startFightStub = sandbox.stub(service as any, 'startFight');
 
-        service['executeAction'](matchCode, position, match, playerId);
+        service['executeAction'](position, match, playerId);
 
         expect(startFightStub.calledWith(matchCode, playerId, match.matchData.players[0].id)).toBeTruthy();
     });
@@ -338,7 +337,7 @@ describe('PlayService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const toggleBridgeTileStub = sandbox.stub(service as any, 'toggleBridgeTile');
 
-        service['executeAction'](matchCode, position, match, playerId);
+        service['executeAction'](position, match, playerId);
 
         expect(toggleBridgeTileStub.calledWith(match, position)).toBeTruthy();
     });

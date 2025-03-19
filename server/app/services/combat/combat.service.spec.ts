@@ -338,7 +338,7 @@ describe('CombatService', () => {
         expect(clearTimeoutSpy.calledWith(timer)).toBeTruthy();
         expect(resetPlayersSpy.calledWith([player2, player1])).toBeTruthy();
 
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, null)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, player1)).toBeTruthy();
         expect(leaveCombatSpy.calledWith(combatRoomCode, combatState)).toBeTruthy();
 
         expect(service['combatTurnSystems'].has(combatRoomCode)).toBeFalsy();
@@ -360,7 +360,7 @@ describe('CombatService', () => {
         endCombatSpy.restore();
         service.endCombat(combatRoomCode, player2.id);
 
-        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, null)).toBeTruthy();
+        expect(combatGatewayStub.emitToCombatRoom.calledWith(combatRoomCode, CombatEvent.EndCombat, player2)).toBeTruthy();
 
         resetPlayersSpy.restore();
     });
