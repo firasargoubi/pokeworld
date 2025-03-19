@@ -1,13 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { CombatSocketService } from './combat-socket.service';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Player } from '@common/interfaces/player';
 import { CombatEvent } from '@common/interfaces/websocket-event.enum';
-import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { CombatSocketService } from './combat-socket.service';
 
 describe('CombatSocketService', () => {
     let service: CombatSocketService;
     let coreSocketSpy: jasmine.SpyObj<CoreSocketService>;
+    let routerSpy: jasmine.Spy;
 
     beforeEach(() => {
         coreSocketSpy = jasmine.createSpyObj('CoreSocketService', ['emit', 'on'], { selfId: 'selfId' });
@@ -15,6 +16,7 @@ describe('CombatSocketService', () => {
         service = TestBed.inject(CombatSocketService);
         coreSocketSpy = TestBed.inject(CoreSocketService) as jasmine.SpyObj<CoreSocketService>;
         service['setupCombatListeners']();
+        routerSpy = spyOn(service['router'], 'navigate');
     });
 
     it('should expose selfPlayer$ as an observable and emit the updated selfPlayer', (done) => {
@@ -148,7 +150,6 @@ describe('CombatSocketService', () => {
     });
 
     it('should set players and navigate to /combat when startCombat is called with self as first player', () => {
-        const routerSpy = spyOn(service['router'], 'navigate');
         const combatData = {
             combatRoomCode: 'testRoom123',
             players: [{ id: coreSocketSpy.selfId, name: 'Self' } as Player, { id: 'enemyId', name: 'Enemy' } as Player],
@@ -163,7 +164,6 @@ describe('CombatSocketService', () => {
     });
 
     it('should set players and navigate to /combat when startCombat is called with self as second player', () => {
-        const routerSpy = spyOn(service['router'], 'navigate');
         const combatData = {
             combatRoomCode: 'testRoom456',
             players: [{ id: 'enemyId', name: 'Enemy' } as Player, { id: coreSocketSpy.selfId, name: 'Self' } as Player],
@@ -178,8 +178,6 @@ describe('CombatSocketService', () => {
     });
 
     it('should navigate to /play when EndCombat event is received', () => {
-        const routerSpy = spyOn(service['router'], 'navigate');
-
         const endCombatCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvent.EndCombat);
         expect(endCombatCall).toBeDefined();
         const endCombatCallback = endCombatCall?.[1];
@@ -218,5 +216,20 @@ describe('CombatSocketService', () => {
             attackResultCallback(attackResult);
         }
         expect(service.attackResult.value).toEqual(attackResult);
+    });
+    it('should show popup with the winner name when EndCombat event is received', () => {
+        const popupSpy = spyOn(service['popupService'], 'showPopup');
+        const winner: Player = { id: 'winnerId', name: 'TestWinner' } as Player;
+
+        const endCombatCall = coreSocketSpy.on.calls.allArgs().find((args) => args[0] === CombatEvent.EndCombat);
+        expect(endCombatCall).toBeDefined();
+        const endCombatCallback = endCombatCall?.[1];
+
+        if (endCombatCallback) {
+            endCombatCallback(winner);
+        }
+
+        expect(popupSpy).toHaveBeenCalledWith('TestWinner a gagné le combat');
+        expect(routerSpy).toHaveBeenCalledWith([PageEndpoint.Play]);
     });
 });

@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { PopupService } from '@app/services/popup/popup.service';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { AttackAttempt, AttackResult, CombatData, CombatResult, EscapeAttempt } from '@common/interfaces/combat';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
@@ -21,6 +22,7 @@ export class CombatSocketService {
     private ennemyPlayerSubject: BehaviorSubject<Player | null> = new BehaviorSubject<Player | null>(null);
     private coreSocket: CoreSocketService = inject(CoreSocketService);
     private router: Router = inject(Router);
+    private popupService: PopupService = inject(PopupService);
 
     constructor() {
         this.setupCombatListeners();
@@ -100,7 +102,13 @@ export class CombatSocketService {
         this.attackResult.next(attackResult);
     }
 
-    private onEndCombat() {
+    private onEndCombat(winner: Player) {
+        this.popupService.keepMessages();
         this.router.navigate([PageEndpoint.Play]);
+        if (winner) {
+            this.popupService.showPopup(`${winner.name} a gagné le combat`);
+        } else {
+            this.popupService.showPopup("Personne n'a gagné le combat");
+        }
     }
 }

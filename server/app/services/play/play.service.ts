@@ -71,7 +71,7 @@ export class PlayService {
 
             if (actions.some((a) => a.x === position.x && a.y === position.y)) {
                 match.matchData.players.find((p) => p.id === playerId).currentStats.hasAction = false;
-                this.executeAction(matchCode, position, match, playerId);
+                this.executeAction(position, match, playerId);
             }
         }
     }
@@ -160,7 +160,6 @@ export class PlayService {
                 }
             }
 
-            this.playGateway.emitCombatResultBroadcast(matchCode, { match, combatResult });
             if (combatResult.loserId && this.canEndTurn(combatResult.loserId, matchCode)) {
                 this.nextTurnPhase(matchCode);
             } else {
@@ -203,13 +202,13 @@ export class PlayService {
         });
     }
 
-    private executeAction(matchCode: string, position: Position, match: Match, playerId: string) {
+    private executeAction(position: Position, match: Match, playerId: string) {
         const player = match.matchData.players.find((p) => p.currentStats.position.x === position.x && p.currentStats.position.y === position.y);
         if (player) {
-            this.startFight(matchCode, playerId, player.id);
+            this.startFight(match.matchData.code, playerId, player.id);
         } else {
             this.toggleBridgeTile(match, position);
-            this.tryEndTurn(matchCode, playerId);
+            this.tryEndTurn(match.matchData.code, playerId);
         }
     }
 
