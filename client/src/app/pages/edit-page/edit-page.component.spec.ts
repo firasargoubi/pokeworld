@@ -10,6 +10,7 @@ import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
 import { EditorEvent, EditorTile } from '@app/interfaces/editor';
 import { EditorService } from '@app/services/editor/editor.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
+import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -46,10 +47,12 @@ describe('EditPageComponent', () => {
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let editorServiceSpy: jasmine.SpyObj<EditorService>;
     let gameDataServiceSpy: jasmine.SpyObj<GameDataService>;
+    let mapServiceSpy: jasmine.SpyObj<MapService>;
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'keepMessages']);
+        mapServiceSpy = jasmine.createSpyObj('MapService', ['clearOverlays', 'setPlayers']);
         editorServiceSpy = jasmine.createSpyObj('EditorService', [
             'saveGame',
             'paintTile',
@@ -78,6 +81,7 @@ describe('EditPageComponent', () => {
                 { provide: PopupService, useValue: popupServiceSpy },
                 { provide: EditorService, useValue: editorServiceSpy },
                 { provide: GameDataService, useValue: gameDataServiceSpy },
+                { provide: MapService, useValue: mapServiceSpy },
             ],
         }).compileComponents();
 
