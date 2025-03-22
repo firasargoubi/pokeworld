@@ -24,7 +24,7 @@ export class LobbyService {
             this.lobbyGateway.connectPlayer(playerId, matchCode);
             this.emitUpdatePlayerList(matchCode);
         } else {
-            this.lobbyGateway.warn(playerId, Warning.AlreadyInGame);
+            this.lobbyGateway.warn(playerId, Warning.AlreadyInMatch);
         }
 
         return matchCode;
@@ -172,7 +172,7 @@ export class LobbyService {
         let result = true;
 
         if (!this.matchService.hasMatchCode(matchCode)) {
-            this.lobbyGateway.warn(playerId, Warning.NotExistGame);
+            this.lobbyGateway.warn(playerId, Warning.InvalidMatchCode);
             result = false;
         } else if (this.isMatchFull(matchCode)) {
             this.lobbyGateway.warn(playerId, Warning.RoomFull);
@@ -181,7 +181,7 @@ export class LobbyService {
             this.lobbyGateway.warn(playerId, Warning.RoomLocked);
             result = false;
         } else if (this.matchService.isPlayerInMatch(playerId)) {
-            this.lobbyGateway.warn(playerId, Warning.AlreadyInGame);
+            this.lobbyGateway.warn(playerId, Warning.AlreadyInMatch);
             result = false;
         }
 

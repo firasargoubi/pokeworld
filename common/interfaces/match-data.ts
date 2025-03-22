@@ -13,7 +13,7 @@ export interface MatchData {
 
 export interface LobbyData {
     isLocked: boolean;
-    adminPlayerIndex: number;
+    hostPlayerIndex: number;
 }
 
 export interface PlayData {
