@@ -2,27 +2,18 @@ export enum MatchEvent {
     CreateMatch = 'createMatch',
     JoinMatch = 'joinMatch',
     LeaveMatch = 'leaveMatch',
-    Message = 'message',
+
     Update = 'update',
+    Message = 'message',
+    RemovedFromMatch = 'removedFromMatch',
 }
 
 export enum LobbyEvent {
-    CreateMatch = 'createMatch',
-    JoinMatch = 'joinMatch',
-    LeaveMatch = 'leaveMatch',
-    UpdatePlayer = 'updatePlayer',
     KickPlayer = 'kickPlayer',
-    ChangeLockStatus = 'shangeLockStatus',
+    ChangeAvatar = 'changeAvatar',
+    JoinLobby = 'joinLobby',
+    ChangeLockStatus = 'changeLockStatus',
     StartMatch = 'startMatch',
-    EmitGameData = 'emitGameData',
-
-    PlayerLeft = 'playerLeft',
-    UpdatePlayerList = 'updatePlayerList',
-    LockStatusChanged = 'lockStatusChanged',
-    MatchStarted = 'matchStarted',
-
-    Warning = 'warning',
-    Update = 'update',
 }
 
 export enum PlayEvent {

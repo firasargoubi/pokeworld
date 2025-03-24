@@ -54,4 +54,8 @@ export class MatchGateway {
     emitMessage(matchCode: string, message: string) {
         this.server.to(matchCode).emit(MatchEvent.Message, message);
     }
+
+    emitRemovedFromMatch(matchCode: string, reason: string) {
+        this.server.to(matchCode).emit(MatchEvent.RemovedFromMatch, reason);
+    }
 }

@@ -6,6 +6,7 @@ import { Inject } from '@nestjs/common';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { MatchService } from '@app/services/match/match.service';
 import { Message } from '@common/interfaces/message.enum';
+import { PlayerData } from '@common/interfaces/player-data';
 
 export class Match {
     @Inject(MatchGateway) private matchGateway: MatchGateway;
@@ -32,9 +33,15 @@ export class Match {
 
     join(playerId: string) {
         this.data.players.push({ ...DEFAULT_PLAYER, id: playerId });
-        if (this.isFull()) {
+        this.changeLockStatus(false);
+    }
+
+    changeLockStatus(lockStatus: boolean) {
+        if (lockStatus || this.isFull()) {
             this.data.lobbyData.isLocked = true;
             this.kickJoiningPlayers();
+        } else {
+            this.data.lobbyData.isLocked = false;
         }
         this.sendUpdate();
     }
@@ -60,6 +67,15 @@ export class Match {
         return this.getConnectedPlayerCount() >= maxPlayerCount;
     }
 
+    isHost(playerId: string): boolean {
+        const playerIdex = this.getPlayerIndex(playerId);
+        return playerIdex === this.data.lobbyData.hostPlayerIndex;
+    }
+
+    getPlayer(playerId: string): PlayerData {
+        return this.data.players.find((p) => p.id === playerId);
+    }
+
     clearTimeout() {
         if (this.timeout !== null) {
             clearTimeout(this.timeout);
@@ -67,24 +83,25 @@ export class Match {
         }
     }
 
-    private kickJoiningPlayers() {
-        this.data.players.forEach((p) => {
-            if (!p.isConnected) {
-                this.matchGateway.emitMessage(p.id, Message.LockedFromLobby);
-                this.matchService.disconnectPlayer(p.id);
-            }
-        });
-        this.data.players = this.data.players.filter((p) => p.isConnected);
+    kickPlayer(playerId: string, reason: string) {
+        this.matchGateway.emitRemovedFromMatch(playerId, reason);
+        this.matchService.disconnectPlayer(playerId);
+        this.data.players = this.data.players.filter((p) => p.id !== playerId);
     }
 
-    private hostLeaveLobby(playerId: string) {
-        this.matchGateway.emitMessage(this.data.code, Message.AdminQuit);
-        this.data.players.forEach((p) => {
-            if (p.id !== playerId) {
-                this.matchService.disconnectPlayer(p.id);
-            }
+    private kickJoiningPlayers() {
+        const playerIdsToKick = this.data.players.filter((p) => !p.isConnected).map((p) => p.id);
+        playerIdsToKick.forEach((playerId) => {
+            this.kickPlayer(playerId, Message.LockedFromLobby);
         });
-        this.data.players = [];
+    }
+
+    private hostLeaveLobby(hostId: string) {
+        this.data.players = this.data.players.filter((p) => p.id !== hostId);
+        const playerIdsToKick = this.data.players.map((p) => p.id);
+        playerIdsToKick.forEach((playerId) => {
+            this.kickPlayer(playerId, Message.AdminQuit);
+        });
     }
 
     private playerLeaveLobby(playerId: string) {
@@ -97,32 +114,16 @@ export class Match {
         const player = this.data.players.find((p) => p.id === playerId);
         player.isConnected = false;
 
-        if (this.getConnectedPlayerCount() <= 1) {
-            this.matchGateway.emitMessage(this.data.code, Message.LastPlayerRemaining);
-            this.data.players = [];
+        const connectedPlayers = this.data.players.filter((p) => p.isConnected);
+        if (connectedPlayers.length === 1) {
+            this.kickPlayer(connectedPlayers[0].id, Message.LastPlayerRemaining);
         } else {
             this.sendMessage(`${player.name} a quitté la partie`);
             this.sendUpdate();
         }
     }
 
-    private isHost(playerId: string): boolean {
-        const playerIdex = this.getPlayerIndex(playerId);
-        return playerIdex === this.data.lobbyData.hostPlayerIndex;
-    }
-
     private getPlayerIndex(playerId: string): number {
         return this.data.players.findIndex((p) => p.id === playerId);
-    }
-
-    private getUniqueName(name: string, playerId: string): string {
-        // TODO
-        let newName = name;
-        let suffix = 2;
-        while (this.data.players.some((p) => p.name === newName && p.id !== playerId)) {
-            newName = `${name}-${suffix}`;
-            suffix++;
-        }
-        return newName;
     }
 }
