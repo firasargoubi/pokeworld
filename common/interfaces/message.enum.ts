@@ -1,4 +1,4 @@
-export enum Warning {
+export enum Message {
     AdminQuit = "L'administrateur a quitté la partie !",
     Kick = "Vous avez été exclu par l'administrateur!",
     RoomFull = 'La partie est pleine',

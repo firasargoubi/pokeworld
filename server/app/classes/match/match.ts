@@ -1,12 +1,18 @@
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { GameData } from '@common/interfaces/game-data';
 import { DEFAULT_MATCH_DATA } from '@common/consts/match-data.const';
-import { DEFAULT_PLAYER } from '@common/consts/player.const';
+import { DEFAULT_PLAYER, MAX_PLAYERS } from '@common/consts/player.const';
+import { Inject } from '@nestjs/common';
+import { MatchGateway } from '@app/gateways/match/match.gateway';
+import { MatchService } from '@app/services/match/match.service';
+import { Message } from '@common/interfaces/message.enum';
 
 export class Match {
+    @Inject(MatchGateway) private matchGateway: MatchGateway;
+    @Inject(MatchService) private matchService: MatchService;
     data: MatchData = structuredClone(DEFAULT_MATCH_DATA);
-    lastPhaseStartTime: Date = new Date();
-    phaseTimeout: NodeJS.Timeout | null = null;
+    private lastTimeoutStart: Date = new Date();
+    private timeout: NodeJS.Timeout | null = null;
 
     constructor(matchCode: string, gameData: GameData, playerId: string) {
         this.data.code = matchCode;
@@ -15,12 +21,22 @@ export class Match {
     }
 
     sendUpdate() {
-        // TODO
+        this.matchGateway.emitUpdate(this.data.code, this.data);
+    }
+
+    sendMessage(message: string) {
+        this.matchGateway.emitMessage(this.data.code, message);
+
+        // TODO ajouter le message a l'historique du journal
     }
 
     join(playerId: string) {
         this.data.players.push({ ...DEFAULT_PLAYER, id: playerId });
-        // TODO update lock state + kick joining players
+        if (this.isFull()) {
+            this.data.lobbyData.isLocked = true;
+            this.kickJoiningPlayers();
+        }
+        this.sendUpdate();
     }
 
     leave(playerId: string) {
@@ -31,28 +47,63 @@ export class Match {
                 this.playerLeaveLobby(playerId);
             }
         } else {
-            this.playerLeaveStarted(playerId);
+            this.playerLeaveMatch(playerId);
         }
     }
 
-    // eslint-disable-next-line no-unused-vars
-    endTurn(playerId: string) {
-        // TODO
+    getConnectedPlayerCount(): number {
+        return this.data.players.filter((p) => p.isConnected).length;
     }
 
-    // eslint-disable-next-line no-unused-vars
+    isFull(): boolean {
+        const maxPlayerCount = MAX_PLAYERS[this.data.gameData.mapData.size];
+        return this.getConnectedPlayerCount() >= maxPlayerCount;
+    }
+
+    clearTimeout() {
+        if (this.timeout !== null) {
+            clearTimeout(this.timeout);
+            this.timeout = null;
+        }
+    }
+
+    private kickJoiningPlayers() {
+        this.data.players.forEach((p) => {
+            if (!p.isConnected) {
+                this.matchGateway.emitMessage(p.id, Message.LockedFromLobby);
+                this.matchService.disconnectPlayer(p.id);
+            }
+        });
+        this.data.players = this.data.players.filter((p) => p.isConnected);
+    }
+
     private hostLeaveLobby(playerId: string) {
-        // TODO
+        this.matchGateway.emitMessage(this.data.code, Message.AdminQuit);
+        this.data.players.forEach((p) => {
+            if (p.id !== playerId) {
+                this.matchService.disconnectPlayer(p.id);
+            }
+        });
+        this.data.players = [];
     }
 
-    // eslint-disable-next-line no-unused-vars
     private playerLeaveLobby(playerId: string) {
-        // TODO
+        this.data.players = this.data.players.filter((p) => p.id !== playerId);
+        this.data.lobbyData.isLocked = false;
+        this.sendUpdate();
     }
 
-    // eslint-disable-next-line no-unused-vars
-    private playerLeaveStarted(playerId: string) {
-        // TODO
+    private playerLeaveMatch(playerId: string) {
+        const player = this.data.players.find((p) => p.id === playerId);
+        player.isConnected = false;
+
+        if (this.getConnectedPlayerCount() <= 1) {
+            this.matchGateway.emitMessage(this.data.code, Message.LastPlayerRemaining);
+            this.data.players = [];
+        } else {
+            this.sendMessage(`${player.name} a quitté la partie`);
+            this.sendUpdate();
+        }
     }
 
     private isHost(playerId: string): boolean {
@@ -65,6 +116,7 @@ export class Match {
     }
 
     private getUniqueName(name: string, playerId: string): string {
+        // TODO
         let newName = name;
         let suffix = 2;
         while (this.data.players.some((p) => p.name === newName && p.id !== playerId)) {

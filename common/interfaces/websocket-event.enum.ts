@@ -1,3 +1,11 @@
+export enum MatchEvent {
+    CreateMatch = 'createMatch',
+    JoinMatch = 'joinMatch',
+    LeaveMatch = 'leaveMatch',
+    Message = 'message',
+    Update = 'update',
+}
+
 export enum LobbyEvent {
     CreateMatch = 'createMatch',
     JoinMatch = 'joinMatch',
@@ -12,7 +20,9 @@ export enum LobbyEvent {
     UpdatePlayerList = 'updatePlayerList',
     LockStatusChanged = 'lockStatusChanged',
     MatchStarted = 'matchStarted',
+
     Warning = 'warning',
+    Update = 'update',
 }
 
 export enum PlayEvent {

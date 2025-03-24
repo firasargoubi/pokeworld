@@ -1,9 +1,8 @@
 import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { CODE_LENGTH, CODE_RANGE } from '@common/consts/match-data.const';
-import { MAX_PLAYERS } from '@common/consts/player.const';
 import { GameData } from '@common/interfaces/game-data';
-import { Warning } from '@common/interfaces/warning.enum';
+import { Message } from '@common/interfaces/message.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -31,19 +30,6 @@ export class MatchService {
         return hasJoined;
     }
 
-    leaveMatch(playerId: string) {
-        const match = this.getMatchFromPlayerId(playerId);
-        if (match) {
-            match.leave(playerId);
-            const connectedPlayerCount = match.data.players.filter((p) => p.isConnected).length;
-            if (connectedPlayerCount === 0) {
-                this.matches.delete(match.data.code);
-            }
-        }
-        this.playerToMatchCode.delete(playerId);
-        this.matchGateway.disconnectPlayer(playerId);
-    }
-
     getMatchFromPlayerId(playerId: string): Match {
         let match: Match;
         const matchCode = this.getMatchCode(playerId);
@@ -53,19 +39,36 @@ export class MatchService {
         return match;
     }
 
+    leaveMatch(playerId: string) {
+        this.disconnectPlayer(playerId);
+        const match = this.getMatchFromPlayerId(playerId);
+        if (match) {
+            match.leave(playerId);
+            if (match.getConnectedPlayerCount() === 0) {
+                match.clearTimeout();
+                this.matches.delete(match.data.code);
+            }
+        }
+    }
+
+    disconnectPlayer(playerId: string) {
+        this.playerToMatchCode.delete(playerId);
+        this.matchGateway.disconnectPlayer(playerId);
+    }
+
     private canJoinMatch(playerId: string, matchCode: string) {
         let canJoinMatch = true;
         if (!this.hasMatchCode(matchCode)) {
-            this.matchGateway.emitWarning(playerId, Warning.InvalidMatchCode);
+            this.matchGateway.emitMessage(playerId, Message.InvalidMatchCode);
             canJoinMatch = false;
         } else if (this.hasPlayerId(playerId)) {
-            this.matchGateway.emitWarning(playerId, Warning.AlreadyInMatch);
+            this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch);
             canJoinMatch = false;
         } else if (this.isMatchFull(matchCode)) {
-            this.matchGateway.emitWarning(playerId, Warning.RoomFull);
+            this.matchGateway.emitMessage(playerId, Message.RoomFull);
             canJoinMatch = false;
         } else if (this.isMatchLocked(matchCode)) {
-            this.matchGateway.emitWarning(playerId, Warning.RoomLocked);
+            this.matchGateway.emitMessage(playerId, Message.RoomLocked);
             canJoinMatch = false;
         }
         return canJoinMatch;
@@ -75,9 +78,7 @@ export class MatchService {
         let isMatchFull = false;
         const match = this.getMatch(matchCode);
         if (match) {
-            const maxPlayerCount = MAX_PLAYERS[match.data.gameData.mapData.size];
-            const currentPlayerCount = match.data.players.filter((p) => p.isConnected).length;
-            isMatchFull = currentPlayerCount >= maxPlayerCount;
+            isMatchFull = match.isFull();
         }
         return isMatchFull;
     }

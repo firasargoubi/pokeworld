@@ -1,7 +1,7 @@
 import { MatchService } from '@app/services/match/match.service';
 import { GameData } from '@common/interfaces/game-data';
-import { Warning } from '@common/interfaces/warning.enum';
-import { LobbyEvent, PlayEvent } from '@common/interfaces/websocket-event.enum';
+import { MatchData } from '@common/interfaces/match-data';
+import { MatchEvent } from '@common/interfaces/websocket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -12,27 +12,19 @@ export class MatchGateway {
     @WebSocketServer() private server: Server;
     @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
 
-    @SubscribeMessage(LobbyEvent.CreateMatch)
+    @SubscribeMessage(MatchEvent.CreateMatch)
     createMatch(socket: Socket, gameData: GameData): string {
         return this.matchService.createMatch(socket.id, gameData);
     }
 
-    @SubscribeMessage(LobbyEvent.JoinMatch)
+    @SubscribeMessage(MatchEvent.JoinMatch)
     joinMatch(socket: Socket, matchCode: string): boolean {
         return this.matchService.joinMatch(socket.id, matchCode);
     }
 
-    @SubscribeMessage(LobbyEvent.LeaveMatch)
+    @SubscribeMessage(MatchEvent.LeaveMatch)
     leaveMatch(socket: Socket) {
         this.matchService.leaveMatch(socket.id);
-    }
-
-    @SubscribeMessage(PlayEvent.EndTurn)
-    endTurn(socket: Socket) {
-        const match = this.matchService.getMatchFromPlayerId(socket.id);
-        if (match) {
-            match.endTurn(socket.id);
-        }
     }
 
     handleDisconnect(socket: Socket) {
@@ -55,11 +47,11 @@ export class MatchGateway {
         }
     }
 
-    emitWarning(matchCode: string, warning: Warning) {
-        this.server.to(matchCode).emit(LobbyEvent.Warning, warning);
+    emitUpdate(matchCode: string, matchData: MatchData) {
+        this.server.to(matchCode).emit(MatchEvent.Update, matchData);
     }
 
-    // emitDebugModeChanged(matchCode: string, matchData: MatchData) {
-    //     this.server.to(matchCode).emit(PlayEvent.DebugModeChanged, matchData);
-    // }
+    emitMessage(matchCode: string, message: string) {
+        this.server.to(matchCode).emit(MatchEvent.Message, message);
+    }
 }
