@@ -1,256 +1,242 @@
-import { CombatGateway } from '@app/gateways/combat/combat.gateway';
-import { MatchService } from '@app/services/match/match.service';
-import { PlayService } from '@app/services/play/play.service';
-import { AttackResult, CombatData, CombatResult, CombatState } from '@common/interfaces/combat';
-import { DICE_MAX_VALUE, DiceType } from '@common/interfaces/dice';
-import { Player } from '@common/interfaces/player';
-import { TileType } from '@common/interfaces/tile-type.enum';
-import { CombatEvent } from '@common/interfaces/websocket-event.enum';
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import {
-    COMBAT_CODE_LENGTH,
-    COMBAT_CODE_RANGE,
-    ESCAPE_RATIO,
-    MAX_TURN_DURATION,
-    MIN_TURN_DURATION,
-    PLAYER_STATS_MALUS,
-} from './combat.service.const';
+import { Injectable } from '@nestjs/common';
+import { Match } from '@app/classes/match/match';
 
 @Injectable()
 export class CombatService {
-    @Inject(forwardRef(() => CombatGateway)) private readonly combatGateway: CombatGateway;
-    @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
-    @Inject(MatchService) private readonly matchService: MatchService;
-    private combatTurnSystems: Map<string, CombatState> = new Map();
-
-    getCombatTurnSystems(): Map<string, CombatState> {
-        return this.combatTurnSystems;
+    // eslint-disable-next-line no-unused-vars
+    attack(match: Match, playerId: string) {
+        // TODO
     }
 
-    initiateCombat(playerId: string, targetPlayerId: string, matchCode: string): void {
-        const targetPlayer = this.matchService.getPlayer(matchCode, targetPlayerId);
-        const initiatingPlayer = this.matchService.getPlayer(matchCode, playerId);
-
-        const combatRoomCode = this.generateUniqueCombatCode();
-
-        this.combatGateway.getSocketById(playerId).join(combatRoomCode);
-        const targetSocket = this.combatGateway.getSocketById(targetPlayerId);
-        if (targetSocket) {
-            targetSocket.join(combatRoomCode);
-        }
-
-        const combatData: CombatData = { combatRoomCode, players: [initiatingPlayer, targetPlayer] };
-        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.CombatStarted, combatData);
-
-        this.resetPlayers([initiatingPlayer, targetPlayer]);
-        this.updatePlayersStatsByCurrentTile([initiatingPlayer, targetPlayer]);
-        this.startTurnSystem(combatRoomCode, [initiatingPlayer, targetPlayer], matchCode);
+    // eslint-disable-next-line no-unused-vars
+    escape(match: Match, playerId: string) {
+        // TODO
     }
 
-    escape(combatRoomCode: string, playerId: string): void {
-        const state = this.combatTurnSystems.get(combatRoomCode);
-        if (!state) return;
+    // initiateCombat(playerId: string, targetPlayerId: string, matchCode: string): void {
+    //     const targetPlayer = this.matchService.getPlayer(matchCode, targetPlayerId);
+    //     const initiatingPlayer = this.matchService.getPlayer(matchCode, playerId);
 
-        const player = this.getPlayerById(combatRoomCode, playerId);
+    //     const combatRoomCode = this.generateUniqueCombatCode();
 
-        if (player.currentStats.escapes > 0) {
-            player.currentStats.escapes--;
-            this.notifyPlayersStatsUpdate(combatRoomCode);
+    //     this.combatGateway.getSocketById(playerId).join(combatRoomCode);
+    //     const targetSocket = this.combatGateway.getSocketById(targetPlayerId);
+    //     if (targetSocket) {
+    //         targetSocket.join(combatRoomCode);
+    //     }
 
-            if (Math.random() < ESCAPE_RATIO) {
-                this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.EscapedResult, playerId);
-                this.endCombat(combatRoomCode);
-            }
-        }
-        this.forceCombatTurnSwitch(combatRoomCode);
-    }
+    //     const combatData: CombatData = { combatRoomCode, players: [initiatingPlayer, targetPlayer] };
+    //     this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.CombatStarted, combatData);
 
-    executeAttackAndCheckVictory(combatRoomCode: string, targetId: string): boolean | void {
-        const state = this.combatTurnSystems.get(combatRoomCode);
-        const currentPlayer = this.getPlayerById(combatRoomCode, state.players[state.currentTurnIndex].id);
-        const targetPlayer = this.getPlayerById(combatRoomCode, targetId);
-        if (!currentPlayer || !targetPlayer) return;
+    //     this.resetPlayers([initiatingPlayer, targetPlayer]);
+    //     this.updatePlayersStatsByCurrentTile([initiatingPlayer, targetPlayer]);
+    //     this.startTurnSystem(combatRoomCode, [initiatingPlayer, targetPlayer], matchCode);
+    // }
 
-        const attackDamage =
-            currentPlayer.currentStats.attack +
-            currentPlayer.currentStats.attackBonus -
-            (targetPlayer.currentStats.defense + targetPlayer.currentStats.defenseBonus);
+    // escape(combatRoomCode: string, playerId: string): void {
+    //     const state = this.combatTurnSystems.get(combatRoomCode);
+    //     if (!state) return;
 
-        if (attackDamage > 0) {
-            targetPlayer.currentStats.health = Math.max(0, targetPlayer.currentStats.health - attackDamage);
-            this.notifyPlayersStatsUpdate(combatRoomCode);
-        }
+    //     const player = this.getPlayerById(combatRoomCode, playerId);
 
-        const attackResult: AttackResult = { targetId, attackDamage };
-        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.AttackResult, attackResult);
+    //     if (player.currentStats.escapes > 0) {
+    //         player.currentStats.escapes--;
+    //         this.notifyPlayersStatsUpdate(combatRoomCode);
 
-        if (targetPlayer.currentStats.health <= 0) {
-            this.endCombat(combatRoomCode, currentPlayer.id);
-            return true;
-        }
+    //         if (Math.random() < ESCAPE_RATIO) {
+    //             this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.EscapedResult, playerId);
+    //             this.endCombat(combatRoomCode);
+    //         }
+    //     }
+    //     this.forceCombatTurnSwitch(combatRoomCode);
+    // }
 
-        return false;
-    }
+    // executeAttackAndCheckVictory(combatRoomCode: string, targetId: string): boolean | void {
+    //     const state = this.combatTurnSystems.get(combatRoomCode);
+    //     const currentPlayer = this.getPlayerById(combatRoomCode, state.players[state.currentTurnIndex].id);
+    //     const targetPlayer = this.getPlayerById(combatRoomCode, targetId);
+    //     if (!currentPlayer || !targetPlayer) return;
 
-    endCombat(combatRoomCode: string, winnerId: string = null): void {
-        const state = this.combatTurnSystems.get(combatRoomCode);
-        if (state.timer) {
-            clearTimeout(state.timer);
-        }
+    //     const attackDamage =
+    //         currentPlayer.currentStats.attack +
+    //         currentPlayer.currentStats.attackBonus -
+    //         (targetPlayer.currentStats.defense + targetPlayer.currentStats.defenseBonus);
 
-        const player1 = this.combatTurnSystems.get(combatRoomCode).players[0];
-        const player2 = this.combatTurnSystems.get(combatRoomCode).players[1];
-        const combatResult: CombatResult = { winnerId: null, loserId: null };
-        this.resetPlayers([player1, player2]);
+    //     if (attackDamage > 0) {
+    //         targetPlayer.currentStats.health = Math.max(0, targetPlayer.currentStats.health - attackDamage);
+    //         this.notifyPlayersStatsUpdate(combatRoomCode);
+    //     }
 
-        let winner: Player = null;
-        if (winnerId) {
-            combatResult.winnerId = winnerId;
-            combatResult.loserId = player1.id === winnerId ? player2.id : player1.id;
-            winner = player1.id === winnerId ? player1 : player2;
-        }
-        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.EndCombat, winner);
+    //     const attackResult: AttackResult = { targetId, attackDamage };
+    //     this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.AttackResult, attackResult);
 
-        this.combatTurnSystems.delete(combatRoomCode);
-        this.leaveCombat(combatRoomCode, state);
-        this.playService.endOfCombat(state.matchCode, combatResult, player1.id);
-    }
+    //     if (targetPlayer.currentStats.health <= 0) {
+    //         this.endCombat(combatRoomCode, currentPlayer.id);
+    //         return true;
+    //     }
 
-    forceCombatTurnSwitch(combatRoomCode: string): void {
-        const state = this.combatTurnSystems.get(combatRoomCode);
-        if (!state) {
-            return;
-        }
-        clearTimeout(state.timer);
+    //     return false;
+    // }
 
-        state.currentTurnIndex = 1 - state.currentTurnIndex;
-        this.combatTurnSystems.set(combatRoomCode, state);
+    // endCombat(combatRoomCode: string, winnerId: string = null): void {
+    //     const state = this.combatTurnSystems.get(combatRoomCode);
+    //     if (state.timer) {
+    //         clearTimeout(state.timer);
+    //     }
 
-        this.proceedCombatTurn(combatRoomCode);
-    }
+    //     const player1 = this.combatTurnSystems.get(combatRoomCode).players[0];
+    //     const player2 = this.combatTurnSystems.get(combatRoomCode).players[1];
+    //     const combatResult: CombatResult = { winnerId: null, loserId: null };
+    //     this.resetPlayers([player1, player2]);
 
-    private generateUniqueCombatCode(): string {
-        let combatRoomCode: string;
-        do {
-            const code = Math.floor(Math.random() * COMBAT_CODE_RANGE)
-                .toString()
-                .padStart(COMBAT_CODE_LENGTH, '0');
+    //     let winner: Player = null;
+    //     if (winnerId) {
+    //         combatResult.winnerId = winnerId;
+    //         combatResult.loserId = player1.id === winnerId ? player2.id : player1.id;
+    //         winner = player1.id === winnerId ? player1 : player2;
+    //     }
+    //     this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.EndCombat, winner);
 
-            combatRoomCode = `combat-${code}`;
-        } while (this.combatTurnSystems.has(combatRoomCode));
-        return combatRoomCode;
-    }
+    //     this.combatTurnSystems.delete(combatRoomCode);
+    //     this.leaveCombat(combatRoomCode, state);
+    //     this.playService.endOfCombat(state.matchCode, combatResult, player1.id);
+    // }
 
-    private updatePlayersStatsByCurrentTile(players: Player[]) {
-        for (const player of players) {
-            if (player.currentStats.standingTile === TileType.Path) {
-                player.currentStats.attack -= PLAYER_STATS_MALUS;
-                player.currentStats.defense -= PLAYER_STATS_MALUS;
-            }
-        }
-    }
+    // forceCombatTurnSwitch(combatRoomCode: string): void {
+    //     const state = this.combatTurnSystems.get(combatRoomCode);
+    //     if (!state) {
+    //         return;
+    //     }
+    //     clearTimeout(state.timer);
 
-    private startTurnSystem(combatRoomCode: string, players: Player[], matchCode: string): void {
-        const player1 = players[0];
-        const player2 = players[1];
+    //     state.currentTurnIndex = 1 - state.currentTurnIndex;
+    //     this.combatTurnSystems.set(combatRoomCode, state);
 
-        if (player2.playerStats.speed > player1.playerStats.speed) {
-            players = [players[1], players[0]];
-        }
+    //     this.proceedCombatTurn(combatRoomCode);
+    // }
 
-        this.combatTurnSystems.set(combatRoomCode, {
-            matchCode,
-            timer: null,
-            players,
-            currentTurnIndex: 0,
-        });
+    // private generateUniqueCombatCode(): string {
+    //     let combatRoomCode: string;
+    //     do {
+    //         const code = Math.floor(Math.random() * COMBAT_CODE_RANGE)
+    //             .toString()
+    //             .padStart(COMBAT_CODE_LENGTH, '0');
 
-        this.proceedCombatTurn(combatRoomCode);
-    }
+    //         combatRoomCode = `combat-${code}`;
+    //     } while (this.combatTurnSystems.has(combatRoomCode));
+    //     return combatRoomCode;
+    // }
 
-    private proceedCombatTurn(combatRoomCode: string): void {
-        const state = this.combatTurnSystems.get(combatRoomCode);
-        const { players, currentTurnIndex } = state;
-        const activePlayer = players[currentTurnIndex];
-        const inactivePlayer = players[1 - currentTurnIndex];
+    // private updatePlayersStatsByCurrentTile(players: Player[]) {
+    //     for (const player of players) {
+    //         if (player.currentStats.standingTile === TileType.Path) {
+    //             player.currentStats.attack -= PLAYER_STATS_MALUS;
+    //             player.currentStats.defense -= PLAYER_STATS_MALUS;
+    //         }
+    //     }
+    // }
 
-        let turnDelay = MAX_TURN_DURATION;
-        if (activePlayer.currentStats.escapes === 0) {
-            turnDelay = MIN_TURN_DURATION;
-        }
+    // private startTurnSystem(combatRoomCode: string, players: Player[], matchCode: string): void {
+    //     const player1 = players[0];
+    //     const player2 = players[1];
 
-        this.updatePlayerBonusStats(combatRoomCode, activePlayer, true);
-        this.updatePlayerBonusStats(combatRoomCode, inactivePlayer, false);
-        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.StartTimer, turnDelay);
-        this.combatGateway.emitToPlayer(activePlayer.id, CombatEvent.CombatTurnStarted);
-        this.combatGateway.emitToPlayer(inactivePlayer.id, CombatEvent.CombatTurnStopped);
+    //     if (player2.playerStats.speed > player1.playerStats.speed) {
+    //         players = [players[1], players[0]];
+    //     }
 
-        const timer = setTimeout(() => {
-            const victory = this.executeAttackAndCheckVictory(combatRoomCode, inactivePlayer.id);
+    //     this.combatTurnSystems.set(combatRoomCode, {
+    //         matchCode,
+    //         timer: null,
+    //         players,
+    //         currentTurnIndex: 0,
+    //     });
 
-            if (!victory) {
-                state.currentTurnIndex = 1 - currentTurnIndex;
-                this.combatTurnSystems.set(combatRoomCode, state);
-                this.proceedCombatTurn(combatRoomCode);
-            }
-            return;
-        }, turnDelay);
+    //     this.proceedCombatTurn(combatRoomCode);
+    // }
 
-        state.timer = timer;
-        this.combatTurnSystems.set(combatRoomCode, state);
-    }
+    // private proceedCombatTurn(combatRoomCode: string): void {
+    //     const state = this.combatTurnSystems.get(combatRoomCode);
+    //     const { players, currentTurnIndex } = state;
+    //     const activePlayer = players[currentTurnIndex];
+    //     const inactivePlayer = players[1 - currentTurnIndex];
 
-    private getBonusValue(diceType: DiceType): number {
-        const maxValue = DICE_MAX_VALUE[diceType];
-        return Math.floor(Math.random() * maxValue) + 1;
-    }
+    //     let turnDelay = MAX_TURN_DURATION;
+    //     if (activePlayer.currentStats.escapes === 0) {
+    //         turnDelay = MIN_TURN_DURATION;
+    //     }
 
-    private updatePlayerBonusStats(combatRoomCode: string, player: Player, updateAttack: boolean): void {
-        const state = this.combatTurnSystems.get(combatRoomCode);
-        const match = this.matchService.getMatch(state.matchCode);
-        if (updateAttack) {
-            if (match.matchData.isDebugMode) {
-                player.currentStats.attackBonus = DICE_MAX_VALUE[player.playerStats.attackDice];
-            } else {
-                player.currentStats.attackBonus = this.getBonusValue(player.playerStats.attackDice);
-            }
-        } else {
-            if (match.matchData.isDebugMode) {
-                player.currentStats.defenseBonus = 1;
-            } else {
-                player.currentStats.defenseBonus = this.getBonusValue(player.playerStats.defenseDice);
-            }
-        }
+    //     this.updatePlayerBonusStats(combatRoomCode, activePlayer, true);
+    //     this.updatePlayerBonusStats(combatRoomCode, inactivePlayer, false);
+    //     this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.StartTimer, turnDelay);
+    //     this.combatGateway.emitToPlayer(activePlayer.id, CombatEvent.CombatTurnStarted);
+    //     this.combatGateway.emitToPlayer(inactivePlayer.id, CombatEvent.CombatTurnStopped);
 
-        this.notifyPlayersStatsUpdate(combatRoomCode);
-    }
+    //     const timer = setTimeout(() => {
+    //         const victory = this.executeAttackAndCheckVictory(combatRoomCode, inactivePlayer.id);
 
-    private notifyPlayersStatsUpdate(combatRoomCode: string) {
-        const state = this.combatTurnSystems.get(combatRoomCode);
+    //         if (!victory) {
+    //             state.currentTurnIndex = 1 - currentTurnIndex;
+    //             this.combatTurnSystems.set(combatRoomCode, state);
+    //             this.proceedCombatTurn(combatRoomCode);
+    //         }
+    //         return;
+    //     }, turnDelay);
 
-        this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.UpdatePlayers, state.players);
-    }
+    //     state.timer = timer;
+    //     this.combatTurnSystems.set(combatRoomCode, state);
+    // }
 
-    private resetPlayers(players: Player[]): void {
-        for (const player of players) {
-            player.currentStats.health = player.playerStats.health;
-            player.currentStats.attack = player.playerStats.attack;
-            player.currentStats.defense = player.playerStats.defense;
-            player.currentStats.escapes = player.playerStats.escapes;
-        }
-    }
+    // private getBonusValue(diceType: DiceType): number {
+    //     const maxValue = DICE_MAX_VALUE[diceType];
+    //     return Math.floor(Math.random() * maxValue) + 1;
+    // }
 
-    private leaveCombat(combatRoomCode: string, state: CombatState): void {
-        for (const player of state.players) {
-            const socket = this.combatGateway.getSocketById(player.id);
+    // private updatePlayerBonusStats(combatRoomCode: string, player: Player, updateAttack: boolean): void {
+    //     const state = this.combatTurnSystems.get(combatRoomCode);
+    //     const match = this.matchService.getMatch(state.matchCode);
+    //     if (updateAttack) {
+    //         if (match.matchData.isDebugMode) {
+    //             player.currentStats.attackBonus = DICE_MAX_VALUE[player.playerStats.attackDice];
+    //         } else {
+    //             player.currentStats.attackBonus = this.getBonusValue(player.playerStats.attackDice);
+    //         }
+    //     } else {
+    //         if (match.matchData.isDebugMode) {
+    //             player.currentStats.defenseBonus = 1;
+    //         } else {
+    //             player.currentStats.defenseBonus = this.getBonusValue(player.playerStats.defenseDice);
+    //         }
+    //     }
 
-            if (socket) {
-                socket.leave(combatRoomCode);
-            }
-        }
-    }
+    //     this.notifyPlayersStatsUpdate(combatRoomCode);
+    // }
 
-    private getPlayerById(combatRoomCode: string, playerId: string): Player {
-        return this.combatTurnSystems.get(combatRoomCode).players.find((p) => p.id === playerId);
-    }
+    // private notifyPlayersStatsUpdate(combatRoomCode: string) {
+    //     const state = this.combatTurnSystems.get(combatRoomCode);
+
+    //     this.combatGateway.emitToCombatRoom(combatRoomCode, CombatEvent.UpdatePlayers, state.players);
+    // }
+
+    // private resetPlayers(players: Player[]): void {
+    //     for (const player of players) {
+    //         player.currentStats.health = player.playerStats.health;
+    //         player.currentStats.attack = player.playerStats.attack;
+    //         player.currentStats.defense = player.playerStats.defense;
+    //         player.currentStats.escapes = player.playerStats.escapes;
+    //     }
+    // }
+
+    // private leaveCombat(combatRoomCode: string, state: CombatState): void {
+    //     for (const player of state.players) {
+    //         const socket = this.combatGateway.getSocketById(player.id);
+
+    //         if (socket) {
+    //             socket.leave(combatRoomCode);
+    //         }
+    //     }
+    // }
+
+    // private getPlayerById(combatRoomCode: string, playerId: string): Player {
+    //     return this.combatTurnSystems.get(combatRoomCode).players.find((p) => p.id === playerId);
+    // }
 }
