@@ -12,7 +12,7 @@ import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Match, PlayerLeftData, PlayerMovementData } from '@common/interfaces/match';
 import { Position } from '@common/interfaces/position';
-import { CombatEvent, LobbyEvent, PlayEvent } from '@common/interfaces/websocket-event.enum';
+import { CombatEvent, LobbyEvent, PlayEvent } from '@common/interfaces/socket-event.enum';
 import { END_GAME_DELAY, TIME_SCALE } from './play-sockets.const';
 
 @Injectable({

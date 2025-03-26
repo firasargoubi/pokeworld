@@ -1,7 +1,7 @@
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { Position } from '@common/interfaces/position';
-import { PlayEvent } from '@common/interfaces/websocket-event.enum';
+import { PlayEvent } from '@common/interfaces/socket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';

@@ -2,7 +2,7 @@ import { PlayService } from '@app/services/play/play.service';
 import { CombatDataBroadcast, CombatResultBroadcast } from '@common/interfaces/combat';
 import { Match, PlayerMovementData } from '@common/interfaces/match';
 import { Position } from '@common/interfaces/position';
-import { PlayEvent } from '@common/interfaces/websocket-event.enum';
+import { PlayEvent } from '@common/interfaces/socket-event.enum';
 import { MOCK_MATCHES } from '@common/test-consts/mock-matches';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';

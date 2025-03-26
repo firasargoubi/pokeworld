@@ -5,7 +5,7 @@ import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket
 import { AttackAttempt, AttackResult, CombatData, CombatResult, EscapeAttempt } from '@common/interfaces/combat';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Player } from '@common/interfaces/player';
-import { CombatEvent } from '@common/interfaces/websocket-event.enum';
+import { CombatEvent } from '@common/interfaces/socket-event.enum';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({

@@ -12,7 +12,7 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Match, PlayerMovementData } from '@common/interfaces/match';
 import { Player } from '@common/interfaces/player';
 import { Position } from '@common/interfaces/position';
-import { CombatEvent, LobbyEvent, PlayEvent } from '@common/interfaces/websocket-event.enum';
+import { CombatEvent, LobbyEvent, PlayEvent } from '@common/interfaces/socket-event.enum';
 import { MOCK_MATCHES, MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYERS, PLAYER_IDS } from '@common/test-consts/mock-players';
 import { END_GAME_DELAY, TIME_SCALE } from './play-sockets.const';

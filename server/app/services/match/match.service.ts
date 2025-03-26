@@ -2,6 +2,7 @@ import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { CODE_LENGTH, CODE_RANGE } from '@common/consts/match-data.const';
 import { GameData } from '@common/interfaces/game-data';
+import { MatchData } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
@@ -11,23 +12,27 @@ export class MatchService {
     private matches: Map<string, Match> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
 
-    createMatch(playerId: string, gameData: GameData): string {
-        const matchCode = this.getNewMatchCode();
-        const match: Match = new Match(matchCode, gameData, playerId);
-        this.matches.set(matchCode, match);
-        this.playerToMatchCode.set(playerId, matchCode);
-        return matchCode;
+    createMatch(playerId: string, gameData: GameData): MatchData | null {
+        let matchData: MatchData | null = null;
+        if (this.canCreateMatch(playerId)) {
+            const matchCode = this.getNewMatchCode();
+            const match: Match = new Match(matchCode, gameData, playerId);
+            this.matches.set(matchCode, match);
+            this.playerToMatchCode.set(playerId, matchCode);
+            matchData = match.data;
+        }
+        return matchData;
     }
 
-    joinMatch(playerId: string, matchCode: string): boolean {
-        let hasJoined = false;
+    joinMatch(playerId: string, matchCode: string): MatchData | null {
+        let matchData: MatchData | null = null;
         if (this.canJoinMatch(playerId, matchCode)) {
             const match = this.getMatch(matchCode);
             match.join(playerId);
             this.playerToMatchCode.set(playerId, matchCode);
-            hasJoined = true;
+            matchData = match.data;
         }
-        return hasJoined;
+        return matchData;
     }
 
     getMatchFromPlayerId(playerId: string): Match {
@@ -56,7 +61,7 @@ export class MatchService {
         this.matchGateway.disconnectPlayer(playerId);
     }
 
-    private canJoinMatch(playerId: string, matchCode: string) {
+    private canJoinMatch(playerId: string, matchCode: string): boolean {
         let canJoinMatch = true;
         if (!this.hasMatchCode(matchCode)) {
             this.matchGateway.emitMessage(playerId, Message.InvalidMatchCode);
@@ -71,6 +76,16 @@ export class MatchService {
             this.matchGateway.emitMessage(playerId, Message.RoomLocked);
             canJoinMatch = false;
         }
+        return canJoinMatch;
+    }
+
+    private canCreateMatch(playerId: string): boolean {
+        let canJoinMatch = true;
+        if (this.hasPlayerId(playerId)) {
+            this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch);
+            canJoinMatch = false;
+        }
+        // TODO vérifier si le match est toujours visible
         return canJoinMatch;
     }
 

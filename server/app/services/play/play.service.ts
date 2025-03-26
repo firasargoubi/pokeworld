@@ -9,6 +9,7 @@ export class PlayService {
 
     // eslint-disable-next-line no-unused-vars
     endTurn(match: Match, playerId: string) {
+        // TODO
         // const matchCode = this.matchService.getMatchCode(playerId);
         // if (this.canEndTurn(playerId, matchCode)) {
         //     this.nextTurnPhase(matchCode);
@@ -17,6 +18,7 @@ export class PlayService {
 
     // eslint-disable-next-line no-unused-vars
     move(match: Match, playerId: string, position: Position) {
+        // TODO
         // const matchCode = this.matchService.getMatchCode(playerId);
         // if (this.matchService.isActivePlayer(matchCode, playerId)) {
         //     const player = this.matchService.getPlayer(matchCode, playerId);
@@ -34,6 +36,7 @@ export class PlayService {
 
     // eslint-disable-next-line no-unused-vars
     action(match: Match, playerId: string, position: Position) {
+        // TODO
         // const matchCode = this.matchService.getMatchCode(playerId);
         // if (this.matchService.isActivePlayer(matchCode, playerId)) {
         //     const match = this.matchService.getMatch(matchCode);
@@ -47,6 +50,7 @@ export class PlayService {
 
     // eslint-disable-next-line no-unused-vars
     debugMove(match: Match, playerId: string, position: Position) {
+        // TODO
         // const matchCode = this.matchService.getMatchCode(playerId);
         // if (this.matchService.isActivePlayer(matchCode, playerId)) {
         //     const player = this.matchService.getPlayer(matchCode, playerId);
@@ -66,6 +70,7 @@ export class PlayService {
 
     // eslint-disable-next-line no-unused-vars
     changeDebugMode(match: Match, playerId: string, isDebugMode: boolean) {
+        // TODO
         // const matchCode = this.matchService.getMatchCode(playerId);
         // if (matchCode) {
         //     const isAdmin = this.matchService.isPlayerAdmin(playerId, matchCode);

@@ -241,8 +241,7 @@ main {
     filter: brightness(1);
 }
 
-.dice-icon-4,
-.dice-icon-6 {
+.dice-icon {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -253,26 +252,21 @@ main {
     margin: 0 0 0 30px;
     background-color: 0;
     background-size: cover;
+    background-image: url('../../../assets/images/menu/stat-bar/inverted-dice-4.png');
+    rotate: 0deg;
+    cursor: pointer;
     transition:
         rotate 0.5s ease-in-out,
         background-image 0.5s ease-in-out;
 }
 
-.dice-icon-6:hover,
-.dice-icon-4:hover {
+.dice-icon:hover {
     filter: brightness(0.8);
-}
-
-.dice-icon-4 {
-    background-image: url('../../../assets/images/menu/stat-bar/inverted-dice-4.png');
-    rotate: 0deg;
-    cursor: pointer;
 }
 
 .dice-icon-6 {
     background-image: url('../../../assets/images/menu/stat-bar/dice-six-faces-six.png');
     rotate: 45deg;
-    cursor: pointer;
 }
 
 .hp-points {

@@ -1,117 +1,92 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { PlayerSelectionService } from '@app/services/player-selection/player-selection.service';
+import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { DEFAULT_PLAYER_SELECTION_VISUAL_DATA } from '@app/consts/player-data.const';
+import { PlayerSelectionVisualData } from '@app/interfaces/player-selection-visual-data';
+import { LobbyService } from '@app/services/lobby/lobby.service';
+import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
-import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/player.const';
-import { Avatar } from '@common/interfaces/avatar.enum';
-import { BonusDice, DiceType } from '@common/interfaces/dice';
-import { Player, StatType } from '@common/interfaces/player';
+import { BONUS_STAT, DEFAULT_STAT, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/player-data.const';
+import { Avatar, DiceType, PlayerData } from '@common/interfaces/player-data';
 
 @Component({
     selector: 'app-player-selection-page',
-    imports: [ReactiveFormsModule, HeaderComponent, CommonModule],
+    imports: [ReactiveFormsModule, HeaderComponent, CommonModule, FormsModule],
     templateUrl: './player-selection-page.component.html',
     styleUrl: './player-selection-page.component.scss',
 })
-export class PlayerSelectionPageComponent implements OnInit {
+export class PlayerSelectionPageComponent {
     nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
-    bonusPointsForm: FormControl = new FormControl(StatType.Life, [Validators.required]);
-    bonusDice: BonusDice = { attack: DiceType.D4, defense: DiceType.D6 };
-
-    maxNameLength = MAX_NAME_LENGTH;
-    statType = StatType;
-    playerSelectionService: PlayerSelectionService = inject(PlayerSelectionService);
-    private lobbySocketService: LobbySocketsService = inject(LobbySocketsService);
+    visualData: PlayerSelectionVisualData = DEFAULT_PLAYER_SELECTION_VISUAL_DATA;
+    private matchService: MatchService = inject(MatchService);
     private popupService: PopupService = inject(PopupService);
+    private lobbyService: LobbyService = inject(LobbyService);
 
-    get avatarData() {
-        return this.playerSelectionService.avatarData;
-    }
-
-    get avatarList() {
-        return this.playerSelectionService.avatarList;
-    }
-
-    get selectedAvatar() {
-        return this.playerSelectionService.playerData.avatar as Avatar;
-    }
-
-    ngOnInit(): void {
-        this.playerSelectionService.resetAvatar();
-    }
-
-    isBonusPoint(statCategory: StatType) {
-        return this.bonusPointsForm?.value === statCategory;
-    }
-
-    toggleBonusDice(): void {
-        [this.bonusDice.attack, this.bonusDice.defense] = [this.bonusDice.defense, this.bonusDice.attack];
-    }
-
-    getAvatarBtnStyle(avatar: Avatar) {
-        const avatarStatus = this.playerSelectionService.getAvatarStatus(avatar);
-        return { class: avatarStatus };
-    }
-
-    goToLobby() {
-        const warnings = this.getWarnings();
-        const haveWarnings = warnings.length > 0;
-        if (haveWarnings) {
-            this.popupService.showPopup(warnings.join('\n'));
-        } else {
-            const playerUpdates = this.getPlayerData();
-            this.playerSelectionService.setPlayerData(playerUpdates);
-            this.playerSelectionService.joinLobby();
-        }
+    constructor() {
+        this.updateAvatarList();
+        this.matchService.matchUpdate.subscribe(this.updateAvatarList.bind(this));
     }
 
     goToMenu() {
-        this.popupService.showPopup('Voulez-vous vraiment quitter ?', true, this.lobbySocketService.leaveMatch.bind(this.lobbySocketService));
+        this.popupService.showPopup('Voulez-vous vraiment quitter ?', true, this.matchService.leaveMatch.bind(this.matchService));
     }
 
-    isFormValid() {
-        return this.getWarnings().length === 0;
+    toggleBonusDice() {
+        this.visualData.isAttackSelected = !this.visualData.isAttackSelected;
     }
 
-    private getPlayerData() {
-        const playerUpdates: Partial<Player> = {
-            name: this.nameForm.value.toUpperCase().trim(),
-            avatar: this.selectedAvatar,
-            playerStats: {
-                health: this.getBonusStat(StatType.Life),
-                speed: this.getBonusStat(StatType.Speed),
-                attack: DEFAULT_STAT_POINTS,
-                defense: DEFAULT_STAT_POINTS,
-                attackDice: this.bonusDice.attack,
-                defenseDice: this.bonusDice.defense,
-                escapes: DEFAULT_ESCAPE_POINTS,
-            },
-        };
-        return playerUpdates;
+    joinLobby() {
+        const warnings = this.getWarnings();
+        if (warnings.length > 0) {
+            this.popupService.showPopup(warnings.join('\n'));
+        } else {
+            const playerData = this.getPlayerData();
+            this.lobbyService.joinLobby(playerData);
+        }
     }
 
-    private getBonusStat(statCategory: StatType) {
-        return this.isBonusPoint(statCategory) ? DEFAULT_STAT_POINTS + BONUS_POINTS : DEFAULT_STAT_POINTS;
+    changeAvatar(avatar: Avatar) {
+        this.lobbyService.changeAvatar(avatar);
+    }
+
+    private updateAvatarList() {
+        const selfAvatar = this.matchService.selfPlayer.avatar;
+        const lockedAvatars = this.getLockedAvatars();
+
+        this.visualData.selfAvatarimage = AVATAR_DATA[selfAvatar].image;
+        this.visualData.avatarList = Object.values(Avatar).map((avatar) => ({
+            avatar,
+            name: AVATAR_DATA[avatar].name,
+            image: AVATAR_DATA[avatar].image,
+            isLocked: lockedAvatars.includes(avatar),
+            isSelected: selfAvatar === avatar,
+        }));
+    }
+
+    private getLockedAvatars(): Avatar[] {
+        return this.matchService.matchData.players.filter((_, i) => i !== this.matchService.selfIndex).map((p) => p.avatar);
+    }
+
+    private getPlayerData(): PlayerData {
+        const playerData = this.matchService.selfPlayer;
+        playerData.name = this.nameForm.value.toUpperCase().trim();
+        playerData.health = this.visualData.isHpSelected ? BONUS_STAT : DEFAULT_STAT;
+        playerData.speed = this.visualData.isHpSelected ? DEFAULT_STAT : BONUS_STAT;
+        playerData.attackDice = this.visualData.isAttackSelected ? DiceType.D6 : DiceType.D4;
+        playerData.defenseDice = this.visualData.isAttackSelected ? DiceType.D4 : DiceType.D6;
+        return playerData;
     }
 
     private getWarnings() {
-        const nameErrorMessage = 'Le nom doit contenir entre 3 et 15 caractères';
-        const avatarErrorMessage = 'Veuillez choisir un avatar';
         const warningList = [];
-
         if (!this.nameForm.valid) {
-            warningList.push(nameErrorMessage);
+            warningList.push('Le nom doit contenir entre 3 et 15 caractères');
         }
-        if (!this.isAvatarChosen()) {
-            warningList.push(avatarErrorMessage);
+        if (this.matchService.selfPlayer.avatar === Avatar.Default) {
+            warningList.push('Veuillez choisir un avatar');
         }
         return warningList;
-    }
-
-    private isAvatarChosen() {
-        return this.selectedAvatar !== Avatar.Default;
     }
 }

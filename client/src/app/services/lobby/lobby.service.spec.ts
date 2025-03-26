@@ -7,8 +7,8 @@ import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Match } from '@common/interfaces/match';
 import { Player } from '@common/interfaces/player';
+import { LobbyEvent } from '@common/interfaces/socket-event.enum';
 import { Warning } from '@common/interfaces/warning.enum';
-import { LobbyEvent } from '@common/interfaces/websocket-event.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MOCK_MATCHES } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYERS } from '@common/test-consts/mock-players';

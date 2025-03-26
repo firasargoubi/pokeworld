@@ -6,7 +6,7 @@ import { environment } from 'src/environments/environment';
 @Injectable({
     providedIn: 'root',
 })
-export class CoreSocketService {
+export class SocketService {
     private socket: Socket;
     private status: BehaviorSubject<boolean>;
 

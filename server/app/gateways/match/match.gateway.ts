@@ -1,7 +1,7 @@
 import { MatchService } from '@app/services/match/match.service';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData } from '@common/interfaces/match-data';
-import { MatchEvent } from '@common/interfaces/websocket-event.enum';
+import { MatchEvent } from '@common/interfaces/socket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -13,12 +13,12 @@ export class MatchGateway {
     @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
 
     @SubscribeMessage(MatchEvent.CreateMatch)
-    createMatch(socket: Socket, gameData: GameData): string {
+    createMatch(socket: Socket, gameData: GameData): MatchData | null {
         return this.matchService.createMatch(socket.id, gameData);
     }
 
     @SubscribeMessage(MatchEvent.JoinMatch)
-    joinMatch(socket: Socket, matchCode: string): boolean {
+    joinMatch(socket: Socket, matchCode: string): MatchData | null {
         return this.matchService.joinMatch(socket.id, matchCode);
     }
 

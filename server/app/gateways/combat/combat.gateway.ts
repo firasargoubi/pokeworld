@@ -1,9 +1,9 @@
 import { CombatService } from '@app/services/combat/combat.service';
+import { MatchService } from '@app/services/match/match.service';
+import { CombatEvent } from '@common/interfaces/socket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { CombatEvent } from '@common/interfaces/websocket-event.enum';
-import { MatchService } from '@app/services/match/match.service';
 
 @WebSocketGateway({ cors: true })
 @Injectable()

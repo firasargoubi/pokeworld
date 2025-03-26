@@ -6,14 +6,14 @@
         <main class="flex-container">
             <section id="avatar-info-container" class="flex-container">
                 <div id="player-name-avatar">
-                    <img src="{{ avatarData[selectedAvatar].image }}" id="selected-avatar" />
+                    <img src="{{ visualData.selfAvatarimage }}" id="selected-avatar" />
                     <img src="./assets/images/menu/stat-bar/shadow.png" id="avatar-shadow" />
                     <span id="name-form">
                         <input
                             id="name-input"
                             type="text"
                             [formControl]="nameForm"
-                            maxlength="{{ this.maxNameLength }}"
+                            maxlength="{{ visualData.nameMaxLength }}"
                             placeholder="Entrez votre pseudo"
                             autofocus
                             autocomplete="off"
@@ -26,24 +26,24 @@
                         <span class="stat-bar-container">
                             <img src="./assets/images/menu/stat-bar/hp-bar.png" class="bar-icon" />
                             <div class="stat-bar"></div>
-                            <div class="bonus-bar" [ngClass]="{ 'bonus-active': isBonusPoint(statType.Life) }">
+                            <div class="bonus-bar" [class.bonus-active]="visualData.isHpSelected">
                                 <span class="point-value">4 HP</span>
                                 <span class="point-value bonus-value">6 HP</span>
                             </div>
                         </span>
-                        <input type="radio" [formControl]="bonusPointsForm" value="life" id="life" class="bonus-button" />
+                        <input [(ngModel)]="visualData.isHpSelected" [value]="true" type="radio" id="life" class="bonus-button" />
                     </div>
 
                     <div class="stat-container" title="Capacite de mouvement du personnage">
                         <span class="stat-bar-container">
                             <img src="./assets/images/menu/stat-bar/vit-bar.png" class="bar-icon" />
                             <div class="stat-bar"></div>
-                            <div class="bonus-bar" [ngClass]="{ 'bonus-active': isBonusPoint(statType.Speed) }">
+                            <div class="bonus-bar" [class.bonus-active]="!visualData.isHpSelected">
                                 <span class="point-value">4 MS</span>
                                 <span class="point-value bonus-value">6 MS</span>
                             </div>
                         </span>
-                        <input type="radio" [formControl]="bonusPointsForm" value="speed" id="speed" class="bonus-button" />
+                        <input [(ngModel)]="visualData.isHpSelected" [value]="false" type="radio" value="speed" id="speed" class="bonus-button" />
                     </div>
 
                     <div class="stat-container" title="Puissance d'attaque du personnage">
@@ -54,7 +54,7 @@
                                 <span class="point-value">4 AD</span>
                             </div>
                         </span>
-                        <span class="{{ bonusDice[statType.Attack] }}" (click)="toggleBonusDice()"></span>
+                        <span class="dice-icon" [class.dice-icon-6]="visualData.isAttackSelected" (click)="toggleBonusDice()"></span>
                     </div>
 
                     <div class="stat-container" title="Capacité de défense du personnage">
@@ -65,20 +65,20 @@
                                 <span class="point-value">4 DP</span>
                             </div>
                         </span>
-                        <span class="{{ bonusDice[statType.Defense] }}" (click)="toggleBonusDice()"></span>
+                        <span class="dice-icon" [class.dice-icon-6]="!visualData.isAttackSelected" (click)="toggleBonusDice()"></span>
                     </div>
                 </div>
             </section>
             <section id="avatar-selection-container">
                 <div id="avatar-list">
-                    @for(avatar of avatarList ; track avatarData[avatar].name ; ){
-                    <div
-                        [ngClass]="['avatar-container', getAvatarBtnStyle(avatar).class]"
-                        (click)="this.playerSelectionService.handleAvatarSelection(avatar)"
-                        title="{{ avatarData[avatar].name }}"
-                    >
-                        <img src="{{ avatarData[avatar].image }}" class="avatar-select" />
-                    </div>
+                    @for(avatar of visualData.avatarList; track avatar.name;) {
+                        <div
+                            class="avatar-container" [class.locked]="avatar.isLocked" [class.selected]="avatar.isSelected"
+                            (click)="changeAvatar(avatar.avatar)"
+                            title="{{ avatar.name }}"
+                        >
+                            <img src="{{ avatar.image }}" class="avatar-select" />
+                        </div>
                     }
                 </div>
             </section>
@@ -86,7 +86,7 @@
     </div>
     <footer id="page-footer">
         <div class="flex-container">
-            <button type="button" class="start-btn" [ngClass]="{ disabled: !isFormValid() }" (click)="goToLobby()">START GAME</button>
+            <button type="button" class="start-btn" [class.disabled]="!nameForm.valid || !visualData.isAvatarSelected" (click)="joinLobby()">START GAME</button>
         </div>
     </footer>
 </div>

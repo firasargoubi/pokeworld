@@ -1,7 +1,7 @@
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
-import { Avatar } from '@common/interfaces/player-data';
-import { LobbyEvent } from '@common/interfaces/websocket-event.enum';
+import { Avatar, PlayerData } from '@common/interfaces/player-data';
+import { LobbyEvent } from '@common/interfaces/socket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -30,10 +30,10 @@ export class LobbyGateway {
     }
 
     @SubscribeMessage(LobbyEvent.JoinLobby)
-    joinLobby(socket: Socket, name: string) {
+    joinLobby(socket: Socket, playerData: PlayerData) {
         const match = this.matchService.getMatchFromPlayerId(socket.id);
         if (match) {
-            this.lobbyService.joinLobby(match, socket.id, name);
+            this.lobbyService.joinLobby(match, socket.id, playerData);
         }
     }
 

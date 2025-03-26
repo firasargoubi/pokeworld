@@ -26,12 +26,11 @@ export class LobbyService {
         match.sendUpdate();
     }
 
-    joinLobby(match: Match, playerId: string, name: string) {
-        const index = match.data.players.findIndex((p) => p.id === playerId);
-        const player = match.data.players.splice(index, 1)[0];
-        player.name = this.getUniqueName(match, playerId, name);
-        player.isConnected = true;
-        match.data.players.push(player);
+    joinLobby(match: Match, playerId: string, playerData: PlayerData) {
+        match.data.players = match.data.players.filter((p) => p.id !== playerId);
+        playerData.name = this.getUniqueName(match, playerId, playerData.name);
+        playerData.isConnected = true;
+        match.data.players.push(playerData);
         match.sendUpdate();
     }
 

@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Player } from '@common/interfaces/player';
-import { CombatEvent } from '@common/interfaces/websocket-event.enum';
+import { CombatEvent } from '@common/interfaces/socket-event.enum';
 import { CombatSocketService } from './combat-socket.service';
 
 describe('CombatSocketService', () => {

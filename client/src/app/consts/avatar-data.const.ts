@@ -1,4 +1,4 @@
-import { Avatar } from '@common/interfaces/avatar.enum';
+import { Avatar } from '@common/interfaces/player-data';
 
 export const AVATAR_DATA = {
     [Avatar.Default]: {
