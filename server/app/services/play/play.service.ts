@@ -1,15 +1,22 @@
 import { Match } from '@app/classes/match/match';
 import { MovementService } from '@app/services/movement/movement.service';
-import { CombatResult } from '@common/interfaces/combat';
 import { Position } from '@common/interfaces/position';
-import { TileType } from '@common/interfaces/tile-type.enum';
 import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PlayService {
     @Inject(MovementService) private readonly movementService: MovementService;
 
-    move(playerId: string, position: Position) {
+    // eslint-disable-next-line no-unused-vars
+    endTurn(match: Match, playerId: string) {
+        // const matchCode = this.matchService.getMatchCode(playerId);
+        // if (this.canEndTurn(playerId, matchCode)) {
+        //     this.nextTurnPhase(matchCode);
+        // }
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    move(match: Match, playerId: string, position: Position) {
         // const matchCode = this.matchService.getMatchCode(playerId);
         // if (this.matchService.isActivePlayer(matchCode, playerId)) {
         //     const player = this.matchService.getPlayer(matchCode, playerId);
@@ -25,17 +32,17 @@ export class PlayService {
         // }
     }
 
-    action(playerId: string, position: Position) {
-        const matchCode = this.matchService.getMatchCode(playerId);
-        if (this.matchService.isActivePlayer(matchCode, playerId)) {
-            const match = this.matchService.getMatch(matchCode);
-            const actions = this.movementService.getActions(match);
-
-            if (actions.some((a) => a.x === position.x && a.y === position.y)) {
-                match.matchData.players.find((p) => p.id === playerId).currentStats.hasAction = false;
-                this.executeAction(position, match, playerId);
-            }
-        }
+    // eslint-disable-next-line no-unused-vars
+    action(match: Match, playerId: string, position: Position) {
+        // const matchCode = this.matchService.getMatchCode(playerId);
+        // if (this.matchService.isActivePlayer(matchCode, playerId)) {
+        //     const match = this.matchService.getMatch(matchCode);
+        //     const actions = this.movementService.getActions(match);
+        //     if (actions.some((a) => a.x === position.x && a.y === position.y)) {
+        //         match.matchData.players.find((p) => p.id === playerId).currentStats.hasAction = false;
+        //         this.executeAction(position, match, playerId);
+        //     }
+        // }
     }
 
     // eslint-disable-next-line no-unused-vars
@@ -57,235 +64,229 @@ export class PlayService {
         // }
     }
 
-    endTurn(playerId: string) {
-        const matchCode = this.matchService.getMatchCode(playerId);
-        if (this.canEndTurn(playerId, matchCode)) {
-            this.nextTurnPhase(matchCode);
-        }
+    // eslint-disable-next-line no-unused-vars
+    changeDebugMode(match: Match, playerId: string, isDebugMode: boolean) {
+        // const matchCode = this.matchService.getMatchCode(playerId);
+        // if (matchCode) {
+        //     const isAdmin = this.matchService.isPlayerAdmin(playerId, matchCode);
+        //     if (isAdmin) {
+        //         const match = this.matchService.getMatch(matchCode);
+        //         match.matchData.isDebugMode = forceMode !== undefined ? forceMode : !match.matchData.isDebugMode;
+        //         this.playGateway.emitDebugModeChanged(matchCode, match);
+        //     }
+        // }
     }
 
-    changeDebugMode(playerId: string, forceMode?: boolean) {
-        const matchCode = this.matchService.getMatchCode(playerId);
-        if (matchCode) {
-            const isAdmin = this.matchService.isPlayerAdmin(playerId, matchCode);
-            if (isAdmin) {
-                const match = this.matchService.getMatch(matchCode);
-                match.matchData.isDebugMode = forceMode !== undefined ? forceMode : !match.matchData.isDebugMode;
-                this.playGateway.emitDebugModeChanged(matchCode, match);
-            }
-        }
-    }
+    // canEndTurn(playerId: string, matchCode: string): boolean {
+    //     const match = this.matchService.getMatch(matchCode);
+    //     const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
+    //     const isActivePlayer = match.matchData.activePlayer === playerIndex;
 
-    canEndTurn(playerId: string, matchCode: string): boolean {
-        const match = this.matchService.getMatch(matchCode);
-        const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
-        const isActivePlayer = match.matchData.activePlayer === playerIndex;
+    //     return isActivePlayer;
+    // }
 
-        return isActivePlayer;
-    }
+    // nextTurnPhase(matchCode: string) {
+    //     const match = this.matchService.getMatch(matchCode);
+    //     if (match.matchData.phase === TurnPhase.PreTurn) {
+    //         match.matchData.phase = TurnPhase.Turn;
+    //         this.startTurnTimer(match, TURN_DURATION);
+    //         this.startTurn(match);
+    //     } else if (match.matchData.phase === TurnPhase.Turn) {
+    //         match.matchData.phase = TurnPhase.PreTurn;
+    //         this.startTurnTimer(match, PRE_TURN_DURATION);
+    //         this.startPreTurn(match);
+    //     }
+    // }
 
-    nextTurnPhase(matchCode: string) {
-        const match = this.matchService.getMatch(matchCode);
-        if (match.matchData.phase === TurnPhase.PreTurn) {
-            match.matchData.phase = TurnPhase.Turn;
-            this.startTurnTimer(match, TURN_DURATION);
-            this.startTurn(match);
-        } else if (match.matchData.phase === TurnPhase.Turn) {
-            match.matchData.phase = TurnPhase.PreTurn;
-            this.startTurnTimer(match, PRE_TURN_DURATION);
-            this.startPreTurn(match);
-        }
-    }
+    // endOfCombat(matchCode: string, combatResult: CombatResult, playerId: string) {
+    //     const match = this.matchService.getMatch(matchCode);
+    //     if (match) {
+    //         if (combatResult.winnerId) {
+    //             this.respawnPlayer(combatResult.loserId, matchCode);
+    //             const winnerPlayer = match.matchData.players.find((p) => p.id === combatResult.winnerId);
+    //             winnerPlayer.currentStats.fightsWon += 1;
+    //             if (winnerPlayer.currentStats.fightsWon >= MINIMUM_FIGHTS_TO_WIN) {
+    //                 this.endMatch(matchCode);
+    //                 return;
+    //             }
+    //         }
+    //         this.playGateway.emitCombatResultBroadcast(matchCode, { match, combatResult });
+    //         if (combatResult.loserId && this.canEndTurn(combatResult.loserId, matchCode)) {
+    //             this.nextTurnPhase(matchCode);
+    //         } else {
+    //             this.tryEndTurn(matchCode, playerId);
+    //             this.unfreezeMatch(match);
+    //         }
+    //     }
+    // }
 
-    endOfCombat(matchCode: string, combatResult: CombatResult, playerId: string) {
-        const match = this.matchService.getMatch(matchCode);
-        if (match) {
-            if (combatResult.winnerId) {
-                this.respawnPlayer(combatResult.loserId, matchCode);
-                const winnerPlayer = match.matchData.players.find((p) => p.id === combatResult.winnerId);
-                winnerPlayer.currentStats.fightsWon += 1;
-                if (winnerPlayer.currentStats.fightsWon >= MINIMUM_FIGHTS_TO_WIN) {
-                    this.endMatch(matchCode);
-                    return;
-                }
-            }
-            this.playGateway.emitCombatResultBroadcast(matchCode, { match, combatResult });
-            if (combatResult.loserId && this.canEndTurn(combatResult.loserId, matchCode)) {
-                this.nextTurnPhase(matchCode);
-            } else {
-                this.tryEndTurn(matchCode, playerId);
-                this.unfreezeMatch(match);
-            }
-        }
-    }
+    // private unfreezeMatch(match: Match) {
+    //     const turnData = this.matchService.getTurnData(match.matchData.code);
+    //     if (turnData.phaseTimeout) {
+    //         clearTimeout(turnData.phaseTimeout);
+    //         turnData.phaseTimeout = null;
+    //     }
+    //     turnData.phaseTimeout = setTimeout(() => {
+    //         this.nextTurnPhase(match.matchData.code);
+    //     }, match.matchData.currentTimer);
+    // }
 
-    private unfreezeMatch(match: Match) {
-        const turnData = this.matchService.getTurnData(match.matchData.code);
-        if (turnData.phaseTimeout) {
-            clearTimeout(turnData.phaseTimeout);
-            turnData.phaseTimeout = null;
-        }
-        turnData.phaseTimeout = setTimeout(() => {
-            this.nextTurnPhase(match.matchData.code);
-        }, match.matchData.currentTimer);
-    }
+    // private respawnPlayer(playerId: string, matchCode: string) {
+    //     const match = this.matchService.getMatch(matchCode);
+    //     if (match) {
+    //         const player = this.matchService.getPlayer(match.matchData.code, playerId);
+    //         if (player && player.isConnected) {
+    //             if (player.spawnPoint !== player.currentStats.position) {
+    //                 const position = this.movementService.getNearestEmptyTile(player.spawnPoint, match);
+    //                 player.currentStats.position = position;
+    //             }
+    //         }
+    //     }
+    // }
 
-    private respawnPlayer(playerId: string, matchCode: string) {
-        const match = this.matchService.getMatch(matchCode);
-        if (match) {
-            const player = this.matchService.getPlayer(match.matchData.code, playerId);
-            if (player && player.isConnected) {
-                if (player.spawnPoint !== player.currentStats.position) {
-                    const position = this.movementService.getNearestEmptyTile(player.spawnPoint, match);
-                    player.currentStats.position = position;
-                }
-            }
-        }
-    }
+    // private endMatch(matchCode: string) {
+    //     const players = this.matchService.getPlayers(matchCode);
+    //     this.playGateway.emitMatchEnded(matchCode, this.matchService.getMatch(matchCode));
+    //     players.forEach((player) => {
+    //         this.matchService.removePlayerFromMatch(player.id, matchCode, true);
+    //         this.lobbyGateway.disconnectPlayer(player.id);
+    //     });
+    // }
 
-    private endMatch(matchCode: string) {
-        const players = this.matchService.getPlayers(matchCode);
-        this.playGateway.emitMatchEnded(matchCode, this.matchService.getMatch(matchCode));
-        players.forEach((player) => {
-            this.matchService.removePlayerFromMatch(player.id, matchCode, true);
-            this.lobbyGateway.disconnectPlayer(player.id);
-        });
-    }
+    // private executeAction(position: Position, match: Match, playerId: string) {
+    //     const player = match.matchData.players.find((p) => p.currentStats.position.x === position.x && p.currentStats.position.y === position.y);
+    //     if (player) {
+    //         this.startFight(match.matchData.code, playerId, player.id);
+    //     } else {
+    //         this.toggleBridgeTile(match, position);
+    //         this.tryEndTurn(match.matchData.code, playerId);
+    //     }
+    // }
 
-    private executeAction(position: Position, match: Match, playerId: string) {
-        const player = match.matchData.players.find((p) => p.currentStats.position.x === position.x && p.currentStats.position.y === position.y);
-        if (player) {
-            this.startFight(match.matchData.code, playerId, player.id);
-        } else {
-            this.toggleBridgeTile(match, position);
-            this.tryEndTurn(match.matchData.code, playerId);
-        }
-    }
+    // private startFight(matchCode: string, playerId: string, targetPlayerId: string) {
+    //     const match = this.matchService.getMatch(matchCode);
+    //     const turnData = this.matchService.getTurnData(matchCode);
+    //     if (turnData.phaseTimeout) {
+    //         clearTimeout(turnData.phaseTimeout);
+    //         turnData.phaseTimeout = null;
+    //     }
+    //     const player = this.matchService.getPlayer(matchCode, playerId);
+    //     const targetPlayer = this.matchService.getPlayer(matchCode, targetPlayerId);
+    //     const tiles = match.gameData.mapData.tiles;
+    //     player.currentStats.standingTile = tiles[player.currentStats.position.x][player.currentStats.position.y];
+    //     targetPlayer.currentStats.standingTile = tiles[targetPlayer.currentStats.position.x][targetPlayer.currentStats.position.y];
 
-    private startFight(matchCode: string, playerId: string, targetPlayerId: string) {
-        const match = this.matchService.getMatch(matchCode);
-        const turnData = this.matchService.getTurnData(matchCode);
-        if (turnData.phaseTimeout) {
-            clearTimeout(turnData.phaseTimeout);
-            turnData.phaseTimeout = null;
-        }
-        const player = this.matchService.getPlayer(matchCode, playerId);
-        const targetPlayer = this.matchService.getPlayer(matchCode, targetPlayerId);
-        const tiles = match.gameData.mapData.tiles;
-        player.currentStats.standingTile = tiles[player.currentStats.position.x][player.currentStats.position.y];
-        targetPlayer.currentStats.standingTile = tiles[targetPlayer.currentStats.position.x][targetPlayer.currentStats.position.y];
+    //     const elapsedTime = Math.abs(new Date().getTime() - turnData.lastPhaseStartTime.getTime());
+    //     match.matchData.currentTimer = match.matchData.currentTimer - elapsedTime;
+    //     this.playGateway.emitCombatDataBroadcast(matchCode, {
+    //         match,
+    //         playerOneIndex: this.matchService.getPlayerIndex(matchCode, playerId),
+    //         playerTwoIndex: this.matchService.getPlayerIndex(matchCode, targetPlayerId),
+    //     });
+    //     this.combatService.initiateCombat(playerId, targetPlayerId, matchCode);
+    // }
 
-        const elapsedTime = Math.abs(new Date().getTime() - turnData.lastPhaseStartTime.getTime());
-        match.matchData.currentTimer = match.matchData.currentTimer - elapsedTime;
-        this.playGateway.emitCombatDataBroadcast(matchCode, {
-            match,
-            playerOneIndex: this.matchService.getPlayerIndex(matchCode, playerId),
-            playerTwoIndex: this.matchService.getPlayerIndex(matchCode, targetPlayerId),
-        });
-        this.combatService.initiateCombat(playerId, targetPlayerId, matchCode);
-    }
+    // private toggleBridgeTile(match: Match, position: Position) {
+    //     const tile = match.gameData.mapData.tiles[position.x][position.y];
+    //     if (tile === TileType.Bridge) {
+    //         match.gameData.mapData.tiles[position.x][position.y] = TileType.BrokenBridge;
+    //     } else if (tile === TileType.BrokenBridge) {
+    //         match.gameData.mapData.tiles[position.x][position.y] = TileType.Bridge;
+    //     }
+    //     this.playGateway.emitBridgeChanged(match.matchData.code, match);
+    // }
 
-    private toggleBridgeTile(match: Match, position: Position) {
-        const tile = match.gameData.mapData.tiles[position.x][position.y];
-        if (tile === TileType.Bridge) {
-            match.gameData.mapData.tiles[position.x][position.y] = TileType.BrokenBridge;
-        } else if (tile === TileType.BrokenBridge) {
-            match.gameData.mapData.tiles[position.x][position.y] = TileType.Bridge;
-        }
-        this.playGateway.emitBridgeChanged(match.matchData.code, match);
-    }
+    // private startPreTurn(match: Match) {
+    //     this.depleteCurrentStats(match.matchData.players[match.matchData.activePlayer]);
+    //     match.matchData.activePlayer = this.getNextCurrentIndex(match.matchData.players, match.matchData.activePlayer);
+    //     this.playGateway.emitPreTurnStarted(match.matchData.code, match);
+    // }
 
-    private startPreTurn(match: Match) {
-        this.depleteCurrentStats(match.matchData.players[match.matchData.activePlayer]);
-        match.matchData.activePlayer = this.getNextCurrentIndex(match.matchData.players, match.matchData.activePlayer);
-        this.playGateway.emitPreTurnStarted(match.matchData.code, match);
-    }
+    // private startTurn(match: Match) {
+    //     this.resetCurrentStats(match.matchData.players[match.matchData.activePlayer]);
+    //     this.playGateway.emitTurnStarted(match.matchData.code, match);
+    // }
 
-    private startTurn(match: Match) {
-        this.resetCurrentStats(match.matchData.players[match.matchData.activePlayer]);
-        this.playGateway.emitTurnStarted(match.matchData.code, match);
-    }
+    // private startTurnTimer(match: Match, duration: number) {
+    //     const turnData = this.matchService.getTurnData(match.matchData.code);
+    //     if (turnData.phaseTimeout) {
+    //         clearTimeout(turnData.phaseTimeout);
+    //         turnData.phaseTimeout = null;
+    //     }
+    //     turnData.lastPhaseStartTime = new Date();
+    //     match.matchData.currentTimer = duration;
+    //     match.matchData.maxTimer = duration;
+    //     turnData.phaseTimeout = setTimeout(() => {
+    //         this.nextTurnPhase(match.matchData.code);
+    //     }, duration);
+    // }
 
-    private startTurnTimer(match: Match, duration: number) {
-        const turnData = this.matchService.getTurnData(match.matchData.code);
-        if (turnData.phaseTimeout) {
-            clearTimeout(turnData.phaseTimeout);
-            turnData.phaseTimeout = null;
-        }
-        turnData.lastPhaseStartTime = new Date();
-        match.matchData.currentTimer = duration;
-        match.matchData.maxTimer = duration;
-        turnData.phaseTimeout = setTimeout(() => {
-            this.nextTurnPhase(match.matchData.code);
-        }, duration);
-    }
+    // private resetCurrentStats(player: Player) {
+    //     player.currentStats.hasAction = true;
+    //     player.currentStats.health = player.playerStats.health;
+    //     player.currentStats.movement = player.playerStats.speed;
+    // }
 
-    private resetCurrentStats(player: Player) {
-        player.currentStats.hasAction = true;
-        player.currentStats.health = player.playerStats.health;
-        player.currentStats.movement = player.playerStats.speed;
-    }
+    // private depleteCurrentStats(player: Player) {
+    //     player.currentStats.hasAction = false;
+    //     player.currentStats.movement = 0;
+    //     player.currentStats.health = player.playerStats.health;
+    // }
 
-    private depleteCurrentStats(player: Player) {
-        player.currentStats.hasAction = false;
-        player.currentStats.movement = 0;
-        player.currentStats.health = player.playerStats.health;
-    }
+    // private getNextCurrentIndex(players: Player[], currentIndex: number): number {
+    //     const totalPlayers = players.length;
+    //     let nextIndex = (currentIndex + 1) % totalPlayers;
 
-    private getNextCurrentIndex(players: Player[], currentIndex: number): number {
-        const totalPlayers = players.length;
-        let nextIndex = (currentIndex + 1) % totalPlayers;
+    //     let steps = 0;
+    //     while (steps <= totalPlayers && !players[nextIndex].isConnected) {
+    //         nextIndex = (nextIndex + 1) % totalPlayers;
+    //         steps++;
+    //     }
 
-        let steps = 0;
-        while (steps <= totalPlayers && !players[nextIndex].isConnected) {
-            nextIndex = (nextIndex + 1) % totalPlayers;
-            steps++;
-        }
+    //     return nextIndex;
+    // }
 
-        return nextIndex;
-    }
+    // private reorganizeMatch(match: Match) {
+    //     match.matchData.activePlayer = match.matchData.players.length - 1;
+    //     match.matchData.isStarted = true;
+    //     match.matchData.isLocked = true;
+    //     this.sortPlayers(match);
+    //     this.assignSpawnPoints(match);
+    // }
 
-    private reorganizeMatch(match: Match) {
-        match.matchData.activePlayer = match.matchData.players.length - 1;
-        match.matchData.isStarted = true;
-        match.matchData.isLocked = true;
-        this.sortPlayers(match);
-        this.assignSpawnPoints(match);
-    }
+    // private sortPlayers(match: Match) {
+    //     match.matchData.players = match.matchData.players.sort((a: Player, b: Player) => {
+    //         if (a.playerStats.speed !== b.playerStats.speed) {
+    //             return b.playerStats.speed - a.playerStats.speed;
+    //         }
+    //         return Math.random() - HALF_POINT;
+    //     });
+    // }
 
-    private sortPlayers(match: Match) {
-        match.matchData.players = match.matchData.players.sort((a: Player, b: Player) => {
-            if (a.playerStats.speed !== b.playerStats.speed) {
-                return b.playerStats.speed - a.playerStats.speed;
-            }
-            return Math.random() - HALF_POINT;
-        });
-    }
+    // private assignSpawnPoints(match: Match) {
+    //     const spawnPoints = match.gameData.mapData.items.Spawn;
+    //     const shuffledSpawnPoints = spawnPoints.sort(() => Math.random() - HALF_POINT).slice(0, match.matchData.players.length);
+    //     match.gameData.mapData.items.Spawn = spawnPoints.filter((s) => shuffledSpawnPoints.includes(s));
 
-    private assignSpawnPoints(match: Match) {
-        const spawnPoints = match.gameData.mapData.items.Spawn;
-        const shuffledSpawnPoints = spawnPoints.sort(() => Math.random() - HALF_POINT).slice(0, match.matchData.players.length);
-        match.gameData.mapData.items.Spawn = spawnPoints.filter((s) => shuffledSpawnPoints.includes(s));
+    //     shuffledSpawnPoints.forEach((spawnPoint, i) => {
+    //         match.matchData.players[i].spawnPoint = spawnPoint;
+    //         match.matchData.players[i].currentStats.position = spawnPoint;
+    //     });
+    // }
 
-        shuffledSpawnPoints.forEach((spawnPoint, i) => {
-            match.matchData.players[i].spawnPoint = spawnPoint;
-            match.matchData.players[i].currentStats.position = spawnPoint;
-        });
-    }
+    // private tryEndTurn(matchCode: string, playerId: string): boolean {
+    //     const match = this.matchService.getMatch(matchCode);
+    //     const activePlayerId = match.matchData.players[match.matchData.activePlayer].id;
+    //     const player = this.matchService.getPlayer(matchCode, activePlayerId);
 
-    private tryEndTurn(matchCode: string, playerId: string): boolean {
-        const match = this.matchService.getMatch(matchCode);
-        const activePlayerId = match.matchData.players[match.matchData.activePlayer].id;
-        const player = this.matchService.getPlayer(matchCode, activePlayerId);
+    //     const isCurrentTurn = activePlayerId === playerId;
+    //     const canMove = this.movementService.getPossibleMoves(match).length > 0;
+    //     const canAct = this.movementService.getActions(match).length > 1 && player.currentStats.hasAction;
 
-        const isCurrentTurn = activePlayerId === playerId;
-        const canMove = this.movementService.getPossibleMoves(match).length > 0;
-        const canAct = this.movementService.getActions(match).length > 1 && player.currentStats.hasAction;
-
-        if (!canMove && !canAct && isCurrentTurn) {
-            this.endTurn(activePlayerId);
-            return true;
-        }
-        return false;
-    }
+    //     if (!canMove && !canAct && isCurrentTurn) {
+    //         this.endTurn(activePlayerId);
+    //         return true;
+    //     }
+    //     return false;
+    // }
 }
