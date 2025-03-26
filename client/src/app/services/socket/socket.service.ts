@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
@@ -8,22 +7,12 @@ import { environment } from 'src/environments/environment';
 })
 export class SocketService {
     private socket: Socket;
-    private status: BehaviorSubject<boolean>;
 
     constructor() {
-        this.status = new BehaviorSubject<boolean>(false);
-
         this.socket = io(environment.socketUrl, {
             transports: ['websocket'],
             upgrade: false,
         });
-
-        this.socket.on('connect', this.setStatusConnected.bind(this));
-        this.socket.on('disconnect', this.setStatusDisconnected.bind(this));
-    }
-
-    get connectionStatus(): Observable<boolean> {
-        return this.status.asObservable();
     }
 
     get selfId(): string {
@@ -43,13 +32,5 @@ export class SocketService {
 
     on<T>(event: string, callback: (...args: T[]) => void): void {
         this.socket.on(event, callback);
-    }
-
-    private setStatusConnected(): void {
-        this.status.next(true);
-    }
-
-    private setStatusDisconnected(): void {
-        this.status.next(false);
     }
 }

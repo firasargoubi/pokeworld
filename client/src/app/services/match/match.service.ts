@@ -21,7 +21,7 @@ export class MatchService {
     matchUpdate: Subject<void> = new Subject();
     selfIndex: number = -1;
     selfPlayer: PlayerData = structuredClone(DEFAULT_PLAYER_DATA);
-    matchData: MatchData = structuredClone(DEFAULT_MATCH_DATA);
+    data: MatchData = structuredClone(DEFAULT_MATCH_DATA);
     private socketService: SocketService = inject(SocketService);
     private gameDataService: GameDataService = inject(GameDataService);
     private mapService: MapService = inject(MapService);
@@ -29,7 +29,10 @@ export class MatchService {
     private router: Router = inject(Router);
 
     constructor() {
-        this.setupListeners();
+        this.socketService.on(MatchEvent.Disconnect, this.onDisconnect.bind(this));
+        this.socketService.on(MatchEvent.Update, this.onUpdate.bind(this));
+        this.socketService.on(MatchEvent.Message, this.onMessage.bind(this));
+        this.socketService.on(MatchEvent.RemovedFromMatch, this.onRemovedFromMatch.bind(this));
     }
 
     createMatch(gameData: GameData) {
@@ -51,19 +54,36 @@ export class MatchService {
     }
 
     leaveMatch(): void {
-        this.socketService.emit(MatchEvent.LeaveMatch);
-        this.resetMatchData();
+        if (this.isInMatch()) {
+            this.socketService.emit(MatchEvent.LeaveMatch);
+            this.resetMatchData();
+        }
         this.router.navigate([PageEndpoint.Menu]);
     }
 
-    private setupListeners(): void {
-        this.socketService.on(MatchEvent.Update, this.onUpdate.bind(this));
-        this.socketService.on(MatchEvent.Message, this.onMessage.bind(this));
-        this.socketService.on(MatchEvent.RemovedFromMatch, this.onRemovedFromMatch.bind(this));
+    isActivePlayer(): boolean {
+        return this.selfIndex === this.data.playData.activePlayerIndex;
+    }
+
+    isHost(): boolean {
+        return this.selfIndex === this.data.lobbyData.hostPlayerIndex;
+    }
+
+    isInMatch(): boolean {
+        return this.selfIndex >= 0;
+    }
+
+    private onDisconnect() {
+        if (this.isInMatch()) {
+            this.popupService.keepMessages();
+            this.popupService.showPopup('La connexion avec le serveur a été interrompu');
+            this.resetMatchData();
+            this.router.navigate([PageEndpoint.Menu]);
+        }
     }
 
     private onUpdate(matchData: MatchData) {
-        this.matchData = matchData;
+        this.data = matchData;
         this.selfIndex = matchData.players.findIndex((p) => p.id === this.socketService.selfId);
         this.selfPlayer = matchData.players[this.selfIndex];
         this.gameDataService.setGameData(matchData.gameData);
@@ -76,14 +96,16 @@ export class MatchService {
     }
 
     private onRemovedFromMatch(reason: string) {
-        this.popupService.keepMessages();
-        this.popupService.showPopup(reason);
-        this.resetMatchData();
-        this.router.navigate([PageEndpoint.Menu]);
+        if (this.isInMatch()) {
+            this.popupService.keepMessages();
+            this.popupService.showPopup(reason);
+            this.resetMatchData();
+            this.router.navigate([PageEndpoint.Menu]);
+        }
     }
 
     private resetMatchData() {
-        this.matchData = structuredClone(DEFAULT_MATCH_DATA);
+        this.data = structuredClone(DEFAULT_MATCH_DATA);
         this.selfIndex = -1;
         this.selfPlayer = structuredClone(DEFAULT_PLAYER_DATA);
         this.gameDataService.setGameData(structuredClone(DEFAULT_GAME_DATA));

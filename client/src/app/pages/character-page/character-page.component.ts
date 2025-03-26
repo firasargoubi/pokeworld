@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { DEFAULT_CHARACTER_VISUAL_DATA } from '@app/consts/player-data.const';
@@ -9,6 +10,7 @@ import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { BONUS_STAT, DEFAULT_STAT, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/player-data.const';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Avatar, DiceType, PlayerData } from '@common/interfaces/player-data';
 
 @Component({
@@ -23,8 +25,12 @@ export class CharacterPageComponent {
     private matchService: MatchService = inject(MatchService);
     private popupService: PopupService = inject(PopupService);
     private lobbyService: LobbyService = inject(LobbyService);
+    private router: Router = inject(Router);
 
     constructor() {
+        if (!this.matchService.isInMatch()) {
+            this.router.navigate([PageEndpoint.Menu]);
+        }
         this.updateAvatarList();
         this.matchService.matchUpdate.subscribe(this.updateAvatarList.bind(this));
     }
@@ -66,7 +72,7 @@ export class CharacterPageComponent {
     }
 
     private getLockedAvatars(): Avatar[] {
-        return this.matchService.matchData.players.filter((_, i) => i !== this.matchService.selfIndex).map((p) => p.avatar);
+        return this.matchService.data.players.filter((_, i) => i !== this.matchService.selfIndex).map((p) => p.avatar);
     }
 
     private getPlayerData(): PlayerData {

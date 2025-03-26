@@ -1,8 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { AVATAR_DATA } from '@app/consts/avatar-data.const';
-import { Player } from '@common/interfaces/player';
-import { DEFAULT_PLAYER } from '@common/consts/player.const';
 
 @Component({
     selector: 'app-player-card',
@@ -11,14 +8,12 @@ import { DEFAULT_PLAYER } from '@common/consts/player.const';
     imports: [CommonModule],
 })
 export class PlayerCardComponent {
-    @Input() player: Player = structuredClone(DEFAULT_PLAYER);
-    @Input() isAdmin: boolean = false;
+    @Input() isHost: boolean = false;
     @Input() isSelfPlayer: boolean = false;
-    @Input() isDisconeected: boolean = false;
+    @Input() isConnected: boolean = false;
+    @Input() name: string = '';
+    @Input() health: number = 0;
     @Input() displayBanButton: boolean = false;
+    @Input() avatarImage: string = '';
     @Input() onClick: () => void;
-
-    get avatarUrl(): string {
-        return AVATAR_DATA[this.player.avatar].htmlImageCentred;
-    }
 }

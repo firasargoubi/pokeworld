@@ -71,7 +71,7 @@
             </section>
             <section id="avatar-selection-container">
                 <div id="avatar-list">
-                    @for(avatar of visualData.avatarList; track avatar.name;) {
+                    @for(avatar of visualData.avatarList; track avatar.name) {
                         <div
                             class="avatar-container" [class.locked]="avatar.isLocked" [class.selected]="avatar.isSelected"
                             (click)="changeAvatar(avatar.avatar)"

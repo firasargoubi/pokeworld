@@ -1,3 +1,4 @@
+
 export enum MatchEvent {
     CreateMatch = 'createMatch',
     JoinMatch = 'joinMatch',
@@ -6,6 +7,7 @@ export enum MatchEvent {
     Update = 'update',
     Message = 'message',
     RemovedFromMatch = 'removedFromMatch',
+    Disconnect = 'disconnect',
 }
 
 export enum LobbyEvent {

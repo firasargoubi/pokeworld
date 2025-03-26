@@ -1,50 +1,42 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { MapService } from '@app/services/map/map.service';
-import { MatchDataService } from '@app/services/match-data/match-data.service';
 import { PopupService } from '@app/services/popup/popup.service';
-import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
-import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { MOVE_ANIMATION_DURATION } from '@common/consts/player.const';
-import { CombatData, CombatDataBroadcast, CombatResultBroadcast } from '@common/interfaces/combat';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
-import { Match, PlayerLeftData, PlayerMovementData } from '@common/interfaces/match';
 import { Position } from '@common/interfaces/position';
 import { CombatEvent, LobbyEvent, PlayEvent } from '@common/interfaces/socket-event.enum';
-import { END_GAME_DELAY, TIME_SCALE } from './play-sockets.const';
+import { SocketService } from '@app/services/socket/socket.service';
+import { MatchService } from '@app/services/match/match.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlaySocketsService {
-    private coreSocket: CoreSocketService = inject(CoreSocketService);
-    private matchDataService: MatchDataService = inject(MatchDataService);
+    private socketService: SocketService = inject(SocketService);
+    private matchService: MatchService = inject(MatchService);
     private timerService: TimerService = inject(TimerService);
     private mapService: MapService = inject(MapService);
     private popupService: PopupService = inject(PopupService);
-    private combatSocketService: CombatSocketService = inject(CombatSocketService);
-    private lobbySocketsService: LobbySocketsService = inject(LobbySocketsService);
     private router: Router = inject(Router);
 
-    constructor() {
-        this.setupPlayListeners();
-    }
+    // constructor() {
+    //     // this.setupPlayListeners();
+    //     // TODO
+    // }
 
     rightClickTile(position: Position) {
-        if (this.matchDataService.matchData.isDebugMode && this.matchDataService.isActivePlayer()) {
-            this.coreSocket.emit(PlayEvent.DebugMove, position);
+        if (this.matchService.data.playData.isDebugMode && this.matchService.isActivePlayer()) {
+            this.socketService.emit(PlayEvent.DebugMove, position);
         }
     }
 
     leaveMatch(): void {
-        this.lobbySocketsService.leaveMatch();
-        this.matchDataService.resetMatch();
+        this.matchService.leaveMatch();
     }
 
     endTurn(): void {
-        this.coreSocket.emit(PlayEvent.EndTurn);
+        this.socketService.emit(PlayEvent.EndTurn);
     }
 
     clickTile(position: Position): void {

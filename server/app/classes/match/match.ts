@@ -1,7 +1,7 @@
 import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { MatchService } from '@app/services/match/match.service';
 import { DEFAULT_MATCH_DATA } from '@common/consts/match-data.const';
-import { DEFAULT_PLAYER, MAX_PLAYERS } from '@common/consts/player.const';
+import { DEFAULT_PLAYER_DATA, MAX_PLAYERS } from '@common/consts/player-data.const';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
@@ -18,7 +18,7 @@ export class Match {
     constructor(matchCode: string, gameData: GameData, playerId: string) {
         this.data.code = matchCode;
         this.data.gameData = gameData;
-        this.data.players = [{ ...DEFAULT_PLAYER, id: playerId }];
+        this.data.players = [{ ...DEFAULT_PLAYER_DATA, id: playerId }];
     }
 
     sendUpdate() {
@@ -32,7 +32,7 @@ export class Match {
     }
 
     join(playerId: string) {
-        this.data.players.push({ ...DEFAULT_PLAYER, id: playerId });
+        this.data.players.push({ ...DEFAULT_PLAYER_DATA, id: playerId });
         this.changeLockStatus(false);
     }
 
