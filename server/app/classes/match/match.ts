@@ -6,11 +6,11 @@ import { GameData } from '@common/interfaces/game-data';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { PlayerData } from '@common/interfaces/player-data';
-import { Inject } from '@nestjs/common';
+import { forwardRef, Inject } from '@nestjs/common';
 
 export class Match {
-    @Inject(MatchGateway) private matchGateway: MatchGateway;
-    @Inject(MatchService) private matchService: MatchService;
+    @Inject(forwardRef(() => MatchGateway)) private matchGateway: MatchGateway;
+    @Inject(forwardRef(() => MatchService)) private matchService: MatchService;
     data: MatchData = structuredClone(DEFAULT_MATCH_DATA);
     private lastTimeoutStart: Date = new Date();
     private timeout: NodeJS.Timeout | null = null;

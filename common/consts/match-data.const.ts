@@ -5,12 +5,12 @@ export const TURN_DURATION = 30000;
 
 export const DEFAULT_LOBBY_DATA: LobbyData = {
     isLocked: false,
-    adminPlayerIndex: 0,
+    hostPlayerIndex: 0,
 };
 
 export const DEFAULT_PLAY_DATA: PlayData = {
     timeLeft: TURN_DURATION,
-    activePlayer: 0,
+    activePlayerIndex: 0,
     isDebugMode: false,
 };
 

@@ -1,4 +1,4 @@
-import { Match } from '@common/interfaces/match';
+import { MatchData } from '@common/interfaces/match-data';
 import { Position } from '@common/interfaces/position';
 
 export interface NeighborContext {
@@ -7,7 +7,7 @@ export interface NeighborContext {
     offset: { x: number; y: number };
     maxCost: number;
     size: number;
-    match: Match;
+    match: MatchData;
     distances: number[][];
     predecessors: Map<Position, Position>;
     queue: { pos: Position; cost: number }[];

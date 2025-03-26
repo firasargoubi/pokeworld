@@ -1,6 +1,4 @@
-import { DiceType, PlayerData } from '../interfaces/player-data';
-import { TileType } from '../interfaces/tile-type.enum';
-import { Avatar } from '../interfaces/avatar.enum';
+import { Avatar, DiceType, PlayerData } from '../interfaces/player-data';
 import { MapSize } from '../interfaces/map-data';
 
 export const DEFAULT_PLAYER: PlayerData = {
@@ -8,12 +6,13 @@ export const DEFAULT_PLAYER: PlayerData = {
     name: '',
     avatar: Avatar.Default,
     isConnected: false,
-    spawnPoint: { x: 0, y: 0 },
+    spawnPoint: { x: -2, y: -2 },
     items: [],
     health: 6,
     speed: 4,
     attackDice: DiceType.D6,
     defenseDice: DiceType.D4,
+    position: { x: -2, y: -2 }
 };
 
 export const MIN_NAME_LENGTH = 3;

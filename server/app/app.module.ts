@@ -12,6 +12,7 @@ import { LobbyService } from './services/lobby/lobby.service';
 import { MatchService } from './services/match/match.service';
 import { MovementService } from './services/movement/movement.service';
 import { PlayService } from './services/play/play.service';
+import { MatchGateway } from './gateways/match/match.gateway';
 
 @Module({
     imports: [
@@ -28,15 +29,18 @@ import { PlayService } from './services/play/play.service';
     controllers: [GameController],
     providers: [
         Logger,
+
         GameService,
         MatchService,
-        MovementService,
-        LobbyGateway,
         LobbyService,
-        PlayGateway,
         PlayService,
-        CombatGateway,
         CombatService,
+        MovementService,
+
+        MatchGateway,
+        LobbyGateway,
+        PlayGateway,
+        CombatGateway,
     ],
 })
 export class AppModule {}

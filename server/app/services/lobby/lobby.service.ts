@@ -4,11 +4,11 @@ import { HALF_POINT } from '@common/consts/match-data.const';
 import { MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { Avatar, PlayerData } from '@common/interfaces/player-data';
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class LobbyService {
-    @Inject(PlayService) private readonly playService: PlayService;
+    @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
 
     kickPlayer(match: Match, playerId: string, targetPlayerId: string) {
         const isHost = match.isHost(playerId);
