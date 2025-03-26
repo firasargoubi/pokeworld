@@ -1,32 +1,32 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { PlayerSelectionService } from '@app/services/player-selection/player-selection.service';
+import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { CharacterService } from '@app/services/character/character.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-import { Subject } from 'rxjs';
-import { PlayerSelectionPageComponent } from './player-selection-page.component';
-import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS } from '@common/consts/player.const';
 import { Avatar, AvatarStatus } from '@common/interfaces/avatar.enum';
 import { DiceType } from '@common/interfaces/dice';
 import { StatType } from '@common/interfaces/player';
-import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS } from '@common/consts/player.const';
+import { Subject } from 'rxjs';
+import { CharacterPageComponent } from './character-page.component';
 
-describe('PlayerSelectionPageComponent', () => {
-    let component: PlayerSelectionPageComponent;
-    let fixture: ComponentFixture<PlayerSelectionPageComponent>;
+describe('CharacterPageComponent', () => {
+    let component: CharacterPageComponent;
+    let fixture: ComponentFixture<CharacterPageComponent>;
     let routerSpy: jasmine.SpyObj<Router>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let lobbySocketServiceSpy: jasmine.SpyObj<LobbySocketsService>;
-    let playerSelectionServiceSpy: jasmine.SpyObj<PlayerSelectionService>;
+    let characterServiceSpy: jasmine.SpyObj<CharacterService>;
     let roomLockedSubject: Subject<boolean>;
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
         lobbySocketServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['updatePlayer', 'leaveMatch']);
-        playerSelectionServiceSpy = jasmine.createSpyObj(
-            'PlayerSelectionService',
+        characterServiceSpy = jasmine.createSpyObj(
+            'CharacterService',
             ['getAvatarStatus', 'isAvatarAvailable', 'updatePlayerAvatar', 'resetAvatar', 'setPlayerData', 'joinLobby', 'handleAvatarSelection'],
             {
                 avatarData: AVATAR_DATA,
@@ -57,15 +57,15 @@ describe('PlayerSelectionPageComponent', () => {
                 { provide: Router, useValue: routerSpy },
                 { provide: PopupService, useValue: popupServiceSpy },
                 { provide: LobbySocketsService, useValue: lobbySocketServiceSpy },
-                { provide: PlayerSelectionService, useValue: playerSelectionServiceSpy },
+                { provide: CharacterService, useValue: characterServiceSpy },
             ],
         }).compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(PlayerSelectionPageComponent);
+        fixture = TestBed.createComponent(CharacterPageComponent);
         component = fixture.componentInstance;
-        playerSelectionServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
+        characterServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
         fixture.detectChanges();
     });
 
@@ -75,7 +75,7 @@ describe('PlayerSelectionPageComponent', () => {
 
     it('should reset avatar on initialization', () => {
         component.ngOnInit();
-        expect(playerSelectionServiceSpy.resetAvatar).toHaveBeenCalled();
+        expect(characterServiceSpy.resetAvatar).toHaveBeenCalled();
     });
 
     it('should toggle bonus dice', () => {
@@ -87,7 +87,7 @@ describe('PlayerSelectionPageComponent', () => {
     });
 
     it('should return correct avatar button style', () => {
-        playerSelectionServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
+        characterServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
         const style = component.getAvatarBtnStyle(Avatar.Avatar1);
         expect(style).toEqual({ class: AvatarStatus.UNSELECTED });
     });
@@ -125,19 +125,19 @@ describe('PlayerSelectionPageComponent', () => {
     it('should return correct warnings', () => {
         component.nameForm.setValue('');
         expect(component['getWarnings']()).toContain('Le nom doit contenir entre 3 et 15 caractères');
-        component['playerSelectionService'].playerData.avatar = Avatar.Default;
+        component['characterService'].playerData.avatar = Avatar.Default;
         expect(component['getWarnings']()).toContain('Veuillez choisir un avatar');
     });
 
     it('should check if avatar is chosen', () => {
-        component['playerSelectionService'].playerData.avatar = Avatar.Avatar1;
+        component['characterService'].playerData.avatar = Avatar.Avatar1;
         expect(component['isAvatarChosen']()).toBeTrue();
-        component['playerSelectionService'].playerData.avatar = Avatar.Default;
+        component['characterService'].playerData.avatar = Avatar.Default;
         expect(component['isAvatarChosen']()).toBeFalse();
     });
 
     it('should return correct avatar button style', () => {
-        playerSelectionServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
+        characterServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
         const style = component.getAvatarBtnStyle(Avatar.Avatar1);
         expect(style).toEqual({ class: AvatarStatus.UNSELECTED });
     });
@@ -163,22 +163,22 @@ describe('PlayerSelectionPageComponent', () => {
 
     it('should reset avatar on init', () => {
         component.ngOnInit();
-        expect(playerSelectionServiceSpy.resetAvatar).toHaveBeenCalled();
+        expect(characterServiceSpy.resetAvatar).toHaveBeenCalled();
     });
 
     it('should set player data and join lobby when form is valid', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(component, 'getWarnings').and.returnValue([]);
         component.goToLobby();
-        expect(playerSelectionServiceSpy.setPlayerData).toHaveBeenCalled();
-        expect(playerSelectionServiceSpy.joinLobby).toHaveBeenCalled();
+        expect(characterServiceSpy.setPlayerData).toHaveBeenCalled();
+        expect(characterServiceSpy.joinLobby).toHaveBeenCalled();
     });
 
     it('should not join lobby when form is invalid', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(component, 'getWarnings').and.returnValue(['Warning']);
         component.goToLobby();
-        expect(playerSelectionServiceSpy.joinLobby).not.toHaveBeenCalled();
+        expect(characterServiceSpy.joinLobby).not.toHaveBeenCalled();
     });
 
     it('should show popup when navigating to menu', () => {
@@ -215,14 +215,14 @@ describe('PlayerSelectionPageComponent', () => {
     it('should return correct warnings', () => {
         component.nameForm.setValue('');
         expect(component['getWarnings']()).toContain('Le nom doit contenir entre 3 et 15 caractères');
-        component['playerSelectionService'].playerData.avatar = Avatar.Default;
+        component['characterService'].playerData.avatar = Avatar.Default;
         expect(component['getWarnings']()).toContain('Veuillez choisir un avatar');
     });
 
     it('should check if avatar is chosen', () => {
-        component['playerSelectionService'].playerData.avatar = Avatar.Avatar1;
+        component['characterService'].playerData.avatar = Avatar.Avatar1;
         expect(component['isAvatarChosen']()).toBeTrue();
-        component['playerSelectionService'].playerData.avatar = Avatar.Default;
+        component['characterService'].playerData.avatar = Avatar.Default;
         expect(component['isAvatarChosen']()).toBeFalse();
     });
 });

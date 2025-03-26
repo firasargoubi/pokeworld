@@ -1,8 +1,8 @@
-import { PlayerSelectionVisualData } from '@app/interfaces/player-selection-visual-data';
+import { CharacterVisualData } from '@app/interfaces/character-visual-data';
 import { MAX_NAME_LENGTH } from '@common/consts/player-data.const';
 import { EMPTY_IMAGE } from './images.const';
 
-export const DEFAULT_PLAYER_SELECTION_VISUAL_DATA: PlayerSelectionVisualData = {
+export const DEFAULT_CHARACTER_VISUAL_DATA: CharacterVisualData = {
     isHpSelected: true,
     isAttackSelected: true,
     avatarList: [],

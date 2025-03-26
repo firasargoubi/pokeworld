@@ -1,6 +1,6 @@
 import { Avatar } from '@common/interfaces/player-data';
 
-export interface PlayerSelectionVisualData {
+export interface CharacterVisualData {
     isHpSelected: boolean;
     isAttackSelected: boolean;
     avatarList: AvatarVisualData[];

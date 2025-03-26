@@ -36,7 +36,7 @@ export class MatchService {
         this.socketService.emit(MatchEvent.CreateMatch, gameData, (matchData: MatchData | null) => {
             if (matchData !== null) {
                 this.onUpdate(matchData);
-                this.router.navigate([PageEndpoint.PlayerSelection]);
+                this.router.navigate([PageEndpoint.character]);
             }
         });
     }
@@ -45,7 +45,7 @@ export class MatchService {
         this.socketService.emit(MatchEvent.JoinMatch, matchCode, (matchData: MatchData | null) => {
             if (matchData !== null) {
                 this.onUpdate(matchData);
-                this.router.navigate([PageEndpoint.PlayerSelection]);
+                this.router.navigate([PageEndpoint.character]);
             }
         });
     }

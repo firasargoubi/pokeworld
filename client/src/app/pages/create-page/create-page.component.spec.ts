@@ -99,7 +99,7 @@ describe('CreatePageComponent', () => {
     it('should handle createMatch success and failure', async () => {
         lobbySocketServiceSpy.createMatch.and.returnValue(Promise.resolve(true));
         await component.createMatch(MOCK_GAME_DATAS[0]);
-        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.PlayerSelection]);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.character]);
         expect(popupServiceSpy.showPopup).not.toHaveBeenCalled();
 
         lobbySocketServiceSpy.createMatch.and.returnValue(Promise.resolve(false));

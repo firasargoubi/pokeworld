@@ -3,30 +3,30 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { PlayerSelectionService } from '@app/services/player-selection/player-selection.service';
+import { CharacterService } from '@app/services/character/character.service';
 import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { of } from 'rxjs';
 import { JoinPageComponent } from './join-page.component';
-import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 
 describe('JoinPageComponent', () => {
     let component: JoinPageComponent;
     let fixture: ComponentFixture<JoinPageComponent>;
     let routerSpy: jasmine.SpyObj<Router>;
     let lobbySocketsServiceSpy: jasmine.SpyObj<LobbySocketsService>;
-    let playerSelectionServiceSpy: jasmine.SpyObj<PlayerSelectionService>;
+    let characterServiceSpy: jasmine.SpyObj<CharacterService>;
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         lobbySocketsServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['joinMatch']);
-        playerSelectionServiceSpy = jasmine.createSpyObj('PlayerSelectionService', ['matchCode']);
+        characterServiceSpy = jasmine.createSpyObj('CharacterService', ['matchCode']);
 
         await TestBed.configureTestingModule({
             imports: [FormsModule, HeaderComponent],
             providers: [
                 { provide: Router, useValue: routerSpy },
                 { provide: LobbySocketsService, useValue: lobbySocketsServiceSpy },
-                { provide: PlayerSelectionService, useValue: playerSelectionServiceSpy },
+                { provide: CharacterService, useValue: characterServiceSpy },
             ],
         }).compileComponents();
 
@@ -39,7 +39,7 @@ describe('JoinPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should navigate to player-selection on successful join', () => {
+    it('should navigate to character on successful join', () => {
         const matchCode = 'ABC123';
         const mockEvent = new KeyboardEvent('keydown', { key: 'Enter' });
         component.gameCode = matchCode;
@@ -48,7 +48,7 @@ describe('JoinPageComponent', () => {
         component.joinMatch(mockEvent);
 
         expect(lobbySocketsServiceSpy.joinMatch).toHaveBeenCalledWith(matchCode);
-        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.PlayerSelection]);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.character]);
     });
 
     it('should not navigate on unsuccessful join', () => {

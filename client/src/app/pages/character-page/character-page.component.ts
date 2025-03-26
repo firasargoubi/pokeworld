@@ -3,8 +3,8 @@ import { Component, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
-import { DEFAULT_PLAYER_SELECTION_VISUAL_DATA } from '@app/consts/player-data.const';
-import { PlayerSelectionVisualData } from '@app/interfaces/player-selection-visual-data';
+import { DEFAULT_CHARACTER_VISUAL_DATA } from '@app/consts/player-data.const';
+import { CharacterVisualData } from '@app/interfaces/character-visual-data';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -12,14 +12,14 @@ import { BONUS_STAT, DEFAULT_STAT, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@com
 import { Avatar, DiceType, PlayerData } from '@common/interfaces/player-data';
 
 @Component({
-    selector: 'app-player-selection-page',
+    selector: 'app-character-page',
     imports: [ReactiveFormsModule, HeaderComponent, CommonModule, FormsModule],
-    templateUrl: './player-selection-page.component.html',
-    styleUrl: './player-selection-page.component.scss',
+    templateUrl: './character-page.component.html',
+    styleUrl: './character-page.component.scss',
 })
-export class PlayerSelectionPageComponent {
+export class CharacterPageComponent {
     nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
-    visualData: PlayerSelectionVisualData = DEFAULT_PLAYER_SELECTION_VISUAL_DATA;
+    visualData: CharacterVisualData = DEFAULT_CHARACTER_VISUAL_DATA;
     private matchService: MatchService = inject(MatchService);
     private popupService: PopupService = inject(PopupService);
     private lobbyService: LobbyService = inject(LobbyService);
