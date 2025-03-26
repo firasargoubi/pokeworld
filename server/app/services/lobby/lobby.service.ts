@@ -1,11 +1,15 @@
 import { Match } from '@app/classes/match/match';
+import { PlayService } from '@app/services/play/play.service';
+import { HALF_POINT } from '@common/consts/match-data.const';
 import { MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
-import { Avatar } from '@common/interfaces/player-data';
-import { Injectable } from '@nestjs/common';
+import { Avatar, PlayerData } from '@common/interfaces/player-data';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class LobbyService {
+    @Inject(PlayService) private readonly playService: PlayService;
+
     kickPlayer(match: Match, playerId: string, targetPlayerId: string) {
         const isHost = match.isHost(playerId);
         const isTryingToKickThemselve = playerId === targetPlayerId;
@@ -23,10 +27,11 @@ export class LobbyService {
     }
 
     joinLobby(match: Match, playerId: string, name: string) {
-        const player = match.getPlayer(playerId);
+        const index = match.data.players.findIndex((p) => p.id === playerId);
+        const player = match.data.players.splice(index, 1)[0];
         player.name = this.getUniqueName(match, playerId, name);
         player.isConnected = true;
-        // TODO change player order
+        match.data.players.push(player);
         match.sendUpdate();
     }
 
@@ -45,9 +50,33 @@ export class LobbyService {
         }
     }
 
-    // eslint-disable-next-line no-unused-vars
     private startMatchFirstTurn(match: Match) {
-        // TODO set match state, re-organize match, start timeout, sendUpdate
+        this.sortPlayers(match);
+        this.assignSpawnPoints(match);
+        // this.playService.startTurn(match, 0);
+        // TODO
+    }
+
+    private sortPlayers(match: Match) {
+        const hostPlayerId = match.data.players[match.data.lobbyData.hostPlayerIndex].id;
+        match.data.players = match.data.players.sort((a: PlayerData, b: PlayerData) => {
+            if (a.speed !== b.speed) {
+                return b.speed - a.speed;
+            }
+            return Math.random() - HALF_POINT;
+        });
+        match.data.lobbyData.hostPlayerIndex = match.data.players.findIndex((p) => p.id === hostPlayerId);
+    }
+
+    private assignSpawnPoints(match: Match) {
+        const spawnPoints = match.data.gameData.mapData.items.Spawn;
+        const shuffledSpawnPoints = spawnPoints.sort(() => Math.random() - HALF_POINT).slice(0, match.data.players.length);
+        match.data.gameData.mapData.items.Spawn = spawnPoints.filter((s) => shuffledSpawnPoints.includes(s));
+
+        shuffledSpawnPoints.forEach((spawnPoint, i) => {
+            match.data.players[i].spawnPoint = spawnPoint;
+            match.data.players[i].position = spawnPoint;
+        });
     }
 
     private getUniqueName(match: Match, playerId: string, name: string): string {

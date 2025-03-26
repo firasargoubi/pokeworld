@@ -1,12 +1,12 @@
-import { MatchData, MatchState } from '@common/interfaces/match-data';
-import { GameData } from '@common/interfaces/game-data';
-import { DEFAULT_MATCH_DATA } from '@common/consts/match-data.const';
-import { DEFAULT_PLAYER, MAX_PLAYERS } from '@common/consts/player.const';
-import { Inject } from '@nestjs/common';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { MatchService } from '@app/services/match/match.service';
+import { DEFAULT_MATCH_DATA } from '@common/consts/match-data.const';
+import { DEFAULT_PLAYER, MAX_PLAYERS } from '@common/consts/player.const';
+import { GameData } from '@common/interfaces/game-data';
+import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { PlayerData } from '@common/interfaces/player-data';
+import { Inject } from '@nestjs/common';
 
 export class Match {
     @Inject(MatchGateway) private matchGateway: MatchGateway;

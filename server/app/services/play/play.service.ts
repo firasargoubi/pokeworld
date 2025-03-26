@@ -1,66 +1,28 @@
-import { LobbyGateway } from '@app/gateways/lobby/lobby.gateway';
-import { PlayGateway } from '@app/gateways/play/play.gateway';
-import { CombatService } from '@app/services/combat/combat.service';
-import { MatchService } from '@app/services/match/match.service';
+import { Match } from '@app/classes/match/match';
 import { MovementService } from '@app/services/movement/movement.service';
-import { HALF_POINT, MINIMUM_FIGHTS_TO_WIN, PRE_TURN_DURATION, TURN_DURATION } from '@common/consts/match.const';
 import { CombatResult } from '@common/interfaces/combat';
-import { Match, TurnPhase } from '@common/interfaces/match';
-import { Player } from '@common/interfaces/player';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PlayService {
-    @Inject(forwardRef(() => PlayGateway)) private readonly playGateway: PlayGateway;
-    @Inject(MatchService) private readonly matchService: MatchService;
     @Inject(MovementService) private readonly movementService: MovementService;
-    @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
-    @Inject(forwardRef(() => LobbyGateway)) private readonly lobbyGateway: LobbyGateway;
-
-    debugMove(playerId: string, position: Position) {
-        const matchCode = this.matchService.getMatchCode(playerId);
-        if (this.matchService.isActivePlayer(matchCode, playerId)) {
-            const player = this.matchService.getPlayer(matchCode, playerId);
-            const match = this.matchService.getMatch(matchCode);
-            if (match.matchData.isDebugMode) {
-                const possibleMoves = this.movementService.getPossibleMovesDebug(match);
-                const isMoveValid = possibleMoves.some((m) => m.x === position.x && m.y === position.y);
-                if (isMoveValid) {
-                    const originalPosition = player.currentStats.position;
-                    player.currentStats.position = position;
-                    const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
-                    this.playGateway.emitPlayerMoved(matchCode, { match, movement: [originalPosition, position], playerIndex });
-                }
-            }
-        }
-    }
-
-    getPossibleMoves(playerId: string): Position[] {
-        let positions = [];
-        const matchCode = this.matchService.getMatchCode(playerId);
-        if (matchCode) {
-            positions = this.movementService.getPossibleMoves(this.matchService.getMatch(matchCode));
-        }
-        return positions;
-    }
 
     move(playerId: string, position: Position) {
-        const matchCode = this.matchService.getMatchCode(playerId);
-        if (this.matchService.isActivePlayer(matchCode, playerId)) {
-            const player = this.matchService.getPlayer(matchCode, playerId);
-            const match = this.matchService.getMatch(matchCode);
-            const shortestPath = this.movementService.getShortestPath(match, position);
-
-            if (shortestPath.moveCost <= player.currentStats.movement) {
-                player.currentStats.position = position;
-                player.currentStats.movement -= shortestPath.moveCost;
-                const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
-                this.playGateway.emitPlayerMoved(matchCode, { match, movement: shortestPath.path, playerIndex });
-                this.tryEndTurn(matchCode, playerId);
-            }
-        }
+        // const matchCode = this.matchService.getMatchCode(playerId);
+        // if (this.matchService.isActivePlayer(matchCode, playerId)) {
+        //     const player = this.matchService.getPlayer(matchCode, playerId);
+        //     const match = this.matchService.getMatch(matchCode);
+        //     const shortestPath = this.movementService.getShortestPath(match, position);
+        //     if (shortestPath.moveCost <= player.currentStats.movement) {
+        //         player.currentStats.position = position;
+        //         player.currentStats.movement -= shortestPath.moveCost;
+        //         const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
+        //         this.playGateway.emitPlayerMoved(matchCode, { match, movement: shortestPath.path, playerIndex });
+        //         this.tryEndTurn(matchCode, playerId);
+        //     }
+        // }
     }
 
     action(playerId: string, position: Position) {
@@ -76,35 +38,23 @@ export class PlayService {
         }
     }
 
-    getHoverMoves(playerId: string, position: Position): Position[] {
-        const matchCode = this.matchService.getMatchCode(playerId);
-        let moves = [];
-        if (position.x >= 0 && position.y >= 0 && this.matchService.isActivePlayer(matchCode, playerId)) {
-            const player = this.matchService.getPlayer(matchCode, playerId);
-            const shortestPath = this.movementService.getShortestPath(this.matchService.getMatch(matchCode), position);
-            if (shortestPath.moveCost <= player.currentStats.movement) {
-                moves = shortestPath.path;
-            }
-        }
-        return moves;
-    }
-
-    getActions(playerId: string): Position[] {
-        const matchCode = this.matchService.getMatchCode(playerId);
-        let actions = [];
-        if (this.matchService.isActivePlayer(matchCode, playerId)) {
-            const match = this.matchService.getMatch(matchCode);
-            actions = this.movementService.getActions(match);
-        }
-
-        return actions;
-    }
-
-    startMatch(matchCode: string) {
-        const match = this.matchService.getMatch(matchCode);
-        this.reorganizeMatch(match);
-        this.playGateway.emitMatchStarted(matchCode, match);
-        this.nextTurnPhase(matchCode);
+    // eslint-disable-next-line no-unused-vars
+    debugMove(match: Match, playerId: string, position: Position) {
+        // const matchCode = this.matchService.getMatchCode(playerId);
+        // if (this.matchService.isActivePlayer(matchCode, playerId)) {
+        //     const player = this.matchService.getPlayer(matchCode, playerId);
+        //     const match = this.matchService.getMatch(matchCode);
+        //     if (match.matchData.isDebugMode) {
+        //         const possibleMoves = this.movementService.getPossibleMovesDebug(match);
+        //         const isMoveValid = possibleMoves.some((m) => m.x === position.x && m.y === position.y);
+        //         if (isMoveValid) {
+        //             const originalPosition = player.currentStats.position;
+        //             player.currentStats.position = position;
+        //             const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
+        //             this.playGateway.emitPlayerMoved(matchCode, { match, movement: [originalPosition, position], playerIndex });
+        //         }
+        //     }
+        // }
     }
 
     endTurn(playerId: string) {

@@ -33,4 +33,5 @@ export interface PlayerData {
     attackDice: DiceType;
     defenseDice: DiceType;
     spawnPoint: Position;
+    position: Position;
 }
