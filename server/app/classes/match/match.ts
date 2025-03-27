@@ -37,7 +37,6 @@ export class Match {
 
     join(playerId: string) {
         this.data.players.push({ ...structuredClone(DEFAULT_PLAYER_DATA), id: playerId });
-        this.changeLockStatus(false);
         this.sendUpdate();
     }
 
@@ -51,18 +50,20 @@ export class Match {
     }
 
     leave(playerId: string) {
-        if (this.isState([MatchState.Lobby])) {
-            if (this.isHost(playerId)) {
-                this.hostLeaveLobby(playerId);
-            } else {
-                this.playerLeaveLobby(playerId);
-            }
-        } else if (this.isState([MatchState.MatchEnd])) {
-            this.playerLeaveStats(playerId);
-        } else if (this.isState([MatchState.CombatAnimation, MatchState.CombatWait])) {
-            this.playerLeaveCombat(playerId);
-        } else {
-            this.playerLeaveMatch(playerId);
+        switch (this.data.state) {
+            case MatchState.Lobby:
+                if (this.isHost(playerId)) {
+                    return this.hostLeaveLobby(playerId);
+                } else {
+                    return this.playerLeaveLobby(playerId);
+                }
+            case MatchState.MatchEnd:
+                return this.playerLeaveStats(playerId);
+            case MatchState.CombatAnimation:
+            case MatchState.CombatWait:
+                return this.playerLeaveCombat(playerId);
+            default:
+                return this.playerLeaveMatch(playerId);
         }
     }
 
@@ -118,7 +119,6 @@ export class Match {
 
     private playerLeaveLobby(playerId: string) {
         this.data.players = this.data.players.filter((p) => p.id !== playerId);
-        this.changeLockStatus(false);
         this.sendUpdate();
     }
 
