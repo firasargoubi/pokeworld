@@ -18,7 +18,7 @@ import { Subject } from 'rxjs';
     providedIn: 'root',
 })
 export class MatchService {
-    matchUpdate: Subject<void> = new Subject();
+    matchUpdate: Subject<MatchData> = new Subject();
     selfIndex: number = -1;
     selfPlayer: PlayerData = structuredClone(DEFAULT_PLAYER_DATA);
     data: MatchData = structuredClone(DEFAULT_MATCH_DATA);
@@ -103,12 +103,13 @@ export class MatchService {
     }
 
     private onUpdate(matchData: MatchData) {
+        const oldMatchData = this.data;
         this.data = matchData;
         this.selfIndex = matchData.players.findIndex((p) => p.id === this.socketService.selfId);
         this.selfPlayer = matchData.players[this.selfIndex];
         this.gameDataService.setGameData(matchData.gameData);
         this.mapService.setPlayers(matchData.players);
-        this.matchUpdate.next();
+        this.matchUpdate.next(oldMatchData);
     }
 
     private onMessage(message: string) {
@@ -131,6 +132,6 @@ export class MatchService {
         this.gameDataService.setGameData(structuredClone(DEFAULT_GAME_DATA));
         this.mapService.setPlayers([]);
         this.mapService.clearOverlays();
-        this.matchUpdate.next();
+        this.matchUpdate.next(this.data);
     }
 }

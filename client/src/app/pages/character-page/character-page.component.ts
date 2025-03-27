@@ -21,7 +21,7 @@ import { Avatar, DiceType, PlayerData } from '@common/interfaces/player-data';
 })
 export class CharacterPageComponent {
     nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
-    visualData: CharacterVisualData = DEFAULT_CHARACTER_VISUAL_DATA;
+    visualData: CharacterVisualData = structuredClone(DEFAULT_CHARACTER_VISUAL_DATA);
     private matchService: MatchService = inject(MatchService);
     private popupService: PopupService = inject(PopupService);
     private lobbyService: LobbyService = inject(LobbyService);
@@ -62,13 +62,16 @@ export class CharacterPageComponent {
         const lockedAvatars = this.getLockedAvatars();
 
         this.visualData.selfAvatarimage = AVATAR_DATA[selfAvatar].image;
-        this.visualData.avatarList = Object.values(Avatar).map((avatar) => ({
-            avatar,
-            name: AVATAR_DATA[avatar].name,
-            image: AVATAR_DATA[avatar].image,
-            isLocked: lockedAvatars.includes(avatar),
-            isSelected: selfAvatar === avatar,
-        }));
+        this.visualData.isAvatarSelected = selfAvatar !== Avatar.Default;
+        this.visualData.avatarList = Object.values(Avatar)
+            .filter((a) => a !== Avatar.Default)
+            .map((avatar) => ({
+                avatar,
+                name: AVATAR_DATA[avatar].name,
+                image: AVATAR_DATA[avatar].image,
+                isLocked: lockedAvatars.includes(avatar),
+                isSelected: selfAvatar === avatar,
+            }));
     }
 
     private getLockedAvatars(): Avatar[] {

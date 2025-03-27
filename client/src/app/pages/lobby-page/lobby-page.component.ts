@@ -21,7 +21,7 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
     standalone: true,
 })
 export class LobbyPageComponent {
-    visualData: LobbyVisualData = DEFAULT_LOBBY_VISUAL_DATA;
+    visualData: LobbyVisualData = structuredClone(DEFAULT_LOBBY_VISUAL_DATA);
     matchService: MatchService = inject(MatchService);
     private lobbyService: LobbyService = inject(LobbyService);
     private popupService: PopupService = inject(PopupService);
