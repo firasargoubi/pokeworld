@@ -34,4 +34,12 @@ export interface PlayerData {
     defenseDice: DiceType;
     spawnPoint: Position;
     position: Position;
+    fightsWon: number;
+    type: PlayerType;
+}
+
+export enum PlayerType {
+    Player = 'player',
+    BotOffensive  = 'botOffensive',
+    BotDefensive = 'botDefensive',
 }

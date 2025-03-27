@@ -1,17 +1,10 @@
 export interface PlayVisualData {
-    mapSize: string;
-    gameMode: string;
     canUseAction: boolean;
     canEndTurn: boolean;
-    selfIndex: number;
     currentPlayerCount: number;
-    maxPlayerCount: number;
-    activePlayer: number;
     players: PlayerVisualData[];
     selfAvatarUrl: string;
-    selfName: string;
-    currentMovement: number;
-    maxMovement: number;
+    movementLeft: number;
     thumbnailUrl: string;
 }
 
@@ -20,7 +13,7 @@ export interface PlayerVisualData {
     name: string;
     avatarUrl: string;
     fightsWon: number;
-    isAdmin: boolean;
+    isHost: boolean;
     isBot: boolean;
     isConnected: boolean;
 }

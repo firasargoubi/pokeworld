@@ -1,5 +1,7 @@
-import { CombatData, LobbyData, MatchData, MatchState, PlayData } from '../interfaces/match-data';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { CombatAction, CombatData, LobbyData, MatchData, MatchState, PlayData, PlayerCombatData } from '../interfaces/match-data';
 import { DEFAULT_GAME_DATA } from './game-data.const';
+import { DEFAULT_PLAYER_DATA } from './player-data.const';
 
 export const TURN_DURATION = 30000;
 
@@ -12,11 +14,28 @@ export const DEFAULT_PLAY_DATA: PlayData = {
     timeLeft: TURN_DURATION,
     activePlayerIndex: 0,
     isDebugMode: false,
+    hasAction: false,
+    movementLeft: 0,
+};
+
+export const DEFAULT_PLAYER_COMBAT_DATA: PlayerCombatData = {
+    playerIndex: 0,
+    currentHealth: 4,
+    currentEscapes: 2,
+    maxEscapes: 2,
+    attack: 4,
+    defense: 4,
+    playerData: structuredClone(DEFAULT_PLAYER_DATA),
+    standingTile: TileType.Grass,
+    lastRolledAttack: 0,
+    lastRolledDefense: 0,
 };
 
 export const DEFAULT_COMBAT_DATA: CombatData = {
-    firstPlayerIndex: 0,
-    seccondPlayerIndex: 0,
+    firstPlayer: structuredClone(DEFAULT_PLAYER_COMBAT_DATA),
+    secondPlayer: structuredClone(DEFAULT_PLAYER_COMBAT_DATA),
+    lastCombatAction: CombatAction.None,
+    isFirstPlayerTurn: true,
 };
 
 export const DEFAULT_MATCH_DATA: MatchData = {

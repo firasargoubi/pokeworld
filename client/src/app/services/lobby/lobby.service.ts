@@ -1,23 +1,13 @@
 import { inject, Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { PopupService } from '@app/services/popup/popup.service';
 import { LobbyEvent } from '@common/interfaces/socket-event.enum';
 import { Avatar, PlayerData } from '@common/interfaces/player-data';
 import { SocketService } from '@app/services/socket/socket.service';
-import { MatchService } from '@app/services/match/match.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class LobbyService {
     private socketService: SocketService = inject(SocketService);
-    private matchService: MatchService = inject(MatchService);
-    private popupService: PopupService = inject(PopupService);
-    private router: Router = inject(Router);
-
-    // constructor() {
-    //     this.setupLobbyListeners();
-    // }
 
     kickPlayer(playerId: string) {
         this.socketService.emit(LobbyEvent.KickPlayer, playerId);

@@ -9,7 +9,7 @@ import { DEFAULT_MATCH_DATA } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
-import { MatchData } from '@common/interfaces/match-data';
+import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { PlayerData } from '@common/interfaces/player-data';
 import { MatchEvent } from '@common/interfaces/socket-event.enum';
 import { Subject } from 'rxjs';
@@ -65,12 +65,32 @@ export class MatchService {
         return this.selfIndex === this.data.playData.activePlayerIndex;
     }
 
+    canUseDebugMove(): boolean {
+        return this.data.playData.isDebugMode && this.isActivePlayer();
+    }
+
     isHost(): boolean {
         return this.selfIndex === this.data.lobbyData.hostPlayerIndex;
     }
 
     isInMatch(): boolean {
         return this.selfIndex >= 0;
+    }
+
+    isTurnWait(): boolean {
+        return this.data.state === MatchState.TurnWait;
+    }
+
+    canUseAction(): boolean {
+        return this.isActivePlayer() && this.isTurnWait() && this.data.playData.hasAction;
+    }
+
+    canEndTurn(): boolean {
+        return this.isActivePlayer() && this.isTurnWait();
+    }
+
+    getMovementLeft(): number {
+        return this.isActivePlayer() ? this.data.playData.movementLeft : 0;
     }
 
     private onDisconnect() {
@@ -110,6 +130,7 @@ export class MatchService {
         this.selfPlayer = structuredClone(DEFAULT_PLAYER_DATA);
         this.gameDataService.setGameData(structuredClone(DEFAULT_GAME_DATA));
         this.mapService.setPlayers([]);
+        this.mapService.clearOverlays();
         this.matchUpdate.next();
     }
 }

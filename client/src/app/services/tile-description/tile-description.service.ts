@@ -1,13 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
-import { DEFAULT_TILE_DESCRIPTION } from '@app/consts/default-tile-description.const';
-import { TILE_EFFECT } from '@app/consts/tile-effect.const';
+import { DEFAULT_TILE_DESCRIPTION, TILE_EFFECT } from '@app/consts/tile-data.const';
 import { TileDescriptionInfo } from '@app/interfaces/tile-description';
-import { GameDataService } from '@app/services/game-data/game-data.service';
-import { MatchDataService } from '@app/services/match-data/match-data.service';
-import { Player } from '@common/interfaces/player';
 import { Position } from '@common/interfaces/position';
 import { TILE_COST } from '@common/interfaces/tile-type.enum';
+import { MatchService } from '@app/services/match/match.service';
+import { PlayerData } from '@common/interfaces/player-data';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 
 @Injectable({
     providedIn: 'root',
@@ -18,11 +17,11 @@ export class TileDescriptionService {
     tileDescriptionPos: Position = { x: 0, y: 0 };
     isPlayerDescription: boolean = false;
 
-    private gameDataService = inject(GameDataService);
-    private matchDataService = inject(MatchDataService);
+    private matchService: MatchService = inject(MatchService);
+    private gameDataService: GameDataService = inject(GameDataService);
 
     displayTileDescription(event: MouseEvent): void {
-        if (!this.matchDataService.matchData.isDebugMode || !this.matchDataService.isActivePlayer()) {
+        if (!this.matchService.canUseDebugMove()) {
             event.preventDefault();
 
             const mapContainer = event.currentTarget as HTMLElement;
@@ -90,15 +89,15 @@ export class TileDescriptionService {
         }
     }
 
-    private findPlayerAtPosition(position: Position): Player | null {
-        const players = this.matchDataService.matchData.players;
+    private findPlayerAtPosition(position: Position): PlayerData | null {
+        let playerAtPosition = null;
 
-        for (const player of players) {
-            if (player.currentStats.position.x === position.x && player.currentStats.position.y === position.y) {
-                return player;
+        for (const player of this.matchService.data.players) {
+            if (player.position.x === position.x && player.position.y === position.y) {
+                playerAtPosition = player;
             }
         }
 
-        return null;
+        return playerAtPosition;
     }
 }

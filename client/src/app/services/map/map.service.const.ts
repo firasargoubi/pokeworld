@@ -1,6 +1,5 @@
 import { MapVisualData, OverlayTiles, TileVisualData } from '@app/interfaces/map-visual-data';
 import { MapSize } from '@common/interfaces/map-data';
-import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 
 export const ACTION_OVERLAY = 'action-overlay';
@@ -37,29 +36,6 @@ export const BRIDGE_VARIANTS: Map<string, string> = new Map([
     ['1001', '1'],
     ['0110', '2'],
 ]);
-
-export const SURROUNDING_POSITIONS_SQUARE: Position[] = [
-    { x: -1, y: -1 },
-    { x: -1, y: 0 },
-    { x: -1, y: 1 },
-    { x: 0, y: -1 },
-    { x: 0, y: 0 },
-    { x: 0, y: 1 },
-    { x: 1, y: -1 },
-    { x: 1, y: 0 },
-    { x: 1, y: 1 },
-];
-
-export const SURROUNDING_POSITIONS_DONUT: Position[] = [
-    { x: -1, y: -1 },
-    { x: -1, y: 0 },
-    { x: -1, y: 1 },
-    { x: 0, y: -1 },
-    { x: 0, y: 1 },
-    { x: 1, y: -1 },
-    { x: 1, y: 0 },
-    { x: 1, y: 1 },
-];
 
 export const DEFAULT_MAP_VISUAL_DATA: MapVisualData = {
     tiles: Array.from({ length: MapSize.Small }, () => Array(MapSize.Small).fill(DEFAULT_TILE_VISUAL)),
