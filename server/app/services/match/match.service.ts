@@ -1,6 +1,7 @@
 import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
-import { CODE_LENGTH, CODE_RANGE } from '@common/consts/match-data.const';
+import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA } from '@common/consts/match-data.const';
+import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
@@ -13,23 +14,38 @@ export class MatchService {
     private playerToMatchCode: Map<string, string> = new Map();
 
     createMatch(playerId: string, gameData: GameData): MatchData | null {
-        let matchData: MatchData | null = null;
+        let matchData = null;
         if (this.canCreateMatch(playerId)) {
-            const matchCode = this.getNewMatchCode();
-            const match: Match = new Match(matchCode, gameData, playerId);
-            this.matches.set(matchCode, match);
-            this.playerToMatchCode.set(playerId, matchCode);
-            matchData = match.data;
+            matchData = { ...DEFAULT_MATCH_DATA, code: this.getNewMatchCode(), gameData, players: [{ ...DEFAULT_PLAYER_DATA, id: playerId }] };
+            const match = new Match(matchData, this);
+            this.matches.set(matchData.code, match);
+            this.playerToMatchCode.set(playerId, matchData.code);
+            this.matchGateway.connectPlayer(playerId, matchData.code);
+            return matchData;
         }
         return matchData;
     }
 
+    sendUpdate(matchData: MatchData) {
+        this.matchGateway.emitUpdate(matchData.code, matchData);
+    }
+
+    sendMessage(matchCode: string, message: string) {
+        this.matchGateway.emitMessage(matchCode, message);
+    }
+
+    playerRemovedFromMatch(playerId: string, reason: string) {
+        this.matchGateway.emitRemovedFromMatch(playerId, reason);
+        this.disconnectPlayer(playerId);
+    }
+
     joinMatch(playerId: string, matchCode: string): MatchData | null {
-        let matchData: MatchData | null = null;
+        let matchData = null;
         if (this.canJoinMatch(playerId, matchCode)) {
             const match = this.getMatch(matchCode);
             match.join(playerId);
             this.playerToMatchCode.set(playerId, matchCode);
+            this.matchGateway.connectPlayer(playerId, matchCode);
             matchData = match.data;
         }
         return matchData;

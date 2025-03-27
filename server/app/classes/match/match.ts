@@ -1,34 +1,30 @@
-import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { MatchService } from '@app/services/match/match.service';
-import { DEFAULT_MATCH_DATA } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA, MAX_PLAYERS } from '@common/consts/player-data.const';
-import { GameData } from '@common/interfaces/game-data';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { PlayerData } from '@common/interfaces/player-data';
-import { forwardRef, Inject } from '@nestjs/common';
 
 export class Match {
-    @Inject(forwardRef(() => MatchGateway)) private matchGateway: MatchGateway;
-    @Inject(forwardRef(() => MatchService)) private matchService: MatchService;
-    data: MatchData = structuredClone(DEFAULT_MATCH_DATA);
+    data: MatchData;
+    private matchService: MatchService;
     private lastTimeoutStart: Date = new Date();
     private timeout: NodeJS.Timeout | null = null;
 
-    constructor(matchCode: string, gameData: GameData, playerId: string) {
-        this.data.code = matchCode;
-        this.data.gameData = gameData;
-        this.data.players = [{ ...DEFAULT_PLAYER_DATA, id: playerId }];
+    constructor(matchData: MatchData, matchService: MatchService) {
+        this.data = matchData;
+        this.matchService = matchService;
     }
 
     sendUpdate() {
-        this.matchGateway.emitUpdate(this.data.code, this.data);
+        this.matchService.sendUpdate(this.data);
     }
 
     sendMessage(message: string) {
-        this.matchGateway.emitMessage(this.data.code, message);
+        this.matchService.sendMessage(this.data.code, message);
 
         // TODO ajouter le message a l'historique du journal
+
+        this.sendUpdate();
     }
 
     join(playerId: string) {
@@ -84,8 +80,7 @@ export class Match {
     }
 
     kickPlayer(playerId: string, reason: string) {
-        this.matchGateway.emitRemovedFromMatch(playerId, reason);
-        this.matchService.disconnectPlayer(playerId);
+        this.matchService.playerRemovedFromMatch(playerId, reason);
         this.data.players = this.data.players.filter((p) => p.id !== playerId);
     }
 
