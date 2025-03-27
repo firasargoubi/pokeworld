@@ -3,7 +3,9 @@ import { CombatAction, CombatData, LobbyData, MatchData, MatchState, PlayData, P
 import { DEFAULT_GAME_DATA } from './game-data.const';
 import { DEFAULT_PLAYER_DATA } from './player-data.const';
 
-export const TURN_DURATION = 30000;
+export const TURN_WAIT_DURATION = 30000;
+export const TURN_START_DURATION = 3000;
+export const MOVEMENT_ANIMATION_DURATION = 150;
 
 export const DEFAULT_LOBBY_DATA: LobbyData = {
     isLocked: false,
@@ -11,7 +13,7 @@ export const DEFAULT_LOBBY_DATA: LobbyData = {
 };
 
 export const DEFAULT_PLAY_DATA: PlayData = {
-    timeLeft: TURN_DURATION,
+    timeLeft: TURN_WAIT_DURATION,
     activePlayerIndex: 0,
     isDebugMode: false,
     hasAction: false,
@@ -48,15 +50,11 @@ export const DEFAULT_MATCH_DATA: MatchData = {
     players: [],
 };
 
-export const CODE_RANGE = 10000;
+export const MATCH_CODE_RANGE = 10000;
 
-export const CODE_LENGTH = 4;
+export const MATCH_CODE_LENGTH = 4;
 
 export const HALF_POINT = 0.5;
-
-export const MATCH_END_DELAY = 4000;
-
-export const PRE_TURN_DURATION = 3000;
 
 export const MS_CONVERSION_FACTOR = 10;
 

@@ -7,4 +7,6 @@ export enum Message {
     RoomLocked = 'La partie est verrouillée',
     LockedFromLobby = "Le jeu s'est verrouillé pendant que vous choisissiez votre personnage",
     LastPlayerRemaining = 'La partie est terminée car tous les autres joueurs ont quitté',
+    DebugModeOn = 'Le mode de debug a été activé',
+    DebugModeOff = 'Le mode de debug a été désactivé',
 }

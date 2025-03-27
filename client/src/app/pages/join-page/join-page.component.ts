@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { MatchService } from '@app/services/match/match.service';
-import { CODE_LENGTH } from '@common/consts/match-data.const';
+import { MATCH_CODE_LENGTH } from '@common/consts/match-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 
 @Component({
@@ -14,7 +14,7 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 })
 export class JoinPageComponent {
     gameCode: string = '';
-    codeLength: number = CODE_LENGTH;
+    codeLength: number = MATCH_CODE_LENGTH;
     private router: Router = inject(Router);
     private matchService: MatchService = inject(MatchService);
 

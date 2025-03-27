@@ -1,85 +1,149 @@
 import { Match } from '@app/classes/match/match';
 import { MovementService } from '@app/services/movement/movement.service';
+import { MOVEMENT_ANIMATION_DURATION, TURN_START_DURATION, TURN_WAIT_DURATION } from '@common/consts/match-data.const';
+import { MatchState } from '@common/interfaces/match-data';
+import { Message } from '@common/interfaces/message.enum';
 import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
 import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PlayService {
     @Inject(MovementService) private readonly movementService: MovementService;
 
-    // eslint-disable-next-line no-unused-vars
     endTurn(match: Match, playerId: string) {
-        // TODO
-        // const matchCode = this.matchService.getMatchCode(playerId);
-        // if (this.canEndTurn(playerId, matchCode)) {
-        //     this.nextTurnPhase(matchCode);
-        // }
+        if (match.isActivePlayer(playerId) && match.isState(MatchState.TurnWait)) {
+            this.startTurnStart(match);
+        }
     }
 
-    // eslint-disable-next-line no-unused-vars
     move(match: Match, playerId: string, position: Position) {
-        // TODO
-        // const matchCode = this.matchService.getMatchCode(playerId);
-        // if (this.matchService.isActivePlayer(matchCode, playerId)) {
-        //     const player = this.matchService.getPlayer(matchCode, playerId);
-        //     const match = this.matchService.getMatch(matchCode);
-        //     const shortestPath = this.movementService.getShortestPath(match, position);
-        //     if (shortestPath.moveCost <= player.currentStats.movement) {
-        //         player.currentStats.position = position;
-        //         player.currentStats.movement -= shortestPath.moveCost;
-        //         const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
-        //         this.playGateway.emitPlayerMoved(matchCode, { match, movement: shortestPath.path, playerIndex });
-        //         this.tryEndTurn(matchCode, playerId);
-        //     }
-        // }
+        if (match.isActivePlayer(playerId) && match.isState(MatchState.TurnWait)) {
+            const shortestPath = this.movementService.getShortestPath(match.data, position);
+            if (shortestPath.moveCost <= match.data.playData.movementLeft) {
+                const player = match.getPlayer(playerId);
+                player.position = position;
+                match.data.playData.movementLeft -= shortestPath.moveCost;
+                const elapsedTime = Math.abs(new Date().getTime() - match.lastTimeoutStart.getTime());
+                match.data.playData.timeLeft = match.data.playData.timeLeft - elapsedTime;
+                match.data.state = MatchState.MovementAnimation;
+                match.sendUpdate();
+                match.setTimeout(this.endOfMovementAnimation.bind(this, match), (shortestPath.path.length + 1) * MOVEMENT_ANIMATION_DURATION);
+            }
+        }
     }
 
-    // eslint-disable-next-line no-unused-vars
+    endOfMovementAnimation(match: Match) {
+        match.data.state = MatchState.TurnWait;
+        match.setTimeout(this.startTurnStart.bind(this, match), match.data.playData.timeLeft);
+        match.sendUpdate();
+    }
+
     action(match: Match, playerId: string, position: Position) {
-        // TODO
-        // const matchCode = this.matchService.getMatchCode(playerId);
-        // if (this.matchService.isActivePlayer(matchCode, playerId)) {
-        //     const match = this.matchService.getMatch(matchCode);
-        //     const actions = this.movementService.getActions(match);
-        //     if (actions.some((a) => a.x === position.x && a.y === position.y)) {
-        //         match.matchData.players.find((p) => p.id === playerId).currentStats.hasAction = false;
-        //         this.executeAction(position, match, playerId);
-        //     }
-        // }
+        if (match.data.playData.hasAction && match.isActivePlayer(playerId) && match.isState(MatchState.TurnWait)) {
+            const actions = this.movementService.getActions(match.data);
+            if (actions.some((a) => a.x === position.x && a.y === position.y)) {
+                match.data.playData.hasAction = false;
+                this.executeAction(match, playerId, position);
+            }
+        }
     }
 
-    // eslint-disable-next-line no-unused-vars
     debugMove(match: Match, playerId: string, position: Position) {
-        // TODO
-        // const matchCode = this.matchService.getMatchCode(playerId);
-        // if (this.matchService.isActivePlayer(matchCode, playerId)) {
-        //     const player = this.matchService.getPlayer(matchCode, playerId);
-        //     const match = this.matchService.getMatch(matchCode);
-        //     if (match.matchData.isDebugMode) {
-        //         const possibleMoves = this.movementService.getPossibleMovesDebug(match);
-        //         const isMoveValid = possibleMoves.some((m) => m.x === position.x && m.y === position.y);
-        //         if (isMoveValid) {
-        //             const originalPosition = player.currentStats.position;
-        //             player.currentStats.position = position;
-        //             const playerIndex = match.matchData.players.findIndex((p) => p.id === playerId);
-        //             this.playGateway.emitPlayerMoved(matchCode, { match, movement: [originalPosition, position], playerIndex });
-        //         }
-        //     }
-        // }
+        if (match.data.playData.isDebugMode && match.isActivePlayer(playerId) && match.isState(MatchState.TurnWait)) {
+            const possibleMoves = this.movementService.getPossibleMovesDebug(match.data);
+            const isMoveValid = possibleMoves.some((m) => m.x === position.x && m.y === position.y);
+            if (isMoveValid) {
+                const player = match.getPlayer(playerId);
+                player.position = position;
+                match.sendUpdate();
+            }
+        }
     }
 
-    // eslint-disable-next-line no-unused-vars
     changeDebugMode(match: Match, playerId: string, isDebugMode: boolean) {
+        if (match.isHost(playerId) && match.isActivePlayer(playerId)) {
+            match.data.playData.isDebugMode = isDebugMode;
+            match.sendMessage(isDebugMode ? Message.DebugModeOn : Message.DebugModeOff);
+        }
+    }
+
+    startTurnStart(match: Match) {
+        match.data.state = MatchState.TurnStart;
+        match.data.playData.hasAction = false;
+        match.data.playData.movementLeft = 0;
+        match.data.playData.timeLeft = TURN_WAIT_DURATION;
+        match.data.playData.activePlayerIndex = this.getNextPlayerIndex(match);
+
+        match.setTimeout(this.startTurnWait.bind(this, match), TURN_START_DURATION);
+        const playerName = match.data.players[match.data.playData.activePlayerIndex].name;
+        match.sendMessage(`Début du tour de ${playerName}`);
+    }
+
+    private startTurnWait(match: Match) {
+        match.data.state = MatchState.TurnWait;
+        match.data.playData.hasAction = true;
+        match.data.playData.movementLeft = match.data.players[match.data.playData.activePlayerIndex].speed;
+
+        match.setTimeout(this.startTurnStart.bind(this, match), TURN_WAIT_DURATION);
+        match.sendUpdate();
+    }
+
+    private executeAction(match: Match, playerId: string, position: Position) {
+        const targetPlayer = match.data.players.find((p) => p.position.x === position.x && p.position.y === position.y);
+        if (targetPlayer) {
+            this.startFight(match, playerId, targetPlayer.id);
+        } else {
+            this.toggleBridgeTile(match, position);
+            match.sendUpdate();
+        }
+    }
+
+    private toggleBridgeTile(match: Match, position: Position) {
+        const tile = match.data.gameData.mapData.tiles[position.x][position.y];
+        if (tile === TileType.Bridge) {
+            match.data.gameData.mapData.tiles[position.x][position.y] = TileType.BrokenBridge;
+        } else if (tile === TileType.BrokenBridge) {
+            match.data.gameData.mapData.tiles[position.x][position.y] = TileType.Bridge;
+        }
+    }
+
+    private getNextPlayerIndex(match: Match): number {
+        let nextIndex = (match.data.playData.activePlayerIndex + 1) % match.data.players.length;
+        let steps = 0;
+        while (steps <= match.data.players.length && !match.data.players[nextIndex].isConnected) {
+            nextIndex = (nextIndex + 1) % match.data.players.length;
+            steps++;
+        }
+        return nextIndex;
+    }
+
+    private startFight(match: Match, playerId: string, targetPlayerId: string) {
         // TODO
-        // const matchCode = this.matchService.getMatchCode(playerId);
-        // if (matchCode) {
-        //     const isAdmin = this.matchService.isPlayerAdmin(playerId, matchCode);
-        //     if (isAdmin) {
-        //         const match = this.matchService.getMatch(matchCode);
-        //         match.matchData.isDebugMode = forceMode !== undefined ? forceMode : !match.matchData.isDebugMode;
-        //         this.playGateway.emitDebugModeChanged(matchCode, match);
-        //     }
+        // eslint-disable-next-line no-console
+        console.log('startFight', match.data.state, playerId, targetPlayerId);
+        match.sendUpdate();
+
+        // const match = this.matchService.getMatch(matchCode);
+        // const turnData = this.matchService.getTurnData(matchCode);
+        // if (turnData.phaseTimeout) {
+        //     clearTimeout(turnData.phaseTimeout);
+        //     turnData.phaseTimeout = null;
         // }
+        // const player = this.matchService.getPlayer(matchCode, playerId);
+        // const targetPlayer = this.matchService.getPlayer(matchCode, targetPlayerId);
+        // const tiles = match.gameData.mapData.tiles;
+        // player.currentStats.standingTile = tiles[player.currentStats.position.x][player.currentStats.position.y];
+        // targetPlayer.currentStats.standingTile = tiles[targetPlayer.currentStats.position.x][targetPlayer.currentStats.position.y];
+
+        // const elapsedTime = Math.abs(new Date().getTime() - turnData.lastPhaseStartTime.getTime());
+        // match.matchData.currentTimer = match.matchData.currentTimer - elapsedTime;
+        // this.playGateway.emitCombatDataBroadcast(matchCode, {
+        //     match,
+        //     playerOneIndex: this.matchService.getPlayerIndex(matchCode, playerId),
+        //     playerTwoIndex: this.matchService.getPlayerIndex(matchCode, targetPlayerId),
+        // });
+        // this.combatService.initiateCombat(playerId, targetPlayerId, matchCode);
     }
 
     // canEndTurn(playerId: string, matchCode: string): boolean {
@@ -158,49 +222,6 @@ export class PlayService {
     //     });
     // }
 
-    // private executeAction(position: Position, match: Match, playerId: string) {
-    //     const player = match.matchData.players.find((p) => p.currentStats.position.x === position.x && p.currentStats.position.y === position.y);
-    //     if (player) {
-    //         this.startFight(match.matchData.code, playerId, player.id);
-    //     } else {
-    //         this.toggleBridgeTile(match, position);
-    //         this.tryEndTurn(match.matchData.code, playerId);
-    //     }
-    // }
-
-    // private startFight(matchCode: string, playerId: string, targetPlayerId: string) {
-    //     const match = this.matchService.getMatch(matchCode);
-    //     const turnData = this.matchService.getTurnData(matchCode);
-    //     if (turnData.phaseTimeout) {
-    //         clearTimeout(turnData.phaseTimeout);
-    //         turnData.phaseTimeout = null;
-    //     }
-    //     const player = this.matchService.getPlayer(matchCode, playerId);
-    //     const targetPlayer = this.matchService.getPlayer(matchCode, targetPlayerId);
-    //     const tiles = match.gameData.mapData.tiles;
-    //     player.currentStats.standingTile = tiles[player.currentStats.position.x][player.currentStats.position.y];
-    //     targetPlayer.currentStats.standingTile = tiles[targetPlayer.currentStats.position.x][targetPlayer.currentStats.position.y];
-
-    //     const elapsedTime = Math.abs(new Date().getTime() - turnData.lastPhaseStartTime.getTime());
-    //     match.matchData.currentTimer = match.matchData.currentTimer - elapsedTime;
-    //     this.playGateway.emitCombatDataBroadcast(matchCode, {
-    //         match,
-    //         playerOneIndex: this.matchService.getPlayerIndex(matchCode, playerId),
-    //         playerTwoIndex: this.matchService.getPlayerIndex(matchCode, targetPlayerId),
-    //     });
-    //     this.combatService.initiateCombat(playerId, targetPlayerId, matchCode);
-    // }
-
-    // private toggleBridgeTile(match: Match, position: Position) {
-    //     const tile = match.gameData.mapData.tiles[position.x][position.y];
-    //     if (tile === TileType.Bridge) {
-    //         match.gameData.mapData.tiles[position.x][position.y] = TileType.BrokenBridge;
-    //     } else if (tile === TileType.BrokenBridge) {
-    //         match.gameData.mapData.tiles[position.x][position.y] = TileType.Bridge;
-    //     }
-    //     this.playGateway.emitBridgeChanged(match.matchData.code, match);
-    // }
-
     // private startPreTurn(match: Match) {
     //     this.depleteCurrentStats(match.matchData.players[match.matchData.activePlayer]);
     //     match.matchData.activePlayer = this.getNextCurrentIndex(match.matchData.players, match.matchData.activePlayer);
@@ -236,19 +257,6 @@ export class PlayService {
     //     player.currentStats.hasAction = false;
     //     player.currentStats.movement = 0;
     //     player.currentStats.health = player.playerStats.health;
-    // }
-
-    // private getNextCurrentIndex(players: Player[], currentIndex: number): number {
-    //     const totalPlayers = players.length;
-    //     let nextIndex = (currentIndex + 1) % totalPlayers;
-
-    //     let steps = 0;
-    //     while (steps <= totalPlayers && !players[nextIndex].isConnected) {
-    //         nextIndex = (nextIndex + 1) % totalPlayers;
-    //         steps++;
-    //     }
-
-    //     return nextIndex;
     // }
 
     // private reorganizeMatch(match: Match) {

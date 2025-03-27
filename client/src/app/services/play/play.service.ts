@@ -49,6 +49,6 @@ export class PlayService {
     }
 
     changeDebugMode(): void {
-        this.socketService.emit(PlayEvent.ChangeDebugMode, this.matchService.data.playData.isDebugMode);
+        this.socketService.emit(PlayEvent.ChangeDebugMode, !this.matchService.data.playData.isDebugMode);
     }
 }

@@ -6,8 +6,8 @@ import { PlayerData } from '@common/interfaces/player-data';
 
 export class Match {
     data: MatchData;
+    lastTimeoutStart: Date = new Date();
     private matchService: MatchService;
-    private lastTimeoutStart: Date = new Date();
     private timeout: NodeJS.Timeout | null = null;
 
     constructor(matchData: MatchData, matchService: MatchService) {
@@ -20,11 +20,19 @@ export class Match {
     }
 
     sendMessage(message: string) {
-        this.matchService.sendMessage(this.data.code, message);
-
-        // TODO ajouter le message a l'historique du journal
-
         this.sendUpdate();
+        this.matchService.sendMessage(this.data.code, message);
+        // TODO ajouter le message a l'historique du journal
+    }
+
+    setTimeout(callback: () => void, duration: number) {
+        this.clearTimeout();
+        this.lastTimeoutStart = new Date();
+        this.timeout = setTimeout(callback, duration);
+    }
+
+    isState(state: MatchState): boolean {
+        return this.data.state === state;
     }
 
     join(playerId: string) {
@@ -43,13 +51,13 @@ export class Match {
     }
 
     leave(playerId: string) {
-        if (this.data.state === MatchState.Lobby) {
+        if (this.isState(MatchState.Lobby)) {
             if (this.isHost(playerId)) {
                 this.hostLeaveLobby(playerId);
             } else {
                 this.playerLeaveLobby(playerId);
             }
-        } else if (this.data.state === MatchState.MatchEnd) {
+        } else if (this.isState(MatchState.MatchEnd)) {
             this.playerLeaveStats(playerId);
         } else {
             this.playerLeaveMatch(playerId);
@@ -68,6 +76,11 @@ export class Match {
     isHost(playerId: string): boolean {
         const playerIdex = this.getPlayerIndex(playerId);
         return playerIdex === this.data.lobbyData.hostPlayerIndex;
+    }
+
+    isActivePlayer(playerId: string): boolean {
+        const playerIdex = this.getPlayerIndex(playerId);
+        return playerIdex === this.data.playData.activePlayerIndex;
     }
 
     getPlayer(playerId: string): PlayerData {

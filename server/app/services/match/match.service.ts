@@ -1,6 +1,6 @@
 import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
-import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA } from '@common/consts/match-data.const';
+import { MATCH_CODE_LENGTH, MATCH_CODE_RANGE, DEFAULT_MATCH_DATA } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData } from '@common/interfaces/match-data';
@@ -46,9 +46,7 @@ export class MatchService {
 
     joinMatch(playerId: string, matchCode: string): MatchData | null {
         let matchData = null;
-        console.log('joinMatch 1');
         if (this.canJoinMatch(playerId, matchCode)) {
-            console.log('joinMatch 2');
             const match = this.getMatch(matchCode);
             match.join(playerId);
             this.playerToMatchCode.set(playerId, matchCode);
@@ -149,9 +147,9 @@ export class MatchService {
     private getNewMatchCode(): string {
         let matchCode: string;
         do {
-            matchCode = Math.floor(Math.random() * CODE_RANGE)
+            matchCode = Math.floor(Math.random() * MATCH_CODE_RANGE)
                 .toString()
-                .padStart(CODE_LENGTH, '0');
+                .padStart(MATCH_CODE_LENGTH, '0');
         } while (this.hasMatchCode(matchCode));
         return matchCode;
     }

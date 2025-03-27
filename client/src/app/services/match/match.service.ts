@@ -77,16 +77,16 @@ export class MatchService {
         return this.selfIndex >= 0;
     }
 
-    isTurnWait(): boolean {
-        return this.data.state === MatchState.TurnWait;
+    isState(state: MatchState): boolean {
+        return this.data.state === state;
     }
 
     canUseAction(): boolean {
-        return this.isActivePlayer() && this.isTurnWait() && this.data.playData.hasAction;
+        return this.isActivePlayer() && this.isState(MatchState.TurnWait) && this.data.playData.hasAction;
     }
 
     canEndTurn(): boolean {
-        return this.isActivePlayer() && this.isTurnWait();
+        return this.isActivePlayer() && this.isState(MatchState.TurnWait);
     }
 
     getMovementLeft(): number {
@@ -103,6 +103,7 @@ export class MatchService {
     }
 
     private onUpdate(matchData: MatchData) {
+        window.console.log(matchData);
         const oldMatchData = this.data;
         this.data = matchData;
         this.selfIndex = matchData.players.findIndex((p) => p.id === this.socketService.selfId);

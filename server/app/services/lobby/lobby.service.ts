@@ -55,8 +55,8 @@ export class LobbyService {
     private startMatchFirstTurn(match: Match) {
         this.sortPlayers(match);
         this.assignSpawnPoints(match);
-        // this.playService.startTurn(match, 0);
-        // TODO
+        match.data.playData.activePlayerIndex = -1;
+        this.playService.startTurnStart(match);
     }
 
     private sortPlayers(match: Match) {
