@@ -31,8 +31,8 @@ export class Match {
         this.timeout = setTimeout(callback, duration);
     }
 
-    isState(state: MatchState): boolean {
-        return this.data.state === state;
+    isState(states: MatchState[]): boolean {
+        return states.includes(this.data.state);
     }
 
     join(playerId: string) {
@@ -51,14 +51,16 @@ export class Match {
     }
 
     leave(playerId: string) {
-        if (this.isState(MatchState.Lobby)) {
+        if (this.isState([MatchState.Lobby])) {
             if (this.isHost(playerId)) {
                 this.hostLeaveLobby(playerId);
             } else {
                 this.playerLeaveLobby(playerId);
             }
-        } else if (this.isState(MatchState.MatchEnd)) {
+        } else if (this.isState([MatchState.MatchEnd])) {
             this.playerLeaveStats(playerId);
+        } else if (this.isState([MatchState.CombatAnimation, MatchState.CombatWait])) {
+            this.playerLeaveCombat(playerId);
         } else {
             this.playerLeaveMatch(playerId);
         }
@@ -118,6 +120,11 @@ export class Match {
         this.data.players = this.data.players.filter((p) => p.id !== playerId);
         this.changeLockStatus(false);
         this.sendUpdate();
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    private playerLeaveCombat(playerId: string) {
+        // TODO a player has left the match while there was a combat going on
     }
 
     // eslint-disable-next-line no-unused-vars

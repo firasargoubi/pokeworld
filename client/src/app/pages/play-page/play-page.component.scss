@@ -493,7 +493,7 @@ app-map {
     width: calc(200vw + 2 * $timer-height);
     background-image: url($timer-image);
     background-size: auto $timer-height;
-    transform: translateX(calc((var(--max-time) - var(--pause-time)) / var(--max-time) * -103vw - 2.5vw));
+    transform: translateX(calc((var(--max-time) - var(--pause-time)) / var(--max-time) * -103vw - 1.5vw));
 }
 
 .active .timer-image {
@@ -502,10 +502,10 @@ app-map {
 
 @keyframes timer-animation {
     from {
-        transform: translateX(calc((var(--max-time) - var(--pause-time)) / var(--max-time) * -103vw - 2.5vw));
+        transform: translateX(calc((var(--max-time) - var(--pause-time)) / var(--max-time) * -103vw - 1.5vw));
     }
     to {
-        transform: translateX(calc(-103vw - 2.5vw));
+        transform: translateX(calc(-103vw - 1.5vw));
     }
 }
 

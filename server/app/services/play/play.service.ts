@@ -12,13 +12,13 @@ export class PlayService {
     @Inject(MovementService) private readonly movementService: MovementService;
 
     endTurn(match: Match, playerId: string) {
-        if (match.isActivePlayer(playerId) && match.isState(MatchState.TurnWait)) {
+        if (match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
             this.startTurnStart(match);
         }
     }
 
     move(match: Match, playerId: string, position: Position) {
-        if (match.isActivePlayer(playerId) && match.isState(MatchState.TurnWait)) {
+        if (match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
             const shortestPath = this.movementService.getShortestPath(match.data, position);
             if (shortestPath.moveCost <= match.data.playData.movementLeft) {
                 const player = match.getPlayer(playerId);
@@ -40,7 +40,7 @@ export class PlayService {
     }
 
     action(match: Match, playerId: string, position: Position) {
-        if (match.data.playData.hasAction && match.isActivePlayer(playerId) && match.isState(MatchState.TurnWait)) {
+        if (match.data.playData.hasAction && match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
             const actions = this.movementService.getActions(match.data);
             if (actions.some((a) => a.x === position.x && a.y === position.y)) {
                 match.data.playData.hasAction = false;
@@ -50,7 +50,7 @@ export class PlayService {
     }
 
     debugMove(match: Match, playerId: string, position: Position) {
-        if (match.data.playData.isDebugMode && match.isActivePlayer(playerId) && match.isState(MatchState.TurnWait)) {
+        if (match.data.playData.isDebugMode && match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
             const possibleMoves = this.movementService.getPossibleMovesDebug(match.data);
             const isMoveValid = possibleMoves.some((m) => m.x === position.x && m.y === position.y);
             if (isMoveValid) {

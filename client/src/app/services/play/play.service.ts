@@ -4,6 +4,7 @@ import { Position } from '@common/interfaces/position';
 import { SocketService } from '@app/services/socket/socket.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { PlayEvent } from '@common/interfaces/socket-event.enum';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 
@@ -15,6 +16,7 @@ export class PlayService {
     private matchService: MatchService = inject(MatchService);
     private mapService: MapService = inject(MapService);
     private movementService: MovementService = inject(MovementService);
+    private timerService: TimerService = inject(TimerService);
 
     constructor() {
         this.matchService.matchUpdate.subscribe(this.onMatchUpdate.bind(this));
@@ -67,18 +69,34 @@ export class PlayService {
     }
 
     private onMatchUpdate(oldMatchData: MatchData) {
-        if (this.matchService.isState(MatchState.TurnWait) && this.matchService.isActivePlayer()) {
-            this.displayPossibleMoves();
-        } else {
-            this.mapService.clearOverlays();
-        }
+        this.updateOverlays();
+        this.updateMovement(oldMatchData);
+        this.updateTimer();
+    }
 
+    private updateTimer() {
+        if (this.matchService.isState(MatchState.TurnWait)) {
+            this.timerService.startTimer();
+        } else {
+            this.timerService.stopTimer(this.matchService.data.playData.timeLeft);
+        }
+    }
+
+    private updateMovement(oldMatchData: MatchData) {
         if (this.matchService.isState(MatchState.MovementAnimation)) {
             const newPosition = this.matchService.data.players[this.matchService.data.playData.activePlayerIndex].position;
             const shortestPath = this.movementService.getShortestPath(oldMatchData, newPosition);
             this.mapService.movePlayer(this.matchService.data.playData.activePlayerIndex, shortestPath.path);
         } else {
             this.mapService.setPlayers(this.matchService.data.players);
+        }
+    }
+
+    private updateOverlays() {
+        if (this.matchService.isState(MatchState.TurnWait) && this.matchService.isActivePlayer()) {
+            this.displayPossibleMoves();
+        } else {
+            this.mapService.clearOverlays();
         }
     }
 

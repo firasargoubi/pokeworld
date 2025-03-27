@@ -45,7 +45,7 @@ export class LobbyService {
     }
 
     startMatch(match: Match, playerId: string) {
-        const isInLobby = match.isState(MatchState.Lobby);
+        const isInLobby = match.isState([MatchState.Lobby]);
         const hasEnoughPlayers = match.data.players.length >= MIN_PLAYERS;
         const isLocked = match.data.lobbyData.isLocked;
         const isHost = match.isHost(playerId);

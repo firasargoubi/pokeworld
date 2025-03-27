@@ -1,34 +1,33 @@
 import { Injectable } from '@angular/core';
-import { DEFAULT_TIME, TIME_SCALE, TIMER_START_DELAY } from './timer.service.const';
+import { TIME_SCALE, TURN_WAIT_DURATION } from '@common/consts/match-data.const';
 
 @Injectable({
     providedIn: 'root',
 })
 export class TimerService {
-    maxTime: number = DEFAULT_TIME;
-    lastUnpauseTime: number = DEFAULT_TIME;
-    currentTime: number = DEFAULT_TIME;
-    interval: number | null = null;
+    maxTime: number = TURN_WAIT_DURATION / TIME_SCALE;
+    lastUnpauseTime: number = TURN_WAIT_DURATION / TIME_SCALE;
+    currentTime: number = Math.floor(TURN_WAIT_DURATION / TIME_SCALE);
     isStarted: boolean = false;
+    private interval: number | null = null;
 
-    startTimer(time: number) {
-        this.isStarted = false;
-        this.maxTime = time;
-        this.lastUnpauseTime = time;
-        this.currentTime = time;
-        this.startInterval();
-        window.setTimeout(this.intervalTrigger.bind(this), TIMER_START_DELAY);
+    startTimer() {
+        if (!this.isStarted) {
+            this.isStarted = true;
+            this.startInterval();
+        }
     }
 
-    pauseTimer(remainingTime: number) {
-        this.isStarted = false;
-        this.stopInterval();
-        this.lastUnpauseTime = remainingTime;
-    }
-
-    unPauseTimer() {
-        this.isStarted = true;
-        this.startInterval();
+    stopTimer(time: number) {
+        if (this.isStarted) {
+            this.stopInterval();
+            this.isStarted = false;
+        }
+        const roundedTime = time / TIME_SCALE;
+        if (this.lastUnpauseTime !== roundedTime) {
+            this.lastUnpauseTime = roundedTime;
+            this.currentTime = Math.floor(roundedTime);
+        }
     }
 
     private startInterval() {
@@ -44,7 +43,6 @@ export class TimerService {
     }
 
     private intervalTrigger() {
-        this.isStarted = true;
         this.currentTime--;
 
         if (this.currentTime === 0) {

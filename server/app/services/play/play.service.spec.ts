@@ -77,7 +77,6 @@ describe('PlayService', () => {
         expect(mockMovementService.getPossibleMoves.called).toBeTruthy();
     });
 
-    // TODO
     it('should debug move the players to the specified position', () => {
         const position = { x: 1, y: 1 };
         match.matchData.isDebugMode = true;

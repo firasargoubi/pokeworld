@@ -23,7 +23,6 @@ export class MovementService {
         return { moveCost: distances[target.x][target.y], path: path || [] };
     }
 
-    // TODO review / rework this service + remove this function
     getActions(matchData: MatchData): Position[] {
         const position = matchData.players[matchData.playData.activePlayerIndex].position;
         return SURROUNDING_POSITIONS_PLUS.map((delta) => ({ x: position.x + delta.x, y: position.y + delta.y })).filter((neighbor) => {
