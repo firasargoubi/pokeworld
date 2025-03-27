@@ -70,12 +70,8 @@ export class LobbyPageComponent {
                 health: p.health,
                 id: p.id,
             }));
-        this.visualData.players = [
-            ...this.visualData.players,
-            ...Array(MAX_PLAYERS[this.matchService.data.gameData.mapData.size] - this.visualData.players.length).fill({
-                ...this.visualData.players[0],
-                isConnected: false,
-            }),
-        ];
+        while (this.visualData.players.length < MAX_PLAYERS[this.matchService.data.gameData.mapData.size]) {
+            this.visualData.players.push({ ...this.visualData.players[0], isHost: false, isSelf: false, isConnected: false });
+        }
     }
 }

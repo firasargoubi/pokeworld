@@ -40,22 +40,11 @@
             <div id="players-list">
                 @for (player of visualData.players; track $index) {
                     <div class="player-card-container">
-                        @if (player.isConnected) {
-                            <app-player-card
-                                [isHost]="player.isHost"
-                                [isSelfPlayer]="player.isSelf"
-                                [isDisconnected]="false"
-                                [name]="player.name"
-                                [health]="player.health"
-                                [avatarImage]="player.avatarImage"
-                                [displayBanButton]="visualData.isSelfHost"
-                                [onClick]="kickPlayer.bind(this, player.id)"
-                            ></app-player-card>
-                        } @else {
-                            <app-player-card
-                                [isDisconnected]="true"
-                            ></app-player-card>
-                        }
+                        <app-player-card
+                            [player]="player"
+                            [displayKickButton]="visualData.isSelfHost"
+                            [onClick]="kickPlayer.bind(this, player.id)"
+                        ></app-player-card>
                     </div>
                 }
             </div>

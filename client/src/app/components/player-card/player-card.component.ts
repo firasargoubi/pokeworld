@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { LobbyPlayerVisualData } from '@app/interfaces/lobby-visual-data';
 
 @Component({
     selector: 'app-player-card',
@@ -8,12 +9,7 @@ import { Component, Input } from '@angular/core';
     imports: [CommonModule],
 })
 export class PlayerCardComponent {
-    @Input() isHost: boolean = false;
-    @Input() isSelfPlayer: boolean = false;
-    @Input() isDisconnected: boolean = false;
-    @Input() name: string = '';
-    @Input() health: number = 0;
-    @Input() displayBanButton: boolean = false;
-    @Input() avatarImage: string = '';
+    @Input() player: LobbyPlayerVisualData;
+    @Input() displayKickButton: boolean = false;
     @Input() onClick: () => void;
 }
