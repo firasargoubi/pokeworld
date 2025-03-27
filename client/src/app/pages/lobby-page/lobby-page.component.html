@@ -11,7 +11,7 @@
                 @if (visualData.isSelfHost) {
                 <div class="access-instruction">
                     <div class="lock-container" (click)="this.toggleLockRoom()">
-                        @if (visualData.isRoomLocked) {
+                        @if (this.matchService.data.lobbyData.isLocked) {
                             <div class="lock-icon"></div>
                         } @else {
                             <div class="unlock-icon"></div>
@@ -24,7 +24,7 @@
                 } @else{
                 <div class="access-instruction">
                     <div class="empty-lock-container">
-                        @if (visualData.isRoomLocked) {
+                        @if (this.matchService.data.lobbyData.isLocked) {
                             <div class="lock-icon"></div>
                         } @else {
                             <div class="unlock-icon"></div>

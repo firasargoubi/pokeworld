@@ -57,7 +57,6 @@ export class LobbyPageComponent {
     }
 
     private updateVisual() {
-        this.visualData.isRoomLocked = this.matchService.data.lobbyData.isLocked;
         this.visualData.isSelfHost = this.matchService.isHost();
         this.visualData.players = this.matchService.data.players
             .filter((p) => p.isConnected)

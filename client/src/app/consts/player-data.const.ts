@@ -1,7 +1,7 @@
 import { CharacterVisualData } from '@app/interfaces/character-visual-data';
+import { LobbyVisualData } from '@app/interfaces/lobby-visual-data';
 import { MAX_NAME_LENGTH } from '@common/consts/player-data.const';
 import { EMPTY_IMAGE } from './images.const';
-import { LobbyVisualData } from '@app/interfaces/lobby-visual-data';
 
 export const DEFAULT_CHARACTER_VISUAL_DATA: CharacterVisualData = {
     isHpSelected: true,
@@ -15,5 +15,4 @@ export const DEFAULT_CHARACTER_VISUAL_DATA: CharacterVisualData = {
 export const DEFAULT_LOBBY_VISUAL_DATA: LobbyVisualData = {
     players: [],
     isSelfHost: false,
-    isRoomLocked: false,
 };

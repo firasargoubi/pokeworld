@@ -1,7 +1,6 @@
 export interface LobbyVisualData {
     players: LobbyPlayerVisualData[];
     isSelfHost: boolean;
-    isRoomLocked: boolean;
 }
 
 export interface LobbyPlayerVisualData {
