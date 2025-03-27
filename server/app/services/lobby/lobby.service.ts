@@ -16,6 +16,7 @@ export class LobbyService {
 
         if (isHost && !isTryingToKickThemselve) {
             match.kickPlayer(targetPlayerId, Message.Kick);
+            match.changeLockStatus(false);
             match.sendUpdate();
         }
     }
@@ -31,12 +32,14 @@ export class LobbyService {
         playerData.name = this.getUniqueName(match, playerId, playerData.name);
         playerData.isConnected = true;
         match.data.players.push(playerData);
+        match.changeLockStatus(false);
         match.sendUpdate();
     }
 
     changeLockStatus(match: Match, playerId: string, lockStatus: boolean) {
         if (match.isHost(playerId)) {
             match.changeLockStatus(lockStatus);
+            match.sendUpdate();
         }
     }
 

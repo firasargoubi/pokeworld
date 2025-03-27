@@ -16,7 +16,12 @@ export class MatchService {
     createMatch(playerId: string, gameData: GameData): MatchData | null {
         let matchData = null;
         if (this.canCreateMatch(playerId)) {
-            matchData = { ...DEFAULT_MATCH_DATA, code: this.getNewMatchCode(), gameData, players: [{ ...DEFAULT_PLAYER_DATA, id: playerId }] };
+            matchData = {
+                ...structuredClone(DEFAULT_MATCH_DATA),
+                code: this.getNewMatchCode(),
+                gameData,
+                players: [{ ...structuredClone(DEFAULT_PLAYER_DATA), id: playerId }],
+            };
             const match = new Match(matchData, this);
             this.matches.set(matchData.code, match);
             this.playerToMatchCode.set(playerId, matchData.code);
@@ -41,7 +46,9 @@ export class MatchService {
 
     joinMatch(playerId: string, matchCode: string): MatchData | null {
         let matchData = null;
+        console.log('joinMatch 1');
         if (this.canJoinMatch(playerId, matchCode)) {
+            console.log('joinMatch 2');
             const match = this.getMatch(matchCode);
             match.join(playerId);
             this.playerToMatchCode.set(playerId, matchCode);
@@ -61,8 +68,8 @@ export class MatchService {
     }
 
     leaveMatch(playerId: string) {
-        this.disconnectPlayer(playerId);
         const match = this.getMatchFromPlayerId(playerId);
+        this.disconnectPlayer(playerId);
         if (match) {
             match.leave(playerId);
             if (match.getConnectedPlayerCount() === 0) {

@@ -11,6 +11,7 @@ import { LobbyVisualData } from '@app/interfaces/lobby-visual-data';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { MAX_PLAYERS } from '@common/consts/player-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 
 @Component({
@@ -71,7 +72,7 @@ export class LobbyPageComponent {
             }));
         this.visualData.players = [
             ...this.visualData.players,
-            ...Array(this.matchService.data.gameData.mapData.size - this.visualData.players.length).fill({
+            ...Array(MAX_PLAYERS[this.matchService.data.gameData.mapData.size] - this.visualData.players.length).fill({
                 ...this.visualData.players[0],
                 isConnected: false,
             }),

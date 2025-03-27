@@ -28,8 +28,9 @@ export class Match {
     }
 
     join(playerId: string) {
-        this.data.players.push({ ...DEFAULT_PLAYER_DATA, id: playerId });
+        this.data.players.push({ ...structuredClone(DEFAULT_PLAYER_DATA), id: playerId });
         this.changeLockStatus(false);
+        this.sendUpdate();
     }
 
     changeLockStatus(lockStatus: boolean) {
@@ -39,7 +40,6 @@ export class Match {
         } else {
             this.data.lobbyData.isLocked = false;
         }
-        this.sendUpdate();
     }
 
     leave(playerId: string) {
@@ -49,6 +49,8 @@ export class Match {
             } else {
                 this.playerLeaveLobby(playerId);
             }
+        } else if (this.data.state === MatchState.MatchEnd) {
+            this.playerLeaveStats(playerId);
         } else {
             this.playerLeaveMatch(playerId);
         }
@@ -101,8 +103,13 @@ export class Match {
 
     private playerLeaveLobby(playerId: string) {
         this.data.players = this.data.players.filter((p) => p.id !== playerId);
-        this.data.lobbyData.isLocked = false;
+        this.changeLockStatus(false);
         this.sendUpdate();
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    private playerLeaveStats(playerId: string) {
+        // TODO a player has left the match while on the end of match stat screen
     }
 
     private playerLeaveMatch(playerId: string) {

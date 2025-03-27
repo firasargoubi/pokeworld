@@ -54,7 +54,10 @@ export class CharacterPageComponent {
     }
 
     changeAvatar(avatar: Avatar) {
-        this.lobbyService.changeAvatar(avatar);
+        const lockedAvatars = this.getLockedAvatars();
+        if (!lockedAvatars.includes(avatar)) {
+            this.lobbyService.changeAvatar(avatar);
+        }
     }
 
     private updateAvatarList() {

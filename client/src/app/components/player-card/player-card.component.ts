@@ -10,7 +10,7 @@ import { Component, Input } from '@angular/core';
 export class PlayerCardComponent {
     @Input() isHost: boolean = false;
     @Input() isSelfPlayer: boolean = false;
-    @Input() isConnected: boolean = false;
+    @Input() isDisconnected: boolean = false;
     @Input() name: string = '';
     @Input() health: number = 0;
     @Input() displayBanButton: boolean = false;

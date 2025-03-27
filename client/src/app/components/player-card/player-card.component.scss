@@ -208,13 +208,13 @@ $text-shadow-color: rgb(112, 112, 112);
     user-select: none;
 }
 
-.is-disconeected {
+.is-disconnected {
     transform: translateX(80%);
     filter: brightness(0.4);
 }
 
-.is-disconeected .avatar,
-.is-disconeected .player-card *,
-.is-disconeected .ban-button {
+.is-disconnected .avatar,
+.is-disconnected .player-card *,
+.is-disconnected .ban-button {
     display: none;
 }

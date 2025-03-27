@@ -50,7 +50,7 @@ export class MapService {
         const mapSize = this.gameDataService.gameData.mapData.size;
 
         this.visualMapData = {
-            tiles: Array.from({ length: mapSize }, () => Array.from({ length: mapSize }, () => ({ ...DEFAULT_TILE_VISUAL }))),
+            tiles: Array.from({ length: mapSize }, () => Array.from({ length: mapSize }, () => ({ ...structuredClone(DEFAULT_TILE_VISUAL) }))),
             size: mapSize,
         };
 

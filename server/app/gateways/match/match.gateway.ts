@@ -52,10 +52,18 @@ export class MatchGateway {
     }
 
     emitMessage(matchCode: string, message: string) {
-        this.server.to(matchCode).emit(MatchEvent.Message, message);
+        const socket = this.server.sockets.sockets.get(matchCode);
+        if (socket) {
+            socket.emit(MatchEvent.Message, message);
+        } else {
+            this.server.to(matchCode).emit(MatchEvent.Message, message);
+        }
     }
 
-    emitRemovedFromMatch(matchCode: string, reason: string) {
-        this.server.to(matchCode).emit(MatchEvent.RemovedFromMatch, reason);
+    emitRemovedFromMatch(playerId: string, reason: string) {
+        const socket = this.server.sockets.sockets.get(playerId);
+        if (socket) {
+            socket.emit(MatchEvent.RemovedFromMatch, reason);
+        }
     }
 }
