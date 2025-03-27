@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { ItemComponent } from '@app/components/item/item.component';
 import { MapComponent } from '@app/components/map/map.component';
-import { DEFAULT_EDITOR_DATA, EDITOR_ERASE_TILE } from '@app/consts/editor-data.const';
+import { DEFAULT_EDITOR_DATA, EDITOR_ERASE_TILE, ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from '@app/consts/editor-data.const';
 import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
 import { ITEM_DESCRIPTION } from '@app/consts/item-data.const';
 import { EditorEvent, EditorItem, EditorVisualData } from '@app/interfaces/editor';
@@ -178,15 +178,19 @@ export class EditPageComponent {
     }
 
     private clickOnItem(editorEvent: EditorEvent) {
-        if (this.getRemainingItemCount(editorEvent.item as ItemType) > 0) {
+        if (this.editorService.getRemainingItemCount(editorEvent.item as ItemType, this.editorVisualData.dragItem) > 0) {
             this.editorService.resetLastPicked();
             this.setActiveItem(editorEvent.item, editorEvent);
             this.updateItems();
         }
     }
 
-    private getRemainingItemCount(item: ItemType): number {
-        return this.editorService.getRemainingItemCount(item, this.editorVisualData.dragItem);
+    private getRemainingItemCount(item: ItemType): number | null {
+        let remainingItemCount: number | null = this.editorService.getRemainingItemCount(item, this.editorVisualData.dragItem);
+        if (remainingItemCount === 1 && SHARED_ITEM_POOL.includes(item) && item !== ITEM_POOL_HIGHEST_ITEM) {
+            remainingItemCount = null;
+        }
+        return remainingItemCount;
     }
 
     private clickOnTile(tile: TileType) {
