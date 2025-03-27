@@ -103,7 +103,6 @@ export class MatchService {
     }
 
     private onUpdate(matchData: MatchData) {
-        window.console.log(matchData);
         const oldMatchData = this.data;
         this.data = matchData;
         this.selfIndex = matchData.players.findIndex((p) => p.id === this.socketService.selfId);
