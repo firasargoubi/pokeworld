@@ -26,6 +26,7 @@ import {
     RANDOM_NUMBER_MULTIPLIER,
     WATER_SIMILAR_TILES,
 } from './map.service.const';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/player-data.const';
 
 @Injectable({
     providedIn: 'root',
@@ -88,15 +89,14 @@ export class MapService {
         this.updateAllTiles();
     }
 
-    // movePlayer(playerMovementData: PlayerMovementData) {
-    //     for (let i = 1; i < playerMovementData.movement.length; i++) {
-    //         setTimeout(() => {
-    //             this.players[playerMovementData.playerIndex].currentStats.position = playerMovementData.movement[i];
-    //             this.updateAllTiles();
-    //         }, MOVE_ANIMATION_DURATION * i);
-    //     }
-    // TODO
-    // }
+    movePlayer(playerIndex: number, moves: Position[]) {
+        for (let i = 1; i < moves.length; i++) {
+            setTimeout(() => {
+                this.players[playerIndex].position = moves[i];
+                this.updateAllTiles();
+            }, MOVE_ANIMATION_DURATION * i);
+        }
+    }
 
     getTileImage(tiles: TileType[][], position: Position): string {
         const tile = this.gameDataService.getTile(tiles, position);

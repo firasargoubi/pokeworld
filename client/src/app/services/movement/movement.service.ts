@@ -17,12 +17,17 @@ export class MovementService {
     }
 
     getShortestPath(matchData: MatchData, target: Position): ShortestPath {
-        const activePlayer = matchData.players[matchData.playData.activePlayerIndex];
-        const startPos = activePlayer.position;
-
-        const { distances, predecessors } = this.calculateDistancesAndPredecessors(matchData, startPos, Infinity);
-        const path = this.reconstructPath(target, predecessors);
-        return { moveCost: distances[target.x][target.y], path: path || [] };
+        let shortestPath: ShortestPath = { moveCost: Infinity, path: [] };
+        if (!this.isOutOfBounds(matchData, target)) {
+            const activePlayer = matchData.players[matchData.playData.activePlayerIndex];
+            const startPos = activePlayer.position;
+            const { distances, predecessors } = this.calculateDistancesAndPredecessors(matchData, startPos, Infinity);
+            const path = this.reconstructPath(target, predecessors);
+            if (path) {
+                shortestPath = { moveCost: distances[target.x][target.y], path };
+            }
+        }
+        return shortestPath;
     }
 
     // TODO review / rework this service + remove this function

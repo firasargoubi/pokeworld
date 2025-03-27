@@ -1,6 +1,7 @@
 import { Match } from '@app/classes/match/match';
 import { PlayService } from '@app/services/play/play.service';
 import { HALF_POINT } from '@common/consts/match-data.const';
+import { MIN_PLAYERS } from '@common/consts/player-data.const';
 import { MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { Avatar, PlayerData } from '@common/interfaces/player-data';
@@ -44,10 +45,11 @@ export class LobbyService {
     }
 
     startMatch(match: Match, playerId: string) {
-        const isInLobby = match.data.state === MatchState.Lobby;
+        const isInLobby = match.isState(MatchState.Lobby);
+        const hasEnoughPlayers = match.data.players.length >= MIN_PLAYERS;
         const isLocked = match.data.lobbyData.isLocked;
         const isHost = match.isHost(playerId);
-        if (isInLobby && isLocked && isHost) {
+        if (isInLobby && hasEnoughPlayers && isLocked && isHost) {
             this.startMatchFirstTurn(match);
         }
     }

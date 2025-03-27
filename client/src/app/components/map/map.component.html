@@ -1,5 +1,5 @@
 <div class="map-wrapper" [style.--size]="mapService.visualMapData.size" [class.is-editor]="isEditor">
-    <div class="map-container" (mouseout)="onHover({ x: -1, y: -1 })">
+    <div class="map-container" (mouseleave)="onHover({ x: -1, y: -1 })">
         <div class="map">
             @for (tileRow of mapService.visualMapData.tiles; track tileRow; let x = $index) {
                 @for (tile of tileRow; track tile; let y = $index) {

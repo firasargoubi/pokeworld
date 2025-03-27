@@ -109,7 +109,6 @@ export class MatchService {
         this.selfIndex = matchData.players.findIndex((p) => p.id === this.socketService.selfId);
         this.selfPlayer = matchData.players[this.selfIndex];
         this.gameDataService.setGameData(matchData.gameData);
-        this.mapService.setPlayers(matchData.players);
         this.matchUpdate.next(oldMatchData);
     }
 
