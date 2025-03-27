@@ -40,7 +40,7 @@ export class LobbyService {
     }
 
     private onMatchUpdate(oldMatchData: MatchData) {
-        const oldIsConnected = oldMatchData.players[this.matchService.selfIndex].isConnected;
+        const oldIsConnected = oldMatchData.players.find((p) => p.id === this.socketService.selfId)?.isConnected ?? true;
         const oldState = oldMatchData.state;
         if (this.matchService.isState(MatchState.Lobby) && !oldIsConnected && this.matchService.selfPlayer.isConnected) {
             this.router.navigate([PageEndpoint.Lobby]);

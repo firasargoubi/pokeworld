@@ -59,16 +59,16 @@ export class LobbyPageComponent {
     private updateVisual() {
         this.visualData.isSelfHost = this.matchService.isHost();
         this.visualData.players = this.matchService.data.players
-            .filter((p) => p.isConnected)
             .map((p, i) => ({
-                isConnected: true,
+                isConnected: p.isConnected,
                 name: p.name,
                 isHost: i === this.matchService.data.lobbyData.hostPlayerIndex,
                 isSelf: i === this.matchService.selfIndex,
                 avatarImage: AVATAR_DATA[p.avatar].imageCentered,
                 health: p.health,
                 id: p.id,
-            }));
+            }))
+            .filter((p) => p.isConnected);
         while (this.visualData.players.length < MAX_PLAYERS[this.matchService.data.gameData.mapData.size]) {
             this.visualData.players.push({ ...this.visualData.players[0], isHost: false, isSelf: false, isConnected: false });
         }
