@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
+import { ItemDropPopupComponent } from '@app/components/item-drop-popup/item-drop-popup.component';
+import { ItemComponent } from '@app/components/item/item.component';
 import { MapComponent } from '@app/components/map/map.component';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { DEFAULT_PLAY_VISUAL_DATA } from '@app/consts/play-data.const';
@@ -20,7 +22,7 @@ import { PlayerType } from '@common/interfaces/player-data';
     selector: 'app-play-page',
     templateUrl: './play-page.component.html',
     styleUrls: ['./play-page.component.scss'],
-    imports: [MapComponent, CommonModule, ChatComponent],
+    imports: [MapComponent, CommonModule, ChatComponent, ItemComponent, ItemDropPopupComponent],
 })
 export class PlayPageComponent {
     visualData: PlayVisualData = structuredClone(DEFAULT_PLAY_VISUAL_DATA);
@@ -95,6 +97,7 @@ export class PlayPageComponent {
             selfAvatarUrl: AVATAR_DATA[this.matchService.selfPlayer.avatar].imageCentered,
             movementLeft: this.matchService.getMovementLeft(),
             thumbnailUrl: this.visualData.thumbnailUrl,
+            isInetoryFull: this.matchService.isInventoryFull(),
         };
     }
 

@@ -1,9 +1,10 @@
+import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MatchData } from '@common/interfaces/match-data';
 import { DistancesAndPredecessors, NeighborContext, QueueNode, ShortestPath, VisitedQueue } from '@common/interfaces/movement';
 import { Position } from '@common/interfaces/position';
 import { TILE_COST, TileType } from '@common/interfaces/tile-type.enum';
-import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
 import { Injectable } from '@nestjs/common';
-import { MatchData } from '@common/interfaces/match-data';
 
 @Injectable()
 export class MovementService {
@@ -19,8 +20,23 @@ export class MovementService {
         const startPos = activePlayer.position;
 
         const { distances, predecessors } = this.calculateDistancesAndPredecessors(matchData, startPos, Infinity);
-        const path = this.reconstructPath(target, predecessors);
-        return { moveCost: distances[target.x][target.y], path: path || [] };
+        let path = this.reconstructPath(target, predecessors);
+        path = this.stopPathAtItemEncounter(path, matchData);
+        return { moveCost: distances[path[path.length - 1].x][path[path.length - 1].y], path: path || [] };
+    }
+
+    // TODO: mettre en privee
+    stopPathAtItemEncounter(path: Position[], matchData: MatchData): Position[] {
+        if (path.length === 0) {
+            return [];
+        }
+
+        for (let i = 1; i < path.length; i++) {
+            if (this.isTileOccupiedByObject(matchData, path[i], true)) {
+                return path.slice(0, i + 1);
+            }
+        }
+        return path;
     }
 
     getActions(matchData: MatchData): Position[] {
@@ -166,16 +182,19 @@ export class MovementService {
         return matchData.players.some((p) => p.position.x === position.x && p.position.y === position.y);
     }
 
-    private isTileOccupiedByObject(matchData: MatchData, position: Position): boolean {
-        let isTileOccupiedByObject = false;
-        for (const items of Object.values(matchData.gameData.mapData.items)) {
+    private isTileOccupiedByObject(matchData: MatchData, position: Position, ignoreSpawnpoints: boolean = false): boolean {
+        for (const [itemType, items] of Object.entries(matchData.gameData.mapData.items)) {
+            if (ignoreSpawnpoints && itemType === ItemType.Spawn) {
+                continue;
+            }
+
             for (const item of items) {
                 if (item.x === position.x && item.y === position.y) {
-                    isTileOccupiedByObject = true;
+                    return true;
                 }
             }
         }
-        return isTileOccupiedByObject;
+        return false;
     }
 
     private isOutOfBounds(matchData: MatchData, position: Position): boolean {

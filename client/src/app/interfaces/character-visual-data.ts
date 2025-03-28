@@ -16,3 +16,5 @@ export interface AvatarVisualData {
     isLocked: boolean;
     isSelected: boolean;
 }
+
+export const MAIN_AVATAR_COUNT = 12;

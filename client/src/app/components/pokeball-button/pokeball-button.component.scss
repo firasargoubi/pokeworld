@@ -57,7 +57,7 @@
     display: flex;
     align-items: center;
     height: 100%;
-    width: fit-content;
+    flex: 1;
     background-image: url('../../../assets/images/menu/buttons/poke-button/button-container-borderless.png');
     background-repeat: repeat-x;
     background-size: auto 100%;
@@ -69,10 +69,11 @@
 }
 
 .pokeball-button-content p {
-    font-size: 3vw;
+    font-size: min(3vw, 4vh);
     width: auto;
-    text-align: end;
+    text-align: center;
     user-select: none;
+    width: 100%;
 }
 
 .pokeball-button-end {

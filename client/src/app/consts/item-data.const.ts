@@ -5,15 +5,15 @@ import { ItemType } from '@common/interfaces/item-type.enum';
 import { MapSize } from '@common/interfaces/map-data';
 
 export const ITEM_DESCRIPTION: Map<ItemType, string> = new Map([
-    [ItemType.Item1, '<b>Item 1</b>Description de item 1'],
-    [ItemType.Item2, '<b>Item 2</b>Description de item 2'],
-    [ItemType.Item3, '<b>Item 3</b>Description de item 3'],
-    [ItemType.Item4, '<b>Item 4</b>Description de item 4'],
-    [ItemType.Item5, '<b>Item 5</b>Description de item 5'],
-    [ItemType.Item6, '<b>Item 6</b>Description de item 6'],
-    [ItemType.Random, '<b>Item Aléatoire</b>Aléatoirement 1 des 6 items'],
-    [ItemType.Spawn, '<b>Point de départ</b>Point de départ des joueurs'],
-    [ItemType.Flag, '<b>Drapeau</b>Objectif de capture de CTF'],
+    [ItemType.Item1, '<b>Shiny Charm</b> Rend shiny (+1 ATT / +1 DEF)'],
+    [ItemType.Item2, '<b>Evo Gem</b> Évolution (+2 ATT / +2 DEF)'],
+    [ItemType.Item3, '<b>Bush Boost</b> +3 ATT en buisson'],
+    [ItemType.Item4, '<b>Healing Berry</b> +1 HP/tour si PV ≤ 50%'],
+    [ItemType.Item5, '<b>Phantom Cloak</b> +30% évasion, +1 nb évasion'],
+    [ItemType.Item6, '<b>Invisibility Mantle</b> Joueur invisible'],
+    [ItemType.Random, '<b>Item Aléatoire</b> Donne aléatoirement 1 des 6 items'],
+    [ItemType.Spawn, '<b>Point de départ</b> Point de départ des joueurs'],
+    [ItemType.Flag, '<b>Drapeau</b> Objectif de capture (CTF)'],
 ]);
 
 export const MAX_ITEM_COUNT: Record<MapSize, Record<ItemType, number>> = {

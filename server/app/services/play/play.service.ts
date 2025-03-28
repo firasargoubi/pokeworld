@@ -1,8 +1,10 @@
 import { Match } from '@app/classes/match/match';
 import { MovementService } from '@app/services/movement/movement.service';
 import { MOVEMENT_ANIMATION_DURATION, TURN_START_DURATION, TURN_WAIT_DURATION } from '@common/consts/match-data.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
+import { Avatar, PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { Inject, Injectable } from '@nestjs/common';
@@ -20,23 +22,86 @@ export class PlayService {
     move(match: Match, playerId: string, position: Position) {
         if (match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
             const shortestPath = this.movementService.getShortestPath(match.data, position);
+
             if (shortestPath.moveCost <= match.data.playData.movementLeft) {
                 const player = match.getPlayer(playerId);
-                player.position = position;
+                player.position = shortestPath.path[shortestPath.path.length - 1];
                 match.data.playData.movementLeft -= shortestPath.moveCost;
                 const elapsedTime = Math.abs(new Date().getTime() - match.lastTimeoutStart.getTime());
                 match.data.playData.timeLeft = match.data.playData.timeLeft - elapsedTime;
                 match.data.state = MatchState.MovementAnimation;
                 match.sendUpdate();
-                match.setTimeout(this.endOfMovementAnimation.bind(this, match), (shortestPath.path.length + 1) * MOVEMENT_ANIMATION_DURATION);
+                match.setTimeout(this.endOfMovementAnimation.bind(this, match, player), (shortestPath.path.length + 1) * MOVEMENT_ANIMATION_DURATION);
             }
         }
     }
 
-    endOfMovementAnimation(match: Match) {
+    endOfMovementAnimation(match: Match, player: PlayerData) {
         match.data.state = MatchState.TurnWait;
         match.setTimeout(this.startTurnStart.bind(this, match), match.data.playData.timeLeft);
+        this.checkAndPickupItem(match, player);
         match.sendUpdate();
+    }
+
+    // TODO: mettre en privee
+    checkAndPickupItem(match: Match, playerData: PlayerData) {
+        const position = playerData.position;
+
+        for (const [itemType, positions] of Object.entries(match.data.gameData.mapData.items)) {
+            if (itemType !== ItemType.Spawn) {
+                const foundItem = positions.find((itemPos) => itemPos.x === position.x && itemPos.y === position.y);
+                if (foundItem) {
+                    if (this.handleItemAddition(playerData, itemType as ItemType)) {
+                        match.data.gameData.mapData.items[itemType] = positions.filter((itemPos) => itemPos !== foundItem);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    // TODO: mettre en privee
+    handleItemAddition(player: PlayerData, itemType: ItemType): boolean {
+        if (player.items.length < 2 || player.type === PlayerType.Player) {
+            player.items.push(itemType);
+
+            if (itemType === ItemType.Item1) {
+                player.avatar = this.getAvatarVariant(player.avatar, true, false);
+            }
+            return true;
+        } else {
+            // player is a bot and inventory is full
+            // eslint-disable-next-line no-console
+            console.log('Player inventory is full');
+            return false;
+        }
+    }
+
+    // TODO: mettre en privee
+    getAvatarVariant(avatar: Avatar, isShiny: boolean, isEvolved: boolean): Avatar {
+        if (avatar === Avatar.Default) return Avatar.Default;
+
+        const baseMatch = avatar.match(/^(avatar\d+)/);
+        if (!baseMatch) {
+            // eslint-disable-next-line no-console
+            console.log('Invalid avatar', avatar);
+            return avatar;
+        }
+
+        const base = baseMatch[1];
+        let result = base;
+
+        if (isEvolved) {
+            result += '-evolved';
+        }
+        if (isShiny) {
+            result += '-shiny';
+        }
+
+        // eslint-disable-next-line no-console
+        console.log('getAvatarVariant', avatar, result as Avatar);
+
+        return result as Avatar;
     }
 
     action(match: Match, playerId: string, position: Position) {

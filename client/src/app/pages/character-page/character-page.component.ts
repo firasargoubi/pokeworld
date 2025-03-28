@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { DEFAULT_CHARACTER_VISUAL_DATA } from '@app/consts/player-data.const';
-import { CharacterVisualData } from '@app/interfaces/character-visual-data';
+import { CharacterVisualData, MAIN_AVATAR_COUNT } from '@app/interfaces/character-visual-data';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -33,6 +33,7 @@ export class CharacterPageComponent {
         }
         this.updateAvatarList();
         this.matchService.matchUpdate.subscribe(this.updateAvatarList.bind(this));
+        this.visualData.avatarList = this.visualData.avatarList.slice(0, MAIN_AVATAR_COUNT);
     }
 
     goToMenu() {
@@ -74,7 +75,8 @@ export class CharacterPageComponent {
                 image: AVATAR_DATA[avatar].image,
                 isLocked: lockedAvatars.includes(avatar),
                 isSelected: selfAvatar === avatar,
-            }));
+            }))
+            .slice(0, MAIN_AVATAR_COUNT);
     }
 
     private getLockedAvatars(): Avatar[] {

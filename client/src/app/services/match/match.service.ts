@@ -81,6 +81,10 @@ export class MatchService {
         return this.data.state === state;
     }
 
+    isInventoryFull(): boolean {
+        return this.selfPlayer.items.length > 2;
+    }
+
     canUseAction(): boolean {
         return this.isActivePlayer() && this.isState(MatchState.TurnWait) && this.data.playData.hasAction;
     }
