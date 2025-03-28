@@ -24,7 +24,7 @@ export enum PlayEvent {
     Action = 'action',
     DebugMove = 'debugMove',
     ChangeDebugMode = 'changeDebugMode',
-    InventoryFull = 'inventoryFull',
+    DropItem = 'dropItem',
 }
 
 export enum CombatEvent {

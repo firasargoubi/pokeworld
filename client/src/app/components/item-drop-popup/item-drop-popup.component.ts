@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { ItemComponent } from '@app/components/item/item.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
+import { PlayService } from '@app/services/play/play.service';
 import { ItemType } from '@common/interfaces/item-type.enum';
 
 @Component({
@@ -11,13 +12,11 @@ import { ItemType } from '@common/interfaces/item-type.enum';
     imports: [ItemComponent, PokeballButtonComponent, CommonModule],
 })
 export class ItemDropPopupComponent {
-    @Input() inventoryItems: ItemType[] = [ItemType.Item1, ItemType.Item2, ItemType.Item3];
-    @Output() itemSelected = new EventEmitter<ItemType>();
+    @Input() inventoryItems: ItemType[] = [];
     selectedItem: number = 2;
+    private playService: PlayService = inject(PlayService);
 
     validateChoise() {
-        // eslint-disable-next-line no-console
-        console.log(this.inventoryItems[this.selectedItem]);
-        this.itemSelected.emit(this.inventoryItems[this.selectedItem]);
+        this.playService.dropItem(this.inventoryItems[this.selectedItem]);
     }
 }

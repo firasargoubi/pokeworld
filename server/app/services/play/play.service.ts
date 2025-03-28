@@ -104,6 +104,13 @@ export class PlayService {
         return result as Avatar;
     }
 
+    dropItem(match: Match, playerId: string, itemType: ItemType) {
+        const player = match.getPlayer(playerId);
+        player.items = player.items.filter((i) => i !== itemType);
+        match.data.gameData.mapData.items[itemType].push(player.position);
+        match.sendUpdate();
+    }
+
     action(match: Match, playerId: string, position: Position) {
         if (match.data.playData.hasAction && match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
             const actions = this.movementService.getActions(match.data);

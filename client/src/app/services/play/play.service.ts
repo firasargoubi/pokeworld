@@ -1,12 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { MapService } from '@app/services/map/map.service';
-import { Position } from '@common/interfaces/position';
-import { SocketService } from '@app/services/socket/socket.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { PlayEvent } from '@common/interfaces/socket-event.enum';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
+import { Position } from '@common/interfaces/position';
+import { PlayEvent } from '@common/interfaces/socket-event.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -66,6 +67,10 @@ export class PlayService {
         if (this.matchService.isHost()) {
             this.socketService.emit(PlayEvent.ChangeDebugMode, !this.matchService.data.playData.isDebugMode);
         }
+    }
+
+    dropItem(itemType: ItemType) {
+        this.socketService.emit(PlayEvent.DropItem, itemType);
     }
 
     private onMatchUpdate(oldMatchData: MatchData) {

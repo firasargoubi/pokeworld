@@ -1,5 +1,6 @@
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { Position } from '@common/interfaces/position';
 import { PlayEvent } from '@common/interfaces/socket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -50,6 +51,14 @@ export class PlayGateway {
         const match = this.matchService.getMatchFromPlayerId(socket.id);
         if (match) {
             this.playService.changeDebugMode(match, socket.id, isDebugMode);
+        }
+    }
+
+    @SubscribeMessage(PlayEvent.DropItem)
+    dropItem(socket: Socket, itemType: ItemType) {
+        const match = this.matchService.getMatchFromPlayerId(socket.id);
+        if (match) {
+            this.playService.dropItem(match, socket.id, itemType);
         }
     }
 }
