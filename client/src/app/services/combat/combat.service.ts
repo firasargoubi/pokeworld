@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { CombatEvent } from '@common/interfaces/socket-event.enum';
 import { SocketService } from '@app/services/socket/socket.service';
+import { CombatEvent } from '@common/interfaces/socket-event.enum';
 
 @Injectable({
     providedIn: 'root',

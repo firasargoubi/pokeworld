@@ -14,6 +14,7 @@ import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { TileDescriptionService } from '@app/services/tile-description/tile-description.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { MatchState } from '@common/interfaces/match-data';
 import { PlayerType } from '@common/interfaces/player-data';
 
 @Component({
@@ -39,7 +40,7 @@ export class PlayPageComponent {
         }
         this.mapService.clearOverlays();
         this.updateVisual();
-        this.matchService.matchUpdate.subscribe(this.updateVisual.bind(this));
+        this.matchService.matchUpdate.subscribe(this.onMatchUpdate.bind(this));
         this.generateThumbnail();
     }
 
@@ -76,6 +77,21 @@ export class PlayPageComponent {
 
     hideTileDescription(): void {
         this.tileDescriptionService.hideTileDescription();
+    }
+
+    private onMatchUpdate() {
+        this.updateVisual();
+        this.checkForRedirect();
+    }
+
+    private checkForRedirect() {
+        const isSelfInCombat = this.matchService.data.combatData.playersCombatData.some((p) => p.playerIndex === this.matchService.selfIndex);
+        const isMatchInCombatState = this.matchService.isState([MatchState.CombatWait, MatchState.CombatAnimation, MatchState.CombatEnd]);
+        if (isSelfInCombat && isMatchInCombatState) {
+            this.router.navigate([PageEndpoint.Combat]);
+        } else if (this.matchService.isState([MatchState.Statistics])) {
+            // TODO rediriger vers la page de statistique
+        }
     }
 
     private updateVisual() {

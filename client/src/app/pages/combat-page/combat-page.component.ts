@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { DEFAULT_COMBAT_ANIMATIONS } from '@app/consts/combat-data.const';
 import { BATTLE_PLATFORM_IMAGES } from '@app/consts/images.const';
@@ -7,8 +8,9 @@ import { CombatAnimations } from '@app/interfaces/combat-animations';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
-import { DEFAULT_PLAYER_COMBAT_DATA } from '@common/consts/match-data.const';
-import { PlayerCombatData } from '@common/interfaces/match-data';
+import { DEFAULT_PLAYER_COMBAT_DATA } from '@common/consts/combat-data.const';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { CombatAction, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
 import { DiceType } from '@common/interfaces/player-data';
 
 @Component({
@@ -17,23 +19,27 @@ import { DiceType } from '@common/interfaces/player-data';
     styleUrls: ['./combat-page.component.scss'],
     imports: [CommonModule],
 })
-export class CombatPageComponent implements OnInit {
+export class CombatPageComponent {
     avatarData = AVATAR_DATA;
     battlePlatformData = BATTLE_PLATFORM_IMAGES;
+    combatAction = CombatAction;
+    matchState = MatchState;
     diceType = DiceType;
 
+    isSelfTurn: boolean = false;
     animation: CombatAnimations = structuredClone(DEFAULT_COMBAT_ANIMATIONS);
     selfPlayer: PlayerCombatData = structuredClone(DEFAULT_PLAYER_COMBAT_DATA);
-    ennemyPlayer: PlayerCombatData = structuredClone(DEFAULT_PLAYER_COMBAT_DATA);
+    enemyPlayer: PlayerCombatData = structuredClone(DEFAULT_PLAYER_COMBAT_DATA);
 
-    iscurrentTurn = false;
-    currentTime = 0;
-    maxTime = 0;
-
-    // private timerInterval: number | null = null;
     matchService: MatchService = inject(MatchService);
     private combatService: CombatService = inject(CombatService);
     private playService: PlayService = inject(PlayService);
+    private router: Router = inject(Router);
+
+    constructor() {
+        this.onMatchUpdate();
+        this.matchService.matchUpdate.subscribe(this.onMatchUpdate.bind(this));
+    }
 
     @HostListener('document:keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
@@ -44,16 +50,37 @@ export class CombatPageComponent implements OnInit {
         }
     }
 
-    ngOnInit(): void {
-        this.animation = structuredClone(DEFAULT_COMBAT_ANIMATIONS);
-    }
-
     escapeButon(): void {
         this.combatService.escape();
     }
 
     attackButton(): void {
         this.combatService.attack();
+    }
+
+    private onMatchUpdate() {
+        this.checkForRedirect();
+        this.updatePlayersCombatData();
+    }
+
+    private checkForRedirect() {
+        const isMatchInCombatState = this.matchService.isState([MatchState.CombatWait, MatchState.CombatAnimation, MatchState.CombatEnd]);
+        if (isMatchInCombatState) {
+            this.router.navigate([PageEndpoint.Play]);
+        }
+    }
+
+    private updatePlayersCombatData() {
+        const isFirstPlayer = this.matchService.data.combatData.playersCombatData.some((p) => p.playerIndex === this.matchService.selfIndex);
+        if (isFirstPlayer) {
+            this.selfPlayer = this.matchService.data.combatData.playersCombatData[0];
+            this.enemyPlayer = this.matchService.data.combatData.playersCombatData[1];
+            this.isSelfTurn = !this.matchService.data.combatData.isSecondPlayerTurn;
+        } else {
+            this.selfPlayer = this.matchService.data.combatData.playersCombatData[1];
+            this.enemyPlayer = this.matchService.data.combatData.playersCombatData[0];
+            this.isSelfTurn = this.matchService.data.combatData.isSecondPlayerTurn;
+        }
     }
 
     // private attackAnimation(attackResult: AttackResult): void {

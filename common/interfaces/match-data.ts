@@ -61,4 +61,5 @@ export enum MatchState {
     CombatAnimation = 'combatAnimation',
     CombatEnd = 'combatEnd',
     MatchEnd = 'matchEnd',
+    Statistics = 'Statistics',
 }

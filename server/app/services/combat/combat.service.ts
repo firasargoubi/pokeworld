@@ -33,31 +33,48 @@ export class CombatService {
         this.startCombatWait(match);
     }
 
-    private executeAttack(match: Match) {
+    private startCombatWait(match: Match) {
+        match.data.state = MatchState.CombatWait;
+        match.data.combatData.turnDuration = this.getActivePlayerData(match).currentEscapes === 0 ? COMBAT_SHORT_TURN_DURATION : COMBAT_TURN_DURATION;
+        // eslint-disable-next-line no-console
+        console.log('startCombatWait', match.data.combatData.turnDuration);
+        match.sendUpdate();
+        console.log(match);
+        // match.setTimeout(this.startCombatAnimation.bind(this, match), match.data.combatData.turnDuration);
+    }
+
+    private startCombatAnimation(match: Match) {
         match.data.state = MatchState.CombatAnimation;
-        const attackResult = this.computeAttack(match);
-        if (attackResult > 0) {
-            this.getInactivePlayerData(match).currentHealth -= attackResult;
+        this.executeAttack(match);
+        match.data.combatData.isSecondPlayerTurn = !match.data.combatData.isSecondPlayerTurn;
+        match.sendUpdate();
+        if (this.getInactivePlayerData(match).currentHealth > 0) {
+            match.setTimeout(this.startCombatWait.bind(this, match), COMBAT_ANIMATION_DURATION);
         } else {
-            match.data.combatData.lastCombatAction = CombatAction.FailAttack;
+            match.setTimeout(this.startCombatEnd.bind(this, match), COMBAT_ANIMATION_DURATION);
         }
+    }
+
+    private startCombatEnd(match: Match) {
+        match.data.state = MatchState.CombatEnd;
+        const winningPlayer = match.data.players[this.getActivePlayerData(match).playerIndex];
+        winningPlayer.combatsWon += 1;
+        match.sendMessage(`${winningPlayer.name} a gagné le combat`);
         match.setTimeout(this.startCombatWait.bind(this, match), COMBAT_ANIMATION_DURATION);
     }
 
-    private computeAttack(match: Match): number {
+    private executeAttack(match: Match) {
+        const attackResult = this.computeAttackResult(match);
+        match.data.combatData.lastCombatAction = attackResult > 0 ? CombatAction.SuccessAttack : CombatAction.FailAttack;
+        this.getInactivePlayerData(match).currentHealth -= attackResult;
+    }
+
+    private computeAttackResult(match: Match): number {
         const rolledAttack = this.rollAttack(match);
         const rolledDefense = this.rollDefense(match);
         match.data.combatData.lastRolledAttack = rolledAttack;
         match.data.combatData.lastRolledDefense = rolledDefense;
         return Math.max(0, rolledAttack + this.getActivePlayerData(match).attack - rolledDefense - this.getInactivePlayerData(match).defense);
-    }
-
-    private startCombatWait(match: Match) {
-        match.data.state = MatchState.CombatWait;
-        match.data.combatData.isSecondPlayerTurn = !match.data.combatData.isSecondPlayerTurn;
-        match.data.combatData.turnDuration = this.getActivePlayerData(match).currentEscapes === 0 ? COMBAT_SHORT_TURN_DURATION : COMBAT_TURN_DURATION;
-        match.sendUpdate();
-        match.setTimeout(this.executeAttack.bind(this, match), match.data.combatData.turnDuration);
     }
 
     private rollAttack(match: Match): number {

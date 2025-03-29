@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { MapService } from '@app/services/map/map.service';
-import { Position } from '@common/interfaces/position';
-import { SocketService } from '@app/services/socket/socket.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { PlayEvent } from '@common/interfaces/socket-event.enum';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
+import { Position } from '@common/interfaces/position';
+import { PlayEvent } from '@common/interfaces/socket-event.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -36,7 +36,7 @@ export class PlayService {
         const selfPosition = this.matchService.selfPlayer.position;
         const clickedItself = selfPosition.x === position.x && selfPosition.y === position.y;
 
-        if (!clickedItself && this.matchService.isActivePlayer() && this.matchService.isState(MatchState.TurnWait)) {
+        if (!clickedItself && this.matchService.isActivePlayer() && this.matchService.isState([MatchState.TurnWait])) {
             if (this.mapService.hasActionOverlay()) {
                 this.socketService.emit(PlayEvent.Action, position);
             } else {
@@ -55,7 +55,7 @@ export class PlayService {
     displayMovementPath(targetPositon: Position) {
         const shortestPath = this.movementService.getShortestPath(this.matchService.data, targetPositon);
         const hasEnoughMovement = shortestPath.moveCost <= this.matchService.data.playData.movementLeft;
-        if (hasEnoughMovement && this.matchService.isState(MatchState.TurnWait) && this.matchService.isActivePlayer()) {
+        if (hasEnoughMovement && this.matchService.isState([MatchState.TurnWait]) && this.matchService.isActivePlayer()) {
             this.mapService.setHoverMoves(shortestPath.path);
         } else {
             this.mapService.setHoverMoves([]);
@@ -75,7 +75,7 @@ export class PlayService {
     }
 
     private updateTimer() {
-        if (this.matchService.isState(MatchState.TurnWait)) {
+        if (this.matchService.isState([MatchState.TurnWait])) {
             this.timerService.startTimer();
         } else {
             this.timerService.stopTimer(this.matchService.data.playData.timeLeft);
@@ -83,7 +83,7 @@ export class PlayService {
     }
 
     private updateMovement(oldMatchData: MatchData) {
-        if (this.matchService.isState(MatchState.MovementAnimation)) {
+        if (this.matchService.isState([MatchState.MovementAnimation])) {
             const newPosition = this.matchService.data.players[this.matchService.data.playData.activePlayerIndex].position;
             const shortestPath = this.movementService.getShortestPath(oldMatchData, newPosition);
             this.mapService.movePlayer(this.matchService.data.playData.activePlayerIndex, shortestPath.path);
@@ -93,7 +93,7 @@ export class PlayService {
     }
 
     private updateOverlays() {
-        if (this.matchService.isState(MatchState.TurnWait) && this.matchService.isActivePlayer()) {
+        if (this.matchService.isState([MatchState.TurnWait]) && this.matchService.isActivePlayer()) {
             this.displayPossibleMoves();
         } else {
             this.mapService.clearOverlays();

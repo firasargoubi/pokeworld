@@ -23,22 +23,14 @@ export class PlayService {
         if (match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
             const shortestPath = this.movementService.getShortestPath(match.data, position);
             if (shortestPath.moveCost <= match.data.playData.movementLeft) {
-                const player = match.getPlayer(playerId);
-                player.position = position;
+                match.getPlayer(playerId).position = position;
                 match.data.playData.movementLeft -= shortestPath.moveCost;
-                const elapsedTime = Math.abs(new Date().getTime() - match.lastTimeoutStart.getTime());
-                match.data.playData.timeLeft = match.data.playData.timeLeft - elapsedTime;
                 match.data.state = MatchState.MovementAnimation;
+                this.setTimeLeft(match);
                 match.sendUpdate();
                 match.setTimeout(this.endOfMovementAnimation.bind(this, match), (shortestPath.path.length + 1) * MOVEMENT_ANIMATION_DURATION);
             }
         }
-    }
-
-    endOfMovementAnimation(match: Match) {
-        match.data.state = MatchState.TurnWait;
-        match.setTimeout(this.startTurnStart.bind(this, match), match.data.playData.timeLeft);
-        match.sendUpdate();
     }
 
     action(match: Match, playerId: string, position: Position) {
@@ -76,24 +68,41 @@ export class PlayService {
         match.data.playData.movementLeft = 0;
         match.data.playData.timeLeft = TURN_WAIT_DURATION;
         match.data.playData.activePlayerIndex = this.getNextPlayerIndex(match);
-
-        match.setTimeout(this.startTurnWait.bind(this, match), TURN_START_DURATION);
         const playerName = match.data.players[match.data.playData.activePlayerIndex].name;
         match.sendMessage(`Début du tour de ${playerName}`);
+        match.setTimeout(this.startTurnWait.bind(this, match), TURN_START_DURATION);
+    }
+
+    endOfCombat(match: Match) {
+        match.data.state = MatchState.TurnWait;
+        // TODO check for win condition
+        match.sendUpdate();
+        match.setTimeout(this.startTurnStart.bind(this, match), match.data.playData.timeLeft);
+    }
+
+    private setTimeLeft(match: Match) {
+        const elapsedTime = Math.abs(new Date().getTime() - match.lastTimeoutStart.getTime());
+        match.data.playData.timeLeft = match.data.playData.timeLeft - elapsedTime;
+    }
+
+    private endOfMovementAnimation(match: Match) {
+        match.data.state = MatchState.TurnWait;
+        match.sendUpdate();
+        match.setTimeout(this.startTurnStart.bind(this, match), match.data.playData.timeLeft);
     }
 
     private startTurnWait(match: Match) {
         match.data.state = MatchState.TurnWait;
         match.data.playData.hasAction = true;
         match.data.playData.movementLeft = match.data.players[match.data.playData.activePlayerIndex].speed;
-
-        match.setTimeout(this.startTurnStart.bind(this, match), TURN_WAIT_DURATION);
         match.sendUpdate();
+        match.setTimeout(this.startTurnStart.bind(this, match), TURN_WAIT_DURATION);
     }
 
     private executeAction(match: Match, playerId: string, position: Position) {
         const targetPlayer = match.data.players.find((p) => p.position.x === position.x && p.position.y === position.y);
         if (targetPlayer) {
+            this.setTimeLeft(match);
             this.combatService.startCombat(match, playerId, targetPlayer.id);
         } else {
             this.toggleBridgeTile(match, position);
