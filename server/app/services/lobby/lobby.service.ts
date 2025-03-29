@@ -58,7 +58,7 @@ export class LobbyService {
         this.assignSpawnPoints(match);
         // TODO remplacer les items random par des items réels
         match.data.playData.activePlayerIndex = -1;
-        this.playService.startTurnStart(match);
+        this.playService.startNextTurn(match);
     }
 
     private sortPlayers(match: Match) {

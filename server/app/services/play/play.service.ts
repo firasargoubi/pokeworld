@@ -28,7 +28,7 @@ export class PlayService {
                 match.data.state = MatchState.MovementAnimation;
                 this.setTimeLeft(match);
                 match.sendUpdate();
-                match.setTimeout(this.endOfTurnInteruption.bind(this, match), (shortestPath.path.length + 1) * MOVEMENT_ANIMATION_DURATION);
+                match.setTimeout(this.continueTurn.bind(this, match), (shortestPath.path.length + 1) * MOVEMENT_ANIMATION_DURATION);
             }
         }
     }
@@ -73,9 +73,9 @@ export class PlayService {
         match.setTimeout(this.startTurnWait.bind(this, match), TURN_START_DURATION);
     }
 
-    endOfTurnInteruption(match: Match) {
+    continueTurn(match: Match) {
         // TODO check for win condition
-
+        // TODO check if player can still move and still act
         match.data.state = MatchState.TurnWait;
         match.sendUpdate();
         match.setTimeout(this.startNextTurn.bind(this, match), match.data.playData.timeLeft);
@@ -101,6 +101,7 @@ export class PlayService {
             this.combatService.startCombat(match, playerId, targetPlayer.id);
         } else {
             this.toggleBridgeTile(match, position);
+            this.continueTurn(match);
         }
     }
 
@@ -111,7 +112,6 @@ export class PlayService {
         } else if (tile === TileType.BrokenBridge) {
             match.data.gameData.mapData.tiles[position.x][position.y] = TileType.Bridge;
         }
-        match.sendUpdate();
     }
 
     private getNextPlayerIndex(match: Match): number {
