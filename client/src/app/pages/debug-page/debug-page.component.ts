@@ -18,11 +18,13 @@ import { DEBUG_GAMES, DEBUG_PLAYERS } from './debug-page.component.const';
 })
 export class DebugPageComponent {
     matchCodeInput: string = '';
-    private matchService: MatchService = inject(MatchService);
+    private matchService: MatchService;
     private socketService: SocketService = inject(SocketService);
     private router: Router = inject(Router);
 
     constructor() {
+        this.socketService.emit(MatchEvent.LeaveMatch);
+        this.matchService = inject(MatchService);
         this.matchService['resetMatchData']();
     }
 

@@ -16,9 +16,14 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CombatService {
-    // eslint-disable-next-line no-unused-vars
     attack(match: Match, playerId: string) {
-        // TODO
+        const index = match.getPlayerIndex(playerId);
+        const isFirstPlayer = !match.data.combatData.isSecondPlayerTurn && match.data.combatData.playersCombatData[0].playerIndex === index;
+        const isSecondPlayer = match.data.combatData.isSecondPlayerTurn && match.data.combatData.playersCombatData[1].playerIndex === index;
+        const isActivePlayer = isFirstPlayer || isSecondPlayer;
+        if (isActivePlayer && match.isState([MatchState.CombatWait])) {
+            this.startCombatAnimation(match);
+        }
     }
 
     // eslint-disable-next-line no-unused-vars
@@ -36,12 +41,8 @@ export class CombatService {
     private startCombatWait(match: Match) {
         match.data.state = MatchState.CombatWait;
         match.data.combatData.turnDuration = this.getActivePlayerData(match).currentEscapes === 0 ? COMBAT_SHORT_TURN_DURATION : COMBAT_TURN_DURATION;
-        // eslint-disable-next-line no-console
-        console.log('startCombatWait', match.data.combatData.turnDuration);
         match.sendUpdate();
-        // eslint-disable-next-line no-console
-        console.log(match);
-        // match.setTimeout(this.startCombatAnimation.bind(this, match), match.data.combatData.turnDuration);
+        match.setTimeout(this.startCombatAnimation.bind(this, match), match.data.combatData.turnDuration);
     }
 
     private startCombatAnimation(match: Match) {
@@ -49,7 +50,7 @@ export class CombatService {
         this.executeAttack(match);
         match.data.combatData.isSecondPlayerTurn = !match.data.combatData.isSecondPlayerTurn;
         match.sendUpdate();
-        if (this.getInactivePlayerData(match).currentHealth > 0) {
+        if (this.getActivePlayerData(match).currentHealth > 0) {
             match.setTimeout(this.startCombatWait.bind(this, match), COMBAT_ANIMATION_DURATION);
         } else {
             match.setTimeout(this.startCombatEnd.bind(this, match), COMBAT_ANIMATION_DURATION);
@@ -58,16 +59,17 @@ export class CombatService {
 
     private startCombatEnd(match: Match) {
         match.data.state = MatchState.CombatEnd;
-        const winningPlayer = match.data.players[this.getActivePlayerData(match).playerIndex];
+        const winningPlayer = match.data.players[this.getInactivePlayerData(match).playerIndex];
         winningPlayer.combatsWon += 1;
         match.sendMessage(`${winningPlayer.name} a gagné le combat`);
-        match.setTimeout(this.startCombatWait.bind(this, match), COMBAT_ANIMATION_DURATION);
+        // match.setTimeout(this.startCombatWait.bind(this, match), COMBAT_ANIMATION_DURATION);
     }
 
     private executeAttack(match: Match) {
         const attackResult = this.computeAttackResult(match);
         match.data.combatData.lastCombatAction = attackResult > 0 ? CombatAction.SuccessAttack : CombatAction.FailAttack;
-        this.getInactivePlayerData(match).currentHealth -= attackResult;
+        const attackedPlayer = this.getInactivePlayerData(match);
+        attackedPlayer.currentHealth = Math.max(0, attackedPlayer.currentHealth - attackResult);
     }
 
     private computeAttackResult(match: Match): number {
@@ -106,7 +108,7 @@ export class CombatService {
     private computePlayerData(match: Match, playerId: string): PlayerCombatData {
         const player = match.getPlayer(playerId);
         const playerCombatData = {
-            playerIndex: match.data.players.findIndex((p) => p.id === playerId),
+            playerIndex: match.getPlayerIndex(playerId),
             currentHealth: player.health,
             currentEscapes: DEFAULT_ESCAPES,
             maxEscapes: DEFAULT_ESCAPES,

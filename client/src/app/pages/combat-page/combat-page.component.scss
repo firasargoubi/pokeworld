@@ -145,7 +145,6 @@ $combat-info-height: 28vh;
 
 #self-container .pokemon-container {
     position: relative;
-    z-index: 1;
     width: 100%;
     position: absolute;
     bottom: 0;
@@ -281,7 +280,7 @@ $combat-info-height: 28vh;
     height: $combat-info-height;
     width: 100%;
     background-color: #283030;
-    z-index: 5;
+    z-index: 4;
     padding: 0.5vw;
     display: flex;
 }
@@ -384,7 +383,7 @@ $combat-info-height: 28vh;
     justify-content: space-between;
     width: 100%;
     color: #585851;
-    font-size: 6.1vh;
+    font-size: 5.5vh;
     user-select: none;
 }
 
@@ -393,12 +392,12 @@ $combat-info-height: 28vh;
 }
 
 .bonus-value {
-    width: 10%;
+    width: 20%;
 }
 
 .stat-label {
     text-align: left;
-    width: 30%;
+    width: 36%;
     overflow: visible;
 }
 

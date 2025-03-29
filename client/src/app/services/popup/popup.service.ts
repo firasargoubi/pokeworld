@@ -107,10 +107,10 @@ export class PopupService {
     }
 
     private setOverlayZIndexLow() {
-        this.overlayContainer.getContainerElement().setAttribute('style', 'z-index: -1');
+        this.overlayContainer.getContainerElement().setAttribute('style', 'z-index: -99');
     }
 
     private setOverlayZIndexHigh() {
-        this.overlayContainer.getContainerElement().setAttribute('style', 'z-index: 2');
+        this.overlayContainer.getContainerElement().setAttribute('style', 'z-index: 99');
     }
 }

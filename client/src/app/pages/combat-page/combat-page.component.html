@@ -24,9 +24,9 @@
                 </div>
                 @if ([combatAction.SuccessAttack, combatAction.FailAttack].includes(matchService.data.combatData.lastCombatAction)) {
                     @if (isSelfTurn) {
-                        <p class="dice-bonus">Dé défense: +{{ matchService.data.combatData.lastRolledDefense }}</p>
-                    } @else {
                         <p class="dice-bonus">Dé attaque: +{{ matchService.data.combatData.lastRolledAttack }}</p>
+                    } @else {
+                        <p class="dice-bonus">Dé défense: +{{ matchService.data.combatData.lastRolledDefense }}</p>
                     }
                 }
             </div>
@@ -99,21 +99,21 @@
             <div class="conatiner-body">
                 <div class="stat-container">
                     <span class="stat-label">Attaque @if (matchService.data.players[selfPlayer.playerIndex].attackDice === diceType.D4) { (D4) } @else { (D6) } </span>
-                    @if (isSelfTurn && [combatAction.SuccessAttack, combatAction.FailAttack].includes(matchService.data.combatData.lastCombatAction)) {
-                        <span class="bonus-value">+{{ matchService.data.combatData.lastRolledAttack }}</span>
+                    @if (!isSelfTurn && [combatAction.SuccessAttack, combatAction.FailAttack].includes(matchService.data.combatData.lastCombatAction)) {
+                        <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledAttack }}</span>
                     }
                     <span class="stat-value">{{ selfPlayer.attack }}/4</span>
                 </div>
                 <div class="stat-container">
                     <span class="stat-label">Défense @if (matchService.data.players[selfPlayer.playerIndex].defenseDice === diceType.D4) { (D4) } @else { (D6) }</span>
-                    @if (!isSelfTurn && [combatAction.SuccessAttack, combatAction.FailAttack].includes(matchService.data.combatData.lastCombatAction)) {
-                    <span class="bonus-value">+{{ matchService.data.combatData.lastRolledDefense }}</span>
+                    @if (isSelfTurn && [combatAction.SuccessAttack, combatAction.FailAttack].includes(matchService.data.combatData.lastCombatAction)) {
+                    <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledDefense }}</span>
                     }
                     <span class="stat-value">{{ selfPlayer.defense }}/4</span>
                 </div>
                 <div class="stat-container">
                     <span class="stat-label">Vitesse</span>
-                    <span class="stat-value">{{ matchService.data.players[selfPlayer.playerIndex].speed }}</span>
+                    <span class="stat-value">{{ matchService.data.players[selfPlayer.playerIndex].speed }}/{{ matchService.data.players[selfPlayer.playerIndex].speed }}</span>
                 </div>
             </div>
             <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />

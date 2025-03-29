@@ -69,7 +69,7 @@ export class LobbyService {
             }
             return Math.random() - HALF_POINT;
         });
-        match.data.lobbyData.hostPlayerIndex = match.data.players.findIndex((p) => p.id === hostPlayerId);
+        match.data.lobbyData.hostPlayerIndex = match.getPlayerIndex(hostPlayerId);
     }
 
     private assignSpawnPoints(match: Match) {

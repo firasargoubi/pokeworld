@@ -90,6 +90,10 @@ export class Match {
         return this.data.players.find((p) => p.id === playerId);
     }
 
+    getPlayerIndex(playerId: string): number {
+        return this.data.players.findIndex((p) => p.id === playerId);
+    }
+
     clearTimeout() {
         if (this.timeout !== null) {
             clearTimeout(this.timeout);
@@ -143,9 +147,5 @@ export class Match {
             this.sendMessage(`${player.name} a quitté la partie`);
             this.sendUpdate();
         }
-    }
-
-    private getPlayerIndex(playerId: string): number {
-        return this.data.players.findIndex((p) => p.id === playerId);
     }
 }

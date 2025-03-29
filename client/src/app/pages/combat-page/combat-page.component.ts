@@ -37,6 +37,9 @@ export class CombatPageComponent {
     private router: Router = inject(Router);
 
     constructor() {
+        if (!this.matchService.isInMatch()) {
+            this.router.navigate([PageEndpoint.Menu]);
+        }
         this.onMatchUpdate();
         this.matchService.matchUpdate.subscribe(this.onMatchUpdate.bind(this));
     }
@@ -50,12 +53,12 @@ export class CombatPageComponent {
         }
     }
 
-    escapeButon(): void {
-        this.combatService.escape();
+    attackButton() {
+        this.combatService.attack();
     }
 
-    attackButton(): void {
-        this.combatService.attack();
+    escapeButon() {
+        this.combatService.escape();
     }
 
     private onMatchUpdate() {
@@ -65,13 +68,13 @@ export class CombatPageComponent {
 
     private checkForRedirect() {
         const isMatchInCombatState = this.matchService.isState([MatchState.CombatWait, MatchState.CombatAnimation, MatchState.CombatEnd]);
-        if (isMatchInCombatState) {
+        if (!isMatchInCombatState) {
             this.router.navigate([PageEndpoint.Play]);
         }
     }
 
     private updatePlayersCombatData() {
-        const isFirstPlayer = this.matchService.data.combatData.playersCombatData.some((p) => p.playerIndex === this.matchService.selfIndex);
+        const isFirstPlayer = this.matchService.data.combatData.playersCombatData[0].playerIndex === this.matchService.selfIndex;
         if (isFirstPlayer) {
             this.selfPlayer = this.matchService.data.combatData.playersCombatData[0];
             this.enemyPlayer = this.matchService.data.combatData.playersCombatData[1];
