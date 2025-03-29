@@ -97,7 +97,6 @@ export class PlayService {
             this.combatService.startCombat(match, playerId, targetPlayer.id);
         } else {
             this.toggleBridgeTile(match, position);
-            match.sendUpdate();
         }
     }
 
@@ -108,6 +107,7 @@ export class PlayService {
         } else if (tile === TileType.BrokenBridge) {
             match.data.gameData.mapData.tiles[position.x][position.y] = TileType.Bridge;
         }
+        match.sendUpdate();
     }
 
     private getNextPlayerIndex(match: Match): number {

@@ -1,4 +1,17 @@
 import { Match } from '@app/classes/match/match';
+import {
+    COMBAT_ANIMATION_DURATION,
+    COMBAT_SHORT_TURN_DURATION,
+    COMBAT_TURN_DURATION,
+    DEFAULT_ATTACK,
+    DEFAULT_DEFENSE,
+    DEFAULT_ESCAPES,
+    PATH_ATTACK_MODIFICATION,
+    PATH_DEFENSE_MODIFICATION,
+} from '@common/consts/combat-data.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { CombatAction, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
+import { TileType } from '@common/interfaces/tile-type.enum';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -14,10 +27,94 @@ export class CombatService {
     }
 
     startCombat(match: Match, playerId: string, targetPlayerId: string) {
-        // TODO
-        // eslint-disable-next-line no-console
-        console.log('startCombat', match.data.state, playerId, targetPlayerId);
+        match.data.combatData.lastCombatAction = CombatAction.None;
+        match.data.combatData.playersCombatData = [this.computePlayerData(match, playerId), this.computePlayerData(match, targetPlayerId)];
+        match.data.combatData.isSecondPlayerTurn = match.getPlayer(playerId).speed >= match.getPlayer(targetPlayerId).speed;
+        this.startCombatWait(match);
+    }
+
+    private executeAttack(match: Match) {
+        match.data.state = MatchState.CombatAnimation;
+        const attackResult = this.computeAttack(match);
+        if (attackResult > 0) {
+            this.getInactivePlayerData(match).currentHealth -= attackResult;
+        } else {
+            match.data.combatData.lastCombatAction = CombatAction.FailAttack;
+        }
+        match.setTimeout(this.startCombatWait.bind(this, match), COMBAT_ANIMATION_DURATION);
+    }
+
+    private computeAttack(match: Match): number {
+        const rolledAttack = this.rollAttack(match);
+        const rolledDefense = this.rollDefense(match);
+        match.data.combatData.lastRolledAttack = rolledAttack;
+        match.data.combatData.lastRolledDefense = rolledDefense;
+        return Math.max(0, rolledAttack + this.getActivePlayerData(match).attack - rolledDefense - this.getInactivePlayerData(match).defense);
+    }
+
+    private startCombatWait(match: Match) {
+        match.data.state = MatchState.CombatWait;
+        match.data.combatData.isSecondPlayerTurn = !match.data.combatData.isSecondPlayerTurn;
+        match.data.combatData.turnDuration = this.getActivePlayerData(match).currentEscapes === 0 ? COMBAT_SHORT_TURN_DURATION : COMBAT_TURN_DURATION;
         match.sendUpdate();
+        match.setTimeout(this.executeAttack.bind(this, match), match.data.combatData.turnDuration);
+    }
+
+    private rollAttack(match: Match): number {
+        let dice = match.data.players[this.getActivePlayerData(match).playerIndex].attackDice;
+        if (!match.data.playData.isDebugMode) {
+            dice = Math.floor(Math.random() * dice) + 1;
+        }
+        return dice;
+    }
+
+    private rollDefense(match: Match): number {
+        let result = 1;
+        const dice = match.data.players[this.getInactivePlayerData(match).playerIndex].defenseDice;
+        if (!match.data.playData.isDebugMode) {
+            result = Math.floor(Math.random() * dice) + 1;
+        }
+        return result;
+    }
+
+    private getActivePlayerData(match: Match): PlayerCombatData {
+        return match.data.combatData.playersCombatData[Number(match.data.combatData.isSecondPlayerTurn)];
+    }
+
+    private getInactivePlayerData(match: Match): PlayerCombatData {
+        return match.data.combatData.playersCombatData[Number(!match.data.combatData.isSecondPlayerTurn)];
+    }
+
+    private computePlayerData(match: Match, playerId: string): PlayerCombatData {
+        const player = match.getPlayer(playerId);
+        const playerCombatData = {
+            playerIndex: match.data.players.findIndex((p) => p.id === playerId),
+            currentHealth: player.health,
+            currentEscapes: DEFAULT_ESCAPES,
+            maxEscapes: DEFAULT_ESCAPES,
+            attack: DEFAULT_ATTACK,
+            defense: DEFAULT_DEFENSE,
+            standingTile: match.data.gameData.mapData.tiles[player.position.x][player.position.y],
+        };
+        return this.applyCombatBuffs(match, playerCombatData);
+    }
+
+    private applyCombatBuffs(match: Match, playerCombatData: PlayerCombatData): PlayerCombatData {
+        if (playerCombatData.standingTile === TileType.Path) {
+            playerCombatData.attack += PATH_ATTACK_MODIFICATION;
+            playerCombatData.defense += PATH_DEFENSE_MODIFICATION;
+        }
+
+        match.data.players[playerCombatData.playerIndex].items.forEach((item) => {
+            if (item === ItemType.Item1) {
+                playerCombatData.attack += 0;
+                playerCombatData.defense += 0;
+
+                // TODO apply item buffs to player
+            }
+        });
+
+        return playerCombatData;
     }
 
     // private respawnPlayer(playerId: string, matchCode: string) {

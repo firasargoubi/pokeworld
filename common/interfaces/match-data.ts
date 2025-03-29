@@ -27,28 +27,29 @@ export interface PlayData {
 
 export interface CombatData {
     lastCombatAction: CombatAction;
-    isFirstPlayerTurn: boolean;
-    firstPlayer: PlayerCombatData;
-    secondPlayer: PlayerCombatData;
+    turnDuration: number;
+    isSecondPlayerTurn: boolean;
+    playersCombatData: PlayerCombatData[];
+    lastRolledAttack: number;
+    lastRolledDefense: number;
 }
 
 export interface PlayerCombatData {
     playerIndex: number;
-    playerData: PlayerData;
     currentHealth: number;
     currentEscapes: number;
     maxEscapes: number;
     attack: number;
     defense: number;
     standingTile: TileType;
-    lastRolledAttack: number;
-    lastRolledDefense: number;
 }
 
 export enum CombatAction {
     None = 'none',
-    Attack = 'attack',
-    Escape = 'Escape',
+    SuccessAttack = 'successAttack',
+    FailAttack = 'failAttack',
+    SuccessEscape = 'successEscape',
+    FailEscape = 'failEscape',
 }
 
 export enum MatchState {
