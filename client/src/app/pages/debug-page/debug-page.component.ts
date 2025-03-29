@@ -22,6 +22,10 @@ export class DebugPageComponent {
     private socketService: SocketService = inject(SocketService);
     private router: Router = inject(Router);
 
+    constructor() {
+        this.matchService['resetMatchData']();
+    }
+
     @HostListener('document:keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
         if (!event.repeat) {

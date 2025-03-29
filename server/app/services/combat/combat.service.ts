@@ -39,6 +39,7 @@ export class CombatService {
         // eslint-disable-next-line no-console
         console.log('startCombatWait', match.data.combatData.turnDuration);
         match.sendUpdate();
+        // eslint-disable-next-line no-console
         console.log(match);
         // match.setTimeout(this.startCombatAnimation.bind(this, match), match.data.combatData.turnDuration);
     }
