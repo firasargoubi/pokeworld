@@ -51,7 +51,7 @@ export class PlayService {
             if (itemType !== ItemType.Spawn) {
                 const foundItem = positions.find((itemPos) => itemPos.x === position.x && itemPos.y === position.y);
                 if (foundItem) {
-                    if (this.handleItemAddition(playerData, itemType as ItemType)) {
+                    if (this.handleItemAddition(match, playerData, itemType as ItemType)) {
                         match.data.gameData.mapData.items[itemType] = positions.filter((itemPos) => itemPos !== foundItem);
                         return;
                     }
@@ -61,20 +61,30 @@ export class PlayService {
     }
 
     // TODO: mettre en privee
-    handleItemAddition(player: PlayerData, itemType: ItemType): boolean {
+    handleItemAddition(match: Match, player: PlayerData, itemType: ItemType): boolean {
         if (player.items.length < 2 || player.type === PlayerType.Player) {
             player.items.push(itemType);
 
-            if (itemType === ItemType.Item1) {
-                player.avatar = this.getAvatarVariant(player.avatar, true, false);
+            if (player.items.length > 2) {
+                const elapsedTime = Math.abs(new Date().getTime() - match.lastTimeoutStart.getTime());
+                match.data.playData.timeLeft = match.data.playData.timeLeft - elapsedTime;
+                match.data.state = MatchState.ItemDropSelection;
+                match.clearTimeout();
             }
+
+            this.computeItems(player);
+            match.sendUpdate();
             return true;
         } else {
             // player is a bot and inventory is full
-            // eslint-disable-next-line no-console
-            console.log('Player inventory is full');
             return false;
         }
+    }
+
+    computeItems(player: PlayerData) {
+        const hasItem1 = player.items.includes(ItemType.Item1);
+        const hasItem2 = player.items.includes(ItemType.Item2);
+        player.avatar = this.getAvatarVariant(player.avatar, hasItem1, hasItem2);
     }
 
     // TODO: mettre en privee
@@ -108,6 +118,10 @@ export class PlayService {
         const player = match.getPlayer(playerId);
         player.items = player.items.filter((i) => i !== itemType);
         match.data.gameData.mapData.items[itemType].push(player.position);
+
+        match.data.state = MatchState.TurnWait;
+        match.setTimeout(this.startTurnStart.bind(this, match), match.data.playData.timeLeft);
+        this.computeItems(player);
         match.sendUpdate();
     }
 

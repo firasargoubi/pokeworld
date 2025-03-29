@@ -19,11 +19,20 @@ $clip-path: polygon(
 
 $text-shadow-color: #707070;
 
-#item-popup {
+#popup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#item-popup {
     height: min(50vh, 50vw);
     aspect-ratio: 16 / 9;
     overflow: visible;

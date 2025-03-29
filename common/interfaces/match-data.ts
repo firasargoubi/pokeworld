@@ -56,6 +56,7 @@ export enum MatchState {
     TurnStart = 'turnStart',
     TurnWait = 'turnWait',
     MovementAnimation = 'movementAnimation',
+    ItemDropSelection = 'itemDropSelection',  
     CombatWait = 'combatAnimation',
     CombatAnimation = 'combatAnimation',
     CombatEnd = 'combatEnd',
