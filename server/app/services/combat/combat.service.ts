@@ -1,6 +1,9 @@
 import { Match } from '@app/classes/match/match';
+import { MovementService } from '@app/services/movement/movement.service';
+import { PlayService } from '@app/services/play/play.service';
 import {
     COMBAT_ANIMATION_DURATION,
+    COMBAT_END_DURATION,
     COMBAT_SHORT_TURN_DURATION,
     COMBAT_TURN_DURATION,
     DEFAULT_ATTACK,
@@ -11,18 +14,22 @@ import {
 } from '@common/consts/combat-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatAction, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
+import { PlayerData } from '@common/interfaces/player-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CombatService {
+    @Inject(MovementService) private readonly movementService: MovementService;
+    @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
+
     attack(match: Match, playerId: string) {
         const index = match.getPlayerIndex(playerId);
         const isFirstPlayer = !match.data.combatData.isSecondPlayerTurn && match.data.combatData.playersCombatData[0].playerIndex === index;
         const isSecondPlayer = match.data.combatData.isSecondPlayerTurn && match.data.combatData.playersCombatData[1].playerIndex === index;
         const isActivePlayer = isFirstPlayer || isSecondPlayer;
         if (isActivePlayer && match.isState([MatchState.CombatWait])) {
-            this.startCombatAnimation(match);
+            this.startAttackAnimation(match);
         }
     }
 
@@ -42,10 +49,10 @@ export class CombatService {
         match.data.state = MatchState.CombatWait;
         match.data.combatData.turnDuration = this.getActivePlayerData(match).currentEscapes === 0 ? COMBAT_SHORT_TURN_DURATION : COMBAT_TURN_DURATION;
         match.sendUpdate();
-        match.setTimeout(this.startCombatAnimation.bind(this, match), match.data.combatData.turnDuration);
+        match.setTimeout(this.startAttackAnimation.bind(this, match), match.data.combatData.turnDuration);
     }
 
-    private startCombatAnimation(match: Match) {
+    private startAttackAnimation(match: Match) {
         match.data.state = MatchState.CombatAnimation;
         this.executeAttack(match);
         match.data.combatData.isSecondPlayerTurn = !match.data.combatData.isSecondPlayerTurn;
@@ -59,10 +66,15 @@ export class CombatService {
 
     private startCombatEnd(match: Match) {
         match.data.state = MatchState.CombatEnd;
-        const winningPlayer = match.data.players[this.getInactivePlayerData(match).playerIndex];
-        winningPlayer.combatsWon += 1;
-        match.sendMessage(`${winningPlayer.name} a gagné le combat`);
-        // match.setTimeout(this.startCombatWait.bind(this, match), COMBAT_ANIMATION_DURATION);
+        match.data.players[this.getInactivePlayerData(match).playerIndex].combatsWon += 1;
+        const deadPlayerIndex = this.getActivePlayerData(match).playerIndex;
+        this.respawnPlayer(match, match.data.players[deadPlayerIndex]);
+        match.sendUpdate();
+        if (match.data.playData.activePlayerIndex === deadPlayerIndex) {
+            match.setTimeout(this.playService.startNextTurn.bind(this.playService, match), COMBAT_END_DURATION);
+        } else {
+            match.setTimeout(this.playService.endOfTurnInteruption.bind(this.playService, match), COMBAT_END_DURATION);
+        }
     }
 
     private executeAttack(match: Match) {
@@ -137,18 +149,13 @@ export class CombatService {
         return playerCombatData;
     }
 
-    // private respawnPlayer(playerId: string, matchCode: string) {
-    //     const match = this.matchService.getMatch(matchCode);
-    //     if (match) {
-    //         const player = this.matchService.getPlayer(match.matchData.code, playerId);
-    //         if (player && player.isConnected) {
-    //             if (player.spawnPoint !== player.currentStats.position) {
-    //                 const position = this.movementService.getNearestEmptyTile(player.spawnPoint, match);
-    //                 player.currentStats.position = position;
-    //             }
-    //         }
-    //     }
-    // }
+    private respawnPlayer(match: Match, player: PlayerData) {
+        if (player.spawnPoint !== player.position) {
+            // TODO drop items on the ground
+
+            player.position = this.movementService.getNearestEmptyTile(match.data, player.spawnPoint);
+        }
+    }
 
     // initiateCombat(playerId: string, targetPlayerId: string, matchCode: string): void {
     //     const targetPlayer = this.matchService.getPlayer(matchCode, targetPlayerId);

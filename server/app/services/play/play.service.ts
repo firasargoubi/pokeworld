@@ -6,16 +6,16 @@ import { MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PlayService {
     @Inject(MovementService) private readonly movementService: MovementService;
-    @Inject(CombatService) private readonly combatService: CombatService;
+    @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
 
     endTurn(match: Match, playerId: string) {
         if (match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
-            this.startTurnStart(match);
+            this.startNextTurn(match);
         }
     }
 
@@ -28,7 +28,7 @@ export class PlayService {
                 match.data.state = MatchState.MovementAnimation;
                 this.setTimeLeft(match);
                 match.sendUpdate();
-                match.setTimeout(this.endOfMovementAnimation.bind(this, match), (shortestPath.path.length + 1) * MOVEMENT_ANIMATION_DURATION);
+                match.setTimeout(this.endOfTurnInteruption.bind(this, match), (shortestPath.path.length + 1) * MOVEMENT_ANIMATION_DURATION);
             }
         }
     }
@@ -62,7 +62,7 @@ export class PlayService {
         }
     }
 
-    startTurnStart(match: Match) {
+    startNextTurn(match: Match) {
         match.data.state = MatchState.TurnStart;
         match.data.playData.hasAction = false;
         match.data.playData.movementLeft = 0;
@@ -73,11 +73,12 @@ export class PlayService {
         match.setTimeout(this.startTurnWait.bind(this, match), TURN_START_DURATION);
     }
 
-    endOfCombat(match: Match) {
-        match.data.state = MatchState.TurnWait;
+    endOfTurnInteruption(match: Match) {
         // TODO check for win condition
+
+        match.data.state = MatchState.TurnWait;
         match.sendUpdate();
-        match.setTimeout(this.startTurnStart.bind(this, match), match.data.playData.timeLeft);
+        match.setTimeout(this.startNextTurn.bind(this, match), match.data.playData.timeLeft);
     }
 
     private setTimeLeft(match: Match) {
@@ -85,18 +86,12 @@ export class PlayService {
         match.data.playData.timeLeft = match.data.playData.timeLeft - elapsedTime;
     }
 
-    private endOfMovementAnimation(match: Match) {
-        match.data.state = MatchState.TurnWait;
-        match.sendUpdate();
-        match.setTimeout(this.startTurnStart.bind(this, match), match.data.playData.timeLeft);
-    }
-
     private startTurnWait(match: Match) {
         match.data.state = MatchState.TurnWait;
         match.data.playData.hasAction = true;
         match.data.playData.movementLeft = match.data.players[match.data.playData.activePlayerIndex].speed;
         match.sendUpdate();
-        match.setTimeout(this.startTurnStart.bind(this, match), TURN_WAIT_DURATION);
+        match.setTimeout(this.startNextTurn.bind(this, match), TURN_WAIT_DURATION);
     }
 
     private executeAction(match: Match, playerId: string, position: Position) {

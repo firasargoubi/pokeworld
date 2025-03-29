@@ -38,8 +38,7 @@ export class PlayPageComponent {
         if (!this.matchService.isInMatch()) {
             this.router.navigate([PageEndpoint.Menu]);
         }
-        this.mapService.clearOverlays();
-        this.updateVisual();
+        this.onMatchUpdate();
         this.matchService.matchUpdate.subscribe(this.onMatchUpdate.bind(this));
         this.generateThumbnail();
     }
@@ -87,7 +86,6 @@ export class PlayPageComponent {
     private checkForRedirect() {
         const isSelfInCombat = this.matchService.data.combatData.playersCombatData.some((p) => p.playerIndex === this.matchService.selfIndex);
         const isMatchInCombatState = this.matchService.isState([MatchState.CombatWait, MatchState.CombatAnimation, MatchState.CombatEnd]);
-        window.console.log(isSelfInCombat, isMatchInCombatState);
         if (isSelfInCombat && isMatchInCombatState) {
             this.router.navigate([PageEndpoint.Combat]);
         } else if (this.matchService.isState([MatchState.Statistics])) {

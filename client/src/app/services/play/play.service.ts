@@ -19,6 +19,7 @@ export class PlayService {
     private timerService: TimerService = inject(TimerService);
 
     constructor() {
+        this.onMatchUpdate(this.matchService.data);
         this.matchService.matchUpdate.subscribe(this.onMatchUpdate.bind(this));
     }
 
