@@ -1,4 +1,5 @@
 import { Match } from '@app/classes/match/match';
+import { CombatService } from '@app/services/combat/combat.service';
 import { MovementService } from '@app/services/movement/movement.service';
 import { MOVEMENT_ANIMATION_DURATION, TURN_START_DURATION, TURN_WAIT_DURATION } from '@common/consts/match-data.const';
 import { MatchState } from '@common/interfaces/match-data';
@@ -10,6 +11,7 @@ import { Inject, Injectable } from '@nestjs/common';
 @Injectable()
 export class PlayService {
     @Inject(MovementService) private readonly movementService: MovementService;
+    @Inject(CombatService) private readonly combatService: CombatService;
 
     endTurn(match: Match, playerId: string) {
         if (match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
@@ -92,7 +94,7 @@ export class PlayService {
     private executeAction(match: Match, playerId: string, position: Position) {
         const targetPlayer = match.data.players.find((p) => p.position.x === position.x && p.position.y === position.y);
         if (targetPlayer) {
-            this.startFight(match, playerId, targetPlayer.id);
+            this.combatService.startCombat(match, playerId, targetPlayer.id);
         } else {
             this.toggleBridgeTile(match, position);
             match.sendUpdate();
@@ -117,24 +119,4 @@ export class PlayService {
         }
         return nextIndex;
     }
-
-    private startFight(match: Match, playerId: string, targetPlayerId: string) {
-        // TODO
-        // eslint-disable-next-line no-console
-        console.log('startFight', match.data.state, playerId, targetPlayerId);
-        match.sendUpdate();
-    }
-
-    // private respawnPlayer(playerId: string, matchCode: string) {
-    //     const match = this.matchService.getMatch(matchCode);
-    //     if (match) {
-    //         const player = this.matchService.getPlayer(match.matchData.code, playerId);
-    //         if (player && player.isConnected) {
-    //             if (player.spawnPoint !== player.currentStats.position) {
-    //                 const position = this.movementService.getNearestEmptyTile(player.spawnPoint, match);
-    //                 player.currentStats.position = position;
-    //             }
-    //         }
-    //     }
-    // }
 }

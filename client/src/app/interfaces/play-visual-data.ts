@@ -12,7 +12,7 @@ export interface PlayerVisualData {
     id: string;
     name: string;
     avatarUrl: string;
-    fightsWon: number;
+    combatsWon: number;
     isHost: boolean;
     isBot: boolean;
     isConnected: boolean;

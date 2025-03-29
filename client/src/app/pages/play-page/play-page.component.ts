@@ -87,7 +87,7 @@ export class PlayPageComponent {
                 id: p.id,
                 name: p.name,
                 avatarUrl: AVATAR_DATA[p.avatar].imageCentered,
-                fightsWon: p.fightsWon,
+                combatsWon: p.combatsWon,
                 isHost: i === this.matchService.data.lobbyData.hostPlayerIndex,
                 isBot: p.type !== PlayerType.Player,
                 isConnected: p.isConnected,

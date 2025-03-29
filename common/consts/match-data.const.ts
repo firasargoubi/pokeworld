@@ -59,4 +59,4 @@ export const HALF_POINT = 0.5;
 
 export const MS_CONVERSION_FACTOR = 10;
 
-export const MINIMUM_FIGHTS_TO_WIN = 3;
+export const MINIMUM_COMBATS_TO_WIN = 3;

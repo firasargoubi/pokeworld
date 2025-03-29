@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
 import { Match } from '@app/classes/match/match';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CombatService {
@@ -12,6 +12,26 @@ export class CombatService {
     escape(match: Match, playerId: string) {
         // TODO
     }
+
+    startCombat(match: Match, playerId: string, targetPlayerId: string) {
+        // TODO
+        // eslint-disable-next-line no-console
+        console.log('startCombat', match.data.state, playerId, targetPlayerId);
+        match.sendUpdate();
+    }
+
+    // private respawnPlayer(playerId: string, matchCode: string) {
+    //     const match = this.matchService.getMatch(matchCode);
+    //     if (match) {
+    //         const player = this.matchService.getPlayer(match.matchData.code, playerId);
+    //         if (player && player.isConnected) {
+    //             if (player.spawnPoint !== player.currentStats.position) {
+    //                 const position = this.movementService.getNearestEmptyTile(player.spawnPoint, match);
+    //                 player.currentStats.position = position;
+    //             }
+    //         }
+    //     }
+    // }
 
     // initiateCombat(playerId: string, targetPlayerId: string, matchCode: string): void {
     //     const targetPlayer = this.matchService.getPlayer(matchCode, targetPlayerId);
