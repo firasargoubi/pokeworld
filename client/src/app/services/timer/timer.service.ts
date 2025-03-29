@@ -24,10 +24,8 @@ export class TimerService {
             this.isStarted = false;
         }
         const roundedTime = time / TIME_SCALE;
-        if (this.lastUnpauseTime !== roundedTime) {
-            this.lastUnpauseTime = roundedTime;
-            this.currentTime = Math.floor(roundedTime);
-        }
+        this.lastUnpauseTime = roundedTime;
+        this.currentTime = Math.floor(roundedTime);
     }
 
     private startInterval() {
