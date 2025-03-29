@@ -1,29 +1,28 @@
 import { CombatAction, CombatData, PlayerCombatData } from '../interfaces/match-data';
 import { TileType } from '../interfaces/tile-type.enum';
+import { DEFAULT_PLAYER_DATA } from './player-data.const';
+
+export const PATH_ATTACK_MODIFICATION = -2;
+export const PATH_DEFENSE_MODIFICATION = -2;
 
 export const COMBAT_TURN_DURATION = 5000;
 export const COMBAT_SHORT_TURN_DURATION = 3000;
 export const COMBAT_ANIMATION_DURATION = 500;
 export const COMBAT_END_DURATION = 3000;
 
-export const ESCAPE_CHANCES = 0.3;
-
 export const DEFAULT_ATTACK = 4;
-
 export const DEFAULT_DEFENSE = 4;
-
 export const DEFAULT_ESCAPES = 2;
-
-export const PATH_ATTACK_MODIFICATION = -2;
-export const PATH_DEFENSE_MODIFICATION = -2;
+export const DEFAULT_ESCAPE_CHANCES = 0.3;
 
 export const DEFAULT_PLAYER_COMBAT_DATA: PlayerCombatData = {
     playerIndex: 0,
-    currentHealth: 4,
-    currentEscapes: 2,
-    maxEscapes: 2,
-    attack: 4,
-    defense: 4,
+    currentHealth: DEFAULT_PLAYER_DATA.health,
+    currentEscapes: DEFAULT_ESCAPES,
+    maxEscapes: DEFAULT_ESCAPES,
+    escapeChances: DEFAULT_ESCAPE_CHANCES,
+    attack: DEFAULT_ATTACK,
+    defense: DEFAULT_DEFENSE,
     standingTile: TileType.Grass,
 };
 

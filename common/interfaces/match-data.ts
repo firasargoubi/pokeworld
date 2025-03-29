@@ -39,6 +39,7 @@ export interface PlayerCombatData {
     currentHealth: number;
     currentEscapes: number;
     maxEscapes: number;
+    escapeChances: number;
     attack: number;
     defense: number;
     standingTile: TileType;

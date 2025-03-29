@@ -6,10 +6,7 @@ import {
     COMBAT_END_DURATION,
     COMBAT_SHORT_TURN_DURATION,
     COMBAT_TURN_DURATION,
-    DEFAULT_ATTACK,
-    DEFAULT_DEFENSE,
-    DEFAULT_ESCAPES,
-    ESCAPE_CHANCES,
+    DEFAULT_PLAYER_COMBAT_DATA,
     PATH_ATTACK_MODIFICATION,
     PATH_DEFENSE_MODIFICATION,
 } from '@common/consts/combat-data.const';
@@ -108,7 +105,7 @@ export class CombatService {
         const escapingPlayer = this.getActivePlayerData(match);
         if (escapingPlayer.currentEscapes > 0) {
             escapingPlayer.currentEscapes--;
-            isEscapeSuccessful = Math.random() < ESCAPE_CHANCES;
+            isEscapeSuccessful = Math.random() < escapingPlayer.escapeChances;
         }
         return isEscapeSuccessful;
     }
@@ -156,12 +153,9 @@ export class CombatService {
     private computePlayerData(match: Match, playerId: string): PlayerCombatData {
         const player = match.getPlayer(playerId);
         const playerCombatData = {
+            ...structuredClone(DEFAULT_PLAYER_COMBAT_DATA),
             playerIndex: match.getPlayerIndex(playerId),
             currentHealth: player.health,
-            currentEscapes: DEFAULT_ESCAPES,
-            maxEscapes: DEFAULT_ESCAPES,
-            attack: DEFAULT_ATTACK,
-            defense: DEFAULT_DEFENSE,
             standingTile: match.data.gameData.mapData.tiles[player.position.x][player.position.y],
         };
         return this.applyCombatBuffs(match, playerCombatData);
@@ -177,6 +171,9 @@ export class CombatService {
             if (item === ItemType.Item1) {
                 playerCombatData.attack += 0;
                 playerCombatData.defense += 0;
+                playerCombatData.escapeChances += 0.2;
+                playerCombatData.maxEscapes += 1;
+                playerCombatData.currentEscapes += 1;
 
                 // TODO apply item buffs to player
             }
