@@ -5,6 +5,7 @@ import { DEFAULT_GAME_DATA } from './game-data.const';
 export const TURN_WAIT_DURATION = 30000;
 export const TURN_START_DURATION = 3000;
 export const MOVEMENT_ANIMATION_DURATION = 150;
+export const MATCH_END_DURATION = 3000;
 export const TIME_SCALE = 1000;
 
 export const DEFAULT_LOBBY_DATA: LobbyData = {

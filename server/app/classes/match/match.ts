@@ -57,14 +57,14 @@ export class Match {
                 } else {
                     return this.playerLeaveLobby(playerId);
                 }
+            case MatchState.Statistics:
             case MatchState.MatchEnd:
                 return this.playerLeaveStats(playerId);
             case MatchState.CombatAnimation:
             case MatchState.CombatWait:
-                return this.playerLeaveCombat(playerId);
-            default:
-                return this.playerLeaveMatch(playerId);
+                this.playerLeaveCombat(playerId);
         }
+        return this.playerLeaveMatch(playerId);
     }
 
     getConnectedPlayerCount(): number {
@@ -126,14 +126,21 @@ export class Match {
         this.sendUpdate();
     }
 
-    // eslint-disable-next-line no-unused-vars
     private playerLeaveCombat(playerId: string) {
-        // TODO a player has left the match while there was a combat going on
+        const playerIndex = this.getPlayerIndex(playerId);
+        if (this.data.combatData.playersCombatData[0].playerIndex === playerIndex) {
+            this.data.combatData.isSecondPlayerTurn = false;
+            this.matchService.killPlayerCombat(this);
+        } else if (this.data.combatData.playersCombatData[1].playerIndex === playerIndex) {
+            this.data.combatData.isSecondPlayerTurn = true;
+            this.matchService.killPlayerCombat(this);
+        }
     }
 
-    // eslint-disable-next-line no-unused-vars
     private playerLeaveStats(playerId: string) {
-        // TODO a player has left the match while on the end of match stat screen
+        const player = this.data.players.find((p) => p.id === playerId);
+        player.isConnected = false;
+        this.sendMessage(`${player.name} a quitté la partie`);
     }
 
     private playerLeaveMatch(playerId: string) {
@@ -145,7 +152,6 @@ export class Match {
             this.kickPlayer(connectedPlayers[0].id, Message.LastPlayerRemaining);
         } else {
             this.sendMessage(`${player.name} a quitté la partie`);
-            this.sendUpdate();
         }
     }
 }

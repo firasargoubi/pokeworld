@@ -36,8 +36,22 @@ export class CombatService {
     startCombat(match: Match, playerId: string, targetPlayerId: string) {
         match.data.combatData.lastCombatAction = CombatAction.None;
         match.data.combatData.playersCombatData = [this.computePlayerData(match, playerId), this.computePlayerData(match, targetPlayerId)];
-        match.data.combatData.isSecondPlayerTurn = match.getPlayer(playerId).speed >= match.getPlayer(targetPlayerId).speed;
+        match.data.combatData.isSecondPlayerTurn = match.getPlayer(playerId).speed < match.getPlayer(targetPlayerId).speed;
         this.startCombatWait(match);
+    }
+
+    startCombatEndDeath(match: Match) {
+        match.data.state = MatchState.CombatEnd;
+        match.data.players[this.getInactivePlayerData(match).playerIndex].combatsWon += 1;
+        const deadPlayer = this.getActivePlayerData(match);
+        deadPlayer.currentHealth = 0;
+        this.respawnPlayer(match, match.data.players[deadPlayer.playerIndex]);
+        match.sendUpdate();
+        if (match.data.playData.activePlayerIndex === deadPlayer.playerIndex) {
+            match.setTimeout(this.playService.startNextTurn.bind(this.playService, match), COMBAT_END_DURATION);
+        } else {
+            match.setTimeout(this.playService.continueTurn.bind(this.playService, match), COMBAT_END_DURATION);
+        }
     }
 
     private canPlayerAct(match: Match, playerId: string): boolean {
@@ -68,7 +82,6 @@ export class CombatService {
     }
 
     private startEscapeAnimation(match: Match) {
-        // HERE
         match.data.state = MatchState.CombatAnimation;
         const isEscapeSuccessful = this.executeEscape(match);
         match.data.combatData.isSecondPlayerTurn = !match.data.combatData.isSecondPlayerTurn;
@@ -85,19 +98,6 @@ export class CombatService {
         match.data.state = MatchState.CombatEnd;
         match.sendUpdate();
         match.setTimeout(this.playService.continueTurn.bind(this.playService, match), COMBAT_END_DURATION);
-    }
-
-    private startCombatEndDeath(match: Match) {
-        match.data.state = MatchState.CombatEnd;
-        match.data.players[this.getInactivePlayerData(match).playerIndex].combatsWon += 1;
-        const deadPlayerIndex = this.getActivePlayerData(match).playerIndex;
-        this.respawnPlayer(match, match.data.players[deadPlayerIndex]);
-        match.sendUpdate();
-        if (match.data.playData.activePlayerIndex === deadPlayerIndex) {
-            match.setTimeout(this.playService.startNextTurn.bind(this.playService, match), COMBAT_END_DURATION);
-        } else {
-            match.setTimeout(this.playService.continueTurn.bind(this.playService, match), COMBAT_END_DURATION);
-        }
     }
 
     private executeEscape(match: Match): boolean {

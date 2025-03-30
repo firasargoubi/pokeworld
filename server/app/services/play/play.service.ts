@@ -1,7 +1,14 @@
 import { Match } from '@app/classes/match/match';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MovementService } from '@app/services/movement/movement.service';
-import { MOVEMENT_ANIMATION_DURATION, TURN_START_DURATION, TURN_WAIT_DURATION } from '@common/consts/match-data.const';
+import {
+    MATCH_END_DURATION,
+    MINIMUM_COMBATS_TO_WIN,
+    MOVEMENT_ANIMATION_DURATION,
+    TURN_START_DURATION,
+    TURN_WAIT_DURATION,
+} from '@common/consts/match-data.const';
+import { GameMode } from '@common/interfaces/map-data';
 import { MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { Position } from '@common/interfaces/position';
@@ -74,11 +81,60 @@ export class PlayService {
     }
 
     continueTurn(match: Match) {
-        // TODO check for win condition
-        // TODO check if player can still move and still act
-        match.data.state = MatchState.TurnWait;
+        if (this.checkWinCondition(match)) {
+            match.setTimeout(this.endMatch.bind(this, match), MATCH_END_DURATION);
+        } else {
+            if (this.canPlayerAct(match)) {
+                match.data.state = MatchState.TurnWait;
+                match.sendUpdate();
+                match.setTimeout(this.startNextTurn.bind(this, match), match.data.playData.timeLeft);
+            } else {
+                this.startNextTurn(match);
+            }
+        }
+    }
+
+    private canPlayerAct(match: Match): boolean {
+        const hasPossibleActions = this.movementService.getActions(match.data).length > 0;
+        const canUseAction = hasPossibleActions && match.data.playData.hasAction;
+        const canMove = this.movementService.getPossibleMoves(match.data).length > 0;
+        return canUseAction || canMove;
+    }
+
+    private checkWinCondition(match: Match): boolean {
+        if (match.data.gameData.mapData.gameMode === GameMode.CTF) {
+            return this.checkWinConditionCtf(match);
+        } else {
+            return this.checkWinConditionFfa(match);
+        }
+    }
+
+    private checkWinConditionFfa(match: Match): boolean {
+        const winner = match.data.players.find((p) => p.combatsWon >= MINIMUM_COMBATS_TO_WIN);
+        if (winner) {
+            match.data.state = MatchState.MatchEnd;
+            match.sendMessage(`${winner.name} à gagné la partie`);
+        }
+        return Boolean(winner);
+    }
+
+    private endMatch(match: Match) {
+        match.data.state = MatchState.Statistics;
         match.sendUpdate();
-        match.setTimeout(this.startNextTurn.bind(this, match), match.data.playData.timeLeft);
+        match.clearTimeout();
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    private checkWinConditionCtf(match: Match): boolean {
+        // TODO check win condition for CTF games, return TRUE if game is over, return FALSE if game should continue
+
+        if (Math.random() === 0) {
+            match.data.state = MatchState.MatchEnd;
+            match.sendMessage('Les rouges remporte la partie');
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private setTimeLeft(match: Match) {
