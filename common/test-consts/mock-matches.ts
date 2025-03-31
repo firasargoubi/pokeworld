@@ -1,68 +1,83 @@
-import { Match, MatchData, TurnPhase } from '../interfaces/match';
+import { CombatAction, CombatData, LobbyData, MatchData, MatchState, PlayData, PlayerCombatData } from '../interfaces/match-data';
+import { MOCK_PLAYER_DATAS } from './mock-players';
 import { MOCK_GAME_DATAS } from './mock-games';
-import { MOCK_PLAYERS, PLAYER_IDS } from './mock-players';
+import { TURN_WAIT_DURATION } from '../consts/match-data.const';
+import { COMBAT_TURN_DURATION } from '../consts/combat-data.const';
+import { TileType } from '../interfaces/tile-type.enum';
+
+export const MOCK_MATCH_CODES = ['1111', '2222', '3333'];
+
+export const MOCK_LOBBY_DATA: LobbyData = {
+    isLocked: false,
+    hostPlayerIndex: 0,
+};
+
+export const MOCK_PLAY_DATA: PlayData = {
+    timeLeft: structuredClone(TURN_WAIT_DURATION),
+    isDebugMode: false,
+    activePlayerIndex: 0,
+    hasAction: true,
+    movementLeft: 6,
+};
+
+export const MOCK_PLAYER_COMBAT_DATAS: PlayerCombatData[] = [
+    {
+        playerIndex: 0,
+        currentHealth: 6,
+        currentEscapes: 2,
+        maxEscapes: 2,
+        escapeChances: 0.3,
+        attack: 4,
+        defense: 4,
+        standingTile: TileType.Grass
+    },
+    {
+        playerIndex: 1,
+        currentHealth: 6,
+        currentEscapes: 2,
+        maxEscapes: 2,
+        escapeChances: 0.3,
+        attack: 4,
+        defense: 4,
+        standingTile: TileType.Grass
+    }
+];
+
+export const MOCK_COMBAT_DATA: CombatData = {
+    lastCombatAction: CombatAction.None,
+    turnDuration: structuredClone(COMBAT_TURN_DURATION),
+    isSecondPlayerTurn: false,
+    playersCombatData: structuredClone(MOCK_PLAYER_COMBAT_DATAS),
+    lastRolledAttack: 4,
+    lastRolledDefense: 1,
+};
 
 export const MOCK_MATCH_DATAS: MatchData[] = [
     {
-        code: '1111',
-        isDebugMode: false,
-        isStarted: false,
-        isLocked: false,
-        activePlayer: 0,
-        players: structuredClone(MOCK_PLAYERS),
-        phase: TurnPhase.PreTurn,
-        currentTimer: 0,
-        maxTimer: 0,
-    },
-    {
-        code: '2222',
-        isDebugMode: false,
-        isStarted: true,
-        isLocked: true,
-        activePlayer: 0,
-        players: structuredClone(MOCK_PLAYERS),
-        phase: TurnPhase.PreTurn,
-        currentTimer: 0,
-        maxTimer: 0,
-    },
-    {
-        code: '3333',
-        isDebugMode: true,
-        isStarted: true,
-        isLocked: true,
-        activePlayer: 0,
-        players: structuredClone(MOCK_PLAYERS),
-        phase: TurnPhase.PreTurn,
-        currentTimer: 0,
-        maxTimer: 0,
-    },
-];
-
-export const MOCK_MATCHES: Match[] = [
-    {
-        matchData: structuredClone(MOCK_MATCH_DATAS[0]),
+        code: structuredClone(MOCK_MATCH_CODES[0]),
+        players: structuredClone(MOCK_PLAYER_DATAS),
+        state: MatchState.TurnWait,
         gameData: structuredClone(MOCK_GAME_DATAS[0]),
+        lobbyData: structuredClone(MOCK_LOBBY_DATA),
+        playData: structuredClone(MOCK_PLAY_DATA),
+        combatData: structuredClone(MOCK_COMBAT_DATA),
     },
     {
-        matchData: structuredClone(MOCK_MATCH_DATAS[1]),
+        code: structuredClone(MOCK_MATCH_CODES[1]),
+        players: structuredClone(MOCK_PLAYER_DATAS),
+        state: MatchState.TurnWait,
         gameData: structuredClone(MOCK_GAME_DATAS[1]),
+        lobbyData: structuredClone(MOCK_LOBBY_DATA),
+        playData: structuredClone(MOCK_PLAY_DATA),
+        combatData: structuredClone(MOCK_COMBAT_DATA),
     },
     {
-        matchData: structuredClone(MOCK_MATCH_DATAS[2]),
+        code: structuredClone(MOCK_MATCH_CODES[2]),
+        players: structuredClone(MOCK_PLAYER_DATAS),
+        state: MatchState.TurnWait,
         gameData: structuredClone(MOCK_GAME_DATAS[2]),
+        lobbyData: structuredClone(MOCK_LOBBY_DATA),
+        playData: structuredClone(MOCK_PLAY_DATA),
+        combatData: structuredClone(MOCK_COMBAT_DATA),
     },
 ];
-
-export const MATCH_CODES = ['1111', '2222'];
-
-export const MATCHES: Map<string, Match> = new Map([
-    [MATCH_CODES[0], MOCK_MATCHES[0]],
-    [MATCH_CODES[1], MOCK_MATCHES[1]],
-]);
-
-export const PLAYER_TO_MATCH_CODE: Map<string, string> = new Map([
-    [PLAYER_IDS[0], MATCH_CODES[0]],
-    [PLAYER_IDS[1], MATCH_CODES[0]],
-    [PLAYER_IDS[2], MATCH_CODES[1]],
-    [PLAYER_IDS[3], MATCH_CODES[1]],
-]);
