@@ -1,6 +1,3 @@
-import { Avatar } from '../interfaces/avatar.enum';
-import { DiceType } from '../interfaces/dice';
-import { CurrentStats, Player, PlayertStats } from '../interfaces/player';
 import { TileType } from '../interfaces/tile-type.enum';
 
 export const MOCK_PLAYER_STATS: PlayertStats[] = [
@@ -37,7 +34,7 @@ export const MOCK_CURRENT_STATS: CurrentStats[] = [
         position: { x: 0, y: 0 },
         movement: 0,
         hasAction: false,
-        fightsWon: 0,
+        combatsWon: 0,
         standingTile: TileType.Grass,
     },
     {
@@ -52,7 +49,7 @@ export const MOCK_CURRENT_STATS: CurrentStats[] = [
         position: { x: 0, y: 0 },
         movement: 0,
         hasAction: false,
-        fightsWon: 0,
+        combatsWon: 0,
         standingTile: TileType.Grass,
     },
 ];

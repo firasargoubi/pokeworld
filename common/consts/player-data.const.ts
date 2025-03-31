@@ -1,5 +1,5 @@
-import { Avatar, DiceType, PlayerData, PlayerType } from '../interfaces/player-data';
 import { MapSize } from '../interfaces/map-data';
+import { Avatar, DiceType, PlayerData, PlayerType } from '../interfaces/player-data';
 
 export const DEFAULT_PLAYER_DATA: PlayerData = {
     id: '',
@@ -13,7 +13,7 @@ export const DEFAULT_PLAYER_DATA: PlayerData = {
     attackDice: DiceType.D6,
     defenseDice: DiceType.D4,
     position: { x: -2, y: -2 },
-    fightsWon: 0,
+    combatsWon: 0,
     type: PlayerType.Player,
 };
 

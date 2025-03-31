@@ -58,7 +58,7 @@ export class LobbyService {
         this.assignSpawnPoints(match);
         // TODO remplacer les items random par des items réels
         match.data.playData.activePlayerIndex = -1;
-        this.playService.startTurnStart(match);
+        this.playService.startNextTurn(match);
     }
 
     private sortPlayers(match: Match) {
@@ -69,7 +69,7 @@ export class LobbyService {
             }
             return Math.random() - HALF_POINT;
         });
-        match.data.lobbyData.hostPlayerIndex = match.data.players.findIndex((p) => p.id === hostPlayerId);
+        match.data.lobbyData.hostPlayerIndex = match.getPlayerIndex(hostPlayerId);
     }
 
     private assignSpawnPoints(match: Match) {

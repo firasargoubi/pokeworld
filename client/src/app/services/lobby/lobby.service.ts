@@ -1,11 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { LobbyEvent } from '@common/interfaces/socket-event.enum';
-import { Avatar, PlayerData } from '@common/interfaces/player-data';
-import { SocketService } from '@app/services/socket/socket.service';
-import { MatchService } from '@app/services/match/match.service';
 import { Router } from '@angular/router';
+import { MatchService } from '@app/services/match/match.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
+import { Avatar, PlayerData } from '@common/interfaces/player-data';
+import { LobbyEvent } from '@common/interfaces/socket-event.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -42,9 +42,9 @@ export class LobbyService {
     private onMatchUpdate(oldMatchData: MatchData) {
         const oldIsConnected = oldMatchData.players.find((p) => p.id === this.socketService.selfId)?.isConnected ?? true;
         const oldState = oldMatchData.state;
-        if (this.matchService.isState(MatchState.Lobby) && !oldIsConnected && this.matchService.selfPlayer.isConnected) {
+        if (this.matchService.isState([MatchState.Lobby]) && !oldIsConnected && this.matchService.selfPlayer.isConnected) {
             this.router.navigate([PageEndpoint.Lobby]);
-        } else if (oldState === MatchState.Lobby && this.matchService.isState(MatchState.TurnStart)) {
+        } else if (oldState === MatchState.Lobby && this.matchService.isState([MatchState.TurnStart])) {
             this.router.navigate([PageEndpoint.Play]);
         }
     }

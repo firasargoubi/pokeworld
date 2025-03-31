@@ -8,6 +8,7 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { CharacterPageComponent } from '@app/pages/character-page/character-page.component';
 import { CombatPageComponent } from '@app/pages/combat-page/combat-page.component';
 import { CreatePageComponent } from '@app/pages/create-page/create-page.component';
+import { DebugPageComponent } from '@app/pages/debug-page/debug-page.component';
 import { EditPageComponent } from '@app/pages/edit-page/edit-page.component';
 import { JoinPageComponent } from '@app/pages/join-page/join-page.component';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
@@ -30,6 +31,7 @@ const routes: Routes = [
     { path: 'edit', component: EditPageComponent },
     { path: 'combat', component: CombatPageComponent },
     { path: 'character', component: CharacterPageComponent },
+    { path: 'debug', component: DebugPageComponent },
     { path: '**', redirectTo: '' },
 ];
 

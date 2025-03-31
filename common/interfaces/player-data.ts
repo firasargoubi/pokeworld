@@ -71,7 +71,7 @@ export interface PlayerData {
     defenseDice: DiceType;
     spawnPoint: Position;
     position: Position;
-    fightsWon: number;
+    combatsWon: number;
     type: PlayerType;
 }
 

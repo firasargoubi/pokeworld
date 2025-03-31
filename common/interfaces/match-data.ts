@@ -27,28 +27,30 @@ export interface PlayData {
 
 export interface CombatData {
     lastCombatAction: CombatAction;
-    isFirstPlayerTurn: boolean;
-    firstPlayer: PlayerCombatData;
-    secondPlayer: PlayerCombatData;
-}
-
-export interface PlayerCombatData {
-    playerIndex: number;
-    playerData: PlayerData;
-    currentHealth: number;
-    currentEscapes: number;
-    maxEscapes: number;
-    attack: number;
-    defense: number;
-    standingTile: TileType;
+    turnDuration: number;
+    isSecondPlayerTurn: boolean;
+    playersCombatData: PlayerCombatData[];
     lastRolledAttack: number;
     lastRolledDefense: number;
 }
 
+export interface PlayerCombatData {
+    playerIndex: number;
+    currentHealth: number;
+    currentEscapes: number;
+    maxEscapes: number;
+    escapeChances: number;
+    attack: number;
+    defense: number;
+    standingTile: TileType;
+}
+
 export enum CombatAction {
     None = 'none',
-    Attack = 'attack',
-    Escape = 'Escape',
+    SuccessAttack = 'successAttack',
+    FailAttack = 'failAttack',
+    SuccessEscape = 'successEscape',
+    FailEscape = 'failEscape',
 }
 
 export enum MatchState {
@@ -57,8 +59,9 @@ export enum MatchState {
     TurnWait = 'turnWait',
     MovementAnimation = 'movementAnimation',
     ItemDropSelection = 'itemDropSelection',  
-    CombatWait = 'combatAnimation',
+    CombatWait = 'combatWait',
     CombatAnimation = 'combatAnimation',
     CombatEnd = 'combatEnd',
     MatchEnd = 'matchEnd',
+    Statistics = 'statistics',
 }

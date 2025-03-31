@@ -1,6 +1,7 @@
 import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
-import { MATCH_CODE_LENGTH, MATCH_CODE_RANGE, DEFAULT_MATCH_DATA } from '@common/consts/match-data.const';
+import { CombatService } from '@app/services/combat/combat.service';
+import { DEFAULT_MATCH_DATA, MATCH_CODE_LENGTH, MATCH_CODE_RANGE } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData } from '@common/interfaces/match-data';
@@ -10,6 +11,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 @Injectable()
 export class MatchService {
     @Inject(forwardRef(() => MatchGateway)) private matchGateway: MatchGateway;
+    @Inject(forwardRef(() => CombatService)) private combatService: CombatService;
     private matches: Map<string, Match> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
 
@@ -82,6 +84,10 @@ export class MatchService {
         this.matchGateway.disconnectPlayer(playerId);
     }
 
+    killPlayerCombat(match: Match) {
+        this.combatService.startCombatEndDeath(match);
+    }
+
     private canJoinMatch(playerId: string, matchCode: string): boolean {
         let canJoinMatch = true;
         if (!this.hasMatchCode(matchCode)) {
@@ -106,7 +112,6 @@ export class MatchService {
             this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch);
             canJoinMatch = false;
         }
-        // TODO vérifier si le match est toujours visible
         return canJoinMatch;
     }
 

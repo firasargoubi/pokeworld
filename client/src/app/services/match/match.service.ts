@@ -39,7 +39,7 @@ export class MatchService {
         this.socketService.emit(MatchEvent.CreateMatch, gameData, (matchData: MatchData | null) => {
             if (matchData !== null) {
                 this.onUpdate(matchData);
-                this.router.navigate([PageEndpoint.character]);
+                this.router.navigate([PageEndpoint.Character]);
             }
         });
     }
@@ -48,7 +48,7 @@ export class MatchService {
         this.socketService.emit(MatchEvent.JoinMatch, matchCode, (matchData: MatchData | null) => {
             if (matchData !== null) {
                 this.onUpdate(matchData);
-                this.router.navigate([PageEndpoint.character]);
+                this.router.navigate([PageEndpoint.Character]);
             }
         });
     }
@@ -77,8 +77,8 @@ export class MatchService {
         return this.selfIndex >= 0;
     }
 
-    isState(state: MatchState): boolean {
-        return this.data.state === state;
+    isState(states: MatchState[]): boolean {
+        return states.includes(this.data.state);
     }
 
     isInventoryFull(): boolean {
@@ -86,11 +86,11 @@ export class MatchService {
     }
 
     canUseAction(): boolean {
-        return this.isActivePlayer() && this.isState(MatchState.TurnWait) && this.data.playData.hasAction;
+        return this.isActivePlayer() && this.isState([MatchState.TurnWait]) && this.data.playData.hasAction;
     }
 
     canEndTurn(): boolean {
-        return this.isActivePlayer() && this.isState(MatchState.TurnWait);
+        return this.isActivePlayer() && this.isState([MatchState.TurnWait]);
     }
 
     getMovementLeft(): number {

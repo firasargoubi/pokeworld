@@ -7,7 +7,7 @@ export enum PageEndpoint {
     Create = '/create',
     Combat = '/combat',
     Edit = '/edit',
-    character = '/character',
+    Character = '/character',
 }
 
 export enum ApiEndpoint {
