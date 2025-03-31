@@ -28,7 +28,6 @@ export class MatchService {
             this.matches.set(matchData.code, match);
             this.playerToMatchCode.set(playerId, matchData.code);
             this.matchGateway.connectPlayer(playerId, matchData.code);
-            return matchData;
         }
         return matchData;
     }
@@ -107,12 +106,12 @@ export class MatchService {
     }
 
     private canCreateMatch(playerId: string): boolean {
-        let canJoinMatch = true;
+        let canCreateMatch = true;
         if (this.hasPlayerId(playerId)) {
             this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch);
-            canJoinMatch = false;
+            canCreateMatch = false;
         }
-        return canJoinMatch;
+        return canCreateMatch;
     }
 
     private isMatchFull(matchCode: string): boolean {
