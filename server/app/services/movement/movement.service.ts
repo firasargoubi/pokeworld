@@ -20,7 +20,7 @@ export class MovementService {
 
         const { distances, predecessors } = this.calculateDistancesAndPredecessors(matchData, startPos, Infinity);
         const path = this.reconstructPath(target, predecessors);
-        return { moveCost: distances[target.x][target.y], path: path || [] };
+        return { moveCost: distances[target.x][target.y], path };
     }
 
     getActions(matchData: MatchData): Position[] {
@@ -159,7 +159,7 @@ export class MovementService {
         }
         path.unshift(this.keyToPos(currentKey));
 
-        return path.length > 1 ? path : null;
+        return path;
     }
 
     private isTileOccupiedByPlayer(matchData: MatchData, position: Position): boolean {
