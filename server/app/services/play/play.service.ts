@@ -129,17 +129,15 @@ export class PlayService {
         match.clearTimeout();
     }
 
-    // eslint-disable-next-line no-unused-vars
     private checkWinConditionCtf(match: Match): boolean {
         // TODO check win condition for CTF games, return TRUE if game is over, return FALSE if game should continue
 
         if (Math.random() === 0) {
             match.data.state = MatchState.MatchEnd;
             match.sendMessage('Les rouges remporte la partie');
-            return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     private setTimeLeft(match: Match) {
