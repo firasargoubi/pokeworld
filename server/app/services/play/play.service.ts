@@ -75,9 +75,14 @@ export class PlayService {
         match.data.playData.movementLeft = 0;
         match.data.playData.timeLeft = TURN_WAIT_DURATION;
         match.data.playData.activePlayerIndex = this.getNextPlayerIndex(match);
-        const playerName = match.data.players[match.data.playData.activePlayerIndex].name;
-        match.sendMessage(`Début du tour de ${playerName}`);
-        match.setTimeout(this.startTurnWait.bind(this, match), TURN_START_DURATION);
+
+        if (this.checkWinCondition(match)) {
+            match.setTimeout(this.endMatch.bind(this, match), MATCH_END_DURATION);
+        } else {
+            const playerName = match.data.players[match.data.playData.activePlayerIndex].name;
+            match.sendMessage(`Début du tour de ${playerName}`);
+            match.setTimeout(this.startTurnWait.bind(this, match), TURN_START_DURATION);
+        }
     }
 
     continueTurn(match: Match) {
