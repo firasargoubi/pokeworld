@@ -2,14 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { DEFAULT_COMBAT_VISUAL_DATA } from '@app/consts/combat-data.const';
 import { BATTLE_PLATFORM_IMAGES } from '@app/consts/images.const';
+import { CombatVisualData } from '@app/interfaces/combat-visual-data';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
-import { DEFAULT_PLAYER_COMBAT_DATA } from '@common/consts/combat-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
-import { CombatAction, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
-import { DiceType } from '@common/interfaces/player-data';
+import { MatchState } from '@common/interfaces/match-data';
 
 @Component({
     selector: 'app-combat-page',
@@ -18,14 +18,7 @@ import { DiceType } from '@common/interfaces/player-data';
     imports: [CommonModule],
 })
 export class CombatPageComponent {
-    avatarData = AVATAR_DATA;
-    battlePlatformData = BATTLE_PLATFORM_IMAGES;
-    combatAction = CombatAction;
-    matchState = MatchState;
-    diceType = DiceType;
-    isSelfTurn = false;
-    selfPlayer: PlayerCombatData = structuredClone(DEFAULT_PLAYER_COMBAT_DATA);
-    enemyPlayer: PlayerCombatData = structuredClone(DEFAULT_PLAYER_COMBAT_DATA);
+    visualData: CombatVisualData = structuredClone(DEFAULT_COMBAT_VISUAL_DATA);
     matchService: MatchService = inject(MatchService);
     private combatService: CombatService = inject(CombatService);
     private playService: PlayService = inject(PlayService);
@@ -36,6 +29,7 @@ export class CombatPageComponent {
             this.router.navigate([PageEndpoint.Menu]);
         }
         this.onMatchUpdate();
+        this.updateImages();
         this.matchService.matchUpdate.subscribe(this.onMatchUpdate.bind(this));
     }
 
@@ -56,6 +50,13 @@ export class CombatPageComponent {
         this.combatService.escape();
     }
 
+    private updateImages() {
+        this.visualData.selfPlatform = BATTLE_PLATFORM_IMAGES[this.visualData.selfPlayer.standingTile].selfPlatform;
+        this.visualData.enemyPlatform = BATTLE_PLATFORM_IMAGES[this.visualData.enemyPlayer.standingTile].enemyPlatform;
+        this.visualData.selfImage = AVATAR_DATA[this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar].backGif;
+        this.visualData.enemyImage = AVATAR_DATA[this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar].frontGif;
+    }
+
     private onMatchUpdate() {
         this.checkForRedirect();
         this.updatePlayersCombatData();
@@ -71,13 +72,13 @@ export class CombatPageComponent {
     private updatePlayersCombatData() {
         const isFirstPlayer = this.matchService.data.combatData.playersCombatData[0].playerIndex === this.matchService.selfIndex;
         if (isFirstPlayer) {
-            this.selfPlayer = this.matchService.data.combatData.playersCombatData[0];
-            this.enemyPlayer = this.matchService.data.combatData.playersCombatData[1];
-            this.isSelfTurn = !this.matchService.data.combatData.isSecondPlayerTurn;
+            this.visualData.selfPlayer = this.matchService.data.combatData.playersCombatData[0];
+            this.visualData.enemyPlayer = this.matchService.data.combatData.playersCombatData[1];
+            this.visualData.isSelfTurn = !this.matchService.data.combatData.isSecondPlayerTurn;
         } else {
-            this.selfPlayer = this.matchService.data.combatData.playersCombatData[1];
-            this.enemyPlayer = this.matchService.data.combatData.playersCombatData[0];
-            this.isSelfTurn = this.matchService.data.combatData.isSecondPlayerTurn;
+            this.visualData.selfPlayer = this.matchService.data.combatData.playersCombatData[1];
+            this.visualData.enemyPlayer = this.matchService.data.combatData.playersCombatData[0];
+            this.visualData.isSelfTurn = this.matchService.data.combatData.isSecondPlayerTurn;
         }
     }
 }

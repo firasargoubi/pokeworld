@@ -1,5 +1,5 @@
 <div id="combat-page"
-    [ngClass]="{ 'not-current-turn': !isSelfTurn || matchService.data.state !== matchState.CombatWait}">
+    [ngClass]="{ 'not-current-turn': !visualData.isSelfTurn || matchService.data.state !== 'combatWait'}">
     <div id="timer">
         {{ matchService.data.combatData.turnDuration }}/{{ matchService.data.combatData.turnDuration }}
         <div id="timer-icon"></div>
@@ -7,116 +7,101 @@
     <div id="enemy-container">
         <div class="enemy-hp-container hp-container">
             <div class="body">
-                <p class="name">{{ matchService.data.players[enemyPlayer.playerIndex].name }}</p>
+                <p class="name">{{ matchService.data.players[visualData.enemyPlayer.playerIndex].name }}</p>
                 <div class="hp-bar">
                     <div class="hp-backround">
                         <div class="hp-progress"
-                            [style.width]="(enemyPlayer.currentHealth / matchService.data.players[enemyPlayer.playerIndex].health) * 100 + '%'"
+                            [style.width]="(visualData.enemyPlayer.currentHealth / matchService.data.players[visualData.enemyPlayer.playerIndex].health) * 100 + '%'"
                             [ngClass]="{
                                 'orange-hp':
-                                enemyPlayer.currentHealth / matchService.data.players[enemyPlayer.playerIndex].health >= 0.4 &&
-                                enemyPlayer.currentHealth / matchService.data.players[enemyPlayer.playerIndex].health < 0.75,
-                                'red-hp': enemyPlayer.currentHealth / matchService.data.players[enemyPlayer.playerIndex].health < 0.4
-                            }"></div>
+                                    visualData.enemyPlayer.currentHealth / matchService.data.players[visualData.enemyPlayer.playerIndex].health >= 0.4 &&
+                                    visualData.enemyPlayer.currentHealth / matchService.data.players[visualData.enemyPlayer.playerIndex].health < 0.75,
+                                'red-hp': visualData.enemyPlayer.currentHealth / matchService.data.players[visualData.enemyPlayer.playerIndex].health < 0.4
+                            }">
+                        </div>
                     </div>
-                    <p class="hp-value">{{ enemyPlayer.currentHealth }}/{{
-                        matchService.data.players[enemyPlayer.playerIndex].health }}</p>
+                    <p class="hp-value">{{ visualData.enemyPlayer.currentHealth }}/{{ matchService.data.players[visualData.enemyPlayer.playerIndex].health }}</p>
                 </div>
-                @if ([combatAction.SuccessAttack,
-                combatAction.FailAttack].includes(matchService.data.combatData.lastCombatAction)) {
-                @if (isSelfTurn) {
-                <p class="dice-bonus">Dé attaque: +{{ matchService.data.combatData.lastRolledAttack }}</p>
-                } @else {
-                <p class="dice-bonus">Dé défense: +{{ matchService.data.combatData.lastRolledDefense }}</p>
-                }
+                @if (['successAttack', 'failAttack'].includes(matchService.data.combatData.lastCombatAction)) {
+                    @if (visualData.isSelfTurn) {
+                        <p class="dice-bonus">Dé attaque: +{{ matchService.data.combatData.lastRolledAttack }}</p>
+                    } @else {
+                        <p class="dice-bonus">Dé défense: +{{ matchService.data.combatData.lastRolledDefense }}</p>
+                    }
                 }
             </div>
         </div>
 
-        <img class="battel-plateform" src="{{ battlePlatformData[enemyPlayer.standingTile].enemyPlatform }}" />
-        <span class="pokemon-container" [class.is-turn]="!isSelfTurn" [class.is-dead]="enemyPlayer.currentHealth <= 0"
+        <img class="battel-plateform" src="{{ visualData.enemyPlatform }}">
+        <span class="pokemon-container" [class.is-turn]="!visualData.isSelfTurn" [class.is-dead]="visualData.enemyPlayer.currentHealth <= 0"
             [class]="matchService.data.state + ' ' + matchService.data.combatData.lastCombatAction">
-            <img class="pokemon-gif"
-                src="{{ avatarData[matchService.data.players[enemyPlayer.playerIndex].avatar].frontGif }}" />
+            <img class="pokemon-gif" src="{{ visualData.enemyImage }}">
         </span>
     </div>
     <div id="self-container">
-        <img class="battel-plateform" src="{{ battlePlatformData[selfPlayer.standingTile].selfPlatform }}" />
-        <span class="pokemon-container" [class.is-turn]="isSelfTurn" [class.is-dead]="selfPlayer.currentHealth <= 0"
+        <img class="battel-plateform" src="{{ visualData.selfPlatform }}">
+        <span class="pokemon-container" [class.is-turn]="visualData.isSelfTurn" [class.is-dead]="visualData.selfPlayer.currentHealth <= 0"
             [class]="matchService.data.state + ' ' + matchService.data.combatData.lastCombatAction">
-            <img class="pokemon-gif"
-                src="{{ avatarData[matchService.data.players[selfPlayer.playerIndex].avatar].backGif }}" />
+            <img class="pokemon-gif" src="{{ visualData.selfImage }}">
         </span>
     </div>
     <div class="self-hp-container hp-container">
         <div class="body">
-            <p class="name">{{ matchService.data.players[selfPlayer.playerIndex].name }}</p>
+            <p class="name">{{ matchService.data.players[visualData.selfPlayer.playerIndex].name }}</p>
             <div class="hp-bar">
                 <div class="hp-backround">
                     <div class="hp-progress"
-                        [style.width]="(selfPlayer.currentHealth / matchService.data.players[selfPlayer.playerIndex].health) * 100 + '%'"
+                        [style.width]="(visualData.selfPlayer.currentHealth / matchService.data.players[visualData.selfPlayer.playerIndex].health) * 100 + '%'"
                         [ngClass]="{
                             'orange-hp':
-                                selfPlayer.currentHealth / matchService.data.players[selfPlayer.playerIndex].health >= 0.33 &&
-                                selfPlayer.currentHealth / matchService.data.players[selfPlayer.playerIndex].health < 0.75,
-                            'red-hp': selfPlayer.currentHealth / matchService.data.players[selfPlayer.playerIndex].health < 0.4
-                        }"></div>
+                                visualData.selfPlayer.currentHealth / matchService.data.players[visualData.selfPlayer.playerIndex].health >= 0.33 &&
+                                visualData.selfPlayer.currentHealth / matchService.data.players[visualData.selfPlayer.playerIndex].health < 0.75,
+                            'red-hp': visualData.selfPlayer.currentHealth / matchService.data.players[visualData.selfPlayer.playerIndex].health < 0.4
+                        }">
+                    </div>
                 </div>
-                <p class="hp-value">{{ selfPlayer.currentHealth }}/{{
-                    matchService.data.players[selfPlayer.playerIndex].health }}</p>
+                <p class="hp-value">{{ visualData.selfPlayer.currentHealth }}/{{ matchService.data.players[visualData.selfPlayer.playerIndex].health }}</p>
             </div>
         </div>
     </div>
     <div id="combat-footer">
         <div id="action-container">
-            <img class="container-border"
-                src="./assets/images/menu/containers/combat-container/combat-container-left-border.png" />
+            <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png">
             <div class="conatiner-body">
                 <div class="action-button" (click)="attackButton()">
-                    <img class="container-selection"
-                        src="./assets/images/menu/containers/combat-container/container-selection.png" />
+                    <img class="container-selection" src="./assets/images/menu/containers/combat-container/container-selection.png">
                     <p>Attaquer</p>
                 </div>
-                <div class="action-button" [ngClass]="{ disabled: selfPlayer.currentEscapes === 0 }"
-                    (click)="escapeButon()">
-                    <img class="container-selection"
-                        src="./assets/images/menu/containers/combat-container/container-selection.png" />
-                    <p>Fuire {{ selfPlayer.currentEscapes }}/{{ selfPlayer.maxEscapes }}</p>
+                <div class="action-button" [ngClass]="{ disabled: visualData.selfPlayer.currentEscapes === 0 }" (click)="escapeButon()">
+                    <img class="container-selection" src="./assets/images/menu/containers/combat-container/container-selection.png">
+                    <p>Fuire {{ visualData.selfPlayer.currentEscapes }}/{{ visualData.selfPlayer.maxEscapes }}</p>
                 </div>
             </div>
-            <img class="container-border"
-                src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
+            <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png">
         </div>
         <div id="stats-container">
-            <img class="container-border"
-                src="./assets/images/menu/containers/combat-container/combat-container-left-border.png" />
+            <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png">
             <div class="conatiner-body">
                 <div class="stat-container">
-                    <span class="stat-label">Attaque @if (matchService.data.players[selfPlayer.playerIndex].attackDice
-                        === diceType.D4) { (D4) } @else { (D6) } </span>
-                    @if (!isSelfTurn && [combatAction.SuccessAttack,
-                    combatAction.FailAttack].includes(matchService.data.combatData.lastCombatAction)) {
-                    <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledAttack }}</span>
+                    <span class="stat-label">Attaque @if (matchService.data.players[visualData.selfPlayer.playerIndex].attackDice === 4) { (D4) } @else { (D6) } </span>
+                    @if (!visualData.isSelfTurn && ['successAttack', 'failAttack'].includes(matchService.data.combatData.lastCombatAction)) {
+                        <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledAttack }}</span>
                     }
-                    <span class="stat-value">{{ selfPlayer.attack }}/4</span>
+                    <span class="stat-value">{{ visualData.selfPlayer.attack }}/4</span>
                 </div>
                 <div class="stat-container">
-                    <span class="stat-label">Défense @if (matchService.data.players[selfPlayer.playerIndex].defenseDice
-                        === diceType.D4) { (D4) } @else { (D6) }</span>
-                    @if (isSelfTurn && [combatAction.SuccessAttack,
-                    combatAction.FailAttack].includes(matchService.data.combatData.lastCombatAction)) {
-                    <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledDefense }}</span>
+                    <span class="stat-label">Défense @if (matchService.data.players[visualData.selfPlayer.playerIndex].defenseDice === 4) { (D4) } @else { (D6) }</span>
+                    @if (visualData.isSelfTurn && ['successAttack', 'failAttack'].includes(matchService.data.combatData.lastCombatAction)) {
+                        <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledDefense }}</span>
                     }
-                    <span class="stat-value">{{ selfPlayer.defense }}/4</span>
+                    <span class="stat-value">{{ visualData.selfPlayer.defense }}/4</span>
                 </div>
                 <div class="stat-container">
                     <span class="stat-label">Vitesse</span>
-                    <span class="stat-value">{{ matchService.data.players[selfPlayer.playerIndex].speed }}/{{
-                        matchService.data.players[selfPlayer.playerIndex].speed }}</span>
+                    <span class="stat-value">{{ matchService.data.players[visualData.selfPlayer.playerIndex].speed }}/{{ matchService.data.players[visualData.selfPlayer.playerIndex].speed }}</span>
                 </div>
             </div>
-            <img class="container-border"
-                src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
+            <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png">
         </div>
     </div>
 </div>
