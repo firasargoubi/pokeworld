@@ -27,7 +27,7 @@ describe('CombatPageComponent', () => {
 //     let mockMatchDataService: jasmine.SpyObj<MatchDataService>;
 //     let mockPopupService: jasmine.SpyObj<PopupService>;
 //     let selfPlayerSubject: BehaviorSubject<Player | null>;
-//     let ennemyPlayerSubject: BehaviorSubject<Player | null>;
+//     let enemyPlayerSubject: BehaviorSubject<Player | null>;
 //     let currentTurnSubject: BehaviorSubject<boolean>;
 //     let currentTimerSubject: BehaviorSubject<number>;
 //     let attackResultSubject: BehaviorSubject<AttackResult | null>;
@@ -41,7 +41,7 @@ describe('CombatPageComponent', () => {
 
 //     beforeEach(async () => {
 //         selfPlayerSubject = new BehaviorSubject<Player | null>(null);
-//         ennemyPlayerSubject = new BehaviorSubject<Player | null>(null);
+//         enemyPlayerSubject = new BehaviorSubject<Player | null>(null);
 //         currentTurnSubject = new BehaviorSubject<boolean>(false);
 //         currentTimerSubject = new BehaviorSubject<number>(0);
 //         attackResultSubject = new BehaviorSubject<AttackResult | null>(null);
@@ -57,7 +57,7 @@ describe('CombatPageComponent', () => {
 //         mockPopupService = jasmine.createSpyObj('PopupService', ['showPopup', 'clearMessages', 'keepMessages']);
 //         combatSocketServiceMock = {
 //             selfPlayer$: selfPlayerSubject.asObservable(),
-//             ennemyPlayer$: ennemyPlayerSubject.asObservable(),
+//             enemyPlayer$: enemyPlayerSubject.asObservable(),
 //             currentTurn: currentTurnSubject,
 //             currentTimer: currentTimerSubject,
 //             attackResult: attackResultSubject,
@@ -92,7 +92,7 @@ describe('CombatPageComponent', () => {
 //             name: 'Self Player',
 //             currentStats: { health: 100 },
 //         } as Player;
-//         component.ennemyPlayer = {
+//         component.enemyPlayer = {
 //             id: 'enemy1',
 //             name: 'Enemy Player',
 //             currentStats: { health: 100 },
@@ -111,10 +111,10 @@ describe('CombatPageComponent', () => {
 //         expect(component.selfPlayer).toEqual(testPlayer);
 //     });
 
-//     it('should update ennemyPlayer when CombatSocketService emits an ennemyPlayer', () => {
+//     it('should update enemyPlayer when CombatSocketService emits an enemyPlayer', () => {
 //         const testPlayer: Player = { id: 'enemy1', currentStats: { health: 100 } } as Player;
-//         ennemyPlayerSubject.next(testPlayer);
-//         expect(component.ennemyPlayer).toEqual(testPlayer);
+//         enemyPlayerSubject.next(testPlayer);
+//         expect(component.enemyPlayer).toEqual(testPlayer);
 //     });
 
 //     it('should update iscurrentTurn when CombatSocketService currentTurn emits a value', () => {
@@ -145,46 +145,46 @@ describe('CombatPageComponent', () => {
 //         const self: Player = { id: 'self1', currentStats: { health: 100 } } as Player;
 //         const enemy: Player = { id: 'enemy1', currentStats: { health: 100 } } as Player;
 //         selfPlayerSubject.next(self);
-//         ennemyPlayerSubject.next(enemy);
+//         enemyPlayerSubject.next(enemy);
 
 //         const attackResult: AttackResult = { targetId: 'self1', attackDamage: 10 };
 //         attackResultSubject.next(attackResult);
 
 //         expect(component.animation.selfattack).toBe(false);
-//         expect(component.animation.ennemyattack).toBe(true);
+//         expect(component.animation.enemyattack).toBe(true);
 //         expect(component.animation.selfDamage).toBe(true);
-//         expect(component.animation.ennemyDamage).toBe(false);
+//         expect(component.animation.enemyDamage).toBe(false);
 
 //         jasmine.clock().tick(ONE_SEC);
 //         expect(component.animation.selfattack).toBe(false);
-//         expect(component.animation.ennemyattack).toBe(false);
+//         expect(component.animation.enemyattack).toBe(false);
 //         expect(component.animation.selfDamage).toBe(false);
-//         expect(component.animation.ennemyDamage).toBe(false);
+//         expect(component.animation.enemyDamage).toBe(false);
 
 //         jasmine.clock().uninstall();
 //     });
 
-//     it('should perform attackAnimation when attackResult is emitted with target ennemy', () => {
+//     it('should perform attackAnimation when attackResult is emitted with target enemy', () => {
 //         jasmine.clock().install();
 
 //         const self: Player = { id: 'self1', currentStats: { health: 100 } } as Player;
 //         const enemy: Player = { id: 'enemy1', currentStats: { health: 100 } } as Player;
 //         selfPlayerSubject.next(self);
-//         ennemyPlayerSubject.next(enemy);
+//         enemyPlayerSubject.next(enemy);
 
 //         const attackResult: AttackResult = { targetId: 'enemy1', attackDamage: 10 };
 //         attackResultSubject.next(attackResult);
 
 //         expect(component.animation.selfattack).toBe(true);
-//         expect(component.animation.ennemyattack).toBe(false);
+//         expect(component.animation.enemyattack).toBe(false);
 //         expect(component.animation.selfDamage).toBe(false);
-//         expect(component.animation.ennemyDamage).toBe(true);
+//         expect(component.animation.enemyDamage).toBe(true);
 
 //         jasmine.clock().tick(ONE_SEC);
 //         expect(component.animation.selfattack).toBe(false);
-//         expect(component.animation.ennemyattack).toBe(false);
+//         expect(component.animation.enemyattack).toBe(false);
 //         expect(component.animation.selfDamage).toBe(false);
-//         expect(component.animation.ennemyDamage).toBe(false);
+//         expect(component.animation.enemyDamage).toBe(false);
 
 //         jasmine.clock().uninstall();
 //     });
@@ -195,7 +195,7 @@ describe('CombatPageComponent', () => {
 //         const self: Player = { id: 'self1', currentStats: { health: 100 } } as Player;
 //         const enemy: Player = { id: 'enemy1', currentStats: { health: 100 } } as Player;
 //         selfPlayerSubject.next(self);
-//         ennemyPlayerSubject.next(enemy);
+//         enemyPlayerSubject.next(enemy);
 
 //         escapeResultSubject.next('self1');
 //         expect(component.iscurrentTurn).toBe(false);
@@ -203,14 +203,14 @@ describe('CombatPageComponent', () => {
 
 //         jasmine.clock().tick(2 * ONE_SEC);
 //         expect(component.animation.selfEscape).toBe(false);
-//         expect(component.animation.ennemyEscape).toBe(false);
+//         expect(component.animation.enemyEscape).toBe(false);
 
 //         escapeResultSubject.next('enemy1');
-//         expect(component.animation.ennemyEscape).toBe(true);
+//         expect(component.animation.enemyEscape).toBe(true);
 
 //         jasmine.clock().tick(2 * ONE_SEC);
 //         expect(component.animation.selfEscape).toBe(false);
-//         expect(component.animation.ennemyEscape).toBe(false);
+//         expect(component.animation.enemyEscape).toBe(false);
 
 //         jasmine.clock().uninstall();
 //     });
@@ -221,7 +221,7 @@ describe('CombatPageComponent', () => {
 //         const self: Player = { id: 'self1', currentStats: { health: 0 } } as Player;
 //         const enemy: Player = { id: 'enemy1', currentStats: { health: 100 } } as Player;
 //         selfPlayerSubject.next(self);
-//         ennemyPlayerSubject.next(enemy);
+//         enemyPlayerSubject.next(enemy);
 
 //         combatResultSubject.next({ winnerId: 'enemy1', loserId: 'self1' });
 //         expect(component.animation.selfDeath).toBe(true);
@@ -232,13 +232,13 @@ describe('CombatPageComponent', () => {
 //         self.currentStats.health = 100;
 //         enemy.currentStats.health = 0;
 //         selfPlayerSubject.next(self);
-//         ennemyPlayerSubject.next(enemy);
+//         enemyPlayerSubject.next(enemy);
 //         combatResultSubject.next({ winnerId: 'self1', loserId: 'enemy1' });
 
-//         expect(component.animation.ennemyDeath).toBe(true);
+//         expect(component.animation.enemyDeath).toBe(true);
 
 //         jasmine.clock().tick(2 * ONE_SEC);
-//         expect(component.animation.ennemyDeath).toBe(false);
+//         expect(component.animation.enemyDeath).toBe(false);
 
 //         jasmine.clock().uninstall();
 //     });

@@ -43,12 +43,12 @@ describe('CombatService', () => {
 //         service['selfPlayerSubject'].next(expectedPlayer);
 //     });
 
-//     it('should expose ennemyPlayer$ as an observable and emit the updated ennemyPlayer', (done) => {
-//         const expectedPlayer: Player = { id: 'ennemyTestId' } as Player;
+//     it('should expose enemyPlayer$ as an observable and emit the updated enemyPlayer', (done) => {
+//         const expectedPlayer: Player = { id: 'enemyTestId' } as Player;
 //         const expectedEmissions = [null, expectedPlayer];
 //         const receivedEmissions: (Player | null)[] = [];
 
-//         const subscription = service.ennemyPlayer$.subscribe((player) => {
+//         const subscription = service.enemyPlayer$.subscribe((player) => {
 //             receivedEmissions.push(player);
 //             if (receivedEmissions.length === expectedEmissions.length) {
 //                 expect(receivedEmissions).toEqual(expectedEmissions);
@@ -57,7 +57,7 @@ describe('CombatService', () => {
 //             }
 //         });
 
-//         service['ennemyPlayerSubject'].next(expectedPlayer);
+//         service['enemyPlayerSubject'].next(expectedPlayer);
 //     });
 
 //     it('should call coreSocket.emit with EscapeAttempt event and correct data', () => {
@@ -80,7 +80,7 @@ describe('CombatService', () => {
 //         service['combatRoomCode'] = combatRoomCode;
 
 //         const enemyPlayer = { id: 'enemyPlayerId' } as Player;
-//         service['ennemyPlayerSubject'].next(enemyPlayer);
+//         service['enemyPlayerSubject'].next(enemyPlayer);
 
 //         service.attackAttempt();
 
@@ -124,7 +124,7 @@ describe('CombatService', () => {
 //         expect(service.currentTimer.value).toBe(newTime);
 //     });
 
-//     it('should update selfPlayer and ennemyPlayer when UpdatePlayers event is received and playerOne is self', () => {
+//     it('should update selfPlayer and enemyPlayer when UpdatePlayers event is received and playerOne is self', () => {
 //         const playerOne: Player = { id: coreSocketSpy.selfId } as Player;
 //         const playerTwo: Player = { id: 'enemyId' } as Player;
 
@@ -137,10 +137,10 @@ describe('CombatService', () => {
 //         }
 
 //         expect(service['selfPlayerSubject'].value).toEqual(playerOne);
-//         expect(service['ennemyPlayerSubject'].value).toEqual(playerTwo);
+//         expect(service['enemyPlayerSubject'].value).toEqual(playerTwo);
 //     });
 
-//     it('should update selfPlayer and ennemyPlayer when UpdatePlayers event is received and playerOne is not self', () => {
+//     it('should update selfPlayer and enemyPlayer when UpdatePlayers event is received and playerOne is not self', () => {
 //         const playerOne: Player = { id: 'enemyId' } as Player;
 //         const playerTwo: Player = { id: coreSocketSpy.selfId } as Player;
 
@@ -153,7 +153,7 @@ describe('CombatService', () => {
 //         }
 
 //         expect(service['selfPlayerSubject'].value).toEqual(playerTwo);
-//         expect(service['ennemyPlayerSubject'].value).toEqual(playerOne);
+//         expect(service['enemyPlayerSubject'].value).toEqual(playerOne);
 //     });
 
 //     it('should set players and navigate to /combat when startCombat is called with self as first player', () => {
@@ -166,7 +166,7 @@ describe('CombatService', () => {
 
 //         expect(service['combatRoomCode']).toBe('testRoom123');
 //         expect(service['selfPlayerSubject'].value).toEqual(combatData.players[0]);
-//         expect(service['ennemyPlayerSubject'].value).toEqual(combatData.players[1]);
+//         expect(service['enemyPlayerSubject'].value).toEqual(combatData.players[1]);
 //         expect(routerSpy).toHaveBeenCalledWith([PageEndpoint.Combat]);
 //     });
 
@@ -180,7 +180,7 @@ describe('CombatService', () => {
 
 //         expect(service['combatRoomCode']).toBe('testRoom456');
 //         expect(service['selfPlayerSubject'].value).toEqual(combatData.players[1]);
-//         expect(service['ennemyPlayerSubject'].value).toEqual(combatData.players[0]);
+//         expect(service['enemyPlayerSubject'].value).toEqual(combatData.players[0]);
 //         expect(routerSpy).toHaveBeenCalledWith([PageEndpoint.Combat]);
 //     });
 
