@@ -90,17 +90,17 @@
         </div>
         <div
             class="timer"
-            [class.active]="timerService.isStarted"
+            [class.active]="playService.timer.isStarted"
             [ngStyle]="{
-                '--max-time': timerService.maxTime,
-                '--current-time': timerService.currentTime,
-                '--pause-time': timerService.lastUnpauseTime
+                '--max-time': playService.timer.maxTime,
+                '--current-time': playService.timer.currentTime,
+                '--pause-time': playService.timer.lastUnpauseTime
             }"
         >
             <div class="timer-bar">
                 <div class="timer-image"></div>
             </div>
-            <div class="timer-text">{{ timerService.currentTime }}</div>
+            <div class="timer-text">{{ playService.timer.currentTime }}</div>
         </div>
     </main>
 </div>

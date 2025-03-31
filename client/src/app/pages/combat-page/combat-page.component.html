@@ -1,8 +1,10 @@
 <div id="combat-page"
     [ngClass]="{ 'not-current-turn': !visualData.isSelfTurn || matchService.data.state !== 'combatWait'}">
     <div id="timer">
-        {{ matchService.data.combatData.turnDuration }}/{{ matchService.data.combatData.turnDuration }}
-        <div id="timer-icon"></div>
+        {{ combatService.timer.currentTime }}/{{ combatService.timer.maxTime }}
+        <div class="timer-container">
+            <div class="timer-icon"></div>
+        </div>
     </div>
     <div id="enemy-container">
         <div class="enemy-hp-container hp-container">

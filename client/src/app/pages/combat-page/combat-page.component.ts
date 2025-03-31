@@ -20,7 +20,7 @@ import { MatchState } from '@common/interfaces/match-data';
 export class CombatPageComponent {
     visualData: CombatVisualData = structuredClone(DEFAULT_COMBAT_VISUAL_DATA);
     matchService: MatchService = inject(MatchService);
-    private combatService: CombatService = inject(CombatService);
+    combatService: CombatService = inject(CombatService);
     private playService: PlayService = inject(PlayService);
     private router: Router = inject(Router);
 

@@ -2,17 +2,16 @@ $gray-border-color: #636776;
 $wheat-border-color: #e9f6f7;
 $stripes-color1: #e0f6e1;
 $stripes-color2: #ddf3de;
+$timer-color: #585851;
 
 $page-border-width: 0.5vw;
 $padding-wheat-border: 0.7vw;
-$stripes-size-1: 1.3vw;
-$stripes-size-2: 0.7vw;
+$stripes-size-1: 2.2vh;
+$stripes-size-2: 1.1vh;
 
 $combat-info-height: 28vh;
 
 * {
-    // after font refont, retablish font-family
-    // font-family: 'pokemon-narrow';
     font-family: 'pixel';
     color: #585851;
 }
@@ -27,7 +26,7 @@ $combat-info-height: 28vh;
             $stripes-color2 $stripes-size-2,
             $stripes-color2 $stripes-size-1 * 2);
     background-size: 100% ($stripes-size-1 * 2);
-    animation: fall 2s linear infinite;
+    animation: fall 3s linear infinite;
 }
 
 @keyframes fall {
@@ -50,29 +49,49 @@ $combat-info-height: 28vh;
     user-select: none;
 }
 
-#timer #timer-icon {
+.timer-container {
     height: 6vh;
-    aspect-ratio: 1/1;
+    width: 6vh;
     margin: 0 0 0.4vw 0.4vw;
-    background-image: url('../../../assets/images/menu/icons/clock.png');
-    background-size: 100% 100%;
-    background-position: center;
-    background-repeat: no-repeat;
     user-select: none;
-    animation: timer 5s steps(2) infinite;
+    position: relative;
 }
 
-@keyframes timer {
+.timer-icon {
+    height: 6vh;
+    width: 6vh;
+    border: 5px solid black;
+    border-radius: 50%;
+    background: black;
+    position: absolute;
+    clip-path: polygon(50% 50%, 50% 0%, 100% 0%);
+    animation: slice 4s linear forwards;
+}
+
+.timer-border {
+    width: 100%;
+    height: 100%;
+    border: 5px solid black;
+    border-radius: 50%;
+    position: absolute;
+}
+
+@keyframes slice {
     0% {
+        clip-path: polygon(50% 50%, 50% 0%, 100% 0%);
         transform: rotate(0deg);
     }
-
-    50% {
-        transform: rotate(180deg);
+    25% {
+        transform: rotate(-90deg);  /* 3/4 full, upper-right empty */
     }
-
+    50% {
+        transform: rotate(-180deg); /* 1/2 full */
+    }
+    75% {
+        transform: rotate(-270deg); /* 1/4 full */
+    }
     100% {
-        transform: rotate(360deg);
+        transform: rotate(-360deg); /* empty */
     }
 }
 
