@@ -6,7 +6,7 @@ import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { DEFAULT_MATCH_DATA } from '@common/consts/match-data.const';
-import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
+import { DEFAULT_PLAYER_DATA, MAX_ITEMS } from '@common/consts/player-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
@@ -82,7 +82,7 @@ export class MatchService {
     }
 
     isInventoryFull(): boolean {
-        return this.selfPlayer.items.length > 2;
+        return this.selfPlayer.items.length > MAX_ITEMS;
     }
 
     canUseAction(): boolean {

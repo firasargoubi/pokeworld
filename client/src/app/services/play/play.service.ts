@@ -4,6 +4,7 @@ import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Position } from '@common/interfaces/position';
 import { PlayEvent } from '@common/interfaces/socket-event.enum';

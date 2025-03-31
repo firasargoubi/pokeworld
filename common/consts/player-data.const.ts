@@ -22,6 +22,7 @@ export const MAX_NAME_LENGTH = 20;
 export const DEFAULT_STAT = 4;
 export const BONUS_STAT = 6;
 export const DEFAULT_ESCAPE_POINTS = 2;
+export const MAX_ITEMS = 2;
 
 export const MOVE_ANIMATION_DURATION = 150;
 

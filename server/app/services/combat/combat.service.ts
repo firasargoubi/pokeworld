@@ -168,14 +168,27 @@ export class CombatService {
         }
 
         match.data.players[playerCombatData.playerIndex].items.forEach((item) => {
-            if (item === ItemType.Item1) {
-                playerCombatData.attack += 0;
-                playerCombatData.defense += 0;
-                playerCombatData.escapeChances += 0.2;
-                playerCombatData.maxEscapes += 1;
-                playerCombatData.currentEscapes += 1;
-
-                // TODO apply item buffs to player
+            switch (item) {
+                case ItemType.Item1:
+                    playerCombatData.attack += 1;
+                    playerCombatData.defense += 1;
+                    break;
+                case ItemType.Item2:
+                    playerCombatData.attack += 2;
+                    playerCombatData.defense += 2;
+                    break;
+                case ItemType.Item3:
+                    if (playerCombatData.standingTile === TileType.Bush) {
+                        playerCombatData.attack += 3;
+                    }
+                    break;
+                case ItemType.Item5:
+                    playerCombatData.maxEscapes += 1;
+                    playerCombatData.currentEscapes += 1;
+                    playerCombatData.escapeChances += 0.3;
+                    break;
+                default:
+                    break;
             }
         });
 

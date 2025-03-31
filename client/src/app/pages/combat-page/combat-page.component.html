@@ -1,4 +1,4 @@
-<div id="combat-page" [ngClass]="{ 'not-current-turn': !isSelfTurn || matchService.data.state !== matchState.CombatWait}">
+<div id="combat-page" [ngClass]="{ 'not-current-turn': !isSelfTurn || matchService.data.state !== matchState.CombatWait }">
     <div id="timer">
         {{ matchService.data.combatData.turnDuration }}/{{ matchService.data.combatData.turnDuration }}
         <div id="timer-icon"></div>
@@ -14,21 +14,20 @@
                             [style.width]="(enemyPlayer.currentHealth / matchService.data.players[enemyPlayer.playerIndex].health) * 100 + '%'"
                             [ngClass]="{
                                 'orange-hp':
-                                enemyPlayer.currentHealth / matchService.data.players[enemyPlayer.playerIndex].health >= 0.4 &&
-                                enemyPlayer.currentHealth / matchService.data.players[enemyPlayer.playerIndex].health < 0.75,
+                                    enemyPlayer.currentHealth / matchService.data.players[enemyPlayer.playerIndex].health >= 0.4 &&
+                                    enemyPlayer.currentHealth / matchService.data.players[enemyPlayer.playerIndex].health < 0.75,
                                 'red-hp': enemyPlayer.currentHealth / matchService.data.players[enemyPlayer.playerIndex].health < 0.4
                             }"
                         ></div>
                     </div>
                     <p class="hp-value">{{ enemyPlayer.currentHealth }}/{{ matchService.data.players[enemyPlayer.playerIndex].health }}</p>
                 </div>
-                @if ([combatAction.SuccessAttack, combatAction.FailAttack].includes(matchService.data.combatData.lastCombatAction)) {
-                    @if (isSelfTurn) {
-                        <p class="dice-bonus">Dé attaque: +{{ matchService.data.combatData.lastRolledAttack }}</p>
-                    } @else {
-                        <p class="dice-bonus">Dé défense: +{{ matchService.data.combatData.lastRolledDefense }}</p>
-                    }
-                }
+                @if ([combatAction.SuccessAttack, combatAction.FailAttack].includes(matchService.data.combatData.lastCombatAction)) { @if (isSelfTurn)
+                {
+                <p class="dice-bonus">Dé attaque: +{{ matchService.data.combatData.lastRolledAttack }}</p>
+                } @else {
+                <p class="dice-bonus">Dé défense: +{{ matchService.data.combatData.lastRolledDefense }}</p>
+                } }
             </div>
         </div>
 
@@ -89,7 +88,7 @@
                 </div>
                 <div class="action-button" [ngClass]="{ disabled: selfPlayer.currentEscapes === 0 }" (click)="escapeButon()">
                     <img class="container-selection" src="./assets/images/menu/containers/combat-container/container-selection.png" />
-                    <p>Fuire {{ selfPlayer.currentEscapes }}/ 2</p>
+                    <p>Fuire {{ selfPlayer.currentEscapes }}/ {{ selfPlayer.maxEscapes }}</p>
                 </div>
             </div>
             <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
@@ -98,22 +97,32 @@
             <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png" />
             <div class="conatiner-body">
                 <div class="stat-container">
-                    <span class="stat-label">Attaque @if (matchService.data.players[selfPlayer.playerIndex].attackDice === diceType.D4) { (D4) } @else { (D6) } </span>
-                    @if (!isSelfTurn && [combatAction.SuccessAttack, combatAction.FailAttack].includes(matchService.data.combatData.lastCombatAction)) {
-                        <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledAttack }}</span>
+                    <span class="stat-label"
+                        >Attaque @if (matchService.data.players[selfPlayer.playerIndex].attackDice === diceType.D4) { (D4) } @else { (D6) }
+                    </span>
+                    @if (!isSelfTurn && [combatAction.SuccessAttack, combatAction.FailAttack].includes(matchService.data.combatData.lastCombatAction))
+                    {
+                    <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledAttack }}</span>
                     }
-                    <span class="stat-value">{{ selfPlayer.attack }}/4</span>
+                    <span class="stat-value" [ngClass]="{ buff: selfPlayer.attack > 4 }">{{ selfPlayer.attack }}<span>/4</span></span>
                 </div>
                 <div class="stat-container">
-                    <span class="stat-label">Défense @if (matchService.data.players[selfPlayer.playerIndex].defenseDice === diceType.D4) { (D4) } @else { (D6) }</span>
-                    @if (isSelfTurn && [combatAction.SuccessAttack, combatAction.FailAttack].includes(matchService.data.combatData.lastCombatAction)) {
+                    <span class="stat-label"
+                        >Défense @if (matchService.data.players[selfPlayer.playerIndex].defenseDice === diceType.D4) { (D4) } @else { (D6) }</span
+                    >
+                    @if (isSelfTurn && [combatAction.SuccessAttack, combatAction.FailAttack].includes(matchService.data.combatData.lastCombatAction))
+                    {
                     <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledDefense }}</span>
                     }
-                    <span class="stat-value">{{ selfPlayer.defense }}/4</span>
+                    <span class="stat-value" [ngClass]="{ buff: selfPlayer.defense > 4 }">{{ selfPlayer.defense }}<span>/4</span></span>
                 </div>
                 <div class="stat-container">
                     <span class="stat-label">Vitesse</span>
-                    <span class="stat-value">{{ matchService.data.players[selfPlayer.playerIndex].speed }}/{{ matchService.data.players[selfPlayer.playerIndex].speed }}</span>
+                    <span class="stat-value"
+                        >{{ matchService.data.players[selfPlayer.playerIndex].speed }}/{{
+                            matchService.data.players[selfPlayer.playerIndex].speed
+                        }}</span
+                    >
                 </div>
             </div>
             <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
