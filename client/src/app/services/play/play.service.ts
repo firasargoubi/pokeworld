@@ -80,7 +80,7 @@ export class PlayService {
         if (this.matchService.isState([MatchState.TurnWait])) {
             this.timer.startTimer();
         } else {
-            this.timer.stopTimer(this.matchService.data.playData.timeLeft);
+            this.timer.pauseTimer(this.matchService.data.playData.timeLeft);
         }
     }
 

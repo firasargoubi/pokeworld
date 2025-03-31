@@ -21,14 +21,26 @@ export class Timer {
         }
     }
 
-    stopTimer(time: number) {
+    restartTimer(time: number) {
         if (this.isStarted) {
             this.stopInterval();
             this.isStarted = false;
         }
-        const roundedTime = time / TIME_SCALE;
-        this.lastUnpauseTime = roundedTime;
-        this.currentTime = Math.ceil(roundedTime);
+        const scaledTime = time / TIME_SCALE;
+        this.lastUnpauseTime = scaledTime;
+        this.maxTime = scaledTime;
+        this.currentTime = Math.ceil(scaledTime);
+        this.startTimer();
+    }
+
+    pauseTimer(time: number) {
+        if (this.isStarted) {
+            this.stopInterval();
+            this.isStarted = false;
+        }
+        const scaledTime = time / TIME_SCALE;
+        this.lastUnpauseTime = scaledTime;
+        this.currentTime = Math.ceil(scaledTime);
     }
 
     private startInterval() {

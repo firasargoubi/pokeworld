@@ -52,46 +52,60 @@ $combat-info-height: 28vh;
 .timer-container {
     height: 6vh;
     width: 6vh;
-    margin: 0 0 0.4vw 0.4vw;
+    margin-left: 1vh;
+    margin-right: 1vh;
     user-select: none;
     position: relative;
 }
 
-.timer-icon {
+.timer-border {
+    position: absolute;
     height: 6vh;
     width: 6vh;
-    border: 5px solid black;
     border-radius: 50%;
-    background: black;
-    position: absolute;
-    clip-path: polygon(50% 50%, 50% 0%, 100% 0%);
-    animation: slice 4s linear forwards;
+    border: 0.5vh solid $timer-color;
 }
 
-.timer-border {
-    width: 100%;
-    height: 100%;
-    border: 5px solid black;
-    border-radius: 50%;
+.timer-icon {
     position: absolute;
+    height: 6vh;
+    width: 6vh;
+    border-radius: 50%;
+    background: $timer-color;
+    clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 0%, 50% 0%);
 }
 
-@keyframes slice {
+.timer-icon.active {
+    animation: timer-animation calc(var(--max-time) * 1s) linear 1 forwards;
+}
+
+@keyframes timer-animation {
     0% {
-        clip-path: polygon(50% 50%, 50% 0%, 100% 0%);
-        transform: rotate(0deg);
+        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 0%, 50% 0%);
+    }
+    12.5% {
+        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 0%, 100% 0%);
     }
     25% {
-        transform: rotate(-90deg);  /* 3/4 full, upper-right empty */
+        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 50%, 100% 50%);
+    }
+    37.5% {
+        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 100%, 100% 100%);
     }
     50% {
-        transform: rotate(-180deg); /* 1/2 full */
+        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 100%, 50% 100%);
+    }
+    62.5% {
+        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 0% 100%, 0% 100%, 0% 100%);
     }
     75% {
-        transform: rotate(-270deg); /* 1/4 full */
+        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 50%, 0% 50%, 0% 50%, 0% 50%);
+    }
+    87.5% {
+        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%);
     }
     100% {
-        transform: rotate(-360deg); /* empty */
+        clip-path: polygon(50% 50%, 50% 0%, 50% 0%, 50% 0%, 50% 0%, 50% 0%, 50% 0%);
     }
 }
 

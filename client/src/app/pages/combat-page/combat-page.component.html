@@ -3,7 +3,14 @@
     <div id="timer">
         {{ combatService.timer.currentTime }}/{{ combatService.timer.maxTime }}
         <div class="timer-container">
-            <div class="timer-icon"></div>
+            <div class="timer-icon"
+                [class.active]="combatService.timer.isStarted && matchService.data.state === 'combatWait'"
+                [ngStyle]="{
+                    '--max-time': combatService.timer.maxTime,
+                }">
+            </div>
+            
+            <div class="timer-border"></div>
         </div>
     </div>
     <div id="enemy-container">
