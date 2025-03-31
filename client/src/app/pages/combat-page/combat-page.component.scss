@@ -149,21 +149,21 @@ $combat-info-height: 28vh;
 }
 
 #self-container .pokemon-container.combatAnimation.successAttack.is-turn:not(.is-dead) {
-    animation: self-hurt 0.4s ease-in-out forwards;
+    animation: self-hurt 0.5s ease-in-out forwards;
 }
 
 #enemy-container .pokemon-container.combatAnimation.successAttack.is-turn:not(.is-dead) {
-    animation: enemy-hurt 0.4s ease-in-out forwards;
+    animation: enemy-hurt 0.5s ease-in-out forwards;
 }
 
 #self-container .pokemon-container.combatAnimation.successAttack:not(.is-dead):not(.is-turn),
 #self-container .pokemon-container.combatAnimation.failAttack:not(.is-dead):not(.is-turn) {
-    animation: self-attack 0.4s ease-in-out forwards;
+    animation: self-attack 0.5s ease-in-out forwards;
 }
 
 #enemy-container .pokemon-container.combatAnimation.successAttack:not(.is-dead):not(.is-turn),
 #enemy-container .pokemon-container.combatAnimation.failAttack:not(.is-dead):not(.is-turn) {
-    animation: enemy-attack 0.4s ease-in-out forwards;
+    animation: enemy-attack 0.5s ease-in-out forwards;
 }
 
 #self-container .pokemon-container.combatAnimation.successEscape:not(.is-dead):not(.is-turn),
@@ -410,10 +410,10 @@ $combat-info-height: 28vh;
     0% {
         transform: translateX(0) translateY(0);
     }
-    30% {
+    35% {
         transform: translateX(-5.8vw) translateY(1.8vw);
     }
-    70% {
+    65% {
         transform: translateX(-5.8vw) translateY(1.8vw);
     }
     100% {
@@ -425,10 +425,10 @@ $combat-info-height: 28vh;
     0% {
         transform: translateX(0) translateY(0);
     }
-    30% {
+    35% {
         transform: translateX(7vw) translateY(-3.5vw);
     }
-    70% {
+    65% {
         transform: translateX(7vw) translateY(-3.5vw);
     }
     100% {
