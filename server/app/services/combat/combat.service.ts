@@ -94,6 +94,37 @@ export class CombatService {
         }
     }
 
+    private startHealingAnimation(match: Match) {
+        match.data.state = MatchState.CombatAnimation;
+        const successHeal = this.computeHealingItems(match);
+        match.sendUpdate();
+        if (successHeal) {
+            match.setTimeout(this.startCombatWait.bind(this, match), COMBAT_ANIMATION_DURATION);
+        } else {
+            this.startCombatWait.bind(this, match);
+        }
+    }
+
+    private computeHealingItems(match: Match): boolean {
+        const healingRatio = 0.5;
+        const playerCombatData = this.getInactivePlayerData(match);
+        const player = match.data.players[playerCombatData.playerIndex];
+
+        match.data.players[playerCombatData.playerIndex].items.forEach((item) => {
+            switch (item) {
+                case ItemType.Item4:
+                    if (playerCombatData.currentHealth < player.health * healingRatio) {
+                        playerCombatData.currentHealth += 1;
+                        return true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
+        return false;
+    }
+
     private startCombatEndEscape(match: Match) {
         match.data.state = MatchState.CombatEnd;
         match.sendUpdate();
@@ -194,7 +225,6 @@ export class CombatService {
 
         return playerCombatData;
     }
-
     private respawnPlayer(match: Match, player: PlayerData) {
         if (player.spawnPoint !== player.position) {
             // TODO drop items on the ground
