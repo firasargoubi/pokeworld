@@ -8,6 +8,7 @@ import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Position } from '@common/interfaces/position';
 import { PlayEvent } from '@common/interfaces/socket-event.enum';
 import { TURN_WAIT_DURATION } from '@common/consts/match-data.const';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({
     providedIn: 'root',
@@ -21,7 +22,7 @@ export class PlayService {
 
     constructor() {
         this.onMatchUpdate(this.matchService.data);
-        this.matchService.matchUpdate.subscribe(this.onMatchUpdate.bind(this));
+        this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
     }
 
     endTurn(): void {
