@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
@@ -32,7 +33,7 @@ export class CharacterPageComponent {
             this.router.navigate([PageEndpoint.Menu]);
         }
         this.updateAvatarList();
-        this.matchService.matchUpdate.subscribe(this.updateAvatarList.bind(this));
+        this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.updateAvatarList.bind(this));
     }
 
     goToMenu() {

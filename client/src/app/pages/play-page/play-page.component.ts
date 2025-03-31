@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { MapComponent } from '@app/components/map/map.component';
@@ -37,7 +38,7 @@ export class PlayPageComponent {
             this.router.navigate([PageEndpoint.Menu]);
         }
         this.onMatchUpdate();
-        this.matchService.matchUpdate.subscribe(this.onMatchUpdate.bind(this));
+        this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
         this.generateThumbnail();
     }
 
