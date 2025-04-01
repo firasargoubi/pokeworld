@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Timer } from '@app/classes/timer/timer';
 import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
@@ -9,8 +10,6 @@ import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Position } from '@common/interfaces/position';
 import { PlayEvent } from '@common/interfaces/socket-event.enum';
-import { TURN_WAIT_DURATION } from '@common/consts/match-data.const';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({
     providedIn: 'root',
@@ -84,6 +83,8 @@ export class PlayService {
     }
 
     private updateTimer() {
+        // eslint-disable-next-line no-console
+        console.log(this.matchService.data.state);
         if (this.matchService.isState([MatchState.TurnWait])) {
             this.timer.startTimer();
         } else {

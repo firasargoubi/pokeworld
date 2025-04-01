@@ -106,7 +106,6 @@ export class CombatService {
             switch (item) {
                 case ItemType.Item4:
                     if (playerCombatData.currentHealth < player.health * healingRatio) {
-                        // TODO: A enler ABSOLUMEMNT
                         playerCombatData.currentHealth += 1;
                         return true;
                     }
@@ -219,10 +218,7 @@ export class CombatService {
         return playerCombatData;
     }
     private respawnPlayer(match: Match, player: PlayerData) {
-        player.items.forEach((item) => {
-            this.playService.dropItem(match, player.id, item);
-        });
-        player.items = [];
+        this.playService.dropItems(match, player.id, player.items);
 
         if (player.spawnPoint !== player.position) {
             player.position = this.movementService.getNearestEmptyTile(match.data, player.spawnPoint);

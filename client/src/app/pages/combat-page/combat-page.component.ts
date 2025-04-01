@@ -12,7 +12,6 @@ import { PlayService } from '@app/services/play/play.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchState } from '@common/interfaces/match-data';
 import { Avatar } from '@common/interfaces/player-data';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-combat-page',

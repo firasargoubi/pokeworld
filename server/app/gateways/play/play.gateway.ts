@@ -58,7 +58,8 @@ export class PlayGateway {
     dropItem(socket: Socket, itemType: ItemType) {
         const match = this.matchService.getMatchFromPlayerId(socket.id);
         if (match) {
-            this.playService.dropItem(match, socket.id, itemType);
+            const items = [itemType];
+            this.playService.dropItems(match, socket.id, items);
         }
     }
 }

@@ -36,6 +36,7 @@ export class PlayService {
             if (shortestPath.moveCost <= match.data.playData.movementLeft) {
                 match.getPlayer(playerId).position = shortestPath.path[shortestPath.path.length - 1];
                 match.data.playData.movementLeft -= shortestPath.moveCost;
+
                 match.data.state = MatchState.MovementAnimation;
                 this.setTimeLeft(match);
                 match.sendUpdate();
@@ -62,18 +63,22 @@ export class PlayService {
     handleItemAddition(match: Match, player: PlayerData, itemType: ItemType) {
         if (player.items.length < MAX_ITEMS || player.type === PlayerType.Player) {
             player.items.push(itemType);
-
-            if (player.items.length > MAX_ITEMS) {
-                match.data.state = MatchState.ItemDropSelection;
-                this.setTimeLeft(match);
-                const time = 10000;
-                match.setTimeout(this.dropItem.bind(this, match, player.id, itemType), time);
-            }
-
-            this.computeItems(player);
             match.data.gameData.mapData.items[itemType] = match.data.gameData.mapData.items[itemType].filter(
                 (itemPos) => itemPos.x !== player.position.x || itemPos.y !== player.position.y,
             );
+
+            if (player.items.length > MAX_ITEMS) {
+                const time = 10000;
+                const items = [itemType];
+
+                match.data.state = MatchState.ItemDropSelection;
+                this.setTimeLeft(match);
+                match.sendUpdate();
+                match.setTimeout(this.dropItems.bind(this, match, player.id, items), time);
+                return;
+            }
+
+            this.computeItems(player);
             match.sendUpdate();
         } else {
             // player is a bot and inventory is full
@@ -102,17 +107,21 @@ export class PlayService {
             result += '-evolved';
         }
         if (isShiny) {
+            // TODO: transformer en Const
             result += '-shiny';
         }
 
         return result as Avatar;
     }
 
-    dropItem(match: Match, playerId: string, itemType: ItemType) {
+    dropItems(match: Match, playerId: string, items: ItemType[]) {
+        match.data.state = MatchState.TurnWait;
         const player = match.getPlayer(playerId);
-        const position = this.movementService.getNearestItemDropSpot(match.data, player.position);
-        player.items = player.items.filter((i) => i !== itemType);
-        match.data.gameData.mapData.items[itemType].push(position);
+        for (const item of items) {
+            const position = this.movementService.getNearestItemDropSpot(match.data, player.position);
+            match.data.gameData.mapData.items[item].push(position);
+            player.items = player.items.filter((i) => i !== item);
+        }
         this.computeItems(player);
 
         this.continueTurn(match);
@@ -128,7 +137,6 @@ export class PlayService {
             }
         }
     }
-
     debugMove(match: Match, playerId: string, position: Position) {
         if (match.data.playData.isDebugMode && match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
             const possibleMoves = this.movementService.getPossibleMovesDebug(match.data);
@@ -168,16 +176,17 @@ export class PlayService {
         if (this.checkWinCondition(match)) {
             match.setTimeout(this.endMatch.bind(this, match), MATCH_END_DURATION);
         } else {
+            if (match.data.state === MatchState.MovementAnimation) {
+                const curentPlayer = match.data.players[match.data.playData.activePlayerIndex];
+                this.checkAndPickupItem(match, curentPlayer);
+            }
+            if (match.data.state === MatchState.ItemDropSelection) {
+                return;
+            }
             if (this.canPlayerAct(match)) {
-                const lastState = match.data.state;
                 match.data.state = MatchState.TurnWait;
                 match.sendUpdate();
                 match.setTimeout(this.startNextTurn.bind(this, match), match.data.playData.timeLeft);
-
-                if (lastState === MatchState.MovementAnimation) {
-                    const curentPlayer = match.data.players[match.data.playData.activePlayerIndex];
-                    this.checkAndPickupItem(match, curentPlayer);
-                }
             } else {
                 this.startNextTurn(match);
             }
