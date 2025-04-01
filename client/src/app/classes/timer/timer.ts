@@ -1,15 +1,18 @@
-import { Injectable } from '@angular/core';
-import { TIME_SCALE, TURN_WAIT_DURATION } from '@common/consts/match-data.const';
+import { TIME_SCALE } from '@common/consts/match-data.const';
 
-@Injectable({
-    providedIn: 'root',
-})
-export class TimerService {
-    maxTime: number = TURN_WAIT_DURATION / TIME_SCALE;
-    lastUnpauseTime: number = TURN_WAIT_DURATION / TIME_SCALE;
-    currentTime: number = Math.floor(TURN_WAIT_DURATION / TIME_SCALE);
+export class Timer {
+    maxTime: number = 0;
+    lastUnpauseTime: number = 0;
+    currentTime: number = 0;
     isStarted: boolean = false;
     private interval: number | null = null;
+
+    constructor(time: number) {
+        const scaledTime = time / TIME_SCALE;
+        this.maxTime = scaledTime;
+        this.lastUnpauseTime = scaledTime;
+        this.currentTime = Math.ceil(scaledTime);
+    }
 
     startTimer() {
         if (!this.isStarted) {
@@ -25,7 +28,7 @@ export class TimerService {
         }
         const roundedTime = time / TIME_SCALE;
         this.lastUnpauseTime = roundedTime;
-        this.currentTime = Math.floor(roundedTime);
+        this.currentTime = Math.ceil(roundedTime);
     }
 
     private startInterval() {

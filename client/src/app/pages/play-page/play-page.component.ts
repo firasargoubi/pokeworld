@@ -14,7 +14,6 @@ import { PlayService } from '@app/services/play/play.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { TileDescriptionService } from '@app/services/tile-description/tile-description.service';
-import { TimerService } from '@app/services/timer/timer.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchState } from '@common/interfaces/match-data';
 import { PlayerType } from '@common/interfaces/player-data';
@@ -27,10 +26,9 @@ import { PlayerType } from '@common/interfaces/player-data';
 })
 export class PlayPageComponent {
     visualData: PlayVisualData = structuredClone(DEFAULT_PLAY_VISUAL_DATA);
-    timerService: TimerService = inject(TimerService);
     tileDescriptionService: TileDescriptionService = inject(TileDescriptionService);
     matchService: MatchService = inject(MatchService);
-    private playService: PlayService = inject(PlayService);
+    playService: PlayService = inject(PlayService);
     private popupService: PopupService = inject(PopupService);
     private thumbnailService: ThumbnailService = inject(ThumbnailService);
     private mapService: MapService = inject(MapService);

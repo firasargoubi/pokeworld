@@ -1,23 +1,24 @@
 import { inject, Injectable } from '@angular/core';
+import { Timer } from '@app/classes/timer/timer';
 import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
 import { SocketService } from '@app/services/socket/socket.service';
-import { TimerService } from '@app/services/timer/timer.service';
-import { ItemType } from '@common/interfaces/item-type.enum';
+import { Timer } from '@app/classes/timer/timer';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Position } from '@common/interfaces/position';
 import { PlayEvent } from '@common/interfaces/socket-event.enum';
+import { TURN_WAIT_DURATION } from '@common/consts/match-data.const';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayService {
+    timer: Timer = new Timer(TURN_WAIT_DURATION);
     private socketService: SocketService = inject(SocketService);
     private matchService: MatchService = inject(MatchService);
     private mapService: MapService = inject(MapService);
     private movementService: MovementService = inject(MovementService);
-    private timerService: TimerService = inject(TimerService);
 
     constructor() {
         this.onMatchUpdate(this.matchService.data);
@@ -82,9 +83,9 @@ export class PlayService {
 
     private updateTimer() {
         if (this.matchService.isState([MatchState.TurnWait])) {
-            this.timerService.startTimer();
+            this.timer.startTimer();
         } else {
-            this.timerService.stopTimer(this.matchService.data.playData.timeLeft);
+            this.timer.stopTimer(this.matchService.data.playData.timeLeft);
         }
     }
 
