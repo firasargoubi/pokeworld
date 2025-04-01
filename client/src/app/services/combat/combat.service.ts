@@ -1,11 +1,11 @@
 import { inject, Injectable } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Timer } from '@app/classes/timer/timer';
+import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { COMBAT_TURN_DURATION } from '@common/consts/combat-data.const';
-import { CombatEvent } from '@common/interfaces/socket-event.enum';
-import { MatchService } from '@app/services/match/match.service';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CombatEvent } from '@common/interfaces/socket-event.enum';
 
 @Injectable({
     providedIn: 'root',

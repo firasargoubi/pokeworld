@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { DEFAULT_COMBAT_VISUAL_DATA } from '@app/consts/combat-data.const';
@@ -10,7 +11,6 @@ import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchState } from '@common/interfaces/match-data';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-combat-page',
