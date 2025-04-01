@@ -44,6 +44,7 @@ export class PlayService {
         }
     }
 
+    // TODO: mettre en privee
     checkAndPickupItem(match: Match, playerData: PlayerData) {
         const position = playerData.position;
 
@@ -65,7 +66,8 @@ export class PlayService {
             if (player.items.length > MAX_ITEMS) {
                 match.data.state = MatchState.ItemDropSelection;
                 this.setTimeLeft(match);
-                match.clearTimeout();
+                const time = 10000;
+                match.setTimeout(this.dropItem.bind(this, match, player.id, itemType), time);
             }
 
             this.computeItems(player);
@@ -78,6 +80,7 @@ export class PlayService {
         }
     }
 
+    // TODO: mettre en privee
     computeItems(player: PlayerData) {
         const hasItem1 = player.items.includes(ItemType.Item1);
         const hasItem2 = player.items.includes(ItemType.Item2);
@@ -95,6 +98,7 @@ export class PlayService {
         let result = base;
 
         if (isEvolved) {
+            // TODO: transformer en Const
             result += '-evolved';
         }
         if (isShiny) {
@@ -106,8 +110,9 @@ export class PlayService {
 
     dropItem(match: Match, playerId: string, itemType: ItemType) {
         const player = match.getPlayer(playerId);
+        const position = this.movementService.getNearestItemDropSpot(match.data, player.position);
         player.items = player.items.filter((i) => i !== itemType);
-        match.data.gameData.mapData.items[itemType].push(player.position);
+        match.data.gameData.mapData.items[itemType].push(position);
         this.computeItems(player);
 
         this.continueTurn(match);

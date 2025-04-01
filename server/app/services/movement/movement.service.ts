@@ -84,6 +84,42 @@ export class MovementService {
         return currentPos;
     }
 
+    getNearestItemDropSpot(matchData: MatchData, currentPos: Position): Position {
+        if (this.hasNoItems(matchData, currentPos)) {
+            return currentPos;
+        }
+
+        const size = matchData.gameData.mapData.size;
+        const visited: boolean[][] = Array.from({ length: size }, () => Array(size).fill(false));
+        const queue: Position[] = [];
+        queue.push(currentPos);
+        visited[currentPos.x][currentPos.y] = true;
+        while (queue.length > 0) {
+            const pos = queue.shift() as Position;
+            if (this.isValidForDrop(matchData, pos)) {
+                return pos;
+            }
+            this.enqueueValidNeighbors(matchData, pos, { visited, queue });
+        }
+        return currentPos;
+    }
+
+    private isValidForDrop(matchData: MatchData, position: Position): boolean {
+        const tile = matchData.gameData.mapData.tiles[position.x][position.y];
+        const isWater = tile !== TileType.Water;
+
+        const hasNoItems = this.hasNoItems(matchData, position);
+        const hasNoPlayers = !matchData.players.some((player) => player.position.x === position.x && player.position.y === position.y);
+
+        return isWater && hasNoItems && hasNoPlayers;
+    }
+
+    private hasNoItems(matchData: MatchData, position: Position): boolean {
+        return !Object.values(matchData.gameData.mapData.items).some((positions) =>
+            positions.some((pos) => pos.x === position.x && pos.y === position.y),
+        );
+    }
+
     private isTileValidForMovement(matchData: MatchData, position: Position): boolean {
         return !this.isTileOccupiedByPlayer(matchData, position) && this.isTileAccessible(matchData, position);
     }

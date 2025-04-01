@@ -1,6 +1,7 @@
 import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { CombatService } from '@app/services/combat/combat.service';
+import { PlayService } from '@app/services/play/play.service';
 import { REGULAR_ITEMS } from '@common/consts/map-data.const';
 import { DEFAULT_MATCH_DATA, MATCH_CODE_LENGTH, MATCH_CODE_RANGE } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
@@ -14,6 +15,8 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 export class MatchService {
     @Inject(forwardRef(() => MatchGateway)) private matchGateway: MatchGateway;
     @Inject(forwardRef(() => CombatService)) private combatService: CombatService;
+    @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
+
     private matches: Map<string, Match> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
 
@@ -74,6 +77,12 @@ export class MatchService {
 
     leaveMatch(playerId: string) {
         const match = this.getMatchFromPlayerId(playerId);
+
+        const player = match.getPlayer(playerId);
+        player.items.forEach((item) => {
+            this.playService.dropItem(match, player.id, item);
+        });
+
         this.disconnectPlayer(playerId);
         if (match) {
             match.leave(playerId);

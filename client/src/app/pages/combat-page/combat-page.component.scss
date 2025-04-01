@@ -20,11 +20,13 @@ $combat-info-height: 28vh;
     position: relative;
     width: 100%;
     height: 100%;
-    background: repeating-linear-gradient(0deg,
-            $stripes-color1,
-            $stripes-color1 $stripes-size-2,
-            $stripes-color2 $stripes-size-2,
-            $stripes-color2 $stripes-size-1 * 2);
+    background: repeating-linear-gradient(
+        0deg,
+        $stripes-color1,
+        $stripes-color1 $stripes-size-2,
+        $stripes-color2 $stripes-size-2,
+        $stripes-color2 $stripes-size-1 * 2
+    );
     background-size: 100% ($stripes-size-1 * 2);
     animation: fall 3s linear infinite;
 }
@@ -82,7 +84,7 @@ $combat-info-height: 28vh;
         transform: rotate(0deg);
     }
     25% {
-        transform: rotate(-90deg);  /* 3/4 full, upper-right empty */
+        transform: rotate(-90deg); /* 3/4 full, upper-right empty */
     }
     50% {
         transform: rotate(-180deg); /* 1/2 full */
@@ -125,9 +127,13 @@ $combat-info-height: 28vh;
 
 #enemy-container .pokemon-gif {
     overflow: visible;
-    width: 35%;
+    width: 30%;
     pointer-events: none;
     user-select: none;
+}
+
+#enemy-container .pokemon-evolved-gif {
+    width: 50%;
 }
 
 #self-container {
@@ -165,6 +171,10 @@ $combat-info-height: 28vh;
     transform: translateY(20%);
     pointer-events: none;
     user-select: none;
+}
+
+#self-container .pokemon-evolved-gif {
+    width: 70%;
 }
 
 #self-container .pokemon-container.combatAnimation.successAttack.is-turn:not(.is-dead) {
@@ -540,6 +550,23 @@ $combat-info-height: 28vh;
     100% {
         filter: none;
         transform: translateX(0) translateY(0);
+    }
+}
+
+@keyframes healing {
+    0%,
+    100% {
+        filter: none;
+    }
+    15%,
+    45%,
+    75% {
+        filter: sepia(80%) saturate(150%) hue-rotate(90deg) brightness(105%);
+    }
+    30%,
+    60%,
+    90% {
+        filter: none;
     }
 }
 

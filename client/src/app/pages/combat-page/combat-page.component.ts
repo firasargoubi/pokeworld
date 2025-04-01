@@ -10,6 +10,7 @@ import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchState } from '@common/interfaces/match-data';
+import { Avatar } from '@common/interfaces/player-data';
 
 @Component({
     selector: 'app-combat-page',
@@ -55,6 +56,8 @@ export class CombatPageComponent {
         this.visualData.enemyPlatform = BATTLE_PLATFORM_IMAGES[this.visualData.enemyPlayer.standingTile].enemyPlatform;
         this.visualData.selfImage = AVATAR_DATA[this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar].backGif;
         this.visualData.enemyImage = AVATAR_DATA[this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar].frontGif;
+        this.visualData.isSelfPlayerEvolved = this.isAvatarEvolved(this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar);
+        this.visualData.isEnemyPlayerEvolved = this.isAvatarEvolved(this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar);
     }
 
     private onMatchUpdate() {
@@ -80,5 +83,9 @@ export class CombatPageComponent {
             this.visualData.enemyPlayer = this.matchService.data.combatData.playersCombatData[0];
             this.visualData.isSelfTurn = this.matchService.data.combatData.isSecondPlayerTurn;
         }
+    }
+
+    private isAvatarEvolved(avatar: Avatar): boolean {
+        return avatar.toString().includes('-evolved');
     }
 }

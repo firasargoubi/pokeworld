@@ -65,6 +65,9 @@ export class CombatService {
     private startCombatWait(match: Match) {
         match.data.state = MatchState.CombatWait;
         match.data.combatData.turnDuration = this.getActivePlayerData(match).currentEscapes === 0 ? COMBAT_SHORT_TURN_DURATION : COMBAT_TURN_DURATION;
+
+        this.computeHealingItems(match);
+
         match.sendUpdate();
         match.setTimeout(this.startAttackAnimation.bind(this, match), match.data.combatData.turnDuration);
     }
@@ -94,26 +97,16 @@ export class CombatService {
         }
     }
 
-    private startHealingAnimation(match: Match) {
-        match.data.state = MatchState.CombatAnimation;
-        const successHeal = this.computeHealingItems(match);
-        match.sendUpdate();
-        if (successHeal) {
-            match.setTimeout(this.startCombatWait.bind(this, match), COMBAT_ANIMATION_DURATION);
-        } else {
-            this.startCombatWait.bind(this, match);
-        }
-    }
-
     private computeHealingItems(match: Match): boolean {
         const healingRatio = 0.5;
-        const playerCombatData = this.getInactivePlayerData(match);
+        const playerCombatData = this.getActivePlayerData(match);
         const player = match.data.players[playerCombatData.playerIndex];
 
         match.data.players[playerCombatData.playerIndex].items.forEach((item) => {
             switch (item) {
                 case ItemType.Item4:
                     if (playerCombatData.currentHealth < player.health * healingRatio) {
+                        // TODO: A enler ABSOLUMEMNT
                         playerCombatData.currentHealth += 1;
                         return true;
                     }
@@ -216,7 +209,7 @@ export class CombatService {
                 case ItemType.Item5:
                     playerCombatData.maxEscapes += 1;
                     playerCombatData.currentEscapes += 1;
-                    playerCombatData.escapeChances += 0.3;
+                    playerCombatData.escapeChances += 0.2;
                     break;
                 default:
                     break;
@@ -226,9 +219,12 @@ export class CombatService {
         return playerCombatData;
     }
     private respawnPlayer(match: Match, player: PlayerData) {
-        if (player.spawnPoint !== player.position) {
-            // TODO drop items on the ground
+        player.items.forEach((item) => {
+            this.playService.dropItem(match, player.id, item);
+        });
+        player.items = [];
 
+        if (player.spawnPoint !== player.position) {
             player.position = this.movementService.getNearestEmptyTile(match.data, player.spawnPoint);
         }
     }
