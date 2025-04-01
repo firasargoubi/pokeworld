@@ -1,10 +1,3 @@
-describe('CombatGateway', () => {
-    it('should be true', () => {
-        // TODO
-        expect(true).toBeTruthy();
-    });
-});
-
 // import { CombatService } from '@app/services/combat/combat.service';
 // import { CombatState } from '@common/interfaces/combat';
 // import { CombatEvent } from '@common/interfaces/socket-event.enum';

@@ -1,10 +1,3 @@
-describe('LobbyGateway', () => {
-    it('should be true', () => {
-        // TODO
-        expect(true).toBeTruthy();
-    });
-});
-
 // import { LobbyService } from '@app/services/lobby/lobby.service';
 // import { GameData } from '@common/interfaces/game-data';
 // import { Match, PlayerLeftData } from '@common/interfaces/match';
@@ -151,6 +144,6 @@ describe('LobbyGateway', () => {
 //         const clientId = '1234';
 //         const gameData = structuredClone(MOCK_GAME_DATAS[0]);
 //         gateway.emitGameDataToPlayer(clientId, gameData);
-//         expect(mockSocket.emit.calledWith(LobbyEvent.EmitGameData, gameData)).toBeTruthy();
+//         // expect(mockSocket.emit.calledWith(LobbyEvent.EmitGameData, gameData)).toBeTruthy();
 //     });
 // });
