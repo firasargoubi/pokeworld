@@ -211,7 +211,7 @@ export class MovementService {
         }
         path.unshift(this.keyToPos(currentKey));
 
-        return path.length > 1 ? path : null;
+        return path;
     }
 
     private isTileOccupiedByPlayer(matchData: MatchData, position: Position): boolean {

@@ -154,9 +154,14 @@ export class PlayService {
         match.data.playData.movementLeft = 0;
         match.data.playData.timeLeft = TURN_WAIT_DURATION;
         match.data.playData.activePlayerIndex = this.getNextPlayerIndex(match);
-        const playerName = match.data.players[match.data.playData.activePlayerIndex].name;
-        match.sendMessage(`Début du tour de ${playerName}`);
-        match.setTimeout(this.startTurnWait.bind(this, match), TURN_START_DURATION);
+
+        if (this.checkWinCondition(match)) {
+            match.setTimeout(this.endMatch.bind(this, match), MATCH_END_DURATION);
+        } else {
+            const playerName = match.data.players[match.data.playData.activePlayerIndex].name;
+            match.sendMessage(`Début du tour de ${playerName}`);
+            match.setTimeout(this.startTurnWait.bind(this, match), TURN_START_DURATION);
+        }
     }
 
     continueTurn(match: Match) {
@@ -209,17 +214,15 @@ export class PlayService {
         match.clearTimeout();
     }
 
-    // eslint-disable-next-line no-unused-vars
     private checkWinConditionCtf(match: Match): boolean {
         // TODO check win condition for CTF games, return TRUE if game is over, return FALSE if game should continue
 
         if (Math.random() === 0) {
             match.data.state = MatchState.MatchEnd;
             match.sendMessage('Les rouges remporte la partie');
-            return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     private setTimeLeft(match: Match) {

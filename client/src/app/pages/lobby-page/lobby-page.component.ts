@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { HeaderComponent } from '@app/components/header/header.component';
@@ -33,7 +34,7 @@ export class LobbyPageComponent {
             this.router.navigate([PageEndpoint.Menu]);
         }
         this.updateVisual();
-        this.matchService.matchUpdate.subscribe(this.updateVisual.bind(this));
+        this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.updateVisual.bind(this));
     }
 
     startMatchButton(): void {

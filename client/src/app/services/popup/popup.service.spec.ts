@@ -100,10 +100,10 @@ describe('PopupService', () => {
     it('should adjust z-index correctly', () => {
         service.showPopup('Test');
         const container = overlayContainer.getContainerElement();
-        expect(container.style.zIndex).toBe('2');
+        expect(container.style.zIndex).toBe('99');
 
         service['setOverlayZIndexLow']();
-        expect(container.style.zIndex).toBe('-1');
+        expect(container.style.zIndex).toBe('-99');
     });
 
     it('should clear messages on navigation by default', () => {
@@ -128,10 +128,10 @@ describe('PopupService', () => {
     it('should set and reset z-index correctly', () => {
         service.showPopup('Test');
         const container = overlayContainer.getContainerElement();
-        expect(container.style.zIndex).toBe('2');
+        expect(container.style.zIndex).toBe('99');
 
         service.clearMessages();
-        expect(container.style.zIndex).toBe('-1');
+        expect(container.style.zIndex).toBe('-99');
     });
 
     it('should access popup components via getter', () => {

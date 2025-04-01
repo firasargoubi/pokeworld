@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { DEFAULT_COMBAT_VISUAL_DATA } from '@app/consts/combat-data.const';
@@ -11,6 +12,7 @@ import { PlayService } from '@app/services/play/play.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchState } from '@common/interfaces/match-data';
 import { Avatar } from '@common/interfaces/player-data';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-combat-page',
@@ -31,7 +33,7 @@ export class CombatPageComponent {
         }
         this.onMatchUpdate();
         this.updateImages();
-        this.matchService.matchUpdate.subscribe(this.onMatchUpdate.bind(this));
+        this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
     }
 
     @HostListener('document:keydown', ['$event'])
@@ -68,6 +70,7 @@ export class CombatPageComponent {
     private checkForRedirect() {
         const isMatchInCombatState = this.matchService.isState([MatchState.CombatWait, MatchState.CombatAnimation, MatchState.CombatEnd]);
         if (!isMatchInCombatState) {
+            window.console.log('CombatPage.checkForRedirect()');
             this.router.navigate([PageEndpoint.Play]);
         }
     }

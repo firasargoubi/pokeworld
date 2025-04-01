@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
@@ -16,7 +17,7 @@ export class LobbyService {
     private router: Router = inject(Router);
 
     constructor() {
-        this.matchService.matchUpdate.subscribe(this.onMatchUpdate.bind(this));
+        this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
     }
 
     kickPlayer(playerId: string) {
@@ -45,6 +46,7 @@ export class LobbyService {
         if (this.matchService.isState([MatchState.Lobby]) && !oldIsConnected && this.matchService.selfPlayer.isConnected) {
             this.router.navigate([PageEndpoint.Lobby]);
         } else if (oldState === MatchState.Lobby && this.matchService.isState([MatchState.TurnStart])) {
+            window.console.log('LobbyServiceFront.onMatchUpdate()');
             this.router.navigate([PageEndpoint.Play]);
         }
     }

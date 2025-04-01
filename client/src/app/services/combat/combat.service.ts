@@ -4,7 +4,8 @@ import { SocketService } from '@app/services/socket/socket.service';
 import { COMBAT_TURN_DURATION } from '@common/consts/combat-data.const';
 import { CombatEvent } from '@common/interfaces/socket-event.enum';
 import { MatchService } from '@app/services/match/match.service';
-import { MatchState } from '@common/interfaces/match-data';
+import { MatchData, MatchState } from '@common/interfaces/match-data';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({
     providedIn: 'root',
@@ -15,8 +16,8 @@ export class CombatService {
     private socketService: SocketService = inject(SocketService);
 
     constructor() {
-        this.onMatchUpdate();
-        this.matchService.matchUpdate.subscribe(this.onMatchUpdate.bind(this));
+        this.timer.restartTimer(this.matchService.data.combatData.turnDuration);
+        this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
     }
 
     escape(): void {
@@ -27,11 +28,9 @@ export class CombatService {
         this.socketService.emit(CombatEvent.Attack);
     }
 
-    private onMatchUpdate() {
-        if (this.matchService.isState([MatchState.CombatWait])) {
-            this.timer.startTimer();
-        } else {
-            this.timer.stopTimer(this.matchService.data.combatData.turnDuration);
+    private onMatchUpdate(oldMatchData: MatchData) {
+        if (oldMatchData.state !== MatchState.CombatWait && this.matchService.isState([MatchState.CombatWait])) {
+            this.timer.restartTimer(this.matchService.data.combatData.turnDuration);
         }
     }
 }
