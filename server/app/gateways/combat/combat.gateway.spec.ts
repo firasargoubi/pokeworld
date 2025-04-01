@@ -1,103 +1,58 @@
-// import { CombatService } from '@app/services/combat/combat.service';
-// import { CombatState } from '@common/interfaces/combat';
-// import { CombatEvent } from '@common/interfaces/socket-event.enum';
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
-// import { Server, Socket } from 'socket.io';
-// import { CombatGateway } from './combat.gateway';
+import { Test, TestingModule } from '@nestjs/testing';
+import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
+import { Server, Socket } from 'socket.io';
+import { MatchService } from '@app/services/match/match.service';
+import { Match } from '@app/classes/match/match';
+import { CombatGateway } from './combat.gateway';
+import { CombatService } from '@app/services/combat/combat.service';
 
-// describe('CombatGateway', () => {
-//     let gateway: CombatGateway;
-//     let mockServer: SinonStubbedInstance<Server>;
-//     let mockCombatService: SinonStubbedInstance<CombatService>;
-//     let emitStub: SinonStub;
+describe('CombatGateway', () => {
+    let gateway: CombatGateway;
+    let mockSocket: SinonStubbedInstance<Socket>;
+    let mockServer: SinonStubbedInstance<Server>;
+    let mockCombatService: SinonStubbedInstance<CombatService>;
+    let mockMatchService: SinonStubbedInstance<MatchService>;
+    let emitStub: SinonStub;
+    let mockMatch: SinonStubbedInstance<Match>;
 
-//     let socket1: SinonStubbedInstance<Socket>;
-//     let socket2: SinonStubbedInstance<Socket>;
+    beforeEach(async () => {
+        mockSocket = createStubInstance<Socket>(Socket);
+        mockCombatService = createStubInstance<CombatService>(CombatService);
+        mockMatchService = createStubInstance<MatchService>(MatchService);
+        mockServer = createStubInstance<Server>(Server);
+        emitStub = stub();
+        mockMatch = createStubInstance<Match>(Match);
+        mockMatchService.getMatchFromPlayerId.returns(mockMatch);
 
-//     beforeEach(async () => {
-//         socket1 = createStubInstance<Socket>(Socket);
-//         socket2 = createStubInstance<Socket>(Socket);
-//         mockCombatService = createStubInstance<CombatService>(CombatService);
-//         mockServer = createStubInstance<Server>(Server);
-//         emitStub = stub();
+        const module: TestingModule = await Test.createTestingModule({
+            providers: [
+                CombatGateway,
+                { provide: MatchService, useValue: mockMatchService },
+                { provide: CombatService, useValue: mockCombatService },
+                { provide: Server, useValue: mockServer },
+            ],
+        }).compile();
 
-//         const module: TestingModule = await Test.createTestingModule({
-//             providers: [CombatGateway, { provide: Server, useValue: mockServer }, { provide: CombatService, useValue: mockCombatService }],
-//         }).compile();
+        gateway = module.get<CombatGateway>(CombatGateway);
 
-//         gateway = module.get<CombatGateway>(CombatGateway);
+        gateway['server'] = {
+            to: () => ({ emit: emitStub }),
+            sockets: { sockets: { get: () => mockSocket } },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 'any' used to mock a partial Server object
+        } as any;
+    });
 
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 'any' used to mock a partial Server object
-//         gateway['server'] = { to: () => ({ emit: emitStub }), sockets: { sockets: { get: () => socket1 } } } as any;
+    it('should be defined', () => {
+        expect(gateway).toBeDefined();
+    });
 
-//         socket1 = createStubInstance<Socket>(Socket);
-//         socket2 = createStubInstance<Socket>(Socket);
+    it('should call attack on attack event', () => {
+        gateway.attack(mockSocket);
+        expect(mockCombatService.attack.calledWith(mockMatch, mockSocket.id)).toBeTruthy();
+    });
 
-//         Object.defineProperty(socket1, 'id', { value: 'player-1' });
-//         Object.defineProperty(socket2, 'id', { value: 'player-2' });
-//     });
-
-//     it('should be defined', () => {
-//         expect(gateway).toBeDefined();
-//     });
-
-//     it('should call escape on escapeAttempt event', () => {
-//         const payload = { combatRoomCode: 'room123', playerId: 'player-1' };
-//         gateway.escapeAttempt(null, payload);
-//         expect(mockCombatService.escape.calledWith(payload.combatRoomCode, payload.playerId)).toBeTruthy();
-//     });
-
-//     it('should call executeAttackAndCheckVictory and forceCombatTurnSwitch on attackAttempt event', () => {
-//         const payload = { combatRoomCode: 'room123', targetId: 'player-2' };
-//         gateway.attackAttempt(null, payload);
-//         expect(mockCombatService.executeAttackAndCheckVictory.calledWith(payload.combatRoomCode, payload.targetId)).toBeTruthy();
-//         expect(mockCombatService.forceCombatTurnSwitch.calledWith(payload.combatRoomCode)).toBeTruthy();
-//     });
-
-//     it('should call endCombat on handleDisconnect if socket is found in a combat room', () => {
-//         const combatRoomCode = 'room123';
-//         const fakeCombatState = { timer: null, players: [{ id: socket1.id || 'test-socket-id' }], currentTurnIndex: 0 } as CombatState;
-//         mockCombatService.getCombatTurnSystems.returns(new Map([[combatRoomCode, fakeCombatState]]));
-
-//         gateway.handleDisconnect(socket1);
-
-//         expect(mockCombatService.endCombat.calledWith(combatRoomCode)).toBeTruthy();
-//     });
-
-//     it('should call endCombat with the correct winner when two players are present', () => {
-//         const combatRoomCode = 'room456';
-//         const fakeCombatState = {
-//             timer: null,
-//             players: [{ id: socket1.id }, { id: socket2.id }],
-//             currentTurnIndex: 0,
-//         } as CombatState;
-//         mockCombatService.getCombatTurnSystems.returns(new Map([[combatRoomCode, fakeCombatState]]));
-//         gateway.handleDisconnect(socket1);
-//         expect(mockCombatService.endCombat.calledWith(combatRoomCode, socket2.id)).toBeTruthy();
-//     });
-//     it('should return a socket by id using getSocketById', () => {
-//         const socket = gateway.getSocketById('test-socket-id');
-//         expect(socket).toEqual(socket1);
-//     });
-
-//     it('should emit an event to a combat room using emitToCombatRoom', () => {
-//         const combatRoomCode = 'room123';
-//         const event = CombatEvent.EscapeAttempt;
-//         const payload = { test: 'data' };
-//         gateway.emitToCombatRoom(combatRoomCode, event, payload);
-//         expect(emitStub.calledWith(event, payload)).toBeTruthy();
-//     });
-
-//     it('should emit an event to a player using emitToPlayer when socket exists', () => {
-//         socket1.emit = stub();
-//         gateway.emitToPlayer('test-socket-id', CombatEvent.AttackAttempt, { data: 123 });
-//         expect(socket1.emit.calledWith(CombatEvent.AttackAttempt, { data: 123 })).toBeTruthy();
-//     });
-
-//     it('should not emit an event in emitToPlayer if socket is not found', () => {
-//         stub(gateway, 'getSocketById').returns(null);
-//         gateway.emitToPlayer('non-existent-socket', CombatEvent.AttackAttempt, { data: 123 });
-//         expect(socket1.emit.notCalled).toBeTruthy();
-//     });
-// });
+    it('should call escape on escape event', () => {
+        gateway.escape(mockSocket);
+        expect(mockCombatService.escape.calledWith(mockMatch, mockSocket.id)).toBeTruthy();
+    });
+});
