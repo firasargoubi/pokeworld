@@ -103,7 +103,9 @@ export class PlayService {
         const hasPossibleActions = this.movementService.getActions(match.data).length > 0;
         const canUseAction = hasPossibleActions && match.data.playData.hasAction;
         const canMove = this.movementService.getPossibleMoves(match.data).length > 0;
-        return canUseAction || canMove;
+        const canAct = canUseAction || canMove;
+        const isConnected = match.data.players[match.data.playData.activePlayerIndex].isConnected;
+        return canAct || isConnected;
     }
 
     private checkWinCondition(match: Match): boolean {

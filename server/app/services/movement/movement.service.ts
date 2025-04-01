@@ -1,9 +1,9 @@
+import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
+import { MatchData } from '@common/interfaces/match-data';
 import { DistancesAndPredecessors, NeighborContext, QueueNode, ShortestPath, VisitedQueue } from '@common/interfaces/movement';
 import { Position } from '@common/interfaces/position';
 import { TILE_COST, TileType } from '@common/interfaces/tile-type.enum';
-import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
 import { Injectable } from '@nestjs/common';
-import { MatchData } from '@common/interfaces/match-data';
 
 @Injectable()
 export class MovementService {
@@ -53,6 +53,9 @@ export class MovementService {
     }
 
     getNearestEmptyTile(matchData: MatchData, currentPos: Position): Position {
+        if (this.isOutOfBounds(matchData, currentPos)) {
+            return currentPos;
+        }
         const size = matchData.gameData.mapData.size;
         const visited: boolean[][] = Array.from({ length: size }, () => Array(size).fill(false));
         const queue: Position[] = [];

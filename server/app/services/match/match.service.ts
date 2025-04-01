@@ -1,17 +1,20 @@
 import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { CombatService } from '@app/services/combat/combat.service';
+import { PlayService } from '@app/services/play/play.service';
 import { DEFAULT_MATCH_DATA, MATCH_CODE_LENGTH, MATCH_CODE_RANGE } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
+import { PlayerData } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MatchService {
     @Inject(forwardRef(() => MatchGateway)) private matchGateway: MatchGateway;
     @Inject(forwardRef(() => CombatService)) private combatService: CombatService;
+    @Inject(forwardRef(() => PlayService)) private playService: PlayService;
     private matches: Map<string, Match> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
 
@@ -85,6 +88,14 @@ export class MatchService {
 
     killPlayerCombat(match: Match) {
         this.combatService.startCombatEndDeath(match);
+    }
+
+    respawnPlayer(match: Match, player: PlayerData) {
+        this.combatService.respawnPlayer(match, player);
+    }
+
+    startNextTurn(match: Match) {
+        this.playService.startNextTurn(match);
     }
 
     private canJoinMatch(playerId: string, matchCode: string): boolean {

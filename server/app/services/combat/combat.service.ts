@@ -54,6 +54,14 @@ export class CombatService {
         }
     }
 
+    respawnPlayer(match: Match, player: PlayerData) {
+        if (player.spawnPoint !== player.position) {
+            // TODO drop items on the ground
+
+            player.position = this.movementService.getNearestEmptyTile(match.data, player.spawnPoint);
+        }
+    }
+
     private canPlayerAct(match: Match, playerId: string): boolean {
         const index = match.getPlayerIndex(playerId);
         const isFirstPlayer = !match.data.combatData.isSecondPlayerTurn && match.data.combatData.playersCombatData[0].playerIndex === index;
@@ -180,13 +188,5 @@ export class CombatService {
         });
 
         return playerCombatData;
-    }
-
-    private respawnPlayer(match: Match, player: PlayerData) {
-        if (player.spawnPoint !== player.position) {
-            // TODO drop items on the ground
-
-            player.position = this.movementService.getNearestEmptyTile(match.data, player.spawnPoint);
-        }
     }
 }
