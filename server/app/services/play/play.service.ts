@@ -132,14 +132,16 @@ export class PlayService {
     }
 
     private checkWinConditionCtf(match: Match): boolean {
+        let result = false;
         // TODO check win condition for CTF games, return TRUE if game is over, return FALSE if game should continue
 
         if (Math.random() === 0) {
             match.data.state = MatchState.MatchEnd;
             match.sendMessage('Les rouges remporte la partie');
+            result = true;
         }
 
-        return false;
+        return result;
     }
 
     private setTimeLeft(match: Match) {

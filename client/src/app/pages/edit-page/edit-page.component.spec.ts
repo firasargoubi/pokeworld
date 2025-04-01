@@ -403,6 +403,12 @@ describe('EditPageComponent', () => {
         expect(component.editorVisualData.paintingTile).toBe(EDITOR_ERASE_TILE);
     });
 
+    it('should return null on get remaining item count', () => {
+        editorServiceSpy.getRemainingItemCount.and.returnValue(1);
+        const result = component['getRemainingItemCount'](ItemType.Item2);
+        expect(result).toBe(null);
+    });
+
     it('should navigate to admin page if map is invalid', () => {
         gameDataServiceSpy.isMapValid.and.returnValue(false);
         fixture = TestBed.createComponent(EditPageComponent);

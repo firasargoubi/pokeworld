@@ -1,14 +1,14 @@
 import { inject, Injectable } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Timer } from '@app/classes/timer/timer';
 import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
 import { SocketService } from '@app/services/socket/socket.service';
-import { Timer } from '@app/classes/timer/timer';
+import { TURN_WAIT_DURATION } from '@common/consts/match-data.const';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Position } from '@common/interfaces/position';
 import { PlayEvent } from '@common/interfaces/socket-event.enum';
-import { TURN_WAIT_DURATION } from '@common/consts/match-data.const';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({
     providedIn: 'root',

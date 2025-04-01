@@ -81,7 +81,6 @@ export class EditorService {
     getRemainingItemCount(item: ItemType, activeItem: ItemType | null): number {
         const currentItemCount = this.getItemCount(item, activeItem);
         const maxItemCount = this.getMaxItemCount(item, activeItem);
-
         return maxItemCount - currentItemCount;
     }
 
