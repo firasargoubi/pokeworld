@@ -146,16 +146,15 @@ export class Match {
     private playerLeaveMatch(playerId: string) {
         const player = this.data.players.find((p) => p.id === playerId);
         player.isConnected = false;
-        if (this.isActivePlayer(player.id) && this.isState([MatchState.TurnWait])) {
-            this.matchService.startNextTurn(this);
-        }
-        player.spawnPoint = { x: -2, y: -2 };
-        this.matchService.respawnPlayer(this, player);
-
         const connectedPlayers = this.data.players.filter((p) => p.isConnected);
         if (connectedPlayers.length === 1) {
             this.kickPlayer(connectedPlayers[0].id, Message.LastPlayerRemaining);
         } else {
+            if (this.isActivePlayer(player.id) && this.isState([MatchState.TurnWait])) {
+                this.matchService.startNextTurn(this);
+            }
+            player.spawnPoint = { x: -2, y: -2 };
+            this.matchService.respawnPlayer(this, player);
             this.sendMessage(`${player.name} a quitté la partie`);
         }
     }
