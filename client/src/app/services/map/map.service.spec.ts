@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/player-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MapSize } from '@common/interfaces/map-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
+import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { BehaviorSubject } from 'rxjs';
 import { MapService } from './map.service';
 import { ACTION_OVERLAY, DEFAULT_OVERLAY_TILES, HOVER_MOVE_OVERLAY, POSSIBLE_MOVE_OVERLAY } from './map.service.const';
@@ -341,6 +343,19 @@ describe('MapService', () => {
         expect(result).toBe(ACTION_OVERLAY);
     });
 
+    it('should set players correctly', () => {
+        const players = structuredClone(MOCK_PLAYER_DATAS);
+        service.setPlayers(players);
+        expect(service['players']).toBe(players);
+    });
+
+    it('should execute move player animation', () => {
+        service['players'] = structuredClone(MOCK_PLAYER_DATAS);
+        const position = { x: 6, y: 5 };
+        service['movePlayerAnimation'](0, position);
+        expect(service['players'][0].position).toBe(position);
+    });
+
     it('should handle overlay-related methods correctly', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'updateAllTiles');
@@ -372,5 +387,19 @@ describe('MapService', () => {
         expect(service['overlayTiles'].actions).toEqual([]);
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expect's count
         expect(service['updateAllTiles']).toHaveBeenCalledTimes(5);
+    });
+
+    it('should schedule player movement animations for each position', () => {
+        const positions = [
+            { x: 1, y: 1 },
+            { x: 2, y: 2 },
+        ];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const movePlayerAnimationSpy = spyOn<any>(service, 'movePlayerAnimation');
+        jasmine.clock().install();
+        service.movePlayer(0, positions);
+        jasmine.clock().tick(MOVE_ANIMATION_DURATION + 1);
+        expect(movePlayerAnimationSpy).toHaveBeenCalled();
+        jasmine.clock().uninstall();
     });
 });

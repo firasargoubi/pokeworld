@@ -4,12 +4,13 @@ import { IMAGE_SUFIX, TILE_IMAGES_PREFIX, UNDERLAY_IMAGES_PREFIX } from '@app/co
 import { MapVisualData, OverlayTiles, TileVisualData } from '@app/interfaces/map-visual-data';
 import { TileComparisonData } from '@app/interfaces/tile-comparison-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
+import { SURROUNDING_POSITIONS_DONUT, SURROUNDING_POSITIONS_PLUS, SURROUNDING_POSITIONS_SQUARE } from '@common/consts/map-data.const';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/player-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MapData } from '@common/interfaces/map-data';
+import { PlayerData } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
-import { PlayerData } from '@common/interfaces/player-data';
-import { SURROUNDING_POSITIONS_DONUT, SURROUNDING_POSITIONS_PLUS, SURROUNDING_POSITIONS_SQUARE } from '@common/consts/map-data.const';
 import {
     ACTION_OVERLAY,
     BRIDGE_SIMILAR_TILES,
@@ -26,7 +27,6 @@ import {
     RANDOM_NUMBER_MULTIPLIER,
     WATER_SIMILAR_TILES,
 } from './map.service.const';
-import { MOVE_ANIMATION_DURATION } from '@common/consts/player-data.const';
 
 @Injectable({
     providedIn: 'root',
@@ -91,10 +91,7 @@ export class MapService {
 
     movePlayer(playerIndex: number, moves: Position[]) {
         for (let i = 1; i < moves.length; i++) {
-            setTimeout(() => {
-                this.players[playerIndex].position = moves[i];
-                this.updateAllTiles();
-            }, MOVE_ANIMATION_DURATION * i);
+            setTimeout(this.movePlayerAnimation.bind(this, playerIndex, moves[i]), MOVE_ANIMATION_DURATION * i);
         }
     }
 
@@ -108,6 +105,11 @@ export class MapService {
 
     hasActionOverlay(): boolean {
         return this.overlayTiles.actions.length > 0;
+    }
+
+    private movePlayerAnimation(playerIndex: number, move: Position) {
+        this.players[playerIndex].position = move;
+        this.updateAllTiles();
     }
 
     private getTileVisualData(mapData: MapData, position: Position): TileVisualData {
