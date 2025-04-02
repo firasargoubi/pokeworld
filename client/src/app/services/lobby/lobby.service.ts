@@ -46,7 +46,6 @@ export class LobbyService {
         if (this.matchService.isState([MatchState.Lobby]) && !oldIsConnected && this.matchService.selfPlayer.isConnected) {
             this.router.navigate([PageEndpoint.Lobby]);
         } else if (oldState === MatchState.Lobby && this.matchService.isState([MatchState.TurnStart])) {
-            window.console.log('LobbyServiceFront.onMatchUpdate()');
             this.router.navigate([PageEndpoint.Play]);
         }
     }

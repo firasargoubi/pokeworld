@@ -66,7 +66,6 @@ export class CombatPageComponent {
     private checkForRedirect() {
         const isMatchInCombatState = this.matchService.isState([MatchState.CombatWait, MatchState.CombatAnimation, MatchState.CombatEnd]);
         if (!isMatchInCombatState) {
-            window.console.log('CombatPage.checkForRedirect()');
             this.router.navigate([PageEndpoint.Play]);
         }
     }

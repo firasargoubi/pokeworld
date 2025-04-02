@@ -1,235 +1,95 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { CharacterPageComponent } from './character-page.component';
+import { LobbyService } from '@app/services/lobby/lobby.service';
+import { MatchService } from '@app/services/match/match.service';
+import { PopupService } from '@app/services/popup/popup.service';
+import { Avatar } from '@common/interfaces/player-data';
+import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
+
 describe('CharacterPageComponent', () => {
-    it('should be true', () => {
-        // TODO
-        expect(true).toBeTruthy();
+    let component: CharacterPageComponent;
+    let fixture: ComponentFixture<CharacterPageComponent>;
+    let mockMatchService: jasmine.SpyObj<MatchService>;
+    let mockPopupService: jasmine.SpyObj<PopupService>;
+    let mockLobbyService: jasmine.SpyObj<LobbyService>;
+    let mockRouter: jasmine.SpyObj<Router>;
+
+    beforeEach(async () => {
+        mockMatchService = jasmine.createSpyObj('MatchService', ['isInMatch', 'leaveMatch', 'selfPlayer', 'selfIndex', 'matchUpdate'], {
+            data: structuredClone(MOCK_MATCH_DATAS[0]),
+            selfPlayer: structuredClone(MOCK_PLAYER_DATAS[0]),
+            matchUpdate: { pipe: () => ({ subscribe: () => ({}) }) },
+        });
+        mockPopupService = jasmine.createSpyObj('PopupService', ['showPopup']);
+        mockLobbyService = jasmine.createSpyObj('LobbyService', ['joinLobby', 'changeAvatar']);
+        mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+
+        await TestBed.configureTestingModule({
+            imports: [ReactiveFormsModule, CharacterPageComponent],
+            providers: [
+                { provide: MatchService, useValue: mockMatchService },
+                { provide: PopupService, useValue: mockPopupService },
+                { provide: LobbyService, useValue: mockLobbyService },
+                { provide: Router, useValue: mockRouter },
+            ],
+        }).compileComponents();
+
+        fixture = TestBed.createComponent(CharacterPageComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
+
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
+
+    it('should show popup with confirmation and bind leaveMatch', () => {
+        component.goToMenu();
+        expect(mockPopupService.showPopup).toHaveBeenCalled();
+    });
+
+    it('should toggle is attack selected', () => {
+        component.visualData.isAttackSelected = true;
+        component.toggleBonusDice();
+        expect(component.visualData.isAttackSelected).toBeFalse();
+    });
+
+    it('should get player data correctly', () => {
+        component.visualData.isHpSelected = false;
+        component.visualData.isAttackSelected = false;
+        component['getPlayerData']();
+        expect(component.visualData.isAttackSelected).toBeFalse();
+    });
+
+    it('should show popup with warnings if name form is invalid', () => {
+        component.nameForm.setValue('ab');
+        component.joinLobby();
+        expect(mockPopupService.showPopup).toHaveBeenCalledWith('Le nom doit contenir entre 3 et 15 caractères');
+        expect(mockLobbyService.joinLobby).not.toHaveBeenCalled();
+    });
+
+    it('should show popup with avatar warning if avatar is Default', () => {
+        component.nameForm.setValue('ValidName');
+        mockMatchService.selfPlayer.avatar = Avatar.Default;
+        component.joinLobby();
+        expect(mockPopupService.showPopup).toHaveBeenCalledWith('Veuillez choisir un avatar');
+        expect(mockLobbyService.joinLobby).not.toHaveBeenCalled();
+    });
+
+    it('should call lobbyService.joinLobby with player data if no warnings', () => {
+        component.nameForm.setValue('ValidName');
+        mockMatchService.selfPlayer.avatar = Avatar.Avatar7;
+        component.visualData.isHpSelected = true;
+        component.visualData.isAttackSelected = true;
+        component.joinLobby();
+        expect(mockLobbyService.joinLobby).toHaveBeenCalled();
+    });
+
+    it('should call lobbyService.changeAvatar if avatar is not locked', () => {
+        component.changeAvatar(Avatar.Avatar7);
+        expect(mockLobbyService.changeAvatar).toHaveBeenCalledWith(Avatar.Avatar7);
     });
 });
-
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
-// import { ReactiveFormsModule } from '@angular/forms';
-// import { Router } from '@angular/router';
-// import { AVATAR_DATA } from '@app/consts/avatar-data.const';
-// import { CharacterService } from '@app/services/character/character.service';
-// import { PopupService } from '@app/services/popup/popup.service';
-// import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
-// import { BONUS_POINTS, DEFAULT_ESCAPE_POINTS, DEFAULT_STAT_POINTS } from '@common/consts/player.const';
-// import { Avatar, AvatarStatus } from '@common/interfaces/avatar.enum';
-// import { DiceType } from '@common/interfaces/dice';
-// import { StatType } from '@common/interfaces/player';
-// import { Subject } from 'rxjs';
-// import { CharacterPageComponent } from './character-page.component';
-
-// describe('CharacterPageComponent', () => {
-//     let component: CharacterPageComponent;
-//     let fixture: ComponentFixture<CharacterPageComponent>;
-//     let routerSpy: jasmine.SpyObj<Router>;
-//     let popupServiceSpy: jasmine.SpyObj<PopupService>;
-//     let lobbySocketServiceSpy: jasmine.SpyObj<LobbySocketsService>;
-//     let characterServiceSpy: jasmine.SpyObj<CharacterService>;
-//     let roomLockedSubject: Subject<boolean>;
-
-//     beforeEach(async () => {
-//         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-//         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
-//         lobbySocketServiceSpy = jasmine.createSpyObj('LobbySocketsService', ['updatePlayer', 'leaveMatch']);
-//         characterServiceSpy = jasmine.createSpyObj(
-//             'CharacterService',
-//             ['getAvatarStatus', 'isAvatarAvailable', 'updatePlayerAvatar', 'resetAvatar', 'setPlayerData', 'joinLobby', 'handleAvatarSelection'],
-//             {
-//                 avatarData: AVATAR_DATA,
-//                 avatarList: Object.keys(AVATAR_DATA).slice(1) as Avatar[],
-//                 playerData: {
-//                     name: '',
-//                     avatar: Avatar.Avatar1,
-//                     playerStats: {
-//                         health: 0,
-//                         speed: 0,
-//                         attack: 0,
-//                         defense: 0,
-//                         attackDice: DiceType.D4,
-//                         defenseDice: DiceType.D6,
-//                         escapes: 0,
-//                     },
-//                     isConnected: true,
-//                 },
-//             },
-//         );
-
-//         roomLockedSubject = new Subject<boolean>();
-//         Object.defineProperty(lobbySocketServiceSpy, 'roomLocked$', { get: () => roomLockedSubject.asObservable() });
-
-//         await TestBed.configureTestingModule({
-//             imports: [ReactiveFormsModule],
-//             providers: [
-//                 { provide: Router, useValue: routerSpy },
-//                 { provide: PopupService, useValue: popupServiceSpy },
-//                 { provide: LobbySocketsService, useValue: lobbySocketServiceSpy },
-//                 { provide: CharacterService, useValue: characterServiceSpy },
-//             ],
-//         }).compileComponents();
-//     });
-
-//     beforeEach(() => {
-//         fixture = TestBed.createComponent(CharacterPageComponent);
-//         component = fixture.componentInstance;
-//         characterServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
-//         fixture.detectChanges();
-//     });
-
-//     it('should create', () => {
-//         expect(component).toBeTruthy();
-//     });
-
-//     it('should reset avatar on initialization', () => {
-//         component.ngOnInit();
-//         expect(characterServiceSpy.resetAvatar).toHaveBeenCalled();
-//     });
-
-//     it('should toggle bonus dice', () => {
-//         const initialAttackDice = component.bonusDice.attack;
-//         const initialDefenseDice = component.bonusDice.defense;
-//         component.toggleBonusDice();
-//         expect(component.bonusDice.attack).toBe(initialDefenseDice);
-//         expect(component.bonusDice.defense).toBe(initialAttackDice);
-//     });
-
-//     it('should return correct avatar button style', () => {
-//         characterServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
-//         const style = component.getAvatarBtnStyle(Avatar.Avatar1);
-//         expect(style).toEqual({ class: AvatarStatus.UNSELECTED });
-//     });
-
-//     it('should show popup if form is invalid', () => {
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any  -- Private method
-//         spyOn<any>(component, 'getWarnings').and.returnValue(['Warning']);
-//         component.goToLobby();
-//         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Warning');
-//     });
-
-//     it('should navigate to create page', () => {
-//         component.goToMenu();
-//         expect(popupServiceSpy.showPopup).toHaveBeenCalled();
-//     });
-
-//     it('should validate form as valid when there are no warnings', () => {
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any  -- Private method
-//         spyOn<any>(component, 'getWarnings').and.returnValue([]);
-//         expect(component.isFormValid()).toBeTrue();
-//     });
-
-//     it('should validate form as invalid when there are warnings', () => {
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any  -- Private method
-//         spyOn<any>(component, 'getWarnings').and.returnValue(['Warning']);
-//         expect(component.isFormValid()).toBeFalse();
-//     });
-
-//     it('should return correct bonus stat', () => {
-//         component.bonusPointsForm.setValue(StatType.Life);
-//         expect(component['getBonusStat'](StatType.Life)).toBe(DEFAULT_STAT_POINTS + BONUS_POINTS);
-//         expect(component['getBonusStat'](StatType.Speed)).toBe(DEFAULT_STAT_POINTS);
-//     });
-
-//     it('should return correct warnings', () => {
-//         component.nameForm.setValue('');
-//         expect(component['getWarnings']()).toContain('Le nom doit contenir entre 3 et 15 caractères');
-//         component['characterService'].playerData.avatar = Avatar.Default;
-//         expect(component['getWarnings']()).toContain('Veuillez choisir un avatar');
-//     });
-
-//     it('should check if avatar is chosen', () => {
-//         component['characterService'].playerData.avatar = Avatar.Avatar1;
-//         expect(component['isAvatarChosen']()).toBeTrue();
-//         component['characterService'].playerData.avatar = Avatar.Default;
-//         expect(component['isAvatarChosen']()).toBeFalse();
-//     });
-
-//     it('should return correct avatar button style', () => {
-//         characterServiceSpy.getAvatarStatus.and.returnValue(AvatarStatus.UNSELECTED);
-//         const style = component.getAvatarBtnStyle(Avatar.Avatar1);
-//         expect(style).toEqual({ class: AvatarStatus.UNSELECTED });
-//     });
-
-//     it('should call getAvatarBtnStyle with correct avatar', () => {
-//         const avatar = Avatar.Avatar1;
-//         const spy = spyOn(component, 'getAvatarBtnStyle').and.callThrough();
-//         component.getAvatarBtnStyle(avatar);
-//         expect(spy).toHaveBeenCalledWith(avatar);
-//     });
-
-//     it('should return correct avatar data', () => {
-//         expect(component.avatarData).toEqual(AVATAR_DATA);
-//     });
-
-//     it('should return correct avatar list', () => {
-//         expect(component.avatarList).toEqual(Object.keys(AVATAR_DATA).slice(1) as Avatar[]);
-//     });
-
-//     it('should return the selected avatar', () => {
-//         expect(component.selectedAvatar).toBe(Avatar.Avatar1);
-//     });
-
-//     it('should reset avatar on init', () => {
-//         component.ngOnInit();
-//         expect(characterServiceSpy.resetAvatar).toHaveBeenCalled();
-//     });
-
-//     it('should set player data and join lobby when form is valid', () => {
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-//         spyOn<any>(component, 'getWarnings').and.returnValue([]);
-//         component.goToLobby();
-//         expect(characterServiceSpy.setPlayerData).toHaveBeenCalled();
-//         expect(characterServiceSpy.joinLobby).toHaveBeenCalled();
-//     });
-
-//     it('should not join lobby when form is invalid', () => {
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-//         spyOn<any>(component, 'getWarnings').and.returnValue(['Warning']);
-//         component.goToLobby();
-//         expect(characterServiceSpy.joinLobby).not.toHaveBeenCalled();
-//     });
-
-//     it('should show popup when navigating to menu', () => {
-//         component.goToMenu();
-//         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Voulez-vous vraiment quitter ?', true, jasmine.any(Function));
-//     });
-
-//     it('should return correct player data', () => {
-//         component.nameForm.setValue('TestPlayer');
-//         component.bonusPointsForm.setValue(StatType.Life);
-//         const playerData = component['getPlayerData']();
-//         expect(playerData).toEqual({
-//             name: 'TESTPLAYER',
-//             avatar: Avatar.Avatar1,
-//             playerStats: {
-//                 health: DEFAULT_STAT_POINTS + BONUS_POINTS,
-//                 speed: DEFAULT_STAT_POINTS,
-//                 attack: DEFAULT_STAT_POINTS,
-//                 defense: DEFAULT_STAT_POINTS,
-//                 attackDice: DiceType.D4,
-//                 defenseDice: DiceType.D6,
-//                 escapes: DEFAULT_ESCAPE_POINTS,
-//             },
-//         });
-//     });
-
-//     it('should return correct bonus stat', () => {
-//         component.bonusPointsForm.setValue(StatType.Life);
-//         expect(component['getBonusStat'](StatType.Life)).toBe(DEFAULT_STAT_POINTS + BONUS_POINTS);
-//         component.bonusPointsForm.setValue(StatType.Speed);
-//         expect(component['getBonusStat'](StatType.Speed)).toBe(DEFAULT_STAT_POINTS + BONUS_POINTS);
-//     });
-
-//     it('should return correct warnings', () => {
-//         component.nameForm.setValue('');
-//         expect(component['getWarnings']()).toContain('Le nom doit contenir entre 3 et 15 caractères');
-//         component['characterService'].playerData.avatar = Avatar.Default;
-//         expect(component['getWarnings']()).toContain('Veuillez choisir un avatar');
-//     });
-
-//     it('should check if avatar is chosen', () => {
-//         component['characterService'].playerData.avatar = Avatar.Avatar1;
-//         expect(component['isAvatarChosen']()).toBeTrue();
-//         component['characterService'].playerData.avatar = Avatar.Default;
-//         expect(component['isAvatarChosen']()).toBeFalse();
-//     });
-// });
