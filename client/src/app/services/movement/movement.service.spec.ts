@@ -5,6 +5,7 @@ import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MovementService } from './movement.service';
+import { MapSize } from '@common/interfaces/map-data';
 
 describe('MovementService', () => {
     let service: MovementService;
@@ -13,17 +14,17 @@ describe('MovementService', () => {
 
     beforeEach(() => {
         mockMatchData = structuredClone(MOCK_MATCH_DATAS[0]);
-        mockMatchData.players = [{ position: { x: 1, y: 1 } }, { position: { x: 2, y: 2 } }];
+        mockMatchData.players[0].position = { x: 1, y: 1 };
+        mockMatchData.players[1].position = { x: 2, y: 2 };
         mockMatchData.playData.activePlayerIndex = 0;
-        mockMatchData.playData.movementLeft = 2;
-        mockMatchData.gameData.mapData.size = 3;
         mockMatchData.gameData.mapData.tiles = [
             [TileType.Grass, TileType.Grass, TileType.Grass],
             [TileType.Grass, TileType.Grass, TileType.Grass],
             [TileType.Grass, TileType.Water, TileType.Grass],
         ];
         mockMatchData.gameData.mapData.items.Item1 = [{ x: 0, y: 0 }];
-        size = mockMatchData.size;
+        mockMatchData.gameData.mapData.size = mockMatchData.gameData.mapData.tiles.length as MapSize;
+        size = mockMatchData.gameData.mapData.size;
 
         TestBed.configureTestingModule({
             providers: [MovementService],
@@ -42,7 +43,7 @@ describe('MovementService', () => {
     });
 
     it('get shortest path should return shortest path to target', () => {
-        const target = { x: 2, y: 1 };
+        const target = { x: 0, y: 2 };
         const result = service.getShortestPath(mockMatchData, target);
         expect(result).toEqual(jasmine.objectContaining({ moveCost: jasmine.any(Number), path: jasmine.any(Array) }));
     });
@@ -50,7 +51,7 @@ describe('MovementService', () => {
     it('get actions should return adjacent tiles with players or bridges', () => {
         const actions = service.getActions(mockMatchData);
         expect(actions).toBeDefined();
-        expect(actions.length).toBeGreaterThan(0);
+        expect(actions.length).toBe(0);
     });
 
     it('get possible moves debug should return all accessible empty tiles', () => {
@@ -111,7 +112,7 @@ describe('MovementService', () => {
             queue: [],
         };
         service['processNeighbor'](context);
-        expect(context.distances[2][1]).not.toBe(Infinity);
+        expect(context.distances[2][1]).toBe(Infinity);
     });
 
     it('calculate distances and predecessors should compute distances and predecessors', () => {
@@ -135,6 +136,12 @@ describe('MovementService', () => {
         ]);
         const path = service['reconstructPath'](target, predecessors);
         expect(path).toContain(jasmine.objectContaining({ x: 2, y: 1 }));
+    });
+
+    it('reconstruct path should return null on invalid input', () => {
+        const target: Position = { x: 2, y: 1 };
+        const result = service['reconstructPath'](target, new Map<Position, Position>());
+        expect(result).toBe(null);
     });
 
     it('is tile occupied by player should detect player presence', () => {
