@@ -7,7 +7,7 @@ import { TILE_COST, TileType } from '@common/interfaces/tile-type.enum';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class MovementService {
+export class MapService {
     getPossibleMoves(matchData: MatchData): Position[] {
         const activePlayer = matchData.players[matchData.playData.activePlayerIndex];
         const currentPos = activePlayer.position;
@@ -23,20 +23,6 @@ export class MovementService {
         let path = this.reconstructPath(target, predecessors);
         path = this.stopPathAtItemEncounter(path, matchData);
         return { moveCost: distances[path[path.length - 1].x][path[path.length - 1].y], path: path || [] };
-    }
-
-    // TODO: mettre en privee
-    stopPathAtItemEncounter(path: Position[], matchData: MatchData): Position[] {
-        if (path.length === 0) {
-            return [];
-        }
-
-        for (let i = 1; i < path.length; i++) {
-            if (this.isTileOccupiedByObject(matchData, path[i], true)) {
-                return path.slice(0, i + 1);
-            }
-        }
-        return path;
     }
 
     getActions(matchData: MatchData): Position[] {
@@ -102,6 +88,18 @@ export class MovementService {
             this.enqueueValidNeighbors(matchData, pos, { visited, queue });
         }
         return currentPos;
+    }
+
+    getItemTypeAtPosition(matchData: MatchData, position: Position): ItemType | null {
+        for (const [itemType, positions] of Object.entries(matchData.gameData.mapData.items)) {
+            if (itemType !== ItemType.Spawn) {
+                const foundItem = positions.find((itemPos) => itemPos.x === position.x && itemPos.y === position.y);
+                if (foundItem) {
+                    return itemType as ItemType;
+                }
+            }
+        }
+        return null;
     }
 
     private isValidForDrop(matchData: MatchData, position: Position): boolean {
@@ -260,5 +258,18 @@ export class MovementService {
     private keyToPos(key: string): Position {
         const [x, y] = key.split('-').map(Number);
         return { x, y };
+    }
+
+    private stopPathAtItemEncounter(path: Position[], matchData: MatchData): Position[] {
+        if (path.length === 0) {
+            return [];
+        }
+
+        for (let i = 1; i < path.length; i++) {
+            if (this.isTileOccupiedByObject(matchData, path[i], true)) {
+                return path.slice(0, i + 1);
+            }
+        }
+        return path;
     }
 }

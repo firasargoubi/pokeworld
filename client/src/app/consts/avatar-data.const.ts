@@ -394,7 +394,7 @@ export const AVATAR_DATA = {
         frontGif: './assets/images/game/avatars-gifs/evolved-shiny/mewtwo-shiny.gif',
         backGif: './assets/images/game/avatars-gifs/evolved-shiny/mewtwo-shiny-back.gif',
     },
-    [Avatar.MisingNo]: {
+    [Avatar.MissingNo]: {
         name: 'MissingNo',
         image: './assets/images/game/avatars/missingno.png',
         imageFace: './assets/images/game/avatars/face/missingno.png',

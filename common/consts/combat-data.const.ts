@@ -15,6 +15,8 @@ export const DEFAULT_DEFENSE = 4;
 export const DEFAULT_ESCAPES = 2;
 export const DEFAULT_ESCAPE_CHANCES = 0.3;
 
+export const HEALING_ITEM_RATIO = 0.5;
+
 export const DEFAULT_PLAYER_COMBAT_DATA: PlayerCombatData = {
     playerIndex: 0,
     currentHealth: DEFAULT_PLAYER_DATA.health,

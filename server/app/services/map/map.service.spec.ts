@@ -1,24 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, createSandbox } from 'sinon';
-import { MovementService } from './movement.service';
+import { MapService } from './map.service';
 import { MatchData } from '@common/interfaces/match-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
 import { NeighborContext } from '@common/interfaces/movement';
 
-describe('MovementService', () => {
-    let service: MovementService;
+describe('MapService', () => {
+    let service: MapService;
     let sandbox: SinonSandbox;
     let mockMatchData: MatchData;
 
     beforeAll(async () => {
         sandbox = createSandbox();
         const module: TestingModule = await Test.createTestingModule({
-            providers: [MovementService],
+            providers: [MapService],
         }).compile();
 
-        service = module.get<MovementService>(MovementService);
+        service = module.get<MapService>(MapService);
     });
 
     beforeEach(() => {

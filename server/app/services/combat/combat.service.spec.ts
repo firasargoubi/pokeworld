@@ -1,35 +1,31 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { SinonSandbox, createSandbox, SinonStubbedInstance, createStubInstance } from 'sinon';
-import { CombatService } from './combat.service';
-import { MovementService } from '@app/services/movement/movement.service';
-import { PlayService } from '@app/services/play/play.service';
 import { Match } from '@app/classes/match/match';
-import { MatchState, CombatAction } from '@common/interfaces/match-data';
+import { MapService } from '@app/services/map/map.service';
+import { PlayService } from '@app/services/play/play.service';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { CombatAction, MatchState } from '@common/interfaces/match-data';
+import { DiceType } from '@common/interfaces/player-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS, MOCK_PLAYER_COMBAT_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
-import { DiceType } from '@common/interfaces/player-data';
-import { ItemType } from '@common/interfaces/item-type.enum';
+import { Test, TestingModule } from '@nestjs/testing';
+import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
+import { CombatService } from './combat.service';
 
 describe('CombatService', () => {
     let service: CombatService;
     let sandbox: SinonSandbox;
-    let mockMovementService: SinonStubbedInstance<MovementService>;
+    let mockMapService: SinonStubbedInstance<MapService>;
     let mockPlayService: SinonStubbedInstance<PlayService>;
     let mockMatch: SinonStubbedInstance<Match>;
 
     beforeAll(async () => {
         sandbox = createSandbox();
-        mockMovementService = createStubInstance(MovementService);
+        mockMapService = createStubInstance(MapService);
         mockPlayService = createStubInstance(PlayService);
         mockMatch = createStubInstance(Match);
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                CombatService,
-                { provide: MovementService, useValue: mockMovementService },
-                { provide: PlayService, useValue: mockPlayService },
-            ],
+            providers: [CombatService, { provide: MapService, useValue: mockMapService }, { provide: PlayService, useValue: mockPlayService }],
         }).compile();
 
         service = module.get<CombatService>(CombatService);
@@ -368,7 +364,7 @@ describe('CombatService', () => {
 
     it('respawn player should move to empty tile if needed', () => {
         const player = { ...structuredClone(MOCK_PLAYER_DATAS[0]), spawnPoint: { x: 1, y: 1 }, position: { x: 0, y: 0 } };
-        mockMovementService.getNearestEmptyTile.returns({ x: 1, y: 1 });
+        mockMapService.getNearestEmptyTile.returns({ x: 1, y: 1 });
 
         service['respawnPlayer'](mockMatch, player);
 

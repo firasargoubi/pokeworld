@@ -61,13 +61,12 @@ export class CombatPageComponent {
     private onMatchUpdate() {
         this.checkForRedirect();
         this.updatePlayersCombatData();
-        // this.checkHealingAnimation();
+        this.checkHealingAnimation();
     }
 
     private checkForRedirect() {
         const isMatchInCombatState = this.matchService.isState([MatchState.CombatWait, MatchState.CombatAnimation, MatchState.CombatEnd]);
         if (!isMatchInCombatState) {
-            window.console.log('CombatPage.checkForRedirect()');
             this.router.navigate([PageEndpoint.Play]);
         }
     }
@@ -85,11 +84,8 @@ export class CombatPageComponent {
         }
     }
 
-    // private checkHealingAnimation() {
-    //     // eslint-disable-next-line no-console
-    //     console.log('selfIndex', this.visualData.selfPlayer.playerIndex);
-
-    //     this.visualData.isSelfHealing = this.combatService.hasPlayerHealed(this.visualData.selfPlayer.playerIndex);
-    //     this.visualData.isEnemyHealing = this.combatService.hasPlayerHealed(this.visualData.enemyPlayer.playerIndex);
-    // }
+    private checkHealingAnimation() {
+        this.visualData.isSelfHealing = this.combatService.hasPlayerHealed(this.visualData.selfPlayer.playerIndex);
+        this.visualData.isEnemyHealing = this.combatService.hasPlayerHealed(this.visualData.enemyPlayer.playerIndex);
+    }
 }

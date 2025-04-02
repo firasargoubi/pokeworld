@@ -10,7 +10,7 @@ import { CombatService } from './services/combat/combat.service';
 import { GameService } from './services/game/game.service';
 import { LobbyService } from './services/lobby/lobby.service';
 import { MatchService } from './services/match/match.service';
-import { MovementService } from './services/movement/movement.service';
+import { MapService } from './services/map/map.service';
 import { PlayService } from './services/play/play.service';
 import { MatchGateway } from './gateways/match/match.gateway';
 
@@ -35,7 +35,7 @@ import { MatchGateway } from './gateways/match/match.gateway';
         LobbyService,
         PlayService,
         CombatService,
-        MovementService,
+        MapService,
 
         MatchGateway,
         LobbyGateway,

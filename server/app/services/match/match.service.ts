@@ -78,11 +78,6 @@ export class MatchService {
     leaveMatch(playerId: string) {
         const match = this.getMatchFromPlayerId(playerId);
 
-        // const player = match.getPlayer(playerId);
-        // if (player) {
-        //     this.playService.dropItems(match, player.id, player.items);
-        // }
-
         this.disconnectPlayer(playerId);
         if (match) {
             match.leave(playerId);

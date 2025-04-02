@@ -200,11 +200,14 @@ export const DEBUG_GAMES = [
             items: {
                 [ItemType.Item1]: [],
                 [ItemType.Item2]: [],
-                [ItemType.Item3]: [{ x: 2, y: 4 }],
+                [ItemType.Item3]: [],
                 [ItemType.Item4]: [],
-                [ItemType.Item5]: [{ x: 6, y: 7 }],
+                [ItemType.Item5]: [],
                 [ItemType.Item6]: [],
-                [ItemType.Random]: [],
+                [ItemType.Random]: [
+                    { x: 6, y: 7 },
+                    { x: 2, y: 4 },
+                ],
                 [ItemType.Spawn]: [
                     { x: 7, y: 7 },
                     { x: 2, y: 2 },

@@ -1,5 +1,5 @@
 import { Match } from '@app/classes/match/match';
-import { MovementService } from '@app/services/movement/movement.service';
+import { MapService } from '@app/services/map/map.service';
 import { PlayService } from '@app/services/play/play.service';
 import {
     COMBAT_ANIMATION_DURATION,
@@ -7,6 +7,7 @@ import {
     COMBAT_SHORT_TURN_DURATION,
     COMBAT_TURN_DURATION,
     DEFAULT_PLAYER_COMBAT_DATA,
+    HEALING_ITEM_RATIO,
     PATH_ATTACK_MODIFICATION,
     PATH_DEFENSE_MODIFICATION,
 } from '@common/consts/combat-data.const';
@@ -18,7 +19,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CombatService {
-    @Inject(MovementService) private readonly movementService: MovementService;
+    @Inject(MapService) private readonly mapService: MapService;
     @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
 
     attack(match: Match, playerId: string) {
@@ -42,6 +43,7 @@ export class CombatService {
 
     startCombatEndDeath(match: Match) {
         match.data.state = MatchState.CombatEnd;
+        match.data.combatData.lastCombatAction = CombatAction.None;
         match.data.players[this.getInactivePlayerData(match).playerIndex].combatsWon += 1;
         const deadPlayer = this.getActivePlayerData(match);
         deadPlayer.currentHealth = 0;
@@ -98,15 +100,13 @@ export class CombatService {
     }
 
     private computeHealingItems(match: Match): boolean {
-        // TODO: Mettre en CONST
-        const healingRatio = 0.5;
         const playerCombatData = this.getActivePlayerData(match);
         const player = match.data.players[playerCombatData.playerIndex];
 
         match.data.players[playerCombatData.playerIndex].items.forEach((item) => {
             switch (item) {
                 case ItemType.Item4:
-                    if (playerCombatData.currentHealth < player.health * healingRatio) {
+                    if (playerCombatData.currentHealth < player.health * HEALING_ITEM_RATIO) {
                         playerCombatData.currentHealth += 1;
                         return true;
                     }
@@ -135,9 +135,7 @@ export class CombatService {
     }
 
     private executeAttack(match: Match) {
-        let attackResult = this.computeAttackResult(match);
-        // TODO: A enlever ABSOLUMENT
-        attackResult = 1;
+        const attackResult = this.computeAttackResult(match);
         match.data.combatData.lastCombatAction = attackResult > 0 ? CombatAction.SuccessAttack : CombatAction.FailAttack;
         const attackedPlayer = this.getInactivePlayerData(match);
         attackedPlayer.currentHealth = Math.max(0, attackedPlayer.currentHealth - attackResult);
@@ -224,7 +222,7 @@ export class CombatService {
         this.playService.dropItems(match, player.id, player.items);
 
         if (player.spawnPoint !== player.position) {
-            player.position = this.movementService.getNearestEmptyTile(match.data, player.spawnPoint);
+            player.position = this.mapService.getNearestEmptyTile(match.data, player.spawnPoint);
         }
     }
 }

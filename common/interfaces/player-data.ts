@@ -56,7 +56,7 @@ export enum Avatar {
     Avatar10EvolvedShiny = 'avatar10-evolved-shiny',
     Avatar11EvolvedShiny = 'avatar11-evolved-shiny',
     Avatar12EvolvedShiny = 'avatar12-evolved-shiny',
-    MisingNo = 'misingNo',
+    MissingNo = 'missingNo',
 }
 
 export interface PlayerData {
@@ -77,6 +77,12 @@ export interface PlayerData {
 
 export enum PlayerType {
     Player = 'player',
-    BotOffensive  = 'botOffensive',
+    BotOffensive = 'botOffensive',
     BotDefensive = 'botDefensive',
+}
+
+export interface AvatarModifiers {
+    isShiny: boolean;
+    isEvolved: boolean;
+    isMissingNo: boolean;
 }

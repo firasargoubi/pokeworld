@@ -34,8 +34,6 @@ export class CombatService {
         const previousPlayerData = this.lastCombatData.playersCombatData.find((data) => data.playerIndex === playerIndex);
         const currentPlayerData = this.matchService.data.combatData.playersCombatData.find((data) => data.playerIndex === playerIndex);
 
-        // eslint-disable-next-line no-console
-        console.log('lastCombatAction:', this.lastCombatData.lastCombatAction);
         if (!previousPlayerData || !currentPlayerData || this.lastCombatData.lastCombatAction === CombatAction.None) {
             return false;
         }

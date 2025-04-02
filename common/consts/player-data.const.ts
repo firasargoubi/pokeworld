@@ -33,3 +33,6 @@ export const MAX_PLAYERS = {
     [MapSize.Medium]: 4,
     [MapSize.Large]: 6,
 };
+
+export const AVATAR_EVOLVED_SUFFIX = '-evolved';
+export const AVATAR_SHINY_SUFFIX = '-shiny';

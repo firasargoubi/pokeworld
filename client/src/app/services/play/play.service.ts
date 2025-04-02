@@ -83,8 +83,6 @@ export class PlayService {
     }
 
     private updateTimer() {
-        // eslint-disable-next-line no-console
-        console.log(this.matchService.data.state);
         if (this.matchService.isState([MatchState.TurnWait])) {
             this.timer.startTimer();
         } else {
