@@ -50,7 +50,7 @@ export class Timer {
 
     private stopInterval() {
         if (this.interval !== null) {
-            clearInterval(this.interval);
+            window.clearInterval(this.interval);
             this.interval = null;
         }
     }
