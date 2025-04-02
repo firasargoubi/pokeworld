@@ -12,4 +12,6 @@ export const DEFAULT_COMBAT_VISUAL_DATA: CombatVisualData = {
     enemyPlatform: EMPTY_IMAGE,
     isEnemyPlayerEvolved: false,
     isSelfPlayerEvolved: false,
+    isSelfHealing: false,
+    isEnemyHealing: false,
 };

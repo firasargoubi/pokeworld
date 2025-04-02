@@ -227,6 +227,44 @@ $combat-info-height: 28vh;
     animation: enemy-death 1.5s ease-in-out forwards;
 }
 
+#enemy-container .is-healing .pokemon-gif {
+    background-image: none;
+    animation: healing 1.5s ease-in-out forwards;
+}
+
+#self-container .is-healing .pokemon-gif {
+    background-image: none;
+    animation: healing 1.5s ease-in-out forwards;
+}
+
+@keyframes healing {
+    0%,
+    100% {
+        filter: none;
+        background-image: url('../../../assets/images/game/effects/healing.gif');
+        background-size: 100% 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    15%,
+    45%,
+    75% {
+        filter: sepia(100%) saturate(150%) hue-rotate(90deg) brightness(110%);
+    }
+    30%,
+    60%,
+    90% {
+        filter: none;
+        background-image: url('../../../assets/images/game/effects/healing.gif');
+        background-size: 100% 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    100% {
+        background-image: none;
+    }
+}
+
 .hp-container {
     position: absolute;
     bottom: $combat-info-height;
@@ -564,23 +602,6 @@ $combat-info-height: 28vh;
     100% {
         filter: none;
         transform: translateX(0) translateY(0);
-    }
-}
-
-@keyframes healing {
-    0%,
-    100% {
-        filter: none;
-    }
-    15%,
-    45%,
-    75% {
-        filter: sepia(80%) saturate(150%) hue-rotate(90deg) brightness(105%);
-    }
-    30%,
-    60%,
-    90% {
-        filter: none;
     }
 }
 

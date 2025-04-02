@@ -2,13 +2,14 @@
     <div id="timer">
         {{ combatService.timer.currentTime }}/{{ combatService.timer.maxTime }}
         <div class="timer-container">
-            <div class="timer-icon"
+            <div
+                class="timer-icon"
                 [class.active]="combatService.timer.isStarted && matchService.data.state === 'combatWait'"
                 [ngStyle]="{
-                    '--max-time': combatService.timer.maxTime,
-                }">
-            </div>
-            
+                    '--max-time': combatService.timer.maxTime
+                }"
+            ></div>
+
             <div class="timer-border"></div>
         </div>
     </div>
@@ -53,8 +54,17 @@
             [class.is-turn]="!visualData.isSelfTurn"
             [class.is-dead]="visualData.enemyPlayer.currentHealth <= 0"
             [class]="matchService.data.state + ' ' + matchService.data.combatData.lastCombatAction"
+            [class.is-healing]="visualData.isEnemyHealing"
         >
-            <img class="pokemon-gif" src="{{ visualData.enemyImage }}" [ngClass]="{ 'pokemon-evolved-gif': visualData.isEnemyPlayerEvolved}" />
+            <img
+                class="pokemon-gif"
+                src="{{ visualData.enemyImage }}"
+                [ngClass]="{
+                    'pokemon-evolved-gif': this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar
+                        .toString()
+                        .includes('-evolved')
+                }"
+            />
         </span>
     </div>
     <div id="self-container">
@@ -64,8 +74,17 @@
             [class.is-turn]="visualData.isSelfTurn"
             [class.is-dead]="visualData.selfPlayer.currentHealth <= 0"
             [class]="matchService.data.state + ' ' + matchService.data.combatData.lastCombatAction"
+            [class.is-healing]="visualData.isSelfHealing"
         >
-            <img class="pokemon-gif" src="{{ visualData.selfImage }}" [ngClass]="{ 'pokemon-evolved-gif': visualData.isSelfPlayerEvolved }" />
+            <img
+                class="pokemon-gif"
+                src="{{ visualData.selfImage }}"
+                [ngClass]="{
+                    'pokemon-evolved-gif': this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar
+                        .toString()
+                        .includes('-evolved')
+                }"
+            />
         </span>
     </div>
     <div class="self-hp-container hp-container">

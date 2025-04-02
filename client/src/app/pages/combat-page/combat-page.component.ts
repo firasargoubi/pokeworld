@@ -11,7 +11,6 @@ import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchState } from '@common/interfaces/match-data';
-import { Avatar } from '@common/interfaces/player-data';
 
 @Component({
     selector: 'app-combat-page',
@@ -57,13 +56,12 @@ export class CombatPageComponent {
         this.visualData.enemyPlatform = BATTLE_PLATFORM_IMAGES[this.visualData.enemyPlayer.standingTile].enemyPlatform;
         this.visualData.selfImage = AVATAR_DATA[this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar].backGif;
         this.visualData.enemyImage = AVATAR_DATA[this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar].frontGif;
-        this.visualData.isSelfPlayerEvolved = this.isAvatarEvolved(this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar);
-        this.visualData.isEnemyPlayerEvolved = this.isAvatarEvolved(this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar);
     }
 
     private onMatchUpdate() {
         this.checkForRedirect();
         this.updatePlayersCombatData();
+        // this.checkHealingAnimation();
     }
 
     private checkForRedirect() {
@@ -87,7 +85,11 @@ export class CombatPageComponent {
         }
     }
 
-    private isAvatarEvolved(avatar: Avatar): boolean {
-        return avatar.toString().includes('-evolved');
-    }
+    // private checkHealingAnimation() {
+    //     // eslint-disable-next-line no-console
+    //     console.log('selfIndex', this.visualData.selfPlayer.playerIndex);
+
+    //     this.visualData.isSelfHealing = this.combatService.hasPlayerHealed(this.visualData.selfPlayer.playerIndex);
+    //     this.visualData.isEnemyHealing = this.combatService.hasPlayerHealed(this.visualData.enemyPlayer.playerIndex);
+    // }
 }

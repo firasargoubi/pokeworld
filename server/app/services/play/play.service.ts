@@ -2,6 +2,7 @@ import { Match } from '@app/classes/match/match';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MovementService } from '@app/services/movement/movement.service';
 import {
+    DROP_ITEMS_DURATION,
     MATCH_END_DURATION,
     MINIMUM_COMBATS_TO_WIN,
     MOVEMENT_ANIMATION_DURATION,
@@ -13,7 +14,7 @@ import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
 import { MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
-import { Avatar, PlayerData, PlayerType } from '@common/interfaces/player-data';
+import { Avatar, PlayerData } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -45,7 +46,7 @@ export class PlayService {
         }
     }
 
-    // TODO: mettre en privee
+    // TODO: mettre en privee, mettre dans movement service
     checkAndPickupItem(match: Match, playerData: PlayerData) {
         const position = playerData.position;
 
@@ -61,28 +62,20 @@ export class PlayService {
 
     // TODO: mettre en privee
     handleItemAddition(match: Match, player: PlayerData, itemType: ItemType) {
-        if (player.items.length < MAX_ITEMS || player.type === PlayerType.Player) {
-            player.items.push(itemType);
-            match.data.gameData.mapData.items[itemType] = match.data.gameData.mapData.items[itemType].filter(
-                (itemPos) => itemPos.x !== player.position.x || itemPos.y !== player.position.y,
-            );
+        player.items.push(itemType);
+        match.data.gameData.mapData.items[itemType] = match.data.gameData.mapData.items[itemType].filter(
+            (itemPos) => itemPos.x !== player.position.x || itemPos.y !== player.position.y,
+        );
 
-            if (player.items.length > MAX_ITEMS) {
-                const time = 10000;
-                const items = [itemType];
-
-                match.data.state = MatchState.ItemDropSelection;
-                this.setTimeLeft(match);
-                match.sendUpdate();
-                match.setTimeout(this.dropItems.bind(this, match, player.id, items), time);
-                return;
-            }
-
-            this.computeItems(player);
+        if (player.items.length > MAX_ITEMS) {
+            match.data.state = MatchState.ItemDropSelection;
             match.sendUpdate();
-        } else {
-            // player is a bot and inventory is full
+            this.continueTurn(match);
+            return;
         }
+
+        this.computeItems(player);
+        match.sendUpdate();
     }
 
     // TODO: mettre en privee
@@ -173,17 +166,18 @@ export class PlayService {
     }
 
     continueTurn(match: Match) {
+        const curentPlayer = match.data.players[match.data.playData.activePlayerIndex];
         if (this.checkWinCondition(match)) {
             match.setTimeout(this.endMatch.bind(this, match), MATCH_END_DURATION);
         } else {
             if (match.data.state === MatchState.MovementAnimation) {
-                const curentPlayer = match.data.players[match.data.playData.activePlayerIndex];
                 this.checkAndPickupItem(match, curentPlayer);
             }
             if (match.data.state === MatchState.ItemDropSelection) {
-                return;
-            }
-            if (this.canPlayerAct(match)) {
+                this.setTimeLeft(match);
+                match.sendUpdate();
+                match.setTimeout(this.dropItems.bind(this, match, curentPlayer.id, [curentPlayer.items[MAX_ITEMS]]), DROP_ITEMS_DURATION);
+            } else if (this.canPlayerAct(match)) {
                 match.data.state = MatchState.TurnWait;
                 match.sendUpdate();
                 match.setTimeout(this.startNextTurn.bind(this, match), match.data.playData.timeLeft);

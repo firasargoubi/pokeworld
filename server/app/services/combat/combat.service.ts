@@ -98,6 +98,7 @@ export class CombatService {
     }
 
     private computeHealingItems(match: Match): boolean {
+        // TODO: Mettre en CONST
         const healingRatio = 0.5;
         const playerCombatData = this.getActivePlayerData(match);
         const player = match.data.players[playerCombatData.playerIndex];
@@ -134,7 +135,9 @@ export class CombatService {
     }
 
     private executeAttack(match: Match) {
-        const attackResult = this.computeAttackResult(match);
+        let attackResult = this.computeAttackResult(match);
+        // TODO: A enlever ABSOLUMENT
+        attackResult = 1;
         match.data.combatData.lastCombatAction = attackResult > 0 ? CombatAction.SuccessAttack : CombatAction.FailAttack;
         const attackedPlayer = this.getInactivePlayerData(match);
         attackedPlayer.currentHealth = Math.max(0, attackedPlayer.currentHealth - attackResult);
