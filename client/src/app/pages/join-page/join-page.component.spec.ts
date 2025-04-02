@@ -34,8 +34,7 @@ describe('JoinPageComponent', () => {
     });
 
     it('should join match on enter key press', () => {
-        const mockEvent = new KeyboardEvent('Enter');
-        Object.defineProperty(mockEvent, 'key', { value: 'Enter' });
+        const mockEvent = new KeyboardEvent('Enter', { key: 'Enter' });
         component.joinMatch(mockEvent);
         expect(matchServiceSpy.joinMatch).toHaveBeenCalled();
     });
