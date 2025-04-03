@@ -13,7 +13,7 @@ import { GameDataService } from '@app/services/game-data/game-data.service';
 })
 export class TileDescriptionService {
     showTileDescription: boolean = false;
-    tileDescription: TileDescriptionInfo = DEFAULT_TILE_DESCRIPTION;
+    tileDescription: TileDescriptionInfo = structuredClone(DEFAULT_TILE_DESCRIPTION);
     tileDescriptionPos: Position = { x: 0, y: 0 };
     isPlayerDescription: boolean = false;
 

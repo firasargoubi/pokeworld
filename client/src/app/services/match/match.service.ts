@@ -36,21 +36,11 @@ export class MatchService {
     }
 
     createMatch(gameData: GameData) {
-        this.socketService.emit(MatchEvent.CreateMatch, gameData, (matchData: MatchData | null) => {
-            if (matchData !== null) {
-                this.onUpdate(matchData);
-                this.router.navigate([PageEndpoint.Character]);
-            }
-        });
+        this.socketService.emit(MatchEvent.CreateMatch, gameData, this.onMatchJoined.bind(this));
     }
 
     joinMatch(matchCode: string) {
-        this.socketService.emit(MatchEvent.JoinMatch, matchCode, (matchData: MatchData | null) => {
-            if (matchData !== null) {
-                this.onUpdate(matchData);
-                this.router.navigate([PageEndpoint.Character]);
-            }
-        });
+        this.socketService.emit(MatchEvent.JoinMatch, matchCode, this.onMatchJoined.bind(this));
     }
 
     leaveMatch(): void {
@@ -95,6 +85,13 @@ export class MatchService {
 
     getMovementLeft(): number {
         return this.isActivePlayer() ? this.data.playData.movementLeft : 0;
+    }
+
+    private onMatchJoined(matchData: MatchData | null) {
+        if (matchData !== null) {
+            this.onUpdate(matchData);
+            this.router.navigate([PageEndpoint.Character]);
+        }
     }
 
     private onDisconnect() {

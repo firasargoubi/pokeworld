@@ -10,7 +10,7 @@ import { LobbyEvent, MatchEvent } from '@common/interfaces/socket-event.enum';
 import { DEBUG_GAMES, DEBUG_PLAYERS } from './debug-page.component.const';
 
 @Component({
-    selector: 'app-game-lobby',
+    selector: 'app-debug-page',
     templateUrl: './debug-page.component.html',
     styleUrls: ['./debug-page.component.scss'],
     standalone: true,
@@ -18,15 +18,9 @@ import { DEBUG_GAMES, DEBUG_PLAYERS } from './debug-page.component.const';
 })
 export class DebugPageComponent {
     matchCodeInput: string = '';
-    private matchService: MatchService;
+    private matchService: MatchService = inject(MatchService);
     private socketService: SocketService = inject(SocketService);
     private router: Router = inject(Router);
-
-    constructor() {
-        this.socketService.emit(MatchEvent.LeaveMatch);
-        this.matchService = inject(MatchService);
-        this.matchService['resetMatchData']();
-    }
 
     @HostListener('document:keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
@@ -41,29 +35,22 @@ export class DebugPageComponent {
 
     createMatch(index: number): void {
         const gameData = DEBUG_GAMES[index];
-        this.socketService.emit(MatchEvent.CreateMatch, gameData, (matchData: MatchData | null) => {
-            if (matchData !== null) {
-                navigator.clipboard.writeText(matchData.code);
-                const selfIndex = 0;
-                const player = DEBUG_PLAYERS[selfIndex];
-                player.id = this.socketService.selfId;
-                this.socketService.emit(LobbyEvent.JoinLobby, player);
-                this.matchService.selfIndex = selfIndex;
-                this.router.navigate([PageEndpoint.Lobby]);
-            }
-        });
+        this.socketService.emit(MatchEvent.CreateMatch, gameData, this.onJoinMatch.bind(this));
     }
 
     private joinMatch(): void {
-        this.socketService.emit(MatchEvent.JoinMatch, this.matchCodeInput, (matchData: MatchData | null) => {
-            if (matchData !== null) {
-                const selfIndex = matchData.players.length - 1;
-                const player = DEBUG_PLAYERS[selfIndex];
-                player.id = this.socketService.selfId;
-                this.socketService.emit(LobbyEvent.JoinLobby, player);
-                this.matchService.selfIndex = selfIndex;
-                this.router.navigate([PageEndpoint.Lobby]);
-            }
-        });
+        this.socketService.emit(MatchEvent.JoinMatch, this.matchCodeInput, this.onJoinMatch.bind(this));
+    }
+
+    private onJoinMatch(matchData: MatchData | null) {
+        if (matchData !== null) {
+            navigator.clipboard.writeText(matchData.code);
+            const selfIndex = matchData.players.length - 1;
+            const player = DEBUG_PLAYERS[selfIndex];
+            player.id = this.socketService.selfId;
+            this.socketService.emit(LobbyEvent.JoinLobby, player);
+            this.matchService.selfIndex = selfIndex;
+            this.router.navigate([PageEndpoint.Lobby]);
+        }
     }
 }
