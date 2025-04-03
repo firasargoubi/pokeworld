@@ -1,18 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
-import { COMBAT_TIME_SCALE, DEFAULT_COMBAT_ANIMATIONS } from '@app/consts/combat-data.const';
+import { DEFAULT_COMBAT_VISUAL_DATA } from '@app/consts/combat-data.const';
 import { BATTLE_PLATFORM_IMAGES } from '@app/consts/images.const';
-import { CombatAnimations } from '@app/interfaces/combat-animations';
-import { MatchDataService } from '@app/services/match-data/match-data.service';
-import { CombatSocketService } from '@app/services/sockets/combat-socket/combat-socket.service';
-import { CoreSocketService } from '@app/services/sockets/core-socket/core-socket.service';
-import { PlaySocketsService } from '@app/services/sockets/play-socket/play-sockets.service';
-import { AttackResult } from '@common/interfaces/combat';
+import { CombatVisualData } from '@app/interfaces/combat-visual-data';
+import { CombatService } from '@app/services/combat/combat.service';
+import { MatchService } from '@app/services/match/match.service';
+import { PlayService } from '@app/services/play/play.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
-import { Player } from '@common/interfaces/player';
-import { DiceType } from '@common/interfaces/dice';
+import { MatchState } from '@common/interfaces/match-data';
 
 @Component({
     selector: 'app-combat-page',
@@ -20,164 +18,68 @@ import { DiceType } from '@common/interfaces/dice';
     styleUrls: ['./combat-page.component.scss'],
     imports: [CommonModule],
 })
-export class CombatPageComponent implements OnInit {
-    avatarsData = AVATAR_DATA;
-    battlePlatformData = BATTLE_PLATFORM_IMAGES;
-    diceType = DiceType;
-
-    animation: CombatAnimations = structuredClone(DEFAULT_COMBAT_ANIMATIONS);
-    selfPlayer: Player;
-    ennemyPlayer: Player;
-
-    iscurrentTurn = false;
-    currentTime = 0;
-    maxTime = 0;
-
-    private combatSocketService: CombatSocketService = inject(CombatSocketService);
-    private timerInterval: number | null = null;
-    private router = inject(Router);
-    private matchDataService: MatchDataService = inject(MatchDataService);
-    private coreSocketService: CoreSocketService = inject(CoreSocketService);
-    private playSocketsService: PlaySocketsService = inject(PlaySocketsService);
+export class CombatPageComponent {
+    visualData: CombatVisualData = structuredClone(DEFAULT_COMBAT_VISUAL_DATA);
+    matchService: MatchService = inject(MatchService);
+    combatService: CombatService = inject(CombatService);
+    private playService: PlayService = inject(PlayService);
+    private router: Router = inject(Router);
 
     constructor() {
-        if (this.combatSocketService) {
-            this.combatSocketService.selfPlayer$.subscribe((player) => {
-                if (player) this.selfPlayer = player;
-            });
-            this.combatSocketService.ennemyPlayer$.subscribe((player) => {
-                if (player) this.ennemyPlayer = player;
-            });
-            this.combatSocketService.currentTurn.subscribe((turn) => {
-                this.iscurrentTurn = turn;
-            });
-            this.combatSocketService.currentTimer.subscribe((timer) => {
-                this.maxTime = timer / COMBAT_TIME_SCALE;
-                this.setTimer();
-            });
-            this.combatSocketService.attackResult.subscribe((attackResult) => {
-                if (attackResult) {
-                    this.attackAnimation(attackResult);
-                }
-            });
-            this.combatSocketService.escapeResult.subscribe((playerId) => {
-                if (playerId) {
-                    this.iscurrentTurn = false;
-                    this.escapeAnimation(playerId);
-                }
-            });
-
-            this.combatSocketService.combatResult.subscribe((combatResult) => {
-                if (combatResult) {
-                    this.iscurrentTurn = false;
-                    this.deathAnimation();
-                }
-            });
-            this.coreSocketService.connectionStatus.subscribe((status) => this.verifySocketConnection(status));
+        if (!this.matchService.isInMatch()) {
+            this.router.navigate([PageEndpoint.Menu]);
         }
+        this.onMatchUpdate();
+        this.updateImages();
+        this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
     }
 
     @HostListener('document:keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
-        if (event.repeat) {
-            return;
-        }
-        if (event.key === 'd' || event.key === 'D') {
-            this.playSocketsService.changeDebugMode();
-        }
-    }
-
-    ngOnInit(): void {
-        this.animation = structuredClone(DEFAULT_COMBAT_ANIMATIONS);
-    }
-
-    escapeAttempt(): void {
-        this.combatSocketService.escapeAttempt();
-    }
-
-    attackAttempt(): void {
-        this.combatSocketService.attackAttempt();
-    }
-
-    private attackAnimation(attackResult: AttackResult): void {
-        if (attackResult.targetId === this.selfPlayer.id) {
-            this.animation.selfattack = false;
-            this.animation.ennemyattack = true;
-            if (attackResult.attackDamage > 0) {
-                this.animation.selfDamage = true;
-                this.animation.ennemyDamage = false;
-            }
-        } else if (attackResult.targetId === this.ennemyPlayer.id) {
-            this.animation.selfattack = true;
-            this.animation.ennemyattack = false;
-            if (attackResult.attackDamage > 0) {
-                this.animation.selfDamage = false;
-                this.animation.ennemyDamage = true;
+        if (!event.repeat) {
+            if (event.key === 'd' || event.key === 'D') {
+                this.playService.changeDebugMode();
             }
         }
-
-        const animationDelay = 1000;
-        setTimeout(() => {
-            this.animation.selfDamage = false;
-            this.animation.ennemyDamage = false;
-            this.animation.selfattack = false;
-            this.animation.ennemyattack = false;
-        }, animationDelay);
-
-        return;
     }
 
-    private deathAnimation(): void {
-        if (this.selfPlayer.currentStats.health <= 0) {
-            this.animation.selfDeath = true;
-        } else if (this.ennemyPlayer.currentStats.health <= 0) {
-            this.animation.ennemyDeath = true;
+    attackButton() {
+        this.combatService.attack();
+    }
+
+    escapeButon() {
+        this.combatService.escape();
+    }
+
+    private updateImages() {
+        this.visualData.selfPlatform = BATTLE_PLATFORM_IMAGES[this.visualData.selfPlayer.standingTile].selfPlatform;
+        this.visualData.enemyPlatform = BATTLE_PLATFORM_IMAGES[this.visualData.enemyPlayer.standingTile].enemyPlatform;
+        this.visualData.selfImage = AVATAR_DATA[this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar].backGif;
+        this.visualData.enemyImage = AVATAR_DATA[this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar].frontGif;
+    }
+
+    private onMatchUpdate() {
+        this.checkForRedirect();
+        this.updatePlayersCombatData();
+    }
+
+    private checkForRedirect() {
+        const isMatchInCombatState = this.matchService.isState([MatchState.CombatWait, MatchState.CombatAnimation, MatchState.CombatEnd]);
+        if (!isMatchInCombatState) {
+            this.router.navigate([PageEndpoint.Play]);
         }
-
-        const animationTime = 2000;
-        setTimeout(() => {
-            this.animation.selfDeath = false;
-            this.animation.ennemyDeath = false;
-        }, animationTime);
     }
 
-    private escapeAnimation(playerId: string): void {
-        if (this.selfPlayer.id === playerId) {
-            this.animation.selfEscape = true;
-        } else if (this.ennemyPlayer.id === playerId) {
-            this.animation.ennemyEscape = true;
-        }
-
-        const animationTime = 2000;
-        setTimeout(() => {
-            this.animation.selfEscape = false;
-            this.animation.ennemyEscape = false;
-        }, animationTime);
-    }
-
-    private setTimer(): void {
-        if (this.timerInterval !== null) {
-            clearInterval(this.timerInterval);
-            this.timerInterval = null;
-        }
-
-        this.currentTime = this.maxTime;
-
-        this.timerInterval = window.setInterval(() => {
-            if (this.currentTime > 0) {
-                this.currentTime--;
-            } else {
-                if (this.timerInterval !== null) {
-                    clearInterval(this.timerInterval);
-                    this.timerInterval = null;
-                }
-            }
-        }, COMBAT_TIME_SCALE);
-    }
-
-    private verifySocketConnection(isConnected: boolean) {
-        if (!isConnected || this.matchDataService.matchData.players.length <= 0) {
-            this.router.navigate([PageEndpoint.Menu]);
+    private updatePlayersCombatData() {
+        const isFirstPlayer = this.matchService.data.combatData.playersCombatData[0].playerIndex === this.matchService.selfIndex;
+        if (isFirstPlayer) {
+            this.visualData.selfPlayer = this.matchService.data.combatData.playersCombatData[0];
+            this.visualData.enemyPlayer = this.matchService.data.combatData.playersCombatData[1];
+            this.visualData.isSelfTurn = !this.matchService.data.combatData.isSecondPlayerTurn;
+        } else {
+            this.visualData.selfPlayer = this.matchService.data.combatData.playersCombatData[1];
+            this.visualData.enemyPlayer = this.matchService.data.combatData.playersCombatData[0];
+            this.visualData.isSelfTurn = this.matchService.data.combatData.isSecondPlayerTurn;
         }
     }
 }

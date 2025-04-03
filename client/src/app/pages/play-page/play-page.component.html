@@ -1,9 +1,9 @@
 <div
     class="play-page"
     [ngStyle]="{
-        '--player-count': playVisualData.maxPlayerCount,
-        '--current-player-turn': playVisualData.activePlayer,
-        '--bg-url': 'url(' + playVisualData.thumbnailUrl + ')'
+        '--player-count': matchService.data.players.length,
+        '--current-player-turn': matchService.data.playData.activePlayerIndex,
+        '--bg-url': 'url(' + visualData.thumbnailUrl + ')'
     }"
     (click)="hideTileDescription()"
 >
@@ -15,8 +15,8 @@
                     <div class="player-arrow"></div>
                 </div>
                 <div class="player-cards">
-                    @for (player of playVisualData.players; track player.id) {
-                    <div class="player-card" [class.has-left]="!player.isConnected" [class.is-admin]="player.isAdmin" [class.is-bot]="player.isBot">
+                    @for (player of visualData.players; track player.id) {
+                    <div class="player-card" [class.has-left]="!player.isConnected" [class.is-admin]="player.isHost" [class.is-bot]="player.isBot">
                         <div class="player-card-left">
                             <div class="player-avatar" [style.backgroundImage]="'url(' + player.avatarUrl + ')'"></div>
                             <div class="player-name">{{ player.name }}</div>
@@ -24,7 +24,7 @@
                         </div>
                         <div class="player-card-right">
                             <div class="sword-icon"></div>
-                            <div class="player-fights">{{ player.fightsWon }}/3</div>
+                            <div class="player-combats">{{ player.combatsWon }}/3</div>
                         </div>
                     </div>
                     }
@@ -56,15 +56,15 @@
         </div>
         <div class="main-right">
             <div class="map-info-card">
-                <div>Taille de la carte : {{ playVisualData.mapSize }} x {{ playVisualData.mapSize }}</div>
-                <div>Mode de jeu : {{ playVisualData.gameMode }}</div>
-                <div>Nombre de joueurs : {{ playVisualData.currentPlayerCount }} / {{ playVisualData.maxPlayerCount }}</div>
-                <button (click)="surrender()" class="surrender-button">< Abandonner</button>
+                <div>Taille de la carte : {{ matchService.data.gameData.mapData.size }} x {{ matchService.data.gameData.mapData.size }}</div>
+                <div>Mode de jeu : {{ matchService.data.gameData.mapData.gameMode }}</div>
+                <div>Nombre de joueurs : {{ visualData.currentPlayerCount }} / {{ matchService.data.players.length }}</div>
+                <button (click)="surrenderButton()" class="surrender-button">< Abandonner</button>
             </div>
             <div class="self-info-card">
                 <div class="self-info-container">
-                    <div class="self-info-avatar" [style.backgroundImage]="'url(' + playVisualData.selfAvatarUrl + ')'"></div>
-                    <div class="self-info-name">{{ playVisualData.selfName }}</div>
+                    <div class="self-info-avatar" [style.backgroundImage]="'url(' + visualData.selfAvatarUrl "></div>
+                    <div class="self-info-name">{{ matchService.selfPlayer.name }}</div>
                 </div>
                 <div class="movement-container">
                     <div class="movement-text">
@@ -72,9 +72,9 @@
                             Mouvement
                             <div class="movement-icon"></div>
                         </div>
-                        <div class="movement-text-right">{{ playVisualData.currentMovement }} / {{ playVisualData.maxMovement }}</div>
+                        <div class="movement-text-right">{{ visualData.movementLeft }} / {{ matchService.selfPlayer.speed }}</div>
                     </div>
-                    <div class="movement-bar" [ngStyle]="{ '--cur-move': playVisualData.currentMovement, '--max-move': playVisualData.maxMovement }">
+                    <div class="movement-bar" [ngStyle]="{ '--cur-move': visualData.movementLeft, '--max-move': matchService.selfPlayer.speed }">
                         <div class="movement-bar-bot"></div>
                         <div class="movement-bar-mid"></div>
                         <div class="movement-bar-top"></div>
@@ -85,22 +85,22 @@
                     <div class="item-slot"><div class="item-icon"></div></div>
                 </div>
             </div>
-            <button (click)="useAction()" class="action-button" [class.active]="playVisualData.canUseAction">Action</button>
-            <button (click)="endTurn()" class="endturn-button" [class.active]="playVisualData.canEndTurn">Terminer le tour</button>
+            <button (click)="actionButton()" class="action-button" [class.active]="visualData.canUseAction">Action</button>
+            <button (click)="endTurnButton()" class="endturn-button" [class.active]="visualData.canEndTurn">Terminer le tour</button>
         </div>
         <div
             class="timer"
-            [class.active]="timerService.isStarted"
+            [class.active]="playService.timer.isStarted"
             [ngStyle]="{
-                '--max-time': timerService.maxTime,
-                '--current-time': timerService.currentTime,
-                '--pause-time': timerService.lastUnpauseTime
+                '--max-time': playService.timer.maxTime,
+                '--current-time': playService.timer.currentTime,
+                '--pause-time': playService.timer.lastUnpauseTime
             }"
         >
             <div class="timer-bar">
                 <div class="timer-image"></div>
             </div>
-            <div class="timer-text">{{ timerService.currentTime }}</div>
+            <div class="timer-text">{{ playService.timer.currentTime }}</div>
         </div>
     </main>
 </div>

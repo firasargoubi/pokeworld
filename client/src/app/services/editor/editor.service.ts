@@ -43,21 +43,6 @@ export class EditorService {
         this.resetLastPicked();
     }
 
-    getRemainingItemCount(item: ItemType, activeItem: ItemType | null): number {
-        let currentItemCount = this.gameDataService.getItemCount(item);
-        const maxItemCount = this.getMaxItemCount(item);
-
-        if (item === activeItem) {
-            currentItemCount++;
-        }
-
-        if (maxItemCount === 1 && currentItemCount === 0) {
-            return -1;
-        }
-
-        return maxItemCount - currentItemCount;
-    }
-
     paintTile(tile: TileType, position: Position) {
         const oldTile = this.gameDataService.getTileFromPosition(position);
 
@@ -93,6 +78,52 @@ export class EditorService {
         return await this.saveGameOnServer();
     }
 
+    getRemainingItemCount(item: ItemType, activeItem: ItemType | null): number {
+        const currentItemCount = this.getItemCount(item, activeItem);
+        const maxItemCount = this.getMaxItemCount(item, activeItem);
+        return maxItemCount - currentItemCount;
+    }
+
+    private getMaxItemCount(item: ItemType, activeItem: ItemType | null): number {
+        if (item === ItemType.Flag) {
+            if (this.gameDataService.getGameMode() === GameMode.CTF) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+
+        let maxItemCount = MAX_ITEM_COUNT[this.gameDataService.getMapSize()][item];
+
+        if (SHARED_ITEM_POOL.includes(item)) {
+            const maxSharedItemCount = this.getMaxSharedItemCount(item, activeItem);
+            maxItemCount = Math.min(maxItemCount, maxSharedItemCount);
+        }
+
+        return maxItemCount;
+    }
+
+    private getMaxSharedItemCount(item: ItemType, activeItem: ItemType | null): number {
+        let sharedCount = 0;
+        SHARED_ITEM_POOL.forEach((sharedItem) => {
+            if (sharedItem !== item) {
+                sharedCount += this.getItemCount(sharedItem, activeItem);
+            }
+        });
+        const highestMaxItemCount = MAX_ITEM_COUNT[this.gameDataService.getMapSize()][ITEM_POOL_HIGHEST_ITEM];
+        return highestMaxItemCount - sharedCount;
+    }
+
+    private getItemCount(item: ItemType, activeItem: ItemType | null): number {
+        let itemCount = this.gameDataService.getItemCount(item);
+
+        if (item === activeItem) {
+            itemCount++;
+        }
+
+        return itemCount;
+    }
+
     private async saveGameOnServer(): Promise<boolean> {
         this.gameDataService.gameData.isVisible = false;
         this.gameDataService.gameData.lastEdited = new Date();
@@ -105,35 +136,5 @@ export class EditorService {
         }
 
         return true;
-    }
-
-    private getMaxItemCount(item: ItemType): number {
-        if (item === ItemType.Flag) {
-            if (this.gameDataService.getGameMode() === GameMode.CTF) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-
-        let maxItemCount = MAX_ITEM_COUNT[this.gameDataService.getMapSize()][item];
-
-        if (SHARED_ITEM_POOL.includes(item)) {
-            const maxSharedItemCount = this.getMaxSharedItemCount(item);
-            maxItemCount = Math.min(maxItemCount, maxSharedItemCount);
-        }
-
-        return maxItemCount;
-    }
-
-    private getMaxSharedItemCount(item: ItemType): number {
-        let sharedCount = 0;
-        SHARED_ITEM_POOL.forEach((sharedItem) => {
-            if (sharedItem !== item) {
-                sharedCount += this.gameDataService.getItemCount(item);
-            }
-        });
-        const highestMaxItemCount = MAX_ITEM_COUNT[this.gameDataService.getMapSize()][ITEM_POOL_HIGHEST_ITEM];
-        return highestMaxItemCount - sharedCount;
     }
 }

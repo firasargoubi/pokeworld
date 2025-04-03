@@ -5,14 +5,15 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { Routes, provideRouter, withHashLocation } from '@angular/router';
 import { AdminPageComponent } from '@app/pages/admin-page/admin-page.component';
 import { AppComponent } from '@app/pages/app/app.component';
+import { CharacterPageComponent } from '@app/pages/character-page/character-page.component';
 import { CombatPageComponent } from '@app/pages/combat-page/combat-page.component';
+import { CreatePageComponent } from '@app/pages/create-page/create-page.component';
+import { DebugPageComponent } from '@app/pages/debug-page/debug-page.component';
 import { EditPageComponent } from '@app/pages/edit-page/edit-page.component';
+import { JoinPageComponent } from '@app/pages/join-page/join-page.component';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { MenuPageComponent } from '@app/pages/menu-page/menu-page.component';
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
-import { JoinPageComponent } from '@app/pages/join-page/join-page.component';
-import { CreatePageComponent } from '@app/pages/create-page/create-page.component';
-import { PlayerSelectionPageComponent } from '@app/pages/player-selection-page/player-selection-page.component';
 import { environment } from './environments/environment';
 
 
@@ -29,7 +30,8 @@ const routes: Routes = [
     { path: 'create', component: CreatePageComponent },
     { path: 'edit', component: EditPageComponent },
     { path: 'combat', component: CombatPageComponent },
-    { path: 'player-selection', component: PlayerSelectionPageComponent },
+    { path: 'character', component: CharacterPageComponent },
+    { path: 'debug', component: DebugPageComponent },
     { path: '**', redirectTo: '' },
 ];
 

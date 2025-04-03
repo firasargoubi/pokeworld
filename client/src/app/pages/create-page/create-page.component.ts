@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
+import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
-import { LobbySocketsService } from '@app/services/sockets/lobby-socket/lobby-sockets.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
 
@@ -18,7 +18,7 @@ export class CreatePageComponent implements OnInit {
     games: GameData[] = [];
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);
-    private lobbySocketService: LobbySocketsService = inject(LobbySocketsService);
+    private matchService: MatchService = inject(MatchService);
     private popupService: PopupService = inject(PopupService);
 
     navigateToMenu() {
@@ -35,15 +35,8 @@ export class CreatePageComponent implements OnInit {
         return classes[classIndex];
     }
 
-    async createMatch(gameData: GameData) {
-        this.lobbySocketService.createMatch(gameData).then((hasCreatedGame) => {
-            if (hasCreatedGame) {
-                this.router.navigate([PageEndpoint.PlayerSelection]);
-            } else {
-                this.loadGames();
-                this.popupService.showPopup("Ce jeu n'est plus disponible");
-            }
-        });
+    createMatch(gameData: GameData) {
+        this.matchService.createMatch(gameData);
     }
 
     private loadGames() {

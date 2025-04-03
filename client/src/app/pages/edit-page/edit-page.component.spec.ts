@@ -12,6 +12,7 @@ import { EditorService } from '@app/services/editor/editor.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { TileType } from '@common/interfaces/tile-type.enum';
@@ -201,7 +202,7 @@ describe('EditPageComponent', () => {
         component.onMouseUp(mockEvent);
 
         expect(component.editorVisualData.paintingTile).toBeNull();
-        expect(component.editorVisualData.lastPaintedPosition).toEqual({ x: -1, y: -1 });
+        expect(component.editorVisualData.lastPaintedPosition).toEqual(structuredClone(OUTSIDE_OF_MAP));
         expect(getEventPropertySpy).toHaveBeenCalledWith(mockEvent);
         expect(dropItemSpy).toHaveBeenCalledWith({ tilePosition: { x: 2, y: 2 }, mousePosition: null, tile: null, item: null });
     });
@@ -401,6 +402,12 @@ describe('EditPageComponent', () => {
 
         component['updatePaintingTile'](false);
         expect(component.editorVisualData.paintingTile).toBe(EDITOR_ERASE_TILE);
+    });
+
+    it('should return null on get remaining item count', () => {
+        editorServiceSpy.getRemainingItemCount.and.returnValue(1);
+        const result = component['getRemainingItemCount'](ItemType.Item2);
+        expect(result).toBe(null);
     });
 
     it('should navigate to admin page if map is invalid', () => {

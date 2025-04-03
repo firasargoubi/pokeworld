@@ -40,30 +40,30 @@ export const ITEM_IMAGES: Map<ItemType, string> = new Map([
 export const BATTLE_PLATFORM_IMAGES = {
     [TileType.Grass]: {
         selfPlatform: './assets/images/game/battle-platforms/self-grass.png',
-        enemyPlatform: './assets/images/game/battle-platforms/ennemy-grass.png',
+        enemyPlatform: './assets/images/game/battle-platforms/enemy-grass.png',
     },
     [TileType.Bush]: {
         selfPlatform: './assets/images/game/battle-platforms/self-bush.png',
-        enemyPlatform: './assets/images/game/battle-platforms/ennemy-bush.png',
+        enemyPlatform: './assets/images/game/battle-platforms/enemy-bush.png',
     },
     [TileType.Path]: {
         selfPlatform: './assets/images/game/battle-platforms/self-path.png',
-        enemyPlatform: './assets/images/game/battle-platforms/ennemy-path.png',
+        enemyPlatform: './assets/images/game/battle-platforms/enemy-path.png',
     },
     [TileType.Bridge]: {
         selfPlatform: './assets/images/game/battle-platforms/self-bridge.png',
-        enemyPlatform: './assets/images/game/battle-platforms/ennemy-bridge.png',
+        enemyPlatform: './assets/images/game/battle-platforms/enemy-bridge.png',
     },
     [TileType.BrokenBridge]: {
         selfPlatform: './assets/images/game/battle-platforms/self-grass.png',
-        enemyPlatform: './assets/images/game/battle-platforms/ennemy-grass.png',
+        enemyPlatform: './assets/images/game/battle-platforms/enemy-grass.png',
     },
     [TileType.Water]: {
         selfPlatform: './assets/images/game/battle-platforms/self-grass.png',
-        enemyPlatform: './assets/images/game/battle-platforms/ennemy-grass.png',
+        enemyPlatform: './assets/images/game/battle-platforms/enemy-grass.png',
     },
     [TileType.None]: {
         selfPlatform: './assets/images/game/battle-platforms/self-grass.png',
-        enemyPlatform: './assets/images/game/battle-platforms/ennemy-grass.png',
+        enemyPlatform: './assets/images/game/battle-platforms/enemy-grass.png',
     },
 };

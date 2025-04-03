@@ -7,11 +7,11 @@
         <div id="lobby-body">
             <div class="access-code-container">
                 <p class="access-title">Votre code d'accès</p>
-                <p class="access-code">{{ this.matchCode }}</p>
-                @if (this.isSelfAdmin) {
+                <p class="access-code">{{ matchService.data.code }}</p>
+                @if (visualData.isSelfHost) {
                 <div class="access-instruction">
                     <div class="lock-container" (click)="this.toggleLockRoom()">
-                        @if (this.isRoomLocked) {
+                        @if (this.matchService.data.lobbyData.isLocked) {
                             <div class="lock-icon"></div>
                         } @else {
                             <div class="unlock-icon"></div>
@@ -24,7 +24,7 @@
                 } @else{
                 <div class="access-instruction">
                     <div class="empty-lock-container">
-                        @if (this.isRoomLocked) {
+                        @if (this.matchService.data.lobbyData.isLocked) {
                             <div class="lock-icon"></div>
                         } @else {
                             <div class="unlock-icon"></div>
@@ -38,19 +38,14 @@
             </div>
 
             <div id="players-list">
-                @for (player of (players$ | async); track player.id) { @if (player.isConnected) {
-                <div class="player-card-container">
-                    <app-player-card
-                        [player]="player"
-                        [displayBanButton]="this.isSelfAdmin"
-                        [isSelfPlayer]="this.selfId === player.id"
-                        [onClick]="kickPlayer.bind(this, player.id)"
-                    ></app-player-card>
-                </div>
-                } } @for (availebelPlayer of this.availebelPlayers; track $index) {
-                <div class="player-card-container">
-                    <app-player-card [isDisconeected]="true"></app-player-card>
-                </div>
+                @for (player of visualData.players; track $index) {
+                    <div class="player-card-container">
+                        <app-player-card
+                            [player]="player"
+                            [displayKickButton]="visualData.isSelfHost"
+                            [onClick]="kickPlayer.bind(this, player.id)"
+                        ></app-player-card>
+                    </div>
                 }
             </div>
         </div>
@@ -58,9 +53,9 @@
     <div class="chat-container">
         <app-chat></app-chat>
     </div>
-    @if (this.isSelfAdmin) {
-    <div id="poke-button">
-        <app-pokeball-button [buttonContent]="'LANCER PARTIE'" [onClickAction]="this.startMatchButton.bind(this)"></app-pokeball-button>
-    </div>
+    @if (visualData.isSelfHost) {
+        <div id="poke-button">
+            <app-pokeball-button [buttonContent]="'LANCER PARTIE'" [onClickAction]="this.startMatchButton.bind(this)"></app-pokeball-button>
+        </div>
     }
 </div>

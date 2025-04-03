@@ -1,7 +1,8 @@
 import { Component, inject, Input } from '@angular/core';
 import { ItemComponent } from '@app/components/item/item.component';
 import { MapService } from '@app/services/map/map.service';
-import { PlaySocketsService } from '@app/services/sockets/play-socket/play-sockets.service';
+import { PlayService } from '@app/services/play/play.service';
+import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { Position } from '@common/interfaces/position';
 
 @Component({
@@ -14,27 +15,27 @@ import { Position } from '@common/interfaces/position';
 export class MapComponent {
     @Input() isEditor: boolean = false;
     mapService: MapService = inject(MapService);
-    private playSocketsService: PlaySocketsService = inject(PlaySocketsService);
-    private lastHover: Position = { x: -1, y: -1 };
+    private playService: PlayService = inject(PlayService);
+    private lastHover: Position = structuredClone(OUTSIDE_OF_MAP);
 
     onHover(position: Position) {
         const hoveringLastTile = this.lastHover.x !== position.x || this.lastHover.y !== position.y;
         if (!this.isEditor && hoveringLastTile) {
             this.lastHover = position;
-            this.playSocketsService.setHoverMoves(position);
+            this.playService.displayMovementPath(position);
         }
     }
 
     clickTile(position: Position) {
         if (!this.isEditor) {
-            this.playSocketsService.clickTile(position);
+            this.playService.clickTile(position);
         }
     }
 
     rightClickTile(event: MouseEvent, position: Position) {
         if (!this.isEditor) {
             event.preventDefault();
-            this.playSocketsService.rightClickTile(position);
+            this.playService.rightClickTile(position);
         }
     }
 }

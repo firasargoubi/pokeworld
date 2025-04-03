@@ -13,7 +13,7 @@ export interface EditorItem {
     item: ItemType;
     image: string;
     description: string;
-    count: number;
+    count: number | null;
 }
 
 export interface EditorVisualData {

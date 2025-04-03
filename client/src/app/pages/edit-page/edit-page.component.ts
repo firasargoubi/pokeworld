@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { ItemComponent } from '@app/components/item/item.component';
 import { MapComponent } from '@app/components/map/map.component';
-import { DEFAULT_EDITOR_DATA, EDITOR_ERASE_TILE } from '@app/consts/editor-data.const';
+import { DEFAULT_EDITOR_DATA, EDITOR_ERASE_TILE, ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from '@app/consts/editor-data.const';
 import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
 import { ITEM_DESCRIPTION } from '@app/consts/item-data.const';
 import { EditorEvent, EditorItem, EditorVisualData } from '@app/interfaces/editor';
@@ -12,6 +12,7 @@ import { EditorService } from '@app/services/editor/editor.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -84,7 +85,7 @@ export class EditPageComponent {
 
     onMouseUp(event: MouseEvent) {
         this.editorVisualData.paintingTile = null;
-        this.editorVisualData.lastPaintedPosition = { x: -1, y: -1 };
+        this.editorVisualData.lastPaintedPosition = structuredClone(OUTSIDE_OF_MAP);
 
         if (this.editorVisualData.dragItem) {
             this.dropItem(this.getEventProperty(event));
@@ -178,15 +179,21 @@ export class EditPageComponent {
     }
 
     private clickOnItem(editorEvent: EditorEvent) {
-        if (this.getRemainingItemCount(editorEvent.item as ItemType) > 0) {
+        if (this.editorService.getRemainingItemCount(editorEvent.item as ItemType, this.editorVisualData.dragItem) > 0) {
             this.editorService.resetLastPicked();
             this.setActiveItem(editorEvent.item, editorEvent);
             this.updateItems();
         }
     }
 
-    private getRemainingItemCount(item: ItemType): number {
-        return this.editorService.getRemainingItemCount(item, this.editorVisualData.dragItem);
+    private getRemainingItemCount(item: ItemType): number | null {
+        let remainingItemCount: number | null = this.editorService.getRemainingItemCount(item, this.editorVisualData.dragItem);
+        const isSingleSharedItem = SHARED_ITEM_POOL.includes(item) && item !== ITEM_POOL_HIGHEST_ITEM;
+        const isSingleItem = item === ItemType.Flag || isSingleSharedItem;
+        if (remainingItemCount === 1 && isSingleItem) {
+            remainingItemCount = null;
+        }
+        return remainingItemCount;
     }
 
     private clickOnTile(tile: TileType) {

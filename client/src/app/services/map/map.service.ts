@@ -4,12 +4,11 @@ import { IMAGE_SUFIX, TILE_IMAGES_PREFIX, UNDERLAY_IMAGES_PREFIX } from '@app/co
 import { MapVisualData, OverlayTiles, TileVisualData } from '@app/interfaces/map-visual-data';
 import { TileComparisonData } from '@app/interfaces/tile-comparison-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
-import { MOVE_ANIMATION_DURATION } from '@common/consts/player.const';
-import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/surrounding-positions.const';
+import { SURROUNDING_POSITIONS_DONUT, SURROUNDING_POSITIONS_PLUS, SURROUNDING_POSITIONS_SQUARE } from '@common/consts/map-data.const';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/player-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MapData } from '@common/interfaces/map-data';
-import { PlayerMovementData } from '@common/interfaces/match';
-import { Player } from '@common/interfaces/player';
+import { PlayerData } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import {
@@ -26,8 +25,6 @@ import {
     POSSIBLE_MOVE_OVERLAY,
     RANDOM_NUMBER_BASE,
     RANDOM_NUMBER_MULTIPLIER,
-    SURROUNDING_POSITIONS_DONUT,
-    SURROUNDING_POSITIONS_SQUARE,
     WATER_SIMILAR_TILES,
 } from './map.service.const';
 
@@ -38,7 +35,7 @@ export class MapService {
     visualMapData: MapVisualData = structuredClone(DEFAULT_MAP_VISUAL_DATA);
     gameDataService: GameDataService = inject(GameDataService);
     private overlayTiles: OverlayTiles = structuredClone(DEFAULT_OVERLAY_TILES);
-    private players: Player[] = [];
+    private players: PlayerData[] = [];
 
     constructor() {
         this.updateAllTiles();
@@ -54,7 +51,7 @@ export class MapService {
         const mapSize = this.gameDataService.gameData.mapData.size;
 
         this.visualMapData = {
-            tiles: Array.from({ length: mapSize }, () => Array.from({ length: mapSize }, () => ({ ...DEFAULT_TILE_VISUAL }))),
+            tiles: Array.from({ length: mapSize }, () => Array.from({ length: mapSize }, () => ({ ...structuredClone(DEFAULT_TILE_VISUAL) }))),
             size: mapSize,
         };
 
@@ -87,17 +84,14 @@ export class MapService {
         this.updateAllTiles();
     }
 
-    setPlayers(players: Player[]) {
+    setPlayers(players: PlayerData[]) {
         this.players = players;
         this.updateAllTiles();
     }
 
-    movePlayer(playerMovementData: PlayerMovementData) {
-        for (let i = 1; i < playerMovementData.movement.length; i++) {
-            setTimeout(() => {
-                this.players[playerMovementData.playerIndex].currentStats.position = playerMovementData.movement[i];
-                this.updateAllTiles();
-            }, MOVE_ANIMATION_DURATION * i);
+    movePlayer(playerIndex: number, moves: Position[]) {
+        for (let i = 1; i < moves.length; i++) {
+            setTimeout(this.movePlayerAnimation.bind(this, playerIndex, moves[i]), MOVE_ANIMATION_DURATION * i);
         }
     }
 
@@ -111,6 +105,11 @@ export class MapService {
 
     hasActionOverlay(): boolean {
         return this.overlayTiles.actions.length > 0;
+    }
+
+    private movePlayerAnimation(playerIndex: number, move: Position) {
+        this.players[playerIndex].position = move;
+        this.updateAllTiles();
     }
 
     private getTileVisualData(mapData: MapData, position: Position): TileVisualData {
@@ -183,7 +182,7 @@ export class MapService {
         let playerAvatar: string | null = null;
 
         this.players.forEach((player) => {
-            if (player.currentStats.position.x === position.x && player.currentStats.position.y === position.y) {
+            if (player.position.x === position.x && player.position.y === position.y) {
                 playerAvatar = AVATAR_DATA[player.avatar].imageFace;
             }
         });

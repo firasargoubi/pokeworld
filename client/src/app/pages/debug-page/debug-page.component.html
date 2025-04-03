@@ -1,0 +1,15 @@
+<div class="debug-container">
+    <div class="left-panel">
+        <div class="block">
+            <button class="item" (click)="createMatch(0)">Create SMALL match</button>
+            <button class="item" (click)="createMatch(1)">Create MEDIUM match</button>
+            <button class="item" (click)="createMatch(2)">Create LARGE match</button>
+        </div>
+    </div>
+    <div class="right-panel">
+        <div class="block">
+            <h2 class="item">Join match</h2>
+            <input class="item" type="text" placeholder="Match code" [(ngModel)]="matchCodeInput">
+        </div>
+    </div>
+</div>
