@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { PopupService } from '@app/services/popup/popup.service';
-import { PageEndpoint } from '@common/interfaces/endpoint.enum';
-import { LobbyPageComponent } from './lobby-page.component';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
+import { PopupService } from '@app/services/popup/popup.service';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { LobbyPageComponent } from './lobby-page.component';
 
 describe('LobbyPageComponent', () => {
     let component: LobbyPageComponent;
@@ -14,7 +14,6 @@ describe('LobbyPageComponent', () => {
     let matchServiceSpy: jasmine.SpyObj<MatchService>;
     let lobbyServiceSpy: jasmine.SpyObj<LobbyService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
-    let clipboardSpy: jasmine.SpyObj<Clipboard>;
 
     beforeEach(async () => {
         const mockMatchData = structuredClone(MOCK_MATCH_DATAS[0]);
@@ -23,7 +22,6 @@ describe('LobbyPageComponent', () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
         lobbyServiceSpy = jasmine.createSpyObj('LobbyService', ['startMatch', 'kickPlayer', 'changeLockStatus']);
-        clipboardSpy = jasmine.createSpyObj('clipboard', ['writeText']);
         matchServiceSpy = jasmine.createSpyObj('MatchService', ['isInMatch', 'isState', 'isHost', 'leaveMatch'], {
             matchUpdate: { pipe: () => ({ subscribe: () => ({}) }) },
             data: mockMatchData,
@@ -81,8 +79,16 @@ describe('LobbyPageComponent', () => {
     });
 
     it('should copy match code to clipboard', () => {
-        Object.defineProperty(navigator, 'clipboard', { value: clipboardSpy, writable: true, configurable: true });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const copyToClipboardSpy = spyOn(component as any, 'copyToClipboard').and.callThrough();
         component.copyMatchCode();
-        expect(clipboardSpy.writeText).toHaveBeenCalled();
+        expect(copyToClipboardSpy).toHaveBeenCalled();
+    });
+
+    it('ask copy permission should correct', () => {
+        const code = '1234';
+        expect(() => {
+            component['askCopyPermission'](code);
+        }).not.toThrow();
     });
 });

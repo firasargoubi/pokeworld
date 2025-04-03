@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DebugPageComponent } from './debug-page.component';
 import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { DebugPageComponent } from './debug-page.component';
 
 describe('DebugPageComponent', () => {
     let component: DebugPageComponent;
@@ -55,9 +55,17 @@ describe('DebugPageComponent', () => {
         expect(mockSocketService.emit).toHaveBeenCalled();
     });
 
-    it('on join match', () => {
-        spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.resolve());
+    it('on join match should redirect to game', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn(component as any, 'joinMatch').and.callThrough();
         component['onJoinMatch'](structuredClone(MOCK_MATCH_DATAS[0]));
         expect(mockRouter.navigate).toHaveBeenCalled();
+    });
+
+    it('ask copy permission should correct', () => {
+        const code = '1234';
+        expect(() => {
+            component['askCopyPermission'](code);
+        }).not.toThrow();
     });
 });

@@ -1,4 +1,5 @@
 import { MapVisualData, OverlayTiles, TileVisualData } from '@app/interfaces/map-visual-data';
+import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { MapSize } from '@common/interfaces/map-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
 
@@ -11,7 +12,7 @@ export const DEFAULT_OVERLAY_TILES: OverlayTiles = {
     possibleMoves: [],
     hoverMoves: [],
     actions: [],
-    playerPosition: { x: -1, y: -1 },
+    playerPosition: structuredClone(OUTSIDE_OF_MAP),
 };
 
 export const DEFAULT_TILE_VISUAL: TileVisualData = {

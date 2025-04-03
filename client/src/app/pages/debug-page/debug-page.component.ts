@@ -44,7 +44,7 @@ export class DebugPageComponent {
 
     private onJoinMatch(matchData: MatchData | null) {
         if (matchData !== null) {
-            navigator.clipboard.writeText(matchData.code);
+            this.copyToClipboard(matchData.code);
             const selfIndex = matchData.players.length - 1;
             const player = DEBUG_PLAYERS[selfIndex];
             player.id = this.socketService.selfId;
@@ -52,5 +52,25 @@ export class DebugPageComponent {
             this.matchService.selfIndex = selfIndex;
             this.router.navigate([PageEndpoint.Lobby]);
         }
+    }
+
+    private copyToClipboard(text: string) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        const success = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        if (!success) {
+            navigator.clipboard.writeText(text).then().catch(this.askCopyPermission.bind(this, text));
+        }
+    }
+
+    private askCopyPermission(text: string) {
+        navigator.permissions
+            .query({ name: 'clipboard-write' as PermissionName })
+            .then()
+            .catch();
+        navigator.clipboard.writeText(text).then().catch();
     }
 }

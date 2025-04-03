@@ -2,6 +2,7 @@ import { Component, inject, Input } from '@angular/core';
 import { ItemComponent } from '@app/components/item/item.component';
 import { MapService } from '@app/services/map/map.service';
 import { PlayService } from '@app/services/play/play.service';
+import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { Position } from '@common/interfaces/position';
 
 @Component({
@@ -15,7 +16,7 @@ export class MapComponent {
     @Input() isEditor: boolean = false;
     mapService: MapService = inject(MapService);
     private playService: PlayService = inject(PlayService);
-    private lastHover: Position = { x: -1, y: -1 };
+    private lastHover: Position = structuredClone(OUTSIDE_OF_MAP);
 
     onHover(position: Position) {
         const hoveringLastTile = this.lastHover.x !== position.x || this.lastHover.y !== position.y;

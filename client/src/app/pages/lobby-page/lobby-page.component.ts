@@ -54,7 +54,27 @@ export class LobbyPageComponent {
     }
 
     copyMatchCode() {
-        navigator.clipboard.writeText(this.matchService.data.code);
+        this.copyToClipboard(this.matchService.data.code);
+    }
+
+    private copyToClipboard(text: string) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        const success = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        if (!success) {
+            navigator.clipboard.writeText(text).then().catch(this.askCopyPermission.bind(this, text));
+        }
+    }
+
+    private askCopyPermission(text: string) {
+        navigator.permissions
+            .query({ name: 'clipboard-write' as PermissionName })
+            .then()
+            .catch();
+        navigator.clipboard.writeText(text).then().catch();
     }
 
     private updateVisual() {

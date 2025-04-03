@@ -15,6 +15,9 @@ import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
 import { PlayService } from './play.service';
+import { Test, TestingModule } from '@nestjs/testing';
+import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
+import { PlayService } from './play.service';
 
 describe('PlayService', () => {
     let service: PlayService;
@@ -167,7 +170,7 @@ describe('PlayService', () => {
     });
 
     it('check win condition ffa should return true if winner found', () => {
-        mockMatch.data.players[0].combatsWon = 3; // Assuming MINIMUM_COMBATS_TO_WIN <= 3
+        mockMatch.data.players[0].combatsWon = MINIMUM_COMBATS_TO_WIN;
 
         const result = service['checkWinConditionFfa'](mockMatch);
 

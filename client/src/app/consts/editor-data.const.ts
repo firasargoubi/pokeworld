@@ -1,4 +1,5 @@
 import { EditorTile, EditorVisualData } from '@app/interfaces/editor';
+import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { EMPTY_IMAGE, ITEM_IMAGES, TILE_IMAGES } from './images.const';
@@ -42,10 +43,10 @@ export const DEFAULT_EDITOR_DATA: EditorVisualData = {
     })),
     selectedTile: DEFAULT_EDITOR_TILES[0].tile,
     paintingTile: null,
-    lastPaintedPosition: { x: -1, y: -1 },
+    lastPaintedPosition: structuredClone(OUTSIDE_OF_MAP),
     dragItem: null,
     dragItemImage: EMPTY_IMAGE,
-    dragPosition: { x: -1, y: -1 },
+    dragPosition: structuredClone(OUTSIDE_OF_MAP),
 };
 
 export const EDITOR_ERASE_TILE: TileType = TileType.Grass;

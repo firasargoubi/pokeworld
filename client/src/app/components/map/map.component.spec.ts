@@ -55,7 +55,7 @@ describe('MapComponent', () => {
     });
 
     it('should handle on hover correctly', () => {
-        const position = { x: -1, y: 3 };
+        const position = { x: -2, y: 3 };
         component.isEditor = false;
         component.onHover(position);
         expect(playServiceSpy.displayMovementPath).toHaveBeenCalledWith(position);
