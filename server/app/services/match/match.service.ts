@@ -32,8 +32,6 @@ export class MatchService {
             this.matches.set(matchData.code, match);
             this.playerToMatchCode.set(playerId, matchData.code);
             this.matchGateway.connectPlayer(playerId, matchData.code);
-
-            return matchData;
         }
         return matchData;
     }
