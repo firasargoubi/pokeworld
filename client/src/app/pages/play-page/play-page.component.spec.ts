@@ -1,20 +1,20 @@
+import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { Timer } from '@app/classes/timer/timer';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { MapComponent } from '@app/components/map/map.component';
+import { DEFAULT_TILE_DESCRIPTION } from '@app/consts/tile-data.const';
 import { MapService } from '@app/services/map/map.service';
-import { PopupService } from '@app/services/popup/popup.service';
-import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
-import { PlayPageComponent } from './play-page.component';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
+import { PopupService } from '@app/services/popup/popup.service';
+import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { TileDescriptionService } from '@app/services/tile-description/tile-description.service';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
-import { Timer } from '@app/classes/timer/timer';
-import { DEFAULT_TILE_DESCRIPTION } from '@app/consts/tile-data.const';
-import { Component, Input } from '@angular/core';
-import { ChatComponent } from '@app/components/chat/chat.component';
-import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { PlayPageComponent } from './play-page.component';
 
 @Component({
     selector: 'app-chat',
@@ -52,7 +52,7 @@ describe('PlayPageComponent', () => {
         });
         mockMatchService = jasmine.createSpyObj(
             'MatchService',
-            ['isInMatch', 'canUseAction', 'canEndTurn', 'getMovementLeft', 'isState', 'leaveMatch'],
+            ['isInMatch', 'canUseAction', 'canEndTurn', 'getMovementLeft', 'isState', 'leaveMatch', 'isInventoryFull'],
             {
                 matchUpdate: { pipe: () => ({ subscribe: () => ({}) }) },
                 data: structuredClone(MOCK_MATCH_DATAS[0]),

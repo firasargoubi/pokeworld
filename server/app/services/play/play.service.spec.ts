@@ -3,6 +3,7 @@
 import { Match } from '@app/classes/match/match';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MapService } from '@app/services/map/map.service';
+import { MINIMUM_COMBATS_TO_WIN } from '@common/consts/match-data.const';
 import { AVATAR_EVOLVED_SUFFIX, AVATAR_SHINY_SUFFIX, MAX_ITEMS } from '@common/consts/player-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
@@ -12,9 +13,6 @@ import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
-import { Test, TestingModule } from '@nestjs/testing';
-import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
-import { PlayService } from './play.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
 import { PlayService } from './play.service';
