@@ -1,14 +1,14 @@
 <div
     class="player-component"
     [ngClass]="{
-        'is-self-player-card': isSelfPlayer,
-        'is-disconeected': isDisconeected,
-        'display-ban-button': displayBanButton,
-        'is-admin': player.isAdmin
+        'is-self-player-card': player.isSelf,
+        'is-disconnected': !player.isConnected,
+        'display-ban-button': displayKickButton,
+        'is-host': player.isHost
     }"
 >
     <div class="avatar-container">
-        <img src="{{ avatarUrl }}" class="avatar" />
+        <img src="{{ player.avatarImage }}" class="avatar" />
     </div>
     <div class="player-card">
         <div class="player-name">
@@ -19,7 +19,7 @@
             <div class="hp-backround">
                 <div class="hp-progress"></div>
             </div>
-            <div class="hp-value">{{ player.playerStats.health }}/ {{ player.playerStats.health }}</div>
+            <div class="hp-value">{{ player.health }} / {{ player.health }}</div>
         </div>
     </div>
     <div class="ban-button">

@@ -59,16 +59,16 @@ $text-shadow-color: rgb(112, 112, 112);
     rotate: 180deg;
 }
 
-.is-admin .ban-icon {
+.is-host .ban-icon {
     user-select: none;
     cursor: not-allowed;
 }
 
-.is-admin .ban-icon:hover {
+.is-host .ban-icon:hover {
     filter: brightness(1);
 }
 
-.is-admin .ban-icon:active {
+.is-host .ban-icon:active {
     rotate: 0deg;
 }
 
@@ -164,7 +164,7 @@ $text-shadow-color: rgb(112, 112, 112);
     opacity: 0;
 }
 
-.is-admin .player-card .crown {
+.is-host .player-card .crown {
     opacity: 1;
 }
 
@@ -208,13 +208,13 @@ $text-shadow-color: rgb(112, 112, 112);
     user-select: none;
 }
 
-.is-disconeected {
+.is-disconnected {
     transform: translateX(80%);
     filter: brightness(0.4);
 }
 
-.is-disconeected .avatar,
-.is-disconeected .player-card *,
-.is-disconeected .ban-button {
+.is-disconnected .avatar,
+.is-disconnected .player-card *,
+.is-disconnected .ban-button {
     display: none;
 }

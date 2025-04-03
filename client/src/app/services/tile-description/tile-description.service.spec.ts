@@ -1,37 +1,38 @@
 import { TestBed } from '@angular/core/testing';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
-import { TILE_EFFECT } from '@app/consts/tile-effect.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
-import { MatchDataService } from '@app/services/match-data/match-data.service';
-import { Player } from '@common/interfaces/player';
 import { Position } from '@common/interfaces/position';
 import { TILE_COST, TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
-import { MOCK_PLAYERS } from '@common/test-consts/mock-players';
 import { TileDescriptionService } from './tile-description.service';
+import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { MatchService } from '@app/services/match/match.service';
+import { PlayerData } from '@common/interfaces/player-data';
+import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
+import { MatchData } from '@common/interfaces/match-data';
+import { TILE_EFFECT } from '@app/consts/tile-data.const';
 
 describe('TileDescriptionService', () => {
     let service: TileDescriptionService;
     let mockGameDataService: jasmine.SpyObj<GameDataService>;
-    let mockMatchDataService: jasmine.SpyObj<MatchDataService>;
+    let mockMatchService: jasmine.SpyObj<MatchService>;
 
-    const mockPosition: Position = { x: 3, y: 4 };
-    const mockPlayer: Player = MOCK_PLAYERS[0];
+    let mockPosition: Position = { x: 3, y: 4 };
+    let mockPlayer: PlayerData;
+    let mockMatchData: MatchData;
 
     beforeEach(() => {
-        mockGameDataService = jasmine.createSpyObj('GameDataService', ['getTileFromPosition']);
-        mockMatchDataService = jasmine.createSpyObj('MatchDataService', ['isActivePlayer'], {
-            matchData: {
-                players: [mockPlayer],
-                isDebugMode: true,
-            },
-        });
+        mockPosition = { x: 3, y: 4 };
+        mockPlayer = { ...structuredClone(MOCK_PLAYER_DATAS[0]), position: mockPosition };
+        mockMatchData = { ...structuredClone(MOCK_MATCH_DATAS[0]), players: [mockPlayer] };
+        mockGameDataService = jasmine.createSpyObj('GameDataService', ['getTileFromPosition'], { gameData: mockMatchData.gameData });
+        mockMatchService = jasmine.createSpyObj('MatchService', ['isActivePlayer', 'canUseDebugMove'], { data: mockMatchData });
 
         TestBed.configureTestingModule({
             providers: [
                 TileDescriptionService,
                 { provide: GameDataService, useValue: mockGameDataService },
-                { provide: MatchDataService, useValue: mockMatchDataService },
+                { provide: MatchService, useValue: mockMatchService },
             ],
         });
         service = TestBed.inject(TileDescriptionService);
@@ -52,17 +53,21 @@ describe('TileDescriptionService', () => {
     });
 
     it('should find player at position', () => {
-        const result = service['findPlayerAtPosition'](mockPlayer.currentStats.position);
+        const result = service['findPlayerAtPosition'](mockPlayer.position);
         expect(result).toEqual(mockPlayer);
     });
 
     it('should update description with player info', () => {
-        const result = service['updateDescription'](mockPlayer.currentStats.position);
+        const result = service['updateDescription'](mockPlayer.position);
         expect(result).toBeTrue();
         expect(service.tileDescription.playerName).toBe(mockPlayer.name);
         expect(service.tileDescription.avatar).toBe(AVATAR_DATA[mockPlayer.avatar].imageCentered);
     });
+
     it('should update description with tile info', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(service, 'findPlayerAtPosition').and.returnValue(null);
+        mockGameDataService.getTileFromPosition.and.returnValue(TileType.Grass);
         const result = service['updateDescription'](mockPosition);
         expect(result).toBeFalse();
         expect(service.tileDescription.cost).toBe(TILE_COST[TileType.Grass]);
@@ -90,7 +95,7 @@ describe('TileDescriptionService', () => {
             clientX: 300,
             clientY: 200,
             currentTarget: mockElement,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mock mouse event
         } as any as MouseEvent;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method

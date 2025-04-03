@@ -77,19 +77,38 @@ describe('EditorService', () => {
         expect(gameDataServiceSpy.addItem).toHaveBeenCalledWith(item, lastPickPosition);
     });
 
-    it('should return correct remaining item count for various scenarios', () => {
-        gameDataServiceSpy.getGameMode.and.returnValue(GameMode.CTF);
-        gameDataServiceSpy.getItemCount.withArgs(ItemType.Flag).and.returnValue(0);
-        expect(service.getRemainingItemCount(ItemType.Flag, null)).toBe(-1);
+    it('should get remaining item count correctly', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(service, 'getItemCount').and.returnValue(1);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(service, 'getMaxItemCount').and.returnValue(2);
 
-        gameDataServiceSpy.getItemCount.withArgs(ItemType.Flag).and.returnValue(1);
-        expect(service.getRemainingItemCount(ItemType.Flag, null)).toBe(0);
+        const result = service.getRemainingItemCount(ItemType.Item1, null);
 
-        gameDataServiceSpy.getGameMode.and.returnValue(GameMode.FFA);
-        gameDataServiceSpy.getItemCount.withArgs(ItemType.Flag).and.returnValue(0);
-        expect(service.getRemainingItemCount(ItemType.Flag, null)).toBe(0);
+        expect(result).toEqual(1);
+    });
 
-        expect(service.getRemainingItemCount(ItemType.Flag, ItemType.Flag)).toBe(-1);
+    it('should get max item count correctly', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(service, 'getMaxSharedItemCount').and.returnValue(2);
+        gameDataServiceSpy.getMapSize.and.returnValue(MapSize.Medium);
+        const result1 = service['getMaxItemCount'](ItemType.Item1, ItemType.Item1);
+        expect(result1).toEqual(1);
+    });
+
+    it('should get max shared item count correctly', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(service, 'getItemCount').and.returnValue(2);
+        gameDataServiceSpy.getMapSize.and.returnValue(MapSize.Medium);
+        const result1 = service['getMaxItemCount'](ItemType.Item1, ItemType.Item1);
+        const expectedResult = -8;
+        expect(result1).toEqual(expectedResult);
+    });
+
+    it('should get max shared item count correctly', () => {
+        gameDataServiceSpy.getItemCount.and.returnValue(1);
+        const result1 = service['getItemCount'](ItemType.Item1, ItemType.Item1);
+        expect(result1).toEqual(2);
     });
 
     it('should paint tile correctly', () => {
@@ -178,21 +197,6 @@ describe('EditorService', () => {
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Erreur lors de la sauvegarde du jeu');
     });
 
-    it('should handle item counts including flags and shared items', () => {
-        const activeItem = null;
-
-        gameDataServiceSpy.getGameMode.and.returnValue(GameMode.CTF);
-        gameDataServiceSpy.getItemCount.withArgs(ItemType.Flag).and.returnValue(0);
-        expect(service.getRemainingItemCount(ItemType.Flag, activeItem)).toBe(-1);
-        gameDataServiceSpy.getItemCount.withArgs(ItemType.Flag).and.returnValue(1);
-        expect(service.getRemainingItemCount(ItemType.Flag, activeItem)).toBe(0);
-        gameDataServiceSpy.getGameMode.and.returnValue(GameMode.FFA);
-        gameDataServiceSpy.getItemCount.withArgs(ItemType.Flag).and.returnValue(0);
-        expect(service.getRemainingItemCount(ItemType.Flag, activeItem)).toBe(0);
-        gameDataServiceSpy.getItemCount.withArgs(ItemType.Flag).and.returnValue(1);
-        expect(service.getRemainingItemCount(ItemType.Flag, activeItem)).toBe(-1);
-    });
-
     it('should pick item correctly', () => {
         const position: Position = { x: 2, y: 2 };
         service.resetLastPicked();
@@ -205,7 +209,7 @@ describe('EditorService', () => {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'getMaxItemCount').and.callThrough();
-        const maxItemCount = service['getMaxItemCount'](ItemType.Flag);
+        const maxItemCount = service['getMaxItemCount'](ItemType.Flag, null);
 
         expect(maxItemCount).toBe(1);
     });
@@ -215,36 +219,8 @@ describe('EditorService', () => {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'getMaxItemCount').and.callThrough();
-        const maxItemCount = service['getMaxItemCount'](ItemType.Flag);
+        const maxItemCount = service['getMaxItemCount'](ItemType.Flag, null);
 
         expect(maxItemCount).toBe(0);
-    });
-
-    it('should return correct max item count for shared items', () => {
-        const item = ItemType.Item1;
-        const mockMaxCount = 0;
-        const mockSharedItemCount = 2;
-
-        gameDataServiceSpy.getMapSize.and.returnValue(MapSize.Large);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        spyOn<any>(service, 'getMaxSharedItemCount').and.returnValue(mockSharedItemCount);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-
-        const maxItemCount = service['getMaxItemCount'](item);
-        expect(maxItemCount).toBe(Math.min(mockMaxCount, mockSharedItemCount));
-    });
-
-    it('should return correct max shared item count', () => {
-        const item = ItemType.Item1;
-        const mockSharedItemCount = 3;
-        const expectedResult = -18;
-
-        gameDataServiceSpy.getItemCount.withArgs(item).and.returnValue(mockSharedItemCount);
-        gameDataServiceSpy.getMapSize.and.returnValue(MapSize.Large);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        spyOn<any>(service, 'getMaxSharedItemCount').and.callThrough();
-
-        const maxSharedItemCount = service['getMaxSharedItemCount'](item);
-        expect(maxSharedItemCount).toBe(expectedResult);
     });
 });

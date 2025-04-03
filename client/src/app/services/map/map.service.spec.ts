@@ -1,16 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
-import { MOVE_ANIMATION_DURATION } from '@common/consts/player.const';
-import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/surrounding-positions.const';
-import { Avatar } from '@common/interfaces/avatar.enum';
+import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
+import { MOVE_ANIMATION_DURATION } from '@common/consts/player-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MapSize } from '@common/interfaces/map-data';
-import { Match, PlayerMovementData } from '@common/interfaces/match';
-import { Player } from '@common/interfaces/player';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
-import { MOCK_PLAYERS } from '@common/test-consts/mock-players';
+import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { BehaviorSubject } from 'rxjs';
 import { MapService } from './map.service';
 import { ACTION_OVERLAY, DEFAULT_OVERLAY_TILES, HOVER_MOVE_OVERLAY, POSSIBLE_MOVE_OVERLAY } from './map.service.const';
@@ -347,17 +343,17 @@ describe('MapService', () => {
         expect(result).toBe(ACTION_OVERLAY);
     });
 
-    it('should return correct player avatar or null based on position', () => {
-        const position: Position = { x: 0, y: 0 };
-        const mockPlayer = MOCK_PLAYERS[0];
+    it('should set players correctly', () => {
+        const players = structuredClone(MOCK_PLAYER_DATAS);
+        service.setPlayers(players);
+        expect(service['players']).toBe(players);
+    });
 
-        service['players'] = [mockPlayer];
-        const result = service['getPlayerAvatar'](position);
-        expect(result).toBe(AVATAR_DATA[Avatar.Avatar1].imageFace);
-
-        service['players'] = [];
-        const resultEmpty = service['getPlayerAvatar'](position);
-        expect(resultEmpty).toBeNull();
+    it('should execute move player animation', () => {
+        service['players'] = structuredClone(MOCK_PLAYER_DATAS);
+        const position = { x: 6, y: 5 };
+        service['movePlayerAnimation'](0, position);
+        expect(service['players'][0].position).toBe(position);
     });
 
     it('should handle overlay-related methods correctly', () => {
@@ -393,30 +389,17 @@ describe('MapService', () => {
         expect(service['updateAllTiles']).toHaveBeenCalledTimes(5);
     });
 
-    it('should handle player-related methods correctly', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        spyOn<any>(service, 'updateAllTiles');
-        const mockPlayer: Player = { id: '1', name: 'Player', avatar: Avatar.Avatar1, currentStats: { position: { x: 1, y: 1 } } } as Player;
-
-        service.setPlayers([mockPlayer]);
-        expect(service['players']).toEqual([mockPlayer]);
-        expect(service['updateAllTiles']).toHaveBeenCalledTimes(1);
-
+    it('should schedule player movement animations for each position', () => {
+        const positions = [
+            { x: 1, y: 1 },
+            { x: 2, y: 2 },
+        ];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const movePlayerAnimationSpy = spyOn<any>(service, 'movePlayerAnimation');
         jasmine.clock().install();
-        const movementData: PlayerMovementData = {
-            playerIndex: 0,
-            movement: [
-                { x: 0, y: 0 },
-                { x: 2, y: 2 },
-                { x: 3, y: 3 },
-            ],
-            match: {} as Match,
-        };
-        service.movePlayer(movementData);
-
-        jasmine.clock().tick(MOVE_ANIMATION_DURATION);
-        expect(service['players'][0].currentStats.position).toEqual({ x: 2, y: 2 });
-        expect(service['updateAllTiles']).toHaveBeenCalledTimes(2);
+        service.movePlayer(0, positions);
+        jasmine.clock().tick(MOVE_ANIMATION_DURATION + 1);
+        expect(movePlayerAnimationSpy).toHaveBeenCalled();
         jasmine.clock().uninstall();
     });
 });

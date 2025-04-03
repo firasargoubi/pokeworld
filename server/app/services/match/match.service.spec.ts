@@ -1,32 +1,47 @@
-import { CODE_LENGTH } from '@common/consts/match.const';
+import { Match } from '@app/classes/match/match';
+import { MatchGateway } from '@app/gateways/match/match.gateway';
+import { CombatService } from '@app/services/combat/combat.service';
+import { PlayService } from '@app/services/play/play.service';
+import { MATCH_CODE_LENGTH } from '@common/consts/match-data.const';
+import { Message } from '@common/interfaces/message.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
-import { MATCH_CODES, MATCHES, MOCK_MATCHES, PLAYER_TO_MATCH_CODE } from '@common/test-consts/mock-matches';
-import { PLAYER_IDS } from '@common/test-consts/mock-players';
+import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createSandbox, SinonSandbox } from 'sinon';
+import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
 import { MatchService } from './match.service';
-import { DEFAULT_TURN_DATA } from './match.service.const';
 
 describe('MatchService', () => {
     let service: MatchService;
     let sandbox: SinonSandbox;
+    let mockMatchGateway: SinonStubbedInstance<MatchGateway>;
+    let mockCombatService: SinonStubbedInstance<CombatService>;
+    let mockPlayService: SinonStubbedInstance<PlayService>;
+    let mockMatch: SinonStubbedInstance<Match>;
 
     beforeAll(async () => {
+        sandbox = createSandbox();
+        mockMatchGateway = createStubInstance<MatchGateway>(MatchGateway);
+        mockCombatService = createStubInstance<CombatService>(CombatService);
+        mockPlayService = createStubInstance<PlayService>(PlayService);
+        mockMatch = createStubInstance<Match>(Match);
+
         const module: TestingModule = await Test.createTestingModule({
-            providers: [MatchService],
+            providers: [
+                MatchService,
+                { provide: MatchGateway, useValue: mockMatchGateway },
+                { provide: PlayService, useValue: mockPlayService },
+                { provide: CombatService, useValue: mockCombatService },
+            ],
         }).compile();
 
         service = module.get<MatchService>(MatchService);
     });
 
     beforeEach(() => {
-        sandbox = createSandbox();
-        service['matches'] = structuredClone(MATCHES);
-        service['playerToMatchCode'] = structuredClone(PLAYER_TO_MATCH_CODE);
-        service['turnDatas'] = new Map([
-            [MATCH_CODES[0], structuredClone(DEFAULT_TURN_DATA)],
-            [MATCH_CODES[1], structuredClone(DEFAULT_TURN_DATA)],
-        ]);
+        mockMatch.data = structuredClone(MOCK_MATCH_DATAS[0]);
+        service['matches'] = new Map();
+        service['playerToMatchCode'] = new Map();
     });
 
     afterEach(() => {
@@ -37,152 +52,233 @@ describe('MatchService', () => {
         expect(service).toBeDefined();
     });
 
-    it('should createMatch correctly', () => {
+    it('create match should create a new match and connect player', () => {
+        const playerId = 'player1';
         const matchCode = '1234';
-        sandbox.stub(service, 'getNewMatchCode').returns(matchCode);
-        const result = service.createMatch(structuredClone(MOCK_GAME_DATAS[0]));
-        expect(service['matches'].has(matchCode)).toBeTruthy();
-        expect(result).toBe(matchCode);
+        const gameData = MOCK_GAME_DATAS[0];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'canCreateMatch').returns(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'getNewMatchCode').returns('1234');
+
+        const matchData = service.createMatch(playerId, gameData);
+
+        expect(matchData.code).toBe(matchCode);
+        expect(matchData.gameData).toBe(gameData);
+        expect(matchData.players[0].id).toBe(playerId);
+        expect(mockMatchGateway.connectPlayer.calledWith(playerId, matchCode)).toBe(true);
     });
 
-    it('should getPlayerIndex correctly', () => {
-        const playerId = PLAYER_IDS[0];
-        const matchCode = MATCH_CODES[0];
-        const getPlayersSpy = sandbox.spy(service, 'getPlayers');
-
-        const result = service.getPlayerIndex(matchCode, playerId);
-
-        expect(result).toBe(0);
-        expect(getPlayersSpy.calledWith(matchCode)).toBe(true);
+    it('send update should emit update via gateway', () => {
+        const matchData = MOCK_MATCH_DATAS[0];
+        service.sendUpdate(matchData);
+        expect(mockMatchGateway.emitUpdate.calledWith(matchData.code, matchData)).toBe(true);
     });
 
-    it('should detect isPlayerInMatch correctly', () => {
-        const playerId = '7777';
-        expect(service.isPlayerInMatch(playerId)).toBe(false);
-        service.addPlayerToMatch(playerId, structuredClone(MATCH_CODES[0]), false);
-        expect(service.isPlayerInMatch(playerId)).toBe(true);
+    it('send message should emit message via gateway', () => {
+        const matchCode = '1234';
+        const message = 'Test message';
+        service.sendMessage(matchCode, message);
+        expect(mockMatchGateway.emitMessage.calledWith(matchCode, message)).toBe(true);
     });
 
-    it('should getIsMatchStarted correctly', () => {
-        expect(service.getIsMatchStarted(structuredClone(MATCH_CODES[0]))).toBe(false);
+    it('player removed from match should emit removal and disconnect player', () => {
+        const playerId = 'player1';
+        const reason = 'Kicked';
+        service.playerRemovedFromMatch(playerId, reason);
+        expect(mockMatchGateway.emitRemovedFromMatch.calledWith(playerId, reason)).toBe(true);
+        expect(mockMatchGateway.disconnectPlayer.calledWith(playerId)).toBe(true);
     });
 
-    it('should detect isPlayerAdmin correctly', () => {
-        const playerIdAdmin = '1122';
-        const matchCode = MATCH_CODES[0];
-        service.addPlayerToMatch(playerIdAdmin, matchCode, true);
-        expect(service.isPlayerAdmin(playerIdAdmin, matchCode)).toBe(true);
-        const playerIdNonAdmin = '3344';
-        service.addPlayerToMatch(playerIdNonAdmin, matchCode, false);
-        expect(service.isPlayerAdmin(playerIdNonAdmin, matchCode)).toBe(false);
+    it('join match should join player to match and connect them', () => {
+        const playerId = 'player2';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'canJoinMatch').returns(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'getMatch').returns(mockMatch);
+
+        const matchData = service.joinMatch(playerId, mockMatch.data.code);
+
+        expect(mockMatch.join.calledWith(playerId)).toBe(true);
+        expect(service['playerToMatchCode'].get(playerId)).toBe(mockMatch.data.code);
+        expect(mockMatchGateway.connectPlayer.calledWith(playerId, mockMatch.data.code)).toBe(true);
+        expect(matchData).toBe(mockMatch.data);
     });
 
-    it('should getUniqueName correctly', () => {
-        const name = 'bob';
-        const newPlayerId = '4111';
-        const matchCode = MATCH_CODES[0];
-        service.addPlayerToMatch(newPlayerId, matchCode, false);
-        expect(service.getUniqueName(name, newPlayerId, matchCode)).toBe(name);
-        service.getPlayer(matchCode, structuredClone(PLAYER_IDS[0])).name = name;
-        expect(service.getUniqueName(name, newPlayerId, matchCode)).toBe(`${name}-2`);
+    it('get match from player id should return the correct match', () => {
+        const playerId = 'player1';
+        service['playerToMatchCode'].set(playerId, mockMatch.data.code);
+        service['matches'].set(mockMatch.data.code, mockMatch);
+
+        const match = service.getMatchFromPlayerId(playerId);
+
+        expect(match).toBe(mockMatch);
     });
 
-    it('should getNewMatchCode correctly', () => {
-        sandbox.stub(service, 'hasMatchCode').returns(false);
-        const result = service.getNewMatchCode();
-        expect(result.length).toBe(CODE_LENGTH);
+    it('leave match should remove player and clean up if no players left', () => {
+        const playerId = 'player1';
+        mockMatch.getConnectedPlayerCount.returns(0);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'getMatchFromPlayerId').returns(mockMatch);
+
+        service.leaveMatch(playerId);
+
+        expect(mockMatchGateway.disconnectPlayer.calledWith(playerId)).toBe(true);
+        expect(mockMatch.clearTimeout.calledOnce).toBe(true);
     });
 
-    it('should getMatch correctly', () => {
-        const result = service.getMatch(structuredClone(MATCH_CODES[0]));
-        expect(result).toEqual(structuredClone(MOCK_MATCHES[0]));
+    it('disconnect player should remove player from map and disconnect', () => {
+        const playerId = 'player1';
+        service['playerToMatchCode'].set(playerId, '1234');
+
+        service.disconnectPlayer(playerId);
+
+        expect(service['playerToMatchCode'].has(playerId)).toBe(false);
+        expect(mockMatchGateway.disconnectPlayer.calledWith(playerId)).toBe(true);
     });
 
-    it('should removePlayerFromMatch correctly', () => {
-        const playerId = '9090';
-        const matchCode = MATCH_CODES[0];
-        service.addPlayerToMatch(playerId, matchCode, false);
-        expect(service.isPlayerInMatch(playerId)).toBe(true);
-        service.removePlayerFromMatch(playerId, matchCode, true);
-        expect(service.isPlayerInMatch(playerId)).toBe(false);
+    it('kill player combat should start combat end death', () => {
+        service.killPlayerCombat(mockMatch);
+        expect(mockCombatService.startCombatEndDeath.calledWith(mockMatch)).toBe(true);
     });
 
-    it('should delete match if no player is left', () => {
-        const matchCode = MATCH_CODES[0];
-        expect(service.hasMatchCode(matchCode)).toBe(true);
-        [PLAYER_IDS[0], PLAYER_IDS[1], PLAYER_IDS[2], PLAYER_IDS[3]].forEach((playerId) => {
-            service.removePlayerFromMatch(playerId, matchCode, true);
-        });
-        expect(service.hasMatchCode(matchCode)).toBe(false);
-        expect(service['turnDatas'].has(matchCode)).toBe(false);
+    it('respawn player combat should respawn player', () => {
+        const playerData = structuredClone(MOCK_PLAYER_DATAS[0]);
+        service.respawnPlayer(mockMatch, playerData);
+        expect(mockCombatService.respawnPlayer.calledWith(mockMatch, playerData)).toBe(true);
     });
 
-    it('should getMatchCode correctly', () => {
-        const result = service.getMatchCode(structuredClone(PLAYER_IDS[0]));
-        expect(result).toBe(structuredClone(MATCH_CODES[0]));
+    it('start next turn should start next turn', () => {
+        service.startNextTurn(mockMatch);
+        expect(mockPlayService.startNextTurn.calledWith(mockMatch)).toBe(true);
     });
 
-    it('should setMatchLockState correctly', () => {
-        service.setMatchLockState(structuredClone(MATCH_CODES[0]), true);
-        expect(service.getMatch(structuredClone(MATCH_CODES[0])).matchData.isLocked).toBe(true);
-        service.setMatchLockState(structuredClone(MATCH_CODES[0]), false);
-        expect(service.getMatch(structuredClone(MATCH_CODES[0])).matchData.isLocked).toBe(false);
+    it('can join match should return invalid match code', () => {
+        const playerId = 'player1';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'hasMatchCode').returns(false);
+        const canJoin = service['canJoinMatch'](playerId, mockMatch.data.code);
+        expect(canJoin).toBe(false);
+        expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.InvalidMatchCode)).toBe(true);
     });
 
-    it('should addPlayerToMatch correctly', () => {
-        const playerId = '8000';
-        service.addPlayerToMatch(playerId, structuredClone(MATCH_CODES[0]), false);
-        expect(service.isPlayerInMatch(playerId)).toBe(true);
+    it('can join match should return already in match', () => {
+        const playerId = 'player1';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'hasMatchCode').returns(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'hasPlayerId').returns(true);
+        const canJoin = service['canJoinMatch'](playerId, mockMatch.data.code);
+        expect(canJoin).toBe(false);
+        expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.AlreadyInMatch)).toBe(true);
     });
 
-    it('should check if hasMatchCode correctly', () => {
-        const matchCode = '3300';
-        sandbox.stub(service, 'getNewMatchCode').returns(matchCode);
-        expect(service.hasMatchCode(matchCode)).toBe(false);
-        service.createMatch(structuredClone(MOCK_GAME_DATAS[0]));
-        expect(service.hasMatchCode(matchCode)).toBe(true);
+    it('can join match should return room full', () => {
+        const playerId = 'player1';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'hasMatchCode').returns(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'hasPlayerId').returns(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'isMatchFull').returns(true);
+        const canJoin = service['canJoinMatch'](playerId, mockMatch.data.code);
+        expect(canJoin).toBe(false);
+        expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.RoomFull)).toBe(true);
     });
 
-    it('should getPlayers correctly', () => {
-        const result = service.getPlayers(structuredClone(MATCH_CODES[0]));
-        expect(result).toEqual(MATCHES.get(structuredClone(MATCH_CODES[0])).matchData.players);
+    it('can join match should return room locked', () => {
+        const playerId = 'player1';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'hasMatchCode').returns(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'hasPlayerId').returns(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'isMatchFull').returns(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'isMatchLocked').returns(true);
+        const canJoin = service['canJoinMatch'](playerId, mockMatch.data.code);
+        expect(canJoin).toBe(false);
+        expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.RoomLocked)).toBe(true);
     });
 
-    it('should getPlayers correctly', () => {
-        const result = service.getPlayers(structuredClone(MATCH_CODES[0]));
-        expect(result).toEqual(MATCHES.get(structuredClone(MATCH_CODES[0])).matchData.players);
+    it('can create match should return true if player is not in a match', () => {
+        const playerId = 'player1';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'hasPlayerId').returns(true);
+
+        const canCreate = service['canCreateMatch'](playerId);
+
+        expect(canCreate).toBe(false);
     });
 
-    it('should correctly identify active player', () => {
-        const matchCode = MATCH_CODES[0];
-        const match = service['matches'].get(matchCode);
-        match.matchData.activePlayer = 0;
-        const activePlayerId = match.matchData.players[0].id;
-        expect(service.isActivePlayer(matchCode, activePlayerId)).toBe(true);
-        expect(service.isActivePlayer(matchCode, PLAYER_IDS[1])).toBe(false);
-        expect(service.isActivePlayer(matchCode, 'unknown')).toBe(false);
+    it('is match full should return true if match is full', () => {
+        mockMatch.isFull.returns(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'getMatch').returns(mockMatch);
+
+        const isFull = service['isMatchFull'](mockMatch.data.code);
+
+        expect(isFull).toBe(true);
     });
 
-    it('should get turn data correctly', () => {
-        const turnData = service.getTurnData(MATCH_CODES[0]);
-        expect(turnData).toEqual(structuredClone(DEFAULT_TURN_DATA));
-        expect(service.getTurnData('unknown')).toBeUndefined();
+    it('is match locked should return true if match is locked', () => {
+        mockMatch.data.lobbyData.isLocked = true;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'getMatch').returns(mockMatch);
+
+        const isLocked = service['isMatchLocked'](mockMatch.data.code);
+
+        expect(isLocked).toBe(true);
     });
 
-    it('should clear timeout in removePlayerFromMatch when phaseTimeout is set', () => {
-        const matchCode = MATCH_CODES[0];
-        const turnData = service['turnDatas'].get(matchCode);
-        const fakeTimeout = {} as NodeJS.Timeout;
-        turnData.phaseTimeout = fakeTimeout;
+    it('get match should return the match for the given code', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'getMatch').returns(mockMatch);
 
-        const clearTimeoutSpy = sandbox.spy(global, 'clearTimeout');
+        const match = service['getMatch'](mockMatch.data.code);
 
-        [PLAYER_IDS[0], PLAYER_IDS[1], PLAYER_IDS[2], PLAYER_IDS[3]].forEach((playerId) => {
-            service.removePlayerFromMatch(playerId, matchCode, true);
-        });
+        expect(match).toBe(mockMatch);
+    });
 
-        expect(service.hasMatchCode(matchCode)).toBe(false);
-        expect(service['turnDatas'].has(matchCode)).toBe(false);
-        expect(clearTimeoutSpy.calledOnceWith(fakeTimeout)).toBe(true);
+    it('get match code should return the match code for the player', () => {
+        const playerId = 'player1';
+        const matchCode = '1234';
+        service['playerToMatchCode'].set(playerId, matchCode);
+
+        const code = service['getMatchCode'](playerId);
+
+        expect(code).toBe(matchCode);
+    });
+
+    it('has match code should return true if match exists', () => {
+        service['matches'].set(mockMatch.data.code, mockMatch);
+
+        const hasCode = service['hasMatchCode'](mockMatch.data.code);
+
+        expect(hasCode).toBe(true);
+    });
+
+    it('hasPlayerId should return true if player is in a match', () => {
+        const playerId = 'player1';
+        service['playerToMatchCode'].set(playerId, '1234');
+
+        const hasPlayer = service['hasPlayerId'](playerId);
+
+        expect(hasPlayer).toBe(true);
+    });
+
+    it('getNewMatchCode should generate a unique match code', () => {
+        sandbox
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .stub(service as any, 'hasMatchCode')
+            .onFirstCall()
+            .returns(true)
+            .onSecondCall()
+            .returns(false);
+
+        const matchCode = service['getNewMatchCode']();
+
+        expect(matchCode).toBeDefined();
+        expect(matchCode.length).toBe(MATCH_CODE_LENGTH);
     });
 });

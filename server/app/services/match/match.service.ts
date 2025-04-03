@@ -1,153 +1,171 @@
-import { TurnData } from '@app/interfaces/turn-data';
-import { CODE_LENGTH, CODE_RANGE, DEFAULT_MATCH_DATA } from '@common/consts/match.const';
-import { DEFAULT_PLAYER } from '@common/consts/player.const';
+import { Match } from '@app/classes/match/match';
+import { MatchGateway } from '@app/gateways/match/match.gateway';
+import { CombatService } from '@app/services/combat/combat.service';
+import { PlayService } from '@app/services/play/play.service';
+import { DEFAULT_MATCH_DATA, MATCH_CODE_LENGTH, MATCH_CODE_RANGE } from '@common/consts/match-data.const';
+import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
 import { GameData } from '@common/interfaces/game-data';
-import { Match } from '@common/interfaces/match';
-import { Player } from '@common/interfaces/player';
-import { Injectable } from '@nestjs/common';
-import { DEFAULT_TURN_DATA } from './match.service.const';
+import { MatchData } from '@common/interfaces/match-data';
+import { Message } from '@common/interfaces/message.enum';
+import { PlayerData } from '@common/interfaces/player-data';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MatchService {
+    @Inject(forwardRef(() => MatchGateway)) private matchGateway: MatchGateway;
+    @Inject(forwardRef(() => CombatService)) private combatService: CombatService;
+    @Inject(forwardRef(() => PlayService)) private playService: PlayService;
     private matches: Map<string, Match> = new Map();
-    private turnDatas: Map<string, TurnData> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
 
-    getPlayerIndex(matchCode: string, playerId: string): number {
-        const players = this.getPlayers(matchCode);
-        return players.findIndex((p) => p.id === playerId);
-    }
-
-    createMatch(gameData: GameData): string {
-        const matchCode = this.getNewMatchCode();
-        const match: Match = { gameData, matchData: structuredClone(DEFAULT_MATCH_DATA) };
-        match.matchData.code = matchCode;
-        this.matches.set(matchCode, match);
-        this.turnDatas.set(matchCode, DEFAULT_TURN_DATA);
-        return matchCode;
-    }
-
-    isActivePlayer(matchCode: string, playerId: string): boolean {
-        const activePlayerId = this.getActivePlayerId(matchCode);
-        return playerId === activePlayerId;
-    }
-
-    isPlayerInMatch(playerId: string): boolean {
-        return this.playerToMatchCode.has(playerId);
-    }
-
-    getIsMatchStarted(matchCode: string): boolean {
-        let isStarted = false;
-        const match = this.getMatch(matchCode);
-        if (match) {
-            isStarted = match.matchData.isStarted;
+    createMatch(playerId: string, gameData: GameData): MatchData | null {
+        let matchData = null;
+        if (this.canCreateMatch(playerId)) {
+            matchData = {
+                ...structuredClone(DEFAULT_MATCH_DATA),
+                code: this.getNewMatchCode(),
+                gameData,
+                players: [{ ...structuredClone(DEFAULT_PLAYER_DATA), id: playerId }],
+            };
+            const match = new Match(matchData, this);
+            this.matches.set(matchData.code, match);
+            this.playerToMatchCode.set(playerId, matchData.code);
+            this.matchGateway.connectPlayer(playerId, matchData.code);
         }
-        return isStarted;
+        return matchData;
     }
 
-    isPlayerAdmin(playerId: string, matchCode: string): boolean {
-        let isAdmin = false;
-        const players = this.getPlayers(matchCode);
-        if (players) {
-            const player = players.find((p) => p.id === playerId);
-            if (player) {
-                isAdmin = player.isAdmin;
+    sendUpdate(matchData: MatchData) {
+        this.matchGateway.emitUpdate(matchData.code, matchData);
+    }
+
+    sendMessage(matchCode: string, message: string) {
+        this.matchGateway.emitMessage(matchCode, message);
+    }
+
+    playerRemovedFromMatch(playerId: string, reason: string) {
+        this.matchGateway.emitRemovedFromMatch(playerId, reason);
+        this.disconnectPlayer(playerId);
+    }
+
+    joinMatch(playerId: string, matchCode: string): MatchData | null {
+        let matchData = null;
+        if (this.canJoinMatch(playerId, matchCode)) {
+            const match = this.getMatch(matchCode);
+            match.join(playerId);
+            this.playerToMatchCode.set(playerId, matchCode);
+            this.matchGateway.connectPlayer(playerId, matchCode);
+            matchData = match.data;
+        }
+        return matchData;
+    }
+
+    getMatchFromPlayerId(playerId: string): Match {
+        let match: Match;
+        const matchCode = this.getMatchCode(playerId);
+        if (matchCode) {
+            match = this.getMatch(matchCode);
+        }
+        return match;
+    }
+
+    leaveMatch(playerId: string) {
+        const match = this.getMatchFromPlayerId(playerId);
+        this.disconnectPlayer(playerId);
+        if (match) {
+            match.leave(playerId);
+            if (match.getConnectedPlayerCount() === 0) {
+                match.clearTimeout();
+                this.matches.delete(match.data.code);
             }
         }
-        return isAdmin;
     }
 
-    getUniqueName(name: string, playerId: string, matchCode: string): string {
-        const players = this.getPlayers(matchCode);
-        let newName = name;
-        let suffix = 2;
+    disconnectPlayer(playerId: string) {
+        this.playerToMatchCode.delete(playerId);
+        this.matchGateway.disconnectPlayer(playerId);
+    }
 
-        while (players.some((p) => p.name === newName && p.id !== playerId)) {
-            newName = `${name}-${suffix}`;
-            suffix++;
+    killPlayerCombat(match: Match) {
+        this.combatService.startCombatEndDeath(match);
+    }
+
+    respawnPlayer(match: Match, player: PlayerData) {
+        this.combatService.respawnPlayer(match, player);
+    }
+
+    startNextTurn(match: Match) {
+        this.playService.startNextTurn(match);
+    }
+
+    private canJoinMatch(playerId: string, matchCode: string): boolean {
+        let canJoinMatch = true;
+        if (!this.hasMatchCode(matchCode)) {
+            this.matchGateway.emitMessage(playerId, Message.InvalidMatchCode);
+            canJoinMatch = false;
+        } else if (this.hasPlayerId(playerId)) {
+            this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch);
+            canJoinMatch = false;
+        } else if (this.isMatchFull(matchCode)) {
+            this.matchGateway.emitMessage(playerId, Message.RoomFull);
+            canJoinMatch = false;
+        } else if (this.isMatchLocked(matchCode)) {
+            this.matchGateway.emitMessage(playerId, Message.RoomLocked);
+            canJoinMatch = false;
         }
-
-        return newName;
+        return canJoinMatch;
     }
 
-    getNewMatchCode(): string {
-        let matchCode: string;
-
-        do {
-            matchCode = Math.floor(Math.random() * CODE_RANGE)
-                .toString()
-                .padStart(CODE_LENGTH, '0');
-        } while (this.hasMatchCode(matchCode));
-
-        return matchCode;
+    private canCreateMatch(playerId: string): boolean {
+        let canCreateMatch = true;
+        if (this.hasPlayerId(playerId)) {
+            this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch);
+            canCreateMatch = false;
+        }
+        return canCreateMatch;
     }
 
-    getMatch(matchCode: string): Match {
+    private isMatchFull(matchCode: string): boolean {
+        let isMatchFull = false;
+        const match = this.getMatch(matchCode);
+        if (match) {
+            isMatchFull = match.isFull();
+        }
+        return isMatchFull;
+    }
+
+    private isMatchLocked(matchCode: string): boolean {
+        let isMatchLocked = false;
+        const match = this.getMatch(matchCode);
+        if (match) {
+            isMatchLocked = match.data.lobbyData.isLocked;
+        }
+        return isMatchLocked;
+    }
+
+    private getMatch(matchCode: string): Match {
         return this.matches.get(matchCode);
     }
 
-    getActivePlayerId(matchCode: string): string {
-        let activePlayerId = '';
-        const match = this.getMatch(matchCode);
-        if (match) {
-            activePlayerId = match.matchData.players[match.matchData.activePlayer].id;
-        }
-        return activePlayerId;
-    }
-
-    getTurnData(matchCode: string): TurnData {
-        return this.turnDatas.get(matchCode);
-    }
-
-    removePlayerFromMatch(playerId: string, matchCode: string, changePlayerList: boolean): void {
-        const match = this.getMatch(matchCode);
-        if (match) {
-            if (changePlayerList) {
-                match.matchData.players = match.matchData.players.filter((p) => p.id !== playerId);
-                if (match.matchData.players.length <= 0) {
-                    this.matches.delete(matchCode);
-                    const turnData = this.turnDatas.get(matchCode);
-                    if (turnData.phaseTimeout) {
-                        clearTimeout(turnData.phaseTimeout);
-                        turnData.phaseTimeout = null;
-                    }
-                    this.turnDatas.delete(matchCode);
-                }
-            }
-        }
-        this.playerToMatchCode.delete(playerId);
-    }
-
-    getMatchCode(playerId: string): string {
+    private getMatchCode(playerId: string): string {
         return this.playerToMatchCode.get(playerId);
     }
 
-    setMatchLockState(matchCode: string, isLocked: boolean) {
-        this.getMatch(matchCode).matchData.isLocked = isLocked;
-    }
-
-    addPlayerToMatch(playerId: string, matchCode: string, isAdmin: boolean): void {
-        const newPlayer = { ...structuredClone(DEFAULT_PLAYER), id: playerId, isAdmin };
-        this.getMatch(matchCode).matchData.players.push(newPlayer);
-        this.playerToMatchCode.set(playerId, matchCode);
-    }
-
-    hasMatchCode(matchCode: string): boolean {
+    private hasMatchCode(matchCode: string): boolean {
         return this.matches.has(matchCode);
     }
 
-    getPlayers(matchCode: string): Player[] {
-        let players: Player[] = [];
-        const match = this.getMatch(matchCode);
-        if (match) {
-            players = match.matchData.players;
-        }
-        return players;
+    private hasPlayerId(playerId: string): boolean {
+        return this.playerToMatchCode.has(playerId);
     }
 
-    getPlayer(matchCode: string, playerId: string): Player {
-        const players = this.getPlayers(matchCode);
-        const player = players.find((p) => p.id === playerId);
-        return player;
+    private getNewMatchCode(): string {
+        let matchCode: string;
+        do {
+            matchCode = Math.floor(Math.random() * MATCH_CODE_RANGE)
+                .toString()
+                .padStart(MATCH_CODE_LENGTH, '0');
+        } while (this.hasMatchCode(matchCode));
+        return matchCode;
     }
 }

@@ -11,7 +11,7 @@ import { Subject } from 'rxjs';
     providedIn: 'root',
 })
 export class GameDataService {
-    gameData: GameData = DEFAULT_GAME_DATA;
+    gameData: GameData = structuredClone(DEFAULT_GAME_DATA);
     mapUpdate: Subject<Position | null> = new Subject();
     itemUpdate: Subject<ItemType | null> = new Subject();
 
