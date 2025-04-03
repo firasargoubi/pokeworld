@@ -1,4 +1,5 @@
 import { MapVisualData, OverlayTiles, TileVisualData } from '@app/interfaces/map-visual-data';
+import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { MapSize } from '@common/interfaces/map-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
 
