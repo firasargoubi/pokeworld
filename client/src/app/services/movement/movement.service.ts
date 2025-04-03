@@ -1,9 +1,9 @@
+import { Injectable } from '@angular/core';
+import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
+import { MatchData } from '@common/interfaces/match-data';
 import { DistancesAndPredecessors, NeighborContext, QueueNode, ShortestPath, VisitedQueue } from '@common/interfaces/movement';
 import { Position } from '@common/interfaces/position';
 import { TILE_COST, TileType } from '@common/interfaces/tile-type.enum';
-import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
-import { MatchData } from '@common/interfaces/match-data';
-import { Injectable } from '@angular/core';
 
 @Injectable({
     providedIn: 'root',
@@ -60,6 +60,7 @@ export class MovementService {
     }
 
     getNearestEmptyTile(matchData: MatchData, currentPos: Position): Position {
+        let result = currentPos;
         const size = matchData.gameData.mapData.size;
         const visited: boolean[][] = Array.from({ length: size }, () => Array(size).fill(false));
         const queue: Position[] = [];
@@ -68,11 +69,12 @@ export class MovementService {
         while (queue.length > 0) {
             const pos = queue.shift() as Position;
             if (this.isTileValidForMovement(matchData, pos)) {
-                return pos;
+                result = pos;
+                break;
             }
             this.enqueueValidNeighbors(matchData, pos, { visited, queue });
         }
-        return currentPos;
+        return result;
     }
 
     private hasNoItems(matchData: MatchData, position: Position): boolean {
@@ -105,22 +107,19 @@ export class MovementService {
     }
 
     private getPossibleMovesStandard(matchData: MatchData, currentPos: Position, movementRange: number): Position[] {
-        if (this.isOutOfBounds(matchData, currentPos)) {
-            return [];
-        }
-        const { distances } = this.calculateDistancesAndPredecessors(matchData, currentPos, movementRange);
-        const tiles: Position[] = [];
-        const size: number = matchData.gameData.mapData.size;
-
-        for (let x = 0; x < size; x++) {
-            for (let y = 0; y < size; y++) {
-                const isDifferentPosition = x !== currentPos.x || y !== currentPos.y;
-                if (distances[x][y] <= movementRange && isDifferentPosition) {
-                    tiles.push({ x, y });
+        const tiles = [];
+        if (!this.isOutOfBounds(matchData, currentPos)) {
+            const { distances } = this.calculateDistancesAndPredecessors(matchData, currentPos, movementRange);
+            const size: number = matchData.gameData.mapData.size;
+            for (let x = 0; x < size; x++) {
+                for (let y = 0; y < size; y++) {
+                    const isDifferentPosition = x !== currentPos.x || y !== currentPos.y;
+                    if (distances[x][y] <= movementRange && isDifferentPosition) {
+                        tiles.push({ x, y });
+                    }
                 }
             }
         }
-
         return tiles;
     }
 

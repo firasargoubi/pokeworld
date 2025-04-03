@@ -1,29 +1,38 @@
+import { Match } from '@app/classes/match/match';
+import { MatchGateway } from '@app/gateways/match/match.gateway';
+import { CombatService } from '@app/services/combat/combat.service';
+import { PlayService } from '@app/services/play/play.service';
+import { MATCH_CODE_LENGTH } from '@common/consts/match-data.const';
+import { Message } from '@common/interfaces/message.enum';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
+import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
 import { MatchService } from './match.service';
-import { MatchGateway } from '@app/gateways/match/match.gateway';
-import { CombatService } from '@app/services/combat/combat.service';
-import { Match } from '@app/classes/match/match';
-import { MATCH_CODE_LENGTH } from '@common/consts/match-data.const';
-import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
-import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
-import { Message } from '@common/interfaces/message.enum';
 
 describe('MatchService', () => {
     let service: MatchService;
     let sandbox: SinonSandbox;
     let mockMatchGateway: SinonStubbedInstance<MatchGateway>;
     let mockCombatService: SinonStubbedInstance<CombatService>;
+    let mockPlayService: SinonStubbedInstance<PlayService>;
     let mockMatch: SinonStubbedInstance<Match>;
 
     beforeAll(async () => {
         sandbox = createSandbox();
         mockMatchGateway = createStubInstance<MatchGateway>(MatchGateway);
         mockCombatService = createStubInstance<CombatService>(CombatService);
+        mockPlayService = createStubInstance<PlayService>(PlayService);
         mockMatch = createStubInstance<Match>(Match);
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [MatchService, { provide: MatchGateway, useValue: mockMatchGateway }, { provide: CombatService, useValue: mockCombatService }],
+            providers: [
+                MatchService,
+                { provide: MatchGateway, useValue: mockMatchGateway },
+                { provide: PlayService, useValue: mockPlayService },
+                { provide: CombatService, useValue: mockCombatService },
+            ],
         }).compile();
 
         service = module.get<MatchService>(MatchService);
@@ -131,6 +140,17 @@ describe('MatchService', () => {
     it('kill player combat should start combat end death', () => {
         service.killPlayerCombat(mockMatch);
         expect(mockCombatService.startCombatEndDeath.calledWith(mockMatch)).toBe(true);
+    });
+
+    it('respawn player combat should respawn player', () => {
+        const playerData = structuredClone(MOCK_PLAYER_DATAS[0]);
+        service.respawnPlayer(mockMatch, playerData);
+        expect(mockCombatService.respawnPlayer.calledWith(mockMatch, playerData)).toBe(true);
+    });
+
+    it('start next turn should start next turn', () => {
+        service.startNextTurn(mockMatch);
+        expect(mockPlayService.startNextTurn.calledWith(mockMatch)).toBe(true);
     });
 
     it('can join match should return invalid match code', () => {

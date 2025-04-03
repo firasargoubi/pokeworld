@@ -1,6 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Timer } from '@app/classes/timer/timer';
+import { MatchService } from '@app/services/match/match.service';
 import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { COMBAT_TURN_DURATION } from '@common/consts/combat-data.const';

@@ -55,6 +55,9 @@ export class MapService {
     }
 
     getNearestEmptyTile(matchData: MatchData, currentPos: Position): Position {
+        if (this.isOutOfBounds(matchData, currentPos)) {
+            return currentPos;
+        }
         const size = matchData.gameData.mapData.size;
         const visited: boolean[][] = Array.from({ length: size }, () => Array(size).fill(false));
         const queue: Position[] = [];

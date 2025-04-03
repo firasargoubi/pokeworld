@@ -122,8 +122,10 @@ export class PlayService {
     private canPlayerAct(match: Match): boolean {
         const hasPossibleActions = this.mapService.getActions(match.data).length > 0;
         const canUseAction = hasPossibleActions && match.data.playData.hasAction;
-        const canMove = this.mapService.getPossibleMoves(match.data).length > 0;
-        return canUseAction || canMove;
+        const canMove = this.movementService.getPossibleMoves(match.data).length > 0;
+        const canAct = canUseAction || canMove;
+        const isConnected = match.data.players[match.data.playData.activePlayerIndex].isConnected;
+        return canAct && isConnected;
     }
 
     private scheduleForceItemDrop(match: Match, playerId: string): void {
@@ -162,14 +164,16 @@ export class PlayService {
     }
 
     private checkWinConditionCtf(match: Match): boolean {
+        let result = false;
         // TODO check win condition for CTF games, return TRUE if game is over, return FALSE if game should continue
 
         if (Math.random() === 0) {
             match.data.state = MatchState.MatchEnd;
             match.sendMessage('Les rouges remporte la partie');
+            result = true;
         }
 
-        return false;
+        return result;
     }
 
     private setTimeLeft(match: Match) {

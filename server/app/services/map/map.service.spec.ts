@@ -1,11 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { SinonSandbox, createSandbox } from 'sinon';
-import { MapService } from './map.service';
+import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
 import { MatchData } from '@common/interfaces/match-data';
+import { NeighborContext } from '@common/interfaces/movement';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
-import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
-import { NeighborContext } from '@common/interfaces/movement';
+import { Test, TestingModule } from '@nestjs/testing';
+import { SinonSandbox, createSandbox } from 'sinon';
+import { MovementService } from './movement.service';
 
 describe('MapService', () => {
     let service: MapService;
@@ -85,6 +85,15 @@ describe('MapService', () => {
         expect(result1).toEqual(currentPos);
         const result2 = service.getNearestEmptyTile(mockMatchData, currentPos);
         expect(result2).toEqual(currentPos);
+    });
+
+    it('get nearest empty tile should return position if out of bound', () => {
+        const position = { x: -1, y: -1 };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'isOutOfBounds').returns(true);
+
+        const result = service.getNearestEmptyTile(mockMatchData, position);
+        expect(result).toEqual(position);
     });
 
     it('is tile valid for movement should return true if valid', () => {

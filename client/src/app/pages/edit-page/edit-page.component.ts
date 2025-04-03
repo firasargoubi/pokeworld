@@ -187,7 +187,9 @@ export class EditPageComponent {
 
     private getRemainingItemCount(item: ItemType): number | null {
         let remainingItemCount: number | null = this.editorService.getRemainingItemCount(item, this.editorVisualData.dragItem);
-        if (remainingItemCount === 1 && SHARED_ITEM_POOL.includes(item) && item !== ITEM_POOL_HIGHEST_ITEM) {
+        const isSingleSharedItem = SHARED_ITEM_POOL.includes(item) && item !== ITEM_POOL_HIGHEST_ITEM;
+        const isSingleItem = item === ItemType.Flag || isSingleSharedItem;
+        if (remainingItemCount === 1 && isSingleItem) {
             remainingItemCount = null;
         }
         return remainingItemCount;
