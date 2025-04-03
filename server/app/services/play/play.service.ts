@@ -122,7 +122,7 @@ export class PlayService {
     private canPlayerAct(match: Match): boolean {
         const hasPossibleActions = this.mapService.getActions(match.data).length > 0;
         const canUseAction = hasPossibleActions && match.data.playData.hasAction;
-        const canMove = this.movementService.getPossibleMoves(match.data).length > 0;
+        const canMove = this.mapService.getPossibleMoves(match.data).length > 0;
         const canAct = canUseAction || canMove;
         const isConnected = match.data.players[match.data.playData.activePlayerIndex].isConnected;
         return canAct && isConnected;
@@ -259,9 +259,6 @@ export class PlayService {
     }
 
     private getAvatarVariant(avatar: Avatar, avatarModifiers: AvatarModifiers): Avatar {
-        if (avatarModifiers.isMissingNo) {
-            return Avatar.MissingNo;
-        }
         const baseMatch = avatar.match(/^(avatar\d+)/);
         if (!baseMatch) {
             return avatar;

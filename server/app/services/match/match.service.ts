@@ -2,7 +2,6 @@ import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { CombatService } from '@app/services/combat/combat.service';
 import { PlayService } from '@app/services/play/play.service';
-import { PlayService } from '@app/services/play/play.service';
 import { DEFAULT_MATCH_DATA, MATCH_CODE_LENGTH, MATCH_CODE_RANGE } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
 import { GameData } from '@common/interfaces/game-data';
@@ -17,7 +16,6 @@ export class MatchService {
     @Inject(forwardRef(() => CombatService)) private combatService: CombatService;
     @Inject(forwardRef(() => PlayService)) private playService: PlayService;
 
-    @Inject(forwardRef(() => PlayService)) private playService: PlayService;
     private matches: Map<string, Match> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
 

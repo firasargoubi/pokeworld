@@ -57,10 +57,12 @@ export class CombatService {
     }
 
     respawnPlayer(match: Match, player: PlayerData) {
+        this.playService.dropItems(match, player.id, player.items);
+
         if (player.spawnPoint !== player.position) {
             // TODO drop items on the ground
 
-            player.position = this.movementService.getNearestEmptyTile(match.data, player.spawnPoint);
+            player.position = this.mapService.getNearestEmptyTile(match.data, player.spawnPoint);
         }
     }
 
@@ -76,7 +78,7 @@ export class CombatService {
         match.data.state = MatchState.CombatWait;
         match.data.combatData.turnDuration = this.getActivePlayerData(match).currentEscapes === 0 ? COMBAT_SHORT_TURN_DURATION : COMBAT_TURN_DURATION;
 
-        this.computeHealingItems(match);
+        this.computeHealingItem(match);
 
         match.sendUpdate();
         match.setTimeout(this.startAttackAnimation.bind(this, match), match.data.combatData.turnDuration);
@@ -107,22 +109,18 @@ export class CombatService {
         }
     }
 
-    private computeHealingItems(match: Match): boolean {
+    private computeHealingItem(match: Match): boolean {
         const playerCombatData = this.getActivePlayerData(match);
         const player = match.data.players[playerCombatData.playerIndex];
 
-        match.data.players[playerCombatData.playerIndex].items.forEach((item) => {
-            switch (item) {
-                case ItemType.Item4:
-                    if (playerCombatData.currentHealth < player.health * HEALING_ITEM_RATIO) {
-                        playerCombatData.currentHealth += 1;
-                        return true;
-                    }
-                    break;
-                default:
-                    break;
+        for (const item of match.data.players[playerCombatData.playerIndex].items) {
+            if (item === ItemType.Item4) {
+                if (playerCombatData.currentHealth < player.health * HEALING_ITEM_RATIO) {
+                    playerCombatData.currentHealth += 1;
+                    return true;
+                }
             }
-        });
+        }
         return false;
     }
 
@@ -225,13 +223,5 @@ export class CombatService {
         });
 
         return playerCombatData;
-    }
-
-    private respawnPlayer(match: Match, player: PlayerData) {
-        if (player.spawnPoint !== player.position) {
-            // TODO drop items on the ground
-
-            player.position = this.movementService.getNearestEmptyTile(match.data, player.spawnPoint);
-        }
     }
 }

@@ -5,7 +5,7 @@ import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, createSandbox } from 'sinon';
-import { MovementService } from './movement.service';
+import { MapService } from './map.service';
 
 describe('MapService', () => {
     let service: MapService;
