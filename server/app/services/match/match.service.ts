@@ -2,11 +2,9 @@ import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { CombatService } from '@app/services/combat/combat.service';
 import { PlayService } from '@app/services/play/play.service';
-import { REGULAR_ITEMS } from '@common/consts/map-data.const';
 import { DEFAULT_MATCH_DATA, MATCH_CODE_LENGTH, MATCH_CODE_RANGE } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
 import { GameData } from '@common/interfaces/game-data';
-import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchData } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -33,8 +31,6 @@ export class MatchService {
             this.matches.set(matchData.code, match);
             this.playerToMatchCode.set(playerId, matchData.code);
             this.matchGateway.connectPlayer(playerId, matchData.code);
-
-            this.setupRandomItems(matchData);
 
             return matchData;
         }
@@ -166,21 +162,5 @@ export class MatchService {
                 .padStart(MATCH_CODE_LENGTH, '0');
         } while (this.hasMatchCode(matchCode));
         return matchCode;
-    }
-
-    private setupRandomItems(matchData: MatchData): void {
-        const items = matchData.gameData.mapData.items;
-        const unusedItems = REGULAR_ITEMS.filter((itemType) => {
-            return !items[itemType] || items[itemType].length === 0;
-        });
-
-        const randomThreshold = 0.5;
-        unusedItems.sort(() => Math.random() - randomThreshold);
-
-        for (let i = 0; i < items[ItemType.Random].length; i++) {
-            const itemType = unusedItems[i];
-            items[itemType].push(items[ItemType.Random][i]);
-        }
-        items[ItemType.Random] = [];
     }
 }

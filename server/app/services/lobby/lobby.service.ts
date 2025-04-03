@@ -1,8 +1,10 @@
 import { Match } from '@app/classes/match/match';
 import { PlayService } from '@app/services/play/play.service';
+import { REGULAR_ITEMS } from '@common/consts/map-data.const';
 import { HALF_POINT } from '@common/consts/match-data.const';
 import { MIN_PLAYERS } from '@common/consts/player-data.const';
-import { MatchState } from '@common/interfaces/match-data';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { Avatar, PlayerData } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -56,6 +58,7 @@ export class LobbyService {
     private startMatchFirstTurn(match: Match) {
         this.sortPlayers(match);
         this.assignSpawnPoints(match);
+        this.setupRandomItems(match);
         match.data.playData.activePlayerIndex = -1;
         this.playService.startNextTurn(match);
     }
@@ -90,5 +93,22 @@ export class LobbyService {
             suffix++;
         }
         return newName;
+    }
+
+    private setupRandomItems(match: Match): void {
+        const matchData: MatchData = match.data;
+        const items = matchData.gameData.mapData.items;
+        const unusedItems = REGULAR_ITEMS.filter((itemType) => {
+            return !items[itemType] || items[itemType].length === 0;
+        });
+
+        const randomThreshold = 0.5;
+        unusedItems.sort(() => Math.random() - randomThreshold);
+
+        for (let i = 0; i < items[ItemType.Random].length; i++) {
+            const itemType = unusedItems[i];
+            items[itemType].push(items[ItemType.Random][i]);
+        }
+        items[ItemType.Random] = [];
     }
 }
