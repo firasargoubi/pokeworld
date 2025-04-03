@@ -1,6 +1,9 @@
 import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchData } from '@common/interfaces/match-data';
 import { NeighborContext } from '@common/interfaces/movement';
+import { PlayerData } from '@common/interfaces/player-data';
+import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -245,5 +248,155 @@ describe('MapService', () => {
         const pos = service['keyToPos']('1-2');
 
         expect(pos).toEqual({ x: 1, y: 2 });
+    });
+
+    it('getNearestItemDropSpot should return current position if no items there', () => {
+        const currentPos = { x: 0, y: 0 };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'hasNoItems').returns(true);
+
+        const result = service.getNearestItemDropSpot(mockMatchData, currentPos);
+
+        expect(result).toEqual(currentPos);
+    });
+
+    it('getNearestItemDropSpot should find nearest valid position for dropping items', () => {
+        const currentPos = { x: 0, y: 0 };
+        const validPos = { x: 1, y: 0 };
+
+        sandbox
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .stub(service as any, 'hasNoItems')
+            .onFirstCall()
+            .returns(false)
+            .onSecondCall()
+            .returns(true);
+
+        sandbox
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .stub(service as any, 'isValidForDrop')
+            .onFirstCall()
+            .returns(false)
+            .onSecondCall()
+            .returns(true);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const enqueueStub = sandbox
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .stub(service as any, 'enqueueValidNeighbors')
+            .callsFake((matchData, pos, visitedQueue: { queue: unknown[]; visited: boolean[][] }) => {
+                visitedQueue.queue.push(validPos);
+                visitedQueue.visited[validPos.x][validPos.y] = true;
+            });
+
+        const result = service.getNearestItemDropSpot(mockMatchData, currentPos);
+
+        expect(result).toEqual(validPos);
+        expect(enqueueStub.called).toBe(true);
+    });
+
+    it('getNearestItemDropSpot should return current position if no valid drops found', () => {
+        const currentPos = { x: 0, y: 0 };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'hasNoItems').returns(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'isValidForDrop').returns(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'enqueueValidNeighbors').callsFake(() => {
+            return;
+        });
+
+        const result = service.getNearestItemDropSpot(mockMatchData, currentPos);
+
+        expect(result).toEqual(currentPos);
+    });
+
+    it('getItemTypeAtPosition should return item type at position or null', () => {
+        const itemPosition = { x: 1, y: 2 };
+        const emptyPosition = { x: 3, y: 4 };
+
+        mockMatchData.gameData.mapData.items = {
+            [ItemType.Item1]: [itemPosition],
+            [ItemType.Item2]: [{ x: 5, y: 6 }],
+            [ItemType.Spawn]: [{ x: 7, y: 8 }],
+        } as Record<ItemType, Position[]>;
+
+        const result1 = service.getItemTypeAtPosition(mockMatchData, itemPosition);
+        expect(result1).toBe(ItemType.Item1);
+
+        const result2 = service.getItemTypeAtPosition(mockMatchData, emptyPosition);
+        expect(result2).toBe(null);
+    });
+
+    it('isValidForDrop should validate positions for item dropping correctly', () => {
+        mockMatchData.gameData.mapData.tiles[0][0] = TileType.Grass;
+        mockMatchData.gameData.mapData.tiles[1][1] = TileType.Water;
+        mockMatchData.players = [{ position: { x: 2, y: 2 } }] as PlayerData[];
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'hasNoItems').returns(true);
+        const validResult = service['isValidForDrop'](mockMatchData, { x: 0, y: 0 });
+        expect(validResult).toBe(true);
+
+        const waterResult = service['isValidForDrop'](mockMatchData, { x: 1, y: 1 });
+        expect(waterResult).toBe(false);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (service as any).hasNoItems.restore();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'hasNoItems').returns(false);
+        const withItemsResult = service['isValidForDrop'](mockMatchData, { x: 0, y: 0 });
+        expect(withItemsResult).toBe(false);
+
+        const withPlayerResult = service['isValidForDrop'](mockMatchData, { x: 2, y: 2 });
+        expect(withPlayerResult).toBe(false);
+    });
+
+    it('hasNoItems should return true when position has no items', () => {
+        const emptyPosition = { x: 1, y: 1 };
+        const itemPosition = { x: 2, y: 2 };
+
+        mockMatchData.gameData.mapData.items = {
+            [ItemType.Item1]: [itemPosition],
+            [ItemType.Item2]: [{ x: 3, y: 3 }],
+        } as Record<ItemType, Position[]>;
+
+        const resultEmpty = service['hasNoItems'](mockMatchData, emptyPosition);
+        expect(resultEmpty).toBe(true);
+
+        const resultWithItem = service['hasNoItems'](mockMatchData, itemPosition);
+        expect(resultWithItem).toBe(false);
+    });
+
+    it('stopPathAtItemEncounter should handle empty path and truncate path at item encounters', () => {
+        const emptyPath: Position[] = [];
+        const emptyResult = service['stopPathAtItemEncounter'](emptyPath, mockMatchData);
+        expect(emptyResult).toEqual([]);
+
+        const path: Position[] = [
+            { x: 0, y: 0 },
+            { x: 1, y: 0 },
+            { x: 2, y: 0 },
+            { x: 3, y: 0 },
+        ];
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'isTileOccupiedByObject').returns(false);
+        const fullPathResult = service['stopPathAtItemEncounter'](path, mockMatchData);
+        expect(fullPathResult).toEqual(path);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (service as any).isTileOccupiedByObject.restore();
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sandbox.stub(service as any, 'isTileOccupiedByObject').callsFake((md: any, pos: Position) => pos.x === 2 && pos.y === 0);
+
+        const truncatedResult = service['stopPathAtItemEncounter'](path, mockMatchData);
+        expect(truncatedResult).toEqual([
+            { x: 0, y: 0 },
+            { x: 1, y: 0 },
+            { x: 2, y: 0 },
+        ]);
     });
 });

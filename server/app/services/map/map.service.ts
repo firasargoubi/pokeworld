@@ -22,7 +22,7 @@ export class MapService {
         const { distances, predecessors } = this.calculateDistancesAndPredecessors(matchData, startPos, Infinity);
         let path = this.reconstructPath(target, predecessors);
         path = this.stopPathAtItemEncounter(path, matchData);
-        return { moveCost: distances[path[path.length - 1].x][path[path.length - 1].y], path: path || [] };
+        return { moveCost: distances[path[path.length - 1].x][path[path.length - 1].y], path };
     }
 
     getActions(matchData: MatchData): Position[] {

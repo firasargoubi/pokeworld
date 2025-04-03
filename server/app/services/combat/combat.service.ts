@@ -8,6 +8,15 @@ import {
     COMBAT_TURN_DURATION,
     DEFAULT_PLAYER_COMBAT_DATA,
     HEALING_ITEM_RATIO,
+    ITEM1_ATTACK_BONUS,
+    ITEM1_DEFENSE_BONUS,
+    ITEM2_ATTACK_BONUS,
+    ITEM2_DEFENSE_BONUS,
+    ITEM3_BUSH_ATTACK_BONUS,
+    ITEM4_HEALING_BONUS,
+    ITEM5_CURRENT_ESCAPES_BONUS,
+    ITEM5_ESCAPE_CHANCES_BONUS,
+    ITEM5_MAX_ESCAPES_BONUS,
     PATH_ATTACK_MODIFICATION,
     PATH_DEFENSE_MODIFICATION,
 } from '@common/consts/combat-data.const';
@@ -60,8 +69,6 @@ export class CombatService {
         this.playService.dropItems(match, player.id, player.items);
 
         if (player.spawnPoint !== player.position) {
-            // TODO drop items on the ground
-
             player.position = this.mapService.getNearestEmptyTile(match.data, player.spawnPoint);
         }
     }
@@ -112,15 +119,15 @@ export class CombatService {
     private computeHealingItem(match: Match): boolean {
         const playerCombatData = this.getActivePlayerData(match);
         const player = match.data.players[playerCombatData.playerIndex];
+        const containItem4 = player.items.includes(ItemType.Item4);
 
-        for (const item of match.data.players[playerCombatData.playerIndex].items) {
-            if (item === ItemType.Item4) {
-                if (playerCombatData.currentHealth < player.health * HEALING_ITEM_RATIO) {
-                    playerCombatData.currentHealth += 1;
-                    return true;
-                }
+        if (containItem4) {
+            if (playerCombatData.currentHealth < player.health * HEALING_ITEM_RATIO) {
+                playerCombatData.currentHealth += ITEM4_HEALING_BONUS;
+                return true;
             }
         }
+
         return false;
     }
 
@@ -200,22 +207,22 @@ export class CombatService {
         match.data.players[playerCombatData.playerIndex].items.forEach((item) => {
             switch (item) {
                 case ItemType.Item1:
-                    playerCombatData.attack += 1;
-                    playerCombatData.defense += 1;
+                    playerCombatData.attack += ITEM1_ATTACK_BONUS;
+                    playerCombatData.defense += ITEM1_DEFENSE_BONUS;
                     break;
                 case ItemType.Item2:
-                    playerCombatData.attack += 2;
-                    playerCombatData.defense += 2;
+                    playerCombatData.attack += ITEM2_ATTACK_BONUS;
+                    playerCombatData.defense += ITEM2_DEFENSE_BONUS;
                     break;
                 case ItemType.Item3:
                     if (playerCombatData.standingTile === TileType.Bush) {
-                        playerCombatData.attack += 3;
+                        playerCombatData.attack += ITEM3_BUSH_ATTACK_BONUS;
                     }
                     break;
                 case ItemType.Item5:
-                    playerCombatData.maxEscapes += 1;
-                    playerCombatData.currentEscapes += 1;
-                    playerCombatData.escapeChances += 0.2;
+                    playerCombatData.maxEscapes += ITEM5_MAX_ESCAPES_BONUS;
+                    playerCombatData.currentEscapes += ITEM5_CURRENT_ESCAPES_BONUS;
+                    playerCombatData.escapeChances += ITEM5_ESCAPE_CHANCES_BONUS;
                     break;
                 default:
                     break;

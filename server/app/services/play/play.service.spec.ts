@@ -1,34 +1,30 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { SinonSandbox, createSandbox, SinonStubbedInstance, createStubInstance } from 'sinon';
-import { PlayService } from './play.service';
-import { MovementService } from '@app/services/movement/movement.service';
-import { CombatService } from '@app/services/combat/combat.service';
 import { Match } from '@app/classes/match/match';
+import { CombatService } from '@app/services/combat/combat.service';
+import { MapService } from '@app/services/map/map.service';
+import { GameMode } from '@common/interfaces/map-data';
 import { MatchState } from '@common/interfaces/match-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
-import { GameMode } from '@common/interfaces/map-data';
+import { Test, TestingModule } from '@nestjs/testing';
+import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
+import { PlayService } from './play.service';
 
 describe('PlayService', () => {
     let service: PlayService;
     let sandbox: SinonSandbox;
-    let mockMovementService: SinonStubbedInstance<MovementService>;
+    let mockMapService: SinonStubbedInstance<MapService>;
     let mockCombatService: SinonStubbedInstance<CombatService>;
     let mockMatch: SinonStubbedInstance<Match>;
 
     beforeAll(async () => {
         sandbox = createSandbox();
-        mockMovementService = createStubInstance(MovementService);
+        mockMapService = createStubInstance(MapService);
         mockCombatService = createStubInstance(CombatService);
         mockMatch = createStubInstance(Match);
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                PlayService,
-                { provide: MovementService, useValue: mockMovementService },
-                { provide: CombatService, useValue: mockCombatService },
-            ],
+            providers: [PlayService, { provide: MapService, useValue: mockMapService }, { provide: CombatService, useValue: mockCombatService }],
         }).compile();
 
         service = module.get<PlayService>(PlayService);
@@ -60,7 +56,7 @@ describe('PlayService', () => {
     it('move should update position and state if valid', () => {
         mockMatch.isActivePlayer.returns(true);
         mockMatch.isState.withArgs([MatchState.TurnWait]).returns(true);
-        mockMovementService.getShortestPath.returns({ moveCost: 2, path: [{ x: 1, y: 1 }] });
+        mockMapService.getShortestPath.returns({ moveCost: 2, path: [{ x: 1, y: 1 }] });
         mockMatch.data.playData.movementLeft = 3;
         mockMatch.getPlayer.returns({ ...structuredClone(MOCK_PLAYER_DATAS[0]), position: { x: 0, y: 0 } });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,7 +73,7 @@ describe('PlayService', () => {
         mockMatch.data.playData.hasAction = true;
         mockMatch.isActivePlayer.returns(true);
         mockMatch.isState.withArgs([MatchState.TurnWait]).returns(true);
-        mockMovementService.getActions.returns([{ x: 1, y: 1 }]);
+        mockMapService.getActions.returns([{ x: 1, y: 1 }]);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const executeActionStub = sandbox.stub(service as any, 'executeAction');
 
@@ -92,7 +88,7 @@ describe('PlayService', () => {
         mockMatch.data.playData.isDebugMode = true;
         mockMatch.isActivePlayer.returns(true);
         mockMatch.isState.returns(true);
-        mockMovementService.getPossibleMovesDebug.returns([position]);
+        mockMapService.getPossibleMovesDebug.returns([position]);
         mockMatch.getPlayer.returns({ ...structuredClone(MOCK_PLAYER_DATAS[0]), position: { x: 0, y: 0 } });
 
         service.debugMove(mockMatch, 'player1', position);
@@ -159,9 +155,9 @@ describe('PlayService', () => {
     });
 
     it('can player act should return true if actions available', () => {
-        mockMovementService.getActions.returns([{ x: 1, y: 1 }]);
+        mockMapService.getActions.returns([{ x: 1, y: 1 }]);
         mockMatch.data.playData.hasAction = false;
-        mockMovementService.getPossibleMoves.returns([{ x: 1, y: 1 }]);
+        mockMapService.getPossibleMoves.returns([{ x: 1, y: 1 }]);
 
         const result = service['canPlayerAct'](mockMatch);
 

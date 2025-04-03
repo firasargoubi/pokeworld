@@ -242,13 +242,11 @@ export class PlayService {
     }
 
     private forceItemDrop(match: Match, playerId: string) {
-        if (match.data.state === MatchState.ItemDropSelection) {
-            match.data.state = MatchState.TurnWait;
-            const player = match.getPlayer(playerId);
-            this.dropItems(match, playerId, [player.items[MAX_ITEMS]]);
-            this.continueTurn(match);
-            match.sendUpdate();
-        }
+        match.data.state = MatchState.TurnWait;
+        const player = match.getPlayer(playerId);
+        this.dropItems(match, playerId, [player.items[MAX_ITEMS]]);
+        this.continueTurn(match);
+        match.sendUpdate();
     }
 
     private computeItems(player: PlayerData) {
