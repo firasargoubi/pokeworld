@@ -11,7 +11,7 @@ export const DEFAULT_OVERLAY_TILES: OverlayTiles = {
     possibleMoves: [],
     hoverMoves: [],
     actions: [],
-    playerPosition: { x: -1, y: -1 },
+    playerPosition: structuredClone(OUTSIDE_OF_MAP),
 };
 
 export const DEFAULT_TILE_VISUAL: TileVisualData = {

@@ -1,18 +1,19 @@
 import { MapSize } from '../interfaces/map-data';
 import { Avatar, DiceType, PlayerData, PlayerType } from '../interfaces/player-data';
+import { OUTSIDE_OF_MAP } from './map-data.const';
 
 export const DEFAULT_PLAYER_DATA: PlayerData = {
     id: '',
     name: '',
     avatar: Avatar.Default,
     isConnected: false,
-    spawnPoint: { x: -2, y: -2 },
+    spawnPoint: structuredClone(OUTSIDE_OF_MAP),
     items: [],
     health: 6,
     speed: 4,
     attackDice: DiceType.D6,
     defenseDice: DiceType.D4,
-    position: { x: -2, y: -2 },
+    position: structuredClone(OUTSIDE_OF_MAP),
     combatsWon: 0,
     type: PlayerType.Player,
 };

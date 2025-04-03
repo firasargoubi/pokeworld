@@ -12,6 +12,7 @@ import { EditorService } from '@app/services/editor/editor.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -84,7 +85,7 @@ export class EditPageComponent {
 
     onMouseUp(event: MouseEvent) {
         this.editorVisualData.paintingTile = null;
-        this.editorVisualData.lastPaintedPosition = { x: -1, y: -1 };
+        this.editorVisualData.lastPaintedPosition = structuredClone(OUTSIDE_OF_MAP);
 
         if (this.editorVisualData.dragItem) {
             this.dropItem(this.getEventProperty(event));

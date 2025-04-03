@@ -1,14 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { SinonSandbox, createSandbox, SinonStubbedInstance, createStubInstance } from 'sinon';
-import { PlayService } from './play.service';
-import { MovementService } from '@app/services/movement/movement.service';
-import { CombatService } from '@app/services/combat/combat.service';
 import { Match } from '@app/classes/match/match';
+import { CombatService } from '@app/services/combat/combat.service';
+import { MovementService } from '@app/services/movement/movement.service';
+import { MINIMUM_COMBATS_TO_WIN } from '@common/consts/match-data.const';
+import { GameMode } from '@common/interfaces/map-data';
 import { MatchState } from '@common/interfaces/match-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
-import { GameMode } from '@common/interfaces/map-data';
+import { Test, TestingModule } from '@nestjs/testing';
+import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
+import { PlayService } from './play.service';
 
 describe('PlayService', () => {
     let service: PlayService;
@@ -189,7 +190,7 @@ describe('PlayService', () => {
     });
 
     it('check win condition ffa should return true if winner found', () => {
-        mockMatch.data.players[0].combatsWon = 3; // Assuming MINIMUM_COMBATS_TO_WIN <= 3
+        mockMatch.data.players[0].combatsWon = MINIMUM_COMBATS_TO_WIN;
 
         const result = service['checkWinConditionFfa'](mockMatch);
 

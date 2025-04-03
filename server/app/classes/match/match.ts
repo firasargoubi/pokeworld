@@ -1,4 +1,5 @@
 import { MatchService } from '@app/services/match/match.service';
+import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { DEFAULT_PLAYER_DATA, MAX_PLAYERS } from '@common/consts/player-data.const';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
@@ -153,7 +154,7 @@ export class Match {
             if (this.isActivePlayer(player.id) && this.isState([MatchState.TurnWait])) {
                 this.matchService.startNextTurn(this);
             }
-            player.spawnPoint = { x: -2, y: -2 };
+            player.spawnPoint = structuredClone(OUTSIDE_OF_MAP);
             this.matchService.respawnPlayer(this, player);
             this.sendMessage(`${player.name} a quitté la partie`);
         }

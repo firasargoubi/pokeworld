@@ -1,5 +1,7 @@
 import { Position } from "../interfaces/position";
 
+export const OUTSIDE_OF_MAP: Position = { x: -2, y: -2 };
+
 export const SURROUNDING_POSITIONS_PLUS: Position[] = [
     { x: -1, y: 0 },
     { x: 0, y: -1 },
