@@ -25,7 +25,6 @@ describe('ItemDropPopupComponent', () => {
     });
 
     it('should call playService.dropItem with the selected item when validateChoise is called', () => {
-        // Arrange
         const testItems = [ItemType.Item1, ItemType.Item2];
         component.inventoryItems = testItems;
         component.selectedItem = 1;

@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
+import { MapSize } from '@common/interfaces/map-data';
 import { MatchData } from '@common/interfaces/match-data';
 import { NeighborContext } from '@common/interfaces/movement';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MovementService } from './movement.service';
-import { MapSize } from '@common/interfaces/map-data';
 
 describe('MovementService', () => {
     let service: MovementService;
@@ -52,6 +52,31 @@ describe('MovementService', () => {
         const actions = service.getActions(mockMatchData);
         expect(actions).toBeDefined();
         expect(actions.length).toBe(0);
+    });
+
+    it('get actions should not return action if there is an item on bridges', () => {
+        mockMatchData.gameData.mapData.tiles = [
+            [TileType.Grass, TileType.Bridge, TileType.Grass],
+            [TileType.Grass, TileType.Grass, TileType.Grass],
+            [TileType.Grass, TileType.Water, TileType.Grass],
+        ];
+        mockMatchData.gameData.mapData.items.Item1 = [{ x: 0, y: 1 }];
+
+        const actions = service.getActions(mockMatchData);
+        expect(actions).toBeDefined();
+        expect(actions.length).toBe(0);
+    });
+
+    it('get actions should return action if there not an item on bridges', () => {
+        mockMatchData.gameData.mapData.tiles = [
+            [TileType.Grass, TileType.Bridge, TileType.Grass],
+            [TileType.Grass, TileType.Grass, TileType.Grass],
+            [TileType.Grass, TileType.Water, TileType.Grass],
+        ];
+
+        const actions = service.getActions(mockMatchData);
+        expect(actions).toBeDefined();
+        expect(actions.length).toBe(1);
     });
 
     it('get possible moves debug should return all accessible empty tiles', () => {
@@ -184,5 +209,22 @@ describe('MovementService', () => {
         const key = '1-2';
         const position = service['keyToPos'](key);
         expect(position).toEqual({ x: 1, y: 2 });
+    });
+
+    it('hasNoItems should check if a position has no items', () => {
+        const emptyPosition: Position = { x: 1, y: 1 };
+        const hasNoItemsResult = service['hasItem'](mockMatchData, emptyPosition);
+        expect(hasNoItemsResult).toBeFalse();
+
+        const positionWithItem: Position = { x: 0, y: 0 }; // There's an Item1 at this position in the mock data
+        const hasItemsResult = service['hasItem'](mockMatchData, positionWithItem);
+        expect(hasItemsResult).toBeTrue();
+
+        const updatedMatchData = structuredClone(mockMatchData);
+        updatedMatchData.gameData.mapData.items.Item2 = [{ x: 2, y: 1 }];
+
+        const positionWithNewItem: Position = { x: 2, y: 1 };
+        const hasNewItemResult = service['hasItem'](updatedMatchData, positionWithNewItem);
+        expect(hasNewItemResult).toBeTrue();
     });
 });
