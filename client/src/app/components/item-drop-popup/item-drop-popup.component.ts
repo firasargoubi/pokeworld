@@ -3,6 +3,7 @@ import { Component, inject, Input } from '@angular/core';
 import { ItemComponent } from '@app/components/item/item.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { PlayService } from '@app/services/play/play.service';
+import { MAX_ITEMS } from '@common/consts/player-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 
 @Component({
@@ -13,7 +14,7 @@ import { ItemType } from '@common/interfaces/item-type.enum';
 })
 export class ItemDropPopupComponent {
     @Input() inventoryItems: ItemType[] = [];
-    selectedItem: number = 2;
+    selectedItem: number = MAX_ITEMS;
     private playService: PlayService = inject(PlayService);
 
     validateChoise() {
