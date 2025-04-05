@@ -1,9 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MapComponent } from '@app/components/map/map.component';
-import { MapVisualData } from '@app/interfaces/map-visual-data';
+import { AvatarVisualEffect, MapVisualData } from '@app/interfaces/map-visual-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
+import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { MapSize } from '@common/interfaces/map-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
 
@@ -13,6 +15,7 @@ describe('MapComponent', () => {
     let mapServiceSpy: jasmine.SpyObj<MapService>;
     let playServiceSpy: jasmine.SpyObj<PlayService>;
     let gameDataServiceSpy: jasmine.SpyObj<GameDataService>;
+    let matchServiceSpy: jasmine.SpyObj<MatchService>;
 
     beforeEach(async () => {
         playServiceSpy = jasmine.createSpyObj('PlayService', ['displayMovementPath', 'rightClickTile', 'clickTile']);
@@ -36,12 +39,23 @@ describe('MapComponent', () => {
             visualMapData: mockVisualMapData,
             gameDataService: gameDataServiceSpy,
         });
+        matchServiceSpy = jasmine.createSpyObj('MatchService', [], {
+            data: {
+                players: [
+                    { id: 'player1', items: [ItemType.Item1, ItemType.Item6], position: { x: 0, y: 0 } },
+                    { id: 'player2', items: [ItemType.Item1], position: { x: 1, y: 1 } },
+                    { id: 'player3', items: [ItemType.Item6], position: { x: 2, y: 2 } },
+                ],
+            },
+            selfPlayer: { id: 'player1' },
+        });
 
         await TestBed.configureTestingModule({
             imports: [MapComponent],
             providers: [
                 { provide: MapService, useValue: mapServiceSpy },
                 { provide: PlayService, useValue: playServiceSpy },
+                { provide: MatchService, useValue: matchServiceSpy },
             ],
         }).compileComponents();
 
@@ -73,5 +87,11 @@ describe('MapComponent', () => {
         const position = { x: 5, y: 7 };
         component.rightClickTile(new MouseEvent('click'), position);
         expect(playServiceSpy.rightClickTile).toHaveBeenCalledWith(position);
+    });
+    it('should return correct visual effect for players based on their items', () => {
+        expect(component.getTileEffect('player1')).toEqual(AvatarVisualEffect.Fade);
+        expect(component.getTileEffect('player3')).toEqual(AvatarVisualEffect.Invisible);
+        expect(component.getTileEffect('player2')).toEqual(AvatarVisualEffect.None);
+        expect(component.getTileEffect('unknown')).toEqual(AvatarVisualEffect.None);
     });
 });

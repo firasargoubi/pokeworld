@@ -32,6 +32,7 @@ export class CombatPageComponent {
         }
         this.onMatchUpdate();
         this.updateImages();
+        this.computeItems();
         this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
     }
 
@@ -57,13 +58,6 @@ export class CombatPageComponent {
         this.visualData.enemyPlatform = BATTLE_PLATFORM_IMAGES[this.visualData.enemyPlayer.standingTile].enemyPlatform;
         this.visualData.selfImage = AVATAR_DATA[this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar].backGif;
         this.visualData.enemyImage = AVATAR_DATA[this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar].frontGif;
-
-        if (this.matchService.data.players[this.visualData.selfPlayer.playerIndex].items.includes(ItemType.Item6)) {
-            this.visualData.selfImage = AVATAR_DATA.missingNo.backGif;
-        }
-        if (this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].items.includes(ItemType.Item6)) {
-            this.visualData.enemyImage = AVATAR_DATA.missingNo.backGif;
-        }
     }
 
     private onMatchUpdate() {
@@ -95,5 +89,14 @@ export class CombatPageComponent {
     private checkHealingAnimation() {
         this.visualData.isSelfHealing = this.combatService.hasPlayerHealed(this.visualData.selfPlayer.playerIndex);
         this.visualData.isEnemyHealing = this.combatService.hasPlayerHealed(this.visualData.enemyPlayer.playerIndex);
+    }
+
+    private computeItems() {
+        if (this.matchService.data.players[this.visualData.selfPlayer.playerIndex].items.includes(ItemType.Item6)) {
+            this.visualData.selfImage = AVATAR_DATA.missingNo.backGif;
+        }
+        if (this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].items.includes(ItemType.Item6)) {
+            this.visualData.enemyImage = AVATAR_DATA.missingNo.backGif;
+        }
     }
 }

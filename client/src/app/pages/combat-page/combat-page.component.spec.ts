@@ -1,9 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { Timer } from '@app/classes/timer/timer';
+import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { PlayerCombatData } from '@common/interfaces/match-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { CombatPageComponent } from './combat-page.component';
 
@@ -98,5 +101,17 @@ describe('CombatPageComponent', () => {
         const updatePlayersCombatDataSpy = spyOn(component as any, 'updatePlayersCombatData').and.callThrough();
         component['updatePlayersCombatData']();
         expect(updatePlayersCombatDataSpy).toHaveBeenCalled();
+    });
+
+    it('should set enemyImage to missingNo when enemy player has Item6', () => {
+        component.visualData.selfPlayer = { playerIndex: 0 } as PlayerCombatData;
+        component.visualData.enemyPlayer = { playerIndex: 1 } as PlayerCombatData;
+        mockMatchService.data.players[0].items = [ItemType.Item6];
+        mockMatchService.data.players[1].items = [ItemType.Item6];
+
+        component['computeItems']();
+
+        expect(component.visualData.enemyImage).toEqual(AVATAR_DATA.missingNo.backGif);
+        expect(component.visualData.selfImage).toEqual(AVATAR_DATA.missingNo.backGif);
     });
 });

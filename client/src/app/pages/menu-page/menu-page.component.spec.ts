@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterModule } from '@angular/router'; // Utilisation de RouterModule.forRoot([])
 import { MenuPageComponent } from './menu-page.component';
 
 describe('MenuPageComponent', () => {
@@ -7,7 +8,10 @@ describe('MenuPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [MenuPageComponent],
+            imports: [
+                RouterModule.forRoot([]), // Ajout des routes vides pour fournir les dépendances nécessaires
+                MenuPageComponent,
+            ],
         }).compileComponents();
     });
 
