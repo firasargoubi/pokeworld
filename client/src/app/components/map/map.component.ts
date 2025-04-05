@@ -18,10 +18,10 @@ import { Position } from '@common/interfaces/position';
 export class MapComponent {
     @Input() isEditor: boolean = false;
     mapService: MapService = inject(MapService);
-    matchService: MatchService = inject(MatchService);
     avatarVisualEffect = AvatarVisualEffect;
     private playService: PlayService = inject(PlayService);
     private lastHover: Position = structuredClone(OUTSIDE_OF_MAP);
+    private matchService: MatchService = inject(MatchService);
 
     onHover(position: Position) {
         const hoveringLastTile = this.lastHover.x !== position.x || this.lastHover.y !== position.y;
@@ -42,7 +42,6 @@ export class MapComponent {
             event.preventDefault();
             this.playService.rightClickTile(position);
         }
-        this.matchService.data.players[this.matchService.selfIndex].position = position;
     }
 
     getTileEffect(id: string): AvatarVisualEffect {
