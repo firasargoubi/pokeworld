@@ -1,4 +1,8 @@
 /* eslint-disable max-lines */
+// This file contains large constant data structures for debugging purposes,
+// which exceed our normal line count limits. Disabling the max-lines
+// rule is appropriate here as this is reference/test data.
+
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode, MapSize } from '@common/interfaces/map-data';
 import { Avatar, DiceType, PlayerData, PlayerType } from '@common/interfaces/player-data';

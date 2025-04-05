@@ -1,7 +1,7 @@
 import { Match } from '@app/classes/match/match';
 import { PlayService } from '@app/services/play/play.service';
 import { REGULAR_ITEMS } from '@common/consts/map-data.const';
-import { HALF_POINT } from '@common/consts/match-data.const';
+import { RANDOM_THRESHOLD } from '@common/consts/match-data.const';
 import { MIN_PLAYERS } from '@common/consts/player-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
@@ -69,14 +69,14 @@ export class LobbyService {
             if (a.speed !== b.speed) {
                 return b.speed - a.speed;
             }
-            return Math.random() - HALF_POINT;
+            return Math.random() - RANDOM_THRESHOLD;
         });
         match.data.lobbyData.hostPlayerIndex = match.getPlayerIndex(hostPlayerId);
     }
 
     private assignSpawnPoints(match: Match) {
         const spawnPoints = match.data.gameData.mapData.items.Spawn;
-        const shuffledSpawnPoints = spawnPoints.sort(() => Math.random() - HALF_POINT).slice(0, match.data.players.length);
+        const shuffledSpawnPoints = spawnPoints.sort(() => Math.random() - RANDOM_THRESHOLD).slice(0, match.data.players.length);
         match.data.gameData.mapData.items.Spawn = spawnPoints.filter((s) => shuffledSpawnPoints.includes(s));
 
         shuffledSpawnPoints.forEach((spawnPoint, i) => {

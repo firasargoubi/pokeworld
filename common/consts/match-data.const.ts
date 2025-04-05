@@ -36,7 +36,7 @@ export const MATCH_CODE_RANGE = 10000;
 
 export const MATCH_CODE_LENGTH = 4;
 
-export const HALF_POINT = 0.5;
+export const RANDOM_THRESHOLD = 0.5;
 
 export const MS_CONVERSION_FACTOR = 10;
 

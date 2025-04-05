@@ -18,7 +18,7 @@ export class CombatService {
 
     constructor() {
         this.timer.restartTimer(this.matchService.data.combatData.turnDuration);
-        this.lastCombatData = { ...this.matchService.data.combatData };
+        this.lastCombatData = structuredClone(this.matchService.data.combatData);
         this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
     }
 
