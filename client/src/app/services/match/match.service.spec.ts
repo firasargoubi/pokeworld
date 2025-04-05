@@ -1,15 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { GameDataService } from '@app/services/game-data/game-data.service';
-import { PopupService } from '@app/services/popup/popup.service';
-import { MatchService } from './match.service';
 import { MapService } from '@app/services/map/map.service';
+import { PopupService } from '@app/services/popup/popup.service';
 import { SocketService } from '@app/services/socket/socket.service';
-import { MatchEvent } from '@common/interfaces/socket-event.enum';
-import { MatchState } from '@common/interfaces/match-data';
-import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
-import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
+import { MAX_ITEMS } from '@common/consts/player-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { MatchState } from '@common/interfaces/match-data';
+import { PlayerData } from '@common/interfaces/player-data';
+import { MatchEvent } from '@common/interfaces/socket-event.enum';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
+import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { MatchService } from './match.service';
 
 describe('MatchService', () => {
     let service: MatchService;
@@ -185,5 +187,23 @@ describe('MatchService', () => {
         expect(mapServiceSpy.setPlayers).toHaveBeenCalledWith([]);
         expect(mapServiceSpy.clearOverlays).toHaveBeenCalled();
         expect(service.matchUpdate.next).toHaveBeenCalled();
+    });
+
+    it('should correctly determine if the player inventory is full', () => {
+        service.selfPlayer = {
+            items: new Array(MAX_ITEMS + 1).fill({}),
+        } as PlayerData;
+
+        let result = service.isInventoryFull();
+
+        expect(result).toBeTrue();
+
+        service.selfPlayer = {
+            items: new Array(MAX_ITEMS).fill({}),
+        } as PlayerData;
+
+        result = service.isInventoryFull();
+
+        expect(result).toBeFalse();
     });
 });

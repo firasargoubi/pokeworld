@@ -1,12 +1,14 @@
+import { Match } from '@app/classes/match/match';
 import { PlayService } from '@app/services/play/play.service';
+import { REGULAR_ITEMS } from '@common/consts/map-data.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { Message } from '@common/interfaces/message.enum';
+import { Avatar } from '@common/interfaces/player-data';
+import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
 import { LobbyService } from './lobby.service';
-import { Match } from '@app/classes/match/match';
-import { Message } from '@common/interfaces/message.enum';
-import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
-import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
-import { Avatar } from '@common/interfaces/player-data';
 
 describe('LobbyService', () => {
     let service: LobbyService;
@@ -93,11 +95,14 @@ describe('LobbyService', () => {
         const sortPlayersStub = sandbox.stub(service as any, 'sortPlayers');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const assignSpawnPointsStub = sandbox.stub(service as any, 'assignSpawnPoints');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const setupRandomItemsStub = sandbox.stub(service as any, 'setupRandomItems');
 
         service['startMatchFirstTurn'](mockMatch);
 
         expect(sortPlayersStub.calledWith(mockMatch)).toBeTruthy();
         expect(assignSpawnPointsStub.calledWith(mockMatch)).toBeTruthy();
+        expect(setupRandomItemsStub.calledWith(mockMatch)).toBeTruthy();
         expect(mockMatch.data.playData.activePlayerIndex).toBe(-1);
         expect(mockPlayService.startNextTurn.calledWith(mockMatch)).toBeTruthy();
     });
@@ -142,5 +147,43 @@ describe('LobbyService', () => {
 
         const uniqueName2 = service['getUniqueName'](mockMatch, 'player2', 'Alice');
         expect(uniqueName2).toBe('Alice-2');
+    });
+
+    it('setupRandomItems should distribute random items to unused item types', () => {
+        const randomPosition1 = { x: 3, y: 3 };
+        const randomPosition2 = { x: 4, y: 4 };
+
+        mockMatch.data.gameData.mapData.items = {
+            [ItemType.Random]: [randomPosition1, randomPosition2],
+            [ItemType.Item1]: [],
+            [ItemType.Item2]: [{ x: 0, y: 0 }],
+            [ItemType.Item3]: [],
+            [ItemType.Item4]: [],
+            [ItemType.Item5]: [],
+            [ItemType.Item6]: [],
+            [ItemType.Spawn]: [],
+            [ItemType.Flag]: [],
+        } as Record<ItemType, { x: number; y: number }[]>;
+
+        service['setupRandomItems'](mockMatch);
+
+        expect(mockMatch.data.gameData.mapData.items[ItemType.Random].length).toBe(0);
+
+        const totalDistributed = Object.values(REGULAR_ITEMS)
+            .filter((itemType) => itemType !== ItemType.Random)
+            .reduce((count, itemType) => {
+                return count + mockMatch.data.gameData.mapData.items[itemType].length;
+            }, 0);
+
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        expect(totalDistributed).toBe(3);
+
+        const randomItemsCount = Object.values(REGULAR_ITEMS)
+            .filter((itemType) => itemType === ItemType.Random)
+            .reduce((count, itemType) => {
+                return count + mockMatch.data.gameData.mapData.items[itemType].length;
+            }, 0);
+
+        expect(randomItemsCount).toBe(0);
     });
 });

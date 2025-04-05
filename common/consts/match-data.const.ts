@@ -6,6 +6,7 @@ export const TURN_WAIT_DURATION = 30000;
 export const TURN_START_DURATION = 3000;
 export const MOVEMENT_ANIMATION_DURATION = 150;
 export const MATCH_END_DURATION = 3000;
+export const DROP_ITEMS_DURATION = 10000;
 export const TIME_SCALE = 1000;
 
 export const DEFAULT_LOBBY_DATA: LobbyData = {
@@ -35,7 +36,7 @@ export const MATCH_CODE_RANGE = 10000;
 
 export const MATCH_CODE_LENGTH = 4;
 
-export const HALF_POINT = 0.5;
+export const RANDOM_THRESHOLD = 0.5;
 
 export const MS_CONVERSION_FACTOR = 10;
 

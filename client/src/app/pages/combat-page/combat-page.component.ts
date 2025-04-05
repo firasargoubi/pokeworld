@@ -10,6 +10,7 @@ import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchState } from '@common/interfaces/match-data';
 
 @Component({
@@ -31,6 +32,7 @@ export class CombatPageComponent {
         }
         this.onMatchUpdate();
         this.updateImages();
+        this.computeItems();
         this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
     }
 
@@ -61,6 +63,7 @@ export class CombatPageComponent {
     private onMatchUpdate() {
         this.checkForRedirect();
         this.updatePlayersCombatData();
+        this.checkHealingAnimation();
     }
 
     private checkForRedirect() {
@@ -80,6 +83,20 @@ export class CombatPageComponent {
             this.visualData.selfPlayer = this.matchService.data.combatData.playersCombatData[1];
             this.visualData.enemyPlayer = this.matchService.data.combatData.playersCombatData[0];
             this.visualData.isSelfTurn = this.matchService.data.combatData.isSecondPlayerTurn;
+        }
+    }
+
+    private checkHealingAnimation() {
+        this.visualData.isSelfHealing = this.combatService.hasPlayerHealed(this.visualData.selfPlayer.playerIndex);
+        this.visualData.isEnemyHealing = this.combatService.hasPlayerHealed(this.visualData.enemyPlayer.playerIndex);
+    }
+
+    private computeItems() {
+        if (this.matchService.data.players[this.visualData.selfPlayer.playerIndex].items.includes(ItemType.Item6)) {
+            this.visualData.selfImage = AVATAR_DATA.missingNo.backGif;
+        }
+        if (this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].items.includes(ItemType.Item6)) {
+            this.visualData.enemyImage = AVATAR_DATA.missingNo.backGif;
         }
     }
 }

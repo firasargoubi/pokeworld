@@ -1,10 +1,12 @@
+import { Match } from '@app/classes/match/match';
+import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { PlayGateway } from './play.gateway';
-import { MatchService } from '@app/services/match/match.service';
-import { Match } from '@app/classes/match/match';
 
 describe('PlayGayteway', () => {
     let gateway: PlayGateway;
@@ -73,5 +75,13 @@ describe('PlayGayteway', () => {
         const isLocked = true;
         gateway.changeDebugMode(mockSocket, isLocked);
         expect(mockPlayService.changeDebugMode.calledWith(mockMatch, mockSocket.id, isLocked)).toBeTruthy();
+    });
+    it('should call drop items on drop item event and continue turn', () => {
+        const itemType = ItemType.Item1;
+        mockMatch.data = { state: MatchState.Lobby } as MatchData;
+        gateway.dropItem(mockSocket, itemType);
+        expect(mockPlayService.dropItems.calledWith(mockMatch, mockSocket.id, [itemType])).toBeTruthy();
+        expect(mockMatch.data.state).toBe(MatchState.TurnWait);
+        expect(mockPlayService.continueTurn.calledWith(mockMatch)).toBeTruthy();
     });
 });

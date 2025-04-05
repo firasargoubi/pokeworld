@@ -1,8 +1,10 @@
 import { Match } from '@app/classes/match/match';
 import { PlayService } from '@app/services/play/play.service';
-import { HALF_POINT } from '@common/consts/match-data.const';
+import { REGULAR_ITEMS } from '@common/consts/map-data.const';
+import { RANDOM_THRESHOLD } from '@common/consts/match-data.const';
 import { MIN_PLAYERS } from '@common/consts/player-data.const';
-import { MatchState } from '@common/interfaces/match-data';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { Avatar, PlayerData } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -56,7 +58,7 @@ export class LobbyService {
     private startMatchFirstTurn(match: Match) {
         this.sortPlayers(match);
         this.assignSpawnPoints(match);
-        // TODO remplacer les items random par des items réels
+        this.setupRandomItems(match);
         match.data.playData.activePlayerIndex = -1;
         this.playService.startNextTurn(match);
     }
@@ -67,14 +69,14 @@ export class LobbyService {
             if (a.speed !== b.speed) {
                 return b.speed - a.speed;
             }
-            return Math.random() - HALF_POINT;
+            return Math.random() - RANDOM_THRESHOLD;
         });
         match.data.lobbyData.hostPlayerIndex = match.getPlayerIndex(hostPlayerId);
     }
 
     private assignSpawnPoints(match: Match) {
         const spawnPoints = match.data.gameData.mapData.items.Spawn;
-        const shuffledSpawnPoints = spawnPoints.sort(() => Math.random() - HALF_POINT).slice(0, match.data.players.length);
+        const shuffledSpawnPoints = spawnPoints.sort(() => Math.random() - RANDOM_THRESHOLD).slice(0, match.data.players.length);
         match.data.gameData.mapData.items.Spawn = spawnPoints.filter((s) => shuffledSpawnPoints.includes(s));
 
         shuffledSpawnPoints.forEach((spawnPoint, i) => {
@@ -91,5 +93,22 @@ export class LobbyService {
             suffix++;
         }
         return newName;
+    }
+
+    private setupRandomItems(match: Match): void {
+        const matchData: MatchData = match.data;
+        const items = matchData.gameData.mapData.items;
+        const unusedItems = REGULAR_ITEMS.filter((itemType) => {
+            return !items[itemType] || items[itemType].length === 0;
+        });
+
+        const randomThreshold = 0.5;
+        unusedItems.sort(() => Math.random() - randomThreshold);
+
+        for (let i = 0; i < items[ItemType.Random].length; i++) {
+            const itemType = unusedItems[i];
+            items[itemType].push(items[ItemType.Random][i]);
+        }
+        items[ItemType.Random] = [];
     }
 }

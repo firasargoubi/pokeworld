@@ -34,8 +34,8 @@ export class MovementService {
         const position = matchData.players[matchData.playData.activePlayerIndex].position;
         return SURROUNDING_POSITIONS_PLUS.map((delta) => ({ x: position.x + delta.x, y: position.y + delta.y })).filter((neighbor) => {
             const hasPlayer = this.isTileOccupiedByPlayer(matchData, neighbor);
-            const hasBridge = this.isTileABridge(matchData, neighbor);
-            return hasPlayer || hasBridge;
+            const hasUsableBridge = this.isTileABridge(matchData, neighbor) && !this.hasItem(matchData, neighbor);
+            return hasPlayer || hasUsableBridge;
         });
     }
 
@@ -75,6 +75,12 @@ export class MovementService {
             this.enqueueValidNeighbors(matchData, pos, { visited, queue });
         }
         return result;
+    }
+
+    private hasItem(matchData: MatchData, position: Position): boolean {
+        return Object.values(matchData.gameData.mapData.items).some((positions) =>
+            positions.some((pos) => pos.x === position.x && pos.y === position.y),
+        );
     }
 
     private isTileValidForMovement(matchData: MatchData, position: Position): boolean {

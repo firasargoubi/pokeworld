@@ -6,8 +6,13 @@ export interface TileVisualData {
     tile: string;
     underlay: string | null;
     item: ItemType | null;
-    player: string | null;
+    player: PlayerTileVisual | null;
     overlay: string | null;
+}
+
+export interface PlayerTileVisual {
+    imageFace: string;
+    id: string;
 }
 
 export interface MapVisualData {
@@ -20,4 +25,10 @@ export interface OverlayTiles {
     hoverMoves: Position[];
     actions: Position[];
     playerPosition: Position;
+}
+
+export enum AvatarVisualEffect {
+    None = 'none',
+    Invisible = 'invisible',
+    Fade = 'fade',
 }

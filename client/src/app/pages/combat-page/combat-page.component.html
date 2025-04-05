@@ -1,15 +1,15 @@
-<div id="combat-page"
-    [ngClass]="{ 'not-current-turn': !visualData.isSelfTurn || matchService.data.state !== 'combatWait'}">
+<div id="combat-page" [ngClass]="{ 'not-current-turn': !visualData.isSelfTurn || matchService.data.state !== 'combatWait' }">
     <div id="timer">
         {{ combatService.timer.currentTime }}/{{ combatService.timer.maxTime }}
         <div class="timer-container">
-            <div class="timer-icon"
+            <div
+                class="timer-icon"
                 [class.active]="combatService.timer.isStarted && matchService.data.state === 'combatWait'"
                 [ngStyle]="{
-                    '--max-time': combatService.timer.maxTime,
-                }">
-            </div>
-            
+                    '--max-time': combatService.timer.maxTime
+                }"
+            ></div>
+
             <div class="timer-border"></div>
         </div>
     </div>
@@ -19,39 +19,72 @@
                 <p class="name">{{ matchService.data.players[visualData.enemyPlayer.playerIndex].name }}</p>
                 <div class="hp-bar">
                     <div class="hp-backround">
-                        <div class="hp-progress"
-                            [style.width]="(visualData.enemyPlayer.currentHealth / matchService.data.players[visualData.enemyPlayer.playerIndex].health) * 100 + '%'"
+                        <div
+                            class="hp-progress"
+                            [style.width]="
+                                (visualData.enemyPlayer.currentHealth / matchService.data.players[visualData.enemyPlayer.playerIndex].health) * 100 +
+                                '%'
+                            "
                             [ngClass]="{
                                 'orange-hp':
-                                    visualData.enemyPlayer.currentHealth / matchService.data.players[visualData.enemyPlayer.playerIndex].health >= 0.4 &&
-                                    visualData.enemyPlayer.currentHealth / matchService.data.players[visualData.enemyPlayer.playerIndex].health < 0.75,
-                                'red-hp': visualData.enemyPlayer.currentHealth / matchService.data.players[visualData.enemyPlayer.playerIndex].health < 0.4
-                            }">
-                        </div>
+                                    visualData.enemyPlayer.currentHealth / matchService.data.players[visualData.enemyPlayer.playerIndex].health >=
+                                        0.4 &&
+                                    visualData.enemyPlayer.currentHealth / matchService.data.players[visualData.enemyPlayer.playerIndex].health <
+                                        0.75,
+                                'red-hp':
+                                    visualData.enemyPlayer.currentHealth / matchService.data.players[visualData.enemyPlayer.playerIndex].health < 0.4
+                            }"
+                        ></div>
                     </div>
-                    <p class="hp-value">{{ visualData.enemyPlayer.currentHealth }}/{{ matchService.data.players[visualData.enemyPlayer.playerIndex].health }}</p>
+                    <p class="hp-value">
+                        {{ visualData.enemyPlayer.currentHealth }}/{{ matchService.data.players[visualData.enemyPlayer.playerIndex].health }}
+                    </p>
                 </div>
-                @if (['successAttack', 'failAttack'].includes(matchService.data.combatData.lastCombatAction)) {
-                    @if (visualData.isSelfTurn) {
-                        <p class="dice-bonus">Dé attaque: +{{ matchService.data.combatData.lastRolledAttack }}</p>
-                    } @else {
-                        <p class="dice-bonus">Dé défense: +{{ matchService.data.combatData.lastRolledDefense }}</p>
-                    }
-                }
+                @if (['successAttack', 'failAttack'].includes(matchService.data.combatData.lastCombatAction)) { @if (visualData.isSelfTurn) {
+                <p class="dice-bonus">Dé attaque: +{{ matchService.data.combatData.lastRolledAttack }}</p>
+                } @else {
+                <p class="dice-bonus">Dé défense: +{{ matchService.data.combatData.lastRolledDefense }}</p>
+                } }
             </div>
         </div>
 
-        <img class="battel-plateform" src="{{ visualData.enemyPlatform }}">
-        <span class="pokemon-container" [class.is-turn]="!visualData.isSelfTurn" [class.is-dead]="visualData.enemyPlayer.currentHealth <= 0"
-            [class]="matchService.data.state + ' ' + matchService.data.combatData.lastCombatAction">
-            <img class="pokemon-gif" src="{{ visualData.enemyImage }}">
+        <img class="battel-plateform" src="{{ visualData.enemyPlatform }}" />
+        <span
+            class="pokemon-container"
+            [class.is-turn]="!visualData.isSelfTurn"
+            [class.is-dead]="visualData.enemyPlayer.currentHealth <= 0"
+            [class]="matchService.data.state + ' ' + matchService.data.combatData.lastCombatAction"
+            [class.is-healing]="visualData.isEnemyHealing"
+        >
+            <img
+                class="pokemon-gif"
+                src="{{ visualData.enemyImage }}"
+                [ngClass]="{
+                    'pokemon-evolved-gif': this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar
+                        .toString()
+                        .includes('-evolved')
+                }"
+            />
         </span>
     </div>
     <div id="self-container">
-        <img class="battel-plateform" src="{{ visualData.selfPlatform }}">
-        <span class="pokemon-container" [class.is-turn]="visualData.isSelfTurn" [class.is-dead]="visualData.selfPlayer.currentHealth <= 0"
-            [class]="matchService.data.state + ' ' + matchService.data.combatData.lastCombatAction">
-            <img class="pokemon-gif" src="{{ visualData.selfImage }}">
+        <img class="battel-plateform" src="{{ visualData.selfPlatform }}" />
+        <span
+            class="pokemon-container"
+            [class.is-turn]="visualData.isSelfTurn"
+            [class.is-dead]="visualData.selfPlayer.currentHealth <= 0"
+            [class]="matchService.data.state + ' ' + matchService.data.combatData.lastCombatAction"
+            [class.is-healing]="visualData.isSelfHealing"
+        >
+            <img
+                class="pokemon-gif"
+                src="{{ visualData.selfImage }}"
+                [ngClass]="{
+                    'pokemon-evolved-gif': this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar
+                        .toString()
+                        .includes('-evolved')
+                }"
+            />
         </span>
     </div>
     <div class="self-hp-container hp-container">
@@ -59,58 +92,75 @@
             <p class="name">{{ matchService.data.players[visualData.selfPlayer.playerIndex].name }}</p>
             <div class="hp-bar">
                 <div class="hp-backround">
-                    <div class="hp-progress"
-                        [style.width]="(visualData.selfPlayer.currentHealth / matchService.data.players[visualData.selfPlayer.playerIndex].health) * 100 + '%'"
+                    <div
+                        class="hp-progress"
+                        [style.width]="
+                            (visualData.selfPlayer.currentHealth / matchService.data.players[visualData.selfPlayer.playerIndex].health) * 100 + '%'
+                        "
                         [ngClass]="{
                             'orange-hp':
-                                visualData.selfPlayer.currentHealth / matchService.data.players[visualData.selfPlayer.playerIndex].health >= 0.33 &&
+                                visualData.selfPlayer.currentHealth / matchService.data.players[visualData.selfPlayer.playerIndex].health >= 0.4 &&
                                 visualData.selfPlayer.currentHealth / matchService.data.players[visualData.selfPlayer.playerIndex].health < 0.75,
                             'red-hp': visualData.selfPlayer.currentHealth / matchService.data.players[visualData.selfPlayer.playerIndex].health < 0.4
-                        }">
-                    </div>
+                        }"
+                    ></div>
                 </div>
-                <p class="hp-value">{{ visualData.selfPlayer.currentHealth }}/{{ matchService.data.players[visualData.selfPlayer.playerIndex].health }}</p>
+                <p class="hp-value">
+                    {{ visualData.selfPlayer.currentHealth }}/{{ matchService.data.players[visualData.selfPlayer.playerIndex].health }}
+                </p>
             </div>
         </div>
     </div>
     <div id="combat-footer">
         <div id="action-container">
-            <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png">
+            <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png" />
             <div class="conatiner-body">
                 <div class="action-button" (click)="attackButton()">
-                    <img class="container-selection" src="./assets/images/menu/containers/combat-container/container-selection.png">
+                    <img class="container-selection" src="./assets/images/menu/containers/combat-container/container-selection.png" />
                     <p>Attaquer</p>
                 </div>
                 <div class="action-button" [ngClass]="{ disabled: visualData.selfPlayer.currentEscapes === 0 }" (click)="escapeButon()">
-                    <img class="container-selection" src="./assets/images/menu/containers/combat-container/container-selection.png">
+                    <img class="container-selection" src="./assets/images/menu/containers/combat-container/container-selection.png" />
                     <p>Fuire {{ visualData.selfPlayer.currentEscapes }}/{{ visualData.selfPlayer.maxEscapes }}</p>
                 </div>
             </div>
-            <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png">
+            <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
         </div>
         <div id="stats-container">
-            <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png">
+            <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png" />
             <div class="conatiner-body">
                 <div class="stat-container">
-                    <span class="stat-label">Attaque @if (matchService.data.players[visualData.selfPlayer.playerIndex].attackDice === 4) { (D4) } @else { (D6) } </span>
+                    <span class="stat-label"
+                        >Attaque @if (matchService.data.players[visualData.selfPlayer.playerIndex].attackDice === 4) { (D4) } @else { (D6) }
+                    </span>
                     @if (!visualData.isSelfTurn && ['successAttack', 'failAttack'].includes(matchService.data.combatData.lastCombatAction)) {
-                        <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledAttack }}</span>
+                    <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledAttack }}</span>
                     }
-                    <span class="stat-value">{{ visualData.selfPlayer.attack }}/4</span>
+                    <span class="stat-value" [ngClass]="{ buff: visualData.selfPlayer.attack > 4 }"
+                        >{{ visualData.selfPlayer.attack }}<span>/4</span></span
+                    >
                 </div>
                 <div class="stat-container">
-                    <span class="stat-label">Défense @if (matchService.data.players[visualData.selfPlayer.playerIndex].defenseDice === 4) { (D4) } @else { (D6) }</span>
+                    <span class="stat-label"
+                        >Défense @if (matchService.data.players[visualData.selfPlayer.playerIndex].defenseDice === 4) { (D4) } @else { (D6) }</span
+                    >
                     @if (visualData.isSelfTurn && ['successAttack', 'failAttack'].includes(matchService.data.combatData.lastCombatAction)) {
-                        <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledDefense }}</span>
+                    <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledDefense }}</span>
                     }
-                    <span class="stat-value">{{ visualData.selfPlayer.defense }}/4</span>
+                    <span class="stat-value" [ngClass]="{ buff: visualData.selfPlayer.defense > 4 }"
+                        >{{ visualData.selfPlayer.defense }}<span>/4</span></span
+                    >
                 </div>
                 <div class="stat-container">
                     <span class="stat-label">Vitesse</span>
-                    <span class="stat-value">{{ matchService.data.players[visualData.selfPlayer.playerIndex].speed }}/{{ matchService.data.players[visualData.selfPlayer.playerIndex].speed }}</span>
+                    <span class="stat-value"
+                        >{{ matchService.data.players[visualData.selfPlayer.playerIndex].speed }}/{{
+                            matchService.data.players[visualData.selfPlayer.playerIndex].speed
+                        }}</span
+                    >
                 </div>
             </div>
-            <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png">
+            <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
         </div>
     </div>
 </div>

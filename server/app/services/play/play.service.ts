@@ -1,23 +1,27 @@
 import { Match } from '@app/classes/match/match';
 import { CombatService } from '@app/services/combat/combat.service';
-import { MovementService } from '@app/services/movement/movement.service';
+import { MapService } from '@app/services/map/map.service';
 import {
+    DROP_ITEMS_DURATION,
     MATCH_END_DURATION,
     MINIMUM_COMBATS_TO_WIN,
     MOVEMENT_ANIMATION_DURATION,
     TURN_START_DURATION,
     TURN_WAIT_DURATION,
 } from '@common/consts/match-data.const';
+import { AVATAR_EVOLVED_SUFFIX, AVATAR_SHINY_SUFFIX, MAX_ITEMS } from '@common/consts/player-data.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
 import { MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
+import { Avatar, AvatarModifiers, PlayerData } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PlayService {
-    @Inject(MovementService) private readonly movementService: MovementService;
+    @Inject(MapService) private readonly mapService: MapService;
     @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
 
     endTurn(match: Match, playerId: string) {
@@ -28,10 +32,12 @@ export class PlayService {
 
     move(match: Match, playerId: string, position: Position) {
         if (match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
-            const shortestPath = this.movementService.getShortestPath(match.data, position);
+            const shortestPath = this.mapService.getShortestPath(match.data, position);
+
             if (shortestPath.moveCost <= match.data.playData.movementLeft) {
-                match.getPlayer(playerId).position = position;
+                match.getPlayer(playerId).position = shortestPath.path[shortestPath.path.length - 1];
                 match.data.playData.movementLeft -= shortestPath.moveCost;
+
                 match.data.state = MatchState.MovementAnimation;
                 this.setTimeLeft(match);
                 match.sendUpdate();
@@ -40,19 +46,29 @@ export class PlayService {
         }
     }
 
+    dropItems(match: Match, playerId: string, items: ItemType[]) {
+        const player = match.getPlayer(playerId);
+        for (const item of items) {
+            const position = this.mapService.getNearestItemDropSpot(match.data, player.position);
+            match.data.gameData.mapData.items[item].push(position);
+            player.items = player.items.filter((i) => i !== item);
+        }
+        this.computeItems(player);
+        match.sendUpdate();
+    }
+
     action(match: Match, playerId: string, position: Position) {
         if (match.data.playData.hasAction && match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
-            const actions = this.movementService.getActions(match.data);
+            const actions = this.mapService.getActions(match.data);
             if (actions.some((a) => a.x === position.x && a.y === position.y)) {
                 match.data.playData.hasAction = false;
                 this.executeAction(match, playerId, position);
             }
         }
     }
-
     debugMove(match: Match, playerId: string, position: Position) {
         if (match.data.playData.isDebugMode && match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
-            const possibleMoves = this.movementService.getPossibleMovesDebug(match.data);
+            const possibleMoves = this.mapService.getPossibleMovesDebug(match.data);
             const isMoveValid = possibleMoves.some((m) => m.x === position.x && m.y === position.y);
             if (isMoveValid) {
                 const player = match.getPlayer(playerId);
@@ -86,13 +102,17 @@ export class PlayService {
     }
 
     continueTurn(match: Match) {
+        const curentPlayer = match.data.players[match.data.playData.activePlayerIndex];
         if (this.checkWinCondition(match)) {
             match.setTimeout(this.endMatch.bind(this, match), MATCH_END_DURATION);
         } else {
-            if (this.canPlayerAct(match)) {
-                match.data.state = MatchState.TurnWait;
-                match.sendUpdate();
-                match.setTimeout(this.startNextTurn.bind(this, match), match.data.playData.timeLeft);
+            if (match.data.state === MatchState.MovementAnimation) {
+                this.checkAndPickupItem(match, curentPlayer);
+            }
+            if (match.data.state === MatchState.ItemDropSelection) {
+                this.scheduleForceItemDrop(match, curentPlayer.id);
+            } else if (this.canPlayerAct(match)) {
+                this.scheduleTurnEnd(match);
             } else {
                 this.startNextTurn(match);
             }
@@ -100,12 +120,24 @@ export class PlayService {
     }
 
     private canPlayerAct(match: Match): boolean {
-        const hasPossibleActions = this.movementService.getActions(match.data).length > 0;
+        const hasPossibleActions = this.mapService.getActions(match.data).length > 0;
         const canUseAction = hasPossibleActions && match.data.playData.hasAction;
-        const canMove = this.movementService.getPossibleMoves(match.data).length > 0;
+        const canMove = this.mapService.getPossibleMoves(match.data).length > 0;
         const canAct = canUseAction || canMove;
         const isConnected = match.data.players[match.data.playData.activePlayerIndex].isConnected;
         return canAct && isConnected;
+    }
+
+    private scheduleForceItemDrop(match: Match, playerId: string): void {
+        this.setTimeLeft(match);
+        match.sendUpdate();
+        match.setTimeout(this.forceItemDrop.bind(this, match, playerId), DROP_ITEMS_DURATION);
+    }
+
+    private scheduleTurnEnd(match: Match): void {
+        match.data.state = MatchState.TurnWait;
+        match.sendUpdate();
+        match.setTimeout(this.startNextTurn.bind(this, match), match.data.playData.timeLeft);
     }
 
     private checkWinCondition(match: Match): boolean {
@@ -185,5 +217,61 @@ export class PlayService {
             steps++;
         }
         return nextIndex;
+    }
+
+    private checkAndPickupItem(match: Match, playerData: PlayerData) {
+        const position = playerData.position;
+        const item = this.mapService.getItemTypeAtPosition(match.data, position);
+        if (item) {
+            this.handleItemAddition(match, playerData, item);
+        }
+    }
+
+    private handleItemAddition(match: Match, player: PlayerData, itemType: ItemType) {
+        player.items.push(itemType);
+        match.data.gameData.mapData.items[itemType] = match.data.gameData.mapData.items[itemType].filter(
+            (itemPos) => itemPos.x !== player.position.x || itemPos.y !== player.position.y,
+        );
+
+        if (player.items.length > MAX_ITEMS) {
+            match.data.state = MatchState.ItemDropSelection;
+            return;
+        }
+
+        this.computeItems(player);
+    }
+
+    private forceItemDrop(match: Match, playerId: string) {
+        match.data.state = MatchState.TurnWait;
+        const player = match.getPlayer(playerId);
+        this.dropItems(match, playerId, [player.items[MAX_ITEMS]]);
+        this.continueTurn(match);
+        match.sendUpdate();
+    }
+
+    private computeItems(player: PlayerData) {
+        const isShiny = player.items.includes(ItemType.Item1);
+        const isEvolved = player.items.includes(ItemType.Item2);
+        const isMissingNo = player.items.includes(ItemType.Item6);
+        player.avatar = this.getAvatarVariant(player.avatar, { isShiny, isEvolved, isMissingNo });
+    }
+
+    private getAvatarVariant(avatar: Avatar, avatarModifiers: AvatarModifiers): Avatar {
+        const baseMatch = avatar.match(/^(avatar\d+)/);
+        if (!baseMatch) {
+            return avatar;
+        }
+
+        const base = baseMatch[1];
+        let result = base;
+
+        if (avatarModifiers.isEvolved) {
+            result += AVATAR_EVOLVED_SUFFIX;
+        }
+        if (avatarModifiers.isShiny) {
+            result += AVATAR_SHINY_SUFFIX;
+        }
+
+        return result as Avatar;
     }
 }

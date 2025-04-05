@@ -1,5 +1,5 @@
 import { Match } from '@app/classes/match/match';
-import { MovementService } from '@app/services/movement/movement.service';
+import { MapService } from '@app/services/map/map.service';
 import { PlayService } from '@app/services/play/play.service';
 import {
     COMBAT_ANIMATION_DURATION,
@@ -7,6 +7,16 @@ import {
     COMBAT_SHORT_TURN_DURATION,
     COMBAT_TURN_DURATION,
     DEFAULT_PLAYER_COMBAT_DATA,
+    HEALING_ITEM_RATIO,
+    ITEM1_ATTACK_BONUS,
+    ITEM1_DEFENSE_BONUS,
+    ITEM2_ATTACK_BONUS,
+    ITEM2_DEFENSE_BONUS,
+    ITEM3_BUSH_ATTACK_BONUS,
+    ITEM4_HEALING_BONUS,
+    ITEM5_CURRENT_ESCAPES_BONUS,
+    ITEM5_ESCAPE_CHANCES_BONUS,
+    ITEM5_MAX_ESCAPES_BONUS,
     PATH_ATTACK_MODIFICATION,
     PATH_DEFENSE_MODIFICATION,
 } from '@common/consts/combat-data.const';
@@ -18,7 +28,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CombatService {
-    @Inject(MovementService) private readonly movementService: MovementService;
+    @Inject(MapService) private readonly mapService: MapService;
     @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
 
     attack(match: Match, playerId: string) {
@@ -42,6 +52,7 @@ export class CombatService {
 
     startCombatEndDeath(match: Match) {
         match.data.state = MatchState.CombatEnd;
+        match.data.combatData.lastCombatAction = CombatAction.None;
         match.data.players[this.getInactivePlayerData(match).playerIndex].combatsWon += 1;
         const deadPlayer = this.getActivePlayerData(match);
         deadPlayer.currentHealth = 0;
@@ -55,10 +66,10 @@ export class CombatService {
     }
 
     respawnPlayer(match: Match, player: PlayerData) {
-        if (player.spawnPoint !== player.position) {
-            // TODO drop items on the ground
+        this.playService.dropItems(match, player.id, player.items);
 
-            player.position = this.movementService.getNearestEmptyTile(match.data, player.spawnPoint);
+        if (player.spawnPoint !== player.position) {
+            player.position = this.mapService.getNearestEmptyTile(match.data, player.spawnPoint);
         }
     }
 
@@ -73,6 +84,9 @@ export class CombatService {
     private startCombatWait(match: Match) {
         match.data.state = MatchState.CombatWait;
         match.data.combatData.turnDuration = this.getActivePlayerData(match).currentEscapes === 0 ? COMBAT_SHORT_TURN_DURATION : COMBAT_TURN_DURATION;
+
+        this.computeHealingItem(match);
+
         match.sendUpdate();
         match.setTimeout(this.startAttackAnimation.bind(this, match), match.data.combatData.turnDuration);
     }
@@ -100,6 +114,21 @@ export class CombatService {
         } else {
             match.setTimeout(this.startCombatWait.bind(this, match), COMBAT_ANIMATION_DURATION);
         }
+    }
+
+    private computeHealingItem(match: Match): boolean {
+        const playerCombatData = this.getActivePlayerData(match);
+        const player = match.data.players[playerCombatData.playerIndex];
+        const containItem4 = player.items.includes(ItemType.Item4);
+
+        if (containItem4) {
+            if (playerCombatData.currentHealth < player.health * HEALING_ITEM_RATIO) {
+                playerCombatData.currentHealth += ITEM4_HEALING_BONUS;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private startCombatEndEscape(match: Match) {
@@ -176,14 +205,27 @@ export class CombatService {
         }
 
         match.data.players[playerCombatData.playerIndex].items.forEach((item) => {
-            if (item === ItemType.Item1) {
-                playerCombatData.attack += 0;
-                playerCombatData.defense += 0;
-                playerCombatData.escapeChances += 0.2;
-                playerCombatData.maxEscapes += 1;
-                playerCombatData.currentEscapes += 1;
-
-                // TODO apply item buffs to player
+            switch (item) {
+                case ItemType.Item1:
+                    playerCombatData.attack += ITEM1_ATTACK_BONUS;
+                    playerCombatData.defense += ITEM1_DEFENSE_BONUS;
+                    break;
+                case ItemType.Item2:
+                    playerCombatData.attack += ITEM2_ATTACK_BONUS;
+                    playerCombatData.defense += ITEM2_DEFENSE_BONUS;
+                    break;
+                case ItemType.Item3:
+                    if (playerCombatData.standingTile === TileType.Bush) {
+                        playerCombatData.attack += ITEM3_BUSH_ATTACK_BONUS;
+                    }
+                    break;
+                case ItemType.Item5:
+                    playerCombatData.maxEscapes += ITEM5_MAX_ESCAPES_BONUS;
+                    playerCombatData.currentEscapes += ITEM5_CURRENT_ESCAPES_BONUS;
+                    playerCombatData.escapeChances += ITEM5_ESCAPE_CHANCES_BONUS;
+                    break;
+                default:
+                    break;
             }
         });
 

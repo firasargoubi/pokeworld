@@ -6,6 +6,7 @@ import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TURN_WAIT_DURATION } from '@common/consts/match-data.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Position } from '@common/interfaces/position';
 import { PlayEvent } from '@common/interfaces/socket-event.enum';
@@ -69,6 +70,10 @@ export class PlayService {
         if (this.matchService.isHost()) {
             this.socketService.emit(PlayEvent.ChangeDebugMode, !this.matchService.data.playData.isDebugMode);
         }
+    }
+
+    dropItem(itemType: ItemType) {
+        this.socketService.emit(PlayEvent.DropItem, itemType);
     }
 
     private onMatchUpdate(oldMatchData: MatchData) {

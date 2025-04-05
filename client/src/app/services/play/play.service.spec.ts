@@ -1,14 +1,15 @@
 import { TestBed } from '@angular/core/testing';
+import { Timer } from '@app/classes/timer/timer';
 import { MapService } from '@app/services/map/map.service';
-import { PlayService } from './play.service';
-import { SocketService } from '@app/services/socket/socket.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MovementService } from '@app/services/movement/movement.service';
-import { PlayEvent } from '@common/interfaces/socket-event.enum';
-import { Timer } from '@app/classes/timer/timer';
-import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { SocketService } from '@app/services/socket/socket.service';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchData } from '@common/interfaces/match-data';
 import { Position } from '@common/interfaces/position';
+import { PlayEvent } from '@common/interfaces/socket-event.enum';
+import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { PlayService } from './play.service';
 
 describe('PlayService', () => {
     let service: PlayService;
@@ -174,5 +175,12 @@ describe('PlayService', () => {
         movementServiceSpy.getPossibleMoves.and.returnValue(moves);
         service['displayPossibleMoves']();
         expect(mapServiceSpy.setPossibleMoves).toHaveBeenCalledWith(moves, matchServiceSpy.selfPlayer.position);
+    });
+
+    it('dropItem should emit drop item event with correct item type', () => {
+        const itemType = ItemType.Item1;
+
+        service.dropItem(itemType);
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(PlayEvent.DropItem, itemType);
     });
 });

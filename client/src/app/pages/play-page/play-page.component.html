@@ -9,6 +9,9 @@
 >
     <div class="thumbnail-background"></div>
     <main>
+        @if(this.visualData.isInventoryFull) {
+        <app-item-drop-popup [inventoryItems]="this.matchService.selfPlayer.items"></app-item-drop-popup>
+        }
         <div class="main-left">
             <div class="player-cards-container">
                 <div class="player-arrow-container">
@@ -63,7 +66,7 @@
             </div>
             <div class="self-info-card">
                 <div class="self-info-container">
-                    <div class="self-info-avatar" [style.backgroundImage]="'url(' + visualData.selfAvatarUrl "></div>
+                    <div class="self-info-avatar" [style.backgroundImage]="'url(' + visualData.selfAvatarUrl"></div>
                     <div class="self-info-name">{{ matchService.selfPlayer.name }}</div>
                 </div>
                 <div class="movement-container">
@@ -81,8 +84,12 @@
                     </div>
                 </div>
                 <div class="items-container">
-                    <div class="item-slot"><div class="item-icon"></div></div>
-                    <div class="item-slot"><div class="item-icon"></div></div>
+                    <div class="item-slot">
+                        <div class="item-icon"><app-item [itemType]="this.matchService.selfPlayer.items[0]" [showDescription]="true"></app-item></div>
+                    </div>
+                    <div class="item-slot">
+                        <div class="item-icon"><app-item [itemType]="this.matchService.selfPlayer.items[1]" [showDescription]="true"></app-item></div>
+                    </div>
                 </div>
             </div>
             <button (click)="actionButton()" class="action-button" [class.active]="visualData.canUseAction">Action</button>

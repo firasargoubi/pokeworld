@@ -1,35 +1,45 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { SinonSandbox, createSandbox, SinonStubbedInstance, createStubInstance } from 'sinon';
-import { CombatService } from './combat.service';
-import { MovementService } from '@app/services/movement/movement.service';
-import { PlayService } from '@app/services/play/play.service';
+/* eslint-disable max-lines */
 import { Match } from '@app/classes/match/match';
-import { MatchState, CombatAction } from '@common/interfaces/match-data';
+import { MapService } from '@app/services/map/map.service';
+import { PlayService } from '@app/services/play/play.service';
+import {
+    DEFAULT_ATTACK,
+    DEFAULT_DEFENSE,
+    DEFAULT_ESCAPE_CHANCES,
+    DEFAULT_ESCAPES,
+    ITEM1_ATTACK_BONUS,
+    ITEM1_DEFENSE_BONUS,
+    ITEM2_ATTACK_BONUS,
+    ITEM2_DEFENSE_BONUS,
+    ITEM3_BUSH_ATTACK_BONUS,
+    ITEM5_ESCAPE_CHANCES_BONUS,
+    ITEM5_MAX_ESCAPES_BONUS,
+} from '@common/consts/combat-data.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { CombatAction, MatchState } from '@common/interfaces/match-data';
+import { DiceType } from '@common/interfaces/player-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS, MOCK_PLAYER_COMBAT_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
-import { DiceType } from '@common/interfaces/player-data';
-import { ItemType } from '@common/interfaces/item-type.enum';
+import { Test, TestingModule } from '@nestjs/testing';
+import { createSandbox, createStubInstance, SinonSandbox, SinonStubbedInstance } from 'sinon';
+import { CombatService } from './combat.service';
 
 describe('CombatService', () => {
     let service: CombatService;
     let sandbox: SinonSandbox;
-    let mockMovementService: SinonStubbedInstance<MovementService>;
+    let mockMapService: SinonStubbedInstance<MapService>;
     let mockPlayService: SinonStubbedInstance<PlayService>;
     let mockMatch: SinonStubbedInstance<Match>;
 
     beforeAll(async () => {
         sandbox = createSandbox();
-        mockMovementService = createStubInstance(MovementService);
+        mockMapService = createStubInstance(MapService);
         mockPlayService = createStubInstance(PlayService);
         mockMatch = createStubInstance(Match);
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                CombatService,
-                { provide: MovementService, useValue: mockMovementService },
-                { provide: PlayService, useValue: mockPlayService },
-            ],
+            providers: [CombatService, { provide: MapService, useValue: mockMapService }, { provide: PlayService, useValue: mockPlayService }],
         }).compile();
 
         service = module.get<CombatService>(CombatService);
@@ -147,11 +157,15 @@ describe('CombatService', () => {
         ];
         mockMatch.data.combatData.isSecondPlayerTurn = false;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const computeHealingItemStub = sandbox.stub(service as any, 'computeHealingItem');
+
         service['startCombatWait'](mockMatch);
 
         expect(mockMatch.data.state).toBe(MatchState.CombatWait);
         expect(mockMatch.sendUpdate.called).toBe(true);
         expect(mockMatch.setTimeout.called).toBe(true);
+        expect(computeHealingItemStub.calledWith(mockMatch)).toBe(true);
     });
 
     it('start combat wait should have reduced time when no escape', () => {
@@ -368,10 +382,117 @@ describe('CombatService', () => {
 
     it('respawn player should move to empty tile if needed', () => {
         const player = { ...structuredClone(MOCK_PLAYER_DATAS[0]), spawnPoint: { x: 1, y: 1 }, position: { x: 0, y: 0 } };
-        mockMovementService.getNearestEmptyTile.returns({ x: 1, y: 1 });
+        mockMapService.getNearestEmptyTile.returns({ x: 1, y: 1 });
 
         service['respawnPlayer'](mockMatch, player);
 
         expect(player.position).toEqual({ x: 1, y: 1 });
+    });
+
+    it('computeHealingItem should heal player when they have Item4 and health is below threshold', () => {
+        mockMatch.data.combatData.playersCombatData = [
+            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]), playerIndex: 0, currentHealth: 2 },
+            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), playerIndex: 1 },
+        ];
+        mockMatch.data.combatData.isSecondPlayerTurn = false;
+        mockMatch.data.players = [
+            { ...structuredClone(MOCK_PLAYER_DATAS[0]), items: [ItemType.Item4], health: 10 },
+            { ...structuredClone(MOCK_PLAYER_DATAS[1]) },
+        ];
+
+        const result = service['computeHealingItem'](mockMatch);
+
+        expect(result).toBe(true);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        expect(mockMatch.data.combatData.playersCombatData[0].currentHealth).toBe(3);
+    });
+
+    it('computeHealingItem should not heal player when they do not have Item4', () => {
+        mockMatch.data.combatData.playersCombatData = [
+            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]), playerIndex: 0, currentHealth: 2 },
+            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), playerIndex: 1 },
+        ];
+        mockMatch.data.combatData.isSecondPlayerTurn = false;
+        mockMatch.data.players = [
+            { ...structuredClone(MOCK_PLAYER_DATAS[0]), items: [ItemType.Item1, ItemType.Item2], health: 10 },
+            { ...structuredClone(MOCK_PLAYER_DATAS[1]) },
+        ];
+
+        const result = service['computeHealingItem'](mockMatch);
+
+        expect(result).toBe(false);
+        expect(mockMatch.data.combatData.playersCombatData[0].currentHealth).toBe(2);
+    });
+
+    it('applyCombatBuffs should apply correct buffs for all combat items', () => {
+        // Create base player combat data
+        const playerCombatData = {
+            ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]),
+            playerIndex: 0,
+            attack: DEFAULT_ATTACK,
+            defense: DEFAULT_DEFENSE,
+            maxEscapes: DEFAULT_ESCAPES,
+            currentEscapes: DEFAULT_ESCAPES,
+            escapeChances: DEFAULT_ESCAPE_CHANCES,
+            standingTile: TileType.Bush,
+        };
+
+        // Player has multiple items
+        mockMatch.data.players = [
+            {
+                ...structuredClone(MOCK_PLAYER_DATAS[0]),
+                items: [ItemType.Item1, ItemType.Item2, ItemType.Item3, ItemType.Item4, ItemType.Item5],
+            },
+            structuredClone(MOCK_PLAYER_DATAS[1]),
+        ];
+
+        const result = service['applyCombatBuffs'](mockMatch, playerCombatData);
+
+        const expectedAttack = DEFAULT_ATTACK + ITEM1_ATTACK_BONUS + ITEM2_ATTACK_BONUS + ITEM3_BUSH_ATTACK_BONUS;
+        const expectedDefense = DEFAULT_DEFENSE + ITEM1_DEFENSE_BONUS + ITEM2_DEFENSE_BONUS;
+        const expectedMaxEscapes = DEFAULT_ESCAPES + ITEM5_MAX_ESCAPES_BONUS;
+        const expectedCurrentEscapes = DEFAULT_ESCAPES + ITEM5_MAX_ESCAPES_BONUS;
+        const expectedEscapeChances = DEFAULT_ESCAPE_CHANCES + ITEM5_ESCAPE_CHANCES_BONUS;
+
+        expect(result.attack).toBe(expectedAttack);
+        expect(result.defense).toBe(expectedDefense);
+        expect(result.maxEscapes).toBe(expectedMaxEscapes);
+        expect(result.currentEscapes).toBe(expectedCurrentEscapes);
+        expect(result.escapeChances).toBe(expectedEscapeChances);
+    });
+
+    it('computeHealingItem should heal player when they have Item4 and health is below threshold', () => {
+        mockMatch.data.combatData.playersCombatData = [
+            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]), playerIndex: 0, currentHealth: 2 },
+            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), playerIndex: 1 },
+        ];
+        mockMatch.data.combatData.isSecondPlayerTurn = false;
+        mockMatch.data.players = [
+            { ...structuredClone(MOCK_PLAYER_DATAS[0]), items: [ItemType.Item4], health: 10 },
+            { ...structuredClone(MOCK_PLAYER_DATAS[1]) },
+        ];
+
+        const result = service['computeHealingItem'](mockMatch);
+
+        expect(result).toBe(true);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        expect(mockMatch.data.combatData.playersCombatData[0].currentHealth).toBe(3);
+    });
+
+    it('computeHealingItem should not heal player when they do not have Item4', () => {
+        mockMatch.data.combatData.playersCombatData = [
+            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]), playerIndex: 0, currentHealth: 2 },
+            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), playerIndex: 1 },
+        ];
+        mockMatch.data.combatData.isSecondPlayerTurn = false;
+        mockMatch.data.players = [
+            { ...structuredClone(MOCK_PLAYER_DATAS[0]), items: [ItemType.Item1, ItemType.Item2], health: 10 },
+            { ...structuredClone(MOCK_PLAYER_DATAS[1]) },
+        ];
+
+        const result = service['computeHealingItem'](mockMatch);
+
+        expect(result).toBe(false);
+        expect(mockMatch.data.combatData.playersCombatData[0].currentHealth).toBe(2);
     });
 });

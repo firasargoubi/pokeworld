@@ -22,6 +22,8 @@ export const MIN_NAME_LENGTH = 3;
 export const MAX_NAME_LENGTH = 20;
 export const DEFAULT_STAT = 4;
 export const BONUS_STAT = 6;
+export const DEFAULT_ESCAPE_POINTS = 2;
+export const MAX_ITEMS = 2;
 
 export const MOVE_ANIMATION_DURATION = 150;
 
@@ -32,3 +34,6 @@ export const MAX_PLAYERS = {
     [MapSize.Medium]: 4,
     [MapSize.Large]: 6,
 };
+
+export const AVATAR_EVOLVED_SUFFIX = '-evolved';
+export const AVATAR_SHINY_SUFFIX = '-shiny';

@@ -15,6 +15,23 @@ export const DEFAULT_DEFENSE = 4;
 export const DEFAULT_ESCAPES = 2;
 export const DEFAULT_ESCAPE_CHANCES = 0.3;
 
+
+export const ITEM1_ATTACK_BONUS = 1;
+export const ITEM1_DEFENSE_BONUS = 1;
+
+export const ITEM2_ATTACK_BONUS = 2;
+export const ITEM2_DEFENSE_BONUS = 2;
+
+export const ITEM3_BUSH_ATTACK_BONUS = 3;
+
+export const ITEM5_MAX_ESCAPES_BONUS = 1;
+export const ITEM5_CURRENT_ESCAPES_BONUS = 1;
+export const ITEM5_ESCAPE_CHANCES_BONUS = 0.2;
+
+export const HEALING_ITEM_RATIO = 0.5;
+export const ITEM4_HEALING_BONUS = 1;
+
+
 export const DEFAULT_PLAYER_COMBAT_DATA: PlayerCombatData = {
     playerIndex: 0,
     currentHealth: DEFAULT_PLAYER_DATA.health,

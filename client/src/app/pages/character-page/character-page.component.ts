@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { AVATAR_DATA, MAIN_AVATAR_COUNT } from '@app/consts/avatar-data.const';
 import { DEFAULT_CHARACTER_VISUAL_DATA } from '@app/consts/player-data.const';
 import { CharacterVisualData } from '@app/interfaces/character-visual-data';
 import { LobbyService } from '@app/services/lobby/lobby.service';
@@ -75,7 +75,8 @@ export class CharacterPageComponent {
                 image: AVATAR_DATA[avatar].image,
                 isLocked: lockedAvatars.includes(avatar),
                 isSelected: selfAvatar === avatar,
-            }));
+            }))
+            .slice(0, MAIN_AVATAR_COUNT);
     }
 
     private getLockedAvatars(): Avatar[] {

@@ -6,6 +6,7 @@ export interface PlayVisualData {
     selfAvatarUrl: string;
     movementLeft: number;
     thumbnailUrl: string;
+    isInventoryFull: boolean;
 }
 
 export interface PlayerVisualData {

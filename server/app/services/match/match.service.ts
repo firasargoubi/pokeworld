@@ -15,6 +15,7 @@ export class MatchService {
     @Inject(forwardRef(() => MatchGateway)) private matchGateway: MatchGateway;
     @Inject(forwardRef(() => CombatService)) private combatService: CombatService;
     @Inject(forwardRef(() => PlayService)) private playService: PlayService;
+
     private matches: Map<string, Match> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
 
@@ -71,6 +72,7 @@ export class MatchService {
 
     leaveMatch(playerId: string) {
         const match = this.getMatchFromPlayerId(playerId);
+
         this.disconnectPlayer(playerId);
         if (match) {
             match.leave(playerId);

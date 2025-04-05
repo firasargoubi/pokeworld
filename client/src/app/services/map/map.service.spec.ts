@@ -57,7 +57,7 @@ describe('MapService', () => {
             tile: 'newTile.png',
             underlay: 'newUnderlay.png',
             item: 'newItem.png' as ItemType,
-            player: 'newP11',
+            player: { imageFace: 'newP11', id: 'oldP11' },
             overlay: 'newOverlay.png',
         });
 
@@ -65,7 +65,7 @@ describe('MapService', () => {
             tile: 'oldTile.png',
             underlay: 'oldUnderlay.png',
             item: 'oldItem.png' as ItemType,
-            player: 'P11',
+            player: { imageFace: 'P11', id: 'oldP11' },
             overlay: 'oldOverlay.png',
         };
 
