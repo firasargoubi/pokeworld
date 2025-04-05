@@ -23,10 +23,6 @@ export class MapComponent {
     private playService: PlayService = inject(PlayService);
     private lastHover: Position = structuredClone(OUTSIDE_OF_MAP);
 
-    // constructor() {
-    //     this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.conputeAvatarEffect.bind(this));
-    // }
-
     onHover(position: Position) {
         const hoveringLastTile = this.lastHover.x !== position.x || this.lastHover.y !== position.y;
         if (!this.isEditor && hoveringLastTile) {
@@ -49,43 +45,12 @@ export class MapComponent {
         this.matchService.data.players[this.matchService.selfIndex].position = position;
     }
 
-    // conputeAvatarEffect() {
-    //     const tiles = this.mapService.visualMapData.tiles;
-
-    //     for (let i = 0; i < tiles.length; i++) {
-    //         for (let j = 0; j < tiles[i].length; j++) {
-    //             const tile = tiles[i][j];
-    //             if (tile.player) {
-    //                 const player = this.matchService.data.players.find((p) => p.position.x === i && p.position.y === j);
-
-    //                 if (player?.items.includes(ItemType.Item6)) {
-    //                     if (player.id === this.matchService.selfPlayer.id) {
-    //                         tile.player.effect = AvatarVisualEffect.Fade;
-
-    //                         // eslint-disable-next-line no-console
-    //                         console.log('Player is Fade');
-    //                     } else {
-    //                         tile.player.effect = AvatarVisualEffect.Invisible;
-
-    //                         // eslint-disable-next-line no-console
-    //                         console.log('Player is invisible');
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-
     getTileEffect(id: string): AvatarVisualEffect {
         const player = this.matchService.data.players.find((p) => p.id === id);
         if (player?.items.includes(ItemType.Item6)) {
             if (player.id === this.matchService.selfPlayer.id) {
-                // eslint-disable-next-line no-console
-                console.log('Player is Fade');
                 return AvatarVisualEffect.Fade;
             } else {
-                // eslint-disable-next-line no-console
-                console.log('Player is invisible');
                 return AvatarVisualEffect.Invisible;
             }
         }
