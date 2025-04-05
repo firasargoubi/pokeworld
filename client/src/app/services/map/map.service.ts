@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { IMAGE_SUFIX, TILE_IMAGES_PREFIX, UNDERLAY_IMAGES_PREFIX } from '@app/consts/images.const';
-import { MapVisualData, OverlayTiles, TileVisualData } from '@app/interfaces/map-visual-data';
+import { MapVisualData, OverlayTiles, PlayerTileVisual, TileVisualData } from '@app/interfaces/map-visual-data';
 import { TileComparisonData } from '@app/interfaces/tile-comparison-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { SURROUNDING_POSITIONS_DONUT, SURROUNDING_POSITIONS_PLUS, SURROUNDING_POSITIONS_SQUARE } from '@common/consts/map-data.const';
@@ -178,16 +178,15 @@ export class MapService {
         return Boolean(this.overlayTiles.hoverMoves.find((pos) => pos.x === position.x && pos.y === position.y));
     }
 
-    private getPlayerAvatar(position: Position): string | null {
-        let playerAvatar: string | null = null;
+    private getPlayerAvatar(position: Position): PlayerTileVisual | null {
+        const player = this.players.find((p) => p.position.x === position.x && p.position.y === position.y);
 
-        this.players.forEach((player) => {
-            if (player.position.x === position.x && player.position.y === position.y) {
-                playerAvatar = AVATAR_DATA[player.avatar].imageFace;
-            }
-        });
+        if (!player) return null;
 
-        return playerAvatar;
+        return {
+            imageFace: AVATAR_DATA[player.avatar].imageFace,
+            id: player.id,
+        };
     }
 
     private getTileVariant(tile: TileType, tiles: TileType[][], position: Position): string {

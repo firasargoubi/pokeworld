@@ -396,9 +396,9 @@ export const AVATAR_DATA = {
     },
     [Avatar.MissingNo]: {
         name: 'MissingNo',
-        image: './assets/images/game/avatars/missingno.png',
-        imageFace: './assets/images/game/avatars/face/missingno.png',
-        imageCentered: './assets/images/game/avatars/centered/missingno.png',
+        image: './assets/images/game/avatars/default.png',
+        imageFace: './assets/images/game/avatars/face/default.png',
+        imageCentered: './assets/images/game/avatars/centered/default.png',
         frontGif: './assets/images/game/avatars-gifs/missingno.gif',
         backGif: './assets/images/game/avatars-gifs/missingno.gif',
     },

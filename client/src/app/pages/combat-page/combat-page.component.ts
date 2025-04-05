@@ -10,6 +10,7 @@ import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchState } from '@common/interfaces/match-data';
 
 @Component({
@@ -56,6 +57,13 @@ export class CombatPageComponent {
         this.visualData.enemyPlatform = BATTLE_PLATFORM_IMAGES[this.visualData.enemyPlayer.standingTile].enemyPlatform;
         this.visualData.selfImage = AVATAR_DATA[this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar].backGif;
         this.visualData.enemyImage = AVATAR_DATA[this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar].frontGif;
+
+        if (this.matchService.data.players[this.visualData.selfPlayer.playerIndex].items.includes(ItemType.Item6)) {
+            this.visualData.selfImage = AVATAR_DATA.missingNo.backGif;
+        }
+        if (this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].items.includes(ItemType.Item6)) {
+            this.visualData.enemyImage = AVATAR_DATA.missingNo.backGif;
+        }
     }
 
     private onMatchUpdate() {

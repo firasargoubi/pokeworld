@@ -134,3 +134,12 @@ app-item,
 .action-overlay .tile-overlay {
     background-color: rgba(255, 104, 104, 0.56);
 }
+
+.is-invisible {
+    opacity: 0;
+}
+
+.is-fade {
+    opacity: 0.2;
+}
+
