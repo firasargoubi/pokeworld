@@ -9,5 +9,5 @@ export const DEFAULT_PLAY_VISUAL_DATA: PlayVisualData = {
     selfAvatarUrl: '',
     thumbnailUrl: structuredClone(EMPTY_IMAGE),
     movementLeft: 0,
-    isInetoryFull: false,
+    isInventoryFull: false,
 };

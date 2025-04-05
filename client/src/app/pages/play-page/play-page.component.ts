@@ -111,7 +111,7 @@ export class PlayPageComponent {
             selfAvatarUrl: AVATAR_DATA[this.matchService.selfPlayer.avatar].imageCentered,
             movementLeft: this.matchService.getMovementLeft(),
             thumbnailUrl: this.visualData.thumbnailUrl,
-            isInetoryFull: this.matchService.isInventoryFull(),
+            isInventoryFull: this.matchService.isInventoryFull(),
         };
     }
 
