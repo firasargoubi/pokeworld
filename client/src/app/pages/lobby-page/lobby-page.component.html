@@ -14,7 +14,7 @@
                         @if (this.matchService.data.lobbyData.isLocked) {
                             <div class="lock-icon"></div>
                         } @else {
-                            <div class="unlock-icon"></div>
+                        <div class="unlock-icon"></div>
                         }
                     </div>
                     <div class="copy-container" (click)="this.copyMatchCode()">
@@ -27,7 +27,7 @@
                         @if (this.matchService.data.lobbyData.isLocked) {
                             <div class="lock-icon"></div>
                         } @else {
-                            <div class="unlock-icon"></div>
+                        <div class="unlock-icon"></div>
                         }
                     </div>
                     <div class="copy-container" (click)="this.copyMatchCode()">
@@ -54,8 +54,17 @@
         <app-chat></app-chat>
     </div>
     @if (visualData.isSelfHost) {
-        <div id="poke-button">
-            <app-pokeball-button [buttonContent]="'LANCER PARTIE'" [onClickAction]="this.startMatchButton.bind(this)"></app-pokeball-button>
+    <div id="poke-button-bot">
+        <app-pokeball-button [buttonContent]="'AJOUTER UN ROBOT'" [onClickAction]="this.showBotCreationPopup.bind(this)"></app-pokeball-button>
+    </div>
+    <div id="poke-button">
+        <app-pokeball-button [buttonContent]="'LANCER LA PARTIE'" [onClickAction]="this.startMatchButton.bind(this)"></app-pokeball-button>
+    </div>
+    } @if (showBotPopup) {
+    <div id="creation-bot-popup" (click)="showBotPopup = false">
+        <div (click)="$event.stopPropagation()">
+            <app-create-bot-popup (botTypeSelected)="handleBotTypeSelected($event)"></app-create-bot-popup>
         </div>
+    </div>
     }
 </div>

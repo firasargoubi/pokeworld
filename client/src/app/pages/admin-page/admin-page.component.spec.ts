@@ -59,8 +59,7 @@ describe('AdminPageComponent', () => {
     });
 
     it('should call loadGames on init', () => {
-        // private method
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const loadGamesSpy = spyOn<any>(component, 'loadGames');
         component.ngOnInit();
         expect(loadGamesSpy).toHaveBeenCalled();
@@ -165,8 +164,7 @@ describe('AdminPageComponent', () => {
     });
 
     it('should call loadGames when handleNotFoundError is called', () => {
-        // private method
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const loadGamesSpy = spyOn<any>(component, 'loadGames');
         const error = new HttpErrorResponse({ error: 'Game not found', status: 404 });
 
@@ -182,8 +180,7 @@ describe('AdminPageComponent', () => {
 
     it('should add a message and call loadGames when the error is 404', () => {
         const error = new HttpErrorResponse({ error: 'Not Found', status: 404 });
-        // private method
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const loadGamesSpy = spyOn<any>(component, 'loadGames');
         component['handleNotFoundError'](error);
         expect(loadGamesSpy).toHaveBeenCalled();

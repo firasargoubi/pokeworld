@@ -56,9 +56,9 @@ describe('MatchService', () => {
         const playerId = 'player1';
         const matchCode = '1234';
         const gameData = MOCK_GAME_DATAS[0];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'canCreateMatch').returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getNewMatchCode').returns('1234');
 
         const matchData = service.createMatch(playerId, gameData);
@@ -92,9 +92,9 @@ describe('MatchService', () => {
 
     it('join match should join player to match and connect them', () => {
         const playerId = 'player2';
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'canJoinMatch').returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getMatch').returns(mockMatch);
 
         const matchData = service.joinMatch(playerId, mockMatch.data.code);
@@ -118,7 +118,7 @@ describe('MatchService', () => {
     it('leave match should remove player and clean up if no players left', () => {
         const playerId = 'player1';
         mockMatch.getConnectedPlayerCount.returns(0);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getMatchFromPlayerId').returns(mockMatch);
 
         service.leaveMatch(playerId);
@@ -155,7 +155,7 @@ describe('MatchService', () => {
 
     it('can join match should return invalid match code', () => {
         const playerId = 'player1';
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasMatchCode').returns(false);
         const canJoin = service['canJoinMatch'](playerId, mockMatch.data.code);
         expect(canJoin).toBe(false);
@@ -164,9 +164,9 @@ describe('MatchService', () => {
 
     it('can join match should return already in match', () => {
         const playerId = 'player1';
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasMatchCode').returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasPlayerId').returns(true);
         const canJoin = service['canJoinMatch'](playerId, mockMatch.data.code);
         expect(canJoin).toBe(false);
@@ -175,11 +175,11 @@ describe('MatchService', () => {
 
     it('can join match should return room full', () => {
         const playerId = 'player1';
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasMatchCode').returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasPlayerId').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isMatchFull').returns(true);
         const canJoin = service['canJoinMatch'](playerId, mockMatch.data.code);
         expect(canJoin).toBe(false);
@@ -188,13 +188,13 @@ describe('MatchService', () => {
 
     it('can join match should return room locked', () => {
         const playerId = 'player1';
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasMatchCode').returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasPlayerId').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isMatchFull').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isMatchLocked').returns(true);
         const canJoin = service['canJoinMatch'](playerId, mockMatch.data.code);
         expect(canJoin).toBe(false);
@@ -203,7 +203,7 @@ describe('MatchService', () => {
 
     it('can create match should return true if player is not in a match', () => {
         const playerId = 'player1';
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasPlayerId').returns(true);
 
         const canCreate = service['canCreateMatch'](playerId);
@@ -213,7 +213,7 @@ describe('MatchService', () => {
 
     it('is match full should return true if match is full', () => {
         mockMatch.isFull.returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getMatch').returns(mockMatch);
 
         const isFull = service['isMatchFull'](mockMatch.data.code);
@@ -223,7 +223,7 @@ describe('MatchService', () => {
 
     it('is match locked should return true if match is locked', () => {
         mockMatch.data.lobbyData.isLocked = true;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getMatch').returns(mockMatch);
 
         const isLocked = service['isMatchLocked'](mockMatch.data.code);
@@ -232,7 +232,7 @@ describe('MatchService', () => {
     });
 
     it('get match should return the match for the given code', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getMatch').returns(mockMatch);
 
         const match = service['getMatch'](mockMatch.data.code);
@@ -269,7 +269,7 @@ describe('MatchService', () => {
 
     it('getNewMatchCode should generate a unique match code', () => {
         sandbox
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
             .stub(service as any, 'hasMatchCode')
             .onFirstCall()
             .returns(true)

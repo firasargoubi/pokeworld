@@ -5,7 +5,7 @@ import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
-import { Avatar, PlayerData } from '@common/interfaces/player-data';
+import { Avatar, PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { LobbyEvent } from '@common/interfaces/socket-event.enum';
 
 @Injectable({
@@ -38,6 +38,10 @@ export class LobbyService {
 
     startMatch() {
         this.socketService.emit(LobbyEvent.StartMatch);
+    }
+
+    addBot(botType: PlayerType) {
+        this.socketService.emit(LobbyEvent.AddBot, botType);
     }
 
     private onMatchUpdate(oldMatchData: MatchData) {

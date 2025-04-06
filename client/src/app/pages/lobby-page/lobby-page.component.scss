@@ -28,6 +28,13 @@ $clip-path: polygon(
 $inner-border-width: 0.5vw;
 $text-shadow-color: rgb(112, 112, 112);
 
+$player-list-height: calc((100vh - 6vw) * 0.90);
+$player-list-width: 52vw;
+$player-card-height-1: calc($player-list-height * 0.166666);
+$player-card-height-2: calc($player-list-width * 0.143333);
+$player-card-height: min($player-card-height-1, $player-card-height-2);
+$player-card-width: calc($player-card-height * 6.97674418605);
+
 #lobby-container {
     display: flex;
     flex-direction: column;
@@ -140,6 +147,17 @@ $text-shadow-color: rgb(112, 112, 112);
     justify-content: space-around;
 }
 
+#poke-button-bot {
+    z-index: 999;
+    position: absolute;
+    bottom: 4%;
+    left: 62%;
+    transform: translateX(-65%);
+    width: 22vw;
+    height: 4.1vw;
+    overflow: visible;
+}
+
 .copy-container,
 .empty-lock-container,
 .lock-container {
@@ -196,15 +214,23 @@ $text-shadow-color: rgb(112, 112, 112);
     position: absolute;
     right: 5%;
     bottom: 4%;
-    width: 22.5vw;
-    height: 4vw;
+    width: 22vw;
+    height: 4.1vw;
+    overflow: visible;
+}
+#poke-button-bot {
+    z-index: 999;
+    position: absolute;
+    width: 22vw;
+    height: 4.1vw;
     overflow: visible;
 }
 
-#poke-button app-pokeball-button {
-    width: 100%;
-    height: 100%;
+app-pokeball-button {
+    width: 22vw;
+    height: 4.1vw;
 }
+
 @keyframes fall {
     from {
         background-position: 0 0;
@@ -215,8 +241,8 @@ $text-shadow-color: rgb(112, 112, 112);
 }
 
 #players-list {
-    height: 90%;
-    width: 45%;
+    height: $player-list-height;
+    width: $player-card-width;
     display: flex;
     justify-content: start;
     flex-direction: column;
@@ -224,11 +250,16 @@ $text-shadow-color: rgb(112, 112, 112);
 }
 
 .player-card-container {
-    width: 100%;
-    aspect-ratio: 30/4.3;
+    width: $player-card-width;
+    height: $player-card-height;
     z-index: 1;
     margin: 0 0 2% 0;
     overflow: visible;
+}
+
+app-player-card {
+    width: $player-card-width;
+    height: $player-card-height;
 }
 
 .chat-container {
@@ -259,4 +290,17 @@ $text-shadow-color: rgb(112, 112, 112);
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
+}
+
+#creation-bot-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

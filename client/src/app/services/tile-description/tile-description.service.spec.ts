@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { Position } from '@common/interfaces/position';
 import { TILE_COST, TileType } from '@common/interfaces/tile-type.enum';

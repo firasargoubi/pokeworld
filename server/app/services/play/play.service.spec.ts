@@ -52,7 +52,7 @@ describe('PlayService', () => {
     it('end turn should start next turn if conditions met', () => {
         mockMatch.isActivePlayer.returns(true);
         mockMatch.isState.withArgs([MatchState.TurnWait]).returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const startNextTurnStub = sandbox.stub(service as any, 'startNextTurn');
 
         service.endTurn(mockMatch, 'player1');
@@ -66,7 +66,7 @@ describe('PlayService', () => {
         mockMapService.getShortestPath.returns({ moveCost: 2, path: [{ x: 1, y: 1 }] });
         mockMatch.data.playData.movementLeft = 3;
         mockMatch.getPlayer.returns({ ...structuredClone(MOCK_PLAYER_DATAS[0]), position: { x: 0, y: 0 } });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'setTimeLeft');
 
         service.move(mockMatch, 'player1', { x: 1, y: 1 });
@@ -81,7 +81,7 @@ describe('PlayService', () => {
         mockMatch.isActivePlayer.returns(true);
         mockMatch.isState.withArgs([MatchState.TurnWait]).returns(true);
         mockMapService.getActions.returns([{ x: 1, y: 1 }]);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const executeActionStub = sandbox.stub(service as any, 'executeAction');
 
         service.action(mockMatch, 'player1', { x: 1, y: 1 });
@@ -114,9 +114,9 @@ describe('PlayService', () => {
     });
 
     it('start next turn should update state and check win', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'checkWinCondition').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getNextPlayerIndex').returns(1);
 
         service.startNextTurn(mockMatch);
@@ -126,9 +126,9 @@ describe('PlayService', () => {
     });
 
     it('start next turn should check win condition', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'checkWinCondition').returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getNextPlayerIndex').returns(1);
 
         service.startNextTurn(mockMatch);
@@ -149,7 +149,7 @@ describe('PlayService', () => {
 
     it('check win condition should call check ffa win', () => {
         mockMatch.data.gameData.mapData.gameMode = GameMode.FFA;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const checkWinConditionFfaStub = sandbox.stub(service as any, 'checkWinConditionFfa').returns(false);
 
         service['checkWinCondition'](mockMatch);
@@ -159,7 +159,7 @@ describe('PlayService', () => {
 
     it('check win condition should call check ffa win', () => {
         mockMatch.data.gameData.mapData.gameMode = GameMode.CTF;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const checkWinConditionCtfStub = sandbox.stub(service as any, 'checkWinConditionCtf').returns(false);
 
         service['checkWinCondition'](mockMatch);
@@ -215,7 +215,7 @@ describe('PlayService', () => {
 
     it('execute action should start combat if player at position', () => {
         mockMatch.data.players[1].position = { x: 1, y: 1 };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'setTimeLeft');
 
         service['executeAction'](mockMatch, 'player1', { x: 1, y: 1 });
@@ -225,7 +225,7 @@ describe('PlayService', () => {
 
     it('execute action should toggle bridge if no player', () => {
         mockMatch.data.gameData.mapData.tiles[1][1] = TileType.Bridge;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const toggleBridgeTileStub = sandbox.stub(service as any, 'toggleBridgeTile');
 
         service['executeAction'](mockMatch, 'player1', { x: -3, y: 3 });
@@ -278,7 +278,7 @@ describe('PlayService', () => {
 
         mockMapService.getNearestItemDropSpot.returns(dropPosition);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const computeItemsSpy = sandbox.spy(service as any, 'computeItems');
 
         service.dropItems(mockMatch, playerId, [itemToDrop]);
@@ -292,7 +292,7 @@ describe('PlayService', () => {
     });
 
     it('continueTurn should end match if win condition is met', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'checkWinCondition').returns(true);
 
         service.continueTurn(mockMatch);
@@ -303,9 +303,9 @@ describe('PlayService', () => {
         mockMatch.data.state = MatchState.MovementAnimation;
         mockMatch.data.playData.activePlayerIndex = 0;
         mockMatch.data.players = [{ id: 'player1' }] as PlayerData[];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'checkWinCondition').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const checkAndPickupItemSpy = sandbox.spy(service as any, 'checkAndPickupItem');
 
         service.continueTurn(mockMatch);
@@ -317,9 +317,9 @@ describe('PlayService', () => {
         mockMatch.data.state = MatchState.ItemDropSelection;
         mockMatch.data.playData.activePlayerIndex = 0;
         mockMatch.data.players = [{ id: 'player1' }] as PlayerData[];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'checkWinCondition').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const scheduleForceItemDropSpy = sandbox.spy(service as any, 'scheduleForceItemDrop');
 
         service.continueTurn(mockMatch);
@@ -328,12 +328,12 @@ describe('PlayService', () => {
 
     it('continueTurn should handle TurnWait state correctly based on player ability to act', () => {
         mockMatch.data.state = MatchState.TurnWait;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'checkWinCondition').returns(false);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'canPlayerAct').returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const scheduleTurnEndSpy = sandbox.spy(service as any, 'scheduleTurnEnd');
 
         service.continueTurn(mockMatch);
@@ -343,9 +343,9 @@ describe('PlayService', () => {
         sandbox.restore();
 
         mockMatch.data.state = MatchState.TurnWait;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'checkWinCondition').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'canPlayerAct').returns(false);
         const startNextTurnSpy = sandbox.spy(service, 'startNextTurn');
 
@@ -363,7 +363,7 @@ describe('PlayService', () => {
 
         mockMapService.getItemTypeAtPosition.returns(itemType);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const handleItemAdditionSpy = sandbox.spy(service as any, 'handleItemAddition');
 
         service['checkAndPickupItem'](mockMatch, playerData);
@@ -386,7 +386,7 @@ describe('PlayService', () => {
             ],
         } as Record<ItemType, Position[]>;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const computeItemsSpy = sandbox.spy(service as any, 'computeItems');
 
         service['handleItemAddition'](mockMatch, playerData, itemType);
@@ -408,7 +408,7 @@ describe('PlayService', () => {
             [ItemType.Item3]: [{ x: 2, y: 2 }],
         } as Record<ItemType, Position[]>;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const computeItemsSpy = sandbox.spy(service as any, 'computeItems');
 
         service['handleItemAddition'](mockMatch, playerData, itemType);

@@ -1,9 +1,10 @@
 import { Match } from '@app/classes/match/match';
 import { PlayService } from '@app/services/play/play.service';
 import { REGULAR_ITEMS } from '@common/consts/map-data.const';
+import { BONUS_STAT, DEFAULT_STAT } from '@common/consts/player-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { Message } from '@common/interfaces/message.enum';
-import { Avatar } from '@common/interfaces/player-data';
+import { Avatar, DiceType, PlayerType } from '@common/interfaces/player-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -83,7 +84,7 @@ describe('LobbyService', () => {
         mockMatch.isState.returns(true);
         mockMatch.data.lobbyData.isLocked = true;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const startMatchFirstTurnStub = sandbox.stub(service as any, 'startMatchFirstTurn');
         service.startMatch(mockMatch, playerId);
 
@@ -91,11 +92,11 @@ describe('LobbyService', () => {
     });
 
     it('start match first turn should call start next turn', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const sortPlayersStub = sandbox.stub(service as any, 'sortPlayers');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const assignSpawnPointsStub = sandbox.stub(service as any, 'assignSpawnPoints');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const setupRandomItemsStub = sandbox.stub(service as any, 'setupRandomItems');
 
         service['startMatchFirstTurn'](mockMatch);
@@ -147,6 +148,51 @@ describe('LobbyService', () => {
 
         const uniqueName2 = service['getUniqueName'](mockMatch, 'player2', 'Alice');
         expect(uniqueName2).toBe('Alice-2');
+    });
+
+    it('should add a bot with the specified type if match is not full', () => {
+        mockMatch.isFull.returns(false);
+        mockMatch.data.players = [structuredClone(MOCK_PLAYER_DATAS[0])];
+        const initialPlayerCount = mockMatch.data.players.length;
+        service.addBot(mockMatch, PlayerType.BotAggressive);
+        expect(mockMatch.data.players.length).toBe(initialPlayerCount + 1);
+        expect(mockMatch.changeLockStatus.calledWith(false)).toBeTruthy();
+    });
+
+    it('should set bot data with controlled random values 0', () => {
+        const randomStub = sandbox.stub(Math, 'random');
+        randomStub.onCall(0).returns(0);
+        randomStub.onCall(1).returns(0);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'getBotAvatar').returns(Avatar.Avatar2);
+
+        const botData = service['getBotData'](mockMatch);
+
+        expect(botData.isConnected).toBe(true);
+        expect(botData.avatar).toBe(Avatar.Avatar2);
+        expect(botData.attackDice).toBe(DiceType.D6);
+        expect(botData.defenseDice).toBe(DiceType.D4);
+        expect(botData.health).toBe(DEFAULT_STAT);
+        expect(botData.speed).toBe(BONUS_STAT);
+    });
+
+    it('should set bot data with controlled random values 1', () => {
+        const randomStub = sandbox.stub(Math, 'random');
+        randomStub.onCall(0).returns(1);
+        randomStub.onCall(1).returns(1);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'getBotAvatar').returns(Avatar.Avatar3);
+
+        const botData = service['getBotData'](mockMatch);
+
+        expect(botData.isConnected).toBe(true);
+        expect(botData.avatar).toBe(Avatar.Avatar3);
+        expect(botData.attackDice).toBe(DiceType.D4);
+        expect(botData.defenseDice).toBe(DiceType.D6);
+        expect(botData.health).toBe(BONUS_STAT);
+        expect(botData.speed).toBe(DEFAULT_STAT);
     });
 
     it('setupRandomItems should distribute random items to unused item types', () => {

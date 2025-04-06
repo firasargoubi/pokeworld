@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { Timer } from '@app/classes/timer/timer';
-import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
@@ -9,6 +8,7 @@ import { ItemType } from '@common/interfaces/item-type.enum';
 import { PlayerCombatData } from '@common/interfaces/match-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { CombatPageComponent } from './combat-page.component';
+import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 
 describe('CombatPageComponent', () => {
     let component: CombatPageComponent;
@@ -67,7 +67,7 @@ describe('CombatPageComponent', () => {
     });
 
     it('update images should update visual data', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const updateImagesSpy = spyOn(component as any, 'updateImages').and.callThrough();
         component['updateImages']();
         expect(updateImagesSpy).toHaveBeenCalled();
@@ -75,14 +75,14 @@ describe('CombatPageComponent', () => {
 
     it('on match update should call subfunctions', () => {
         mockMatchService.isState.and.returnValue(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const checkForRedirectSpy = spyOn(component as any, 'checkForRedirect');
         component['onMatchUpdate']();
         expect(checkForRedirectSpy).toHaveBeenCalled();
     });
 
     it('check for redirect should check state', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const checkForRedirectSpy = spyOn(component as any, 'checkForRedirect').and.callThrough();
         component['checkForRedirect']();
         expect(checkForRedirectSpy).toHaveBeenCalled();
@@ -90,14 +90,14 @@ describe('CombatPageComponent', () => {
 
     it('update players combat data should update first player', () => {
         mockMatchService.selfIndex = 0;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const updatePlayersCombatDataSpy = spyOn(component as any, 'updatePlayersCombatData').and.callThrough();
         component['updatePlayersCombatData']();
         expect(updatePlayersCombatDataSpy).toHaveBeenCalled();
     });
 
     it('update players combat data should update second player', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const updatePlayersCombatDataSpy = spyOn(component as any, 'updatePlayersCombatData').and.callThrough();
         component['updatePlayersCombatData']();
         expect(updatePlayersCombatDataSpy).toHaveBeenCalled();

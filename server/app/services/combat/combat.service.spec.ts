@@ -58,9 +58,9 @@ describe('CombatService', () => {
     });
 
     it('attack should start animation if player can act', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'canPlayerAct').returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const startAttackAnimationStub = sandbox.stub(service as any, 'startAttackAnimation');
 
         service.attack(mockMatch, 'player1');
@@ -69,9 +69,9 @@ describe('CombatService', () => {
     });
 
     it('escape should start animation if player can act', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'canPlayerAct').returns(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const startEscapeAnimationStub = sandbox.stub(service as any, 'startEscapeAnimation');
 
         service.escape(mockMatch, 'player1');
@@ -84,7 +84,7 @@ describe('CombatService', () => {
         mockMatch.getPlayer.withArgs('player2').returns({ ...structuredClone(MOCK_PLAYER_DATAS[1]), speed: 6 });
         mockMatch.getPlayerIndex.withArgs('player1').returns(0);
         mockMatch.getPlayerIndex.withArgs('player2').returns(1);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const startCombatWaitStub = sandbox.stub(service as any, 'startCombatWait');
 
         service.startCombat(mockMatch, 'player1', 'player2');
@@ -157,7 +157,7 @@ describe('CombatService', () => {
         ];
         mockMatch.data.combatData.isSecondPlayerTurn = false;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const computeHealingItemStub = sandbox.stub(service as any, 'computeHealingItem');
 
         service['startCombatWait'](mockMatch);
@@ -188,7 +188,7 @@ describe('CombatService', () => {
             { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), currentHealth: 5 },
         ];
         mockMatch.data.combatData.isSecondPlayerTurn = false;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'executeAttack');
 
         service['startAttackAnimation'](mockMatch);
@@ -204,9 +204,9 @@ describe('CombatService', () => {
             { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), currentHealth: 5 },
         ];
         mockMatch.data.combatData.isSecondPlayerTurn = false;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'executeAttack');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getActivePlayerData').returns({ ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]), currentHealth: -2 });
 
         service['startAttackAnimation'](mockMatch);
@@ -222,7 +222,7 @@ describe('CombatService', () => {
             { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), currentEscapes: 0 },
         ];
         mockMatch.data.combatData.isSecondPlayerTurn = false;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'executeEscape').returns(true);
 
         service['startEscapeAnimation'](mockMatch);
@@ -238,7 +238,7 @@ describe('CombatService', () => {
             { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), currentEscapes: 0 },
         ];
         mockMatch.data.combatData.isSecondPlayerTurn = false;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'executeEscape').returns(false);
 
         service['startEscapeAnimation'](mockMatch);
@@ -269,7 +269,7 @@ describe('CombatService', () => {
     });
 
     it('execute attack should update health', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const computeAttackResultStub = sandbox.stub(service as any, 'computeAttackResult');
 
         const attackResult1 = 3;
@@ -290,9 +290,9 @@ describe('CombatService', () => {
         ];
         mockMatch.data.combatData.isSecondPlayerTurn = false;
         const attackRoll = 4;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'rollAttack').returns(attackRoll);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'rollDefense').returns(2);
 
         const result = service['computeAttackResult'](mockMatch);

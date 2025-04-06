@@ -1,4 +1,10 @@
-$corner-square-size: 0.3vw;
+$player-list-height: calc((100vh - 6vw) * 0.90);
+$player-list-width: 52vw;
+$player-card-height-1: calc($player-list-height * 0.166666);
+$player-card-height-2: calc($player-list-width * 0.143333);
+$player-card-height: min($player-card-height-1, $player-card-height-2);
+$scale: calc($player-card-height * 0.15);
+$corner-square-size: calc(0.3 * $scale);
 $clip-path: polygon(
     $corner-square-size 0%,
     calc(100% - #{$corner-square-size}) 0%,
@@ -17,7 +23,7 @@ $clip-path: polygon(
     $corner-square-size $corner-square-size
 );
 
-$inner-border-width: 0.3vw;
+$inner-border-width: calc(0.3 * $scale);
 
 $text-shadow-color: rgb(112, 112, 112);
 
@@ -112,6 +118,15 @@ $text-shadow-color: rgb(112, 112, 112);
         inset 0 calc(-1 * $inner-border-width) 0 0 rgb(231, 163, 131);
 }
 
+.is-bot .player-card {
+    background-image: url('../../../assets/images/menu/containers/gray/gray-scrare-body.png');
+    box-shadow:
+        inset $inner-border-width 0 0 0 hsl(196, 0%, 67%),
+        inset calc(-1 * $inner-border-width) 0 0 0 hsl(205, 0%, 42%),
+        inset 0 $inner-border-width 0 0 hsl(196, 0%, 67%),
+        inset 0 calc(-1 * $inner-border-width) 0 0 hsl(205, 0%, 42%);
+}
+
 .avatar-container {
     height: 100%;
     aspect-ratio: 1/1;
@@ -142,12 +157,12 @@ $text-shadow-color: rgb(112, 112, 112);
 .player-card .player-name {
     position: absolute;
     top: 7%;
-    left: 13%;
-    font-size: 2vw;
-    text-shadow: 0.25vw 0 0 $text-shadow-color;
+    left: 11%;
+    font-size: calc(2 * $scale);
+    text-shadow: calc(0.25 * $scale) 0 0 $text-shadow-color;
     display: flex;
     justify-content: start;
-    gap: 1vw;
+    gap: calc(1 * $scale);
     height: 50%;
     width: 80%;
     z-index: 3;
@@ -170,9 +185,9 @@ $text-shadow-color: rgb(112, 112, 112);
 
 .player-card .hp-bar {
     position: absolute;
-    bottom: 40%;
+    bottom: 52%;
     right: 4%;
-    width: 40%;
+    width: 38%;
     aspect-ratio: 20/1.4;
     background-image: url('../../../assets/images/menu/stat-bar/hp-bar.png');
     background-size: 100% 100%;
@@ -202,9 +217,9 @@ $text-shadow-color: rgb(112, 112, 112);
 .hp-value {
     position: absolute;
     right: 0;
-    bottom: -120%;
-    font-size: 2vw;
-    text-shadow: 0.25vw 0 0 $text-shadow-color;
+    bottom: -130%;
+    font-size: calc(2.00 * $scale);
+    text-shadow: calc(0.25 * $scale) 0 0 $text-shadow-color;
     user-select: none;
 }
 
@@ -217,4 +232,16 @@ $text-shadow-color: rgb(112, 112, 112);
 .is-disconnected .player-card *,
 .is-disconnected .ban-button {
     display: none;
+}
+
+.player-card .bot-type {
+    font-size: calc(1.5 * $scale);
+    color: #50d16c;
+    text-shadow: calc(0.17 * $scale) calc(0.05 * $scale) 0 $text-shadow-color;
+    margin-top: calc(0.29 * $scale);
+    margin-left: calc(0.1 * $scale);
+}
+
+.player-card .aggresive {
+    color: #ff8983;
 }

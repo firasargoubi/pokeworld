@@ -394,7 +394,7 @@ describe('MapService', () => {
             { x: 1, y: 1 },
             { x: 2, y: 2 },
         ];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const movePlayerAnimationSpy = spyOn<any>(service, 'movePlayerAnimation');
         jasmine.clock().install();
         service.movePlayer(0, positions);

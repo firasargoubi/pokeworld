@@ -38,7 +38,7 @@ describe('DebugPageComponent', () => {
 
     it('on key down should call join match', () => {
         component.matchCodeInput = 'test-code';
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const joinMatchSpy = spyOn(component as any, 'joinMatch');
         const event = new KeyboardEvent('keydown', { key: 'Return', repeat: false });
         component.onKeyDown(event);
@@ -56,7 +56,7 @@ describe('DebugPageComponent', () => {
     });
 
     it('on join match should redirect to game', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn(component as any, 'joinMatch').and.callThrough();
         component['onJoinMatch'](structuredClone(MOCK_MATCH_DATAS[0]));
         expect(mockRouter.navigate).toHaveBeenCalled();

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayerCardComponent } from './player-card.component';
 import { EMPTY_IMAGE } from '@app/consts/images.const';
+import { PlayerCardComponent } from './player-card.component';
 
 describe('PlayerCardComponent', () => {
     let component: PlayerCardComponent;
@@ -21,6 +21,7 @@ describe('PlayerCardComponent', () => {
             avatarImage: EMPTY_IMAGE,
             health: 6,
             id: '1234',
+            playerType: 'player',
         };
         fixture.detectChanges();
     });

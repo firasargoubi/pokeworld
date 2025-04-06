@@ -4,7 +4,7 @@ import { LobbyService } from './lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
-import { Avatar } from '@common/interfaces/player-data';
+import { Avatar, PlayerType } from '@common/interfaces/player-data';
 import { LobbyEvent } from '@common/interfaces/socket-event.enum';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
@@ -60,6 +60,11 @@ describe('LobbyService', () => {
     it('startMatch should emit StartMatch event', () => {
         service.startMatch();
         expect(mockSocketService.emit).toHaveBeenCalledWith(LobbyEvent.StartMatch);
+    });
+
+    it('addBot should emit AddBot event', () => {
+        service.addBot(PlayerType.BotDefensive);
+        expect(mockSocketService.emit).toHaveBeenCalledWith(LobbyEvent.AddBot, PlayerType.BotDefensive);
     });
 
     it('on match update should navigate to lobby', () => {

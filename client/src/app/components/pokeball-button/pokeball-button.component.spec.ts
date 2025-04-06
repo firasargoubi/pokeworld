@@ -32,18 +32,26 @@ describe('PokeballButtonComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should display "Test Button" as the button content', () => {
+    it('should set is active to false on mouse leave', () => {
+        component.isActive = true;
+        component.onMouseLeave();
+        expect(component.isActive).toBe(false);
+    });
+
+    it('should display Test Button as the button content', () => {
         expect(component.buttonContent).toBe('Test Button');
     });
 
     it('should set isActive to true on mouse down', () => {
-        component.onMouseDown();
+        const event = new MouseEvent('click');
+        component.onMouseDown(event);
         expect(component.isActive).toBeTrue();
     });
 
     it('should reset isActive to false after delay on mouse up', (done) => {
+        const event = new MouseEvent('click');
         component.delay = 100;
-        component.onMouseDown();
+        component.onMouseDown(event);
         expect(component.isActive).toBeTrue();
         component.onMouseUp();
         setTimeout(() => {
@@ -55,6 +63,7 @@ describe('PokeballButtonComponent', () => {
     it('should call onClickAction if defined when mouse is released', (done) => {
         const verificationTimeout = 50;
         component.delay = 100;
+        component.isActive = true;
         component.onClickAction = jasmine.createSpy('onClickAction');
 
         component.onMouseUp();

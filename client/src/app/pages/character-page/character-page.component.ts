@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { AVATAR_DATA, MAIN_AVATAR_COUNT } from '@app/consts/avatar-data.const';
+import { AVATAR_DATA, MAX_SELECTABLE_AVATAR_INDEX, MIN_SELECTABLE_AVATAR_INDEX } from '@common/consts/avatar-data.const';
 import { DEFAULT_CHARACTER_VISUAL_DATA } from '@app/consts/player-data.const';
 import { CharacterVisualData } from '@app/interfaces/character-visual-data';
 import { LobbyService } from '@app/services/lobby/lobby.service';
@@ -68,15 +68,14 @@ export class CharacterPageComponent {
         this.visualData.selfAvatarimage = AVATAR_DATA[selfAvatar].image;
         this.visualData.isAvatarSelected = selfAvatar !== Avatar.Default;
         this.visualData.avatarList = Object.values(Avatar)
-            .filter((a) => a !== Avatar.Default)
+            .slice(MIN_SELECTABLE_AVATAR_INDEX, MAX_SELECTABLE_AVATAR_INDEX)
             .map((avatar) => ({
                 avatar,
                 name: AVATAR_DATA[avatar].name,
                 image: AVATAR_DATA[avatar].image,
                 isLocked: lockedAvatars.includes(avatar),
                 isSelected: selfAvatar === avatar,
-            }))
-            .slice(0, MAIN_AVATAR_COUNT);
+            }));
     }
 
     private getLockedAvatars(): Avatar[] {
