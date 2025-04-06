@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { DEFAULT_COMBAT_VISUAL_DATA } from '@app/consts/combat-data.const';
 import { BATTLE_PLATFORM_IMAGES } from '@app/consts/images.const';
 import { CombatVisualData } from '@app/interfaces/combat-visual-data';

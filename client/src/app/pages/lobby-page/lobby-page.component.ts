@@ -1,30 +1,33 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { CreateBotPopupComponent } from '@app/components/bot-creation-popup/bot-creation-popup.component';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PlayerCardComponent } from '@app/components/player-card/player-card.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
-import { AVATAR_DATA } from '@app/consts/avatar-data.const';
 import { DEFAULT_LOBBY_VISUAL_DATA } from '@app/consts/player-data.const';
 import { LobbyVisualData } from '@app/interfaces/lobby-visual-data';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { MAX_PLAYERS } from '@common/consts/player-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { PlayerType } from '@common/interfaces/player-data';
 
 @Component({
     selector: 'app-lobby-page',
     templateUrl: './lobby-page.component.html',
     styleUrls: ['./lobby-page.component.scss'],
-    imports: [CommonModule, HeaderComponent, PlayerCardComponent, PokeballButtonComponent, ChatComponent],
+    imports: [CommonModule, HeaderComponent, PlayerCardComponent, PokeballButtonComponent, ChatComponent, CreateBotPopupComponent],
     standalone: true,
 })
 export class LobbyPageComponent {
     visualData: LobbyVisualData = structuredClone(DEFAULT_LOBBY_VISUAL_DATA);
     matchService: MatchService = inject(MatchService);
+    showBotPopup: boolean = false;
     private lobbyService: LobbyService = inject(LobbyService);
     private popupService: PopupService = inject(PopupService);
     private router: Router = inject(Router);
@@ -35,6 +38,12 @@ export class LobbyPageComponent {
         }
         this.updateVisual();
         this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.updateVisual.bind(this));
+    }
+    @HostListener('document:keydown.escape')
+    onEscapeKeydown(): void {
+        if (this.showBotPopup) {
+            this.showBotPopup = false;
+        }
     }
 
     startMatchButton(): void {
@@ -55,6 +64,15 @@ export class LobbyPageComponent {
 
     copyMatchCode() {
         this.copyToClipboard(this.matchService.data.code);
+    }
+
+    showBotCreationPopup() {
+        this.showBotPopup = true;
+    }
+
+    handleBotTypeSelected(botType: PlayerType) {
+        this.lobbyService.addBot(botType);
+        this.showBotPopup = false;
     }
 
     private copyToClipboard(text: string) {
@@ -88,6 +106,7 @@ export class LobbyPageComponent {
                 avatarImage: AVATAR_DATA[p.avatar].imageCentered,
                 health: p.health,
                 id: p.id,
+                playerType: p.type,
             }))
             .filter((p) => p.isConnected);
         while (this.visualData.players.length < MAX_PLAYERS[this.matchService.data.gameData.mapData.size]) {

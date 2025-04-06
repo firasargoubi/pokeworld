@@ -4,6 +4,7 @@ import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { PlayerType } from '@common/interfaces/player-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { LobbyPageComponent } from './lobby-page.component';
 
@@ -21,10 +22,11 @@ describe('LobbyPageComponent', () => {
 
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
-        lobbyServiceSpy = jasmine.createSpyObj('LobbyService', ['startMatch', 'kickPlayer', 'changeLockStatus']);
+        lobbyServiceSpy = jasmine.createSpyObj('LobbyService', ['startMatch', 'kickPlayer', 'changeLockStatus', 'addBot']);
         matchServiceSpy = jasmine.createSpyObj('MatchService', ['isInMatch', 'isState', 'isHost', 'leaveMatch'], {
             matchUpdate: { pipe: () => ({ subscribe: () => ({}) }) },
             data: mockMatchData,
+            selfIndex: 0,
         });
 
         await TestBed.configureTestingModule({
@@ -79,10 +81,33 @@ describe('LobbyPageComponent', () => {
     });
 
     it('should copy match code to clipboard', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const copyToClipboardSpy = spyOn(component as any, 'copyToClipboard').and.callThrough();
         component.copyMatchCode();
         expect(copyToClipboardSpy).toHaveBeenCalled();
+    });
+
+    it('should do nothing when Escape key is pressed and bot popup is hidden', () => {
+        component.showBotPopup = true;
+        fixture.detectChanges();
+        const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+        document.dispatchEvent(escapeEvent);
+
+        expect(component.showBotPopup).toBeFalse();
+    });
+
+    it('should showPopup if add Bot button is triggered', () => {
+        component.showBotPopup = false;
+        component.showBotCreationPopup();
+        expect(component.showBotPopup).toBeTrue();
+    });
+
+    it('should showPopup if add Bot button is triggered', () => {
+        component.showBotPopup = true;
+        const defesiveBot: PlayerType = PlayerType.BotDefensive;
+        component.handleBotTypeSelected(defesiveBot);
+        expect(lobbyServiceSpy.addBot).toHaveBeenCalledWith(defesiveBot);
+        expect(component.showBotPopup).toBeFalse();
     });
 
     it('ask copy permission should correct', () => {

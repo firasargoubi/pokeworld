@@ -1,13 +1,14 @@
 import { Match } from '@app/classes/match/match';
 import { PlayService } from '@app/services/play/play.service';
+import { AVATAR_DATA, MAX_SELECTABLE_AVATAR_INDEX, MIN_SELECTABLE_AVATAR_INDEX } from '@common/consts/avatar-data.const';
+import { BONUS_STAT, DEFAULT_PLAYER_DATA, DEFAULT_STAT, MIN_PLAYERS } from '@common/consts/player-data.const';
 import { REGULAR_ITEMS } from '@common/consts/map-data.const';
-import { RANDOM_THRESHOLD } from '@common/consts/match-data.const';
-import { MIN_PLAYERS } from '@common/consts/player-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
-import { Avatar, PlayerData } from '@common/interfaces/player-data';
+import { Avatar, DiceType, PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { RANDOM_THRESHOLD } from '@common/consts/match-data.const';
 
 @Injectable()
 export class LobbyService {
@@ -55,12 +56,73 @@ export class LobbyService {
         }
     }
 
+    addBot(match: Match, botType: PlayerType) {
+        if (!match.isFull()) {
+            const botData = this.getBotData(match);
+            if (botData !== null) {
+                botData.type = botType;
+                match.data.players.push(botData);
+                match.changeLockStatus(false);
+                match.sendUpdate();
+            }
+        }
+    }
+
+    private getBotData(match: Match): PlayerData | null {
+        let botData = null;
+        const avatar = this.getBotAvatar(match);
+        if (avatar !== null) {
+            const hasStrongAttack = Math.random() < RANDOM_THRESHOLD;
+            const hasStrongSpeed = Math.random() < RANDOM_THRESHOLD;
+            const id = this.getBotId();
+            botData = {
+                ...DEFAULT_PLAYER_DATA,
+                id,
+                isConnected: true,
+                avatar,
+                name: this.getUniqueName(match, id, AVATAR_DATA[avatar].name.toUpperCase()),
+                attackDice: hasStrongAttack ? DiceType.D6 : DiceType.D4,
+                defenseDice: hasStrongAttack ? DiceType.D4 : DiceType.D6,
+                health: hasStrongSpeed ? DEFAULT_STAT : BONUS_STAT,
+                speed: hasStrongSpeed ? BONUS_STAT : DEFAULT_STAT,
+            };
+        }
+        return botData;
+    }
+
+    private getBotAvatar(match: Match): Avatar | null {
+        let botAvatar = null;
+        const lockedAvatars = match.data.players.map((p) => p.avatar);
+        const unlockedAvatars = Object.values(Avatar)
+            .slice(MIN_SELECTABLE_AVATAR_INDEX, MAX_SELECTABLE_AVATAR_INDEX)
+            .filter((avatar) => !lockedAvatars.includes(avatar));
+
+        if (unlockedAvatars.length > 0) {
+            const randomIndex = Math.floor(Math.random() * (unlockedAvatars.length - 1)) + 1;
+            botAvatar = unlockedAvatars[randomIndex];
+        }
+        return botAvatar;
+    }
+
     private startMatchFirstTurn(match: Match) {
         this.sortPlayers(match);
         this.assignSpawnPoints(match);
         this.setupRandomItems(match);
         match.data.playData.activePlayerIndex = -1;
         this.playService.startNextTurn(match);
+    }
+
+    private getBotId(): string {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const length = 8;
+        let result = '';
+
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            result += characters[randomIndex];
+        }
+
+        return result;
     }
 
     private sortPlayers(match: Match) {

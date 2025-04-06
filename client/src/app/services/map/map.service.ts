@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { IMAGE_SUFIX, TILE_IMAGES_PREFIX, UNDERLAY_IMAGES_PREFIX } from '@app/consts/images.const';
 import { MapVisualData, OverlayTiles, PlayerTileVisual, TileVisualData } from '@app/interfaces/map-visual-data';
 import { TileComparisonData } from '@app/interfaces/tile-comparison-data';

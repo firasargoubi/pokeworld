@@ -1,10 +1,7 @@
-/* eslint-disable max-lines */
-// This file is intentionally large as it contains all avatar data in one place for easier management and consistency.
-// Splitting this into multiple files would reduce clarity and make updates more difficult to coordinate.
+import { Avatar } from '../interfaces/player-data';
 
-import { Avatar } from '@common/interfaces/player-data';
-
-export const MAIN_AVATAR_COUNT = 12;
+export const MIN_SELECTABLE_AVATAR_INDEX = 1;
+export const MAX_SELECTABLE_AVATAR_INDEX = 13;
 
 export const AVATAR_DATA = {
     [Avatar.Default]: {

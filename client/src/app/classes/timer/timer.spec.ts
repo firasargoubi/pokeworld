@@ -13,7 +13,7 @@ describe('Timer', () => {
     });
 
     it('should start timer start interval', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const startIntervalSpy = spyOn<any>(timer, 'startInterval').and.callThrough();
 
         timer.startTimer();
@@ -23,9 +23,9 @@ describe('Timer', () => {
     });
 
     it('should restart timer stop and start timer', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const stopIntervalSpy = spyOn<any>(timer, 'stopInterval').and.callThrough();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const startTimerSpy = spyOn<any>(timer, 'startTimer').and.callThrough();
         timer.isStarted = true;
 
@@ -36,7 +36,7 @@ describe('Timer', () => {
     });
 
     it('should restart timer stop and start timer', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const stopIntervalSpy = spyOn<any>(timer, 'stopInterval').and.callThrough();
         timer.isStarted = true;
 
@@ -46,7 +46,7 @@ describe('Timer', () => {
     });
 
     it('should start interval and stop any existing one', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const stopIntervalSpy = spyOn<any>(timer, 'stopInterval').and.callThrough();
         const setIntervalSpy = spyOn(window, 'setInterval').and.callThrough();
 
@@ -66,7 +66,7 @@ describe('Timer', () => {
     });
 
     it('should interval trigger should stop interval', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const stopIntervalSpy = spyOn<any>(timer, 'stopInterval').and.callThrough();
         timer['currentTime'] = 1;
 

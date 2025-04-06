@@ -1,4 +1,3 @@
-
 export enum MatchEvent {
     CreateMatch = 'createMatch',
     JoinMatch = 'joinMatch',
@@ -16,6 +15,7 @@ export enum LobbyEvent {
     JoinLobby = 'joinLobby',
     ChangeLockStatus = 'changeLockStatus',
     StartMatch = 'startMatch',
+    AddBot = 'addBot',
 }
 
 export enum PlayEvent {

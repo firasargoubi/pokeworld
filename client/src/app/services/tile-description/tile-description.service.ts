@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { DEFAULT_TILE_DESCRIPTION, TILE_EFFECT } from '@app/consts/tile-data.const';
 import { TileDescriptionInfo } from '@app/interfaces/tile-description';
 import { Position } from '@common/interfaces/position';

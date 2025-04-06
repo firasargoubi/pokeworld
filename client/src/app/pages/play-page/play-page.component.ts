@@ -6,7 +6,7 @@ import { ChatComponent } from '@app/components/chat/chat.component';
 import { ItemDropPopupComponent } from '@app/components/item-drop-popup/item-drop-popup.component';
 import { ItemComponent } from '@app/components/item/item.component';
 import { MapComponent } from '@app/components/map/map.component';
-import { AVATAR_DATA } from '@app/consts/avatar-data.const';
+import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { DEFAULT_PLAY_VISUAL_DATA } from '@app/consts/play-data.const';
 import { PlayVisualData } from '@app/interfaces/play-visual-data';
 import { MapService } from '@app/services/map/map.service';

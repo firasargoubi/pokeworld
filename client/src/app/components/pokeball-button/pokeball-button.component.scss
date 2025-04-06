@@ -40,7 +40,7 @@
 }
 
 .pokeball-button-spacer {
-    width: 15%;
+    width: 13%;
     height: 100%;
     background-image: url('../../../assets/images/menu/buttons/poke-button/button-container-borderless.png');
     background-repeat: repeat-x;
@@ -58,6 +58,8 @@
     align-items: center;
     height: 100%;
     flex: 1;
+    margin-left: -2%;
+    margin-right: -2%;
     background-image: url('../../../assets/images/menu/buttons/poke-button/button-container-borderless.png');
     background-repeat: repeat-x;
     background-size: auto 100%;
@@ -69,7 +71,7 @@
 }
 
 .pokeball-button-content p {
-    font-size: min(3vw, 4vh);
+    font-size: min(2vw, 6vh);
     width: auto;
     text-align: center;
     user-select: none;

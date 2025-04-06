@@ -75,7 +75,7 @@ describe('Match', () => {
 
     it('change lock status should lock and kick if true', () => {
         match.data.players.push({ ...structuredClone(MOCK_PLAYER_DATAS[0]), isConnected: false });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const kickJoiningPlayersStub = sandbox.stub(match as any, 'kickJoiningPlayers');
 
         match.changeLockStatus(true);
@@ -86,7 +86,7 @@ describe('Match', () => {
 
     it('change lock status should unlock if false', () => {
         match.data.lobbyData.isLocked = true;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(match as any, 'isFull').returns(false);
 
         match.changeLockStatus(false);
@@ -97,7 +97,7 @@ describe('Match', () => {
     it('leave should handle lobby host leave', () => {
         match.data.state = MatchState.Lobby;
         match.data.lobbyData.hostPlayerIndex = 0;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const hostLeaveLobbyStub = sandbox.stub(match as any, 'hostLeaveLobby');
 
         match.leave(match.data.players[0].id);
@@ -108,7 +108,7 @@ describe('Match', () => {
     it('leave should handle lobby player leave', () => {
         match.data.state = MatchState.Lobby;
         match.data.lobbyData.hostPlayerIndex = 0;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const playerLeaveLobbyStub = sandbox.stub(match as any, 'playerLeaveLobby');
 
         match.leave(match.data.players[1].id);
@@ -118,7 +118,7 @@ describe('Match', () => {
 
     it('leave should handle stats leave', () => {
         match.data.state = MatchState.Statistics;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const playerLeaveStatsStub = sandbox.stub(match as any, 'playerLeaveStats');
 
         match.leave(match.data.players[0].id);
@@ -128,7 +128,7 @@ describe('Match', () => {
 
     it('leave should handle combat leave', () => {
         match.data.state = MatchState.CombatAnimation;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const playerLeaveCombatStub = sandbox.stub(match as any, 'playerLeaveCombat');
 
         match.leave(match.data.players[0].id);
@@ -211,7 +211,7 @@ describe('Match', () => {
     // Private Methods
     it('kick joining players should kick disconnected', () => {
         match.data.players.push({ ...structuredClone(MOCK_PLAYER_DATAS[0]), id: 'disconnected', isConnected: false });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const kickPlayerStub = sandbox.stub(match as any, 'kickPlayer');
 
         match['kickJoiningPlayers']();
@@ -224,7 +224,7 @@ describe('Match', () => {
             { ...structuredClone(MOCK_PLAYER_DATAS[0]), id: 'host' },
             { ...structuredClone(MOCK_PLAYER_DATAS[1]), id: 'player1' },
         ];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const kickPlayerStub = sandbox.stub(match as any, 'kickPlayer');
 
         match['hostLeaveLobby']('host');
@@ -269,7 +269,7 @@ describe('Match', () => {
             { ...structuredClone(MOCK_PLAYER_DATAS[0]), id: 'player1', isConnected: true },
             { ...structuredClone(MOCK_PLAYER_DATAS[1]), id: 'player2', isConnected: true },
         ];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const kickPlayerStub = sandbox.stub(match as any, 'kickPlayer');
 
         match['playerLeaveMatch']('player1');

@@ -11,4 +11,5 @@ export interface LobbyPlayerVisualData {
     avatarImage: string;
     health: number;
     id: string;
+    playerType: string;
 }

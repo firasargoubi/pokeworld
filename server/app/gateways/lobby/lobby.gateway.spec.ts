@@ -1,12 +1,12 @@
+import { Match } from '@app/classes/match/match';
+import { LobbyService } from '@app/services/lobby/lobby.service';
+import { MatchService } from '@app/services/match/match.service';
+import { Avatar, PlayerType } from '@common/interfaces/player-data';
+import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
-import { MatchService } from '@app/services/match/match.service';
-import { Match } from '@app/classes/match/match';
 import { LobbyGateway } from './lobby.gateway';
-import { LobbyService } from '@app/services/lobby/lobby.service';
-import { Avatar } from '@common/interfaces/player-data';
-import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 
 describe('LobbyGateway', () => {
     let gateway: LobbyGateway;
@@ -58,6 +58,12 @@ describe('LobbyGateway', () => {
         const avatar = Avatar.Avatar8;
         gateway.changeAvatar(mockSocket, avatar);
         expect(mockLobbyService.changeAvatar.calledWith(mockMatch, mockSocket.id, avatar)).toBeTruthy();
+    });
+
+    it('should call add bot on add bot event', () => {
+        const botType = PlayerType.BotDefensive;
+        gateway.addBot(mockSocket, botType);
+        expect(mockLobbyService.addBot.calledWith(mockMatch, botType)).toBeTruthy();
     });
 
     it('should call join lobby on join lobby event', () => {

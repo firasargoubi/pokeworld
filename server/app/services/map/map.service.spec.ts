@@ -77,7 +77,7 @@ describe('MapService', () => {
     it('get nearest empty tile should return nearest tile', () => {
         const currentPos = { x: 0, y: 0 };
         sandbox
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
             .stub(service as any, 'isTileValidForMovement')
             .onFirstCall()
             .returns(true)
@@ -92,7 +92,7 @@ describe('MapService', () => {
 
     it('get nearest empty tile should return position if out of bound', () => {
         const position = { x: -1, y: -1 };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isOutOfBounds').returns(true);
 
         const result = service.getNearestEmptyTile(mockMatchData, position);
@@ -100,9 +100,9 @@ describe('MapService', () => {
     });
 
     it('is tile valid for movement should return true if valid', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isTileOccupiedByPlayer').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isTileAccessible').returns(true);
 
         const result = service['isTileValidForMovement'](mockMatchData, { x: 0, y: 0 });
@@ -116,7 +116,7 @@ describe('MapService', () => {
             visited: Array.from({ length: size }, () => Array(size).fill(false)),
             queue: [],
         };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isOutOfBounds').returns(false);
 
         service['enqueueValidNeighbors'](mockMatchData, { x: 1, y: 1 }, visitedQueue);
@@ -138,7 +138,7 @@ describe('MapService', () => {
         distances[0][0] = 0;
         distances[0][1] = 1;
         distances[1][0] = 1;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'calculateDistancesAndPredecessors').returns({ distances });
 
         const moves = service['getPossibleMovesStandard'](mockMatchData, { x: 0, y: 0 }, 1);
@@ -147,7 +147,7 @@ describe('MapService', () => {
     });
 
     it('get possible moves standard empty if out of bound', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isOutOfBounds').returns(true);
 
         const result = service['getPossibleMovesStandard'](mockMatchData, { x: 0, y: 0 }, 1);
@@ -170,11 +170,11 @@ describe('MapService', () => {
             queue: [],
             size: 0,
         };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isOutOfBounds').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isTileOccupiedByPlayer').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getMovementCost').returns(1);
 
         service['processNeighbor'](context);
@@ -230,7 +230,7 @@ describe('MapService', () => {
 
     it('is tile accessible should return true if accessible', () => {
         mockMatchData.gameData.mapData.tiles[0][0] = TileType.Grass;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isOutOfBounds').returns(false);
 
         const result = service['isTileAccessible'](mockMatchData, { x: 0, y: 0 });
@@ -252,7 +252,7 @@ describe('MapService', () => {
 
     it('getNearestItemDropSpot should return current position if no items there', () => {
         const currentPos = { x: 0, y: 0 };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasNoItems').returns(true);
 
         const result = service.getNearestItemDropSpot(mockMatchData, currentPos);
@@ -265,7 +265,7 @@ describe('MapService', () => {
         const validPos = { x: 1, y: 0 };
 
         sandbox
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
             .stub(service as any, 'hasNoItems')
             .onFirstCall()
             .returns(false)
@@ -273,16 +273,16 @@ describe('MapService', () => {
             .returns(true);
 
         sandbox
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
             .stub(service as any, 'isValidForDrop')
             .onFirstCall()
             .returns(false)
             .onSecondCall()
             .returns(true);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const enqueueStub = sandbox
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
             .stub(service as any, 'enqueueValidNeighbors')
             .callsFake((matchData, pos, visitedQueue: { queue: unknown[]; visited: boolean[][] }) => {
                 visitedQueue.queue.push(validPos);
@@ -298,11 +298,11 @@ describe('MapService', () => {
     it('getNearestItemDropSpot should return current position if no valid drops found', () => {
         const currentPos = { x: 0, y: 0 };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasNoItems').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isValidForDrop').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'enqueueValidNeighbors').callsFake(() => {
             return;
         });
@@ -334,7 +334,7 @@ describe('MapService', () => {
         mockMatchData.gameData.mapData.tiles[1][1] = TileType.Water;
         mockMatchData.players = [{ position: { x: 2, y: 2 } }] as PlayerData[];
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasNoItems').returns(true);
         const validResult = service['isValidForDrop'](mockMatchData, { x: 0, y: 0 });
         expect(validResult).toBe(true);
@@ -342,9 +342,9 @@ describe('MapService', () => {
         const waterResult = service['isValidForDrop'](mockMatchData, { x: 1, y: 1 });
         expect(waterResult).toBe(false);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         (service as any).hasNoItems.restore();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasNoItems').returns(false);
         const withItemsResult = service['isValidForDrop'](mockMatchData, { x: 0, y: 0 });
         expect(withItemsResult).toBe(false);
@@ -381,15 +381,15 @@ describe('MapService', () => {
             { x: 3, y: 0 },
         ];
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isTileOccupiedByObject').returns(false);
         const fullPathResult = service['stopPathAtItemEncounter'](path, mockMatchData);
         expect(fullPathResult).toEqual(path);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         (service as any).isTileOccupiedByObject.restore();
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'isTileOccupiedByObject').callsFake((md: any, pos: Position) => pos.x === 2 && pos.y === 0);
 
         const truncatedResult = service['stopPathAtItemEncounter'](path, mockMatchData);

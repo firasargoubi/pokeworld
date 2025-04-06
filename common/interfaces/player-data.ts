@@ -77,7 +77,7 @@ export interface PlayerData {
 
 export enum PlayerType {
     Player = 'player',
-    BotOffensive = 'botOffensive',
+    BotAggressive = 'botAggressive',
     BotDefensive = 'botDefensive',
 }
 
