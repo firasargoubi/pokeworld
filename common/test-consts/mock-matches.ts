@@ -61,6 +61,8 @@ export const MOCK_MATCH_DATAS: MatchData[] = [
         lobbyData: structuredClone(MOCK_LOBBY_DATA),
         playData: structuredClone(MOCK_PLAY_DATA),
         combatData: structuredClone(MOCK_COMBAT_DATA),
+        chatData: [],
+        logData: [],
     },
     {
         code: structuredClone(MOCK_MATCH_CODES[1]),
@@ -70,6 +72,8 @@ export const MOCK_MATCH_DATAS: MatchData[] = [
         lobbyData: structuredClone(MOCK_LOBBY_DATA),
         playData: structuredClone(MOCK_PLAY_DATA),
         combatData: structuredClone(MOCK_COMBAT_DATA),
+        chatData: [],
+        logData: [],
     },
     {
         code: structuredClone(MOCK_MATCH_CODES[2]),
@@ -79,5 +83,7 @@ export const MOCK_MATCH_DATAS: MatchData[] = [
         lobbyData: structuredClone(MOCK_LOBBY_DATA),
         playData: structuredClone(MOCK_PLAY_DATA),
         combatData: structuredClone(MOCK_COMBAT_DATA),
+        chatData: [],
+        logData: [],
     },
 ];

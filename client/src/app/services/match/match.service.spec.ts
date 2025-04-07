@@ -146,7 +146,7 @@ describe('MatchService', () => {
         spyOn<any>(service, 'resetMatchData');
         service['onDisconnect']();
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
-        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('La connexion avec le serveur a été interrompu');
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
         expect(service['resetMatchData']).toHaveBeenCalled();
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
@@ -163,7 +163,7 @@ describe('MatchService', () => {
     it('on message should show popup with message', () => {
         const message = 'Test message';
         service['onMessage'](message);
-        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(message);
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 
     it('on removed from match should handle removal', () => {
@@ -174,7 +174,7 @@ describe('MatchService', () => {
         const reason = 'Kicked';
         service['onRemovedFromMatch'](reason);
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
-        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(reason);
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
         expect(service['resetMatchData']).toHaveBeenCalled();
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });

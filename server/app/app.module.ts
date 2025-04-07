@@ -2,17 +2,19 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameController } from './controllers/game/game.controller';
+import { ChatGateway } from './gateways/chat/chat.gateway';
 import { CombatGateway } from './gateways/combat/combat.gateway';
 import { LobbyGateway } from './gateways/lobby/lobby.gateway';
+import { MatchGateway } from './gateways/match/match.gateway';
 import { PlayGateway } from './gateways/play/play.gateway';
 import { Game, gameSchema } from './model/schema/game.schema';
+import { ChatService } from './services/chat/chat.service';
 import { CombatService } from './services/combat/combat.service';
 import { GameService } from './services/game/game.service';
 import { LobbyService } from './services/lobby/lobby.service';
-import { MatchService } from './services/match/match.service';
 import { MapService } from './services/map/map.service';
+import { MatchService } from './services/match/match.service';
 import { PlayService } from './services/play/play.service';
-import { MatchGateway } from './gateways/match/match.gateway';
 
 @Module({
     imports: [
@@ -36,11 +38,13 @@ import { MatchGateway } from './gateways/match/match.gateway';
         PlayService,
         CombatService,
         MapService,
+        ChatService,
 
         MatchGateway,
         LobbyGateway,
         PlayGateway,
         CombatGateway,
+        ChatGateway,
     ],
 })
 export class AppModule {}

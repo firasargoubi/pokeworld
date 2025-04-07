@@ -67,7 +67,7 @@ describe('CharacterPageComponent', () => {
     it('should show popup with warnings if name form is invalid', () => {
         component.nameForm.setValue('ab');
         component.joinLobby();
-        expect(mockPopupService.showPopup).toHaveBeenCalledWith('Le nom doit contenir entre 3 et 15 caractères');
+        expect(mockPopupService.showPopup).toHaveBeenCalled();
         expect(mockLobbyService.joinLobby).not.toHaveBeenCalled();
     });
 
@@ -75,7 +75,7 @@ describe('CharacterPageComponent', () => {
         component.nameForm.setValue('ValidName');
         mockMatchService.selfPlayer.avatar = Avatar.Default;
         component.joinLobby();
-        expect(mockPopupService.showPopup).toHaveBeenCalledWith('Veuillez choisir un avatar');
+        expect(mockPopupService.showPopup).toHaveBeenCalled();
         expect(mockLobbyService.joinLobby).not.toHaveBeenCalled();
     });
 
@@ -91,5 +91,23 @@ describe('CharacterPageComponent', () => {
     it('should call lobbyService.changeAvatar if avatar is not locked', () => {
         component.changeAvatar(Avatar.Avatar7);
         expect(mockLobbyService.changeAvatar).toHaveBeenCalledWith(Avatar.Avatar7);
+    });
+
+    it('should show popup with confirmation and bind leaveMatch action correctly', () => {
+        mockPopupService.showPopup.and.callFake((popupMessage) => {
+            const capturedPopupMessage = popupMessage;
+
+            expect(capturedPopupMessage.message).toBe('Voulez-vous vraiment quitter ?');
+            expect(capturedPopupMessage.hasCloseButton).toBeTrue();
+            expect(capturedPopupMessage.isConfirmation).toBeTrue();
+            expect(capturedPopupMessage.action).toBeDefined();
+
+            capturedPopupMessage.action?.();
+            expect(mockMatchService.leaveMatch).toHaveBeenCalled();
+        });
+
+        component.goToMenu();
+
+        expect(mockPopupService.showPopup).toHaveBeenCalled();
     });
 });

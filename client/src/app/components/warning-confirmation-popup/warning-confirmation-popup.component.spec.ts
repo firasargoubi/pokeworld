@@ -41,6 +41,9 @@ describe('WarningConfirmationPopupComponent', () => {
     });
 
     it('should emit false when cancel button is clicked', () => {
+        component.hasCloseButton = true;
+        fixture.detectChanges();
+
         spyOn(component.closed, 'emit');
 
         const cancelButton = fixture.debugElement.query(By.css('#warning-dismiss'));

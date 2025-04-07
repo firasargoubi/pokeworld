@@ -3,10 +3,11 @@ import { Component, ComponentRef } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Subject } from 'rxjs';
 import { PopupService } from './popup.service';
 import { POPUP_DELAY } from './popup.service.const';
-import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { PopupMessage } from '@app/interfaces/popup-message';
 
 @Component({
     selector: 'app-warning-confirmation-popup',
@@ -59,7 +60,12 @@ describe('PopupService', () => {
     });
 
     it('should clear messages and overlays on clearMessages', () => {
-        service.showPopup('Test message');
+        const popupMessage: PopupMessage = {
+            message: 'Test message',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        service.showPopup(popupMessage);
         service.clearMessages();
 
         expect(service['messages'].length).toBe(0);
@@ -67,7 +73,12 @@ describe('PopupService', () => {
     });
 
     it('should keep overlayRefs on navigation when keepMessages is called', () => {
-        service.showPopup('Test message');
+        const popupMessage: PopupMessage = {
+            message: 'Test message',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        service.showPopup(popupMessage);
         service.keepMessages();
 
         routerEventsSubject.next(new NavigationEnd(1, PageEndpoint.Edit, PageEndpoint.Admin));
@@ -76,7 +87,13 @@ describe('PopupService', () => {
 
     it('should execute action on confirmation', fakeAsync(() => {
         const actionSpy = jasmine.createSpy('action');
-        service.showPopup('Confirmation', true, actionSpy);
+        const popupMessage: PopupMessage = {
+            message: 'Test message',
+            hasCloseButton: true,
+            isConfirmation: true,
+            action: actionSpy,
+        };
+        service.showPopup(popupMessage);
 
         tick();
 
@@ -90,7 +107,12 @@ describe('PopupService', () => {
     }));
 
     it('should auto-close regular popup after delay', fakeAsync(() => {
-        service.showPopup('Regular message');
+        const popupMessage: PopupMessage = {
+            message: 'Regular message',
+            hasCloseButton: false,
+            isConfirmation: false,
+        };
+        service.showPopup(popupMessage);
         expect(service['overlayRefs'].length).toBe(1);
 
         tick(POPUP_DELAY);
@@ -98,7 +120,12 @@ describe('PopupService', () => {
     }));
 
     it('should adjust z-index correctly', () => {
-        service.showPopup('Test');
+        const popupMessage: PopupMessage = {
+            message: 'Test message',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        service.showPopup(popupMessage);
         const container = overlayContainer.getContainerElement();
         expect(container.style.zIndex).toBe('99');
 
@@ -107,18 +134,33 @@ describe('PopupService', () => {
     });
 
     it('should clear messages on navigation by default', () => {
-        service.showPopup('Test');
+        const popupMessage: PopupMessage = {
+            message: 'Test message',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        service.showPopup(popupMessage);
         routerEventsSubject.next(new NavigationEnd(1, '/new', '/new'));
 
         expect(service['overlayRefs'].length).toBe(0);
     });
 
     it('should handle multiple messages in sequence', fakeAsync(() => {
-        service.showPopup('First message');
+        const popupMessage1 = {
+            message: 'First message',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        const popupMessage2 = {
+            message: 'Second message',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        service.showPopup(popupMessage1);
         expect(service['overlayRefs'].length).toBe(1);
         tick(HALF_DELAY);
 
-        service.showPopup('Second message');
+        service.showPopup(popupMessage2);
         expect(service['overlayRefs'].length).toBe(2);
 
         tick(HALF_DELAY);
@@ -126,7 +168,12 @@ describe('PopupService', () => {
     }));
 
     it('should set and reset z-index correctly', () => {
-        service.showPopup('Test');
+        const popupMessage: PopupMessage = {
+            message: 'Test message',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        service.showPopup(popupMessage);
         const container = overlayContainer.getContainerElement();
         expect(container.style.zIndex).toBe('99');
 
@@ -135,7 +182,12 @@ describe('PopupService', () => {
     });
 
     it('should access popup components via getter', () => {
-        service.showPopup('Test message');
+        const popupMessage: PopupMessage = {
+            message: 'Test message',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        service.showPopup(popupMessage);
         const popupComponents = service.popupComponents;
         expect(popupComponents.length).toBe(1);
         expect(popupComponents[0].message).toBe('Test message');
@@ -144,7 +196,12 @@ describe('PopupService', () => {
     it('should return null when no popups are active', () => {
         expect(service.popupComponents.length).toBe(0);
 
-        service.showPopup('Test message');
+        const popupMessage: PopupMessage = {
+            message: 'Test message',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        service.showPopup(popupMessage);
         expect(service.popupComponents.length).toBe(1);
 
         service.clearMessages();
@@ -152,8 +209,18 @@ describe('PopupService', () => {
     });
 
     it('should display next popup when a popup is closed', fakeAsync(() => {
-        service.showPopup('First message');
-        service.showPopup('Second message');
+        const popupMessage1 = {
+            message: 'First message',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        const popupMessage2 = {
+            message: 'Second message',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        service.showPopup(popupMessage1);
+        service.showPopup(popupMessage2);
 
         expect(service.popupComponents.length).toBe(2);
 
@@ -176,10 +243,17 @@ describe('PopupService', () => {
     });
 
     it('should remove messages by filter', () => {
-        service['messages'] = [
-            { message: 'debug info', isConfirmation: false },
-            { message: 'other message', isConfirmation: false },
-        ];
+        const popupMessage1 = {
+            message: 'debug info',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        const popupMessage2 = {
+            message: 'other message',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        service['messages'] = [popupMessage1, popupMessage2];
 
         const mockOverlayRef1 = jasmine.createSpyObj('OverlayRef', ['dispose']);
         const mockOverlayRef2 = jasmine.createSpyObj('OverlayRef', ['dispose']);
@@ -216,4 +290,37 @@ describe('PopupService', () => {
         expect(service['setOverlayZIndexLow']).toHaveBeenCalled();
         expect(service['overlayRefs'].length).toBe(0);
     });
+
+    it('should replace existing messages containing the same keyword when showing a new message', fakeAsync(() => {
+        const debugMessage = {
+            message: 'debug information',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        service.showPopup(debugMessage);
+        tick();
+        expect(service.popupComponents.length).toBe(1);
+        expect(service.popupComponents[0].message).toBe('debug information');
+
+        const newDebugMessage = {
+            message: 'new debug info',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        service.showPopup(newDebugMessage);
+        tick();
+        expect(service.popupComponents.length).toBe(1);
+        expect(service.popupComponents[0].message).toBe('new debug info');
+
+        const otherMessage = {
+            message: 'regular message without keyword',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+        service.showPopup(otherMessage);
+        tick();
+        expect(service.popupComponents.length).toBe(2);
+        expect(service.popupComponents[0].message).toBe('new debug info');
+        expect(service.popupComponents[1].message).toBe('regular message without keyword');
+    }));
 });

@@ -20,6 +20,7 @@ export class LobbyService {
 
         if (isHost && !isTryingToKickThemselve) {
             match.kickPlayer(targetPlayerId, Message.Kick);
+
             match.sendUpdate();
         }
     }

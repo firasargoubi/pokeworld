@@ -57,7 +57,6 @@ body {
 
 .cdk-overlay-container {
     background-color: rgba(0, 0, 0, 0.5);
-    position: relative;
     left: 0;
     top: 0;
     padding: 6vw;
@@ -69,10 +68,14 @@ body {
     position: absolute;
     overflow-y: auto;
     gap: 1vw;
-    pointer-events: auto;
+    pointer-events: none;
     scrollbar-width: none;
 }
 
 .cdk-global-overlay-wrapper {
     flex-shrink: 0;
+}
+
+app-warning-confirmation-popup {
+    pointer-events: auto;
 }

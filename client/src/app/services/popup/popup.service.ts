@@ -3,14 +3,11 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { ComponentRef, inject, Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
+import { PopupMessage } from '@app/interfaces/popup-message';
 import { filter } from 'rxjs/operators';
 import { POPUP_DELAY } from './popup.service.const';
 
-interface PopupMessage {
-    message: string;
-    isConfirmation: boolean;
-    action?: () => void;
-}
+const KEYWORDS_TO_REPLACE = ['debug'];
 
 @Injectable({
     providedIn: 'root',
@@ -35,8 +32,14 @@ export class PopupService {
         return this.overlayRefs.map((ref) => ref.componentRef.instance);
     }
 
-    showPopup(message: string, isConfirmation: boolean = false, action?: () => void) {
-        this.messages.push({ message, isConfirmation, action });
+    showPopup(popupMessage: PopupMessage) {
+        const containedKeyword = KEYWORDS_TO_REPLACE.filter((keyword) => popupMessage.message.toLowerCase().includes(keyword.toLowerCase()));
+        if (containedKeyword.length > 0) {
+            this.removeMessagesByFilter((message: string) => {
+                return containedKeyword.some((keyword) => message.toLowerCase().includes(keyword.toLowerCase()));
+            });
+        }
+        this.messages.push(popupMessage);
         this.displayPopup();
     }
 
@@ -71,7 +74,9 @@ export class PopupService {
         const currentMessage = this.messages.shift();
         if (!currentMessage) return;
 
-        const overlayConfig = new OverlayConfig();
+        const overlayConfig = new OverlayConfig({
+            hasBackdrop: false,
+        });
         const overlayRef = this.overlay.create(overlayConfig);
         this.setOverlayZIndexHigh();
 
@@ -80,6 +85,7 @@ export class PopupService {
         this.overlayRefs.push({ overlayRef, componentRef: popupComponentRef });
 
         popupComponentRef.instance.message = currentMessage.message;
+        popupComponentRef.instance.hasCloseButton = currentMessage.hasCloseButton;
         popupComponentRef.instance.isConfirmation = currentMessage.isConfirmation;
         popupComponentRef.instance.closed.subscribe((confirmed: boolean) => {
             this.handlePopupClose(confirmed, overlayRef, currentMessage);

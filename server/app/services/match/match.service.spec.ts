@@ -2,6 +2,7 @@ import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { CombatService } from '@app/services/combat/combat.service';
 import { PlayService } from '@app/services/play/play.service';
+import { ChatService } from '@app/services/chat/chat.service';
 import { MATCH_CODE_LENGTH } from '@common/consts/match-data.const';
 import { Message } from '@common/interfaces/message.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
@@ -17,6 +18,7 @@ describe('MatchService', () => {
     let mockMatchGateway: SinonStubbedInstance<MatchGateway>;
     let mockCombatService: SinonStubbedInstance<CombatService>;
     let mockPlayService: SinonStubbedInstance<PlayService>;
+    let mockChatService: SinonStubbedInstance<ChatService>;
     let mockMatch: SinonStubbedInstance<Match>;
 
     beforeAll(async () => {
@@ -24,6 +26,7 @@ describe('MatchService', () => {
         mockMatchGateway = createStubInstance<MatchGateway>(MatchGateway);
         mockCombatService = createStubInstance<CombatService>(CombatService);
         mockPlayService = createStubInstance<PlayService>(PlayService);
+        mockChatService = createStubInstance<ChatService>(ChatService);
         mockMatch = createStubInstance<Match>(Match);
 
         const module: TestingModule = await Test.createTestingModule({
@@ -32,6 +35,7 @@ describe('MatchService', () => {
                 { provide: MatchGateway, useValue: mockMatchGateway },
                 { provide: PlayService, useValue: mockPlayService },
                 { provide: CombatService, useValue: mockCombatService },
+                { provide: ChatService, useValue: mockChatService },
             ],
         }).compile();
 

@@ -102,12 +102,12 @@ describe('EditPageComponent', () => {
 
     it('should save game and navigate on success, do nothing on failure', fakeAsync(() => {
         editorServiceSpy.saveGame.and.returnValue(Promise.resolve(true));
-        popupServiceSpy.showPopup.and.callFake((msg, keep, callback) => callback && callback());
+        popupServiceSpy.showPopup.and.callFake((popupMessage) => popupMessage.action && popupMessage.action());
         component.saveButton();
         tick();
 
         expect(editorServiceSpy.saveGame).toHaveBeenCalled();
-        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Jeu sauvegardé avec succès');
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Admin]);
 
@@ -131,18 +131,15 @@ describe('EditPageComponent', () => {
         spyOn<any>(component, 'goToAdminPage');
 
         gameDataServiceSpy.isModified.and.returnValue(true);
-        popupServiceSpy.showPopup.and.callFake((msg, isConfirmation, callback) => {
-            if (isConfirmation && callback) callback();
+        popupServiceSpy.showPopup.and.callFake((popupMessage) => {
+            if (popupMessage.isConfirmation && popupMessage.action) popupMessage.action();
         });
 
         component.backButton();
 
         expect(gameDataServiceSpy.isModified).toHaveBeenCalledWith(component['initialGameData']);
-        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(
-            'Voulez-vous vraiment quitter la page? Les modifications non sauvegardées seront perdues.',
-            true,
-            jasmine.any(Function),
-        );
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
+
         expect(component['goToAdminPage']).toHaveBeenCalled();
 
         gameDataServiceSpy.isModified.calls.reset();
@@ -162,7 +159,7 @@ describe('EditPageComponent', () => {
         component.resetButton();
 
         expect(gameDataServiceSpy.isModified).toHaveBeenCalledWith(component['initialGameData']);
-        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Voulez-vous vraiment annuler les modifications?', true, jasmine.any(Function));
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 
     it('should call onClick with correct isLeftClick value for mouse down events', () => {

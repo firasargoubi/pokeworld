@@ -8,7 +8,9 @@ import { HeaderComponent } from '@app/components/header/header.component';
 import { PlayerCardComponent } from '@app/components/player-card/player-card.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { DEFAULT_LOBBY_VISUAL_DATA } from '@app/consts/player-data.const';
+import { ConfirmationMessage } from '@app/interfaces/confirmation-message.enum';
 import { LobbyVisualData } from '@app/interfaces/lobby-visual-data';
+import { PopupMessage } from '@app/interfaces/popup-message';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -51,7 +53,13 @@ export class LobbyPageComponent {
     }
 
     leaveLobbyButton(): void {
-        this.popupService.showPopup('Voulez-vous vraiment quitter ?', true, this.matchService.leaveMatch.bind(this.matchService));
+        const popupMessage: PopupMessage = {
+            message: ConfirmationMessage.Quit,
+            hasCloseButton: true,
+            isConfirmation: true,
+            action: this.matchService.leaveMatch.bind(this.matchService),
+        };
+        this.popupService.showPopup(popupMessage);
     }
 
     toggleLockRoom(): void {

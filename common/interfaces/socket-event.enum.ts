@@ -31,3 +31,7 @@ export enum CombatEvent {
     Attack = 'attack',
     Escape = 'escape',
 }
+
+export enum ChatEvent {
+    NewMessage = 'newMessage',
+}

@@ -23,7 +23,6 @@ export class Match {
     sendMessage(message: string) {
         this.sendUpdate();
         this.matchService.sendMessage(this.data.code, message);
-        // TODO ajouter le message a l'historique du journal
     }
 
     setTimeout(callback: () => void, duration: number) {
