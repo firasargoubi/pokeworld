@@ -1,12 +1,12 @@
-import { SinonSandbox, createSandbox, SinonStubbedInstance, createStubInstance } from 'sinon';
-import { Match } from './match';
 import { MatchService } from '@app/services/match/match.service';
-import { MOCK_MATCH_DATAS, MOCK_PLAYER_COMBAT_DATAS } from '@common/test-consts/mock-matches';
-import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
+import { MAX_PLAYERS } from '@common/consts/player-data.const';
+import { MapSize } from '@common/interfaces/map-data';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
-import { MapSize } from '@common/interfaces/map-data';
-import { MAX_PLAYERS } from '@common/consts/player-data.const';
+import { MOCK_MATCH_DATAS, MOCK_PLAYER_COMBAT_DATAS } from '@common/test-consts/mock-matches';
+import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
+import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
+import { Match } from './match';
 
 describe('Match', () => {
     let match: Match;
@@ -34,7 +34,7 @@ describe('Match', () => {
 
     it('send update should call match service', () => {
         match.sendUpdate();
-        expect(mockMatchService.sendUpdate.calledWith(match.data)).toBe(true);
+        expect(mockMatchService.sendUpdate.calledWith(match)).toBe(true);
     });
 
     it('send message should send update and message', () => {
@@ -285,5 +285,17 @@ describe('Match', () => {
 
         expect(match.data.players[0].isConnected).toBe(false);
         expect(mockMatchService.sendMessage.calledWith(match.data.code, `${match.data.players[0].name} a quitté la partie`)).toBe(true);
+    });
+
+    it('set bot timeout should set timeout and execute callback', () => {
+        const callbackStub = sandbox.stub();
+        sandbox.stub(global, 'setTimeout').callsFake((callback: () => void) => {
+            callback();
+            return {} as NodeJS.Timeout;
+        });
+
+        match.setBotTimeout(callbackStub, 0);
+
+        expect(callbackStub.called).toBe(true);
     });
 });

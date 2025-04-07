@@ -8,14 +8,16 @@ import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
-import { PlayerData } from '@common/interfaces/player-data';
+import { PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { BotService } from '@app/services/bot/bot.service';
 
 @Injectable()
 export class MatchService {
     @Inject(forwardRef(() => MatchGateway)) private matchGateway: MatchGateway;
     @Inject(forwardRef(() => CombatService)) private combatService: CombatService;
     @Inject(forwardRef(() => PlayService)) private playService: PlayService;
+    @Inject(forwardRef(() => BotService)) private botService: BotService;
     @Inject(forwardRef(() => ChatService)) private chatService: ChatService;
     private matches: Map<string, Match> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
@@ -31,14 +33,15 @@ export class MatchService {
             };
             const match = new Match(matchData, this);
             this.matches.set(matchData.code, match);
-            this.playerToMatchCode.set(playerId, matchData.code);
+            this.addPlayerToMatchCode(playerId, matchData.code);
             this.matchGateway.connectPlayer(playerId, matchData.code);
         }
         return matchData;
     }
 
-    sendUpdate(matchData: MatchData) {
-        this.matchGateway.emitUpdate(matchData.code, matchData);
+    sendUpdate(match: Match) {
+        this.matchGateway.emitUpdate(match.data.code, match.data);
+        this.botService.onMatchUpdate(match);
     }
 
     sendMessage(matchCode: string, message: string) {
@@ -55,11 +58,15 @@ export class MatchService {
         if (this.canJoinMatch(playerId, matchCode)) {
             const match = this.getMatch(matchCode);
             match.join(playerId);
-            this.playerToMatchCode.set(playerId, matchCode);
+            this.addPlayerToMatchCode(playerId, matchCode);
             this.matchGateway.connectPlayer(playerId, matchCode);
             matchData = match.data;
         }
         return matchData;
+    }
+
+    addPlayerToMatchCode(playerId: string, matchCode: string) {
+        this.playerToMatchCode.set(playerId, matchCode);
     }
 
     getMatchFromPlayerId(playerId: string): Match {
@@ -73,12 +80,16 @@ export class MatchService {
 
     leaveMatch(playerId: string) {
         const match = this.getMatchFromPlayerId(playerId);
-
         this.disconnectPlayer(playerId);
         if (match) {
             match.leave(playerId);
             this.chatService.logPlayerLeft(match, playerId);
             if (match.getConnectedPlayerCount() === 0) {
+                match.data.players
+                    .filter((p) => p.type !== PlayerType.Player)
+                    .forEach((p) => {
+                        this.playerToMatchCode.delete(p.id);
+                    });
                 match.clearTimeout();
                 this.matches.delete(match.data.code);
             }

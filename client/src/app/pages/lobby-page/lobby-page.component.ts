@@ -41,6 +41,7 @@ export class LobbyPageComponent {
         this.updateVisual();
         this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.updateVisual.bind(this));
     }
+
     @HostListener('document:keydown.escape')
     onEscapeKeydown(): void {
         if (this.showBotPopup) {
@@ -75,7 +76,9 @@ export class LobbyPageComponent {
     }
 
     showBotCreationPopup() {
-        this.showBotPopup = true;
+        if (this.matchService.data.players.length < MAX_PLAYERS[this.matchService.data.gameData.mapData.size]) {
+            this.showBotPopup = true;
+        }
     }
 
     handleBotTypeSelected(botType: PlayerType) {

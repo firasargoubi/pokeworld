@@ -15,6 +15,7 @@ import { LobbyService } from './services/lobby/lobby.service';
 import { MapService } from './services/map/map.service';
 import { MatchService } from './services/match/match.service';
 import { PlayService } from './services/play/play.service';
+import { BotService } from './services/bot/bot.service';
 
 @Module({
     imports: [
@@ -39,6 +40,7 @@ import { PlayService } from './services/play/play.service';
         CombatService,
         MapService,
         ChatService,
+        BotService,
 
         MatchGateway,
         LobbyGateway,

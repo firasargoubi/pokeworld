@@ -3,13 +3,14 @@ import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { DEFAULT_PLAYER_DATA, MAX_PLAYERS } from '@common/consts/player-data.const';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
-import { PlayerData } from '@common/interfaces/player-data';
+import { PlayerData, PlayerType } from '@common/interfaces/player-data';
 
 export class Match {
     data: MatchData;
     lastTimeoutStart: Date = new Date();
     private matchService: MatchService;
     private timeout: NodeJS.Timeout | null = null;
+    private botTimeout: NodeJS.Timeout | null = null;
 
     constructor(matchData: MatchData, matchService: MatchService) {
         this.data = matchData;
@@ -17,7 +18,7 @@ export class Match {
     }
 
     sendUpdate() {
-        this.matchService.sendUpdate(this.data);
+        this.matchService.sendUpdate(this);
     }
 
     sendMessage(message: string) {
@@ -29,6 +30,15 @@ export class Match {
         this.clearTimeout();
         this.lastTimeoutStart = new Date();
         this.timeout = setTimeout(callback, duration);
+    }
+
+    setBotTimeout(callback: () => void, duration: number) {
+        if (this.botTimeout === null) {
+            this.botTimeout = setTimeout(() => {
+                this.botTimeout = null;
+                callback();
+            }, duration);
+        }
     }
 
     isState(states: MatchState[]): boolean {
@@ -68,12 +78,12 @@ export class Match {
     }
 
     getConnectedPlayerCount(): number {
-        return this.data.players.filter((p) => p.isConnected).length;
+        return this.data.players.filter((p) => p.isConnected && p.type === PlayerType.Player).length;
     }
 
     isFull(): boolean {
         const maxPlayerCount = MAX_PLAYERS[this.data.gameData.mapData.size];
-        return this.getConnectedPlayerCount() >= maxPlayerCount;
+        return this.data.players.filter((p) => p.isConnected).length >= maxPlayerCount;
     }
 
     isHost(playerId: string): boolean {
