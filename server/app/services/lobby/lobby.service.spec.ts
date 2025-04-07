@@ -1,29 +1,39 @@
 import { Match } from '@app/classes/match/match';
 import { PlayService } from '@app/services/play/play.service';
 import { REGULAR_ITEMS } from '@common/consts/map-data.const';
-import { BONUS_STAT, DEFAULT_STAT } from '@common/consts/player-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { Message } from '@common/interfaces/message.enum';
-import { Avatar, DiceType, PlayerType } from '@common/interfaces/player-data';
+import { Avatar, PlayerType } from '@common/interfaces/player-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
 import { LobbyService } from './lobby.service';
+import { MatchService } from '@app/services/match/match.service';
+import { BotService } from '@app/services/bot/bot.service';
 
 describe('LobbyService', () => {
     let service: LobbyService;
     let sandbox: SinonSandbox;
     let mockPlayService: SinonStubbedInstance<PlayService>;
+    let mockMatchService: SinonStubbedInstance<MatchService>;
+    let mockBotService: SinonStubbedInstance<BotService>;
     let mockMatch: SinonStubbedInstance<Match>;
 
     beforeAll(async () => {
         sandbox = createSandbox();
         mockPlayService = createStubInstance<PlayService>(PlayService);
+        mockMatchService = createStubInstance<MatchService>(MatchService);
+        mockBotService = createStubInstance<BotService>(BotService);
         mockMatch = createStubInstance<Match>(Match);
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [LobbyService, { provide: PlayService, useValue: mockPlayService }],
+            providers: [
+                LobbyService,
+                { provide: PlayService, useValue: mockPlayService },
+                { provide: MatchService, useValue: mockMatchService },
+                { provide: BotService, useValue: mockBotService },
+            ],
         }).compile();
 
         service = module.get<LobbyService>(LobbyService);
@@ -150,51 +160,6 @@ describe('LobbyService', () => {
         expect(uniqueName2).toBe('Alice-2');
     });
 
-    it('should add a bot with the specified type if match is not full', () => {
-        mockMatch.isFull.returns(false);
-        mockMatch.data.players = [structuredClone(MOCK_PLAYER_DATAS[0])];
-        const initialPlayerCount = mockMatch.data.players.length;
-        service.addBot(mockMatch, PlayerType.BotAggressive);
-        expect(mockMatch.data.players.length).toBe(initialPlayerCount + 1);
-        expect(mockMatch.changeLockStatus.calledWith(false)).toBeTruthy();
-    });
-
-    it('should set bot data with controlled random values 0', () => {
-        const randomStub = sandbox.stub(Math, 'random');
-        randomStub.onCall(0).returns(0);
-        randomStub.onCall(1).returns(0);
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'getBotAvatar').returns(Avatar.Avatar2);
-
-        const botData = service['getBotData'](mockMatch);
-
-        expect(botData.isConnected).toBe(true);
-        expect(botData.avatar).toBe(Avatar.Avatar2);
-        expect(botData.attackDice).toBe(DiceType.D6);
-        expect(botData.defenseDice).toBe(DiceType.D4);
-        expect(botData.health).toBe(DEFAULT_STAT);
-        expect(botData.speed).toBe(BONUS_STAT);
-    });
-
-    it('should set bot data with controlled random values 1', () => {
-        const randomStub = sandbox.stub(Math, 'random');
-        randomStub.onCall(0).returns(1);
-        randomStub.onCall(1).returns(1);
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'getBotAvatar').returns(Avatar.Avatar3);
-
-        const botData = service['getBotData'](mockMatch);
-
-        expect(botData.isConnected).toBe(true);
-        expect(botData.avatar).toBe(Avatar.Avatar3);
-        expect(botData.attackDice).toBe(DiceType.D4);
-        expect(botData.defenseDice).toBe(DiceType.D6);
-        expect(botData.health).toBe(BONUS_STAT);
-        expect(botData.speed).toBe(DEFAULT_STAT);
-    });
-
     it('setupRandomItems should distribute random items to unused item types', () => {
         const randomPosition1 = { x: 3, y: 3 };
         const randomPosition2 = { x: 4, y: 4 };
@@ -231,5 +196,12 @@ describe('LobbyService', () => {
             }, 0);
 
         expect(randomItemsCount).toBe(0);
+    });
+
+    it('should add bot when match is not full and bot data is available', () => {
+        mockMatch.isFull.returns(false);
+        mockBotService.getBotData.returns(structuredClone(MOCK_PLAYER_DATAS[0]));
+        service.addBot(mockMatch, PlayerType.BotAggressive);
+        expect(mockMatch.sendUpdate.called).toBeTruthy();
     });
 });

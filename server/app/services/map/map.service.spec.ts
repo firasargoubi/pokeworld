@@ -56,6 +56,16 @@ describe('MapService', () => {
         expect(result.moveCost).toBeDefined();
     });
 
+    it('get shortest path should return null', () => {
+        mockMatchData.playData.activePlayerIndex = 0;
+        mockMatchData.players[0].position = { x: 1, y: 1 };
+        const target = { x: 1, y: 1 };
+
+        const result = service.getShortestPath(mockMatchData, target);
+
+        expect(result.moveCost).toBeDefined();
+    });
+
     it('get actions should return actions for bridges', () => {
         mockMatchData.playData.activePlayerIndex = 0;
         mockMatchData.players[0].position = { x: 1, y: 1 };

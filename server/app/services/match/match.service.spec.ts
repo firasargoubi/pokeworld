@@ -11,6 +11,8 @@ import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
 import { MatchService } from './match.service';
+import { BotService } from '@app/services/bot/bot.service';
+import { PlayerType } from '@common/interfaces/player-data';
 
 describe('MatchService', () => {
     let service: MatchService;
@@ -18,6 +20,7 @@ describe('MatchService', () => {
     let mockMatchGateway: SinonStubbedInstance<MatchGateway>;
     let mockCombatService: SinonStubbedInstance<CombatService>;
     let mockPlayService: SinonStubbedInstance<PlayService>;
+    let mockBotService: SinonStubbedInstance<BotService>;
     let mockChatService: SinonStubbedInstance<ChatService>;
     let mockMatch: SinonStubbedInstance<Match>;
 
@@ -26,6 +29,7 @@ describe('MatchService', () => {
         mockMatchGateway = createStubInstance<MatchGateway>(MatchGateway);
         mockCombatService = createStubInstance<CombatService>(CombatService);
         mockPlayService = createStubInstance<PlayService>(PlayService);
+        mockBotService = createStubInstance<BotService>(BotService);
         mockChatService = createStubInstance<ChatService>(ChatService);
         mockMatch = createStubInstance<Match>(Match);
 
@@ -35,6 +39,7 @@ describe('MatchService', () => {
                 { provide: MatchGateway, useValue: mockMatchGateway },
                 { provide: PlayService, useValue: mockPlayService },
                 { provide: CombatService, useValue: mockCombatService },
+                { provide: BotService, useValue: mockBotService },
                 { provide: ChatService, useValue: mockChatService },
             ],
         }).compile();
@@ -74,9 +79,8 @@ describe('MatchService', () => {
     });
 
     it('send update should emit update via gateway', () => {
-        const matchData = MOCK_MATCH_DATAS[0];
-        service.sendUpdate(matchData);
-        expect(mockMatchGateway.emitUpdate.calledWith(matchData.code, matchData)).toBe(true);
+        service.sendUpdate(mockMatch);
+        expect(mockMatchGateway.emitUpdate.calledWith(mockMatch.data.code, mockMatch.data)).toBe(true);
     });
 
     it('send message should emit message via gateway', () => {
@@ -121,6 +125,8 @@ describe('MatchService', () => {
 
     it('leave match should remove player and clean up if no players left', () => {
         const playerId = 'player1';
+        const botPlayer = { ...structuredClone(MOCK_PLAYER_DATAS[0]), type: PlayerType.BotAggressive };
+        mockMatch.data.players.push(botPlayer);
         mockMatch.getConnectedPlayerCount.returns(0);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getMatchFromPlayerId').returns(mockMatch);

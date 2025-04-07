@@ -3,6 +3,7 @@ export interface ChatMessage {
     content: string;
     timestamp: Date;
 }
+
 export interface ChatLog extends ChatMessage {
     concernedPlayersNamesList: string[];
 }

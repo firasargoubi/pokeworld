@@ -16,13 +16,19 @@ export class MapService {
     }
 
     getShortestPath(matchData: MatchData, target: Position): ShortestPath {
-        const activePlayer = matchData.players[matchData.playData.activePlayerIndex];
-        const startPos = activePlayer.position;
-
-        const { distances, predecessors } = this.calculateDistancesAndPredecessors(matchData, startPos, Infinity);
-        let path = this.reconstructPath(target, predecessors);
-        path = this.stopPathAtItemEncounter(path, matchData);
-        return { moveCost: distances[path[path.length - 1].x][path[path.length - 1].y], path };
+        if (this.isTileAccessible(matchData, target) && !this.isTileOccupiedByPlayer(matchData, target)) {
+            const activePlayer = matchData.players[matchData.playData.activePlayerIndex];
+            const startPos = activePlayer.position;
+            const { distances, predecessors } = this.calculateDistancesAndPredecessors(matchData, startPos, Infinity);
+            if (distances) {
+                let path = this.reconstructPath(target, predecessors);
+                path = this.stopPathAtItemEncounter(path, matchData);
+                if (path) {
+                    return { moveCost: distances[path[path.length - 1].x][path[path.length - 1].y], path };
+                }
+            }
+        }
+        return { moveCost: Infinity, path: [] };
     }
 
     getActions(matchData: MatchData): Position[] {

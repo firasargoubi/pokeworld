@@ -1,18 +1,21 @@
 import { Match } from '@app/classes/match/match';
 import { PlayService } from '@app/services/play/play.service';
-import { AVATAR_DATA, MAX_SELECTABLE_AVATAR_INDEX, MIN_SELECTABLE_AVATAR_INDEX } from '@common/consts/avatar-data.const';
-import { BONUS_STAT, DEFAULT_PLAYER_DATA, DEFAULT_STAT, MIN_PLAYERS } from '@common/consts/player-data.const';
+import { MIN_PLAYERS } from '@common/consts/player-data.const';
 import { REGULAR_ITEMS } from '@common/consts/map-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
-import { Avatar, DiceType, PlayerData, PlayerType } from '@common/interfaces/player-data';
+import { Avatar, PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { RANDOM_THRESHOLD } from '@common/consts/match-data.const';
+import { BotService } from '@app/services/bot/bot.service';
+import { MatchService } from '@app/services/match/match.service';
 
 @Injectable()
 export class LobbyService {
     @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
+    @Inject(forwardRef(() => BotService)) private readonly botService: BotService;
+    @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
 
     kickPlayer(match: Match, playerId: string, targetPlayerId: string) {
         const isHost = match.isHost(playerId);
@@ -59,50 +62,25 @@ export class LobbyService {
 
     addBot(match: Match, botType: PlayerType) {
         if (!match.isFull()) {
-            const botData = this.getBotData(match);
+            const botData = this.botService.getBotData(match);
             if (botData !== null) {
                 botData.type = botType;
                 match.data.players.push(botData);
+                this.matchService.addPlayerToMatchCode(botData.id, match.data.code);
                 match.changeLockStatus(false);
                 match.sendUpdate();
             }
         }
     }
 
-    private getBotData(match: Match): PlayerData | null {
-        let botData = null;
-        const avatar = this.getBotAvatar(match);
-        if (avatar !== null) {
-            const hasStrongAttack = Math.random() < RANDOM_THRESHOLD;
-            const hasStrongSpeed = Math.random() < RANDOM_THRESHOLD;
-            const id = this.getBotId();
-            botData = {
-                ...DEFAULT_PLAYER_DATA,
-                id,
-                isConnected: true,
-                avatar,
-                name: this.getUniqueName(match, id, AVATAR_DATA[avatar].name.toUpperCase()),
-                attackDice: hasStrongAttack ? DiceType.D6 : DiceType.D4,
-                defenseDice: hasStrongAttack ? DiceType.D4 : DiceType.D6,
-                health: hasStrongSpeed ? DEFAULT_STAT : BONUS_STAT,
-                speed: hasStrongSpeed ? BONUS_STAT : DEFAULT_STAT,
-            };
+    getUniqueName(match: Match, playerId: string, name: string): string {
+        let newName = name;
+        let suffix = 2;
+        while (match.data.players.some((p) => p.name === newName && p.id !== playerId)) {
+            newName = `${name}-${suffix}`;
+            suffix++;
         }
-        return botData;
-    }
-
-    private getBotAvatar(match: Match): Avatar | null {
-        let botAvatar = null;
-        const lockedAvatars = match.data.players.map((p) => p.avatar);
-        const unlockedAvatars = Object.values(Avatar)
-            .slice(MIN_SELECTABLE_AVATAR_INDEX, MAX_SELECTABLE_AVATAR_INDEX)
-            .filter((avatar) => !lockedAvatars.includes(avatar));
-
-        if (unlockedAvatars.length > 0) {
-            const randomIndex = Math.floor(Math.random() * (unlockedAvatars.length - 1)) + 1;
-            botAvatar = unlockedAvatars[randomIndex];
-        }
-        return botAvatar;
+        return newName;
     }
 
     private startMatchFirstTurn(match: Match) {
@@ -111,19 +89,6 @@ export class LobbyService {
         this.setupRandomItems(match);
         match.data.playData.activePlayerIndex = -1;
         this.playService.startNextTurn(match);
-    }
-
-    private getBotId(): string {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        const length = 8;
-        let result = '';
-
-        for (let i = 0; i < length; i++) {
-            const randomIndex = Math.floor(Math.random() * characters.length);
-            result += characters[randomIndex];
-        }
-
-        return result;
     }
 
     private sortPlayers(match: Match) {
@@ -146,16 +111,6 @@ export class LobbyService {
             match.data.players[i].spawnPoint = spawnPoint;
             match.data.players[i].position = spawnPoint;
         });
-    }
-
-    private getUniqueName(match: Match, playerId: string, name: string): string {
-        let newName = name;
-        let suffix = 2;
-        while (match.data.players.some((p) => p.name === newName && p.id !== playerId)) {
-            newName = `${name}-${suffix}`;
-            suffix++;
-        }
-        return newName;
     }
 
     private setupRandomItems(match: Match): void {
