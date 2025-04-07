@@ -43,6 +43,11 @@ describe('Match', () => {
         expect(mockMatchService.sendMessage.calledWith(match.data.code, 'test message')).toBe(true);
     });
 
+    it('send message to host should send message', () => {
+        match.sendMessageToHost('test message');
+        expect(mockMatchService.sendMessage.called).toBe(true);
+    });
+
     it('set timeout should clear existing timeout', () => {
         const callback = sandbox.stub();
         match['timeout'] = setTimeout(() => ({}), 1);

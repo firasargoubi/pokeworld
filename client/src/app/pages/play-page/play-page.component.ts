@@ -120,6 +120,7 @@ export class PlayPageComponent {
                 isHost: i === this.matchService.data.lobbyData.hostPlayerIndex,
                 isBot: p.type !== PlayerType.Player,
                 isConnected: p.isConnected,
+                team: p.team,
             })),
             selfAvatarUrl: AVATAR_DATA[this.matchService.selfPlayer.avatar].imageCentered,
             movementLeft: this.matchService.getMovementLeft(),

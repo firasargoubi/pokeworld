@@ -1,5 +1,6 @@
 import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
+import { GameMode } from '@common/interfaces/map-data';
 import { MatchData } from '@common/interfaces/match-data';
 import { DistancesAndPredecessors, NeighborContext, QueueNode, ShortestPath, VisitedQueue } from '@common/interfaces/movement';
 import { Position } from '@common/interfaces/position';
@@ -32,11 +33,11 @@ export class MapService {
     }
 
     getActions(matchData: MatchData): Position[] {
-        const position = matchData.players[matchData.playData.activePlayerIndex].position;
-        return SURROUNDING_POSITIONS_PLUS.map((delta) => ({ x: position.x + delta.x, y: position.y + delta.y })).filter((neighbor) => {
-            const hasPlayer = this.isTileOccupiedByPlayer(matchData, neighbor);
-            const hasBridge = this.isTileABridge(matchData, neighbor);
-            return hasPlayer || hasBridge;
+        const playerPosition = matchData.players[matchData.playData.activePlayerIndex].position;
+        return SURROUNDING_POSITIONS_PLUS.map((delta) => ({ x: playerPosition.x + delta.x, y: playerPosition.y + delta.y })).filter((position) => {
+            const hasEnemyPlayer = this.hasEnemyPlayer(matchData, position);
+            const hasActivatableBridge = this.hasActivatableBridge(matchData, position);
+            return hasEnemyPlayer || hasActivatableBridge;
         });
     }
 
@@ -111,6 +112,20 @@ export class MapService {
         return null;
     }
 
+    private hasEnemyPlayer(matchData: MatchData, position: Position): boolean {
+        let hasEnemyPlayer = false;
+        const player = matchData.players.find((p) => p.position.x === position.x && p.position.y === position.y);
+        if (player) {
+            if (matchData.gameData.mapData.gameMode === GameMode.CTF) {
+                const activePlayer = matchData.players[matchData.playData.activePlayerIndex];
+                hasEnemyPlayer = player.team !== activePlayer.team;
+            } else {
+                hasEnemyPlayer = true;
+            }
+        }
+        return hasEnemyPlayer;
+    }
+
     private isValidForDrop(matchData: MatchData, position: Position): boolean {
         const tile = matchData.gameData.mapData.tiles[position.x][position.y];
         const isWater = tile !== TileType.Water;
@@ -141,13 +156,19 @@ export class MapService {
         }
     }
 
-    private isTileABridge(matchData: MatchData, position: Position): boolean {
+    private hasActivatableBridge(matchData: MatchData, position: Position): boolean {
         let isBridge = false;
-        if (!this.isOutOfBounds(matchData, position)) {
+        if (!this.isOutOfBounds(matchData, position) && !this.hasItem(matchData, position)) {
             const tile = matchData.gameData.mapData.tiles[position.x][position.y];
             isBridge = tile === TileType.Bridge || tile === TileType.BrokenBridge;
         }
         return isBridge;
+    }
+
+    private hasItem(matchData: MatchData, position: Position): boolean {
+        return Object.values(matchData.gameData.mapData.items).some((positions) =>
+            positions.some((pos) => pos.x === position.x && pos.y === position.y),
+        );
     }
 
     private getPossibleMovesStandard(matchData: MatchData, currentPos: Position, movementRange: number): Position[] {

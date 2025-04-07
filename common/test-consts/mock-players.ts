@@ -1,4 +1,4 @@
-import { Avatar, DiceType, PlayerData, PlayerType } from '../interfaces/player-data';
+import { Avatar, DiceType, PlayerData, PlayerType, Team } from '../interfaces/player-data';
 
 export const MOCK_PLAYER_IDS = ['3333', '4444', '5555', '6666'];
 
@@ -16,7 +16,8 @@ export const MOCK_PLAYER_DATAS: PlayerData[] = [
         defenseDice: DiceType.D4,
         position: { x: 1, y: 1 },
         combatsWon: 0,
-        type: PlayerType.Player
+        type: PlayerType.Player,
+        team: Team.None,
     },
     {
         id: structuredClone(MOCK_PLAYER_IDS[1]),
@@ -31,7 +32,8 @@ export const MOCK_PLAYER_DATAS: PlayerData[] = [
         defenseDice: DiceType.D4,
         position: { x: 2, y: 2 },
         combatsWon: 0,
-        type: PlayerType.Player
+        type: PlayerType.Player,
+        team: Team.None,
     },
     {
         id: structuredClone(MOCK_PLAYER_IDS[2]),
@@ -46,7 +48,8 @@ export const MOCK_PLAYER_DATAS: PlayerData[] = [
         defenseDice: DiceType.D4,
         position: { x: 3, y: 3 },
         combatsWon: 0,
-        type: PlayerType.Player
+        type: PlayerType.Player,
+        team: Team.None,
     },
     {
         id: structuredClone(MOCK_PLAYER_IDS[4]),
@@ -61,6 +64,7 @@ export const MOCK_PLAYER_DATAS: PlayerData[] = [
         defenseDice: DiceType.D4,
         position: { x: 4, y: 4 },
         combatsWon: 0,
-        type: PlayerType.Player
+        type: PlayerType.Player,
+        team: Team.None,
     },
 ];

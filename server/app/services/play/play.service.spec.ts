@@ -9,7 +9,7 @@ import { AVATAR_EVOLVED_SUFFIX, AVATAR_SHINY_SUFFIX, MAX_ITEMS } from '@common/c
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
 import { MatchState } from '@common/interfaces/match-data';
-import { PlayerData } from '@common/interfaces/player-data';
+import { PlayerData, Team } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
@@ -189,14 +189,6 @@ describe('PlayService', () => {
 
         expect(mockMatch.data.state).toBe(MatchState.Statistics);
         expect(mockMatch.clearTimeout.called).toBe(true);
-    });
-
-    it('check win condition ctf should set state if true', () => {
-        sandbox.stub(Math, 'random').returns(0);
-
-        service['checkWinConditionCtf'](mockMatch);
-
-        expect(mockMatch.data.state).toBe(MatchState.MatchEnd);
     });
 
     it('set time left should update time', () => {
@@ -505,5 +497,16 @@ describe('PlayService', () => {
         service['computeItems'](player as PlayerData);
 
         expect(player.avatar).toBe(nonStandardAvatar);
+    });
+
+    it('checkWinConditionCtf should return true and set state when flag holder is on spawn point', () => {
+        mockMatch.data.gameData.mapData.gameMode = GameMode.CTF;
+        mockMatch.data.players[1].items = [ItemType.Flag];
+        mockMatch.data.players[1].team = Team.Red;
+
+        const result = service['checkWinConditionCtf'](mockMatch);
+
+        expect(result).toBe(true);
+        expect(mockMatch.data.state).toBe(MatchState.MatchEnd);
     });
 });

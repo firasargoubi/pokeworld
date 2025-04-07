@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CreateGamePopupComponent } from '@app/components/create-game-popup/create-game-popup.component';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
@@ -25,6 +25,13 @@ export class AdminPageComponent implements OnInit {
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);
     private popupService: PopupService = inject(PopupService);
+
+    @HostListener('document:keydown.escape')
+    onEscapeKeydown(): void {
+        if (this.isCreationMode) {
+            this.isCreationMode = false;
+        }
+    }
 
     navigateToMenu() {
         this.router.navigate([PageEndpoint.Menu]);

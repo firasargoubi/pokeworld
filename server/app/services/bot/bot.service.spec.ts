@@ -9,11 +9,11 @@ import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { Match } from '@app/classes/match/match';
 import { PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
-import { BOT_CODE_LENGTH } from '@common/consts/match-data.const';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { Position } from '@common/interfaces/position';
+import { BOT_CODE_LENGTH } from './bot.service.const';
 
 describe('BotService', () => {
     let service: BotService;
@@ -150,9 +150,19 @@ describe('BotService', () => {
     it('get best bridge action should return correct position', () => {
         mockMatch.data.playData.hasAction = true;
         const bridgePosition = { x: 1, y: 7 };
+        mockMatch.data.gameData.mapData.tiles[bridgePosition.x][bridgePosition.y] = TileType.BrokenBridge;
         mockMapService.getActions.returns([bridgePosition]);
         const result = service['getBestBridgeAction'](mockMatch);
         expect(result).toEqual(bridgePosition);
+    });
+
+    it('get best bridge action should return self position', () => {
+        mockMatch.data.playData.hasAction = false;
+        const bridgePosition = { x: 1, y: 7 };
+        mockMatch.data.gameData.mapData.tiles[bridgePosition.x][bridgePosition.y] = TileType.BrokenBridge;
+        mockMapService.getActions.returns([bridgePosition]);
+        const result = service['getBestBridgeAction'](mockMatch);
+        expect(result).not.toEqual(bridgePosition);
     });
 
     it('get best move to player should return correct position', () => {
@@ -192,9 +202,18 @@ describe('BotService', () => {
     });
 
     it('get best attack should return correct position', () => {
+        mockMatch.data.playData.hasAction = true;
         mockMapService.getActions.returns([{ x: 1, y: 1 }]);
         const result = service['getBestAttack'](mockMatch);
         expect(result).toEqual({ x: 1, y: 1 });
+    });
+
+    it('get best attack should return self position', () => {
+        mockMatch.data.playData.hasAction = false;
+        const action = { x: 2, y: 2 };
+        mockMapService.getActions.returns([action]);
+        const result = service['getBestAttack'](mockMatch);
+        expect(result).not.toEqual(action);
     });
 
     it('on item wait should call set bot timeout', () => {

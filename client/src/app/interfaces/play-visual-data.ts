@@ -1,3 +1,5 @@
+import { Team } from '@common/interfaces/player-data';
+
 export interface PlayVisualData {
     canUseAction: boolean;
     canEndTurn: boolean;
@@ -17,4 +19,5 @@ export interface PlayerVisualData {
     isHost: boolean;
     isBot: boolean;
     isConnected: boolean;
+    team?: Team;
 }

@@ -1,14 +1,5 @@
 import { Match } from '@app/classes/match/match';
-import {
-    BOT_CODE_LENGTH,
-    BOT_COMBAT_MAX_DELAY,
-    BOT_COMBAT_MIN_DELAY,
-    BOT_ITEM_MAX_DELAY,
-    BOT_ITEM_MIN_DELAY,
-    BOT_TURN_MAX_DELAY,
-    BOT_TURN_MIN_DELAY,
-    RANDOM_THRESHOLD,
-} from '@common/consts/match-data.const';
+import { RANDOM_THRESHOLD } from '@common/consts/match-data.const';
 import { BONUS_STAT, DEFAULT_PLAYER_DATA, DEFAULT_STAT } from '@common/consts/player-data.const';
 import { Avatar, DiceType, PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -25,7 +16,18 @@ import { OUTSIDE_OF_MAP, SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-d
 import { BotAction } from '@app/interfaces/bot-action.enum';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { ShortestPath } from '@common/interfaces/movement';
-import { BOT_ID_LETTERS, BOT_ITEM_PRIORITIES, BOT_TURN_PRIORITIES } from './bot.service.const';
+import {
+    BOT_CODE_LENGTH,
+    BOT_COMBAT_MAX_DELAY,
+    BOT_COMBAT_MIN_DELAY,
+    BOT_ID_LETTERS,
+    BOT_ITEM_MAX_DELAY,
+    BOT_ITEM_MIN_DELAY,
+    BOT_ITEM_PRIORITIES,
+    BOT_TURN_MAX_DELAY,
+    BOT_TURN_MIN_DELAY,
+    BOT_TURN_PRIORITIES,
+} from './bot.service.const';
 
 @Injectable()
 export class BotService {
@@ -110,12 +112,14 @@ export class BotService {
 
     private getBestBridgeAction(match: Match): Position | null {
         let bestBridgeAction = null;
-        if (match.data.playData.hasAction) {
-            const moves = this.mapService
-                .getActions(match.data)
-                .filter((pos) => !match.data.players.some((player) => player.position.x === pos.x && player.position.y === pos.y));
-            if (moves.length > 0) {
-                bestBridgeAction = moves[0];
+        const bridgeActions = this.mapService
+            .getActions(match.data)
+            .filter((pos) => match.data.gameData.mapData.tiles[pos.x][pos.y] === TileType.BrokenBridge);
+        if (bridgeActions.length > 0) {
+            if (match.data.playData.hasAction) {
+                bestBridgeAction = bridgeActions[0];
+            } else {
+                bestBridgeAction = match.data.players[match.data.playData.activePlayerIndex].position;
             }
         }
         return bestBridgeAction;
@@ -153,6 +157,7 @@ export class BotService {
                     return pos;
                 }
             }
+            return selfPosition;
         }
         return null;
     }
@@ -168,12 +173,14 @@ export class BotService {
 
     private getBestAttack(match: Match): Position | null {
         let bestAttack = null;
-        if (match.data.playData.hasAction) {
-            const moves = this.mapService
-                .getActions(match.data)
-                .filter((pos) => match.data.players.some((player) => player.position.x === pos.x && player.position.y === pos.y));
-            if (moves.length > 0) {
-                bestAttack = moves[0];
+        const attacks = this.mapService
+            .getActions(match.data)
+            .filter((pos) => match.data.players.some((player) => player.position.x === pos.x && player.position.y === pos.y));
+        if (attacks.length > 0) {
+            if (match.data.playData.hasAction) {
+                bestAttack = attacks[0];
+            } else {
+                bestAttack = match.data.players[match.data.playData.activePlayerIndex].position;
             }
         }
         return bestAttack;

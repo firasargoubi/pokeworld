@@ -9,4 +9,7 @@ export enum Message {
     LastPlayerRemaining = 'La partie est terminée car tous les autres joueurs ont quitté',
     DebugModeOn = 'Le mode de debug a été activé',
     DebugModeOff = 'Le mode de debug a été désactivé',
+    NotEnoughPlayers = 'La partie doit avoir au moins 2 joueurs pour débuter',
+    NotLocked = 'La partie doit être verouillée pour débuter',
+    NotEvenPlayers = 'Le mode CTF nécessite un nombre pair de joueurs',
 }

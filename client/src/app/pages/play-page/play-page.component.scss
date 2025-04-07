@@ -488,6 +488,23 @@ app-map {
     width: calc(200vw + 2 * $timer-height);
 }
 
+.team-indicator {
+    font-size: calc(0.4 * $player-card-height * $final-side-width);
+    margin-left: calc(0.1 * $player-card-height * $final-side-width);
+    color: $dark-text-color;
+    text-shadow: 
+        calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
+        calc(0.015 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
+}
+
+.team-red .player-card {
+    border: calc(0.02 * $player-card-height * $final-side-width) solid #ff0000;
+}
+
+.team-blue .player-card {
+    border: calc(0.02 * $player-card-height * $final-side-width) solid #0000ff;
+}
+
 .play-page .timer-image {
     height: $timer-height;
     width: calc(200vw + 2 * $timer-height);

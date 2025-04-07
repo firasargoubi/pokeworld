@@ -36,14 +36,6 @@ export const DEFAULT_MATCH_DATA: MatchData = {
 
 export const MATCH_CODE_RANGE = 10000;
 export const MATCH_CODE_LENGTH = 4;
-export const BOT_CODE_LENGTH = 15;
 export const RANDOM_THRESHOLD = 0.5;
 export const MS_CONVERSION_FACTOR = 10;
 export const MINIMUM_COMBATS_TO_WIN = 3;
-
-export const BOT_TURN_MIN_DELAY = 100;
-export const BOT_TURN_MAX_DELAY = 150;
-export const BOT_COMBAT_MIN_DELAY = 100;
-export const BOT_COMBAT_MAX_DELAY = 150;
-export const BOT_ITEM_MIN_DELAY = 100;
-export const BOT_ITEM_MAX_DELAY = 150;
