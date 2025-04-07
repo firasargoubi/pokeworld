@@ -36,12 +36,6 @@ describe('CreateGamePopupComponent', () => {
         expect(component.mapSize).toBe(MapSize.Large);
     });
 
-    // NOT FOR SPRINT 2, TO BE UNCOMMENTED LATER (FUNCTIONAL)
-    // it('should update gameMode on onModeSelection', () => {
-    //     component.onModeSelection(GameMode.CTF);
-    //     expect(component.gameMode).toBe(GameMode.CTF);
-    // });
-
     it('should navigate to edit page on onValiderSelection', () => {
         component.onValiderSelection();
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Edit]);

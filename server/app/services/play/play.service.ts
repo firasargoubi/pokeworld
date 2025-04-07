@@ -1,4 +1,5 @@
 import { Match } from '@app/classes/match/match';
+import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MapService } from '@app/services/map/map.service';
 import {
@@ -23,6 +24,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 export class PlayService {
     @Inject(MapService) private readonly mapService: MapService;
     @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
+    @Inject(forwardRef(() => ChatService)) private readonly chatService: ChatService;
 
     endTurn(match: Match, playerId: string) {
         if (match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
@@ -82,6 +84,7 @@ export class PlayService {
         if (match.isHost(playerId) && match.isActivePlayer(playerId)) {
             match.data.playData.isDebugMode = isDebugMode;
             match.sendMessage(isDebugMode ? Message.DebugModeOn : Message.DebugModeOff);
+            this.chatService.logDebugMode(match, isDebugMode);
         }
     }
 
@@ -97,6 +100,7 @@ export class PlayService {
         } else {
             const playerName = match.data.players[match.data.playData.activePlayerIndex].name;
             match.sendMessage(`Début du tour de ${playerName}`);
+            this.chatService.logPlayerTurnStart(match, playerName);
             match.setTimeout(this.startTurnWait.bind(this, match), TURN_START_DURATION);
         }
     }
@@ -153,12 +157,15 @@ export class PlayService {
         if (winner) {
             match.data.state = MatchState.MatchEnd;
             match.sendMessage(`${winner.name} à gagné la partie`);
+            this.chatService.logMatchWinner(match, winner.name);
         }
         return Boolean(winner);
     }
 
     private endMatch(match: Match) {
         match.data.state = MatchState.Statistics;
+        this.chatService.logEndMatch(match);
+
         match.sendUpdate();
         match.clearTimeout();
     }
@@ -190,12 +197,15 @@ export class PlayService {
     }
 
     private executeAction(match: Match, playerId: string, position: Position) {
+        const player = match.getPlayer(playerId);
         const targetPlayer = match.data.players.find((p) => p.position.x === position.x && p.position.y === position.y);
         if (targetPlayer) {
             this.setTimeLeft(match);
             this.combatService.startCombat(match, playerId, targetPlayer.id);
+            this.chatService.logCombatStart(match, player.name, targetPlayer.name);
         } else {
             this.toggleBridgeTile(match, position);
+            this.chatService.logBridgeToggled(match, player.name);
             this.continueTurn(match);
         }
     }

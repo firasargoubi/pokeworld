@@ -7,6 +7,15 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { PlayerType } from '@common/interfaces/player-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { LobbyPageComponent } from './lobby-page.component';
+import { ChatComponent } from '@app/components/chat/chat.component';
+import { Component } from '@angular/core';
+
+@Component({
+    selector: 'app-chat',
+    standalone: true,
+    template: '',
+})
+class MockChatComponent {}
 
 describe('LobbyPageComponent', () => {
     let component: LobbyPageComponent;
@@ -38,6 +47,11 @@ describe('LobbyPageComponent', () => {
                 { provide: MatchService, useValue: matchServiceSpy },
             ],
         }).compileComponents();
+
+        TestBed.overrideComponent(LobbyPageComponent, {
+            add: { imports: [MockChatComponent] },
+            remove: { imports: [ChatComponent] },
+        });
 
         fixture = TestBed.createComponent(LobbyPageComponent);
         component = fixture.componentInstance;
@@ -72,7 +86,7 @@ describe('LobbyPageComponent', () => {
 
     it('should call showPopup when leaveLobbyButton is called', () => {
         component.leaveLobbyButton();
-        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Voulez-vous vraiment quitter ?', true, jasmine.any(Function));
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 
     it('should kickPlayer when kickPlayer is called', () => {

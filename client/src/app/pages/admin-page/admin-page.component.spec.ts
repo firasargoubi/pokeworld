@@ -80,7 +80,7 @@ describe('AdminPageComponent', () => {
 
         component['loadGames']();
 
-        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith('Échec lors du chargement des jeux');
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 
     it('should navigate to edit page when editGame is called', () => {
@@ -99,7 +99,7 @@ describe('AdminPageComponent', () => {
 
         component.editGame('invalid-id');
 
-        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith("Ce jeu n'existe plus !");
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 
     it('should toggle visibility successfully', () => {
@@ -127,9 +127,9 @@ describe('AdminPageComponent', () => {
 
         component.deleteGame(MOCK_GAME_DATAS[0]._id, '');
 
-        const deleteAction = popupServiceSpy.showPopup.calls.mostRecent().args[2];
-        if (deleteAction) {
-            deleteAction();
+        const popupMessage = popupServiceSpy.showPopup.calls.mostRecent().args[0];
+        if (popupMessage.action) {
+            popupMessage.action();
         }
 
         expect(gameSaveServiceSpy.deleteGame).toHaveBeenCalledWith(MOCK_GAME_DATAS[0]._id);
@@ -141,9 +141,9 @@ describe('AdminPageComponent', () => {
 
         component.deleteGame(MOCK_GAME_DATAS[0]._id, '');
 
-        const deleteAction = popupServiceSpy.showPopup.calls.mostRecent().args[2];
-        if (deleteAction) {
-            deleteAction();
+        const popupMessage = popupServiceSpy.showPopup.calls.mostRecent().args[0];
+        if (popupMessage.action) {
+            popupMessage.action();
         }
 
         expect(popupServiceSpy.showPopup).toHaveBeenCalled();

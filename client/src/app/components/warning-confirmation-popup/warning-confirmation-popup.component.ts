@@ -7,6 +7,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class WarningConfirmationPopupComponent {
     @Input() message: string = '';
+    @Input() hasCloseButton: boolean = false;
     @Input() isConfirmation: boolean = false;
     @Output() closed = new EventEmitter<boolean>();
 

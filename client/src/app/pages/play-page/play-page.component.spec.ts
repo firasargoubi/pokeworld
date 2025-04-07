@@ -157,4 +157,17 @@ describe('PlayPageComponent', () => {
 
         expect(mockPlayService.changeDebugMode).not.toHaveBeenCalled();
     });
+
+    it('should not process key D when focus is on an INPUT element', () => {
+        const inputElement = document.createElement('input');
+        document.body.appendChild(inputElement);
+        inputElement.focus();
+
+        const keyEvent = new KeyboardEvent('keydown', { key: 'd' });
+        component.onKeyDown(keyEvent);
+
+        expect(mockPlayService.changeDebugMode).not.toHaveBeenCalled();
+
+        document.body.removeChild(inputElement);
+    });
 });

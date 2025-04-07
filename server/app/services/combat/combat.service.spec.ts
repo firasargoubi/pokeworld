@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { Match } from '@app/classes/match/match';
+import { ChatService } from '@app/services/chat/chat.service';
 import { MapService } from '@app/services/map/map.service';
 import { PlayService } from '@app/services/play/play.service';
 import {
@@ -30,16 +31,23 @@ describe('CombatService', () => {
     let sandbox: SinonSandbox;
     let mockMapService: SinonStubbedInstance<MapService>;
     let mockPlayService: SinonStubbedInstance<PlayService>;
+    let mockChatService: SinonStubbedInstance<ChatService>;
     let mockMatch: SinonStubbedInstance<Match>;
 
     beforeAll(async () => {
         sandbox = createSandbox();
         mockMapService = createStubInstance(MapService);
         mockPlayService = createStubInstance(PlayService);
+        mockChatService = createStubInstance(ChatService);
         mockMatch = createStubInstance(Match);
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [CombatService, { provide: MapService, useValue: mockMapService }, { provide: PlayService, useValue: mockPlayService }],
+            providers: [
+                CombatService,
+                { provide: PlayService, useValue: mockPlayService },
+                { provide: ChatService, useValue: mockChatService },
+                { provide: MapService, useValue: mockMapService },
+            ],
         }).compile();
 
         service = module.get<CombatService>(CombatService);
@@ -336,28 +344,20 @@ describe('CombatService', () => {
         expect(result).toBe(expectedResult);
     });
 
-    it('get active player data should return correct player', () => {
+    it('get active and inactive player data should return correct players', () => {
         mockMatch.data.combatData.playersCombatData = [
             { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]), playerIndex: 0 },
             { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), playerIndex: 1 },
         ];
         mockMatch.data.combatData.isSecondPlayerTurn = true;
 
-        const result = service['getActivePlayerData'](mockMatch);
+        const activePlayer = service['getActivePlayerData'](mockMatch);
+        expect(activePlayer.playerIndex).toBe(1);
 
-        expect(result.playerIndex).toBe(1);
-    });
+        const inactivePlayer = service['getInactivePlayerData'](mockMatch);
+        expect(inactivePlayer.playerIndex).toBe(0);
 
-    it('get inactive player data should return correct player', () => {
-        mockMatch.data.combatData.playersCombatData = [
-            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]), playerIndex: 0 },
-            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), playerIndex: 1 },
-        ];
-        mockMatch.data.combatData.isSecondPlayerTurn = true;
-
-        const result = service['getInactivePlayerData'](mockMatch);
-
-        expect(result.playerIndex).toBe(0);
+        expect(service.getCombatPlayerNames(mockMatch)).toEqual(['Player2', 'Player1']);
     });
 
     it('compute player data should initialize combat data', () => {

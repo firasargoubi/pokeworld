@@ -1,3 +1,4 @@
+import { ChatLog, ChatMessage } from './chat-message';
 import { GameData } from './game-data';
 import { PlayerData } from './player-data';
 import { TileType } from './tile-type.enum';
@@ -10,6 +11,8 @@ export interface MatchData {
     playData: PlayData;
     combatData: CombatData;
     players: PlayerData[];
+    chatData: ChatMessage[];
+    logData: ChatLog[];
 }
 
 export interface LobbyData {

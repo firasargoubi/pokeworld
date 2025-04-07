@@ -4,26 +4,49 @@
         <div class="input-background"></div>
     </div>
     <div class="chat-body">
-        <div class="message-container">
-            <div class="message">
-                <p class="name">Selim:</p>
-                <p class="message-content">Bonjour !!!</p>
+        <div class="tabs-container">
+            <div class="tab" [class.active]="isChatActive" (click)="switchTab(true)">Messagerie</div>
+            <div class="tab" [class.active]="!isChatActive" (click)="switchTab(false)">Journal</div>
+            @if (!isChatActive) {
+            <div class="filter-button" [class.active]="isFilterEnabled" (click)="toggleFilter()">
+                <span class="filter-icon">{{ isFilterEnabled ? '⚫' : '⚪' }}</span>
+                <span class="filter-text">Filtrer</span>
             </div>
-            <div class="message">
-                <p class="name">Aziz:</p>
-                <p class="message-content">Salut ca va ?</p>
-            </div>
-            <div class="message">
-                <p class="name">Selim:</p>
-                <p class="message-content">Tu lance la game ?</p>
-            </div>
-            <div class="message">
-                <p class="name">Aziz:</p>
-                <p class="message-content">Dans 2 minutes</p>
-            </div>
+            }
         </div>
+        @if (isChatActive) {
+        <div class="message-container">
+            @for (message of chatMessages; track $index) {
+            <div class="message">
+                <div class="message-header">
+                    <p class="timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}]</p>
+                    <p class="sender">{{ message.sender }}</p>
+                </div>
+                <p class="message-content">{{ message.content }}</p>
+            </div>
+            }
+        </div>
+        } @else {
+        <div class="message-container">
+            @for (message of logs; track $index) {
+            <div class="message">
+                <div class="message-header">
+                    <p class="timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}]</p>
+                    <p class="sender">{{ message.sender }}</p>
+                </div>
+                <p class="message-content">{{ message.content }}</p>
+            </div>
+            }
+        </div>
+        }
         <div class="input-container">
-            <p>Entrez message [Appuyer Enter]</p>
+            <input
+                type="text"
+                placeholder="Entrez message [Enter]"
+                class="message-input"
+                (keydown)="sendMessage($event)"
+                [maxLength]="this.maxInputLenght"
+            />
         </div>
     </div>
 </div>

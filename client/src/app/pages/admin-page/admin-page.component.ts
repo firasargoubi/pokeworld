@@ -6,6 +6,8 @@ import { CreateGamePopupComponent } from '@app/components/create-game-popup/crea
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
+import { ConfirmationMessage } from '@app/interfaces/confirmation-message.enum';
+import { PopupMessage } from '@app/interfaces/popup-message';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
@@ -52,7 +54,13 @@ export class AdminPageComponent implements OnInit {
     }
 
     deleteGame(id: string, name: string) {
-        this.popupService.showPopup('Êtes-vous sûr de vouloir supprimer le jeu : ' + name, true, () => this.confirmDeleteGame(id));
+        const popupMessage: PopupMessage = {
+            message: ConfirmationMessage.DeleteGame + name,
+            hasCloseButton: true,
+            isConfirmation: true,
+            action: () => this.confirmDeleteGame(id),
+        };
+        this.popupService.showPopup(popupMessage);
     }
 
     onCreateGame(): void {
@@ -71,7 +79,12 @@ export class AdminPageComponent implements OnInit {
                 this.games = games;
             },
             error: () => {
-                this.popupService.showPopup('Échec lors du chargement des jeux');
+                const popupMessage: PopupMessage = {
+                    message: ConfirmationMessage.ErrorLoadingGames,
+                    hasCloseButton: true,
+                    isConfirmation: false,
+                };
+                this.popupService.showPopup(popupMessage);
             },
         });
     }
@@ -88,11 +101,18 @@ export class AdminPageComponent implements OnInit {
     }
 
     private handleNotFoundError(error: HttpErrorResponse) {
+        const popupMessage: PopupMessage = {
+            message: '',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
         if (error.status === HttpStatusCode.NotFound) {
-            this.popupService.showPopup("Ce jeu n'existe plus !");
+            popupMessage.message = ConfirmationMessage.GameDoesntExist;
+            this.popupService.showPopup(popupMessage);
             this.loadGames();
         } else {
-            this.popupService.showPopup(error.message);
+            popupMessage.message = ConfirmationMessage.ErrorFetchingGame;
+            this.popupService.showPopup(popupMessage);
         }
     }
 }

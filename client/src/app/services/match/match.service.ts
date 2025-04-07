@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { DEFAULT_GAME_DATA } from '@app/consts/game-data.const';
+import { PopupMessage } from '@app/interfaces/popup-message';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -97,7 +98,12 @@ export class MatchService {
     private onDisconnect() {
         if (this.isInMatch()) {
             this.popupService.keepMessages();
-            this.popupService.showPopup('La connexion avec le serveur a été interrompu');
+            const popupMessage: PopupMessage = {
+                message: 'La connexion avec le serveur a été interrompue',
+                hasCloseButton: true,
+                isConfirmation: false,
+            };
+            this.popupService.showPopup(popupMessage);
             this.resetMatchData();
             this.router.navigate([PageEndpoint.Menu]);
         }
@@ -112,14 +118,24 @@ export class MatchService {
         this.matchUpdate.next(oldMatchData);
     }
 
-    private onMessage(message: string) {
-        this.popupService.showPopup(message);
+    private onMessage(receivedMessage: string) {
+        const popupMessage: PopupMessage = {
+            message: receivedMessage,
+            hasCloseButton: false,
+            isConfirmation: false,
+        };
+        this.popupService.showPopup(popupMessage);
     }
 
     private onRemovedFromMatch(reason: string) {
         if (this.isInMatch()) {
             this.popupService.keepMessages();
-            this.popupService.showPopup(reason);
+            const popupMessage: PopupMessage = {
+                message: reason,
+                hasCloseButton: true,
+                isConfirmation: false,
+            };
+            this.popupService.showPopup(popupMessage);
             this.resetMatchData();
             this.router.navigate([PageEndpoint.Menu]);
         }

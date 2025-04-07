@@ -1,4 +1,5 @@
 import { Match } from '@app/classes/match/match';
+import { ChatService } from '@app/services/chat/chat.service';
 import { MapService } from '@app/services/map/map.service';
 import { PlayService } from '@app/services/play/play.service';
 import {
@@ -30,6 +31,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 export class CombatService {
     @Inject(MapService) private readonly mapService: MapService;
     @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
+    @Inject(forwardRef(() => ChatService)) private readonly chatService: ChatService;
 
     attack(match: Match, playerId: string) {
         if (this.canPlayerAct(match, playerId)) {
@@ -51,6 +53,7 @@ export class CombatService {
     }
 
     startCombatEndDeath(match: Match) {
+        this.chatService.logCombatEnd(match, this.getActivePlayerData(match), true);
         match.data.state = MatchState.CombatEnd;
         match.data.combatData.lastCombatAction = CombatAction.None;
         match.data.players[this.getInactivePlayerData(match).playerIndex].combatsWon += 1;
@@ -71,6 +74,13 @@ export class CombatService {
         if (player.spawnPoint !== player.position) {
             player.position = this.mapService.getNearestEmptyTile(match.data, player.spawnPoint);
         }
+    }
+
+    getCombatPlayerNames(match: Match): string[] {
+        return [
+            match.data.players[this.getActivePlayerData(match).playerIndex].name,
+            match.data.players[this.getInactivePlayerData(match).playerIndex].name,
+        ];
     }
 
     private canPlayerAct(match: Match, playerId: string): boolean {
@@ -132,6 +142,8 @@ export class CombatService {
     }
 
     private startCombatEndEscape(match: Match) {
+        this.chatService.logCombatEnd(match, this.getInactivePlayerData(match), false);
+
         match.data.state = MatchState.CombatEnd;
         match.sendUpdate();
         match.setTimeout(this.playService.continueTurn.bind(this.playService, match), COMBAT_END_DURATION);
@@ -144,12 +156,18 @@ export class CombatService {
             escapingPlayer.currentEscapes--;
             isEscapeSuccessful = Math.random() < escapingPlayer.escapeChances;
         }
+        this.chatService.logEscapeAttempt(match, isEscapeSuccessful, escapingPlayer);
         return isEscapeSuccessful;
     }
 
     private executeAttack(match: Match) {
         const attackResult = this.computeAttackResult(match);
         match.data.combatData.lastCombatAction = attackResult > 0 ? CombatAction.SuccessAttack : CombatAction.FailAttack;
+
+        this.chatService.logAttack(match, this.getActivePlayerData(match));
+        this.chatService.logDefense(match, this.getInactivePlayerData(match));
+        this.chatService.logAttackResult(match, attackResult);
+
         const attackedPlayer = this.getInactivePlayerData(match);
         attackedPlayer.currentHealth = Math.max(0, attackedPlayer.currentHealth - attackResult);
     }

@@ -30,6 +30,8 @@ export const DEFAULT_MATCH_DATA: MatchData = {
     playData: structuredClone(DEFAULT_PLAY_DATA),
     combatData: structuredClone(DEFAULT_COMBAT_DATA),
     players: [],
+    chatData: [],
+    logData: [],
 };
 
 export const MATCH_CODE_RANGE = 10000;

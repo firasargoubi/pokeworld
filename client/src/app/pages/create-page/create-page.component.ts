@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { PopupMessage } from '@app/interfaces/popup-message';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -45,7 +46,12 @@ export class CreatePageComponent implements OnInit {
                 this.games = games.filter((game) => game.isVisible);
             },
             error: () => {
-                this.popupService.showPopup('Erreur de connection avec le serveur');
+                const popupMessage: PopupMessage = {
+                    message: 'Erreur de connection avec le serveur',
+                    hasCloseButton: true,
+                    isConfirmation: false,
+                };
+                this.popupService.showPopup(popupMessage);
             },
         });
     }

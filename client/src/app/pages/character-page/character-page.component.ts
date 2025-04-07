@@ -4,12 +4,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { AVATAR_DATA, MAX_SELECTABLE_AVATAR_INDEX, MIN_SELECTABLE_AVATAR_INDEX } from '@common/consts/avatar-data.const';
 import { DEFAULT_CHARACTER_VISUAL_DATA } from '@app/consts/player-data.const';
 import { CharacterVisualData } from '@app/interfaces/character-visual-data';
+import { ConfirmationMessage } from '@app/interfaces/confirmation-message.enum';
+import { PopupMessage } from '@app/interfaces/popup-message';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { AVATAR_DATA, MAX_SELECTABLE_AVATAR_INDEX, MIN_SELECTABLE_AVATAR_INDEX } from '@common/consts/avatar-data.const';
 import { BONUS_STAT, DEFAULT_STAT, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/player-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Avatar, DiceType, PlayerData } from '@common/interfaces/player-data';
@@ -37,7 +39,13 @@ export class CharacterPageComponent {
     }
 
     goToMenu() {
-        this.popupService.showPopup('Voulez-vous vraiment quitter ?', true, this.matchService.leaveMatch.bind(this.matchService));
+        const popupMessage: PopupMessage = {
+            message: ConfirmationMessage.Quit,
+            hasCloseButton: true,
+            isConfirmation: true,
+            action: () => this.matchService.leaveMatch(),
+        };
+        this.popupService.showPopup(popupMessage);
     }
 
     toggleBonusDice() {
@@ -47,7 +55,12 @@ export class CharacterPageComponent {
     joinLobby() {
         const warnings = this.getWarnings();
         if (warnings.length > 0) {
-            this.popupService.showPopup(warnings.join('\n'));
+            const popupMessage: PopupMessage = {
+                message: warnings.join('\n'),
+                hasCloseButton: true,
+                isConfirmation: false,
+            };
+            this.popupService.showPopup(popupMessage);
         } else {
             const playerData = this.getPlayerData();
             this.lobbyService.joinLobby(playerData);

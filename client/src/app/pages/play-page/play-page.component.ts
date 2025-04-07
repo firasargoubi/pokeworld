@@ -6,15 +6,17 @@ import { ChatComponent } from '@app/components/chat/chat.component';
 import { ItemDropPopupComponent } from '@app/components/item-drop-popup/item-drop-popup.component';
 import { ItemComponent } from '@app/components/item/item.component';
 import { MapComponent } from '@app/components/map/map.component';
-import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { DEFAULT_PLAY_VISUAL_DATA } from '@app/consts/play-data.const';
+import { ConfirmationMessage } from '@app/interfaces/confirmation-message.enum';
 import { PlayVisualData } from '@app/interfaces/play-visual-data';
+import { PopupMessage } from '@app/interfaces/popup-message';
 import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { TileDescriptionService } from '@app/services/tile-description/tile-description.service';
+import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchState } from '@common/interfaces/match-data';
 import { PlayerType } from '@common/interfaces/player-data';
@@ -46,6 +48,11 @@ export class PlayPageComponent {
 
     @HostListener('document:keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
+        const activeElement = document.activeElement as HTMLElement;
+        const isInputElement = activeElement.tagName === 'INPUT';
+        if (isInputElement) {
+            return;
+        }
         if (!event.repeat) {
             if (event.key === 'd' || event.key === 'D') {
                 this.playService.changeDebugMode();
@@ -68,7 +75,13 @@ export class PlayPageComponent {
     }
 
     surrenderButton() {
-        this.popupService.showPopup('Voulez-vous vraiment abandonner ?', true, this.matchService.leaveMatch.bind(this.matchService));
+        const popupMessage: PopupMessage = {
+            message: ConfirmationMessage.Surrender,
+            hasCloseButton: true,
+            isConfirmation: true,
+            action: this.matchService.leaveMatch.bind(this.matchService),
+        };
+        this.popupService.showPopup(popupMessage);
     }
 
     showTileDescription(event: MouseEvent): void {

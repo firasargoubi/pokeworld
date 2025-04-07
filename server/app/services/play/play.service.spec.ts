@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 // file exceeds max-lines limit by 10 lines
 import { Match } from '@app/classes/match/match';
+import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MapService } from '@app/services/map/map.service';
 import { MINIMUM_COMBATS_TO_WIN } from '@common/consts/match-data.const';
@@ -22,16 +23,23 @@ describe('PlayService', () => {
     let sandbox: SinonSandbox;
     let mockMapService: SinonStubbedInstance<MapService>;
     let mockCombatService: SinonStubbedInstance<CombatService>;
+    let mockChatService: SinonStubbedInstance<ChatService>;
     let mockMatch: SinonStubbedInstance<Match>;
 
     beforeAll(async () => {
         sandbox = createSandbox();
         mockMapService = createStubInstance(MapService);
         mockCombatService = createStubInstance(CombatService);
+        mockChatService = createStubInstance(ChatService);
         mockMatch = createStubInstance(Match);
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [PlayService, { provide: MapService, useValue: mockMapService }, { provide: CombatService, useValue: mockCombatService }],
+            providers: [
+                PlayService,
+                { provide: MapService, useValue: mockMapService },
+                { provide: CombatService, useValue: mockCombatService },
+                { provide: ChatService, useValue: mockChatService },
+            ],
         }).compile();
 
         service = module.get<PlayService>(PlayService);

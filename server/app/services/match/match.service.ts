@@ -1,5 +1,6 @@
 import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
+import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
 import { PlayService } from '@app/services/play/play.service';
 import { DEFAULT_MATCH_DATA, MATCH_CODE_LENGTH, MATCH_CODE_RANGE } from '@common/consts/match-data.const';
@@ -15,7 +16,7 @@ export class MatchService {
     @Inject(forwardRef(() => MatchGateway)) private matchGateway: MatchGateway;
     @Inject(forwardRef(() => CombatService)) private combatService: CombatService;
     @Inject(forwardRef(() => PlayService)) private playService: PlayService;
-
+    @Inject(forwardRef(() => ChatService)) private chatService: ChatService;
     private matches: Map<string, Match> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
 
@@ -76,6 +77,7 @@ export class MatchService {
         this.disconnectPlayer(playerId);
         if (match) {
             match.leave(playerId);
+            this.chatService.logPlayerLeft(match, playerId);
             if (match.getConnectedPlayerCount() === 0) {
                 match.clearTimeout();
                 this.matches.delete(match.data.code);

@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from '@app/consts/editor-data.const';
 import { MAX_ITEM_COUNT } from '@app/consts/item-data.const';
+import { PopupMessage } from '@app/interfaces/popup-message';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
@@ -65,13 +66,23 @@ export class EditorService {
 
         const validationResult = this.gameValidationService.validateGame(this.gameDataService.gameData);
         if (validationResult) {
-            this.popupService.showPopup(this.gameValidationService.getValidationErrorMessage(validationResult), false);
+            const popupMessage: PopupMessage = {
+                message: this.gameValidationService.getValidationErrorMessage(validationResult),
+                hasCloseButton: true,
+                isConfirmation: false,
+            };
+            this.popupService.showPopup(popupMessage);
             return false;
         }
 
         const isNameUnique = await firstValueFrom(this.gameSaveService.isNameUnique(gameData.name, gameData._id));
         if (!isNameUnique) {
-            this.popupService.showPopup('Le nom est déjà utilisé. Veuillez en choisir un autre.', false);
+            const popupMessage: PopupMessage = {
+                message: 'Le nom est déjà utilisé. Veuillez en choisir un autre.',
+                hasCloseButton: true,
+                isConfirmation: false,
+            };
+            this.popupService.showPopup(popupMessage);
             return false;
         }
 
@@ -131,7 +142,12 @@ export class EditorService {
         try {
             await firstValueFrom(this.gameSaveService.saveGame(this.gameDataService.gameData));
         } catch {
-            this.popupService.showPopup('Erreur lors de la sauvegarde du jeu');
+            const popupMessage: PopupMessage = {
+                message: 'Erreur de connection avec le serveur',
+                hasCloseButton: true,
+                isConfirmation: false,
+            };
+            this.popupService.showPopup(popupMessage);
             return false;
         }
 
