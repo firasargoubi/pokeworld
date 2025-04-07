@@ -73,6 +73,13 @@ export interface PlayerData {
     position: Position;
     combatsWon: number;
     type: PlayerType;
+    team: Team;
+}
+
+export enum Team {
+    Red = 'rouge',
+    Blue = 'bleu',
+    None = 'none',
 }
 
 export enum PlayerType {

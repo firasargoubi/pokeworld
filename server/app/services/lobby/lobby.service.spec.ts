@@ -2,6 +2,7 @@ import { Match } from '@app/classes/match/match';
 import { PlayService } from '@app/services/play/play.service';
 import { REGULAR_ITEMS } from '@common/consts/map-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
+import { GameMode } from '@common/interfaces/map-data';
 import { Message } from '@common/interfaces/message.enum';
 import { Avatar, PlayerType } from '@common/interfaces/player-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
@@ -101,6 +102,24 @@ describe('LobbyService', () => {
         expect(startMatchFirstTurnStub.called).toBeTruthy();
     });
 
+    it('should noy start match if conditions are noy met', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        const startMatchFirstTurnStub = sandbox.stub(service as any, 'startMatchFirstTurn');
+        mockMatch.isHost.returns(true);
+        mockMatch.isState.returns(true);
+        mockMatch.data.lobbyData.isLocked = true;
+        mockMatch.data.players.push(structuredClone(MOCK_PLAYER_DATAS[0]));
+        mockMatch.data.gameData.mapData.gameMode = GameMode.CTF;
+
+        service.startMatch(mockMatch, 'playerId');
+        mockMatch.data.lobbyData.isLocked = false;
+        service.startMatch(mockMatch, 'playerId');
+        mockMatch.data.players = [structuredClone(MOCK_PLAYER_DATAS[0])];
+        service.startMatch(mockMatch, 'playerId');
+
+        expect(startMatchFirstTurnStub.called).toBeFalsy();
+    });
+
     it('start match first turn should call start next turn', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const sortPlayersStub = sandbox.stub(service as any, 'sortPlayers');
@@ -108,6 +127,7 @@ describe('LobbyService', () => {
         const assignSpawnPointsStub = sandbox.stub(service as any, 'assignSpawnPoints');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const setupRandomItemsStub = sandbox.stub(service as any, 'setupRandomItems');
+        mockMatch.data.gameData.mapData.gameMode = GameMode.CTF;
 
         service['startMatchFirstTurn'](mockMatch);
 

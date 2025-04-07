@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { MapSize } from '@common/interfaces/map-data';
+import { GameMode, MapSize } from '@common/interfaces/map-data';
 import { MatchData } from '@common/interfaces/match-data';
 import { NeighborContext } from '@common/interfaces/movement';
+import { Team } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
@@ -79,6 +80,25 @@ describe('MovementService', () => {
         expect(actions.length).toBe(1);
     });
 
+    it('getActions in CTF mode should include opponent tiles and bridges, exclude teammate tiles', () => {
+        mockMatchData.gameData.mapData.gameMode = GameMode.CTF;
+        mockMatchData.playData.activePlayerIndex = 0;
+        mockMatchData.players[0].position = { x: 1, y: 1 };
+        mockMatchData.players[0].team = Team.Red;
+        mockMatchData.players[1].position = { x: 1, y: 2 };
+        mockMatchData.players[1].team = Team.Red;
+        mockMatchData.players[2].position = { x: 1, y: 0 };
+        mockMatchData.players[2].team = Team.Blue;
+        mockMatchData.gameData.mapData.tiles = [
+            [TileType.Grass, TileType.Grass, TileType.Grass],
+            [TileType.Grass, TileType.Grass, TileType.Grass],
+            [TileType.Grass, TileType.Bridge, TileType.Grass],
+        ];
+        const actions = service.getActions(mockMatchData);
+        expect(actions).toBeDefined();
+        expect(actions.length).toBe(2);
+    });
+
     it('get possible moves debug should return all accessible empty tiles', () => {
         const moves = service.getPossibleMovesDebug(mockMatchData);
         expect(moves).toBeDefined();
@@ -110,8 +130,8 @@ describe('MovementService', () => {
     });
 
     it('is tile a bridge should detect bridge tiles', () => {
-        const position: Position = { x: 1, y: 1 }; // Grass tile in mock data
-        const isBridge = service['isTileABridge'](mockMatchData, position);
+        const position: Position = { x: 1, y: 1 };
+        const isBridge = service['hasActivatableBridge'](mockMatchData, position);
         expect(isBridge).toBeFalse();
     });
 
@@ -211,20 +231,13 @@ describe('MovementService', () => {
         expect(position).toEqual({ x: 1, y: 2 });
     });
 
-    it('hasNoItems should check if a position has no items', () => {
-        const emptyPosition: Position = { x: 1, y: 1 };
-        const hasNoItemsResult = service['hasItem'](mockMatchData, emptyPosition);
-        expect(hasNoItemsResult).toBeFalse();
+    it('has enemy player should return true if enemy is on tile', () => {
+        const position = { x: 3, y: 7 };
+        mockMatchData.gameData.mapData.gameMode = GameMode.FFA;
+        mockMatchData.players[0].position = position;
 
-        const positionWithItem: Position = { x: 0, y: 0 }; // There's an Item1 at this position in the mock data
-        const hasItemsResult = service['hasItem'](mockMatchData, positionWithItem);
-        expect(hasItemsResult).toBeTrue();
+        const result = service['hasEnemyPlayer'](mockMatchData, position);
 
-        const updatedMatchData = structuredClone(mockMatchData);
-        updatedMatchData.gameData.mapData.items.Item2 = [{ x: 2, y: 1 }];
-
-        const positionWithNewItem: Position = { x: 2, y: 1 };
-        const hasNewItemResult = service['hasItem'](updatedMatchData, positionWithNewItem);
-        expect(hasNewItemResult).toBeTrue();
+        expect(result).toBe(true);
     });
 });

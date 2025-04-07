@@ -28,10 +28,9 @@ export class CreateGamePopupComponent {
         this.mapSize = sizeKey;
     }
 
-    // NOT FOR SPRINT 2, TO BE UNCOMMENTED LATER (FUNCTIONAL)
-    // onModeSelection(modeKey: GameMode) {
-    //     this.gameMode = modeKey;
-    // }
+    onModeSelection(modeKey: GameMode) {
+        this.gameMode = modeKey;
+    }
 
     onValiderSelection() {
         this.gameDataService.createNewGame(this.mapSize, this.gameMode);

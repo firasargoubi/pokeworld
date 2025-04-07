@@ -3,9 +3,10 @@ import { PlayService } from '@app/services/play/play.service';
 import { MIN_PLAYERS } from '@common/consts/player-data.const';
 import { REGULAR_ITEMS } from '@common/consts/map-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
+import { GameMode } from '@common/interfaces/map-data';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
-import { Avatar, PlayerData, PlayerType } from '@common/interfaces/player-data';
+import { Avatar, PlayerData, PlayerType, Team } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { RANDOM_THRESHOLD } from '@common/consts/match-data.const';
 import { BotService } from '@app/services/bot/bot.service';
@@ -55,8 +56,19 @@ export class LobbyService {
         const hasEnoughPlayers = match.data.players.length >= MIN_PLAYERS;
         const isLocked = match.data.lobbyData.isLocked;
         const isHost = match.isHost(playerId);
-        if (isInLobby && hasEnoughPlayers && isLocked && isHost) {
-            this.startMatchFirstTurn(match);
+        const isEvenPlayers = match.data.players.length % 2 === 0;
+        const isCtfMode = match.data.gameData.mapData.gameMode === GameMode.CTF;
+
+        if (isInLobby && isHost) {
+            if (!hasEnoughPlayers) {
+                match.sendMessageToHost(Message.NotEnoughPlayers);
+            } else if (!isLocked) {
+                match.sendMessageToHost(Message.NotLocked);
+            } else if (isCtfMode && !isEvenPlayers) {
+                match.sendMessageToHost(Message.NotEvenPlayers);
+            } else {
+                this.startMatchFirstTurn(match);
+            }
         }
     }
 
@@ -84,11 +96,24 @@ export class LobbyService {
     }
 
     private startMatchFirstTurn(match: Match) {
+        this.assignTeams(match);
         this.sortPlayers(match);
         this.assignSpawnPoints(match);
         this.setupRandomItems(match);
         match.data.playData.activePlayerIndex = -1;
         this.playService.startNextTurn(match);
+    }
+
+    private assignTeams(match: Match) {
+        if (match.data.gameData.mapData.gameMode === GameMode.CTF) {
+            const connectedPlayers = match.data.players.filter((p) => p.isConnected);
+            const shuffled = connectedPlayers.sort(() => Math.random() - RANDOM_THRESHOLD);
+            const half = shuffled.length / 2;
+
+            shuffled.forEach((player, index) => {
+                player.team = index < half ? Team.Red : Team.Blue;
+            });
+        }
     }
 
     private sortPlayers(match: Match) {

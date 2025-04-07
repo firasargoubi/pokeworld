@@ -1,5 +1,5 @@
 import { MapSize } from '../interfaces/map-data';
-import { Avatar, DiceType, PlayerData, PlayerType } from '../interfaces/player-data';
+import { Avatar, DiceType, PlayerData, PlayerType, Team } from '../interfaces/player-data';
 import { OUTSIDE_OF_MAP } from './map-data.const';
 
 export const DEFAULT_PLAYER_DATA: PlayerData = {
@@ -16,6 +16,7 @@ export const DEFAULT_PLAYER_DATA: PlayerData = {
     position: structuredClone(OUTSIDE_OF_MAP),
     combatsWon: 0,
     type: PlayerType.Player,
+    team: Team.None,
 };
 
 export const MIN_NAME_LENGTH = 3;

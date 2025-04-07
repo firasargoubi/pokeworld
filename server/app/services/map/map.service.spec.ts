@@ -1,8 +1,9 @@
 import { SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
+import { GameMode } from '@common/interfaces/map-data';
 import { MatchData } from '@common/interfaces/match-data';
 import { NeighborContext } from '@common/interfaces/movement';
-import { PlayerData } from '@common/interfaces/player-data';
+import { PlayerData, Team } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
@@ -120,6 +121,16 @@ describe('MapService', () => {
         expect(result).toBe(true);
     });
 
+    it('has enemy player should return true if enemy is on tile', () => {
+        const position = { x: 3, y: 7 };
+        mockMatchData.gameData.mapData.gameMode = GameMode.FFA;
+        mockMatchData.players[0].position = position;
+
+        const result = service['hasEnemyPlayer'](mockMatchData, position);
+
+        expect(result).toBe(true);
+    });
+
     it('enqueue valid neighbors should enqueue neighbors', () => {
         const size = mockMatchData.gameData.mapData.size;
         const visitedQueue = {
@@ -136,8 +147,9 @@ describe('MapService', () => {
 
     it('is tile a bridge should return true for bridge', () => {
         mockMatchData.gameData.mapData.tiles[0][0] = TileType.Bridge;
+        mockMatchData.gameData.mapData.items.Item1 = [{ x: 0, y: 1 }];
 
-        const result = service['isTileABridge'](mockMatchData, { x: 0, y: 0 });
+        const result = service['hasActivatableBridge'](mockMatchData, { x: 0, y: 0 });
 
         expect(result).toBe(true);
     });
@@ -408,5 +420,27 @@ describe('MapService', () => {
             { x: 1, y: 0 },
             { x: 2, y: 0 },
         ]);
+    });
+
+    it('getActions in CTF mode should include opponent tiles and bridges, exclude teammate tiles', () => {
+        mockMatchData.gameData.mapData.gameMode = GameMode.CTF;
+        mockMatchData.playData.activePlayerIndex = 0;
+        mockMatchData.players[0].position = { x: 1, y: 1 };
+        mockMatchData.players[0].team = Team.Red;
+        mockMatchData.players[1].position = { x: 1, y: 2 };
+        mockMatchData.players[1].team = Team.Red;
+        mockMatchData.players[2].position = { x: 1, y: 0 };
+        mockMatchData.players[2].team = Team.Blue;
+        mockMatchData.gameData.mapData.tiles = [
+            [TileType.Grass, TileType.Grass, TileType.Grass],
+            [TileType.Grass, TileType.Grass, TileType.Grass],
+            [TileType.Grass, TileType.Bridge, TileType.Grass],
+        ];
+        const actions = service.getActions(mockMatchData);
+        expect(actions).toBeDefined();
+        expect(actions.length).toBe(2);
+        expect(actions).toContainEqual({ x: 1, y: 0 });
+        expect(actions).toContainEqual({ x: 2, y: 1 });
+        expect(actions).not.toContainEqual({ x: 1, y: 2 });
     });
 });

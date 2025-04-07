@@ -23,6 +23,9 @@
                         <div class="player-card-left">
                             <div class="player-avatar" [style.backgroundImage]="'url(' + player.avatarUrl + ')'"></div>
                             <div class="player-name">{{ player.name }}</div>
+                            @if (player.team) {
+                            <span class="team-indicator">({{ player.team }})</span>
+                            }
                             <div class="info-icon"></div>
                         </div>
                         <div class="player-card-right">

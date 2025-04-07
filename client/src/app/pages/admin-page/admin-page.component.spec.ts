@@ -198,4 +198,13 @@ describe('AdminPageComponent', () => {
         expect(component.games.length).toBe(initialGames.length - 1);
         expect(component.games.some((game) => game._id === gameId)).toBeFalse();
     });
+
+    it('should hide create Game popup when Escape key is pressed', () => {
+        component.isCreationMode = true;
+        fixture.detectChanges();
+        const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+        document.dispatchEvent(escapeEvent);
+
+        expect(component.isCreationMode).toBeFalse();
+    });
 });

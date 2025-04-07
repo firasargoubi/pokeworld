@@ -26,6 +26,11 @@ export class Match {
         this.matchService.sendMessage(this.data.code, message);
     }
 
+    sendMessageToHost(message: string) {
+        this.sendUpdate();
+        this.matchService.sendMessage(this.data.players[this.data.lobbyData.hostPlayerIndex].id, message);
+    }
+
     setTimeout(callback: () => void, duration: number) {
         this.clearTimeout();
         this.lastTimeoutStart = new Date();
