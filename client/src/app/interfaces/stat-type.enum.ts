@@ -5,6 +5,6 @@ export enum PlayerStatType {
     Victories = 'VICTOIRES',
     Defeats = 'DÉFAITES',
     Escapes = 'ÉVASIONS',
-    HpInflicted = 'PV INFLIGÉS',
+    HpInflicted = 'DÉGATS',
     HpLost = 'PV PERDUS',
 }

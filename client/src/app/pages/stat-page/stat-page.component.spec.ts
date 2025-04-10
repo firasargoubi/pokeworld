@@ -64,9 +64,9 @@ describe('StatPageComponent', () => {
         expect(statServiceSpy.initializeData).toHaveBeenCalled();
     });
 
-    it('should update sortingStat when updateSortingStat is called', () => {
+    it('should update sortingStat when updateSortingCriteria is called', () => {
         const newStatType = PlayerStatType.Victories;
-        component.updateSortingStat(newStatType);
+        component.updateSortingCriteria(newStatType);
         expect(component.sortingStat()).toBe(newStatType);
     });
 
@@ -86,5 +86,28 @@ describe('StatPageComponent', () => {
     it('should return true for isModeCTF when game mode is CTF', () => {
         matchServiceSpy.data.gameData.mapData.gameMode = GameMode.CTF;
         expect(component.isModeCTF()).toBeTrue();
+    });
+
+    it('should toggle order when stat type is the same', () => {
+        const initialStatType = PlayerStatType.Combats;
+        component.sortingStat.set(initialStatType);
+        component.sortingOrder.set(Order.ASCENDING);
+
+        component.updateSorting(initialStatType);
+
+        expect(component.sortingStat()).toBe(initialStatType);
+        expect(component.sortingOrder()).toBe(Order.DESCENDING);
+    });
+
+    it('should reset order to ascending and update stat type when different stat type is selected', () => {
+        const initialStatType = PlayerStatType.Combats;
+        const newStatType = PlayerStatType.Victories;
+        component.sortingStat.set(initialStatType);
+        component.sortingOrder.set(Order.DESCENDING);
+
+        component.updateSorting(newStatType);
+
+        expect(component.sortingStat()).toBe(newStatType);
+        expect(component.sortingOrder()).toBe(Order.ASCENDING);
     });
 });

@@ -2,7 +2,7 @@ import { Match } from '@app/classes/match/match';
 import { BotService } from '@app/services/bot/bot.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
-import { StatService } from '@app/services/stat/stat.service';
+import { TrackingService } from '@app/services/tracking/tracking.service';
 import { REGULAR_ITEMS } from '@common/consts/map-data.const';
 import { RANDOM_THRESHOLD } from '@common/consts/match-data.const';
 import { MIN_PLAYERS } from '@common/consts/player-data.const';
@@ -16,7 +16,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class LobbyService {
-    @Inject(StatService) private readonly statService: StatService;
+    @Inject(TrackingService) private readonly trackingService: TrackingService;
     @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
     @Inject(forwardRef(() => BotService)) private readonly botService: BotService;
     @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
@@ -71,7 +71,7 @@ export class LobbyService {
             } else if (isCtfMode && !isEvenPlayers) {
                 match.sendMessageToHost(Message.NotEvenPlayers);
             } else {
-                // this.statService.startTrackingMatch(match); // TODO causes the server to crash
+                this.trackingService.startTrackingMatch(match);
                 this.startMatchFirstTurn(match);
             }
         }
@@ -105,6 +105,7 @@ export class LobbyService {
         this.sortPlayers(match);
         this.assignSpawnPoints(match);
         this.setupRandomItems(match);
+        this.trackingService.startTrackingMatch(match);
         match.data.playData.activePlayerIndex = -1;
         this.playService.startNextTurn(match);
     }
