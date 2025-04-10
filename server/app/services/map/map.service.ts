@@ -32,9 +32,13 @@ export class MapService {
         return { moveCost: Infinity, path: [] };
     }
 
+    getSurroundingPositionsPlus(position: Position): Position[] {
+        return SURROUNDING_POSITIONS_PLUS.map((delta) => ({ x: position.x + delta.x, y: position.y + delta.y }));
+    }
+
     getActions(matchData: MatchData): Position[] {
         const playerPosition = matchData.players[matchData.playData.activePlayerIndex].position;
-        return SURROUNDING_POSITIONS_PLUS.map((delta) => ({ x: playerPosition.x + delta.x, y: playerPosition.y + delta.y })).filter((position) => {
+        return this.getSurroundingPositionsPlus(playerPosition).filter((position) => {
             const hasEnemyPlayer = this.hasEnemyPlayer(matchData, position);
             const hasActivatableBridge = this.hasActivatableBridge(matchData, position);
             return hasEnemyPlayer || hasActivatableBridge;

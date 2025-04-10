@@ -71,7 +71,7 @@ export class LobbyService {
             } else if (isCtfMode && !isEvenPlayers) {
                 match.sendMessageToHost(Message.NotEvenPlayers);
             } else {
-                this.statService.startTrackingMatch(match);
+                // this.statService.startTrackingMatch(match); // TODO causes the server to crash
                 this.startMatchFirstTurn(match);
             }
         }

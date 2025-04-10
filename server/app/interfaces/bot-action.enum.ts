@@ -4,5 +4,10 @@ export enum BotAction {
     MoveItem = 'moveItem',
     Bridge = 'bridge',
     MoveBridge = 'moveBridge',
-    EndTurn = 'endTurn',
+    MoveFlag = 'moveFlag',
+    MoveSpawnpoint = 'moveSpawnpoint',
+    AttackSpawnCamper = 'attackSpawnCamper',
+    AttackFlagHolder = 'attackFlagHolder',
+    MoveFlagHolder = 'moveFlagHolder',
+    CampSpawnpoint = 'campSpawnpoint',
 }
