@@ -8,6 +8,7 @@ export enum PageEndpoint {
     Combat = '/combat',
     Edit = '/edit',
     Character = '/character',
+    Stat = '/stat',
 }
 
 export enum ApiEndpoint {

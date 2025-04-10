@@ -10,6 +10,11 @@ $input-ratio: 10%;
 $container-size: 100%;
 $blur-amount: 5px;
 
+* {
+    font-family: 'pixel';
+    color: #ffffff;
+}
+
 .chat-container {
     height: 100%;
     width: 100%;

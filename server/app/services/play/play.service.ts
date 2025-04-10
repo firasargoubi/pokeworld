@@ -2,6 +2,7 @@ import { Match } from '@app/classes/match/match';
 import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MapService } from '@app/services/map/map.service';
+import { StatService } from '@app/services/stat/stat.service';
 import {
     DROP_ITEMS_DURATION,
     MATCH_END_DURATION,
@@ -23,6 +24,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 @Injectable()
 export class PlayService {
     @Inject(MapService) private readonly mapService: MapService;
+    @Inject(StatService) private readonly statService: StatService;
     @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
     @Inject(forwardRef(() => ChatService)) private readonly chatService: ChatService;
 
@@ -39,9 +41,9 @@ export class PlayService {
             if (shortestPath.moveCost <= match.data.playData.movementLeft) {
                 match.getPlayer(playerId).position = shortestPath.path[shortestPath.path.length - 1];
                 match.data.playData.movementLeft -= shortestPath.moveCost;
-
                 match.data.state = MatchState.MovementAnimation;
                 this.setTimeLeft(match);
+                this.statService.updateGroundTiles(match, position, playerId);
                 match.sendUpdate();
                 match.setTimeout(this.continueTurn.bind(this, match), (shortestPath.path.length + 1) * MOVEMENT_ANIMATION_DURATION);
             }
@@ -75,6 +77,7 @@ export class PlayService {
             if (isMoveValid) {
                 const player = match.getPlayer(playerId);
                 player.position = position;
+                this.statService.updateGroundTiles(match, position, playerId);
                 match.sendUpdate();
             }
         }
@@ -100,6 +103,7 @@ export class PlayService {
         } else {
             const playerName = match.data.players[match.data.playData.activePlayerIndex].name;
             match.sendMessage(`Début du tour de ${playerName}`);
+            this.statService.updateRounds(match);
             this.chatService.logPlayerTurnStart(match, playerName);
             match.setTimeout(this.startTurnWait.bind(this, match), TURN_START_DURATION);
         }
@@ -157,6 +161,7 @@ export class PlayService {
         if (winner) {
             match.data.state = MatchState.MatchEnd;
             match.sendMessage(`${winner.name} à gagné la partie`);
+            this.statService.updateWinner(match, winner);
             this.chatService.logMatchWinner(match, winner.name);
         }
         return Boolean(winner);
@@ -164,6 +169,7 @@ export class PlayService {
 
     private endMatch(match: Match) {
         match.data.state = MatchState.Statistics;
+        this.statService.stopTrackingMatch(match);
         this.chatService.logEndMatch(match);
 
         match.sendUpdate();
@@ -206,6 +212,7 @@ export class PlayService {
             this.chatService.logCombatStart(match, player.name, targetPlayer.name);
         } else {
             this.toggleBridgeTile(match, position);
+            this.statService.updateToggledBridges(match, position);
             this.chatService.logBridgeToggled(match, player.name);
             this.continueTurn(match);
         }
@@ -235,6 +242,7 @@ export class PlayService {
         const item = this.mapService.getItemTypeAtPosition(match.data, position);
         if (item) {
             this.handleItemAddition(match, playerData, item);
+            this.statService.updateItems(match, item, playerData.id);
         }
     }
 

@@ -2,6 +2,7 @@ import { Match } from '@app/classes/match/match';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MapService } from '@app/services/map/map.service';
 import { PlayService } from '@app/services/play/play.service';
+import { StatService } from '@app/services/stat/stat.service';
 import {
     COMBAT_ANIMATION_DURATION,
     COMBAT_END_DURATION,
@@ -30,6 +31,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 @Injectable()
 export class CombatService {
     @Inject(MapService) private readonly mapService: MapService;
+    @Inject(forwardRef(() => StatService)) private statService: StatService;
     @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
     @Inject(forwardRef(() => ChatService)) private readonly chatService: ChatService;
 
@@ -56,12 +58,14 @@ export class CombatService {
         this.chatService.logCombatEnd(match, this.getActivePlayerData(match), true);
         match.data.state = MatchState.CombatEnd;
         match.data.combatData.lastCombatAction = CombatAction.None;
-        match.data.players[this.getInactivePlayerData(match).playerIndex].combatsWon += 1;
-        const deadPlayer = this.getActivePlayerData(match);
-        deadPlayer.currentHealth = 0;
-        this.respawnPlayer(match, match.data.players[deadPlayer.playerIndex]);
+        const winner = this.getInactivePlayerData(match);
+        const loser = this.getActivePlayerData(match);
+        this.statService.updateCombats(match, winner, loser);
+        match.data.players[winner.playerIndex].combatsWon += 1;
+        loser.currentHealth = 0;
+        this.respawnPlayer(match, match.data.players[loser.playerIndex]);
         match.sendUpdate();
-        if (match.data.playData.activePlayerIndex === deadPlayer.playerIndex) {
+        if (match.data.playData.activePlayerIndex === loser.playerIndex) {
             match.setTimeout(this.playService.startNextTurn.bind(this.playService, match), COMBAT_END_DURATION);
         } else {
             match.setTimeout(this.playService.continueTurn.bind(this.playService, match), COMBAT_END_DURATION);
@@ -81,6 +85,14 @@ export class CombatService {
             match.data.players[this.getActivePlayerData(match).playerIndex].name,
             match.data.players[this.getInactivePlayerData(match).playerIndex].name,
         ];
+    }
+
+    getActivePlayerData(match: Match): PlayerCombatData {
+        return match.data.combatData.playersCombatData[Number(match.data.combatData.isSecondPlayerTurn)];
+    }
+
+    getInactivePlayerData(match: Match): PlayerCombatData {
+        return match.data.combatData.playersCombatData[Number(!match.data.combatData.isSecondPlayerTurn)];
     }
 
     private canPlayerAct(match: Match, playerId: string): boolean {
@@ -145,6 +157,7 @@ export class CombatService {
         this.chatService.logCombatEnd(match, this.getInactivePlayerData(match), false);
 
         match.data.state = MatchState.CombatEnd;
+        this.statService.updateEscapes(match, this.getInactivePlayerData(match));
         match.sendUpdate();
         match.setTimeout(this.playService.continueTurn.bind(this.playService, match), COMBAT_END_DURATION);
     }
@@ -163,13 +176,12 @@ export class CombatService {
     private executeAttack(match: Match) {
         const attackResult = this.computeAttackResult(match);
         match.data.combatData.lastCombatAction = attackResult > 0 ? CombatAction.SuccessAttack : CombatAction.FailAttack;
-
         this.chatService.logAttack(match, this.getActivePlayerData(match));
         this.chatService.logDefense(match, this.getInactivePlayerData(match));
         this.chatService.logAttackResult(match, attackResult);
-
-        const attackedPlayer = this.getInactivePlayerData(match);
-        attackedPlayer.currentHealth = Math.max(0, attackedPlayer.currentHealth - attackResult);
+        const attacked = this.getInactivePlayerData(match);
+        this.statService.updateHps(match, attackResult);
+        attacked.currentHealth = Math.max(0, attacked.currentHealth - attackResult);
     }
 
     private computeAttackResult(match: Match): number {
@@ -195,14 +207,6 @@ export class CombatService {
             result = Math.floor(Math.random() * dice) + 1;
         }
         return result;
-    }
-
-    private getActivePlayerData(match: Match): PlayerCombatData {
-        return match.data.combatData.playersCombatData[Number(match.data.combatData.isSecondPlayerTurn)];
-    }
-
-    private getInactivePlayerData(match: Match): PlayerCombatData {
-        return match.data.combatData.playersCombatData[Number(!match.data.combatData.isSecondPlayerTurn)];
     }
 
     private computePlayerData(match: Match, playerId: string): PlayerCombatData {

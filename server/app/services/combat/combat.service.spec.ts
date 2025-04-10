@@ -3,6 +3,7 @@ import { Match } from '@app/classes/match/match';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MapService } from '@app/services/map/map.service';
 import { PlayService } from '@app/services/play/play.service';
+import { StatService } from '@app/services/stat/stat.service';
 import {
     DEFAULT_ATTACK,
     DEFAULT_DEFENSE,
@@ -32,6 +33,7 @@ describe('CombatService', () => {
     let mockMapService: SinonStubbedInstance<MapService>;
     let mockPlayService: SinonStubbedInstance<PlayService>;
     let mockChatService: SinonStubbedInstance<ChatService>;
+    let mockStatService: SinonStubbedInstance<StatService>;
     let mockMatch: SinonStubbedInstance<Match>;
 
     beforeAll(async () => {
@@ -40,6 +42,7 @@ describe('CombatService', () => {
         mockPlayService = createStubInstance(PlayService);
         mockChatService = createStubInstance(ChatService);
         mockMatch = createStubInstance(Match);
+        mockStatService = createStubInstance(StatService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -47,6 +50,7 @@ describe('CombatService', () => {
                 { provide: PlayService, useValue: mockPlayService },
                 { provide: ChatService, useValue: mockChatService },
                 { provide: MapService, useValue: mockMapService },
+                { provide: StatService, useValue: mockStatService },
             ],
         }).compile();
 

@@ -103,7 +103,7 @@ export class PlayPageComponent {
         if (isSelfInCombat && isMatchInCombatState) {
             this.router.navigate([PageEndpoint.Combat]);
         } else if (this.matchService.isState([MatchState.Statistics])) {
-            // TODO rediriger vers la page de statistique
+            this.router.navigate([PageEndpoint.Stat]);
         }
     }
 
