@@ -60,7 +60,7 @@ export class CombatService {
         match.data.combatData.lastCombatAction = CombatAction.None;
         const winner = this.getInactivePlayerData(match);
         const loser = this.getActivePlayerData(match);
-        this.statService.updateCombats(match, winner, loser);
+        // this.statService.updateCombats(match, winner, loser); // TODO causes the server to crash
         match.data.players[winner.playerIndex].combatsWon += 1;
         loser.currentHealth = 0;
         this.respawnPlayer(match, match.data.players[loser.playerIndex]);
@@ -157,7 +157,7 @@ export class CombatService {
         this.chatService.logCombatEnd(match, this.getInactivePlayerData(match), false);
 
         match.data.state = MatchState.CombatEnd;
-        this.statService.updateEscapes(match, this.getInactivePlayerData(match));
+        // this.statService.updateEscapes(match, this.getInactivePlayerData(match)); // TODO causes the server to crash
         match.sendUpdate();
         match.setTimeout(this.playService.continueTurn.bind(this.playService, match), COMBAT_END_DURATION);
     }
@@ -180,7 +180,7 @@ export class CombatService {
         this.chatService.logDefense(match, this.getInactivePlayerData(match));
         this.chatService.logAttackResult(match, attackResult);
         const attacked = this.getInactivePlayerData(match);
-        this.statService.updateHps(match, attackResult);
+        // this.statService.updateHps(match, attackResult); // TODO causes the server to crash
         attacked.currentHealth = Math.max(0, attacked.currentHealth - attackResult);
     }
 

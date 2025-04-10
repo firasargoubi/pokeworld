@@ -1,7 +1,7 @@
 import { Match } from '@app/classes/match/match';
 import { RANDOM_THRESHOLD } from '@common/consts/match-data.const';
 import { BONUS_STAT, DEFAULT_PLAYER_DATA, DEFAULT_STAT } from '@common/consts/player-data.const';
-import { Avatar, DiceType, PlayerData, PlayerType } from '@common/interfaces/player-data';
+import { Avatar, DiceType, PlayerData, PlayerType, Team } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { AVATAR_DATA, MIN_SELECTABLE_AVATAR_INDEX, MAX_SELECTABLE_AVATAR_INDEX } from '@common/consts/avatar-data.const';
@@ -12,7 +12,6 @@ import { PlayGateway } from '@app/gateways/play/play.gateway';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MapService } from '@app/services/map/map.service';
 import { Position } from '@common/interfaces/position';
-import { OUTSIDE_OF_MAP, SURROUNDING_POSITIONS_PLUS } from '@common/consts/map-data.const';
 import { BotAction } from '@app/interfaces/bot-action.enum';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { ShortestPath } from '@common/interfaces/movement';
@@ -72,7 +71,7 @@ export class BotService {
     private onTurnWait(match: Match) {
         const activePlayer = match.data.players[match.data.playData.activePlayerIndex];
         if (activePlayer.type !== PlayerType.Player) {
-            match.setBotTimeout(this.botAction.bind(this, activePlayer, match), this.getRandomNumber(BOT_TURN_MIN_DELAY, BOT_TURN_MAX_DELAY));
+            match.setBotTimeout(this.executeBotAction.bind(this, activePlayer, match), this.getRandomNumber(BOT_TURN_MIN_DELAY, BOT_TURN_MAX_DELAY));
         }
     }
 
@@ -80,56 +79,114 @@ export class BotService {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    private botAction(player: PlayerData, match: Match) {
-        const actions = new Map([
-            [BotAction.Attack, { get: this.getBestAttack.bind(this, match), res: this.playGateway.action.bind(this.playGateway) }],
-            [BotAction.MovePlayer, { get: this.getBestMoveToPlayer.bind(this, match), res: this.playGateway.move.bind(this.playGateway) }],
-            [BotAction.MoveItem, { get: this.getBestMoveToItem.bind(this, match), res: this.playGateway.move.bind(this.playGateway) }],
-            [BotAction.Bridge, { get: this.getBestBridgeAction.bind(this, match), res: this.playGateway.action.bind(this.playGateway) }],
-            [BotAction.MoveBridge, { get: this.getBestMoveToBridge.bind(this, match), res: this.playGateway.move.bind(this.playGateway) }],
-            [BotAction.EndTurn, { get: () => OUTSIDE_OF_MAP, res: this.playGateway.endTurn.bind(this.playGateway) }],
-        ]);
-        for (const priority of BOT_TURN_PRIORITIES.get(player.type)) {
-            const action = actions.get(priority);
-            const result = action.get();
-            if (result) {
-                if (result.x === player.position.x && result.y === player.position.y) {
+    private getBotAction(action: BotAction, match: Match): Position | null {
+        switch (action) {
+            case BotAction.Attack:
+                return this.getBestAttack(match);
+            case BotAction.MovePlayer:
+                return this.getBestMoveToPlayer(match);
+            case BotAction.MoveItem:
+                return this.getBestMoveToItem(match);
+            case BotAction.Bridge:
+                return this.getBestBridgeAction(match);
+            case BotAction.MoveBridge:
+                return this.getBestMoveToBridge(match);
+            case BotAction.MoveFlag:
+                return this.getBestMoveToFlag(match);
+            case BotAction.MoveSpawnpoint:
+                return this.getBestMoveToSpawnpoint(match);
+            case BotAction.AttackSpawnCamper:
+                return this.getBestAttackSpawnCamper(match);
+            case BotAction.AttackFlagHolder:
+                return this.getBestAttackFlagHolder(match);
+            case BotAction.MoveFlagHolder:
+                return this.getBestMoveToFlagHolder(match);
+            case BotAction.CampSpawnpoint:
+                return this.getBestCampSpawnpoint(match);
+            default:
+                return null;
+        }
+    }
+
+    private executeBotAction(player: PlayerData, match: Match) {
+        for (const botAction of BOT_TURN_PRIORITIES.get(match.data.gameData.mapData.gameMode).get(player.type)) {
+            const targetPosition = this.getBotAction(botAction, match);
+            if (targetPosition) {
+                if (targetPosition.x === player.position.x && targetPosition.y === player.position.y) {
                     return this.playGateway.endTurn({ id: player.id } as Socket);
                 } else {
-                    return action.res({ id: player.id } as Socket, result);
+                    this.playGateway.move({ id: player.id } as Socket, targetPosition);
+                    return this.playGateway.action({ id: player.id } as Socket, targetPosition);
                 }
             }
         }
+        this.playGateway.endTurn({ id: player.id } as Socket);
     }
 
     private getBestMoveToBridge(match: Match): Position | null {
         const targetPositions = match.data.gameData.mapData.tiles
             .flatMap((row, x) => row.map((tile, y) => (tile === TileType.BrokenBridge ? { x, y } : null)))
             .filter((p) => p !== null)
-            .map((p) => SURROUNDING_POSITIONS_PLUS.map((delta) => ({ x: p.x + delta.x, y: p.y + delta.y })));
+            .map((p) => this.mapService.getSurroundingPositionsPlus(p));
         return this.getBestMove(targetPositions.flat(), match);
     }
 
     private getBestBridgeAction(match: Match): Position | null {
-        let bestBridgeAction = null;
         const bridgeActions = this.mapService
             .getActions(match.data)
             .filter((pos) => match.data.gameData.mapData.tiles[pos.x][pos.y] === TileType.BrokenBridge);
-        if (bridgeActions.length > 0) {
-            if (match.data.playData.hasAction) {
-                bestBridgeAction = bridgeActions[0];
-            } else {
-                bestBridgeAction = match.data.players[match.data.playData.activePlayerIndex].position;
-            }
-        }
-        return bestBridgeAction;
+        return this.getBestAction(bridgeActions, match);
     }
 
     private getBestMoveToPlayer(match: Match): Position | null {
-        const targetPositions = match.data.players
-            .filter((p) => p.id !== match.data.players[match.data.playData.activePlayerIndex].id)
-            .map((p) => SURROUNDING_POSITIONS_PLUS.map((delta) => ({ x: p.position.x + delta.x, y: p.position.y + delta.y })));
+        const targetPositions = this.getEnemyPlayers(match).map((enemy) => this.mapService.getSurroundingPositionsPlus(enemy.position));
         return this.getBestMove(targetPositions.flat(), match);
+    }
+
+    private getEnemyPlayers(match: Match): PlayerData[] {
+        const activePlayer = match.data.players[match.data.playData.activePlayerIndex];
+        return match.data.players.filter((p) => p.id !== activePlayer.id).filter((p) => p.team === Team.None || p.team !== activePlayer.team);
+    }
+
+    private getFlagHolder(match: Match): PlayerData | null {
+        return this.getEnemyPlayers(match).find((enemy) => enemy.items.includes(ItemType.Flag));
+    }
+
+    private getBestMoveToFlag(match: Match): Position | null {
+        return this.getBestMove(match.data.gameData.mapData.items.Flag, match);
+    }
+
+    private getBestMoveToSpawnpoint(match: Match): Position | null {
+        let bestMoveToSpawnpoint = null;
+        const player = match.data.players[match.data.playData.activePlayerIndex];
+        if (player.items.includes(ItemType.Flag)) {
+            bestMoveToSpawnpoint = this.getBestMove([player.spawnPoint], match);
+            if (!bestMoveToSpawnpoint) {
+                bestMoveToSpawnpoint = this.getBestMove(this.mapService.getSurroundingPositionsPlus(player.spawnPoint), match);
+            }
+        }
+        return bestMoveToSpawnpoint;
+    }
+
+    private getBestCampSpawnpoint(match: Match): Position | null {
+        let bestMoveToSpawnpoint = null;
+        const flagHolder = this.getFlagHolder(match);
+        if (flagHolder) {
+            bestMoveToSpawnpoint = this.getBestMove([flagHolder.spawnPoint], match);
+            if (!bestMoveToSpawnpoint) {
+                bestMoveToSpawnpoint = this.getBestMove(this.mapService.getSurroundingPositionsPlus(flagHolder.spawnPoint), match);
+            }
+        }
+        return bestMoveToSpawnpoint;
+    }
+
+    private getBestMoveToFlagHolder(match: Match): Position | null {
+        let bestMoveToSpawnpoint = null;
+        const flagHolder = this.getFlagHolder(match);
+        if (flagHolder) {
+            bestMoveToSpawnpoint = this.getBestMove(this.mapService.getSurroundingPositionsPlus(flagHolder.position), match);
+        }
+        return bestMoveToSpawnpoint;
     }
 
     private getBestMoveToItem(match: Match): Position | null {
@@ -172,18 +229,47 @@ export class BotService {
     }
 
     private getBestAttack(match: Match): Position | null {
-        let bestAttack = null;
-        const attacks = this.mapService
+        const enemyPlayers = this.getEnemyPlayers(match);
+        const attackActions = this.mapService
             .getActions(match.data)
-            .filter((pos) => match.data.players.some((player) => player.position.x === pos.x && player.position.y === pos.y));
-        if (attacks.length > 0) {
+            .filter((pos) => enemyPlayers.some((enemy) => enemy.position.x === pos.x && enemy.position.y === pos.y));
+        return this.getBestAction(attackActions, match);
+    }
+
+    private getBestAction(possibleActions: Position[], match: Match): Position | null {
+        let bestAttack = null;
+        if (possibleActions.length > 0) {
             if (match.data.playData.hasAction) {
-                bestAttack = attacks[0];
+                bestAttack = possibleActions[0];
             } else {
                 bestAttack = match.data.players[match.data.playData.activePlayerIndex].position;
             }
         }
         return bestAttack;
+    }
+
+    private getBestAttackSpawnCamper(match: Match): Position | null {
+        let bestAttackSpawnCamper = null;
+        const activePlayer = match.data.players[match.data.playData.activePlayerIndex];
+        if (activePlayer.items.includes(ItemType.Flag)) {
+            const attackActions = this.mapService
+                .getActions(match.data)
+                .filter((pos) => activePlayer.spawnPoint.x === pos.x && activePlayer.spawnPoint.y === pos.y);
+            bestAttackSpawnCamper = this.getBestAction(attackActions, match);
+        }
+        return bestAttackSpawnCamper;
+    }
+
+    private getBestAttackFlagHolder(match: Match): Position | null {
+        let bestAttackFlagHolder = null;
+        const flagHolder = this.getFlagHolder(match);
+        if (flagHolder) {
+            const attackActions = this.mapService
+                .getActions(match.data)
+                .filter((attack) => flagHolder.position.x === attack.x && flagHolder.position.y === attack.y);
+            bestAttackFlagHolder = this.getBestAction(attackActions, match);
+        }
+        return bestAttackFlagHolder;
     }
 
     private onItemWait(match: Match) {
@@ -195,7 +281,6 @@ export class BotService {
 
     private itemAction(player: PlayerData) {
         const priorities = BOT_ITEM_PRIORITIES.get(player.type);
-
         const itemToDrop = player.items.reduce((lowest, current) => {
             return priorities.indexOf(current) > priorities.indexOf(lowest) ? current : lowest;
         }, player.items[0]);
@@ -214,9 +299,9 @@ export class BotService {
 
     private botCombatAction(player: PlayerData, playerCombatData: PlayerCombatData) {
         const isDefensiveBot = player.type === PlayerType.BotDefensive;
-        const isUnderHalfHp = playerCombatData.currentHealth * 2 <= player.health;
+        const isWounded = playerCombatData.currentHealth < player.health;
         const hasEscapesLeft = playerCombatData.currentEscapes > 0;
-        if (isDefensiveBot && isUnderHalfHp && hasEscapesLeft) {
+        if (isDefensiveBot && isWounded && hasEscapesLeft) {
             this.combatGateway.escape({ id: player.id } as Socket);
         } else {
             this.combatGateway.attack({ id: player.id } as Socket);

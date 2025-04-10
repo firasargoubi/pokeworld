@@ -43,7 +43,7 @@ export class PlayService {
                 match.data.playData.movementLeft -= shortestPath.moveCost;
                 match.data.state = MatchState.MovementAnimation;
                 this.setTimeLeft(match);
-                this.statService.updateGroundTiles(match, position, playerId);
+                // this.statService.updateGroundTiles(match, position, playerId); // TODO causes the server to crash
                 match.sendUpdate();
                 match.setTimeout(this.continueTurn.bind(this, match), (shortestPath.path.length + 1) * MOVEMENT_ANIMATION_DURATION);
             }
@@ -77,7 +77,7 @@ export class PlayService {
             if (isMoveValid) {
                 const player = match.getPlayer(playerId);
                 player.position = position;
-                this.statService.updateGroundTiles(match, position, playerId);
+                // this.statService.updateGroundTiles(match, position, playerId); // TODO causes the server to crash
                 match.sendUpdate();
             }
         }
@@ -103,7 +103,7 @@ export class PlayService {
         } else {
             const playerName = match.data.players[match.data.playData.activePlayerIndex].name;
             match.sendMessage(`Début du tour de ${playerName}`);
-            this.statService.updateRounds(match);
+            // this.statService.updateRounds(match); // TODO causes the server to crash
             this.chatService.logPlayerTurnStart(match, playerName);
             match.setTimeout(this.startTurnWait.bind(this, match), TURN_START_DURATION);
         }
@@ -161,7 +161,7 @@ export class PlayService {
         if (winner) {
             match.data.state = MatchState.MatchEnd;
             match.sendMessage(`${winner.name} à gagné la partie`);
-            this.statService.updateWinner(match, winner);
+            // this.statService.updateWinner(match, winner); // TODO causes the server to crash
             this.chatService.logMatchWinner(match, winner.name);
         }
         return Boolean(winner);
@@ -169,7 +169,7 @@ export class PlayService {
 
     private endMatch(match: Match) {
         match.data.state = MatchState.Statistics;
-        this.statService.stopTrackingMatch(match);
+        // this.statService.stopTrackingMatch(match); // TODO causes the server to crash
         this.chatService.logEndMatch(match);
 
         match.sendUpdate();
@@ -212,7 +212,7 @@ export class PlayService {
             this.chatService.logCombatStart(match, player.name, targetPlayer.name);
         } else {
             this.toggleBridgeTile(match, position);
-            this.statService.updateToggledBridges(match, position);
+            // this.statService.updateToggledBridges(match, position); // TODO causes the server to crash
             this.chatService.logBridgeToggled(match, player.name);
             this.continueTurn(match);
         }
@@ -242,7 +242,7 @@ export class PlayService {
         const item = this.mapService.getItemTypeAtPosition(match.data, position);
         if (item) {
             this.handleItemAddition(match, playerData, item);
-            this.statService.updateItems(match, item, playerData.id);
+            // this.statService.updateItems(match, item, playerData.id); // TODO causes the server to crash
         }
     }
 
