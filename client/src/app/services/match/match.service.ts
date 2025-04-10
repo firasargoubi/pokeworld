@@ -11,6 +11,7 @@ import { DEFAULT_PLAYER_DATA, MAX_ITEMS } from '@common/consts/player-data.const
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
+import { MessageFromServer } from '@common/interfaces/message-from-server';
 import { PlayerData } from '@common/interfaces/player-data';
 import { MatchEvent } from '@common/interfaces/socket-event.enum';
 import { Subject } from 'rxjs';
@@ -118,10 +119,10 @@ export class MatchService {
         this.matchUpdate.next(oldMatchData);
     }
 
-    private onMessage(receivedMessage: string) {
+    private onMessage(messageFromServer: MessageFromServer) {
         const popupMessage: PopupMessage = {
-            message: receivedMessage,
-            hasCloseButton: false,
+            message: messageFromServer.message,
+            hasCloseButton: messageFromServer.hasCloseButton,
             isConfirmation: false,
         };
         this.popupService.showPopup(popupMessage);

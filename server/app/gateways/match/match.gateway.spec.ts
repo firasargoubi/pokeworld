@@ -1,12 +1,12 @@
+import { Match } from '@app/classes/match/match';
+import { MatchService } from '@app/services/match/match.service';
+import { MatchEvent } from '@common/interfaces/socket-event.enum';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
+import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
-import { Match } from '@app/classes/match/match';
 import { MatchGateway } from './match.gateway';
-import { MatchService } from '@app/services/match/match.service';
-import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
-import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
-import { MatchEvent } from '@common/interfaces/socket-event.enum';
 
 describe('MatchGateway', () => {
     let gateway: MatchGateway;
@@ -91,16 +91,31 @@ describe('MatchGateway', () => {
     it('should emit message to socket', () => {
         const matchCode = '1234';
         const message = 'hello';
+        const hasCloseButton = false;
+        const expectedPayload = {
+            message,
+            hasCloseButton,
+        };
+
         gateway.emitMessage(matchCode, message);
-        expect(mockSocket.emit.calledWith(MatchEvent.Message, message)).toBeTruthy();
+
+        expect(mockSocket.emit.calledWith(MatchEvent.Message, expectedPayload)).toBeTruthy();
     });
 
     it('should emit message to room', () => {
         const matchCode = '1234';
         const message = 'hello';
+        const hasCloseButton = false;
+        const expectedPayload = {
+            message,
+            hasCloseButton,
+        };
+
         mockSocket = null;
-        gateway.emitMessage(matchCode, message);
-        expect(emitStub.calledWith(MatchEvent.Message, message)).toBeTruthy();
+
+        gateway.emitMessage(matchCode, message, hasCloseButton);
+
+        expect(emitStub.calledWith(MatchEvent.Message, expectedPayload)).toBeTruthy();
     });
 
     it('should emit removed from match', () => {
@@ -108,5 +123,19 @@ describe('MatchGateway', () => {
         const reason = 'hello';
         gateway.emitRemovedFromMatch(matchCode, reason);
         expect(mockSocket.emit.calledWith(MatchEvent.RemovedFromMatch, reason)).toBeTruthy();
+    });
+
+    it('should emit message with close button', () => {
+        const matchCode = '1234';
+        const message = 'hello';
+        const hasCloseButton = true;
+        const expectedPayload = {
+            message,
+            hasCloseButton,
+        };
+
+        gateway.emitMessage(matchCode, message, hasCloseButton);
+
+        expect(mockSocket.emit.calledWith(MatchEvent.Message, expectedPayload)).toBeTruthy();
     });
 });

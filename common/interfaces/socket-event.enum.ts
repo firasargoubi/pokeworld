@@ -5,6 +5,7 @@ export enum MatchEvent {
 
     Update = 'update',
     Message = 'message',
+    Popup = 'popup',
     RemovedFromMatch = 'removedFromMatch',
     Disconnect = 'disconnect',
 }

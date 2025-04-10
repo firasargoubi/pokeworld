@@ -1,3 +1,4 @@
+import { signal } from '@angular/core'; // Importez signal
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '@app/services/chat/chat.service';
@@ -23,7 +24,11 @@ describe('ChatComponent', () => {
     ];
 
     beforeEach(async () => {
-        chatServiceSpy = jasmine.createSpyObj('ChatService', ['sendMessage']);
+        chatServiceSpy = jasmine.createSpyObj('ChatService', ['sendMessage'], {
+            isChatActive: signal(true),
+            isFilterEnabled: signal(false),
+        });
+
         matchServiceSpy = jasmine.createSpyObj('MatchService', [], {
             data: {
                 chatData: mockChatData,
@@ -48,6 +53,7 @@ describe('ChatComponent', () => {
 
         fixture = TestBed.createComponent(ChatComponent);
         component = fixture.componentInstance;
+
         fixture.detectChanges();
     });
 
@@ -57,16 +63,16 @@ describe('ChatComponent', () => {
 
     it('should switch between chat and logs tabs', () => {
         component.switchTab(false);
-        expect(component.isChatActive).toBeFalse();
+        expect(component.isChatActive()).toBeFalse();
 
         component.switchTab(true);
-        expect(component.isChatActive).toBeTrue();
+        expect(component.isChatActive()).toBeTrue();
     });
 
     it('should toggle filter', () => {
         component.toggleFilter();
 
-        expect(component.isFilterEnabled).toBeTrue();
+        expect(component.isFilterEnabled()).toBeTrue();
         expect(component.logs.length).toBe(1);
     });
 
@@ -117,14 +123,14 @@ describe('ChatComponent', () => {
         expect(component.logs.length).toBe(2);
         expect(scrollToBottomSpy).toHaveBeenCalled();
 
-        component.isFilterEnabled = true;
+        component.isFilterEnabled.set(true);
         component.updateChatData();
         expect(component.logs.length).toBe(1);
         expect(scrollToBottomSpy).toHaveBeenCalled();
     });
 
     it('should filter logs based on player name when filter is enabled', () => {
-        component.isFilterEnabled = true;
+        component.isFilterEnabled.set(true);
 
         component['filterLogs']();
 
@@ -137,7 +143,7 @@ describe('ChatComponent', () => {
             scrollTop: 0,
             scrollHeight: 100,
         };
-        spyOn(document, 'querySelector').and.returnValue(mockContainer as unknown as Element);
+        spyOn(document, 'querySelector').and.returnValue(mockContainer as Element);
 
         component['scrollToBottom']();
 

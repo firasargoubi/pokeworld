@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
@@ -14,8 +14,8 @@ import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
     imports: [CommonModule, FormsModule],
 })
 export class ChatComponent implements OnInit {
-    isChatActive = true;
-    isFilterEnabled = false;
+    isChatActive: WritableSignal<boolean>;
+    isFilterEnabled: WritableSignal<boolean>;
     maxInputLenght = MAX_MESSAGE_LENGTH;
     chatMessages: ChatMessage[] = [];
     logs: ChatLog[] = [];
@@ -23,6 +23,8 @@ export class ChatComponent implements OnInit {
     private readonly chatService: ChatService = inject(ChatService);
 
     ngOnInit(): void {
+        this.isChatActive = this.chatService.isChatActive;
+        this.isFilterEnabled = this.chatService.isFilterEnabled;
         this.updateChatData();
         this.matchService.matchUpdate.subscribe(() => {
             this.updateChatData();
@@ -30,11 +32,11 @@ export class ChatComponent implements OnInit {
     }
 
     switchTab(isChat: boolean): void {
-        this.isChatActive = isChat;
+        this.chatService.isChatActive.set(isChat);
     }
 
     toggleFilter(): void {
-        this.isFilterEnabled = !this.isFilterEnabled;
+        this.chatService.isFilterEnabled.update((value) => !value);
         this.filterLogs();
     }
 
@@ -60,7 +62,7 @@ export class ChatComponent implements OnInit {
 
     private filterLogs(): void {
         const playerName = this.matchService.selfPlayer.name;
-        if (this.isFilterEnabled) {
+        if (this.isFilterEnabled()) {
             this.logs = this.matchService.data.logData.filter(
                 (log) => log.content.includes(playerName) || log.concernedPlayersNamesList.includes(playerName),
             );
