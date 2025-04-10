@@ -15,6 +15,7 @@ import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { MenuPageComponent } from '@app/pages/menu-page/menu-page.component';
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
 import { environment } from './environments/environment';
+import { StatPageComponent } from '@app/pages/stat-page/stat-page.component';
 
 
 if (environment.production) {
@@ -30,6 +31,7 @@ const routes: Routes = [
     { path: 'create', component: CreatePageComponent },
     { path: 'edit', component: EditPageComponent },
     { path: 'combat', component: CombatPageComponent },
+    { path: 'stat', component: StatPageComponent },
     { path: 'character', component: CharacterPageComponent },
     { path: 'debug', component: DebugPageComponent },
     { path: '**', redirectTo: '' },

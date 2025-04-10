@@ -1,5 +1,8 @@
 import { Match } from '@app/classes/match/match';
+import { BotService } from '@app/services/bot/bot.service';
+import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
+import { StatService } from '@app/services/stat/stat.service';
 import { REGULAR_ITEMS } from '@common/consts/map-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
@@ -10,8 +13,6 @@ import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
 import { LobbyService } from './lobby.service';
-import { MatchService } from '@app/services/match/match.service';
-import { BotService } from '@app/services/bot/bot.service';
 
 describe('LobbyService', () => {
     let service: LobbyService;
@@ -20,6 +21,7 @@ describe('LobbyService', () => {
     let mockMatchService: SinonStubbedInstance<MatchService>;
     let mockBotService: SinonStubbedInstance<BotService>;
     let mockMatch: SinonStubbedInstance<Match>;
+    let mockStatService: SinonStubbedInstance<StatService>;
 
     beforeAll(async () => {
         sandbox = createSandbox();
@@ -27,6 +29,7 @@ describe('LobbyService', () => {
         mockMatchService = createStubInstance<MatchService>(MatchService);
         mockBotService = createStubInstance<BotService>(BotService);
         mockMatch = createStubInstance<Match>(Match);
+        mockStatService = createStubInstance(StatService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -34,6 +37,7 @@ describe('LobbyService', () => {
                 { provide: PlayService, useValue: mockPlayService },
                 { provide: MatchService, useValue: mockMatchService },
                 { provide: BotService, useValue: mockBotService },
+                { provide: StatService, useValue: mockStatService },
             ],
         }).compile();
 

@@ -1,19 +1,22 @@
 import { Match } from '@app/classes/match/match';
+import { BotService } from '@app/services/bot/bot.service';
+import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
-import { MIN_PLAYERS } from '@common/consts/player-data.const';
+import { StatService } from '@app/services/stat/stat.service';
 import { REGULAR_ITEMS } from '@common/consts/map-data.const';
+import { RANDOM_THRESHOLD } from '@common/consts/match-data.const';
+import { MIN_PLAYERS } from '@common/consts/player-data.const';
+import { DEFAULT_PLAYER_TRACKING_DATA } from '@common/consts/track-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { Avatar, PlayerData, PlayerType, Team } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { RANDOM_THRESHOLD } from '@common/consts/match-data.const';
-import { BotService } from '@app/services/bot/bot.service';
-import { MatchService } from '@app/services/match/match.service';
 
 @Injectable()
 export class LobbyService {
+    @Inject(StatService) private readonly statService: StatService;
     @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
     @Inject(forwardRef(() => BotService)) private readonly botService: BotService;
     @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
@@ -38,6 +41,7 @@ export class LobbyService {
     joinLobby(match: Match, playerId: string, playerData: PlayerData) {
         match.data.players = match.data.players.filter((p) => p.id !== playerId);
         playerData.name = this.getUniqueName(match, playerId, playerData.name);
+        match.data.trackingData.players.push({ ...structuredClone(DEFAULT_PLAYER_TRACKING_DATA), id: playerId, name: playerData.name });
         playerData.isConnected = true;
         match.data.players.push(playerData);
         match.changeLockStatus(false);
@@ -67,6 +71,7 @@ export class LobbyService {
             } else if (isCtfMode && !isEvenPlayers) {
                 match.sendMessageToHost(Message.NotEvenPlayers);
             } else {
+                this.statService.startTrackingMatch(match);
                 this.startMatchFirstTurn(match);
             }
         }
@@ -133,8 +138,9 @@ export class LobbyService {
         match.data.gameData.mapData.items.Spawn = spawnPoints.filter((s) => shuffledSpawnPoints.includes(s));
 
         shuffledSpawnPoints.forEach((spawnPoint, i) => {
-            match.data.players[i].spawnPoint = spawnPoint;
-            match.data.players[i].position = spawnPoint;
+            const player = match.data.players[i];
+            player.spawnPoint = spawnPoint;
+            player.position = spawnPoint;
         });
     }
 

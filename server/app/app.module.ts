@@ -8,6 +8,7 @@ import { LobbyGateway } from './gateways/lobby/lobby.gateway';
 import { MatchGateway } from './gateways/match/match.gateway';
 import { PlayGateway } from './gateways/play/play.gateway';
 import { Game, gameSchema } from './model/schema/game.schema';
+import { BotService } from './services/bot/bot.service';
 import { ChatService } from './services/chat/chat.service';
 import { CombatService } from './services/combat/combat.service';
 import { GameService } from './services/game/game.service';
@@ -15,7 +16,7 @@ import { LobbyService } from './services/lobby/lobby.service';
 import { MapService } from './services/map/map.service';
 import { MatchService } from './services/match/match.service';
 import { PlayService } from './services/play/play.service';
-import { BotService } from './services/bot/bot.service';
+import { StatService } from './services/stat/stat.service';
 
 @Module({
     imports: [
@@ -47,6 +48,7 @@ import { BotService } from './services/bot/bot.service';
         PlayGateway,
         CombatGateway,
         ChatGateway,
+        StatService,
     ],
 })
 export class AppModule {}

@@ -1,0 +1,256 @@
+$gray-border-color: #636776;
+$wheat-border-color: #e9f6f7;
+$stripes-color1: #93d7eb;
+$stripes-color2: #ace6f6;
+$text-shadow-color: rgb(112, 112, 112);
+
+$page-border-width: 10px;
+$padding-wheat-border: 0.7vw;
+$stripes-size: 0.7vw;
+$font-size-header: 6.5vh;
+
+$font-family-title: 'pixel';
+
+$corner-square-size: 1vh;
+$clip-path: polygon(
+    $corner-square-size 0%,
+    calc(100% - #{$corner-square-size}) 0%,
+
+    calc(100% - #{$corner-square-size}) $corner-square-size,
+    100% $corner-square-size,
+
+    100% calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) 100%,
+    $corner-square-size 100%,
+
+    $corner-square-size calc(100% - #{$corner-square-size}),
+    0% calc(100% - #{$corner-square-size}),
+    0% $corner-square-size,
+    $corner-square-size $corner-square-size
+);
+
+* {
+    font-family: 'pixel';
+    color: #585851;
+    overflow: visible;
+}
+
+#stat-page-header {
+    height: 7vh;
+}
+
+#stat-page-border {
+    height: calc(100vh - 7vh);
+    border: $page-border-width solid $gray-border-color;
+}
+
+#stat-page-body {
+    position: relative;
+    height: 100%;
+    overflow-y: scroll;
+    background: repeating-linear-gradient(
+        0deg,
+        $stripes-color1,
+        $stripes-color1 $stripes-size,
+        $stripes-color2 $stripes-size,
+        $stripes-color2 $stripes-size * 2
+    );
+    background-size: 100% ($stripes-size * 2);
+    animation: fall 2s linear infinite;
+    box-sizing: border-box;
+
+    border: $page-border-width solid $wheat-border-color;
+    padding: $page-border-width $page-border-width;
+
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+}
+
+@keyframes fall {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 0 $stripes-size * 2;
+    }
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+#top-stats-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+#bottom-stats-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+#match-stats-container,
+#player-stats-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 1% 0;
+}
+
+.container-border {
+    height: 100%;
+    width: auto;
+    pointer-events: none;
+    user-select: none;
+}
+
+.container-body {
+    background-image: url('../../../assets/images/menu/containers/combat-container/combat-container-body.png');
+    background-size: 100% 100%;
+    flex: 1;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#player-stats-container .container-body {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    padding: 4vh 1vh;
+    overflow-x: auto;
+}
+
+#player-stats-container .stat-column {
+    display: grid;
+    grid-template-rows: 15% 85%;
+    height: 100%;
+    margin: 0 1% 0 0;
+    min-width: min-content;
+    flex-shrink: 0;
+    padding: 0 0 0 0.5vw;
+}
+
+#player-stats-container .stat-title {
+    font-size: 3.5vh;
+    text-align: center;
+    user-select: none;
+    cursor: pointer;
+}
+
+#player-stats-container .stat-title:hover {
+    opacity: 0.8;
+}
+
+#player-stats-container .stat-title:active {
+    opacity: 0.5;
+}
+
+#player-stats-container .stat-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    row-gap: 10px;
+    align-items: center;
+    height: 100%;
+    padding: 0.5vh 0;
+}
+
+#player-stats-container .stat-value {
+    font-size: 3.5vh;
+    text-align: center;
+    user-select: none;
+    width: 100%;
+}
+
+#player-stats-container .stat-separator {
+    background-color: #9a9a9a;
+    width: 0.25vw;
+    height: 100%;
+    display: grid;
+    height: 85%;
+    flex-shrink: 0;
+    align-self: flex-end;
+}
+
+#match-stats-container .container-body {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    padding: 6vh 1vh;
+}
+
+#match-stats-container .main-stats-container {
+    width: 70%;
+    height: 80%;
+}
+
+#match-stats-container .match-stat {
+    display: grid;
+    grid-template-columns: 75% 25%;
+
+    width: 100%;
+
+    font-size: 2vw;
+}
+
+#match-stats-container .match-winner-container {
+    margin-top: 50px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 50%;
+    overflow: visible;
+}
+
+#match-stats-container .match-winner-container img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+#match-stats-container .match-winner-container .winner-title {
+    position: absolute;
+    font-size: 2.4vw;
+    text-align: center;
+    width: 100%;
+    top: 17%;
+}
+#match-stats-container .match-winner-container .winner-battle-platform {
+    width: min(40vh, 30vw);
+    transform: translate(-50%, -10%);
+}
+
+#match-stats-container .match-winner-container .winner-avatar {
+    width: min(15vh, 10vw);
+    transform: translate(-50%, -50%);
+}
+
+#chat-container {
+    position: relative;
+    height: 100%;
+}
+
+#sorting-button{
+    margin-left: 30px;
+    font-size: 100px;
+    background-color: white;
+    color : black;
+}
+
+#sorting-stat{
+    background-color: yellow;
+    font-size: 30px;
+}

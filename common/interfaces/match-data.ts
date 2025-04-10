@@ -1,7 +1,9 @@
 import { ChatLog, ChatMessage } from './chat-message';
 import { GameData } from './game-data';
 import { PlayerData } from './player-data';
+import { Position } from './position';
 import { TileType } from './tile-type.enum';
+import { WinnerData, TrackingPlayerData } from './track-data';
 
 export interface MatchData {
     code: string;
@@ -10,6 +12,7 @@ export interface MatchData {
     lobbyData: LobbyData;
     playData: PlayData;
     combatData: CombatData;
+    trackingData: TrackingData;
     players: PlayerData[];
     chatData: ChatMessage[];
     logData: ChatLog[];
@@ -46,6 +49,17 @@ export interface PlayerCombatData {
     attack: number;
     defense: number;
     standingTile: TileType;
+}
+
+export interface TrackingData {
+    startTime: number;
+    endTime: number;
+    coveredBridges: Position[];
+    coveredGroundTiles: Position[];
+    rounds: number;
+    flagHoldersCount: number;
+    matchWinner: WinnerData;
+    players: TrackingPlayerData[];
 }
 
 export enum CombatAction {

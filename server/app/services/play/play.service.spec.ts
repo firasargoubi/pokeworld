@@ -4,6 +4,7 @@ import { Match } from '@app/classes/match/match';
 import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MapService } from '@app/services/map/map.service';
+import { StatService } from '@app/services/stat/stat.service';
 import { MINIMUM_COMBATS_TO_WIN } from '@common/consts/match-data.const';
 import { AVATAR_EVOLVED_SUFFIX, AVATAR_SHINY_SUFFIX, MAX_ITEMS } from '@common/consts/player-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -24,6 +25,7 @@ describe('PlayService', () => {
     let mockMapService: SinonStubbedInstance<MapService>;
     let mockCombatService: SinonStubbedInstance<CombatService>;
     let mockChatService: SinonStubbedInstance<ChatService>;
+    let mockStatService: SinonStubbedInstance<StatService>;
     let mockMatch: SinonStubbedInstance<Match>;
 
     beforeAll(async () => {
@@ -31,6 +33,7 @@ describe('PlayService', () => {
         mockMapService = createStubInstance(MapService);
         mockCombatService = createStubInstance(CombatService);
         mockChatService = createStubInstance(ChatService);
+        mockStatService = createStubInstance(StatService);
         mockMatch = createStubInstance(Match);
 
         const module: TestingModule = await Test.createTestingModule({
@@ -39,6 +42,7 @@ describe('PlayService', () => {
                 { provide: MapService, useValue: mockMapService },
                 { provide: CombatService, useValue: mockCombatService },
                 { provide: ChatService, useValue: mockChatService },
+                { provide: StatService, useValue: mockStatService },
             ],
         }).compile();
 

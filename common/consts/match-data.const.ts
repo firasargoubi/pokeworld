@@ -1,6 +1,7 @@
 import { LobbyData, MatchData, MatchState, PlayData } from '../interfaces/match-data';
 import { DEFAULT_COMBAT_DATA } from './combat-data.const';
 import { DEFAULT_GAME_DATA } from './game-data.const';
+import { DEFAULT_TRACKING_DATA } from './track-data.const';
 
 export const TURN_WAIT_DURATION = 30000;
 export const TURN_START_DURATION = 3000;
@@ -29,6 +30,7 @@ export const DEFAULT_MATCH_DATA: MatchData = {
     lobbyData: structuredClone(DEFAULT_LOBBY_DATA),
     playData: structuredClone(DEFAULT_PLAY_DATA),
     combatData: structuredClone(DEFAULT_COMBAT_DATA),
+    trackingData: structuredClone(DEFAULT_TRACKING_DATA),
     players: [],
     chatData: [],
     logData: [],
