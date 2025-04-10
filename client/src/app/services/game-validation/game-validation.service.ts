@@ -1,11 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BRIDGE_TYPES, MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH, MIN_TERRAIN_RATIO } from './game-validation.const';
-import { GameData } from '@common/interfaces/game-data';
-import { GameMode, MapData } from '@common/interfaces/map-data';
-import { Position } from '@common/interfaces/position';
-import { TileType } from '@common/interfaces/tile-type.enum';
 import { MAX_ITEM_COUNT } from '@app/consts/item-data.const';
-import { ItemType } from '@common/interfaces/item-type.enum';
 import {
     BridgeValidationError,
     ErrorMessage,
@@ -17,6 +11,13 @@ import {
     ValidationResult,
     ValidationStatus,
 } from '@app/interfaces/game-validation';
+import { PERCENTAGE_FACTOR } from '@common/consts/track-data.const';
+import { GameData } from '@common/interfaces/game-data';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { GameMode, MapData } from '@common/interfaces/map-data';
+import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { BRIDGE_TYPES, MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH, MIN_TERRAIN_RATIO } from './game-validation.const';
 
 @Injectable({
     providedIn: 'root',
@@ -160,12 +161,11 @@ export class GameValidationService {
     }
 
     private validateTerrainCoverage(tilesCount: TilesCount): TerrainCoverageValidation {
-        const PERCENTAGE_MULTIPLIER = 100;
         const currentTerrainRatio = tilesCount.nbTerrain / tilesCount.nbTilesTotal;
 
         const terrainCoverageValidation = {
             isValid: currentTerrainRatio > MIN_TERRAIN_RATIO,
-            coveragePercentage: parseFloat((currentTerrainRatio * PERCENTAGE_MULTIPLIER).toFixed(2)),
+            coveragePercentage: parseFloat((currentTerrainRatio * PERCENTAGE_FACTOR).toFixed(2)),
         };
 
         return terrainCoverageValidation;

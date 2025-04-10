@@ -1,3 +1,4 @@
+import { ItemService } from '@app/services/item/item.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -14,6 +15,7 @@ export class PlayGateway {
     @WebSocketServer() private server: Server;
     @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
     @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
+    @Inject(forwardRef(() => ItemService)) private readonly itemService: ItemService;
 
     @SubscribeMessage(PlayEvent.EndTurn)
     endTurn(socket: Socket) {
@@ -59,7 +61,7 @@ export class PlayGateway {
     dropItem(socket: Socket, itemType: ItemType) {
         const match = this.matchService.getMatchFromPlayerId(socket.id);
         if (match) {
-            this.playService.dropItems(match, socket.id, [itemType]);
+            this.itemService.dropItems(match, socket.id, [itemType]);
             match.data.state = MatchState.TurnWait;
             this.playService.continueTurn(match);
         }

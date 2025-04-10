@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { Match } from '@app/classes/match/match';
 import { ChatService } from '@app/services/chat/chat.service';
+import { ItemService } from '@app/services/item/item.service';
 import { MapService } from '@app/services/map/map.service';
 import { PlayService } from '@app/services/play/play.service';
 import { TrackingService } from '@app/services/tracking/tracking.service';
@@ -34,6 +35,7 @@ describe('CombatService', () => {
     let mockPlayService: SinonStubbedInstance<PlayService>;
     let mockChatService: SinonStubbedInstance<ChatService>;
     let mocktrackingService: SinonStubbedInstance<TrackingService>;
+    let mockItemService: SinonStubbedInstance<ItemService>;
     let mockMatch: SinonStubbedInstance<Match>;
 
     beforeAll(async () => {
@@ -42,6 +44,7 @@ describe('CombatService', () => {
         mockPlayService = createStubInstance(PlayService);
         mockChatService = createStubInstance(ChatService);
         mockMatch = createStubInstance(Match);
+        mockItemService = createStubInstance(ItemService);
         mocktrackingService = createStubInstance(TrackingService);
 
         const module: TestingModule = await Test.createTestingModule({
@@ -50,6 +53,7 @@ describe('CombatService', () => {
                 { provide: PlayService, useValue: mockPlayService },
                 { provide: ChatService, useValue: mockChatService },
                 { provide: MapService, useValue: mockMapService },
+                { provide: ItemService, useValue: mockItemService },
                 { provide: TrackingService, useValue: mocktrackingService },
             ],
         }).compile();

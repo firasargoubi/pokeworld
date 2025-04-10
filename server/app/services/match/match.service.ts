@@ -91,6 +91,7 @@ export class MatchService {
                         this.playerToMatchCode.delete(p.id);
                     });
                 match.clearTimeout();
+                match.clearBotTimeout();
                 this.matches.delete(match.data.code);
             }
         }

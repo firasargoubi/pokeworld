@@ -99,6 +99,7 @@ export class ChatService {
             this.addLogToMatch(match, message);
         }
     }
+
     private getConcernedPlayers(match: Match): string[] {
         const combatPlayerData = match.data.combatData.playersCombatData;
         return combatPlayerData.map((playerData) => {

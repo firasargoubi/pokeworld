@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
-import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { IMAGE_SUFIX, TILE_IMAGES_PREFIX, UNDERLAY_IMAGES_PREFIX } from '@app/consts/images.const';
 import { MapVisualData, OverlayTiles, PlayerTileVisual, TileVisualData } from '@app/interfaces/map-visual-data';
 import { TileComparisonData } from '@app/interfaces/tile-comparison-data';
 import { GameDataService } from '@app/services/game-data/game-data.service';
+import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { SURROUNDING_POSITIONS_DONUT, SURROUNDING_POSITIONS_PLUS, SURROUNDING_POSITIONS_SQUARE } from '@common/consts/map-data.const';
 import { MOVE_ANIMATION_DURATION } from '@common/consts/player-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -148,11 +148,7 @@ export class MapService {
         let overlay = null;
 
         if (this.isOnPlayer(position) || this.isPossibleMove(position)) {
-            if (this.isHoveringPosition(position)) {
-                overlay = HOVER_MOVE_OVERLAY;
-            } else {
-                overlay = POSSIBLE_MOVE_OVERLAY;
-            }
+            overlay = this.isHoveringPosition(position) ? HOVER_MOVE_OVERLAY : POSSIBLE_MOVE_OVERLAY;
         }
 
         return overlay;

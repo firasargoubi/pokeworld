@@ -4,13 +4,13 @@ import { Position } from './position';
 export interface NeighborContext {
     pos: Position;
     cost: number;
-    offset: { x: number; y: number };
+    offset: Position;
     maxCost: number;
     size: number;
     matchData: MatchData;
     distances: number[][];
     predecessors: Map<Position, Position>;
-    queue: { pos: Position; cost: number }[];
+    queue: QueueNode[];
 }
 
 export interface QueueNode {
