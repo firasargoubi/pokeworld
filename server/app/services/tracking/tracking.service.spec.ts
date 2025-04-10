@@ -11,6 +11,7 @@ import { MOCK_MATCH_DATAS, MOCK_PLAYER_COMBAT_DATAS } from '@common/test-consts/
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
 import { TrackingService } from './tracking.service';
+import { Team } from '@common/interfaces/player-data';
 
 describe('TrackingService', () => {
     let service: TrackingService;
@@ -164,6 +165,21 @@ describe('TrackingService', () => {
         expect(matchData.trackingData.matchWinner).toEqual({
             id: winnerPlayer.id,
             name: winnerPlayer.name || undefined,
+            avatar: winnerPlayer.avatar,
+            tile: matchData.combatData.playersCombatData[0].standingTile,
+        });
+    });
+
+    it('should update winner with team name in CTF mode', () => {
+        const winnerPlayer = matchData.players[0];
+        winnerPlayer.team = Team.Blue;
+        matchData.gameData.mapData.gameMode = GameMode.CTF;
+
+        service.updateWinner(match, winnerPlayer);
+
+        expect(matchData.trackingData.matchWinner).toEqual({
+            id: winnerPlayer.id,
+            name: winnerPlayer.team,
             avatar: winnerPlayer.avatar,
             tile: matchData.combatData.playersCombatData[0].standingTile,
         });

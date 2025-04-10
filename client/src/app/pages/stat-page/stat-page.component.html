@@ -1,6 +1,6 @@
 <div id="stat-page-container">
     <div id="stat-page-header">
-        <app-header [onClick]="this.navigateToMenu.bind(this)" [stepNumber]="'1'" [title]="'PAGE DE STATISTIQUES'"></app-header>
+        <app-header [onClick]="this.navigateToMenu.bind(this)" [stepNumber]="'1'" [title]="'FIN DE PARTIE'"></app-header>
     </div>
     <div id="stat-page-border">
         <div id="stat-page-body">
@@ -9,7 +9,7 @@
                     <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png" />
                     <div class="container-body">
                         <div class="stat-column">
-                            <div class="stat-title">NOM</div>
+                            <div class="stat-title"></div>
                             <div class="stat-container">
                                 @for(player of playerStatList(); track player.id){
                                 <div class="stat-value">{{ player.name }}</div>
@@ -42,37 +42,37 @@
                     <div class="container-body">
                         <div class="main-stats-container">
                             <div class="match-stat">
-                                <span class="stat-label">DUREE:</span>
+                                <span class="stat-label">DURÉE:</span>
                                 <span class="stat-value">
                                     {{ statService.globalStats.gameDuration | date: 'mm:ss' }}
                                 </span>
                             </div>
 
                             <div class="match-stat">
-                                <span class="stat-label">TOURS:</span>
+                                <span class="stat-label">TOURS :</span>
                                 <span class="stat-value"> {{ statService.globalStats.rounds }} </span>
                             </div>
 
                             <div class="match-stat">
-                                <span class="stat-label">TUILES VISITE:</span>
-                                <span class="stat-value"> {{ statService.globalStats.visitedTilesRatio }}% </span>
+                                <span class="stat-label">TUILES VISITÉES :</span>
+                                <span class="stat-value"> {{ statService.globalStats.visitedTilesRatio }} % </span>
                             </div>
 
                             <div class="match-stat">
-                                <span class="stat-label">PORTES MANIPULES:</span>
+                                <span class="stat-label">PORTES MANIPULÉES :</span>
                                 <span class="stat-value"> {{ statService.globalStats.toggledBridgesRatio }} % </span>
                             </div>
 
                             @if(isModeCTF()){
                             <div class="match-stat">
-                                <span class="stat-label">RAMASSEURS DE DRAPEAUX:</span>
+                                <span class="stat-label">PORTEURS DE DRAPEAU :</span>
                                 <span class="stat-value"> {{ statService.globalStats.flagHoldersCount }}</span>
                             </div>
                             }
                         </div>
 
                         <div class="match-winner-container">
-                            <div class="winner-title">{{ statService.winnerData.name }}</div>
+                            <div class="winner-title">{{ statService.winnerData.name.toUpperCase() }}</div>
                             <img class="winner-battle-platform" src="{{ statService.winnerData.tileImage }}" />
                             <img class="winner-avatar" src="{{ statService.winnerData.avatarImage }}" />
                         </div>

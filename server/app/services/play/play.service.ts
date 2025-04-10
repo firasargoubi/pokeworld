@@ -182,6 +182,7 @@ export class PlayService {
         if (flagHolder) {
             hasWon = flagHolder.position.x === flagHolder.spawnPoint.x && flagHolder.position.y === flagHolder.spawnPoint.y;
             if (hasWon) {
+                this.trackingService.updateWinner(match, flagHolder);
                 const winningTeam = flagHolder.team;
                 match.data.state = MatchState.MatchEnd;
                 match.sendMessage(`L'équipe ${winningTeam} remporte la partie !`);
