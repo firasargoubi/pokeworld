@@ -1,20 +1,20 @@
 import { Match } from '@app/classes/match/match';
-import { RANDOM_THRESHOLD } from '@common/consts/match-data.const';
-import { BONUS_STAT, DEFAULT_PLAYER_DATA, DEFAULT_STAT } from '@common/consts/player-data.const';
-import { Avatar, DiceType, PlayerData, PlayerType, Team } from '@common/interfaces/player-data';
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { LobbyService } from '@app/services/lobby/lobby.service';
-import { AVATAR_DATA, MIN_SELECTABLE_AVATAR_INDEX, MAX_SELECTABLE_AVATAR_INDEX } from '@common/consts/avatar-data.const';
-import { MatchState, PlayerCombatData } from '@common/interfaces/match-data';
 import { CombatGateway } from '@app/gateways/combat/combat.gateway';
-import { Socket } from 'socket.io';
 import { PlayGateway } from '@app/gateways/play/play.gateway';
-import { ItemType } from '@common/interfaces/item-type.enum';
-import { MapService } from '@app/services/map/map.service';
-import { Position } from '@common/interfaces/position';
 import { BotAction } from '@app/interfaces/bot-action.enum';
-import { TileType } from '@common/interfaces/tile-type.enum';
+import { LobbyService } from '@app/services/lobby/lobby.service';
+import { MapService } from '@app/services/map/map.service';
+import { AVATAR_DATA, MAX_SELECTABLE_AVATAR_INDEX, MIN_SELECTABLE_AVATAR_INDEX } from '@common/consts/avatar-data.const';
+import { RANDOM_THRESHOLD } from '@common/consts/match-data.const';
+import { BONUS_STAT, DEFAULT_PLAYER_DATA, DEFAULT_STAT, MAX_ITEMS } from '@common/consts/player-data.const';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MatchState, PlayerCombatData } from '@common/interfaces/match-data';
 import { ShortestPath } from '@common/interfaces/movement';
+import { Avatar, DiceType, PlayerData, PlayerType, Team } from '@common/interfaces/player-data';
+import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Socket } from 'socket.io';
 import {
     BOT_CODE_LENGTH,
     BOT_COMBAT_MAX_DELAY,
@@ -70,7 +70,7 @@ export class BotService {
 
     private onTurnWait(match: Match) {
         const activePlayer = match.data.players[match.data.playData.activePlayerIndex];
-        if (activePlayer.type !== PlayerType.Player) {
+        if (activePlayer && activePlayer.type !== PlayerType.Player) {
             match.setBotTimeout(this.executeBotAction.bind(this, activePlayer, match), this.getRandomNumber(BOT_TURN_MIN_DELAY, BOT_TURN_MAX_DELAY));
         }
     }
@@ -274,24 +274,26 @@ export class BotService {
 
     private onItemWait(match: Match) {
         const activePlayer = match.data.players[match.data.playData.activePlayerIndex];
-        if (activePlayer.type !== PlayerType.Player) {
+        if (activePlayer && activePlayer.type !== PlayerType.Player) {
             match.setBotTimeout(this.itemAction.bind(this, activePlayer), this.getRandomNumber(BOT_ITEM_MIN_DELAY, BOT_ITEM_MAX_DELAY));
         }
     }
 
     private itemAction(player: PlayerData) {
-        const priorities = BOT_ITEM_PRIORITIES.get(player.type);
-        const itemToDrop = player.items.reduce((lowest, current) => {
-            return priorities.indexOf(current) > priorities.indexOf(lowest) ? current : lowest;
-        }, player.items[0]);
-        this.playGateway.dropItem({ id: player.id } as Socket, itemToDrop);
+        if (player.items.length > MAX_ITEMS) {
+            const priorities = BOT_ITEM_PRIORITIES.get(player.type);
+            const itemToDrop = player.items.reduce((lowest, current) => {
+                return priorities.indexOf(current) > priorities.indexOf(lowest) ? current : lowest;
+            }, player.items[0]);
+            this.playGateway.dropItem({ id: player.id } as Socket, itemToDrop);
+        }
     }
 
     private onCombatWait(match: Match) {
         const playerCombatDataIndex = match.data.combatData.isSecondPlayerTurn ? 1 : 0;
         const playerCombatData = match.data.combatData.playersCombatData[playerCombatDataIndex];
         const activePlayer = match.data.players[playerCombatData.playerIndex];
-        if (activePlayer.type !== PlayerType.Player) {
+        if (activePlayer && activePlayer.type !== PlayerType.Player) {
             const delay = this.getRandomNumber(BOT_COMBAT_MIN_DELAY, BOT_COMBAT_MAX_DELAY);
             match.setBotTimeout(this.botCombatAction.bind(this, activePlayer, playerCombatData), delay);
         }

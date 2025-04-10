@@ -97,11 +97,7 @@ export class EditorService {
 
     private getMaxItemCount(item: ItemType, activeItem: ItemType | null): number {
         if (item === ItemType.Flag) {
-            if (this.gameDataService.getGameMode() === GameMode.CTF) {
-                return 1;
-            } else {
-                return 0;
-            }
+            return this.gameDataService.getGameMode() === GameMode.CTF ? 1 : 0;
         }
 
         let maxItemCount = MAX_ITEM_COUNT[this.gameDataService.getMapSize()][item];

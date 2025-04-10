@@ -1,5 +1,6 @@
 import { Match } from '@app/classes/match/match';
 import { ChatService } from '@app/services/chat/chat.service';
+import { ItemService } from '@app/services/item/item.service';
 import { MapService } from '@app/services/map/map.service';
 import { PlayService } from '@app/services/play/play.service';
 import { TrackingService } from '@app/services/tracking/tracking.service';
@@ -32,6 +33,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 export class CombatService {
     @Inject(MapService) private readonly mapService: MapService;
     @Inject(forwardRef(() => TrackingService)) private trackingService: TrackingService;
+    @Inject(forwardRef(() => ItemService)) private readonly itemService: ItemService;
     @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
     @Inject(forwardRef(() => ChatService)) private readonly chatService: ChatService;
 
@@ -73,7 +75,7 @@ export class CombatService {
     }
 
     respawnPlayer(match: Match, player: PlayerData) {
-        this.playService.dropItems(match, player.id, player.items);
+        this.itemService.dropItems(match, player.id, player.items);
 
         if (player.spawnPoint !== player.position) {
             player.position = this.mapService.getNearestEmptyTile(match.data, player.spawnPoint);

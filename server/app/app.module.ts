@@ -12,6 +12,7 @@ import { BotService } from './services/bot/bot.service';
 import { ChatService } from './services/chat/chat.service';
 import { CombatService } from './services/combat/combat.service';
 import { GameService } from './services/game/game.service';
+import { ItemService } from './services/item/item.service';
 import { LobbyService } from './services/lobby/lobby.service';
 import { MapService } from './services/map/map.service';
 import { MatchService } from './services/match/match.service';
@@ -42,6 +43,7 @@ import { TrackingService } from './services/tracking/tracking.service';
         MapService,
         ChatService,
         BotService,
+        ItemService,
 
         MatchGateway,
         LobbyGateway,

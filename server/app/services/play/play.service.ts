@@ -1,6 +1,7 @@
 import { Match } from '@app/classes/match/match';
 import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
+import { ItemService } from '@app/services/item/item.service';
 import { MapService } from '@app/services/map/map.service';
 import { TrackingService } from '@app/services/tracking/tracking.service';
 import {
@@ -11,12 +12,10 @@ import {
     TURN_START_DURATION,
     TURN_WAIT_DURATION,
 } from '@common/consts/match-data.const';
-import { AVATAR_EVOLVED_SUFFIX, AVATAR_SHINY_SUFFIX, MAX_ITEMS } from '@common/consts/player-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
 import { MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
-import { Avatar, AvatarModifiers, PlayerData } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -25,6 +24,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 export class PlayService {
     @Inject(MapService) private readonly mapService: MapService;
     @Inject(TrackingService) private readonly trackingService: TrackingService;
+    @Inject(forwardRef(() => ItemService)) private readonly itemService: ItemService;
     @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
     @Inject(forwardRef(() => ChatService)) private readonly chatService: ChatService;
 
@@ -50,17 +50,6 @@ export class PlayService {
         }
     }
 
-    dropItems(match: Match, playerId: string, items: ItemType[]) {
-        const player = match.getPlayer(playerId);
-        for (const item of items) {
-            const position = this.mapService.getNearestItemDropSpot(match.data, player.position);
-            match.data.gameData.mapData.items[item].push(position);
-            player.items = player.items.filter((i) => i !== item);
-        }
-        this.computeItems(player);
-        match.sendUpdate();
-    }
-
     action(match: Match, playerId: string, position: Position) {
         if (match.data.playData.hasAction && match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
             const actions = this.mapService.getActions(match.data);
@@ -70,6 +59,7 @@ export class PlayService {
             }
         }
     }
+
     debugMove(match: Match, playerId: string, position: Position) {
         if (match.data.playData.isDebugMode && match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
             const possibleMoves = this.mapService.getPossibleMovesDebug(match.data);
@@ -115,12 +105,12 @@ export class PlayService {
             match.setTimeout(this.endMatch.bind(this, match), MATCH_END_DURATION);
         } else {
             if (match.data.state === MatchState.MovementAnimation) {
-                this.checkAndPickupItem(match, curentPlayer);
+                this.itemService.checkAndPickupItem(match, curentPlayer);
             }
             if (match.data.state === MatchState.ItemDropSelection) {
-                this.scheduleForceItemDrop(match, curentPlayer.id);
+                this.startItemDrop(match, curentPlayer.id);
             } else if (this.canPlayerAct(match)) {
-                this.scheduleTurnEnd(match);
+                this.continueTurnWait(match);
             } else {
                 this.startNextTurn(match);
             }
@@ -136,13 +126,13 @@ export class PlayService {
         return canAct && isConnected;
     }
 
-    private scheduleForceItemDrop(match: Match, playerId: string): void {
+    private startItemDrop(match: Match, playerId: string): void {
         this.setTimeLeft(match);
         match.sendUpdate();
-        match.setTimeout(this.forceItemDrop.bind(this, match, playerId), DROP_ITEMS_DURATION);
+        match.setTimeout(this.itemService.forceItemDrop.bind(this, match, playerId), DROP_ITEMS_DURATION);
     }
 
-    private scheduleTurnEnd(match: Match): void {
+    private continueTurnWait(match: Match): void {
         match.data.state = MatchState.TurnWait;
         match.sendUpdate();
         match.setTimeout(this.startNextTurn.bind(this, match), match.data.playData.timeLeft);
@@ -236,63 +226,5 @@ export class PlayService {
             steps++;
         }
         return nextIndex;
-    }
-
-    private checkAndPickupItem(match: Match, playerData: PlayerData) {
-        const position = playerData.position;
-        const item = this.mapService.getItemTypeAtPosition(match.data, position);
-        if (item) {
-            this.handleItemAddition(match, playerData, item);
-            this.trackingService.updateItems(match, item, playerData.id);
-        }
-    }
-
-    private handleItemAddition(match: Match, player: PlayerData, itemType: ItemType) {
-        player.items.push(itemType);
-        this.chatService.logItemPickup(match, player.name, itemType);
-        match.data.gameData.mapData.items[itemType] = match.data.gameData.mapData.items[itemType].filter(
-            (itemPos) => itemPos.x !== player.position.x || itemPos.y !== player.position.y,
-        );
-
-        if (player.items.length > MAX_ITEMS) {
-            match.data.state = MatchState.ItemDropSelection;
-            return;
-        }
-
-        this.computeItems(player);
-    }
-
-    private forceItemDrop(match: Match, playerId: string) {
-        match.data.state = MatchState.TurnWait;
-        const player = match.getPlayer(playerId);
-        this.dropItems(match, playerId, [player.items[MAX_ITEMS]]);
-        this.continueTurn(match);
-        match.sendUpdate();
-    }
-
-    private computeItems(player: PlayerData) {
-        const isShiny = player.items.includes(ItemType.Item1);
-        const isEvolved = player.items.includes(ItemType.Item2);
-        const isMissingNo = player.items.includes(ItemType.Item6);
-        player.avatar = this.getAvatarVariant(player.avatar, { isShiny, isEvolved, isMissingNo });
-    }
-
-    private getAvatarVariant(avatar: Avatar, avatarModifiers: AvatarModifiers): Avatar {
-        const baseMatch = avatar.match(/^(avatar\d+)/);
-        if (!baseMatch) {
-            return avatar;
-        }
-
-        const base = baseMatch[1];
-        let result = base;
-
-        if (avatarModifiers.isEvolved) {
-            result += AVATAR_EVOLVED_SUFFIX;
-        }
-        if (avatarModifiers.isShiny) {
-            result += AVATAR_SHINY_SUFFIX;
-        }
-
-        return result as Avatar;
     }
 }

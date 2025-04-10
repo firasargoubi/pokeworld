@@ -203,6 +203,16 @@ describe('Match', () => {
         expect(match['timeout']).toBeNull();
     });
 
+    it('clear bot timeout should clear bot timeout', () => {
+        match['botTimeout'] = setTimeout(() => ({}), 1);
+        const clearTimeoutStub = sandbox.stub(global, 'clearTimeout');
+
+        match.clearBotTimeout();
+
+        expect(clearTimeoutStub.called).toBe(true);
+        expect(match['botTimeout']).toBeNull();
+    });
+
     it('kick player should remove player', () => {
         const playerId = match.data.players[0].id;
         const initialLength = match.data.players.length;

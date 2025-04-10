@@ -116,6 +116,13 @@ export class Match {
         }
     }
 
+    clearBotTimeout() {
+        if (this.botTimeout !== null) {
+            clearTimeout(this.botTimeout);
+            this.botTimeout = null;
+        }
+    }
+
     kickPlayer(playerId: string, reason: string) {
         this.matchService.playerRemovedFromMatch(playerId, reason);
         this.data.players = this.data.players.filter((p) => p.id !== playerId);

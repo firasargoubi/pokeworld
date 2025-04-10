@@ -1,4 +1,5 @@
 import { Match } from '@app/classes/match/match';
+import { ItemService } from '@app/services/item/item.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -14,6 +15,7 @@ describe('PlayGayteway', () => {
     let mockServer: SinonStubbedInstance<Server>;
     let mockPlayService: SinonStubbedInstance<PlayService>;
     let mockMatchService: SinonStubbedInstance<MatchService>;
+    let mockItemService: SinonStubbedInstance<ItemService>;
     let emitStub: SinonStub;
     let mockMatch: SinonStubbedInstance<Match>;
 
@@ -21,6 +23,7 @@ describe('PlayGayteway', () => {
         mockSocket = createStubInstance<Socket>(Socket);
         mockPlayService = createStubInstance<PlayService>(PlayService);
         mockMatchService = createStubInstance<MatchService>(MatchService);
+        mockItemService = createStubInstance<ItemService>(ItemService);
         mockServer = createStubInstance<Server>(Server);
         emitStub = stub();
         mockMatch = createStubInstance<Match>(Match);
@@ -31,6 +34,7 @@ describe('PlayGayteway', () => {
                 PlayGateway,
                 { provide: MatchService, useValue: mockMatchService },
                 { provide: PlayService, useValue: mockPlayService },
+                { provide: ItemService, useValue: mockItemService },
                 { provide: Server, useValue: mockServer },
             ],
         }).compile();
@@ -80,7 +84,7 @@ describe('PlayGayteway', () => {
         const itemType = ItemType.Item1;
         mockMatch.data = { state: MatchState.Lobby } as MatchData;
         gateway.dropItem(mockSocket, itemType);
-        expect(mockPlayService.dropItems.calledWith(mockMatch, mockSocket.id, [itemType])).toBeTruthy();
+        expect(mockItemService.dropItems.calledWith(mockMatch, mockSocket.id, [itemType])).toBeTruthy();
         expect(mockMatch.data.state).toBe(MatchState.TurnWait);
         expect(mockPlayService.continueTurn.calledWith(mockMatch)).toBeTruthy();
     });
