@@ -16,7 +16,7 @@ import { LobbyService } from './services/lobby/lobby.service';
 import { MapService } from './services/map/map.service';
 import { MatchService } from './services/match/match.service';
 import { PlayService } from './services/play/play.service';
-import { StatService } from './services/stat/stat.service';
+import { TrackingService } from './services/tracking/tracking.service';
 
 @Module({
     imports: [
@@ -48,7 +48,7 @@ import { StatService } from './services/stat/stat.service';
         PlayGateway,
         CombatGateway,
         ChatGateway,
-        StatService,
+        TrackingService,
     ],
 })
 export class AppModule {}

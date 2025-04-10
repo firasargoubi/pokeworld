@@ -1,5 +1,7 @@
 import { Match } from '@app/classes/match/match';
+import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
+import { DEFAULT_PLAYER_TRACKING_DATA } from '@common/consts/track-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
 import { MatchData } from '@common/interfaces/match-data';
@@ -8,11 +10,10 @@ import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS, MOCK_PLAYER_COMBAT_DATAS } from '@common/test-consts/mock-matches';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
-import { StatService } from './stat.service';
-import { CombatService } from '@app/services/combat/combat.service';
+import { TrackingService } from './tracking.service';
 
-describe('StatService', () => {
-    let service: StatService;
+describe('TrackingService', () => {
+    let service: TrackingService;
     let match: Match;
     let mockMatchService: sinon.SinonStubbedInstance<MatchService>;
     let mockCombatService: sinon.SinonStubbedInstance<CombatService>;
@@ -23,10 +24,14 @@ describe('StatService', () => {
         mockCombatService = sinon.createStubInstance(CombatService);
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [StatService, { provide: MatchService, useValue: mockMatchService }, { provide: CombatService, useValue: mockCombatService }],
+            providers: [
+                TrackingService,
+                { provide: MatchService, useValue: mockMatchService },
+                { provide: CombatService, useValue: mockCombatService },
+            ],
         }).compile();
 
-        service = module.get<StatService>(StatService);
+        service = module.get<TrackingService>(TrackingService);
         matchData = structuredClone(MOCK_MATCH_DATAS[0]);
         match = new Match(matchData, mockMatchService);
     });
@@ -46,6 +51,55 @@ describe('StatService', () => {
         expect(matchData.trackingData.startTime).toBeLessThanOrEqual(Date.now());
         service.stopTrackingMatch(match);
         expect(matchData.trackingData.endTime).toBeGreaterThanOrEqual(matchData.trackingData.startTime);
+        expect(matchData.trackingData.startTime).toBeLessThanOrEqual(Date.now());
+    });
+
+    it('should initialize tracking data with only connected players', () => {
+        matchData.players[0].isConnected = false;
+        matchData.players[1].isConnected = false;
+        const nLobbyPlayers = matchData.players.length;
+        const nDiconnected = 2;
+
+        service.startTrackingMatch(match);
+
+        expect(matchData.trackingData.players.length).toBe(nLobbyPlayers - nDiconnected);
+        expect(matchData.trackingData.players[0].id).toBe(matchData.players[nDiconnected].id);
+        expect(matchData.trackingData.players[1].id).toBe(matchData.players[nDiconnected + 1].id);
+    });
+
+    it('should initialize player tracking data with default values for all connected players', () => {
+        matchData.players[0].isConnected = true;
+        matchData.players[1].isConnected = true;
+        const expectedPlayerCount = matchData.players.filter((player) => player.isConnected).length;
+
+        service.startTrackingMatch(match);
+
+        expect(matchData.trackingData.players.length).toBe(expectedPlayerCount);
+
+        matchData.trackingData.players.forEach((playerStats) => {
+            const originalPlayer = matchData.players.find((p) => p.id === playerStats.id);
+            expect(playerStats).toEqual({
+                ...DEFAULT_PLAYER_TRACKING_DATA,
+                id: originalPlayer.id,
+                name: originalPlayer.name,
+            });
+            expect(playerStats.hpInflicted).toBe(0);
+            expect(playerStats.hpLost).toBe(0);
+            expect(playerStats.victories).toBe(0);
+            expect(playerStats.defeats).toBe(0);
+            expect(playerStats.escapes).toBe(0);
+            expect(playerStats.combats).toBe(0);
+            expect(playerStats.pickedUpItems).toEqual([]);
+            expect(playerStats.coveredGroundTiles).toEqual([]);
+        });
+    });
+
+    it('should set start time when tracking begins', () => {
+        const beforeTime = Date.now();
+
+        service.startTrackingMatch(match);
+
+        expect(matchData.trackingData.startTime).toBeGreaterThanOrEqual(beforeTime);
         expect(matchData.trackingData.startTime).toBeLessThanOrEqual(Date.now());
     });
 

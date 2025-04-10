@@ -20,7 +20,7 @@
 
                         @for(statType of playerStatTypes; track statType){
                         <div class="stat-column">
-                            <div class="stat-title" (click)="updateSortingStat(statType)">{{ statType }} ></div>
+                            <div class="stat-title" (click)="updateSorting(statType)">{{ statType }} ></div>
                             <div class="stat-container">
                                 @for(player of playerStatList() ; track player.id){
                                 <div class="stat-value">{{ player[statType] }}</div>
@@ -29,10 +29,6 @@
                         </div>
                         <div class="stat-separator"></div>
                         }
-                        <div>
-                            <div id="sorting-stat">{{ sortingStat() }}</div>
-                            <button id="sorting-button" (click)="toggleOrder()">{{ sortingOrder() }}</button>
-                        </div>
                     </div>
                     <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
                 </div>

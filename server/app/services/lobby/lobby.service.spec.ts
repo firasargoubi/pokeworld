@@ -2,7 +2,7 @@ import { Match } from '@app/classes/match/match';
 import { BotService } from '@app/services/bot/bot.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
-import { StatService } from '@app/services/stat/stat.service';
+import { TrackingService } from '@app/services/tracking/tracking.service';
 import { REGULAR_ITEMS } from '@common/consts/map-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
@@ -21,7 +21,7 @@ describe('LobbyService', () => {
     let mockMatchService: SinonStubbedInstance<MatchService>;
     let mockBotService: SinonStubbedInstance<BotService>;
     let mockMatch: SinonStubbedInstance<Match>;
-    let mockStatService: SinonStubbedInstance<StatService>;
+    let mocktrackingService: SinonStubbedInstance<TrackingService>;
 
     beforeAll(async () => {
         sandbox = createSandbox();
@@ -29,7 +29,7 @@ describe('LobbyService', () => {
         mockMatchService = createStubInstance<MatchService>(MatchService);
         mockBotService = createStubInstance<BotService>(BotService);
         mockMatch = createStubInstance<Match>(Match);
-        mockStatService = createStubInstance(StatService);
+        mocktrackingService = createStubInstance<TrackingService>(TrackingService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -37,7 +37,7 @@ describe('LobbyService', () => {
                 { provide: PlayService, useValue: mockPlayService },
                 { provide: MatchService, useValue: mockMatchService },
                 { provide: BotService, useValue: mockBotService },
-                { provide: StatService, useValue: mockStatService },
+                { provide: TrackingService, useValue: mocktrackingService },
             ],
         }).compile();
 
@@ -135,6 +135,7 @@ describe('LobbyService', () => {
 
         service['startMatchFirstTurn'](mockMatch);
 
+        expect(mocktrackingService.startTrackingMatch.calledWith(mockMatch)).toBeTruthy();
         expect(sortPlayersStub.calledWith(mockMatch)).toBeTruthy();
         expect(assignSpawnPointsStub.calledWith(mockMatch)).toBeTruthy();
         expect(setupRandomItemsStub.calledWith(mockMatch)).toBeTruthy();

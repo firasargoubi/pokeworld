@@ -1,20 +1,28 @@
 import { Match } from '@app/classes/match/match';
+import { CombatService } from '@app/services/combat/combat.service';
+import { DEFAULT_PLAYER_TRACKING_DATA } from '@common/consts/track-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
 import { PlayerCombatData } from '@common/interfaces/match-data';
 import { PlayerData } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { CombatService } from '@app/services/combat/combat.service';
 import { TrackingPlayerData } from '@common/interfaces/track-data';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
-export class StatService {
+export class TrackingService {
     @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
 
     startTrackingMatch(match: Match): void {
         match.data.trackingData.startTime = Date.now();
+        match.data.trackingData.players = match.data.players
+            .filter((player) => player.isConnected)
+            .map((player) => ({
+                ...structuredClone(DEFAULT_PLAYER_TRACKING_DATA),
+                id: player.id,
+                name: player.name,
+            }));
     }
 
     stopTrackingMatch(match: Match): void {
@@ -32,16 +40,16 @@ export class StatService {
 
     updateEscapes(match: Match, player: PlayerCombatData): void {
         const escaperId = match.data.players[player.playerIndex].id;
-        ++this.getPlayerStat(match, escaperId).escapes;
+        this.getPlayerStat(match, escaperId).escapes++;
     }
 
     updateCombats(match: Match, winner: PlayerCombatData, loser: PlayerCombatData): void {
         const winnerId = match.data.players[winner.playerIndex].id;
         const loserId = match.data.players[loser.playerIndex].id;
-        ++this.getPlayerStat(match, winnerId).victories;
-        ++this.getPlayerStat(match, loserId).defeats;
-        ++this.getPlayerStat(match, winnerId).combats;
-        ++this.getPlayerStat(match, loserId).combats;
+        this.getPlayerStat(match, winnerId).victories++;
+        this.getPlayerStat(match, loserId).defeats++;
+        this.getPlayerStat(match, winnerId).combats++;
+        this.getPlayerStat(match, loserId).combats++;
     }
 
     updateRounds(match: Match): void {
@@ -61,7 +69,7 @@ export class StatService {
         if (isNewItem) {
             const gameMode = match.data.gameData.mapData.gameMode;
             if (gameMode === GameMode.CTF && item === ItemType.Flag) {
-                ++match.data.trackingData.flagHoldersCount;
+                match.data.trackingData.flagHoldersCount++;
             }
             itemList.push(item);
         }

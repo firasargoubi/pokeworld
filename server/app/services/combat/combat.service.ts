@@ -2,7 +2,7 @@ import { Match } from '@app/classes/match/match';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MapService } from '@app/services/map/map.service';
 import { PlayService } from '@app/services/play/play.service';
-import { StatService } from '@app/services/stat/stat.service';
+import { TrackingService } from '@app/services/tracking/tracking.service';
 import {
     COMBAT_ANIMATION_DURATION,
     COMBAT_END_DURATION,
@@ -31,7 +31,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 @Injectable()
 export class CombatService {
     @Inject(MapService) private readonly mapService: MapService;
-    @Inject(forwardRef(() => StatService)) private statService: StatService;
+    @Inject(forwardRef(() => TrackingService)) private trackingService: TrackingService;
     @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
     @Inject(forwardRef(() => ChatService)) private readonly chatService: ChatService;
 
@@ -60,7 +60,7 @@ export class CombatService {
         match.data.combatData.lastCombatAction = CombatAction.None;
         const winner = this.getInactivePlayerData(match);
         const loser = this.getActivePlayerData(match);
-        // this.statService.updateCombats(match, winner, loser); // TODO causes the server to crash
+        this.trackingService.updateCombats(match, winner, loser);
         match.data.players[winner.playerIndex].combatsWon += 1;
         loser.currentHealth = 0;
         this.respawnPlayer(match, match.data.players[loser.playerIndex]);
@@ -157,7 +157,7 @@ export class CombatService {
         this.chatService.logCombatEnd(match, this.getInactivePlayerData(match), false);
 
         match.data.state = MatchState.CombatEnd;
-        // this.statService.updateEscapes(match, this.getInactivePlayerData(match)); // TODO causes the server to crash
+        this.trackingService.updateEscapes(match, this.getInactivePlayerData(match));
         match.sendUpdate();
         match.setTimeout(this.playService.continueTurn.bind(this.playService, match), COMBAT_END_DURATION);
     }
@@ -180,7 +180,7 @@ export class CombatService {
         this.chatService.logDefense(match, this.getInactivePlayerData(match));
         this.chatService.logAttackResult(match, attackResult);
         const attacked = this.getInactivePlayerData(match);
-        // this.statService.updateHps(match, attackResult); // TODO causes the server to crash
+        this.trackingService.updateHps(match, attackResult);
         attacked.currentHealth = Math.max(0, attacked.currentHealth - attackResult);
     }
 

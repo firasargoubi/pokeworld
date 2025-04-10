@@ -1,6 +1,6 @@
+import { DatePipe } from '@angular/common';
 import { Component, computed, inject, OnInit, signal, Signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { Order, PlayerStatData } from '@app/interfaces/stat-data';
@@ -31,7 +31,16 @@ export class StatPageComponent implements OnInit {
         this.statService.initializeData();
     }
 
-    updateSortingStat(statType: PlayerStatType): void {
+    updateSorting(statType: PlayerStatType): void {
+        if (statType === this.sortingStat()) {
+            this.toggleOrder();
+        } else {
+            this.sortingOrder.set(Order.ASCENDING);
+        }
+        this.updateSortingCriteria(statType);
+    }
+
+    updateSortingCriteria(statType: PlayerStatType): void {
         this.sortingStat.set(statType);
     }
 
