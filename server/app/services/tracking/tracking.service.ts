@@ -60,7 +60,8 @@ export class TrackingService {
         const winnerId = winner.id;
         const winnerIndex = match.getPlayerIndex(winnerId);
         const standingTile = match.data.combatData.playersCombatData[winnerIndex].standingTile;
-        match.data.trackingData.matchWinner = { id: winnerId, avatar: winner.avatar, name: winner.name, tile: standingTile };
+        const name = match.data.gameData.mapData.gameMode === GameMode.FFA ? winner.name : winner.team;
+        match.data.trackingData.matchWinner = { id: winnerId, avatar: winner.avatar, name, tile: standingTile };
     }
 
     updateItems(match: Match, item: ItemType, playerId: string): void {
