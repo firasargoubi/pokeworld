@@ -1,3 +1,4 @@
+import { Team } from '@common/interfaces/player-data';
 import { PlayerStatType } from './stat-type.enum';
 
 export interface GlobalStatData {
@@ -11,6 +12,7 @@ export interface GlobalStatData {
 export interface PlayerStatData {
     id: string;
     name: string;
+    team?: Team;
     [PlayerStatType.DiscoveredItemsCount]: number;
     [PlayerStatType.VisitedTilesRatio]: number;
     [PlayerStatType.Combats]: number;

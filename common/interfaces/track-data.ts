@@ -1,11 +1,12 @@
 import { ItemType } from "./item-type.enum";
 import { Position } from "./position";
-import { Avatar } from "./player-data";
+import { Avatar, Team } from "./player-data";
 import { TileType } from "./tile-type.enum";
 
 export interface TrackingPlayerData {
     id: string;
     name: string;
+    team?: Team;
     pickedUpItems: ItemType[];
     coveredGroundTiles: Position[];
     combats: number;

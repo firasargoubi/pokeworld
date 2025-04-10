@@ -243,14 +243,14 @@ $clip-path: polygon(
     height: 100%;
 }
 
-#sorting-button{
-    margin-left: 30px;
-    font-size: 100px;
-    background-color: white;
-    color : black;
+.self {
+    background-color: rgba(255, 165, 0, 0.25);
 }
 
-#sorting-stat{
-    background-color: yellow;
-    font-size: 30px;
+.rouge {
+    background-color: rgba(255, 0, 0, 0.2);
+}
+
+.bleu {
+    background-color: rgba(134, 186, 255, 0.3);
 }

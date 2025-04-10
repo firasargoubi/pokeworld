@@ -22,6 +22,7 @@ export class TrackingService {
                 ...structuredClone(DEFAULT_PLAYER_TRACKING_DATA),
                 id: player.id,
                 name: player.name,
+                team: player.team,
             }));
     }
 
@@ -57,11 +58,9 @@ export class TrackingService {
     }
 
     updateWinner(match: Match, winner: PlayerData): void {
-        const winnerId = winner.id;
-        const winnerIndex = match.getPlayerIndex(winnerId);
-        const standingTile = match.data.combatData.playersCombatData[winnerIndex].standingTile;
+        const standingTile = match.data.gameData.mapData.tiles[winner.position.x][winner.position.y];
         const name = match.data.gameData.mapData.gameMode === GameMode.FFA ? winner.name : winner.team;
-        match.data.trackingData.matchWinner = { id: winnerId, avatar: winner.avatar, name, tile: standingTile };
+        match.data.trackingData.matchWinner = { id: winner.id, avatar: winner.avatar, name, tile: standingTile };
     }
 
     updateItems(match: Match, item: ItemType, playerId: string): void {

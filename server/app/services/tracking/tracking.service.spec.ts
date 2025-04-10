@@ -83,6 +83,7 @@ describe('TrackingService', () => {
                 ...DEFAULT_PLAYER_TRACKING_DATA,
                 id: originalPlayer.id,
                 name: originalPlayer.name,
+                team: originalPlayer.team,
             });
             expect(playerStats.hpInflicted).toBe(0);
             expect(playerStats.hpLost).toBe(0);

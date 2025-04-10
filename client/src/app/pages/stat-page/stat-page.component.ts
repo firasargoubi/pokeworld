@@ -54,6 +54,10 @@ export class StatPageComponent implements OnInit {
         this.matchService.leaveMatch();
     }
 
+    isSelfPlayer(playerId: string) {
+        return this.matchService.selfPlayer.id === playerId;
+    }
+
     isModeCTF(): boolean {
         return this.matchService.data.gameData.mapData.gameMode === GameMode.CTF;
     }
