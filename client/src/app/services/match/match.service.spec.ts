@@ -12,6 +12,7 @@ import { MatchEvent } from '@common/interfaces/socket-event.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MatchService } from './match.service';
+import { MessageFromServer } from '@common/interfaces/message-from-server';
 
 describe('MatchService', () => {
     let service: MatchService;
@@ -161,8 +162,11 @@ describe('MatchService', () => {
     });
 
     it('on message should show popup with message', () => {
-        const message = 'Test message';
-        service['onMessage'](message);
+        const messageFromServer = {
+            message: 'Test message',
+            hasCloseButton: false,
+        } as MessageFromServer;
+        service['onMessage'](messageFromServer);
         expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 
@@ -205,5 +209,16 @@ describe('MatchService', () => {
         result = service.isInventoryFull();
 
         expect(result).toBeFalse();
+    });
+    it('onPopup should show popup with message and close button', () => {
+        const messageFromServer = {
+            message: 'Test popup message',
+            hasCloseButton: true,
+        } as MessageFromServer;
+        service['onMessage'](messageFromServer);
+
+        expect(popupServiceSpy.showPopup).toHaveBeenCalled();
+
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(jasmine.objectContaining(messageFromServer));
     });
 });

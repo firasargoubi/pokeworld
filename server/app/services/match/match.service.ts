@@ -1,5 +1,6 @@
 import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
+import { BotService } from '@app/services/bot/bot.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
 import { PlayService } from '@app/services/play/play.service';
@@ -10,7 +11,6 @@ import { MatchData } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { BotService } from '@app/services/bot/bot.service';
 
 @Injectable()
 export class MatchService {
@@ -82,8 +82,8 @@ export class MatchService {
         const match = this.getMatchFromPlayerId(playerId);
         this.disconnectPlayer(playerId);
         if (match) {
-            match.leave(playerId);
             this.chatService.logPlayerLeft(match, playerId);
+            match.leave(playerId);
             if (match.getConnectedPlayerCount() === 0) {
                 match.data.players
                     .filter((p) => p.type !== PlayerType.Player)
@@ -116,16 +116,16 @@ export class MatchService {
     private canJoinMatch(playerId: string, matchCode: string): boolean {
         let canJoinMatch = true;
         if (!this.hasMatchCode(matchCode)) {
-            this.matchGateway.emitMessage(playerId, Message.InvalidMatchCode);
+            this.matchGateway.emitMessage(playerId, Message.InvalidMatchCode, true);
             canJoinMatch = false;
         } else if (this.hasPlayerId(playerId)) {
-            this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch);
+            this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch, true);
             canJoinMatch = false;
         } else if (this.isMatchFull(matchCode)) {
-            this.matchGateway.emitMessage(playerId, Message.RoomFull);
+            this.matchGateway.emitMessage(playerId, Message.RoomFull, true);
             canJoinMatch = false;
         } else if (this.isMatchLocked(matchCode)) {
-            this.matchGateway.emitMessage(playerId, Message.RoomLocked);
+            this.matchGateway.emitMessage(playerId, Message.RoomLocked, true);
             canJoinMatch = false;
         }
         return canJoinMatch;
@@ -134,7 +134,7 @@ export class MatchService {
     private canCreateMatch(playerId: string): boolean {
         let canCreateMatch = true;
         if (this.hasPlayerId(playerId)) {
-            this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch);
+            this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch, true);
             canCreateMatch = false;
         }
         return canCreateMatch;

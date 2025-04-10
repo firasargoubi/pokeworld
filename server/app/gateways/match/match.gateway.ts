@@ -51,12 +51,16 @@ export class MatchGateway {
         this.server.to(matchCode).emit(MatchEvent.Update, matchData);
     }
 
-    emitMessage(matchCode: string, message: string) {
+    emitMessage(matchCode: string, message: string, hasCloseButton: boolean = false) {
         const socket = this.server.sockets.sockets.get(matchCode);
+        const messageFromServer = {
+            message,
+            hasCloseButton,
+        };
         if (socket) {
-            socket.emit(MatchEvent.Message, message);
+            socket.emit(MatchEvent.Message, messageFromServer);
         } else {
-            this.server.to(matchCode).emit(MatchEvent.Message, message);
+            this.server.to(matchCode).emit(MatchEvent.Message, messageFromServer);
         }
     }
 

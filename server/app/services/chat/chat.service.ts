@@ -1,13 +1,19 @@
 import { Match } from '@app/classes/match/match';
+import { ITEM_NAME } from '@app/consts/item-name.const';
+import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { PlayerCombatData } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { Injectable } from '@nestjs/common';
-import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
-import { SERVER_NAME } from './chat.consts';
 
 @Injectable()
 export class ChatService {
+    logItemPickup(match: Match, name: string, itemType: ItemType) {
+        const message = `${name} a ramassé ${ITEM_NAME[itemType]}`;
+        this.addLogToMatch(match, message);
+    }
+
     addMessageToMatch(match: Match, message: ChatMessage): void {
         if (message.content.length <= MAX_MESSAGE_LENGTH) {
             match.data.chatData.push(message);
@@ -16,12 +22,11 @@ export class ChatService {
     }
 
     addLogToMatch(match: Match, message: string, concernedPlayers: string[] = []) {
-        const log = {
+        const log: ChatLog = {
             content: message,
-            sender: SERVER_NAME,
             timestamp: new Date(),
             concernedPlayersNamesList: concernedPlayers,
-        } as ChatLog;
+        };
         match.data.logData.push(log);
         match.sendUpdate();
     }

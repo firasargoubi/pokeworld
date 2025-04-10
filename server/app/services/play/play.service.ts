@@ -248,6 +248,7 @@ export class PlayService {
 
     private handleItemAddition(match: Match, player: PlayerData, itemType: ItemType) {
         player.items.push(itemType);
+        this.chatService.logItemPickup(match, player.name, itemType);
         match.data.gameData.mapData.items[itemType] = match.data.gameData.mapData.items[itemType].filter(
             (itemPos) => itemPos.x !== player.position.x || itemPos.y !== player.position.y,
         );

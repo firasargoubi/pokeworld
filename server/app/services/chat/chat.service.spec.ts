@@ -1,11 +1,12 @@
 import { Match } from '@app/classes/match/match';
+import { ITEM_NAME } from '@app/consts/item-name.const';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ChatMessage } from '@common/interfaces/chat-message';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatData, PlayerCombatData } from '@common/interfaces/match-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createSandbox, createStubInstance, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
-import { SERVER_NAME } from './chat.consts';
 import { ChatService } from './chat.service';
 
 describe('ChatService', () => {
@@ -83,7 +84,6 @@ describe('ChatService', () => {
         expect(mockMatch.data.logData[1].content).toBe(logMessage);
         expect(mockMatch.data.logData[1].concernedPlayersNamesList).toEqual([]);
         expect(mockMatch.sendUpdate.calledTwice).toBe(true);
-        expect(mockMatch.data.logData[1].sender).toBe(SERVER_NAME);
     });
 
     it('should log debug mode status', () => {
@@ -258,5 +258,14 @@ describe('ChatService', () => {
         const result = service['getConcernedPlayers'](mockMatch);
 
         expect(result).toEqual(['Player1', 'Player2']);
+    });
+
+    it('should log item pickup', () => {
+        const playerName = 'CollectorPlayer';
+        const itemType = ItemType.Flag;
+
+        service.logItemPickup(mockMatch, playerName, itemType);
+
+        expect(addLogToMatchStub.calledWith(mockMatch, `${playerName} a ramassé ${ITEM_NAME[itemType]}`)).toBeTruthy();
     });
 });
