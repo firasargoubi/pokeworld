@@ -53,6 +53,7 @@ export class StatService {
             playerStats.push({
                 id: player.id,
                 name: player.name,
+                team: player.team,
                 [PlayerStatType.DiscoveredItemsCount]: player.pickedUpItems.length,
                 [PlayerStatType.VisitedTilesRatio]: this.getTileRatio(player.coveredGroundTiles),
                 [PlayerStatType.Combats]: player.combats,
