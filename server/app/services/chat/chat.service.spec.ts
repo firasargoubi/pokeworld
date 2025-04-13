@@ -4,6 +4,8 @@ import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ChatMessage } from '@common/interfaces/chat-message';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatData, PlayerCombatData } from '@common/interfaces/match-data';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createSandbox, createStubInstance, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
@@ -117,11 +119,11 @@ describe('ChatService', () => {
             { ...mockMatch.data.players[2], name: 'Player3', isConnected: true },
         ];
         service.logEndMatch(mockMatch);
-        expect(addLogToMatchStub.calledWith(mockMatch, 'Fin de partie. Joueurs actifs: Player1, Player2 et Player3')).toBeTruthy();
+        expect(addLogToMatchStub.calledWith(mockMatch, 'Fin de partie avec Player1, Player2 et Player3')).toBeTruthy();
 
         mockMatch.data.players = [{ ...mockMatch.data.players[0], name: 'Player1', isConnected: true }];
         service.logEndMatch(mockMatch);
-        expect(addLogToMatchStub.calledWith(mockMatch, 'Fin de partie. Joueurs actifs: Player1')).toBeTruthy();
+        expect(addLogToMatchStub.calledWith(mockMatch, 'Fin de partie avec Player1')).toBeTruthy();
     });
 
     it('should log combat start', () => {
@@ -133,12 +135,19 @@ describe('ChatService', () => {
         expect(addLogToMatchStub.calledWith(mockMatch, `${attacker} a engagé un combat avec ${defender}`)).toBeTruthy();
     });
 
-    it('should log bridge toggle', () => {
+    it('should log bridge toggle correctly', () => {
         const playerName = 'BridgeToggler';
+        const position = { x: 1, y: 2 };
 
-        service.logBridgeToggled(mockMatch, playerName);
+        mockMatch.data.gameData = structuredClone(MOCK_GAME_DATAS[2]);
 
-        expect(addLogToMatchStub.calledWith(mockMatch, `${playerName} a activé le pont`)).toBeTruthy();
+        mockMatch.data.gameData.mapData.tiles[position.x][position.y] = TileType.Bridge;
+        service.logBridgeToggled(mockMatch, playerName, position);
+        expect(addLogToMatchStub.firstCall.args[1]).toBe(`${playerName} a réparé un pont`);
+
+        mockMatch.data.gameData.mapData.tiles[position.x][position.y] = TileType.BrokenBridge;
+        service.logBridgeToggled(mockMatch, playerName, position);
+        expect(addLogToMatchStub.secondCall.args[1]).toBe(`${playerName} a cassé un pont`);
     });
 
     it('should log escape attempt', () => {
@@ -172,7 +181,7 @@ describe('ChatService', () => {
 
         service.logAttack(mockMatch, attackerData);
 
-        const expectedMessage = 'Attacker attaque: [dé 5 + bonus 3]';
+        const expectedMessage = 'Attacker attaque (3) avec Dé (+5)';
         expect(addLogToMatchStub.calledWith(mockMatch, expectedMessage, ['Player1', 'Player2'])).toBeTruthy();
     });
 
@@ -194,7 +203,7 @@ describe('ChatService', () => {
 
         service.logDefense(mockMatch, defenderData);
 
-        const expectedMessage = 'Defender se défend: [dé 3 + bonus 2]';
+        const expectedMessage = 'Defender se défend (2) avec Dé (+3)';
         expect(addLogToMatchStub.calledWith(mockMatch, expectedMessage, ['Player1', 'Player2'])).toBeTruthy();
     });
 

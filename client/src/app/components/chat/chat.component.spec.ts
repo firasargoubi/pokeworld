@@ -1,4 +1,4 @@
-import { signal } from '@angular/core'; // Importez signal
+import { ElementRef, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '@app/services/chat/chat.service';
@@ -11,6 +11,7 @@ describe('ChatComponent', () => {
     let fixture: ComponentFixture<ChatComponent>;
     let chatServiceSpy: jasmine.SpyObj<ChatService>;
     let matchServiceSpy: jasmine.SpyObj<MatchService>;
+    let scrollToBottomSpy: jasmine.Spy;
 
     const mockChatData = [
         { sender: 'Player1', content: 'Hello', timestamp: new Date() },
@@ -54,6 +55,9 @@ describe('ChatComponent', () => {
         fixture = TestBed.createComponent(ChatComponent);
         component = fixture.componentInstance;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        scrollToBottomSpy = spyOn<any>(component, 'scrollToBottom');
+
         fixture.detectChanges();
     });
 
@@ -83,7 +87,7 @@ describe('ChatComponent', () => {
         const event = new KeyboardEvent('keydown', { key: 'Enter' });
         Object.defineProperty(event, 'target', { value: input });
 
-        await component.sendMessage(event);
+        component.sendMessage(event);
 
         expect(chatServiceSpy.sendMessage).toHaveBeenCalledWith('Test message');
         expect(input.value).toBe('');
@@ -115,8 +119,6 @@ describe('ChatComponent', () => {
     });
 
     it('should update chat messages and logs from match service', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        const scrollToBottomSpy = spyOn<any>(component, 'scrollToBottom');
         component.updateChatData();
 
         expect(component.chatMessages).toEqual(mockChatData);
@@ -138,16 +140,24 @@ describe('ChatComponent', () => {
         expect(component.logs[0].concernedPlayersNamesList).toContain('Player1');
     });
 
-    it('should scroll to the bottom', () => {
-        const mockContainer = {
-            scrollTop: 0,
-            scrollHeight: 100,
+    it('should correctly call scrollToBottom method when needed', () => {
+        scrollToBottomSpy.and.callThrough();
+
+        const mockElement = {
+            nativeElement: {
+                scrollTop: 0,
+                scrollHeight: 100,
+            },
         };
-        spyOn(document, 'querySelector').and.returnValue(mockContainer as Element);
 
-        component['scrollToBottom']();
+        component['chatContainerRef'] = mockElement as ElementRef;
 
-        expect(mockContainer.scrollTop).toBe(mockContainer.scrollHeight);
-        expect(document.querySelector).toHaveBeenCalledWith('.message-container');
+        component['shouldScrollToBottom'] = true;
+
+        component.ngAfterViewChecked();
+
+        expect(mockElement.nativeElement.scrollTop).toBe(mockElement.nativeElement.scrollHeight);
+
+        expect(component['shouldScrollToBottom']).toBeFalse();
     });
 });

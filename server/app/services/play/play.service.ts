@@ -204,7 +204,7 @@ export class PlayService {
         } else {
             this.toggleBridgeTile(match, position);
             this.trackingService.updateToggledBridges(match, position);
-            this.chatService.logBridgeToggled(match, player.name);
+            this.chatService.logBridgeToggled(match, player.name, position);
             this.continueTurn(match);
         }
     }

@@ -5,6 +5,8 @@ import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { PlayerCombatData } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
+import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -50,15 +52,16 @@ export class ChatService {
             activePlayersNames.length === 1
                 ? activePlayersNames[0]
                 : activePlayersNames.slice(0, -1).join(', ') + ' et ' + activePlayersNames[activePlayersNames.length - 1];
-        this.addLogToMatch(match, `Fin de partie. Joueurs actifs: ${formattedPlayersList}`);
+        this.addLogToMatch(match, `Fin de partie avec ${formattedPlayersList}`);
     }
 
     logCombatStart(match: Match, engagingPlayerName: string, targetPlayerName: string) {
         this.addLogToMatch(match, engagingPlayerName + ' a engagé un combat avec ' + targetPlayerName);
     }
 
-    logBridgeToggled(match: Match, playerName: string) {
-        this.addLogToMatch(match, playerName + ' a activé le pont');
+    logBridgeToggled(match: Match, playerName: string, position: Position) {
+        const bridgeState = match.data.gameData.mapData.tiles[position.x][position.y] === TileType.Bridge ? 'réparé' : 'cassé';
+        this.addLogToMatch(match, playerName + ' a ' + bridgeState + ' un pont');
     }
 
     logEscapeAttempt(match: Match, isSuccessful: boolean, escapingPlayer: PlayerCombatData) {
@@ -67,16 +70,16 @@ export class ChatService {
     }
 
     logAttack(match: Match, attackingPlayerData: PlayerCombatData) {
-        const message = `${this.getPlayerName(match, attackingPlayerData)} attaque: [dé ${match.data.combatData.lastRolledAttack} + bonus ${
-            attackingPlayerData.attack
-        }]`;
+        const message = `${this.getPlayerName(match, attackingPlayerData)} attaque (${attackingPlayerData.attack}) avec Dé (+${
+            match.data.combatData.lastRolledAttack
+        })`;
         this.addLogToMatch(match, message, this.getConcernedPlayers(match));
     }
 
     logDefense(match: Match, defendingPlayerData: PlayerCombatData) {
-        const message = `${this.getPlayerName(match, defendingPlayerData)} se défend: [dé ${match.data.combatData.lastRolledDefense} + bonus ${
-            defendingPlayerData.defense
-        }]`;
+        const message = `${this.getPlayerName(match, defendingPlayerData)} se défend (${defendingPlayerData.defense}) avec Dé (+${
+            match.data.combatData.lastRolledDefense
+        })`;
         this.addLogToMatch(match, message, this.getConcernedPlayers(match));
     }
 
@@ -99,7 +102,6 @@ export class ChatService {
             this.addLogToMatch(match, message);
         }
     }
-
     private getConcernedPlayers(match: Match): string[] {
         const combatPlayerData = match.data.combatData.playersCombatData;
         return combatPlayerData.map((playerData) => {
