@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, WritableSignal } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, inject, OnInit, ViewChild, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
@@ -13,12 +13,15 @@ import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
     standalone: true,
     imports: [CommonModule, FormsModule],
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, AfterViewChecked {
+    @ViewChild('chatContainer') private chatContainerRef: ElementRef;
+
     isChatActive: WritableSignal<boolean>;
     isFilterEnabled: WritableSignal<boolean>;
     maxInputLenght = MAX_MESSAGE_LENGTH;
     chatMessages: ChatMessage[] = [];
     logs: ChatLog[] = [];
+    private shouldScrollToBottom = false;
     private readonly matchService: MatchService = inject(MatchService);
     private readonly chatService: ChatService = inject(ChatService);
 
@@ -31,13 +34,22 @@ export class ChatComponent implements OnInit {
         });
     }
 
+    ngAfterViewChecked(): void {
+        if (this.shouldScrollToBottom) {
+            this.scrollToBottom();
+            this.shouldScrollToBottom = false;
+        }
+    }
+
     switchTab(isChat: boolean): void {
         this.chatService.isChatActive.set(isChat);
+        this.shouldScrollToBottom = true;
     }
 
     toggleFilter(): void {
         this.chatService.isFilterEnabled.update((value) => !value);
         this.filterLogs();
+        this.shouldScrollToBottom = true;
     }
 
     sendMessage(event: KeyboardEvent) {
@@ -51,13 +63,14 @@ export class ChatComponent implements OnInit {
         if (message) {
             input.value = '';
             this.chatService.sendMessage(message);
+            this.shouldScrollToBottom = true;
         }
     }
 
     updateChatData(): void {
         this.chatMessages = this.matchService.data.chatData;
         this.filterLogs();
-        this.scrollToBottom();
+        this.shouldScrollToBottom = true;
     }
 
     private filterLogs(): void {
@@ -74,9 +87,9 @@ export class ChatComponent implements OnInit {
     }
 
     private scrollToBottom(): void {
-        const container = document.querySelector('.message-container');
-        if (container) {
-            container.scrollTop = container.scrollHeight;
+        if (this.chatContainerRef?.nativeElement) {
+            const element = this.chatContainerRef.nativeElement;
+            element.scrollTop = element.scrollHeight;
         }
     }
 }
