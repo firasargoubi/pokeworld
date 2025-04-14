@@ -145,10 +145,10 @@ describe('LobbyService', () => {
 
     it('sort players should sort players by speed', () => {
         mockMatch.data.players = [
-            { ...MOCK_PLAYER_DATAS[0], speed: 1 },
-            { ...MOCK_PLAYER_DATAS[1], speed: 2 },
-            { ...MOCK_PLAYER_DATAS[2], speed: 0 },
-            { ...MOCK_PLAYER_DATAS[3], speed: 0 },
+            { ...structuredClone(MOCK_PLAYER_DATAS[0]), speed: 1 },
+            { ...structuredClone(MOCK_PLAYER_DATAS[1]), speed: 2 },
+            { ...structuredClone(MOCK_PLAYER_DATAS[2]), speed: 0 },
+            { ...structuredClone(MOCK_PLAYER_DATAS[3]), speed: 0 },
         ];
         mockMatch.getPlayerIndex.returns(1);
 
@@ -176,7 +176,7 @@ describe('LobbyService', () => {
     });
 
     it('get unique name should return original name if unique or append suffix', () => {
-        mockMatch.data.players = [{ ...MOCK_PLAYER_DATAS[0], name: 'Alice', id: 'player1' }];
+        mockMatch.data.players = [{ ...structuredClone(MOCK_PLAYER_DATAS[0]), name: 'Alice', id: 'player1' }];
 
         const uniqueName1 = service['getUniqueName'](mockMatch, 'player2', 'Bob');
         expect(uniqueName1).toBe('Bob');

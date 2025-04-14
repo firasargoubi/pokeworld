@@ -4,13 +4,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
+import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { of, throwError } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
-import { MatchService } from '@app/services/match/match.service';
 
 @Component({
     selector: 'app-game-card',
@@ -33,12 +33,12 @@ describe('CreatePageComponent', () => {
     let mockGames: GameData[];
 
     beforeEach(async () => {
+        mockGames = structuredClone(MOCK_GAME_DATAS);
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         gameSaveServiceSpy = jasmine.createSpyObj('GameSaveService', ['getAllGames', 'getGame']);
         gameSaveServiceSpy.getAllGames.and.returnValue(of(mockGames));
         matchServiceSpy = jasmine.createSpyObj('MatchService', ['createMatch']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
-        mockGames = structuredClone(MOCK_GAME_DATAS);
 
         await TestBed.configureTestingModule({
             providers: [
@@ -69,7 +69,6 @@ describe('CreatePageComponent', () => {
     });
 
     it('should load games on init', () => {
-        gameSaveServiceSpy.getAllGames.and.returnValue(of(mockGames));
         component.ngOnInit();
         expect(component.games).toEqual(mockGames);
     });

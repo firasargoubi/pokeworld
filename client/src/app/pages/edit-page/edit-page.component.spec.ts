@@ -66,7 +66,7 @@ describe('EditPageComponent', () => {
             itemUpdate: {
                 subscribe: () => undefined,
             },
-            gameData: MOCK_GAME_DATAS[0],
+            gameData: structuredClone(MOCK_GAME_DATAS)[0],
             isOutOfBound: () => false,
             getTile: () => TileType.Grass,
             getMapSizeString: () => '',

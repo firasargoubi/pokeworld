@@ -4,10 +4,10 @@ import { Router } from '@angular/router';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { of } from 'rxjs';
 import { DebugPageComponent } from './debug-page.component';
-import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 
 describe('DebugPageComponent', () => {
     let component: DebugPageComponent;
@@ -58,16 +58,11 @@ describe('DebugPageComponent', () => {
 
     it('on join match should redirect to game', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn(component as any, 'copyToClipboard').and.returnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn(component as any, 'joinMatch').and.callThrough();
         component['onJoinMatch'](structuredClone(MOCK_MATCH_DATAS[0]));
         expect(mockRouter.navigate).toHaveBeenCalled();
-    });
-
-    it('ask copy permission should correct', () => {
-        const code = '1234';
-        expect(() => {
-            component['askCopyPermission'](code);
-        }).not.toThrow();
     });
 
     it('should copy text to clipboard using execCommand when successful', () => {
@@ -112,5 +107,22 @@ describe('DebugPageComponent', () => {
 
         expect(mockGameSaveService.getAllGames).toHaveBeenCalled();
         expect(mockSocketService.emit).not.toHaveBeenCalled();
+    });
+
+    it('copy to clipboard should not throw error', () => {
+        Object.defineProperty(navigator.clipboard, 'writeText', {
+            value: () => ({ then: () => ({ catch: () => true }) }),
+            writable: true,
+        });
+        Object.defineProperty(navigator.clipboard, 'query', {
+            value: () => ({ then: () => ({ catch: () => true }) }),
+            writable: true,
+        });
+        expect(() => {
+            component['copyToClipboard']('1234');
+        }).not.toThrow();
+        expect(() => {
+            component['askCopyPermission']('1234');
+        }).not.toThrow();
     });
 });

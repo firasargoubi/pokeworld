@@ -1,19 +1,19 @@
 import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
-import { CombatService } from '@app/services/combat/combat.service';
-import { PlayService } from '@app/services/play/play.service';
+import { BotService } from '@app/services/bot/bot.service';
 import { ChatService } from '@app/services/chat/chat.service';
+import { CombatService } from '@app/services/combat/combat.service';
+import { GameService } from '@app/services/game/game.service';
+import { PlayService } from '@app/services/play/play.service';
 import { MATCH_CODE_LENGTH } from '@common/consts/match-data.const';
 import { Message } from '@common/interfaces/message.enum';
+import { PlayerType } from '@common/interfaces/player-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
 import { MatchService } from './match.service';
-import { BotService } from '@app/services/bot/bot.service';
-import { PlayerType } from '@common/interfaces/player-data';
-import { GameService } from '@app/services/game/game.service';
 
 describe('MatchService', () => {
     let service: MatchService;
@@ -68,7 +68,7 @@ describe('MatchService', () => {
     it('create match should create a new match and connect player', async () => {
         const playerId = 'player1';
         const matchCode = '1234';
-        const gameData = MOCK_GAME_DATAS[0];
+        const gameData = structuredClone(MOCK_GAME_DATAS[0]);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'canCreateMatch').returns(true);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
@@ -220,7 +220,7 @@ describe('MatchService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasPlayerId').returns(true);
 
-        const canCreate = await service['canCreateMatch'](playerId, MOCK_GAME_DATAS[0]);
+        const canCreate = await service['canCreateMatch'](playerId, structuredClone(MOCK_GAME_DATAS[0]));
 
         expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.AlreadyInMatch, true)).toBe(true);
         expect(canCreate).toBe(false);

@@ -36,9 +36,9 @@ describe('StatPageComponent', () => {
         });
 
         statServiceSpy = jasmine.createSpyObj('StatService', ['initializeData', 'sortPlayerStatsBy'], {
-            playerStats: MOCK_PLAYER_STAT_DATA,
-            globalStats: MOCK_GLOBAL_STAT_DATA,
-            winnerData: MOCK_WINNER_VISUAL_DATA,
+            playerStats: structuredClone(MOCK_PLAYER_STAT_DATA),
+            globalStats: structuredClone(MOCK_GLOBAL_STAT_DATA),
+            winnerData: structuredClone(MOCK_WINNER_VISUAL_DATA),
         });
 
         await TestBed.configureTestingModule({
