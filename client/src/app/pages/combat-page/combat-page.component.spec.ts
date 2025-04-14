@@ -4,11 +4,11 @@ import { Timer } from '@app/classes/timer/timer';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
+import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { PlayerCombatData } from '@common/interfaces/match-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { CombatPageComponent } from './combat-page.component';
-import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 
 describe('CombatPageComponent', () => {
     let component: CombatPageComponent;
@@ -47,6 +47,15 @@ describe('CombatPageComponent', () => {
     });
 
     it('should create', () => {
+        expect(component).toBeTruthy();
+    });
+
+    it('should set listener on construction', () => {
+        fixture.destroy();
+        mockMatchService.isInMatch.and.returnValue(true);
+        fixture = TestBed.createComponent(CombatPageComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
         expect(component).toBeTruthy();
     });
 

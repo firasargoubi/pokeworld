@@ -47,7 +47,7 @@ export class MapService {
         this.updateAllTiles();
     }
 
-    updateAllTiles(): void {
+    updateAllTiles() {
         const mapSize = this.gameDataService.gameData.mapData.size;
 
         this.visualMapData = {
@@ -201,7 +201,7 @@ export class MapService {
         }
     }
 
-    private onMapUpdate(position: Position | null): void {
+    private onMapUpdate(position: Position | null) {
         if (!position) {
             this.updateAllTiles();
         } else {
@@ -209,13 +209,13 @@ export class MapService {
         }
     }
 
-    private updateSuroundingTiles(position: Position): void {
+    private updateSuroundingTiles(position: Position) {
         SURROUNDING_POSITIONS_SQUARE.forEach((deltaPosition) => {
             this.updateTile({ x: position.x + deltaPosition.x, y: position.y + deltaPosition.y });
         });
     }
 
-    private updateTile(position: Position): void {
+    private updateTile(position: Position) {
         const mapData = this.gameDataService.gameData.mapData;
 
         if (this.gameDataService.isOutOfBound(mapData.tiles, position)) {

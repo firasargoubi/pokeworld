@@ -44,7 +44,7 @@ export class GameDataService {
         this.itemUpdate.next(item);
     }
 
-    removeItem(position: Position): void {
+    removeItem(position: Position) {
         const getItemResult = this.getItem(position);
         if (!getItemResult) {
             return;

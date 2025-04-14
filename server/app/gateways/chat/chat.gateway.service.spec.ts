@@ -1,7 +1,6 @@
 import { Match } from '@app/classes/match/match';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
-import { ChatMessage } from '@common/interfaces/chat-message';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
@@ -48,15 +47,11 @@ describe('LobbyGateway', () => {
     });
 
     it('should handle new message successfully', () => {
-        const testMessage: ChatMessage = {
-            sender: 'TestPlayer',
-            content: 'Hello world',
-            timestamp: new Date(),
-        };
+        const testMessage = 'Hello world';
 
-        gateway.handleNewMessage(mockSocket, testMessage);
+        gateway.message(mockSocket, testMessage);
 
         expect(mockMatchService.getMatchFromPlayerId.calledWith(mockSocket.id)).toBe(true);
-        expect(mockChatService.addMessageToMatch.calledWith(mockMatch, testMessage)).toBe(true);
+        expect(mockChatService.message.calledWith(mockMatch, mockSocket.id, testMessage)).toBe(true);
     });
 });

@@ -3,17 +3,16 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { ComponentRef, inject, Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
-import { PopupMessage } from '@app/interfaces/popup-message';
+import { Popup } from '@app/interfaces/popup';
 import { filter } from 'rxjs/operators';
 import { POPUP_DELAY } from './popup.service.const';
-
-const KEYWORDS_TO_REPLACE = ['debug'];
+import { KEYWORDS_TO_REPLACE } from '@app/consts/popup-message.const';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PopupService {
-    private messages: PopupMessage[] = [];
+    private messages: Popup[] = [];
     private overlayRefs: { overlayRef: OverlayRef; componentRef: ComponentRef<WarningConfirmationPopupComponent> }[] = [];
     private keepMessagesOnNavigation: boolean = false;
     private overlay: Overlay = inject(Overlay);
@@ -32,7 +31,7 @@ export class PopupService {
         return this.overlayRefs.map((ref) => ref.componentRef.instance);
     }
 
-    showPopup(popupMessage: PopupMessage) {
+    showPopup(popupMessage: Popup) {
         const containedKeyword = KEYWORDS_TO_REPLACE.filter((keyword) => popupMessage.message.toLowerCase().includes(keyword.toLowerCase()));
         if (containedKeyword.length > 0) {
             this.removeMessagesByFilter((message: string) => {
@@ -54,7 +53,7 @@ export class PopupService {
         this.keepMessagesOnNavigation = true;
     }
 
-    removeMessagesByFilter(filterFn: (message: string) => boolean): void {
+    removeMessagesByFilter(filterFn: (message: string) => boolean) {
         this.messages = this.messages.filter((popup) => !filterFn(popup.message));
 
         const popupsToRemove = this.overlayRefs.filter(({ componentRef }) => filterFn(componentRef.instance.message));
@@ -98,7 +97,7 @@ export class PopupService {
         }
     }
 
-    private handlePopupClose(confirmed: boolean, overlayRef: OverlayRef, message: PopupMessage | null) {
+    private handlePopupClose(confirmed: boolean, overlayRef: OverlayRef, message: Popup | null) {
         const isMessageConfirmed = message && message.isConfirmation;
         if (isMessageConfirmed && confirmed && message.action) {
             message.action();

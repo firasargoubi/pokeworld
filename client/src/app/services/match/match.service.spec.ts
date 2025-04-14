@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { NavigationStart, Router } from '@angular/router';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -7,12 +7,12 @@ import { SocketService } from '@app/services/socket/socket.service';
 import { MAX_ITEMS } from '@common/consts/player-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchState } from '@common/interfaces/match-data';
+import { MessageFromServer } from '@common/interfaces/message-from-server';
 import { PlayerData } from '@common/interfaces/player-data';
 import { MatchEvent } from '@common/interfaces/socket-event.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MatchService } from './match.service';
-import { MessageFromServer } from '@common/interfaces/message-from-server';
 
 describe('MatchService', () => {
     let service: MatchService;
@@ -27,7 +27,7 @@ describe('MatchService', () => {
         gameDataServiceSpy = jasmine.createSpyObj('GameDataService', ['setGameData', 'gameData']);
         mapServiceSpy = jasmine.createSpyObj('MapService', ['startMatch', 'setPlayers', 'clearOverlays']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'keepMessages', 'clearMessages']);
-        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+        routerSpy = jasmine.createSpyObj('Router', ['navigate'], { events: { subscribe: () => ({}) } });
 
         TestBed.configureTestingModule({
             providers: [
@@ -131,6 +131,13 @@ describe('MatchService', () => {
         spyOn<any>(service, 'isActivePlayer').and.returnValue(false);
         const result = service.getMovementLeft();
         expect(result).toBe(0);
+    });
+
+    it('on navigation update should leave match', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        const leaveMatchSpy = spyOn<any>(service, 'leaveMatch');
+        service['onNavigationUpdate'](new NavigationStart(1, 'aaa', 'popstate'));
+        expect(leaveMatchSpy).toHaveBeenCalled();
     });
 
     it('on match joined should update match data', () => {

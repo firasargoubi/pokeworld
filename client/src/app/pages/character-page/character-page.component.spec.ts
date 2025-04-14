@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CharacterPageComponent } from './character-page.component';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { Avatar } from '@common/interfaces/player-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
+import { CharacterPageComponent } from './character-page.component';
 
 describe('CharacterPageComponent', () => {
     let component: CharacterPageComponent;
@@ -43,6 +43,15 @@ describe('CharacterPageComponent', () => {
     });
 
     it('should create', () => {
+        expect(component).toBeTruthy();
+    });
+
+    it('should update avatar list on construction', () => {
+        fixture.destroy();
+        mockMatchService.isInMatch.and.returnValue(true);
+        fixture = TestBed.createComponent(CharacterPageComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
         expect(component).toBeTruthy();
     });
 

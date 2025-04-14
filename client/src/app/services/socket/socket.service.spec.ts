@@ -35,14 +35,20 @@ describe('SocketService', () => {
     });
 
     it('should emit event with data and callback', () => {
-        const spy = spyOn(service['socket'], 'emit');
         const event = 'testEvent';
         const data = 'testData';
-        const callback = jasmine.createSpy('callback');
+        const mockCallback = jasmine.createSpy('callback');
 
-        service.emit(event, data, callback);
+        Object.defineProperty(service['socket'], 'emit', {
+            value: (_msg: string, _value: string, callback: () => boolean) => {
+                callback();
+                return true;
+            },
+        });
 
-        expect(spy).toHaveBeenCalledWith(event, data, callback);
+        service.emit(event, data, mockCallback);
+
+        expect(mockCallback).toHaveBeenCalled();
     });
 
     it('should register event listener on socket', () => {

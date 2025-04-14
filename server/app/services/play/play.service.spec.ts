@@ -318,8 +318,8 @@ describe('PlayService', () => {
         expect(mockMatch.data.state).toBe(MatchState.MatchEnd);
     });
 
-    it('continueTurn should schedule force item drop when state is ItemDropSelection', () => {
-        mockMatch.data.state = MatchState.ItemDropSelection;
+    it('continueTurn should schedule force item drop when state is ItemWait', () => {
+        mockMatch.data.state = MatchState.ItemWait;
         mockMatch.data.playData.activePlayerIndex = 0;
         mockMatch.data.players = [{ id: 'player1' }] as PlayerData[];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method

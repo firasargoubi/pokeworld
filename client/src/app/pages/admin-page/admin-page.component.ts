@@ -6,8 +6,7 @@ import { CreateGamePopupComponent } from '@app/components/create-game-popup/crea
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
-import { ConfirmationMessage } from '@app/interfaces/confirmation-message.enum';
-import { PopupMessage } from '@app/interfaces/popup-message';
+import { PopupMessage } from '@app/consts/popup-message.const';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
@@ -27,7 +26,7 @@ export class AdminPageComponent implements OnInit {
     private popupService: PopupService = inject(PopupService);
 
     @HostListener('document:keydown.escape')
-    onEscapeKeydown(): void {
+    onEscapeKeydown() {
         if (this.isCreationMode) {
             this.isCreationMode = false;
         }
@@ -61,16 +60,15 @@ export class AdminPageComponent implements OnInit {
     }
 
     deleteGame(id: string, name: string) {
-        const popupMessage: PopupMessage = {
-            message: ConfirmationMessage.DeleteGame + name,
+        this.popupService.showPopup({
+            message: `${PopupMessage.DeleteGame} ${name}`,
             hasCloseButton: true,
             isConfirmation: true,
             action: () => this.confirmDeleteGame(id),
-        };
-        this.popupService.showPopup(popupMessage);
+        });
     }
 
-    onCreateGame(): void {
+    onCreateGame() {
         this.isCreationMode = !this.isCreationMode;
     }
 
@@ -86,12 +84,7 @@ export class AdminPageComponent implements OnInit {
                 this.games = games;
             },
             error: () => {
-                const popupMessage: PopupMessage = {
-                    message: ConfirmationMessage.ErrorLoadingGames,
-                    hasCloseButton: true,
-                    isConfirmation: false,
-                };
-                this.popupService.showPopup(popupMessage);
+                this.popupService.showPopup({ message: PopupMessage.ErrorLoadingGames, hasCloseButton: true, isConfirmation: false });
             },
         });
     }
@@ -108,18 +101,11 @@ export class AdminPageComponent implements OnInit {
     }
 
     private handleNotFoundError(error: HttpErrorResponse) {
-        const popupMessage: PopupMessage = {
-            message: '',
-            hasCloseButton: true,
-            isConfirmation: false,
-        };
         if (error.status === HttpStatusCode.NotFound) {
-            popupMessage.message = ConfirmationMessage.GameDoesntExist;
-            this.popupService.showPopup(popupMessage);
+            this.popupService.showPopup({ message: PopupMessage.GameDoesNotExist, hasCloseButton: true, isConfirmation: false });
             this.loadGames();
         } else {
-            popupMessage.message = ConfirmationMessage.ErrorFetchingGame;
-            this.popupService.showPopup(popupMessage);
+            this.popupService.showPopup({ message: PopupMessage.ErrorFetchingGame, hasCloseButton: true, isConfirmation: false });
         }
     }
 }

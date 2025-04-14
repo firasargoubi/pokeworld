@@ -26,7 +26,7 @@ export class PlayService {
         this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
     }
 
-    endTurn(): void {
+    endTurn() {
         this.socketService.emit(PlayEvent.EndTurn);
     }
 
@@ -36,7 +36,7 @@ export class PlayService {
         }
     }
 
-    clickTile(position: Position): void {
+    clickTile(position: Position) {
         const selfPosition = this.matchService.selfPlayer.position;
         const clickedItself = selfPosition.x === position.x && selfPosition.y === position.y;
 
@@ -66,7 +66,7 @@ export class PlayService {
         }
     }
 
-    changeDebugMode(): void {
+    changeDebugMode() {
         if (this.matchService.isHost()) {
             this.socketService.emit(PlayEvent.ChangeDebugMode, !this.matchService.data.playData.isDebugMode);
         }

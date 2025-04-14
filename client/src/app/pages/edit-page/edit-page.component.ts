@@ -7,9 +7,8 @@ import { MapComponent } from '@app/components/map/map.component';
 import { DEFAULT_EDITOR_DATA, EDITOR_ERASE_TILE, ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from '@app/consts/editor-data.const';
 import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
 import { ITEM_DESCRIPTION } from '@app/consts/item-data.const';
-import { ConfirmationMessage } from '@app/interfaces/confirmation-message.enum';
+import { PopupMessage } from '@app/consts/popup-message.const';
 import { EditorEvent, EditorItem, EditorVisualData } from '@app/interfaces/editor';
-import { PopupMessage } from '@app/interfaces/popup-message';
 import { EditorService } from '@app/services/editor/editor.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
@@ -48,13 +47,12 @@ export class EditPageComponent {
 
     backButton() {
         if (this.gameDataService.isModified(this.initialGameData)) {
-            const popupMessage: PopupMessage = {
-                message: ConfirmationMessage.QuitEditPage,
+            this.popupService.showPopup({
+                message: PopupMessage.QuitEditPage,
                 hasCloseButton: true,
                 isConfirmation: true,
                 action: this.goToAdminPage.bind(this),
-            };
-            this.popupService.showPopup(popupMessage);
+            });
         } else {
             this.goToAdminPage();
         }
@@ -63,12 +61,7 @@ export class EditPageComponent {
     async saveButton() {
         const isGameSaved = await this.editorService.saveGame();
         if (isGameSaved) {
-            const popupMessage: PopupMessage = {
-                message: ConfirmationMessage.SuccessfulSave,
-                hasCloseButton: true,
-                isConfirmation: false,
-            };
-            this.popupService.showPopup(popupMessage);
+            this.popupService.showPopup({ message: PopupMessage.SuccessfulSave, hasCloseButton: true, isConfirmation: false });
             this.popupService.keepMessages();
             this.goToAdminPage();
         }
@@ -76,13 +69,12 @@ export class EditPageComponent {
 
     resetButton() {
         if (this.gameDataService.isModified(this.initialGameData)) {
-            const popupMessage: PopupMessage = {
-                message: ConfirmationMessage.CancelModification,
+            this.popupService.showPopup({
+                message: PopupMessage.CancelModification,
                 hasCloseButton: true,
                 isConfirmation: true,
                 action: this.resetGameData.bind(this),
-            };
-            this.popupService.showPopup(popupMessage);
+            });
         }
     }
 

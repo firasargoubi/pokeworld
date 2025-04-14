@@ -150,7 +150,7 @@ export class MapService {
         return !this.isTileOccupiedByPlayer(matchData, position) && this.isTileAccessible(matchData, position);
     }
 
-    private enqueueValidNeighbors(matchData: MatchData, position: Position, visitedQueue: VisitedQueue): void {
+    private enqueueValidNeighbors(matchData: MatchData, position: Position, visitedQueue: VisitedQueue) {
         for (const offset of SURROUNDING_POSITIONS_PLUS) {
             const neighbor = { x: position.x + offset.x, y: position.y + offset.y };
             if (!this.isOutOfBounds(matchData, neighbor) && !visitedQueue.visited[neighbor.x][neighbor.y]) {
@@ -195,7 +195,7 @@ export class MapService {
         return tiles;
     }
 
-    private processNeighbor(context: NeighborContext): void {
+    private processNeighbor(context: NeighborContext) {
         const neighbor: Position = { x: context.pos.x + context.offset.x, y: context.pos.y + context.offset.y };
 
         if (this.isOutOfBounds(context.matchData, neighbor) || this.isTileOccupiedByPlayer(context.matchData, neighbor)) {

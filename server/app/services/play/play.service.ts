@@ -74,7 +74,7 @@ export class PlayService {
     }
 
     changeDebugMode(match: Match, playerId: string, isDebugMode: boolean) {
-        if (match.isHost(playerId) && match.isActivePlayer(playerId)) {
+        if (match.isHost(playerId)) {
             match.data.playData.isDebugMode = isDebugMode;
             match.sendMessage(isDebugMode ? Message.DebugModeOn : Message.DebugModeOff);
             this.chatService.logDebugMode(match, isDebugMode);
@@ -107,7 +107,7 @@ export class PlayService {
             if (match.data.state === MatchState.MovementAnimation) {
                 this.itemService.checkAndPickupItem(match, curentPlayer);
             }
-            if (match.data.state === MatchState.ItemDropSelection) {
+            if (match.data.state === MatchState.ItemWait) {
                 this.startItemDrop(match, curentPlayer.id);
             } else if (this.canPlayerAct(match)) {
                 this.continueTurnWait(match);
@@ -126,13 +126,13 @@ export class PlayService {
         return canAct && isConnected;
     }
 
-    private startItemDrop(match: Match, playerId: string): void {
+    private startItemDrop(match: Match, playerId: string) {
         this.setTimeLeft(match);
         match.sendUpdate();
         match.setTimeout(this.itemService.forceItemDrop.bind(this, match, playerId), DROP_ITEMS_DURATION);
     }
 
-    private continueTurnWait(match: Match): void {
+    private continueTurnWait(match: Match) {
         match.data.state = MatchState.TurnWait;
         match.sendUpdate();
         match.setTimeout(this.startNextTurn.bind(this, match), match.data.playData.timeLeft);

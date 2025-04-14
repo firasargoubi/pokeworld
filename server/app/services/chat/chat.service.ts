@@ -11,16 +11,21 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ChatService {
+    message(match: Match, playerId: string, message: string) {
+        if (message.length <= MAX_MESSAGE_LENGTH) {
+            const chatMessage: ChatMessage = {
+                content: message,
+                sender: match.getPlayer(playerId).name,
+                timestamp: new Date(),
+            };
+            match.data.chatData.push(chatMessage);
+            match.sendUpdate();
+        }
+    }
+
     logItemPickup(match: Match, name: string, itemType: ItemType) {
         const message = `${name} a ramassé ${ITEM_NAME[itemType]}`;
         this.addLogToMatch(match, message);
-    }
-
-    addMessageToMatch(match: Match, message: ChatMessage): void {
-        if (message.content.length <= MAX_MESSAGE_LENGTH) {
-            match.data.chatData.push(message);
-            match.sendUpdate();
-        }
     }
 
     addLogToMatch(match: Match, message: string, concernedPlayers: string[] = []) {

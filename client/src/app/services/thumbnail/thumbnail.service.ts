@@ -1,10 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { ITEM_IMAGES } from '@app/consts/images.const';
 import { MapService } from '@app/services/map/map.service';
-import { BACKGROUND_COLOR, TILE_SIZE } from './thumbnail.service.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MapData, MapSize } from '@common/interfaces/map-data';
 import { Position } from '@common/interfaces/position';
+import { BACKGROUND_COLOR, BATCH_DELAY, BATCH_SIZE, JOB_MAX_DELAY, JOB_MIN_DELAY, TILE_SIZE } from './thumbnail.service.const';
 
 @Injectable({
     providedIn: 'root',
@@ -13,11 +13,13 @@ export class ThumbnailService {
     private mapService: MapService = inject(MapService);
 
     async getThumbnail(map: MapData, loadItems: boolean): Promise<string> {
+        await new Promise((r) => setTimeout(r, this.getRandomNumber(JOB_MIN_DELAY, JOB_MAX_DELAY)));
+
         const { canvas, context } = this.createCanvas(map.size);
         const tilesPromises: Promise<[HTMLImageElement, number, number] | null>[] = [];
         const itemsPromises: Promise<[HTMLImageElement, number, number] | null>[] = [];
 
-        this.loadTiles(map, tilesPromises);
+        await this.loadTiles(map, tilesPromises);
         if (loadItems) {
             this.loadItems(map, itemsPromises);
         }
@@ -26,6 +28,10 @@ export class ThumbnailService {
         await this.renderImages(context, itemsPromises);
 
         return canvas.toDataURL('image/png');
+    }
+
+    private getRandomNumber(min: number, max: number): number {
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
     private createCanvas(size: MapSize): { canvas: HTMLCanvasElement; context: CanvasRenderingContext2D } {
@@ -41,16 +47,30 @@ export class ThumbnailService {
         return { canvas, context };
     }
 
-    private loadTiles(map: MapData, promises: Promise<[HTMLImageElement, number, number] | null>[]): void {
-        for (let x = 0; x < map.tiles.length; x++) {
-            for (let y = 0; y < map.tiles[x].length; y++) {
-                const imagePath = this.mapService.getTileImage(map.tiles, { x, y });
-                promises.push(this.loadImage(imagePath, x, y));
-            }
-        }
+    private async loadTiles(map: MapData, promises: Promise<[HTMLImageElement, number, number] | null>[]): Promise<void> {
+        const totalTiles = map.tiles.length * map.tiles[0].length;
+        let tileIndex = 0;
+        return new Promise((resolve) => {
+            const processBatch = () => {
+                const endIndex = Math.min(tileIndex + BATCH_SIZE, totalTiles);
+                while (tileIndex < endIndex) {
+                    const x = Math.floor(tileIndex / map.tiles[0].length);
+                    const y = tileIndex % map.tiles[0].length;
+                    const imagePath = this.mapService.getTileImage(map.tiles, { x, y });
+                    promises.push(this.loadImage(imagePath, x, y));
+                    tileIndex++;
+                }
+                if (tileIndex < totalTiles) {
+                    setTimeout(processBatch, BATCH_DELAY);
+                } else {
+                    resolve();
+                }
+            };
+            processBatch();
+        });
     }
 
-    private loadItems(map: MapData, promises: Promise<[HTMLImageElement, number, number] | null>[]): void {
+    private loadItems(map: MapData, promises: Promise<[HTMLImageElement, number, number] | null>[]) {
         for (const [itemType, positions] of Object.entries(map.items) as [ItemType, Position[]][]) {
             const itemImage = ITEM_IMAGES.get(itemType) as string;
             if (itemImage) {
@@ -62,12 +82,26 @@ export class ThumbnailService {
     }
 
     private async renderImages(context: CanvasRenderingContext2D, promises: Promise<[HTMLImageElement, number, number] | null>[]) {
-        for await (const result of promises) {
-            if (result) {
-                const [image, x, y] = result;
-                context.drawImage(image, y * TILE_SIZE, x * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-            }
-        }
+        const resolved = await Promise.all(promises);
+        let index = 0;
+        return new Promise<void>((resolve) => {
+            const renderBatch = () => {
+                const end = Math.min(index + BATCH_SIZE, resolved.length);
+                for (; index < end; index++) {
+                    const result = resolved[index];
+                    if (result) {
+                        const [image, x, y] = result;
+                        context.drawImage(image, y * TILE_SIZE, x * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                    }
+                }
+                if (index < resolved.length) {
+                    setTimeout(renderBatch, BATCH_DELAY);
+                } else {
+                    resolve();
+                }
+            };
+            renderBatch();
+        });
     }
 
     private async loadImage(imageUrl: string, x: number, y: number): Promise<[HTMLImageElement, number, number] | null> {

@@ -30,16 +30,30 @@ import {
 
 @Injectable()
 export class BotService {
-    @Inject(forwardRef(() => MapService)) private readonly mapService: MapService;
-    @Inject(forwardRef(() => LobbyService)) private readonly lobbyService: LobbyService;
-    @Inject(forwardRef(() => CombatGateway)) private readonly combatGateway: CombatGateway;
-    @Inject(forwardRef(() => PlayGateway)) private readonly playGateway: PlayGateway;
+    @Inject(forwardRef(() => LobbyService)) private lobbyService: LobbyService;
+    @Inject(forwardRef(() => CombatGateway)) private combatGateway: CombatGateway;
+    @Inject(forwardRef(() => PlayGateway)) private playGateway: PlayGateway;
+    @Inject(MapService) private mapService: MapService;
+
+    private readonly actionMap: Map<BotAction, (match: Match) => Position | null> = new Map([
+        [BotAction.Attack, this.getBestAttack],
+        [BotAction.MovePlayer, this.getBestMoveToPlayer],
+        [BotAction.MoveItem, this.getBestMoveToItem],
+        [BotAction.Bridge, this.getBestBridgeAction],
+        [BotAction.MoveBridge, this.getBestMoveToBridge],
+        [BotAction.MoveFlag, this.getBestMoveToFlag],
+        [BotAction.MoveSpawnpoint, this.getBestMoveToSpawnpoint],
+        [BotAction.AttackSpawnCamper, this.getBestAttackSpawnCamper],
+        [BotAction.AttackFlagHolder, this.getBestAttackFlagHolder],
+        [BotAction.MoveFlagHolder, this.getBestMoveToFlagHolder],
+        [BotAction.CampSpawnpoint, this.getBestCampSpawnpoint],
+    ]);
 
     onMatchUpdate(match: Match) {
         switch (match.data.state) {
             case MatchState.TurnWait:
                 return this.onTurnWait(match);
-            case MatchState.ItemDropSelection:
+            case MatchState.ItemWait:
                 return this.onItemWait(match);
             case MatchState.CombatWait:
                 return this.onCombatWait(match);
@@ -80,32 +94,7 @@ export class BotService {
     }
 
     private getBotAction(action: BotAction, match: Match): Position | null {
-        switch (action) {
-            case BotAction.Attack:
-                return this.getBestAttack(match);
-            case BotAction.MovePlayer:
-                return this.getBestMoveToPlayer(match);
-            case BotAction.MoveItem:
-                return this.getBestMoveToItem(match);
-            case BotAction.Bridge:
-                return this.getBestBridgeAction(match);
-            case BotAction.MoveBridge:
-                return this.getBestMoveToBridge(match);
-            case BotAction.MoveFlag:
-                return this.getBestMoveToFlag(match);
-            case BotAction.MoveSpawnpoint:
-                return this.getBestMoveToSpawnpoint(match);
-            case BotAction.AttackSpawnCamper:
-                return this.getBestAttackSpawnCamper(match);
-            case BotAction.AttackFlagHolder:
-                return this.getBestAttackFlagHolder(match);
-            case BotAction.MoveFlagHolder:
-                return this.getBestMoveToFlagHolder(match);
-            case BotAction.CampSpawnpoint:
-                return this.getBestCampSpawnpoint(match);
-            default:
-                return null;
-        }
+        return this.actionMap.get(action).bind(this)(match);
     }
 
     private executeBotAction(player: PlayerData, match: Match) {

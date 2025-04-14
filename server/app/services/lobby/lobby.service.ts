@@ -145,7 +145,7 @@ export class LobbyService {
         });
     }
 
-    private setupRandomItems(match: Match): void {
+    private setupRandomItems(match: Match) {
         const matchData: MatchData = match.data;
         const items = matchData.gameData.mapData.items;
         const unusedItems = REGULAR_ITEMS.filter((itemType) => {

@@ -15,12 +15,12 @@ export class PokeballButtonComponent {
 
     isActive: boolean = false;
 
-    onMouseDown(event: MouseEvent): void {
+    onMouseDown(event: MouseEvent) {
         this.isActive = true;
         event.preventDefault();
     }
 
-    onMouseUp(): void {
+    onMouseUp() {
         if (this.isActive) {
             setTimeout(() => {
                 this.isActive = false;
@@ -31,7 +31,7 @@ export class PokeballButtonComponent {
         }
     }
 
-    onMouseLeave(): void {
+    onMouseLeave() {
         this.isActive = false;
     }
 }

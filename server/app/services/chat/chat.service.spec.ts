@@ -1,12 +1,12 @@
 import { Match } from '@app/classes/match/match';
 import { ITEM_NAME } from '@app/consts/item-name.const';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
-import { ChatMessage } from '@common/interfaces/chat-message';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatData, PlayerCombatData } from '@common/interfaces/match-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createSandbox, createStubInstance, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
 import { ChatService } from './chat.service';
@@ -42,27 +42,20 @@ describe('ChatService', () => {
     });
 
     it('should add valid message to chat data', () => {
-        const message: ChatMessage = {
-            sender: 'TestPlayer',
-            content: 'Test message',
-            timestamp: new Date(),
-        };
+        const messageContent = 'Test message';
+        mockMatch.getPlayer.returns(MOCK_PLAYER_DATAS[0]);
 
-        service.addMessageToMatch(mockMatch, message);
+        service.message(mockMatch, MOCK_PLAYER_DATAS[0].id, messageContent);
 
         expect(mockMatch.data.chatData.length).toBe(1);
-        expect(mockMatch.data.chatData[0]).toEqual(message);
+        expect(mockMatch.data.chatData[0].content).toEqual(messageContent);
         expect(mockMatch.sendUpdate.calledOnce).toBe(true);
     });
 
     it('should reject message exceeding max length', () => {
-        const longMessage: ChatMessage = {
-            sender: 'TestPlayer',
-            content: 'A'.repeat(MAX_MESSAGE_LENGTH + 1),
-            timestamp: new Date(),
-        };
+        const longMessage = 'A'.repeat(MAX_MESSAGE_LENGTH + 1);
 
-        service.addMessageToMatch(mockMatch, longMessage);
+        service.message(mockMatch, MOCK_PLAYER_DATAS[0].id, longMessage);
 
         expect(mockMatch.data.chatData.length).toBe(0);
         expect(mockMatch.sendUpdate.called).toBe(false);

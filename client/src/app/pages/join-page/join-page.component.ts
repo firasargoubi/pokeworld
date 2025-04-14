@@ -13,16 +13,21 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
     imports: [HeaderComponent, FormsModule],
 })
 export class JoinPageComponent {
-    gameCode: string = '';
+    matchCode: string = '';
     codeLength: number = MATCH_CODE_LENGTH;
+    private isJoiningMatch = false;
     private router: Router = inject(Router);
     private matchService: MatchService = inject(MatchService);
 
-    joinMatch(event: KeyboardEvent) {
+    async joinMatch(event: KeyboardEvent) {
         const isJoinKey = event.key === 'Enter';
 
-        if (isJoinKey) {
-            this.matchService.joinMatch(this.gameCode);
+        if (isJoinKey && !this.isJoiningMatch) {
+            const matchCode = this.matchCode;
+            this.matchCode = '';
+            this.isJoiningMatch = true;
+            await this.matchService.joinMatch(matchCode);
+            this.isJoiningMatch = false;
         }
     }
 

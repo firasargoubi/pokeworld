@@ -1,5 +1,7 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -7,8 +9,6 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { PlayerType } from '@common/interfaces/player-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { LobbyPageComponent } from './lobby-page.component';
-import { ChatComponent } from '@app/components/chat/chat.component';
-import { Component } from '@angular/core';
 
 @Component({
     selector: 'app-chat',
@@ -36,6 +36,7 @@ describe('LobbyPageComponent', () => {
             matchUpdate: { pipe: () => ({ subscribe: () => ({}) }) },
             data: mockMatchData,
             selfIndex: 0,
+            isHost: () => true,
         });
 
         await TestBed.configureTestingModule({
@@ -59,6 +60,15 @@ describe('LobbyPageComponent', () => {
     });
 
     it('should create', () => {
+        expect(component).toBeTruthy();
+    });
+
+    it('should update avatar list on construction', () => {
+        fixture.destroy();
+        matchServiceSpy.isInMatch.and.returnValue(true);
+        fixture = TestBed.createComponent(LobbyPageComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
         expect(component).toBeTruthy();
     });
 
@@ -129,5 +139,10 @@ describe('LobbyPageComponent', () => {
         expect(() => {
             component['askCopyPermission'](code);
         }).not.toThrow();
+    });
+
+    it('should updateVisual on matchUpdate', () => {
+        component['updateVisual']();
+        expect(component.visualData.isSelfHost).toBeTrue();
     });
 });

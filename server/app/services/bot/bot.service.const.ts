@@ -68,9 +68,9 @@ export const BOT_ITEM_PRIORITIES: Map<PlayerType, ItemType[]> = new Map([
 export const BOT_ID_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 export const BOT_CODE_LENGTH = 15;
-export const BOT_TURN_MIN_DELAY = 1000;
-export const BOT_TURN_MAX_DELAY = 3500;
-export const BOT_COMBAT_MIN_DELAY = 500;
-export const BOT_COMBAT_MAX_DELAY = 2000;
-export const BOT_ITEM_MIN_DELAY = 3000;
-export const BOT_ITEM_MAX_DELAY = 5000;
+export const BOT_TURN_MIN_DELAY = 500;
+export const BOT_TURN_MAX_DELAY = 2000;
+export const BOT_COMBAT_MIN_DELAY = 250;
+export const BOT_COMBAT_MAX_DELAY = 1000;
+export const BOT_ITEM_MIN_DELAY = 500;
+export const BOT_ITEM_MAX_DELAY = 2000;

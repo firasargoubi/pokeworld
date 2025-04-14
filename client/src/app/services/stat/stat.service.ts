@@ -21,7 +21,7 @@ export class StatService {
     private mapTotalTiles: TotalTiles;
     private matchService: MatchService = inject(MatchService);
 
-    initializeData(): void {
+    initializeData() {
         this.trackingData = this.matchService.data.trackingData;
         this.mapTotalTiles = this.getTotalTiles();
         this.winnerData = this.getWinnerAssets();
@@ -29,7 +29,7 @@ export class StatService {
         this.playerStats = this.getPlayerStats();
     }
 
-    sortPlayerStatsBy(statType: PlayerStatType, order: Order): void {
+    sortPlayerStatsBy(statType: PlayerStatType, order: Order) {
         this.playerStats.sort((playerX, playerY) => {
             const ascendingComparator = playerY[statType] - playerX[statType];
             const descendingComparator = playerX[statType] - playerY[statType];

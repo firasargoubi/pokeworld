@@ -1,12 +1,12 @@
 import { Injectable, inject } from '@angular/core';
-import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { DEFAULT_TILE_DESCRIPTION, TILE_EFFECT } from '@app/consts/tile-data.const';
 import { TileDescriptionInfo } from '@app/interfaces/tile-description';
+import { GameDataService } from '@app/services/game-data/game-data.service';
+import { MatchService } from '@app/services/match/match.service';
+import { AVATAR_DATA } from '@common/consts/avatar-data.const';
+import { PlayerData } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
 import { TILE_COST } from '@common/interfaces/tile-type.enum';
-import { MatchService } from '@app/services/match/match.service';
-import { PlayerData } from '@common/interfaces/player-data';
-import { GameDataService } from '@app/services/game-data/game-data.service';
 
 @Injectable({
     providedIn: 'root',
@@ -20,7 +20,7 @@ export class TileDescriptionService {
     private matchService: MatchService = inject(MatchService);
     private gameDataService: GameDataService = inject(GameDataService);
 
-    displayTileDescription(event: MouseEvent): void {
+    displayTileDescription(event: MouseEvent) {
         if (!this.matchService.canUseDebugMove()) {
             event.preventDefault();
 
@@ -38,7 +38,7 @@ export class TileDescriptionService {
         }
     }
 
-    hideTileDescription(): void {
+    hideTileDescription() {
         this.showTileDescription = false;
     }
 

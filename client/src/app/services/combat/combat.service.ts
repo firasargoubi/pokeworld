@@ -22,11 +22,11 @@ export class CombatService {
         this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
     }
 
-    escape(): void {
+    escape() {
         this.socketService.emit(CombatEvent.Escape);
     }
 
-    attack(): void {
+    attack() {
         this.socketService.emit(CombatEvent.Attack);
     }
 

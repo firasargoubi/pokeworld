@@ -8,9 +8,8 @@ import { HeaderComponent } from '@app/components/header/header.component';
 import { PlayerCardComponent } from '@app/components/player-card/player-card.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { DEFAULT_LOBBY_VISUAL_DATA } from '@app/consts/player-data.const';
-import { ConfirmationMessage } from '@app/interfaces/confirmation-message.enum';
+import { PopupMessage } from '@app/consts/popup-message.const';
 import { LobbyVisualData } from '@app/interfaces/lobby-visual-data';
-import { PopupMessage } from '@app/interfaces/popup-message';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -35,39 +34,39 @@ export class LobbyPageComponent {
     private router: Router = inject(Router);
 
     constructor() {
-        if (!this.matchService.isInMatch()) {
+        if (this.matchService.isInMatch()) {
+            this.updateVisual();
+            this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.updateVisual.bind(this));
+        } else {
             this.router.navigate([PageEndpoint.Menu]);
         }
-        this.updateVisual();
-        this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.updateVisual.bind(this));
     }
 
     @HostListener('document:keydown.escape')
-    onEscapeKeydown(): void {
+    onEscapeKeydown() {
         if (this.showBotPopup) {
             this.showBotPopup = false;
         }
     }
 
-    startMatchButton(): void {
+    startMatchButton() {
         this.lobbyService.startMatch();
     }
 
-    leaveLobbyButton(): void {
-        const popupMessage: PopupMessage = {
-            message: ConfirmationMessage.Quit,
+    leaveLobbyButton() {
+        this.popupService.showPopup({
+            message: PopupMessage.Quit,
             hasCloseButton: true,
             isConfirmation: true,
             action: this.matchService.leaveMatch.bind(this.matchService),
-        };
-        this.popupService.showPopup(popupMessage);
+        });
     }
 
-    toggleLockRoom(): void {
+    toggleLockRoom() {
         this.lobbyService.changeLockStatus(!this.matchService.data.lobbyData.isLocked);
     }
 
-    kickPlayer(playerId: string): void {
+    kickPlayer(playerId: string) {
         this.lobbyService.kickPlayer(playerId);
     }
 

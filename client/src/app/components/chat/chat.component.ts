@@ -25,7 +25,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     private readonly matchService: MatchService = inject(MatchService);
     private readonly chatService: ChatService = inject(ChatService);
 
-    ngOnInit(): void {
+    ngOnInit() {
         this.isChatActive = this.chatService.isChatActive;
         this.isFilterEnabled = this.chatService.isFilterEnabled;
         this.updateChatData();
@@ -41,12 +41,12 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         }
     }
 
-    switchTab(isChat: boolean): void {
+    switchTab(isChat: boolean) {
         this.chatService.isChatActive.set(isChat);
         this.shouldScrollToBottom = true;
     }
 
-    toggleFilter(): void {
+    toggleFilter() {
         this.chatService.isFilterEnabled.update((value) => !value);
         this.filterLogs();
         this.shouldScrollToBottom = true;
@@ -67,13 +67,13 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         }
     }
 
-    updateChatData(): void {
+    updateChatData() {
         this.chatMessages = this.matchService.data.chatData;
         this.filterLogs();
         this.shouldScrollToBottom = true;
     }
 
-    private filterLogs(): void {
+    private filterLogs() {
         const playerName = this.matchService.selfPlayer.name;
         if (this.isFilterEnabled()) {
             this.logs = this.matchService.data.logData.filter(

@@ -2,13 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { DEFAULT_COMBAT_VISUAL_DATA } from '@app/consts/combat-data.const';
 import { BATTLE_PLATFORM_IMAGES } from '@app/consts/images.const';
 import { CombatVisualData } from '@app/interfaces/combat-visual-data';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
+import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchState } from '@common/interfaces/match-data';
@@ -27,13 +27,14 @@ export class CombatPageComponent {
     private router: Router = inject(Router);
 
     constructor() {
-        if (!this.matchService.isInMatch()) {
+        if (this.matchService.isInMatch()) {
+            this.onMatchUpdate();
+            this.updateImages();
+            this.computeItems();
+            this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
+        } else {
             this.router.navigate([PageEndpoint.Menu]);
         }
-        this.onMatchUpdate();
-        this.updateImages();
-        this.computeItems();
-        this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
     }
 
     @HostListener('document:keydown', ['$event'])

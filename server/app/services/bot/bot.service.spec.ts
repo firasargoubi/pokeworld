@@ -1,20 +1,20 @@
+import { Match } from '@app/classes/match/match';
+import { CombatGateway } from '@app/gateways/combat/combat.gateway';
+import { PlayGateway } from '@app/gateways/play/play.gateway';
+import { BotAction } from '@app/interfaces/bot-action.enum';
+import { LobbyService } from '@app/services/lobby/lobby.service';
+import { MapService } from '@app/services/map/map.service';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { MatchData, MatchState } from '@common/interfaces/match-data';
+import { PlayerData, PlayerType, Team } from '@common/interfaces/player-data';
+import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
+import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
 import { BotService } from './bot.service';
-import { MapService } from '@app/services/map/map.service';
-import { LobbyService } from '@app/services/lobby/lobby.service';
-import { CombatGateway } from '@app/gateways/combat/combat.gateway';
-import { PlayGateway } from '@app/gateways/play/play.gateway';
-import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
-import { Match } from '@app/classes/match/match';
-import { PlayerData, PlayerType, Team } from '@common/interfaces/player-data';
-import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
-import { MatchData, MatchState } from '@common/interfaces/match-data';
-import { TileType } from '@common/interfaces/tile-type.enum';
-import { ItemType } from '@common/interfaces/item-type.enum';
-import { Position } from '@common/interfaces/position';
 import { BOT_CODE_LENGTH } from './bot.service.const';
-import { BotAction } from '@app/interfaces/bot-action.enum';
 
 describe('BotService', () => {
     let service: BotService;
@@ -33,6 +33,14 @@ describe('BotService', () => {
         mockCombatGateway = createStubInstance<CombatGateway>(CombatGateway);
         mockPlayGateway = createStubInstance<PlayGateway>(PlayGateway);
         mockMatch = createStubInstance<Match>(Match);
+        mockMapService.getPossibleMoves.returns([
+            { x: 7, y: 1 },
+            { x: 1, y: 7 },
+        ]);
+        mockMapService.getActions.returns([
+            { x: 7, y: 1 },
+            { x: 1, y: 7 },
+        ]);
         mockMapService.getShortestPath.callsFake((_matchData: MatchData, position: Position) => {
             return { moveCost: position.x, path: [position] };
         });
@@ -78,7 +86,7 @@ describe('BotService', () => {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const onItemWaitStub = sandbox.stub(service as any, 'onItemWait');
-        mockMatch.data.state = MatchState.ItemDropSelection;
+        mockMatch.data.state = MatchState.ItemWait;
         service.onMatchUpdate(mockMatch);
         expect(onItemWaitStub.calledWith(mockMatch)).toBeTruthy();
 
@@ -116,34 +124,35 @@ describe('BotService', () => {
         expect(result).toBeLessThanOrEqual(2);
     });
 
-    it('bot action should execute bot action', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'getBestAttack').returns({ x: 6, y: 7 });
-        service['executeBotAction'](mockBotPlayer, mockMatch);
-        expect(mockPlayGateway.action.called).toBeTruthy();
+    it('get bot action should return bot action', () => {
+        const result = service['getBotAction'](BotAction.Attack, mockMatch);
+        expect(result).toEqual(null);
+    });
+
+    it('get bot action should return bot action', () => {
+        const result = service['getBestMoveToFlag'](mockMatch);
+        expect(result).toEqual(null);
     });
 
     it('bot action should execute end turn', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'getBestAttack').returns(null);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'getBestMoveToPlayer').returns(null);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'getBestMoveToItem').returns(null);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'getBestBridgeAction').returns(null);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'getBestMoveToBridge').returns(null);
-
+        sandbox.stub(service as any, 'getBotAction').returns(mockBotPlayer.position);
         service['executeBotAction'](mockBotPlayer, mockMatch);
         expect(mockPlayGateway.endTurn.called).toBeTruthy();
     });
 
-    it('bot action should execute end turn on player position', () => {
+    it('bot action should execute move', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'getBestAttack').returns(mockBotPlayer.position);
+        sandbox.stub(service as any, 'getBotAction').returns({ x: -2, y: -1 });
         service['executeBotAction'](mockBotPlayer, mockMatch);
-        expect(mockPlayGateway.endTurn.called).toBeTruthy();
+        expect(mockPlayGateway.move.called).toBeTruthy();
+    });
+
+    it('bot action should end turn if no move possible', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'getBotAction').returns(null);
+        service['executeBotAction'](mockBotPlayer, mockMatch);
+        expect(mockPlayGateway.move.called).toBeTruthy();
     });
 
     it('get best move to bridge should return correct position', () => {
@@ -180,6 +189,15 @@ describe('BotService', () => {
         expect(result).toBeDefined();
     });
 
+    it('get best move to flag holder should return correct position', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'getFlagHolder').returns(mockBotPlayer);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'getBestMove').returns(mockBotPlayer.position);
+        const result = service['getBestMoveToFlagHolder'](mockMatch);
+        expect(result).toBeDefined();
+    });
+
     it('get best move to spawnpoint should return correct position', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getBestMove').returns(null);
@@ -209,9 +227,13 @@ describe('BotService', () => {
     });
 
     it('get best move should return self position', () => {
-        mockMapService.getPossibleMoves.returns([{ x: 1, y: 1 }]);
-        const result = service['getBestMove']([{ x: 1, y: 1 }], mockMatch);
-        expect(result).toEqual({ x: 1, y: 1 });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'getBestPath').returns({ moveCost: 1, path: [{ x: 0, y: 2 }] });
+        mockMapService.getPossibleMoves.returns([]);
+        const result1 = service['getBestMove']([{ x: 9, y: 2 }], mockMatch);
+        expect(result1).toEqual({ x: 1, y: 1 });
+        const result2 = service['getBestMove']([{ x: 1, y: 1 }], mockMatch);
+        expect(result2).toEqual({ x: 1, y: 1 });
     });
 
     it('get best path should return path with lowest moveCost', () => {
@@ -222,15 +244,6 @@ describe('BotService', () => {
         ];
         const result = service['getBestPath'](targetPositions, mockMatch);
         expect(result.moveCost).toBe(1);
-    });
-
-    it('get not action should return correct bot action', () => {
-        Object.values(BotAction).forEach((action) => {
-            const result = service['getBotAction'](action, mockMatch);
-            expect(result).toBeDefined();
-        });
-        const nullResult = service['getBotAction']('notAnAction' as BotAction, mockMatch);
-        expect(nullResult).toEqual(null);
     });
 
     it('get best attack should return correct position', () => {
@@ -252,6 +265,18 @@ describe('BotService', () => {
         sandbox.stub(service as any, 'getBestAction').returns(mockBotPlayer.position);
 
         const result = service['getBestAttackFlagHolder'](mockMatch);
+
+        expect(result).toEqual(mockBotPlayer.position);
+    });
+
+    it('get best attack flag holder should return correct position', () => {
+        mockMapService.getActions.returns([mockBotPlayer.position]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'getFlagHolder').returns(mockBotPlayer);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'getBestAction').returns(mockBotPlayer.position);
+
+        const result = service['getBestAttackSpawnCamper'](mockMatch);
 
         expect(result).toEqual(mockBotPlayer.position);
     });

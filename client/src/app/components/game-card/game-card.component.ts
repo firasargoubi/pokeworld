@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
@@ -12,7 +12,7 @@ import { GameData } from '@common/interfaces/game-data';
     imports: [FormsModule, CommonModule],
     standalone: true,
 })
-export class GameCardComponent implements OnInit {
+export class GameCardComponent implements AfterViewInit {
     @Input() game: GameData;
     @Input() isAdminView: boolean = false;
     @Input() cardColor: string = 'blue-card';
@@ -22,14 +22,12 @@ export class GameCardComponent implements OnInit {
     @Output() join = new EventEmitter<string>();
 
     isHovered: boolean = false;
-    thumbnailUrl: string;
+    thumbnailUrl: string = '';
     private thumbnailService: ThumbnailService = inject(ThumbnailService);
     private gameDataService: GameDataService = inject(GameDataService);
 
-    ngOnInit() {
-        this.thumbnailService.getThumbnail(this.game.mapData, true).then((url) => {
-            this.thumbnailUrl = url;
-        });
+    ngAfterViewInit() {
+        setTimeout(this.generateThumbnail.bind(this), 1);
     }
 
     onEdit() {
@@ -60,5 +58,9 @@ export class GameCardComponent implements OnInit {
     formatDate(dateString: string | Date): string {
         const date = new Date(dateString);
         return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    private async generateThumbnail() {
+        this.thumbnailUrl = await this.thumbnailService.getThumbnail(this.game.mapData, true);
     }
 }
