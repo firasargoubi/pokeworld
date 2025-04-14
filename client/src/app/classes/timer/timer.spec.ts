@@ -74,4 +74,14 @@ describe('Timer', () => {
 
         expect(stopIntervalSpy).toHaveBeenCalled();
     });
+
+    it('should set currentTimeRounded to 0 when timer reaches 0', () => {
+        timer['currentTime'] = 0.1;
+        timer['currentTimeRounded'] = 1;
+        timer.isStarted = true;
+
+        timer['intervalTrigger']();
+
+        expect(timer.currentTimeRounded).toBe(0);
+    });
 });

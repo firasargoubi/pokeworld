@@ -106,7 +106,7 @@ describe('LobbyPageComponent', () => {
 
     it('should copy match code to clipboard', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        const copyToClipboardSpy = spyOn(component as any, 'copyToClipboard').and.callThrough();
+        const copyToClipboardSpy = spyOn(component as any, 'copyToClipboard').and.returnValue(true);
         component.copyMatchCode();
         expect(copyToClipboardSpy).toHaveBeenCalled();
     });
@@ -134,15 +134,25 @@ describe('LobbyPageComponent', () => {
         expect(component.showBotPopup).toBeFalse();
     });
 
-    it('ask copy permission should correct', () => {
-        const code = '1234';
-        expect(() => {
-            component['askCopyPermission'](code);
-        }).not.toThrow();
-    });
-
     it('should updateVisual on matchUpdate', () => {
         component['updateVisual']();
         expect(component.visualData.isSelfHost).toBeTrue();
+    });
+
+    it('copy to clipboard should not throw error', () => {
+        Object.defineProperty(navigator.clipboard, 'writeText', {
+            value: () => ({ then: () => ({ catch: () => true }) }),
+            writable: true,
+        });
+        Object.defineProperty(navigator.clipboard, 'query', {
+            value: () => ({ then: () => ({ catch: () => true }) }),
+            writable: true,
+        });
+        expect(() => {
+            component['copyToClipboard']('1234');
+        }).not.toThrow();
+        expect(() => {
+            component['askCopyPermission']('1234');
+        }).not.toThrow();
     });
 });

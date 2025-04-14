@@ -66,12 +66,12 @@ describe('AdminPageComponent', () => {
     });
 
     it('should load games successfully', () => {
-        gameSaveServiceSpy.getAllGames.and.returnValue(of(MOCK_GAME_DATAS));
+        gameSaveServiceSpy.getAllGames.and.returnValue(of(structuredClone(MOCK_GAME_DATAS)));
 
         component['loadGames']();
 
         expect(gameSaveServiceSpy.getAllGames).toHaveBeenCalled();
-        expect(component.games).toEqual(MOCK_GAME_DATAS);
+        expect(component.games).toEqual(structuredClone(MOCK_GAME_DATAS));
     });
 
     it('should handle error when loadGames fails', () => {
@@ -112,34 +112,34 @@ describe('AdminPageComponent', () => {
         const errorResponse = new HttpErrorResponse({ error: 'Server error', status: 500 });
         gameSaveServiceSpy.toggleVisibility.and.returnValue(throwError(() => errorResponse));
 
-        component.toggleVisibility({ id: MOCK_GAME_DATAS[0]._id, isVisible: true });
+        component.toggleVisibility({ id: structuredClone(MOCK_GAME_DATAS)[0]._id, isVisible: true });
 
         expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 
     it('should add a confirmation message when deleteGame is called', () => {
-        component.deleteGame(MOCK_GAME_DATAS[0]._id, '');
+        component.deleteGame(structuredClone(MOCK_GAME_DATAS)[0]._id, '');
         expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });
 
     it('should delete game when confirmation is accepted', () => {
         gameSaveServiceSpy.deleteGame.and.returnValue(of(undefined));
 
-        component.deleteGame(MOCK_GAME_DATAS[0]._id, '');
+        component.deleteGame(structuredClone(MOCK_GAME_DATAS)[0]._id, '');
 
         const popupMessage = popupServiceSpy.showPopup.calls.mostRecent().args[0];
         if (popupMessage.action) {
             popupMessage.action();
         }
 
-        expect(gameSaveServiceSpy.deleteGame).toHaveBeenCalledWith(MOCK_GAME_DATAS[0]._id);
+        expect(gameSaveServiceSpy.deleteGame).toHaveBeenCalledWith(structuredClone(MOCK_GAME_DATAS)[0]._id);
     });
 
     it('should handle error when deleteGame fails', () => {
         const errorResponse = new HttpErrorResponse({ error: 'Delete failed', status: 500 });
         gameSaveServiceSpy.deleteGame.and.returnValue(throwError(() => errorResponse));
 
-        component.deleteGame(MOCK_GAME_DATAS[0]._id, '');
+        component.deleteGame(structuredClone(MOCK_GAME_DATAS)[0]._id, '');
 
         const popupMessage = popupServiceSpy.showPopup.calls.mostRecent().args[0];
         if (popupMessage.action) {
