@@ -27,7 +27,9 @@ export class StatPageComponent {
     private matchService: MatchService = inject(MatchService);
 
     constructor() {
-        this.statService.initializeData();
+        if (this.matchService.isInMatch()) {
+            this.statService.initializeData();
+        }
     }
 
     updateSorting(statType: PlayerStatType) {

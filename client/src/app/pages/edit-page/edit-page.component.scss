@@ -95,6 +95,8 @@ main::after {
 }
 
 .editor-center {
+    vertical-align: top;
+    overflow: visible;
     display: inline-block;
     margin-top: $final-margin-top;
     height: calc($main-height - $final-margin-top);
@@ -102,6 +104,7 @@ main::after {
 }
 
 app-map {
+    overflow: visible;
     display: block;
     height: $final-map-size;
     width: $final-map-size;

@@ -108,8 +108,11 @@ export class MapService {
     }
 
     private movePlayerAnimation(playerIndex: number, move: Position) {
-        this.players[playerIndex].position = move;
-        this.updateAllTiles();
+        const player = this.players[playerIndex];
+        if (player) {
+            player.position = move;
+            this.updateAllTiles();
+        }
     }
 
     private getTileVisualData(mapData: MapData, position: Position): TileVisualData {

@@ -1,7 +1,7 @@
 <div id="combat-page" [ngClass]="{ 'not-current-turn': !visualData.isSelfTurn || matchService.data.state !== 'combatWait' }">
     <div id="timer">
         @if( this.matchService.data.playData.isDebugMode ){ (DEBUG) }
-        {{ combatService.timer.currentTime }}/{{ combatService.timer.maxTime }}
+        {{ combatService.timer.currentTimeRounded + 1 }}/{{ combatService.timer.maxTime }}
         <div class="timer-container">
             <div
                 class="timer-icon"

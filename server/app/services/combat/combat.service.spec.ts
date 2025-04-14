@@ -20,7 +20,7 @@ import {
 } from '@common/consts/combat-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatAction, MatchState } from '@common/interfaces/match-data';
-import { DiceType } from '@common/interfaces/player-data';
+import { DiceType, PlayerType } from '@common/interfaces/player-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS, MOCK_PLAYER_COMBAT_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
@@ -117,6 +117,22 @@ describe('CombatService', () => {
         ];
         mockMatch.data.combatData.isSecondPlayerTurn = true;
         mockMatch.data.playData.activePlayerIndex = 0;
+
+        service.startCombatEndDeath(mockMatch);
+
+        expect(mockMatch.data.state).toBe(MatchState.CombatEnd);
+        expect(mockMatch.setTimeout.called).toBe(true);
+    });
+
+    it('start combat end death should continue turn with two bots in combat', () => {
+        mockMatch.data.combatData.playersCombatData = [
+            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]), playerIndex: 0 },
+            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), playerIndex: 1 },
+        ];
+        mockMatch.data.combatData.isSecondPlayerTurn = true;
+        mockMatch.data.playData.activePlayerIndex = 0;
+        mockMatch.data.players[0].type = PlayerType.BotAggressive;
+        mockMatch.data.players[1].type = PlayerType.BotAggressive;
 
         service.startCombatEndDeath(mockMatch);
 

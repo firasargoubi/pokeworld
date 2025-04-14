@@ -6,6 +6,7 @@ import { PlayService } from '@app/services/play/play.service';
 import { TrackingService } from '@app/services/tracking/tracking.service';
 import {
     COMBAT_ANIMATION_DURATION,
+    COMBAT_BOT_DURATION,
     COMBAT_END_DURATION,
     COMBAT_SHORT_TURN_DURATION,
     COMBAT_TURN_DURATION,
@@ -25,7 +26,7 @@ import {
 } from '@common/consts/combat-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatAction, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
-import { PlayerData } from '@common/interfaces/player-data';
+import { PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
@@ -67,10 +68,11 @@ export class CombatService {
         loser.currentHealth = 0;
         this.respawnPlayer(match, match.data.players[loser.playerIndex]);
         match.sendUpdate();
+        const duration = this.getTimeoutDuration(match, COMBAT_END_DURATION);
         if (match.data.playData.activePlayerIndex === loser.playerIndex) {
-            match.setTimeout(this.playService.startNextTurn.bind(this.playService, match), COMBAT_END_DURATION);
+            match.setTimeout(this.playService.startNextTurn.bind(this.playService, match), duration);
         } else {
-            match.setTimeout(this.playService.continueTurn.bind(this.playService, match), COMBAT_END_DURATION);
+            match.setTimeout(this.playService.continueTurn.bind(this.playService, match), duration);
         }
     }
 
@@ -97,6 +99,13 @@ export class CombatService {
         return match.data.combatData.playersCombatData[Number(!match.data.combatData.isSecondPlayerTurn)];
     }
 
+    private getTimeoutDuration(match: Match, duration: number): number {
+        const firstPlayer = match.data.players[match.data.combatData.playersCombatData[0].playerIndex];
+        const secondPlayer = match.data.players[match.data.combatData.playersCombatData[0].playerIndex];
+        const hasTwoBots = firstPlayer.type !== PlayerType.Player && secondPlayer.type !== PlayerType.Player;
+        return hasTwoBots ? COMBAT_BOT_DURATION : duration;
+    }
+
     private canPlayerAct(match: Match, playerId: string): boolean {
         const index = match.getPlayerIndex(playerId);
         const isFirstPlayer = !match.data.combatData.isSecondPlayerTurn && match.data.combatData.playersCombatData[0].playerIndex === index;
@@ -120,10 +129,11 @@ export class CombatService {
         this.executeAttack(match);
         match.data.combatData.isSecondPlayerTurn = !match.data.combatData.isSecondPlayerTurn;
         match.sendUpdate();
+        const duration = this.getTimeoutDuration(match, COMBAT_ANIMATION_DURATION);
         if (this.getActivePlayerData(match).currentHealth > 0) {
-            match.setTimeout(this.startCombatWait.bind(this, match), COMBAT_ANIMATION_DURATION);
+            match.setTimeout(this.startCombatWait.bind(this, match), duration);
         } else {
-            match.setTimeout(this.startCombatEndDeath.bind(this, match), COMBAT_ANIMATION_DURATION);
+            match.setTimeout(this.startCombatEndDeath.bind(this, match), duration);
         }
     }
 
@@ -133,10 +143,11 @@ export class CombatService {
         match.data.combatData.isSecondPlayerTurn = !match.data.combatData.isSecondPlayerTurn;
         match.data.combatData.lastCombatAction = isEscapeSuccessful ? CombatAction.SuccessEscape : CombatAction.FailEscape;
         match.sendUpdate();
+        const duration = this.getTimeoutDuration(match, COMBAT_ANIMATION_DURATION);
         if (isEscapeSuccessful) {
-            match.setTimeout(this.startCombatEndEscape.bind(this, match), COMBAT_ANIMATION_DURATION);
+            match.setTimeout(this.startCombatEndEscape.bind(this, match), duration);
         } else {
-            match.setTimeout(this.startCombatWait.bind(this, match), COMBAT_ANIMATION_DURATION);
+            match.setTimeout(this.startCombatWait.bind(this, match), duration);
         }
     }
 

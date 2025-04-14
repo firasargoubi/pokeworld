@@ -12,10 +12,8 @@ $player-arrow-width: 0.044;
 $player-card-width: 0.935;
 $player-card-height: 0.165;
 $player-card-margin: 0.015;
-$bg-stripes-size: 2.6vh;
 
 // Adjustable durations
-$stripes-animation-duration: 5s;
 $arrow-transition-time: 0.25s;
 $movement-bar-transition-time: 0.25s;
 
@@ -23,8 +21,6 @@ $movement-bar-transition-time: 0.25s;
 $text-color: rgb(255, 255, 255);
 $main-border-color1: #636776;
 $main-border-color2: #e9f6f7;
-$stripes-color1: hsl(225, 6%, 15%);
-$stripes-color2: hsl(220, 6%, 17%);
 $light-text-color: hsl(220, 1%, 100%);
 $light-text-shadow: hsl(220, 6%, 60%);
 $dark-text-color: hsl(220, 6%, 12%);
@@ -35,10 +31,18 @@ $card-game-info: '../../../assets/images/menu/containers/cards/game-info.png';
 $card-self-info: '../../../assets/images/menu/containers/cards/self-info.png';
 $card-gray: '../../../assets/images/menu/containers/cards/gray.png';
 $card-orange: '../../../assets/images/menu/containers/cards/orange.png';
+$card-red: '../../../assets/images/menu/containers/cards/red.png';
+$card-red-active: '../../../assets/images/menu/containers/cards/red-active.png';
+$card-blue: '../../../assets/images/menu/containers/cards/blue.png';
+$card-blue-active: '../../../assets/images/menu/containers/cards/blue-active.png';
 $arrow-orange: '../../../assets/images/menu/icons/arrows/orange-arrow.png';
+$arrow-red: '../../../assets/images/menu/icons/arrows/red-arrow.png';
+$arrow-blue: '../../../assets/images/menu/icons/arrows/blue-arrow.png';
 $icon-sword: '../../../assets/images/menu/icons/sword.png';
 $icon-crown: '../../../assets/images/menu/icons/crown.png';
-$icon-bot: '../../../assets/images/menu/icons/bot.png';
+$icon-defensive-bot: '../../../assets/images/menu/icons/bot-defensive.png';
+$icon-aggressive-bot: '../../../assets/images/menu/icons/bot-aggressive.png';
+$icon-flag: '../../../assets/images/menu/icons/flag.png';
 $timer-image: '../../../assets/images/menu/timer/timer.png';
 $action-button: '../../../assets/images/menu/buttons/play/action-button.png';
 $endturn-button: '../../../assets/images/menu/buttons/play/endturn-button.png';
@@ -50,6 +54,7 @@ $movement-bar-full: '../../../assets/images/menu/stat-bar/movement-bar-full.png'
 $movement-bar-empty: '../../../assets/images/menu/stat-bar/movement-bar-empty.png';
 $movement-icon: '../../../assets/images/menu/icons/movement.png';
 $item-container: '../../../assets/images/menu/containers/item/item-container.png';
+$info-button: '../../../assets/images/menu/icons/info.png';
 
 // Computed measures
 $map-size-1: calc($main-height * (1 - $margin-top - $margin-bot));
@@ -75,15 +80,7 @@ $shadow: drop-shadow(0 0 calc(0.005 * $map-size) rgba(0, 0, 0, 0.15));
 .play-page {
     height: 100vh;
     width: 100vw;
-    background: repeating-linear-gradient(
-        0deg,
-        $stripes-color1,
-        $stripes-color1 $bg-stripes-size,
-        $stripes-color2 $bg-stripes-size,
-        $stripes-color2 $bg-stripes-size * 2
-    );
-    background-size: 100% ($bg-stripes-size * 2);
-    animation: fall $stripes-animation-duration linear infinite;
+    background: #72C37A;
 }
 
 .play-page * {
@@ -120,16 +117,6 @@ main::after {
     border: calc($main-border-width * $map-size * 2) solid $main-border-color2;
     outline: calc(2 * $main-border-width * $map-size) solid $main-border-color1;
     outline-offset: calc($main-border-width * $map-size * -1);
-}
-
-@keyframes fall {
-    from {
-        background-position: 0 0;
-    }
-
-    to {
-        background-position: 0 $bg-stripes-size * 2;
-    }
 }
 
 .main-center {
@@ -194,6 +181,16 @@ app-map {
     margin-bottom: calc($player-card-margin * $final-side-width);
     background-image: url($card-gray);
     display: flex;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.is-red-team.player-card {
+    background-image: url($card-red);
+}
+
+.is-blue-team.player-card {
+    background-image: url($card-blue);
 }
 
 .player-card-left {
@@ -210,6 +207,24 @@ app-map {
     background-image: url($card-orange);
 }
 
+*[style*='--current-player-turn: 0'] .is-red-team.player-card:nth-child(1),
+*[style*='--current-player-turn: 1'] .is-red-team.player-card:nth-child(2),
+*[style*='--current-player-turn: 2'] .is-red-team.player-card:nth-child(3),
+*[style*='--current-player-turn: 3'] .is-red-team.player-card:nth-child(4),
+*[style*='--current-player-turn: 4'] .is-red-team.player-card:nth-child(5),
+*[style*='--current-player-turn: 5'] .is-red-team.player-card:nth-child(6) {
+    background-image: url($card-red-active);
+}
+
+*[style*='--current-player-turn: 0'] .is-blue-team.player-card:nth-child(1),
+*[style*='--current-player-turn: 1'] .is-blue-team.player-card:nth-child(2),
+*[style*='--current-player-turn: 2'] .is-blue-team.player-card:nth-child(3),
+*[style*='--current-player-turn: 3'] .is-blue-team.player-card:nth-child(4),
+*[style*='--current-player-turn: 4'] .is-blue-team.player-card:nth-child(5),
+*[style*='--current-player-turn: 5'] .is-blue-team.player-card:nth-child(6) {
+    background-image: url($card-blue-active);
+}
+
 .play-page .player-arrow {
     height: calc($player-card-height * $final-side-width);
     width: calc($player-arrow-width * $final-side-width);
@@ -217,6 +232,14 @@ app-map {
     background-size: 100% 69%;
     background-image: url($arrow-orange);
     transition: margin-top $arrow-transition-time ease-in-out;
+}
+
+.play-page .player-arrow.active-blue {
+    background-image: url($arrow-blue);
+}
+
+.play-page .player-arrow.active-red {
+    background-image: url($arrow-red);
 }
 
 .player-cards > .player-card:last-child {
@@ -254,12 +277,25 @@ app-map {
         calc(0.03 * $player-card-height * $final-side-width) calc(0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
 }
 
-.is-bot:not(.is-admin) .player-name {
+.is-aggressive-bot:not(.is-admin) .player-name,
+.is-defensive-bot:not(.is-admin) .player-name {
     max-width: calc(2.7 * $player-card-height * $final-side-width);
 }
 
 .is-admin .player-name {
     max-width: calc(2.67 * $player-card-height * $final-side-width);
+}
+
+.is-aggressive-bot:not(.is-admin).is-red-team .player-name,
+.is-defensive-bot:not(.is-admin).is-red-team .player-name,
+.is-aggressive-bot:not(.is-admin).is-blue-team .player-name,
+.is-defensive-bot:not(.is-admin).is-blue-team .player-name {
+    max-width: calc(2.64 * $player-card-height * $final-side-width);
+}
+
+.is-admin.is-red-team .player-name,
+.is-admin.is-blue-team .player-name {
+    max-width: calc(2.64 * $player-card-height * $final-side-width);
 }
 
 .has-left {
@@ -304,6 +340,11 @@ app-map {
             calc(0.45 * 1.6666666 * 0.008 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
 }
 
+.is-red-team .player-combats,
+.is-blue-team .player-combats {
+    width: calc(0.37 * $player-card-height * $final-side-width);
+}
+
 .sword-icon {
     display: inline-block;
     vertical-align: top;
@@ -312,6 +353,24 @@ app-map {
     margin-top: calc(0.31 * $player-card-height * $final-side-width);
     margin-bottom: calc(0.25 * $player-card-height * $final-side-width);
     background-image: url($icon-sword);
+}
+
+.flag-icon {
+    display: inline-block;
+    vertical-align: top;
+    height: calc(0.44 * $player-card-height * $final-side-width);
+    width: calc(0.44 * $player-card-height * $final-side-width);
+    margin-top: calc(0.31 * $player-card-height * $final-side-width);
+    margin-bottom: calc(0.25 * $player-card-height * $final-side-width);
+    background-image: url($icon-flag);
+    opacity: 0;
+    transition: opacity 0.2s;
+    visibility: hidden;
+}
+
+.has-flag .flag-icon {
+    opacity: 1;
+    visibility: visible;
 }
 
 .player-card-right {
@@ -330,14 +389,19 @@ app-map {
     margin-bottom: calc(0.28 * $player-card-height * $final-side-width);
 }
 
-.is-bot:not(.is-admin) .info-icon {
+.is-aggressive-bot:not(.is-admin) .info-icon,
+.is-defensive-bot:not(.is-admin) .info-icon {
     display: inline-block;
     vertical-align: top;
-    background-image: url($icon-bot);
     height: calc(0.4 * $player-card-height * $final-side-width);
     width: calc(0.4 * $player-card-height * $final-side-width);
     margin-top: calc(0.32 * $player-card-height * $final-side-width);
     margin-bottom: calc(0.28 * $player-card-height * $final-side-width);
+    background-image: url($icon-aggressive-bot);
+}
+
+.is-defensive-bot:not(.is-admin) .info-icon {
+    background-image: url($icon-defensive-bot);
 }
 
 .is-admin .info-icon {
@@ -497,33 +561,12 @@ app-map {
         calc(0.015 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
 }
 
-.team-red .player-card {
-    border: calc(0.02 * $player-card-height * $final-side-width) solid #ff0000;
-}
-
-.team-blue .player-card {
-    border: calc(0.02 * $player-card-height * $final-side-width) solid #0000ff;
-}
-
 .play-page .timer-image {
     height: $timer-height;
     width: calc(200vw + 2 * $timer-height);
     background-image: url($timer-image);
     background-size: auto $timer-height;
-    transform: translateX(calc((var(--max-time) - var(--pause-time)) / var(--max-time) * -103vw - 1.5vw));
-}
-
-.active .timer-image {
-    animation: timer-animation calc(var(--pause-time) * 1s) linear 1 forwards;
-}
-
-@keyframes timer-animation {
-    from {
-        transform: translateX(calc((var(--max-time) - var(--pause-time)) / var(--max-time) * -103vw - 1.5vw));
-    }
-    to {
-        transform: translateX(calc(-103vw - 1.5vw));
-    }
+    transform: translateX(calc((var(--max-time) - var(--current-time)) / var(--max-time) * -103vw - 1.5vw));
 }
 
 .self-info-card {
@@ -566,6 +609,7 @@ app-map {
     height: calc(0.068 * $map-size);
     line-height: calc(0.068 * $map-size);
     padding-bottom: calc(0.05 * 0.04 * $map-size);
+    width: calc(0.26 * $map-size);
 }
 
 .chat-container {
@@ -743,30 +787,117 @@ app-map {
     height: calc(0.195 * $map-size);
 }
 
-#tool-description {
-    position: absolute;
-    z-index: 2;
-    pointer-events: none;
-    width: auto;
-    height: auto;
-    min-width: calc($map-size * 0.12);
-    max-width: calc($map-size * 0.4);
-    margin: 0;
-    font-size: calc($map-size * 0.03);
-    padding: calc($map-size * 0.024) calc($map-size * 0.024);
-    background: url('../../../assets/images/menu/containers/description-container.png');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    text-align: center;
-    color: black;
-    text-transform: none;
-    white-space: normal;
-    box-sizing: border-box;
-}
-
 #player-avatar {
     width: 35.484px;
     height: 35.484px;
     margin: 0 auto;
 }
+
+.debug-text {
+    margin-left: calc($map-size * 0.03);
+    color: #e00004;
+}
+
+.info-button {
+    cursor: pointer;
+    float: right;
+    margin-top: calc(0.004 * $map-size);
+    height: calc(0.060 * $map-size);
+    width: calc(0.060 * $map-size);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: url($info-button);
+    background-color: transparent;
+    text-decoration: none;
+    outline: none;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+}
+
+.info-button:hover {
+    filter: saturate(0.96) brightness(1.16) grayscale(0.06);
+}
+
+.info-button:active {
+    filter: saturate(0.92) brightness(1.32) grayscale(0.12);
+}
+
+
+#tool-description {
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+    max-width: calc($map-size * 0.39);
+    width: auto;
+    height: auto;
+    background: url('../../../assets/images/menu/containers/description-container.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    transform: translateY(-40%);
+    pointer-events: none;
+    user-select: none;
+}
+
+.item-description {
+    max-width: calc($map-size * 0.39);
+    width: auto;
+    height: auto;
+    font-size: calc($map-size * 0.029);
+    line-height: calc($map-size * 0.036);
+    padding: calc($map-size * 0.03);
+    padding-left: calc($map-size * 0.04);
+    color: black;
+    text-transform: none;
+    white-space: normal;
+}
+
+.item-description br {
+    text-align: center;
+}
+
+#player-info-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.3s ease-in-out,
+        background-color 0.3s ease-in-out;
+
+    &.visible {
+        visibility: visible;
+        opacity: 1;
+        background-color: rgba(0, 0, 0, 0.5);
+        pointer-events: auto;
+        animation: popupIn 0.2s steps(8, end) forwards;
+    }
+}
+
+@keyframes popupIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.04);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+

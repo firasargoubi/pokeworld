@@ -1,45 +1,48 @@
 import { Injectable, inject } from '@angular/core';
-import { DEFAULT_TILE_DESCRIPTION, TILE_EFFECT } from '@app/consts/tile-data.const';
-import { TileDescriptionInfo } from '@app/interfaces/tile-description';
+import { RIGHT_CLICK_ITEM_DESCRIPTION } from '@app/consts/item-data.const';
+import { RIGHT_CLICK_TILE_DESCRIPTION } from '@app/consts/tile-data.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MatchService } from '@app/services/match/match.service';
-import { AVATAR_DATA } from '@common/consts/avatar-data.const';
+import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { PlayerData } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
-import { TILE_COST } from '@common/interfaces/tile-type.enum';
 
 @Injectable({
     providedIn: 'root',
 })
 export class TileDescriptionService {
-    showTileDescription: boolean = false;
-    tileDescription: TileDescriptionInfo = structuredClone(DEFAULT_TILE_DESCRIPTION);
-    tileDescriptionPos: Position = { x: 0, y: 0 };
-    isPlayerDescription: boolean = false;
+    visible: boolean = false;
+    description: string = '';
+    position: Position = structuredClone(OUTSIDE_OF_MAP);
 
     private matchService: MatchService = inject(MatchService);
     private gameDataService: GameDataService = inject(GameDataService);
 
-    displayTileDescription(event: MouseEvent) {
+    displayTileDescription(event: MouseEvent): number | null {
         if (!this.matchService.canUseDebugMove()) {
             event.preventDefault();
 
             const mapContainer = event.currentTarget as HTMLElement;
             const mapRect = mapContainer.getBoundingClientRect();
             const mapSize: number = this.gameDataService.gameData.mapData.size;
-
             const tileCoords = this.calculateTileCoordinates(event, mapRect, mapSize);
 
             if (this.isTileInBounds(tileCoords, mapSize)) {
-                this.tileDescriptionPos = this.calculateDescriptionPosition(tileCoords, mapRect, mapSize);
-                this.isPlayerDescription = this.updateDescription(tileCoords);
-                this.showTileDescription = true;
+                const playerOnTile = this.findPlayerAtPosition(tileCoords);
+                if (playerOnTile) {
+                    this.visible = false;
+                    return this.matchService.data.players.findIndex((p) => p.id === playerOnTile.id);
+                }
+                this.position = this.calculateDescriptionPosition(tileCoords, mapRect, mapSize);
+                this.description = this.getDescription(tileCoords);
+                this.visible = true;
             }
         }
+        return null;
     }
 
     hideTileDescription() {
-        this.showTileDescription = false;
+        this.visible = false;
     }
 
     private calculateTileCoordinates(event: MouseEvent, mapRect: DOMRect, mapSize: number): Position {
@@ -74,19 +77,16 @@ export class TileDescriptionService {
         };
     }
 
-    private updateDescription(position: Position): boolean {
-        const playerOnTile = this.findPlayerAtPosition(position);
+    private getDescription(position: Position): string {
+        const tileType = this.gameDataService.getTileFromPosition(position);
+        let description = RIGHT_CLICK_TILE_DESCRIPTION.get(tileType) as string;
 
-        if (playerOnTile) {
-            this.tileDescription.playerName = playerOnTile.name;
-            this.tileDescription.avatar = AVATAR_DATA[playerOnTile.avatar].imageCentered;
-            return true;
-        } else {
-            const tileType = this.gameDataService.getTileFromPosition(position);
-            this.tileDescription.cost = TILE_COST[tileType];
-            this.tileDescription.effect = TILE_EFFECT[tileType];
-            return false;
+        const itemOnTile = this.gameDataService.getItem(position);
+        if (itemOnTile) {
+            description = `${RIGHT_CLICK_ITEM_DESCRIPTION.get(itemOnTile)}<br><br>${description}`;
         }
+
+        return description;
     }
 
     private findPlayerAtPosition(position: Position): PlayerData | null {

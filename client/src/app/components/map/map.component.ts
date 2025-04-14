@@ -38,8 +38,8 @@ export class MapComponent {
     }
 
     rightClickTile(event: MouseEvent, position: Position) {
+        event.preventDefault();
         if (!this.isEditor) {
-            event.preventDefault();
             this.playService.rightClickTile(position);
         }
     }

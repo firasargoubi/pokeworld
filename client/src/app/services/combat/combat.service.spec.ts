@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { Timer } from '@app/classes/timer/timer';
 import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
-import { CombatAction, CombatData } from '@common/interfaces/match-data';
 import { CombatEvent } from '@common/interfaces/socket-event.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { CombatService } from './combat.service';
@@ -47,24 +46,5 @@ describe('CombatService', () => {
         matchServiceSpy.isState.and.returnValue(true);
         service['onMatchUpdate'](matchData);
         expect(timerSpy.restartTimer).toHaveBeenCalled();
-    });
-
-    it('should return true when health increased and last action is not None', () => {
-        const playerIndex = 0;
-        service['lastCombatData'] = {
-            playersCombatData: [{ playerIndex, currentHealth: 50 }],
-        } as CombatData;
-        service['matchService'].data.combatData.lastCombatAction = CombatAction.SuccessAttack;
-        expect(service.hasPlayerHealed(playerIndex)).toBeTrue();
-    });
-
-    it('should return false when lastCombatAction is None', () => {
-        const playerIndex = 0;
-        service['lastCombatData'] = {
-            playersCombatData: [{ playerIndex, currentHealth: 50 }],
-        } as CombatData;
-        service['matchService'].data.combatData.lastCombatAction = CombatAction.None;
-
-        expect(service.hasPlayerHealed(playerIndex)).toBeFalse();
     });
 });

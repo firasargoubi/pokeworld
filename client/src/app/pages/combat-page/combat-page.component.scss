@@ -200,22 +200,20 @@ $combat-info-height: 28vh;
     animation: enemy-escape 1.5s cubic-bezier(0.45, 0, 1, 1) forwards;
 }
 
+#enemy-container .pokemon-container.is-healing,
+#self-container .pokemon-container.is-healing {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    animation: healing 1.5s cubic-bezier(0.45, 0, 1, 1) forwards;
+}
+
 #self-container .is-dead {
     animation: self-death 1.5s ease-in-out forwards;
 }
 
 #enemy-container .is-dead {
     animation: enemy-death 1.5s ease-in-out forwards;
-}
-
-#enemy-container .is-healing {
-    background-image: none;
-    animation: healing 1.5s ease-in-out forwards;
-}
-
-#self-container .is-healing {
-    background-image: none;
-    animation: healing 1.5s ease-in-out forwards;
 }
 
 .hp-container {
@@ -739,29 +737,40 @@ $combat-info-height: 28vh;
 }
 
 @keyframes healing {
-    0%,
-    100% {
+    0% {
+        background-image: none;
         filter: none;
+    }
+    10% {
+        background-image: none;
+        filter: none;
+    }
+    20% {
         background-image: url('../../../assets/images/game/effects/healing.gif');
-        background-size: 100% 100%;
-        background-position: center;
-        background-repeat: no-repeat;
+        filter: none;
     }
-    15%,
-    45%,
-    75% {
-        filter: sepia(100%) saturate(150%) hue-rotate(90deg) brightness(110%);
+    50% {
+        background-image: url('../../../assets/images/game/effects/healing.gif');
+        filter: none;
     }
-    30%,
-    60%,
+    60% {
+        background-image: url('../../../assets/images/game/effects/healing.gif');
+        filter: sepia(100%) hue-rotate(110deg) saturate(400%) brightness(65%);
+    }
+    70% {
+        background-image: url('../../../assets/images/game/effects/healing.gif');
+        filter: sepia(100%) hue-rotate(110deg) saturate(400%) brightness(65%);
+    }
+    80% {
+        background-image: url('../../../assets/images/game/effects/healing.gif');
+        filter: none;
+    }
     90% {
+        background-image: none;
         filter: none;
-        background-image: url('../../../assets/images/game/effects/healing.gif');
-        background-size: 100% 100%;
-        background-position: center;
-        background-repeat: no-repeat;
     }
     100% {
         background-image: none;
+        filter: none;
     }
 }

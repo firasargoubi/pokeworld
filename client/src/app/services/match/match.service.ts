@@ -95,11 +95,8 @@ export class MatchService {
     }
 
     private onNavigationUpdate(event: RouterEvent) {
-        window.console.log('AAA');
         if (event instanceof NavigationStart) {
-            window.console.log('BBB');
             if (event.navigationTrigger !== 'imperative') {
-                window.console.log('CCC');
                 this.leaveMatch();
             }
         }

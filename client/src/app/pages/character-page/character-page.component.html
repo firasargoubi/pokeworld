@@ -1,6 +1,6 @@
 <div>
     <div id="page-header">
-        <app-header [onClick]="this.goToMenu.bind(this)" [stepNumber]="'2'" [title]="'SELECTION DE PERSONNAGE'"></app-header>
+        <app-header [onClick]="this.goToMenu.bind(this)" [stepNumber]="'2'" [title]="'SELECTIONNEZ VOTRE PERSONNAGE'"></app-header>
     </div>
     <div id="ps-page-body">
         <main class="flex-container">
@@ -16,12 +16,12 @@
                             type="text"
                             [formControl]="nameForm"
                             maxlength="{{ visualData.nameMaxLength }}"
-                            placeholder="Entrez votre pseudo"
+                            placeholder="Entrez votre nom"
                             autofocus
                             autocomplete="off"
                             style="text-transform: uppercase"
                         />
-                        <p id="input-border">--------------------</p>
+                        <p id="input-border">----------------</p>
                     </span>
                 </div>
                 <div id="stats-selection-container">
@@ -55,7 +55,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="bonus-selection-container">
+                    <div id="bonus-selection-container" class="dice">
                         <div class="label">SELECTIONNEZ VOS DÉS:</div>
                         <div class="slections-container">
                             <div class="stat-container stat-container-dice-1" (click)="toggleBonusDice()">
@@ -70,8 +70,8 @@
                                     [ngClass]="{ visible: !visualData.isAttackSelected, hidden: visualData.isAttackSelected }"
                                 />
                                 <div class="stat-body">
-                                    <div class="stat-label">ATTAQUE</div>
-                                    <div class="stat-value">4/4</div>
+                                    <div class="stat-label stat-label-dice">ATTAQUE</div>
+                                    <div class="stat-value"></div>
                                 </div>
                             </div>
                             <div class="stat-separator">
@@ -89,8 +89,8 @@
                                     [ngClass]="{ visible: visualData.isAttackSelected, hidden: !visualData.isAttackSelected }"
                                 />
                                 <div class="stat-body">
-                                    <div class="stat-label">DEFENSE</div>
-                                    <div class="stat-value">4/4</div>
+                                    <div class="stat-label stat-label-dice">DÉFENSE</div>
+                                    <div class="stat-value"></div>
                                 </div>
                             </div>
                         </div>
