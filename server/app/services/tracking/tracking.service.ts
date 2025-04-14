@@ -15,6 +15,9 @@ export class TrackingService {
     @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
 
     startTrackingMatch(match: Match) {
+        match.data.players.forEach((player) => {
+            match.data.trackingData.coveredGroundTiles.push(player.position);
+        });
         match.data.trackingData.startTime = Date.now();
         match.data.trackingData.players = match.data.players
             .filter((player) => player.isConnected)
@@ -23,6 +26,7 @@ export class TrackingService {
                 id: player.id,
                 name: player.name,
                 team: player.team,
+                coveredGroundTiles: [player.spawnPoint],
             }));
     }
 
@@ -75,14 +79,16 @@ export class TrackingService {
         }
     }
 
-    updateGroundTiles(match: Match, position: Position, playerId: string) {
+    updateGroundTiles(match: Match, positions: Position[], playerId: string) {
         const tilePositions = match.data.gameData.mapData.tiles;
-        const targetTile = tilePositions[position.x][position.y];
-        if (targetTile !== TileType.Bridge) {
-            let visitedGroundTiles = match.data.trackingData.coveredGroundTiles;
-            this.addPosIfNew(position, visitedGroundTiles);
-            visitedGroundTiles = this.getPlayerStat(match, playerId).coveredGroundTiles;
-            this.addPosIfNew(position, visitedGroundTiles);
+        for (const position of positions) {
+            const targetTile = tilePositions[position.x][position.y];
+            if (targetTile !== TileType.Bridge) {
+                let visitedGroundTiles = match.data.trackingData.coveredGroundTiles;
+                this.addPosIfNew(position, visitedGroundTiles);
+                visitedGroundTiles = this.getPlayerStat(match, playerId).coveredGroundTiles;
+                this.addPosIfNew(position, visitedGroundTiles);
+            }
         }
     }
 

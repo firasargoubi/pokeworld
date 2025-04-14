@@ -4,7 +4,7 @@ import { GlobalStatData, Order, PlayerStatData, TotalTiles, WinnerVisualData } f
 import { PlayerStatType } from '@app/interfaces/stat-type.enum';
 import { MatchService } from '@app/services/match/match.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
-import { PERCENTAGE_FACTOR, SPAWN_POSITION } from '@common/consts/track-data.const';
+import { PERCENTAGE_FACTOR } from '@common/consts/track-data.const';
 import { TrackingData } from '@common/interfaces/match-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
@@ -92,7 +92,7 @@ export class StatService {
     }
 
     private getTileRatio(coveredTiles: Position[]): number {
-        const nCoveredTiles = coveredTiles.length + SPAWN_POSITION;
+        const nCoveredTiles = coveredTiles.length;
         return this.getRatio(nCoveredTiles, this.mapTotalTiles.ground);
     }
 

@@ -71,7 +71,6 @@ export class LobbyService {
             } else if (isCtfMode && !isEvenPlayers) {
                 match.sendMessageToHost(Message.NotEvenPlayers);
             } else {
-                this.trackingService.startTrackingMatch(match);
                 this.startMatchFirstTurn(match);
             }
         }

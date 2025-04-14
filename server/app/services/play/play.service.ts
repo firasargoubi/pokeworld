@@ -43,7 +43,7 @@ export class PlayService {
                 match.data.playData.movementLeft -= shortestPath.moveCost;
                 match.data.state = MatchState.MovementAnimation;
                 this.setTimeLeft(match);
-                this.trackingService.updateGroundTiles(match, position, playerId);
+                this.trackingService.updateGroundTiles(match, shortestPath.path, playerId);
                 match.sendUpdate();
                 match.setTimeout(this.continueTurn.bind(this, match), (shortestPath.path.length + 1) * MOVEMENT_ANIMATION_DURATION);
             }
@@ -67,7 +67,7 @@ export class PlayService {
             if (isMoveValid) {
                 const player = match.getPlayer(playerId);
                 player.position = position;
-                this.trackingService.updateGroundTiles(match, position, playerId);
+                this.trackingService.updateGroundTiles(match, [position], playerId);
                 match.sendUpdate();
             }
         }

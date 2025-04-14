@@ -84,6 +84,7 @@ describe('TrackingService', () => {
                 id: originalPlayer.id,
                 name: originalPlayer.name,
                 team: originalPlayer.team,
+                coveredGroundTiles: [originalPlayer.spawnPoint],
             });
             expect(playerStats.hpInflicted).toBe(0);
             expect(playerStats.hpLost).toBe(0);
@@ -92,7 +93,6 @@ describe('TrackingService', () => {
             expect(playerStats.escapes).toBe(0);
             expect(playerStats.combats).toBe(0);
             expect(playerStats.pickedUpItems).toEqual([]);
-            expect(playerStats.coveredGroundTiles).toEqual([]);
         });
     });
 
@@ -199,10 +199,11 @@ describe('TrackingService', () => {
 
     it('should update ground tiles correctly when tile is not Bridge', () => {
         const playerId = matchData.players[0].id;
-        service.updateGroundTiles(match, { x: 0, y: 0 }, playerId);
+        const positions = [{ x: 0, y: 0 }];
+        service.updateGroundTiles(match, positions, playerId);
         expect(matchData.trackingData.coveredGroundTiles).toContainEqual({ x: 0, y: 0 });
         expect(service['getPlayerStat'](match, playerId).coveredGroundTiles).toContainEqual({ x: 0, y: 0 });
-        service.updateGroundTiles(match, { x: 0, y: 0 }, playerId);
+        service.updateGroundTiles(match, positions, playerId);
         const count = matchData.trackingData.coveredGroundTiles.filter((p: Position) => p.x === 0 && p.y === 0).length;
         expect(count).toEqual(1);
     });
@@ -211,7 +212,8 @@ describe('TrackingService', () => {
         const playerId = matchData.players[0].id;
         matchData.gameData.mapData.tiles[0][0] = TileType.Bridge;
 
-        service.updateGroundTiles(match, { x: 0, y: 0 }, playerId);
+        const positions = [{ x: 0, y: 0 }];
+        service.updateGroundTiles(match, positions, playerId);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const addPosIfNewSpy = jest.spyOn(service as any, 'addPosIfNew');
         expect(addPosIfNewSpy).not.toBeCalled();
@@ -219,9 +221,10 @@ describe('TrackingService', () => {
     });
 
     it('should update toggled bridges correctly', () => {
-        service.updateToggledBridges(match, { x: 1, y: 1 });
+        const position = { x: 1, y: 1 };
+        service.updateToggledBridges(match, position);
         expect(matchData.trackingData.coveredBridges).toContainEqual({ x: 1, y: 1 });
-        service.updateToggledBridges(match, { x: 1, y: 1 });
+        service.updateToggledBridges(match, position);
         const count = matchData.trackingData.coveredBridges.filter((p: Position) => p.x === 1 && p.y === 1).length;
         expect(count).toEqual(1);
     });
