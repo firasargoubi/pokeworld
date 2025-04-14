@@ -8,6 +8,7 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchData } from '@common/interfaces/match-data';
 import { LobbyEvent, MatchEvent } from '@common/interfaces/socket-event.enum';
 import { DEBUG_GAMES, DEBUG_PLAYERS } from './debug-page.component.const';
+import { GameSaveService } from '@app/services/game-save/game-save.service';
 
 @Component({
     selector: 'app-debug-page',
@@ -18,6 +19,7 @@ import { DEBUG_GAMES, DEBUG_PLAYERS } from './debug-page.component.const';
 })
 export class DebugPageComponent {
     matchCodeInput: string = '';
+    private gameSaveService: GameSaveService = inject(GameSaveService);
     private matchService: MatchService = inject(MatchService);
     private socketService: SocketService = inject(SocketService);
     private router: Router = inject(Router);
@@ -35,7 +37,15 @@ export class DebugPageComponent {
 
     createMatch(index: number) {
         const gameData = DEBUG_GAMES[index];
-        this.socketService.emit(MatchEvent.CreateMatch, gameData, this.onJoinMatch.bind(this));
+        this.gameSaveService.getAllGames().subscribe({
+            next: (games) => {
+                const fakeId = games.find((game) => game.isVisible)?._id;
+                if (fakeId) {
+                    gameData._id = fakeId;
+                    this.socketService.emit(MatchEvent.CreateMatch, gameData, this.onJoinMatch.bind(this));
+                }
+            },
+        });
     }
 
     private joinMatch() {

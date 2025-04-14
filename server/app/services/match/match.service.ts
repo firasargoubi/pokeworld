@@ -1,8 +1,10 @@
 import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
+import { Game } from '@app/model/schema/game.schema';
 import { BotService } from '@app/services/bot/bot.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
+import { GameService } from '@app/services/game/game.service';
 import { PlayService } from '@app/services/play/play.service';
 import { DEFAULT_MATCH_DATA, MATCH_CODE_LENGTH, MATCH_CODE_RANGE } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
@@ -19,12 +21,13 @@ export class MatchService {
     @Inject(forwardRef(() => PlayService)) private playService: PlayService;
     @Inject(forwardRef(() => BotService)) private botService: BotService;
     @Inject(forwardRef(() => ChatService)) private chatService: ChatService;
+    @Inject(GameService) private gameService: GameService;
     private matches: Map<string, Match> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
 
-    createMatch(playerId: string, gameData: GameData): MatchData | null {
+    async createMatch(playerId: string, gameData: GameData): Promise<MatchData | null> {
         let matchData = null;
-        if (this.canCreateMatch(playerId)) {
+        if (await this.canCreateMatch(playerId, gameData)) {
             matchData = {
                 ...structuredClone(DEFAULT_MATCH_DATA),
                 code: this.getNewMatchCode(),
@@ -132,10 +135,17 @@ export class MatchService {
         return canJoinMatch;
     }
 
-    private canCreateMatch(playerId: string): boolean {
+    private async canCreateMatch(playerId: string, gameData: GameData): Promise<boolean> {
+        const game: Game = await this.gameService.findGame(gameData._id);
         let canCreateMatch = true;
         if (this.hasPlayerId(playerId)) {
             this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch, true);
+            canCreateMatch = false;
+        } else if (!game) {
+            this.matchGateway.emitMessage(playerId, Message.DeletedGame, true);
+            canCreateMatch = false;
+        } else if (!game.isVisible) {
+            this.matchGateway.emitMessage(playerId, Message.InvisibleGame, true);
             canCreateMatch = false;
         }
         return canCreateMatch;

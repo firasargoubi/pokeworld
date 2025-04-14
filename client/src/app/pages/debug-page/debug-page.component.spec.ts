@@ -1,10 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { of } from 'rxjs';
 import { DebugPageComponent } from './debug-page.component';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 
 describe('DebugPageComponent', () => {
     let component: DebugPageComponent;
@@ -12,11 +15,13 @@ describe('DebugPageComponent', () => {
     let mockMatchService: jasmine.SpyObj<MatchService>;
     let mockSocketService: jasmine.SpyObj<SocketService>;
     let mockRouter: jasmine.SpyObj<Router>;
+    let mockGameSaveService: jasmine.SpyObj<GameSaveService>;
 
     beforeEach(async () => {
         mockMatchService = jasmine.createSpyObj('MatchService', ['resetMatchData'], { selfIndex: 0 });
         mockSocketService = jasmine.createSpyObj('SocketService', ['emit'], { selfId: 'selfId' });
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+        mockGameSaveService = jasmine.createSpyObj('GameSaveService', ['getAllGames']);
 
         await TestBed.configureTestingModule({
             imports: [DebugPageComponent, FormsModule],
@@ -24,6 +29,7 @@ describe('DebugPageComponent', () => {
                 { provide: MatchService, useValue: mockMatchService },
                 { provide: SocketService, useValue: mockSocketService },
                 { provide: Router, useValue: mockRouter },
+                { provide: GameSaveService, useValue: mockGameSaveService },
             ],
         }).compileComponents();
 
@@ -43,11 +49,6 @@ describe('DebugPageComponent', () => {
         const event = new KeyboardEvent('keydown', { key: 'Return', repeat: false });
         component.onKeyDown(event);
         expect(joinMatchSpy).toHaveBeenCalled();
-    });
-
-    it('create match should emit create match and handle callback', () => {
-        component.createMatch(0);
-        expect(mockSocketService.emit).toHaveBeenCalled();
     });
 
     it('join match should emit join match and handle callback', () => {
@@ -78,5 +79,38 @@ describe('DebugPageComponent', () => {
 
         expect(execCommandSpy).toHaveBeenCalledWith('copy');
         expect(clipboardWriteSpy).not.toHaveBeenCalled();
+    });
+
+    it('should create match when visible game is found', () => {
+        const game = structuredClone(MOCK_GAME_DATAS[0]);
+        game.isVisible = true;
+        const mockGames = [game];
+        mockGameSaveService.getAllGames.and.returnValue(of(mockGames));
+
+        component.createMatch(0);
+
+        expect(mockGameSaveService.getAllGames).toHaveBeenCalled();
+        expect(mockSocketService.emit).toHaveBeenCalled();
+    });
+
+    it('should not create match when no visible game is found', () => {
+        const game = structuredClone(MOCK_GAME_DATAS[0]);
+        game.isVisible = false;
+        const mockGames = [game];
+        mockGameSaveService.getAllGames.and.returnValue(of(mockGames));
+
+        component.createMatch(0);
+
+        expect(mockGameSaveService.getAllGames).toHaveBeenCalled();
+        expect(mockSocketService.emit).not.toHaveBeenCalled();
+    });
+
+    it('should handle empty games list', () => {
+        mockGameSaveService.getAllGames.and.returnValue(of([]));
+
+        component.createMatch(0);
+
+        expect(mockGameSaveService.getAllGames).toHaveBeenCalled();
+        expect(mockSocketService.emit).not.toHaveBeenCalled();
     });
 });

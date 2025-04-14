@@ -40,8 +40,11 @@ export class CreatePageComponent implements OnInit {
     async createMatch(gameData: GameData) {
         if (!this.isCreatingMatch) {
             this.isCreatingMatch = true;
-            await this.matchService.createMatch(gameData);
+            const isMatchCreated = await this.matchService.createMatch(gameData);
             this.isCreatingMatch = false;
+            if (!isMatchCreated) {
+                this.loadGames();
+            }
         }
     }
 

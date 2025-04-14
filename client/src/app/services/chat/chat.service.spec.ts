@@ -28,7 +28,7 @@ describe('ChatService', () => {
 
     it('should send a message', () => {
         const message = 'Hello, world!';
-        mockSocketService.emit.and.callFake(async () => true);
+        mockSocketService.emit.and.callFake(async () => Promise.resolve(false));
         service.sendMessage(message);
         expect(mockSocketService.emit).toHaveBeenCalled();
     });

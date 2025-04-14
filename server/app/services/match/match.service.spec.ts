@@ -13,6 +13,7 @@ import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance }
 import { MatchService } from './match.service';
 import { BotService } from '@app/services/bot/bot.service';
 import { PlayerType } from '@common/interfaces/player-data';
+import { GameService } from '@app/services/game/game.service';
 
 describe('MatchService', () => {
     let service: MatchService;
@@ -21,6 +22,7 @@ describe('MatchService', () => {
     let mockCombatService: SinonStubbedInstance<CombatService>;
     let mockPlayService: SinonStubbedInstance<PlayService>;
     let mockBotService: SinonStubbedInstance<BotService>;
+    let mockGameService: SinonStubbedInstance<GameService>;
     let mockChatService: SinonStubbedInstance<ChatService>;
     let mockMatch: SinonStubbedInstance<Match>;
 
@@ -32,6 +34,7 @@ describe('MatchService', () => {
         mockBotService = createStubInstance<BotService>(BotService);
         mockChatService = createStubInstance<ChatService>(ChatService);
         mockMatch = createStubInstance<Match>(Match);
+        mockGameService = createStubInstance<GameService>(GameService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -41,6 +44,7 @@ describe('MatchService', () => {
                 { provide: CombatService, useValue: mockCombatService },
                 { provide: BotService, useValue: mockBotService },
                 { provide: ChatService, useValue: mockChatService },
+                { provide: GameService, useValue: mockGameService },
             ],
         }).compile();
 
@@ -61,7 +65,7 @@ describe('MatchService', () => {
         expect(service).toBeDefined();
     });
 
-    it('create match should create a new match and connect player', () => {
+    it('create match should create a new match and connect player', async () => {
         const playerId = 'player1';
         const matchCode = '1234';
         const gameData = MOCK_GAME_DATAS[0];
@@ -70,7 +74,7 @@ describe('MatchService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getNewMatchCode').returns('1234');
 
-        const matchData = service.createMatch(playerId, gameData);
+        const matchData = await service.createMatch(playerId, gameData);
 
         expect(matchData.code).toBe(matchCode);
         expect(matchData.gameData).toBe(gameData);
@@ -211,14 +215,47 @@ describe('MatchService', () => {
         expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.RoomLocked)).toBe(true);
     });
 
-    it('can create match should return true if player is not in a match', () => {
+    it('can create match should return true if player is not in a match', async () => {
         const playerId = 'player1';
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasPlayerId').returns(true);
 
-        const canCreate = service['canCreateMatch'](playerId);
+        const canCreate = await service['canCreateMatch'](playerId, MOCK_GAME_DATAS[0]);
 
+        expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.AlreadyInMatch, true)).toBe(true);
         expect(canCreate).toBe(false);
+    });
+
+    it('can create match should return false if match does not exist', async () => {
+        const playerId = 'player1';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'hasPlayerId').returns(false);
+        mockGameService.findGame.returns(Promise.resolve(null));
+        const canCreate = await service['canCreateMatch'](playerId, mockMatch.data.gameData);
+        expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.DeletedGame, true)).toBe(true);
+        expect(canCreate).toBe(false);
+    });
+
+    it('can create match should return false if match is not visible ', async () => {
+        const playerId = 'player1';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'hasPlayerId').returns(false);
+        const invisibleGame = mockMatch.data.gameData;
+        invisibleGame.isVisible = false;
+        mockGameService.findGame.returns(Promise.resolve(invisibleGame));
+        const canCreate = await service['canCreateMatch'](playerId, invisibleGame);
+        expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.InvisibleGame, true)).toBe(true);
+        expect(canCreate).toBe(false);
+    });
+
+    it('can create match should return true if match is VALID ', async () => {
+        const playerId = 'player1';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'hasPlayerId').returns(false);
+        const game = mockMatch.data.gameData;
+        mockGameService.findGame.returns(Promise.resolve(game));
+        const canCreate = await service['canCreateMatch'](playerId, game);
+        expect(canCreate).toBe(true);
     });
 
     it('is match full should return true if match is full', () => {
