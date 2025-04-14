@@ -9,6 +9,7 @@ export const COMBAT_TURN_DURATION = 5000;
 export const COMBAT_SHORT_TURN_DURATION = 3000;
 export const COMBAT_ANIMATION_DURATION = 500;
 export const COMBAT_END_DURATION = 2000;
+export const COMBAT_BOT_DURATION = 50;
 
 export const DEFAULT_ATTACK = 4;
 export const DEFAULT_DEFENSE = 4;

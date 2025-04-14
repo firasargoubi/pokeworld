@@ -1,10 +1,11 @@
+// eslint-disable-next-line max-classes-per-file -- To have 3 mocked components classes
 import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { Timer } from '@app/classes/timer/timer';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { MapComponent } from '@app/components/map/map.component';
-import { DEFAULT_TILE_DESCRIPTION } from '@app/consts/tile-data.const';
+import { PlayerInfoPopupComponent } from '@app/components/player-info-popup/player-info-popup.component';
 import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
@@ -32,6 +33,17 @@ class MockMapComponent {
     @Input() isEditor: boolean = false;
 }
 
+@Component({
+    selector: 'app-player-info-popup',
+    standalone: true,
+    template: '',
+})
+class MockPlayerInfoPopupComponent {
+    @Input() playerIndex: number = 0;
+    @Input() isVisible: boolean = false;
+    @Input() closeButton: () => void = () => ({});
+}
+
 describe('PlayPageComponent', () => {
     let component: PlayPageComponent;
     let fixture: ComponentFixture<PlayPageComponent>;
@@ -47,8 +59,7 @@ describe('PlayPageComponent', () => {
     beforeEach(() => {
         mockTimer = jasmine.createSpyObj('Timer', ['isStarted']);
         mockTileDescriptionService = jasmine.createSpyObj('TileDescriptionService', ['displayTileDescription', 'hideTileDescription'], {
-            tileDescriptionPos: { x: 0, y: 0 },
-            tileDescription: structuredClone(DEFAULT_TILE_DESCRIPTION),
+            position: { x: 1, y: 1 },
         });
         mockMatchService = jasmine.createSpyObj(
             'MatchService',
@@ -81,8 +92,8 @@ describe('PlayPageComponent', () => {
         }).compileComponents();
 
         TestBed.overrideComponent(PlayPageComponent, {
-            add: { imports: [MockMapComponent, MockChatComponent] },
-            remove: { imports: [MapComponent, ChatComponent] },
+            add: { imports: [MockMapComponent, MockPlayerInfoPopupComponent, MockChatComponent] },
+            remove: { imports: [MapComponent, PlayerInfoPopupComponent, ChatComponent] },
         });
 
         fixture = TestBed.createComponent(PlayPageComponent);
@@ -178,5 +189,16 @@ describe('PlayPageComponent', () => {
         expect(mockPlayService.changeDebugMode).not.toHaveBeenCalled();
 
         document.body.removeChild(inputElement);
+    });
+
+    it('should show player description on infButton', () => {
+        const spyShowPlayerDescription = spyOn(component, 'showPlayerDescription');
+        component.infoButton();
+        expect(spyShowPlayerDescription).toHaveBeenCalled();
+    });
+
+    it('should hide info popup on hidePlayerDescription', () => {
+        component.hidePlayerDescription();
+        expect(component.showPlayerInfoPopup).toBeFalse();
     });
 });

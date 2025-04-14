@@ -8,8 +8,8 @@ import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
-import { PlayerCombatData } from '@common/interfaces/match-data';
-import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { CombatAction, MatchData, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
+import { MOCK_MATCH_DATAS, MOCK_PLAYER_COMBAT_DATAS } from '@common/test-consts/mock-matches';
 import { CombatPageComponent } from './combat-page.component';
 
 @Component({
@@ -98,14 +98,6 @@ describe('CombatPageComponent', () => {
         expect(updateImagesSpy).toHaveBeenCalled();
     });
 
-    it('on match update should call subfunctions', () => {
-        mockMatchService.isState.and.returnValue(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        const checkForRedirectSpy = spyOn(component as any, 'checkForRedirect');
-        component['onMatchUpdate']();
-        expect(checkForRedirectSpy).toHaveBeenCalled();
-    });
-
     it('check for redirect should check state', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const checkForRedirectSpy = spyOn(component as any, 'checkForRedirect').and.callThrough();
@@ -145,5 +137,26 @@ describe('CombatPageComponent', () => {
         expect(component.displayChat).toBeTrue();
         component.hideChat();
         expect(component.displayChat).toBeFalse();
+    });
+
+    it('should correctly determine if a player has healed based on health, combat action, and state', () => {
+        const playerData: PlayerCombatData = structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]);
+        const oldMatchData: MatchData = structuredClone(MOCK_MATCH_DATAS[0]);
+        mockMatchService.data.combatData.lastCombatAction = CombatAction.SuccessAttack;
+        mockMatchService.data.state = MatchState.CombatWait;
+
+        oldMatchData.combatData.playersCombatData[0].currentHealth = 6;
+        let result = component['hasPlayerHealed'](oldMatchData, playerData);
+        expect(result).toBeFalse();
+
+        oldMatchData.combatData.playersCombatData[0].currentHealth = 4;
+        mockMatchService.data.combatData.lastCombatAction = CombatAction.None;
+        result = component['hasPlayerHealed'](oldMatchData, playerData);
+        expect(result).toBeFalse();
+
+        mockMatchService.data.combatData.lastCombatAction = CombatAction.SuccessAttack;
+        mockMatchService.data.state = MatchState.CombatAnimation;
+        result = component['hasPlayerHealed'](oldMatchData, playerData);
+        expect(result).toBeFalse();
     });
 });

@@ -29,7 +29,7 @@ describe('StatPageComponent', () => {
     class MockChatComponent {}
 
     beforeEach(async () => {
-        matchServiceSpy = jasmine.createSpyObj('MatchService', ['leaveMatch'], {
+        matchServiceSpy = jasmine.createSpyObj('MatchService', ['leaveMatch', 'isInMatch'], {
             data: structuredClone(MOCK_MATCH_DATAS[0]),
             matchUpdate: new Subject<MatchData>(),
             selfPlayer: structuredClone(MOCK_PLAYER_DATAS[0]),
@@ -54,6 +54,7 @@ describe('StatPageComponent', () => {
             remove: { imports: [ChatComponent] },
         });
 
+        matchServiceSpy.isInMatch.and.returnValue(true);
         fixture = TestBed.createComponent(StatPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

@@ -12,7 +12,7 @@ import { PlayService } from '@app/services/play/play.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { ItemType } from '@common/interfaces/item-type.enum';
-import { MatchState } from '@common/interfaces/match-data';
+import { CombatAction, MatchData, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
 
 @Component({
     selector: 'app-combat-page',
@@ -30,7 +30,7 @@ export class CombatPageComponent {
 
     constructor() {
         if (this.matchService.isInMatch()) {
-            this.onMatchUpdate();
+            this.onMatchUpdate(this.matchService.data);
             this.updateImages();
             this.computeItems();
             this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
@@ -67,10 +67,10 @@ export class CombatPageComponent {
         this.visualData.enemyImage = AVATAR_DATA[this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar].frontGif;
     }
 
-    private onMatchUpdate() {
+    private onMatchUpdate(oldMatchData: MatchData) {
         this.checkForRedirect();
         this.updatePlayersCombatData();
-        this.checkHealingAnimation();
+        this.checkHealingAnimation(oldMatchData);
     }
 
     private checkForRedirect() {
@@ -93,9 +93,20 @@ export class CombatPageComponent {
         }
     }
 
-    private checkHealingAnimation() {
-        this.visualData.isSelfHealing = this.combatService.hasPlayerHealed(this.visualData.selfPlayer.playerIndex);
-        this.visualData.isEnemyHealing = this.combatService.hasPlayerHealed(this.visualData.enemyPlayer.playerIndex);
+    private checkHealingAnimation(oldMatchData: MatchData) {
+        this.visualData.isSelfHealing = this.hasPlayerHealed(oldMatchData, this.visualData.selfPlayer);
+        this.visualData.isEnemyHealing = this.hasPlayerHealed(oldMatchData, this.visualData.enemyPlayer);
+    }
+
+    private hasPlayerHealed(oldMatchData: MatchData, playerData: PlayerCombatData): boolean {
+        const previousData = oldMatchData.combatData.playersCombatData.find(
+            (data) => data.playerIndex === playerData.playerIndex,
+        ) as PlayerCombatData;
+        const hasHealed = playerData.currentHealth > previousData.currentHealth;
+        const hasCombatStarted = this.matchService.data.combatData.lastCombatAction !== CombatAction.None;
+        const isCombatWait = this.matchService.data.state === MatchState.CombatWait;
+
+        return hasHealed && hasCombatStarted && isCombatWait;
     }
 
     private computeItems() {

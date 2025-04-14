@@ -296,11 +296,13 @@ app-player-card {
     align-items: center;
     pointer-events: none;
     opacity: 0;
+    visibility: hidden;
     transition:
         opacity 0.3s ease-in-out,
         background-color 0.3s ease-in-out;
 
     &.visible {
+        visibility: visible;
         opacity: 1;
         background-color: rgba(0, 0, 0, 0.5);
         pointer-events: auto;

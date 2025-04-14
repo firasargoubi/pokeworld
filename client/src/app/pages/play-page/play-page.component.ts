@@ -6,6 +6,7 @@ import { ChatComponent } from '@app/components/chat/chat.component';
 import { ItemDropPopupComponent } from '@app/components/item-drop-popup/item-drop-popup.component';
 import { ItemComponent } from '@app/components/item/item.component';
 import { MapComponent } from '@app/components/map/map.component';
+import { PlayerInfoPopupComponent } from '@app/components/player-info-popup/player-info-popup.component';
 import { DEFAULT_PLAY_VISUAL_DATA } from '@app/consts/play-data.const';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { PlayVisualData } from '@app/interfaces/play-visual-data';
@@ -17,16 +18,18 @@ import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { TileDescriptionService } from '@app/services/tile-description/tile-description.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchState } from '@common/interfaces/match-data';
-import { PlayerType } from '@common/interfaces/player-data';
 
 @Component({
     selector: 'app-play-page',
     templateUrl: './play-page.component.html',
     styleUrls: ['./play-page.component.scss'],
-    imports: [MapComponent, CommonModule, ChatComponent, ItemComponent, ItemDropPopupComponent],
+    imports: [MapComponent, CommonModule, ChatComponent, ItemComponent, ItemDropPopupComponent, PlayerInfoPopupComponent],
 })
 export class PlayPageComponent {
+    showPlayerInfoPopup: boolean = false;
+    descriptionPlayerIndex: number = 0;
     visualData: PlayVisualData = structuredClone(DEFAULT_PLAY_VISUAL_DATA);
     tileDescriptionService: TileDescriptionService = inject(TileDescriptionService);
     matchService: MatchService = inject(MatchService);
@@ -79,12 +82,29 @@ export class PlayPageComponent {
         });
     }
 
+    infoButton() {
+        this.showPlayerDescription(this.matchService.selfIndex);
+    }
+
     showTileDescription(event: MouseEvent) {
-        this.tileDescriptionService.displayTileDescription(event);
+        const clickedPlayerIndex = this.tileDescriptionService.displayTileDescription(event);
+        // Explicit null check required because index 0 is valid but falsy
+        if (clickedPlayerIndex !== null) {
+            this.showPlayerDescription(clickedPlayerIndex);
+        }
     }
 
     hideTileDescription() {
         this.tileDescriptionService.hideTileDescription();
+    }
+
+    hidePlayerDescription() {
+        this.showPlayerInfoPopup = false;
+    }
+
+    showPlayerDescription(playerIndex: number) {
+        this.showPlayerInfoPopup = true;
+        this.descriptionPlayerIndex = playerIndex;
     }
 
     private onMatchUpdate() {
@@ -113,9 +133,10 @@ export class PlayPageComponent {
                 avatarUrl: AVATAR_DATA[p.avatar].imageCentered,
                 combatsWon: p.combatsWon,
                 isHost: i === this.matchService.data.lobbyData.hostPlayerIndex,
-                isBot: p.type !== PlayerType.Player,
+                botType: p.type,
                 isConnected: p.isConnected,
                 team: p.team,
+                hasFlag: p.items.includes(ItemType.Flag),
             })),
             selfAvatarUrl: AVATAR_DATA[this.matchService.selfPlayer.avatar].imageCentered,
             movementLeft: this.matchService.getMovementLeft(),

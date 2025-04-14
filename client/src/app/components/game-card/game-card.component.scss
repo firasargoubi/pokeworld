@@ -127,9 +127,7 @@ $clip-path: polygon(
 
 .game-name {
     position: absolute;
-    font-size: min(3vw, 4.5vh);
     font-weight: bolder;
-    text-shadow: 0.25vw 0 0 $text-shadow-color;
     letter-spacing: 0.2vw;
     left: 10px;
     top: 4px;
@@ -141,17 +139,30 @@ $clip-path: polygon(
     display: block;
     overflow: visible;
     z-index: 1;
+    font-size: min(3vw, 4.5vh);
+    text-shadow:
+        calc(min(3vw, 4.5vh) * 0.0172) calc(min(3vw, 4.5vh) * 0.006) 0 rgb(120, 120, 120),
+        calc(min(3vw, 4.5vh) * 0.0344) calc(min(3vw, 4.5vh) * 0.012) 0 rgb(120, 120, 120),
+        calc(min(3vw, 4.5vh) * 0.0516) calc(min(3vw, 4.5vh) * 0.018) 0 rgb(120, 120, 120),
+        calc(min(3vw, 4.5vh) * 0.0688) calc(min(3vw, 4.5vh) * 0.024) 0 rgb(120, 120, 120),
+        calc(min(3vw, 4.5vh) * 0.0860) calc(min(3vw, 4.5vh) * 0.030) 0 rgb(120, 120, 120);
 }
 
 .size-info {
     position: absolute;
     bottom: 2px;
     right: 7px;
-    font-size: min(3vw, 4.5vh);
     text-shadow: 0.2vw 0 0 $text-shadow-color;
     letter-spacing: 0.1vw;
     overflow: visible;
     z-index: 1;
+    font-size: min(3vw, 4.5vh);
+    text-shadow:
+        calc(min(3vw, 4.5vh) * 0.0172) calc(min(3vw, 4.5vh) * 0.006) 0 rgb(120, 120, 120),
+        calc(min(3vw, 4.5vh) * 0.0344) calc(min(3vw, 4.5vh) * 0.012) 0 rgb(120, 120, 120),
+        calc(min(3vw, 4.5vh) * 0.0516) calc(min(3vw, 4.5vh) * 0.018) 0 rgb(120, 120, 120),
+        calc(min(3vw, 4.5vh) * 0.0688) calc(min(3vw, 4.5vh) * 0.024) 0 rgb(120, 120, 120),
+        calc(min(3vw, 4.5vh) * 0.0860) calc(min(3vw, 4.5vh) * 0.030) 0 rgb(120, 120, 120);
 }
 
 .thumbnail-separator {
@@ -219,13 +230,13 @@ $clip-path: polygon(
     top: 50%;
     left: 50%;
     transform: translate(-46%, -52%);
-    font-size: min(2.7vw, 4.5vh);
     text-align: center;
     z-index: 2;
     -webkit-text-stroke: 0.4vw #636776;
     paint-order: stroke fill;
     overflow: visible;
     color: rgb(255, 255, 255);
+    font-size: min(2.7vw, 4.5vh);
 }
 
 .mode-main-background {
@@ -250,7 +261,6 @@ $clip-path: polygon(
 }
 
 .last-edited {
-    font-size: min(1.9vw, 2.6vh);
     letter-spacing: 0.2;
     text-shadow: 0.15vw 0 0 $text-shadow-color;
     width: 60%;
@@ -259,6 +269,13 @@ $clip-path: polygon(
     white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    font-size: min(1.9vw, 2.6vh);
+    text-shadow:
+        calc(min(1.9vw, 2.6vh) * 0.0172) calc(min(1.9vw, 2.6vh) * 0.006) 0 rgb(120, 120, 120),
+        calc(min(1.9vw, 2.6vh) * 0.0344) calc(min(1.9vw, 2.6vh) * 0.012) 0 rgb(120, 120, 120),
+        calc(min(1.9vw, 2.6vh) * 0.0516) calc(min(1.9vw, 2.6vh) * 0.018) 0 rgb(120, 120, 120),
+        calc(min(1.9vw, 2.6vh) * 0.0688) calc(min(1.9vw, 2.6vh) * 0.024) 0 rgb(120, 120, 120),
+        calc(min(1.9vw, 2.6vh) * 0.0860) calc(min(1.9vw, 2.6vh) * 0.030) 0 rgb(120, 120, 120);
 }
 
 .game-interaction {

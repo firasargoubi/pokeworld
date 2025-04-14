@@ -9,6 +9,7 @@ export const MOVEMENT_ANIMATION_DURATION = 150;
 export const MATCH_END_DURATION = 3000;
 export const DROP_ITEMS_DURATION = 10000;
 export const TIME_SCALE = 1000;
+export const TIMER_INTERVAL = 10;
 export const SOCKET_TIMEOUT_DURATION = 1000;
 
 export const DEFAULT_SELF_INDEX = -1;

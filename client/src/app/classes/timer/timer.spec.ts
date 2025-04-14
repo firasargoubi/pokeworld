@@ -68,7 +68,7 @@ describe('Timer', () => {
     it('should interval trigger should stop interval', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const stopIntervalSpy = spyOn<any>(timer, 'stopInterval').and.callThrough();
-        timer['currentTime'] = 1;
+        timer['currentTime'] = 0;
 
         timer['intervalTrigger']();
 

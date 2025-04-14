@@ -10,6 +10,8 @@
                 [attr.x]="x"
                 [attr.y]="y"
                 [class]="tile.overlay"
+                [class.has-item]="tile.item"
+                [class.has-player]="tile.player"
                 [attr.tile]="mapService.gameDataService.getTileFromPosition({ x, y })"
             >
                 @if (tile.underlay) {

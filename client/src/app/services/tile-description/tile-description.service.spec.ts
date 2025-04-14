@@ -1,16 +1,16 @@
 import { TestBed } from '@angular/core/testing';
-import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { Position } from '@common/interfaces/position';
-import { TILE_COST, TileType } from '@common/interfaces/tile-type.enum';
-import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
-import { TileDescriptionService } from './tile-description.service';
-import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { RIGHT_CLICK_ITEM_DESCRIPTION } from '@app/consts/item-data.const';
+import { RIGHT_CLICK_TILE_DESCRIPTION } from '@app/consts/tile-data.const';
 import { MatchService } from '@app/services/match/match.service';
-import { PlayerData } from '@common/interfaces/player-data';
-import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchData } from '@common/interfaces/match-data';
-import { TILE_EFFECT } from '@app/consts/tile-data.const';
+import { PlayerData } from '@common/interfaces/player-data';
+import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
+import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
+import { TileDescriptionService } from './tile-description.service';
 
 describe('TileDescriptionService', () => {
     let service: TileDescriptionService;
@@ -25,7 +25,7 @@ describe('TileDescriptionService', () => {
         mockPosition = { x: 3, y: 4 };
         mockPlayer = { ...structuredClone(MOCK_PLAYER_DATAS[0]), position: mockPosition };
         mockMatchData = { ...structuredClone(MOCK_MATCH_DATAS[0]), players: [mockPlayer] };
-        mockGameDataService = jasmine.createSpyObj('GameDataService', ['getTileFromPosition'], { gameData: mockMatchData.gameData });
+        mockGameDataService = jasmine.createSpyObj('GameDataService', ['getTileFromPosition', 'getItem'], { gameData: mockMatchData.gameData });
         mockMatchService = jasmine.createSpyObj('MatchService', ['isActivePlayer', 'canUseDebugMove'], { data: mockMatchData });
 
         TestBed.configureTestingModule({
@@ -38,8 +38,6 @@ describe('TileDescriptionService', () => {
         service = TestBed.inject(TileDescriptionService);
 
         mockGameDataService.gameData = structuredClone(MOCK_GAME_DATAS[0]);
-
-        mockGameDataService.getTileFromPosition.and.returnValue(TileType.Grass);
     });
 
     it('should be created', () => {
@@ -47,31 +45,14 @@ describe('TileDescriptionService', () => {
     });
 
     it('should hide tool description', () => {
-        service.showTileDescription = true;
+        service.visible = true;
         service.hideTileDescription();
-        expect(service.showTileDescription).toBeFalse();
+        expect(service.visible).toBeFalse();
     });
 
     it('should find player at position', () => {
         const result = service['findPlayerAtPosition'](mockPlayer.position);
         expect(result).toEqual(mockPlayer);
-    });
-
-    it('should update description with player info', () => {
-        const result = service['updateDescription'](mockPlayer.position);
-        expect(result).toBeTrue();
-        expect(service.tileDescription.playerName).toBe(mockPlayer.name);
-        expect(service.tileDescription.avatar).toBe(AVATAR_DATA[mockPlayer.avatar].imageCentered);
-    });
-
-    it('should update description with tile info', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        spyOn<any>(service, 'findPlayerAtPosition').and.returnValue(null);
-        mockGameDataService.getTileFromPosition.and.returnValue(TileType.Grass);
-        const result = service['updateDescription'](mockPosition);
-        expect(result).toBeFalse();
-        expect(service.tileDescription.cost).toBe(TILE_COST[TileType.Grass]);
-        expect(service.tileDescription.effect).toBe(TILE_EFFECT[TileType.Grass]);
     });
 
     it('should display tool description', () => {
@@ -89,6 +70,7 @@ describe('TileDescriptionService', () => {
         Object.defineProperty(mockElement, 'getBoundingClientRect', {
             value: () => mockMapRect,
         });
+        mockMatchService.canUseDebugMove.and.returnValue(false);
 
         const mockEvent = {
             preventDefault: jasmine.createSpy('preventDefault'),
@@ -99,11 +81,34 @@ describe('TileDescriptionService', () => {
         } as any as MouseEvent;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        spyOn<any>(service, 'updateDescription').and.returnValue(false);
+        spyOn<any>(service, 'isTileInBounds').and.returnValue(true);
 
         service.displayTileDescription(mockEvent);
 
         expect(mockEvent.preventDefault).toHaveBeenCalled();
-        expect(service.showTileDescription).toBeTrue();
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(service, 'findPlayerAtPosition').and.returnValue(true);
+        service.displayTileDescription(mockEvent);
+        expect(service.visible).toBeFalse();
+    });
+
+    it('should correctly determine if a position is within map bounds', () => {
+        const mapSize = mockGameDataService.gameData.mapData.size;
+        expect(service['isTileInBounds']({ x: 2, y: 1 }, mapSize)).toBeTrue();
+    });
+
+    it('should return item description if item is present, else tile description', () => {
+        const position: Position = { x: 2, y: 2 };
+        const mockItemDescription = 'Item description';
+        const mockTileDescription = 'Grass tile';
+
+        spyOn(RIGHT_CLICK_ITEM_DESCRIPTION, 'get').and.returnValue(mockItemDescription);
+        spyOn(RIGHT_CLICK_TILE_DESCRIPTION, 'get').and.returnValue(mockTileDescription);
+
+        mockGameDataService.getItem.and.returnValue(ItemType.Item1);
+        const result = service['getDescription'](position);
+        expect(mockGameDataService.getItem).toHaveBeenCalledWith(position);
+        expect(result).toBe(`${mockItemDescription}<br><br>${mockTileDescription}`);
     });
 });

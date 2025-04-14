@@ -34,6 +34,7 @@ $text-shadow-color: rgb(112, 112, 112);
     display: grid;
     grid-template-columns: 5% 95% 0%;
     overflow: visible;
+    transform: translate(0%);
 }
 
 .ban-button {

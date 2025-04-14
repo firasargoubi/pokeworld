@@ -4,6 +4,18 @@
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MapSize } from '@common/interfaces/map-data';
 
+export const RIGHT_CLICK_ITEM_DESCRIPTION: Map<ItemType, string> = new Map([
+    [ItemType.Item1, '<b>Shiny Charm</b><br>+1 ATT / +1 DEF<br>Rend le porteur shiny'],
+    [ItemType.Item2, '<b>Evo Gem</b><br>+2 ATT / +2 DEF<br>Fait évoluer le pokemon'],
+    [ItemType.Item3, "<b>Bush Boost</b><br>+3 ATT depuis un buisson<br>Bonus d'attaque quand le joueur est caché dans les buissons"],
+    [ItemType.Item4, '<b>Healing Berry</b><br>+1 HP/tour si HP ≤ 50%<br>Soigne le joueur quand sa santé est faible.'],
+    [ItemType.Item5, '<b>PokeBall</b><br>+30% chances de fuite<br>+1 fuite par combat'],
+    [ItemType.Item6, '<b>Invisibility Mantle</b><br>Rend le porteur invisible aux yeux des autres'],
+    [ItemType.Random, "<b>Item Aléatoire</b><br>Se transforme aléatoirement en l'un des six objets"],
+    [ItemType.Spawn, "<b>Point de départ</b><br>Endroit où les joueurs réaparaissent lorsqu'ils sont éliminés"],
+    [ItemType.Flag, '<b>Drapeau</b><br>Rapportez le à votre point de départ pour gagner la partie'],
+]);
+
 export const ITEM_DESCRIPTION: Map<ItemType, string> = new Map([
     [ItemType.Item1, "<b>Shiny Charm:</b> +1 ATT / +1 DEF<br>Ajoute un point d'attaque et de défense au joueur qui le ramasse."],
     [ItemType.Item2, "<b>Evo Gem:</b> +2 ATT / +2 DEF<br>Ajoute deux points d'attaque et de défense au joueur."],
