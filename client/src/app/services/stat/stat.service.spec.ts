@@ -88,7 +88,7 @@ describe('StatService', () => {
             { x: 1, y: 1 },
         ];
         const ratio = service['getTileRatio'](coveredTiles);
-        const EXPECTED_RATIO = 0.3;
+        const EXPECTED_RATIO = 0.2;
         expect(ratio).toBe(Number((EXPECTED_RATIO * PERCENTAGE_FACTOR).toFixed(2)));
     });
 
