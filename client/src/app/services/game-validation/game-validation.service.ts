@@ -49,6 +49,8 @@ export class GameValidationService {
                     value.errors.forEach((error: BridgeValidationError) => {
                         errors.push(`  - ${ErrorMessage.Bridge} [${error.x},${error.y}]: ${error.errorMessage}`);
                     });
+                } else if (key === 'mode') {
+                    errors.push(`  - ${ErrorMessage.Mode}`);
                 } else {
                     const errorMessage: ValidationStatus = value;
                     errors.push(`  - ${key}: ${errorMessage.errorMessage}`);

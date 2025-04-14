@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
+import { BridgeValidationError, ErrorMessage, TileHandler, TilesCount, ValidationResult } from '@app/interfaces/game-validation';
+import { GameData } from '@common/interfaces/game-data';
+import { GameMode, MapData, MapSize } from '@common/interfaces/map-data';
+import { TileType } from '@common/interfaces/tile-type.enum';
 import { VALIDATION_TESTS_CASES } from './game-validation.const.spec';
 import { GameValidationService } from './game-validation.service';
-import { GameMode, MapData, MapSize } from '@common/interfaces/map-data';
-import { GameData } from '@common/interfaces/game-data';
-import { BridgeValidationError, ErrorMessage, TileHandler, TilesCount, ValidationResult } from '@app/interfaces/game-validation';
-import { TileType } from '@common/interfaces/tile-type.enum';
 
 describe('GameValidationService', () => {
     let service: GameValidationService;
@@ -352,7 +352,7 @@ describe('GameValidationService', () => {
   - Objets mal placés (2)
   - Problème de pont en [0,0]: Le pont ne peut pas être placé au bord de la carte
   - Problème de pont en [1,1]: Le pont doit être placé entre deux tuiles d'eau
-  - mode: Pas assez d'éléments requis placés sur la carte`;
+  - Un drapeau doit être placé sur la carte en mode CTF`;
         expect(service.getValidationErrorMessage(invalidResult)).toBe(expectedMessage);
     });
 });

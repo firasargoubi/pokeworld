@@ -53,9 +53,8 @@ describe('CombatService', () => {
         const playerIndex = 0;
         service['lastCombatData'] = {
             playersCombatData: [{ playerIndex, currentHealth: 50 }],
-            lastCombatAction: CombatAction.SuccessAttack,
         } as CombatData;
-
+        service['matchService'].data.combatData.lastCombatAction = CombatAction.SuccessAttack;
         expect(service.hasPlayerHealed(playerIndex)).toBeTrue();
     });
 
@@ -63,8 +62,8 @@ describe('CombatService', () => {
         const playerIndex = 0;
         service['lastCombatData'] = {
             playersCombatData: [{ playerIndex, currentHealth: 50 }],
-            lastCombatAction: CombatAction.None,
         } as CombatData;
+        service['matchService'].data.combatData.lastCombatAction = CombatAction.None;
 
         expect(service.hasPlayerHealed(playerIndex)).toBeFalse();
     });

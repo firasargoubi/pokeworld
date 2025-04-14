@@ -265,8 +265,8 @@ export const AVATAR_DATA = {
         image: './assets/images/game/avatars/centered/evolved/flareon.png',
         imageFace: './assets/images/game/avatars/face/evolved/flareon.png',
         imageCentered: './assets/images/game/avatars/centered/evolved/flareon.png',
-        frontGif: './assets/images/game/avatars-gifs/flareon.gif',
-        backGif: './assets/images/game/avatars-gifs/flareon-back.gif',
+        frontGif: './assets/images/game/avatars-gifs/evolved/flareon.gif',
+        backGif: './assets/images/game/avatars-gifs/evolved/flareon-back.gif',
     },
     [Avatar.Avatar9Evolved]: {
         name: 'Ossatueur',

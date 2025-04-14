@@ -60,54 +60,27 @@ $combat-info-height: 28vh;
     position: relative;
 }
 
-.timer-border {
-    position: absolute;
-    height: 6vh;
-    width: 6vh;
-    border-radius: 50%;
-    border: 0.5vh solid $timer-color;
-}
-
 .timer-icon {
     position: absolute;
     height: 6vh;
     width: 6vh;
-    border-radius: 50%;
-    background: $timer-color;
-    clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 0%, 50% 0%);
+    background-image: url('../../../assets/images/menu/icons/clock-icon.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.6;
 }
 
 .timer-icon.active {
-    animation: timer-animation calc(var(--max-time) * 1s) linear 1 forwards;
+    animation: rotate-background calc(var(--max-time) * 1s) steps(4) 1 forwards;
 }
 
-@keyframes timer-animation {
+@keyframes rotate-background {
     0% {
-        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 0%, 50% 0%);
-    }
-    12.5% {
-        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 0%, 100% 0%);
-    }
-    25% {
-        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 50%, 100% 50%);
-    }
-    37.5% {
-        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 100%, 100% 100%);
-    }
-    50% {
-        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 100%, 50% 100%);
-    }
-    62.5% {
-        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 0% 100%, 0% 100%, 0% 100%);
-    }
-    75% {
-        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 50%, 0% 50%, 0% 50%, 0% 50%);
-    }
-    87.5% {
-        clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%);
+        transform: rotate(0deg);
     }
     100% {
-        clip-path: polygon(50% 50%, 50% 0%, 50% 0%, 50% 0%, 50% 0%, 50% 0%, 50% 0%);
+        transform: rotate(360deg);
     }
 }
 
@@ -191,6 +164,14 @@ $combat-info-height: 28vh;
     width: 70%;
 }
 
+#enemy-container .mew {
+    width: 50%;
+}
+
+#self-container .mew {
+    width: 70%;
+}
+
 #self-container .pokemon-container.combatAnimation.successAttack.is-turn:not(.is-dead) {
     animation: self-hurt 0.5s ease-in-out forwards;
 }
@@ -242,7 +223,7 @@ $combat-info-height: 28vh;
     bottom: $combat-info-height;
     right: 7vw;
     width: 38vw;
-    aspect-ratio: 20/5;
+    aspect-ratio: 17/5;
     background-image: url('../../../assets/images/menu/containers/description/battle-player-safari-rotated.png');
     background-size: 100% 100%;
     background-position: center;
@@ -450,17 +431,91 @@ $combat-info-height: 28vh;
 }
 
 .buff {
-    color: #ffe330;
+    color: #ffbf00;
 }
 
-.bonus-value {
-    width: 20%;
+.nerf {
+    color: #ff0000;
 }
 
 .stat-label {
     text-align: left;
     width: 36%;
     overflow: visible;
+}
+
+.chat-button {
+    position: absolute;
+    bottom: calc(1.05 * $combat-info-height);
+    left: 1%;
+    width: 5vw;
+    aspect-ratio: 1/1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 10;
+}
+
+.chat-button.disabel {
+    opacity: 0;
+    transition: opacity 0s ease-in;
+}
+
+.chat-button .button-background {
+    background: rgba(0, 0, 0, 0.2);
+    text-align: center;
+    filter: blur(0.3em);
+    border-radius: 20%;
+    width: 80%;
+    height: 80%;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.chat-button:hover .button-background {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.chat-button:active .button-background {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.button-icon {
+    height: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s ease-in-out;
+}
+
+.chat-container {
+    position: absolute;
+    width: 38%;
+    height: 40%;
+    z-index: 1;
+    margin: 0 0 1.8% 0;
+    bottom: calc(0.97 * $combat-info-height);
+    left: 0.7%;
+    opacity: 1;
+    transform-origin: bottom left;
+    transform: scale(1);
+    z-index: 10;
+    transition:
+        opacity 0.3s ease-out,
+        transform 0.2s ease-out;
+}
+
+.chat-container.disabel {
+    opacity: 0;
+    transform: scale(0);
+    visibility: hidden;
+    transition:
+        opacity 0.3s ease-in,
+        transform 0.2s ease-in,
+        visibility 0s 0.4s;
 }
 
 @keyframes enemy-attack {

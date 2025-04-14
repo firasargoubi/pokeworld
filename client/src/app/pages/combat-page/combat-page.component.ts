@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { DEFAULT_COMBAT_VISUAL_DATA } from '@app/consts/combat-data.const';
 import { BATTLE_PLATFORM_IMAGES } from '@app/consts/images.const';
 import { CombatVisualData } from '@app/interfaces/combat-visual-data';
@@ -17,12 +18,13 @@ import { MatchState } from '@common/interfaces/match-data';
     selector: 'app-combat-page',
     templateUrl: './combat-page.component.html',
     styleUrls: ['./combat-page.component.scss'],
-    imports: [CommonModule],
+    imports: [CommonModule, ChatComponent],
 })
 export class CombatPageComponent {
     visualData: CombatVisualData = structuredClone(DEFAULT_COMBAT_VISUAL_DATA);
     matchService: MatchService = inject(MatchService);
     combatService: CombatService = inject(CombatService);
+    displayChat: boolean = false;
     private playService: PlayService = inject(PlayService);
     private router: Router = inject(Router);
 
@@ -52,6 +54,10 @@ export class CombatPageComponent {
 
     escapeButon() {
         this.combatService.escape();
+    }
+
+    hideChat() {
+        this.displayChat = false;
     }
 
     private updateImages() {

@@ -13,6 +13,7 @@ export enum ErrorMessage {
     TerrainCoverage = 'Couverture du terrain insuffisante',
     TilesAccessibility = 'Tuiles inaccessibles',
     Items = 'Objets mal placés',
+    Mode = 'Un drapeau doit être placé sur la carte en mode CTF',
 }
 
 export interface TilesCount {

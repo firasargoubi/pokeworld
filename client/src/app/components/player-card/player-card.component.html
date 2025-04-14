@@ -8,20 +8,22 @@
         'is-host': player.isHost
     }"
 >
-    <div class="avatar-container">
+    <div class="avatar-container" (click)="displayKickButton && !player.isConnected ? onAddBot() : null">
+        @if(player.isConnected) {
         <img src="{{ player.avatarImage }}" class="avatar" />
+        }
     </div>
-    <div class="player-card">
-        <div class="player-name">
+    <div class="player-card" (click)="displayKickButton && !player.isConnected ? onAddBot() : null">
+        <div class="add-instruction">+ Ajouter</div>
+        <span class="player-name">
             {{ player.name }}
             @if (player.playerType === 'botAggressive') {
-                <span class="bot-type aggresive">Aggresif</span>
-            }
-            @if (player.playerType === 'botDefensive') {
-                <span class="bot-type">Défensif</span>
+            <span class="bot-type aggresive">Agressif</span>
+            } @if (player.playerType === 'botDefensive') {
+            <span class="bot-type">Défensif</span>
             }
             <div class="crown"></div>
-        </div>
+        </span>
         <div class="hp-bar">
             <div class="hp-backround">
                 <div class="hp-progress"></div>

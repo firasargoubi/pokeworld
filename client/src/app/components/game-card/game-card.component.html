@@ -28,30 +28,28 @@
                 </div>
                 <div class="game-interaction">
                     @if(isAdminView) {
-                    <div class="edition-buttons">
-                        <div class="card-button" (click)="onToggleVisibility()">
-                            <img
-                                [src]="
-                                    game.isVisible
-                                        ? './assets/images/menu/buttons/admin-button/eye.png'
-                                        : './assets/images/menu/buttons/admin-button/closed-eye.png'
-                                "
-                                class="button-icon"
-                            />
-                            <img src="./assets/images/menu/buttons/admin-button/green-background-highlight.png" class="button-container" />
-                        </div>
-                        <div class="card-button" (click)="onEdit()">
-                            <img src="./assets/images/menu/buttons/admin-button/pen.png" class="button-icon" />
-                            <img src="./assets/images/menu/buttons/admin-button/blue-background-highlight.png" class="button-container" />
-                        </div>
+                    <div class="card-button" (click)="onToggleVisibility()">
+                        <img
+                            [src]="
+                                game.isVisible
+                                    ? './assets/images/menu/buttons/admin-button/eye.png'
+                                    : './assets/images/menu/buttons/admin-button/closed-eye.png'
+                            "
+                            class="button-icon"
+                        />
+                        <img src="./assets/images/menu/buttons/admin-button/green-background-highlight.png" class="button-container" />
+                    </div>
+                    <div class="card-button" (click)="onEdit()">
+                        <img src="./assets/images/menu/buttons/admin-button/pen.png" class="button-icon" />
+                        <img src="./assets/images/menu/buttons/admin-button/blue-background-highlight.png" class="button-container" />
+                    </div>
 
-                        <div class="card-button" (click)="onDelete()">
-                            <img src="./assets/images/menu/buttons/admin-button/bin.png" class="button-icon" />
-                            <img src="./assets/images/menu/buttons/admin-button/red-background-highlight.png" class="button-container" />
-                        </div>
+                    <div class="card-button" (click)="onDelete()">
+                        <img src="./assets/images/menu/buttons/admin-button/bin.png" class="button-icon" />
+                        <img src="./assets/images/menu/buttons/admin-button/red-background-highlight.png" class="button-container" />
                     </div>
                     } @else {
-                    <div class="card-singel-button" (click)="onJoin()">
+                    <div class="card-single-button" (click)="onJoin()">
                         <p>JOUER</p>
                         <div class="button-container"></div>
                     </div>

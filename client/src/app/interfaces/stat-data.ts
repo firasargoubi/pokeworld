@@ -35,6 +35,6 @@ export interface TotalTiles {
 }
 
 export enum Order {
-    ASCENDING = '↑',
-    DESCENDING = '↓',
+    Ascending = 'ascending',
+    Descending = 'descending',
 }

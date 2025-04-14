@@ -71,11 +71,11 @@ describe('StatPageComponent', () => {
     });
 
     it('should toggle order correctly', () => {
-        expect(component.sortingOrder()).toBe(Order.ASCENDING);
+        expect(component.sortingOrder()).toBe(Order.Ascending);
         component.toggleOrder();
-        expect(component.sortingOrder()).toBe(Order.DESCENDING);
+        expect(component.sortingOrder()).toBe(Order.Descending);
         component.toggleOrder();
-        expect(component.sortingOrder()).toBe(Order.ASCENDING);
+        expect(component.sortingOrder()).toBe(Order.Ascending);
     });
 
     it('should navigate to menu when navigateToMenu is called', () => {
@@ -91,23 +91,23 @@ describe('StatPageComponent', () => {
     it('should toggle order when stat type is the same', () => {
         const initialStatType = PlayerStatType.Combats;
         component.sortingStat.set(initialStatType);
-        component.sortingOrder.set(Order.ASCENDING);
+        component.sortingOrder.set(Order.Ascending);
 
         component.updateSorting(initialStatType);
 
         expect(component.sortingStat()).toBe(initialStatType);
-        expect(component.sortingOrder()).toBe(Order.DESCENDING);
+        expect(component.sortingOrder()).toBe(Order.Descending);
     });
 
     it('should reset order to ascending and update stat type when different stat type is selected', () => {
         const initialStatType = PlayerStatType.Combats;
         const newStatType = PlayerStatType.Victories;
         component.sortingStat.set(initialStatType);
-        component.sortingOrder.set(Order.DESCENDING);
+        component.sortingOrder.set(Order.Descending);
 
         component.updateSorting(newStatType);
 
         expect(component.sortingStat()).toBe(newStatType);
-        expect(component.sortingOrder()).toBe(Order.ASCENDING);
+        expect(component.sortingOrder()).toBe(Order.Ascending);
     });
 });

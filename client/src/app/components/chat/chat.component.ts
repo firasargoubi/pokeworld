@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewChecked, Component, ElementRef, inject, OnInit, ViewChild, WritableSignal } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, inject, Input, OnInit, ViewChild, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
@@ -14,6 +14,7 @@ import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
     imports: [CommonModule, FormsModule],
 })
 export class ChatComponent implements OnInit, AfterViewChecked {
+    @Input() onClickAction?: () => void;
     @ViewChild('chatContainer') private chatContainerRef: ElementRef;
 
     isChatActive: WritableSignal<boolean>;
@@ -54,6 +55,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
     sendMessage(event: KeyboardEvent) {
         if (event.key !== 'Enter') {
+            this.isChatActive.set(true);
             return;
         }
 

@@ -492,7 +492,7 @@ app-map {
     font-size: calc(0.4 * $player-card-height * $final-side-width);
     margin-left: calc(0.1 * $player-card-height * $final-side-width);
     color: $dark-text-color;
-    text-shadow: 
+    text-shadow:
         calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
         calc(0.015 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow;
 }
@@ -534,6 +534,7 @@ app-map {
     padding: calc(0.018 * $map-size) calc(0.035 * $map-size);
     filter: $shadow;
     color: $dark-text-color;
+    overflow: visible;
     text-shadow:
         calc(0.0075 * $player-card-height * $final-side-width) calc(0.002 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
         calc(0.015 * $player-card-height * $final-side-width) calc(0.004 * $player-card-height * $final-side-width) 0 $dark-text-shadow,
@@ -568,13 +569,10 @@ app-map {
 }
 
 .chat-container {
-    width: calc($player-card-width * $final-side-width);
+    width: 100%;
     height: calc($map-size - $total-player-cards-height - 0.027 * $map-size);
-    margin-left: calc($final-side-width - $player-card-width * $final-side-width);
-    margin-top: calc(0.027 * $map-size);
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: calc(0.005 * $map-size);
     position: relative;
+    margin: 0 0 0 2%;
 }
 
 .action-button,
@@ -715,9 +713,11 @@ app-map {
     width: calc($final-side-width - 0.07 * $map-size);
     height: calc(0.195 * $map-size);
     margin-top: calc(0.032 * $map-size);
+    overflow: visible;
 }
 
 .play-page .item-slot {
+    overflow: visible;
     display: inline-block;
     vertical-align: top;
     width: calc(0.195 * $map-size);
@@ -738,6 +738,7 @@ app-map {
 }
 
 .item-icon {
+    overflow: visible;
     width: calc(0.195 * $map-size);
     height: calc(0.195 * $map-size);
 }

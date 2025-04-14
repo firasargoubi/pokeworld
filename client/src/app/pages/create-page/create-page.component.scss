@@ -57,10 +57,11 @@ $card-width: 26vw;
 
 #game-grid {
     display: grid;
-    width: max-content;
-    margin: 5vh auto 20vh;
-    grid-template-columns: repeat(3, $card-width);
-    gap: 30px;
+    width: 90%;
+    max-width: 120vh;
+    margin: 2vh auto 20vh;
+    grid-template-columns: repeat(3, 1fr);
+    gap: min(3vw, 3vh);
     place-items: center;
 }
 

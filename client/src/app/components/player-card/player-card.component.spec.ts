@@ -29,4 +29,13 @@ describe('PlayerCardComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
+    it('should emit addBot event when onAddBot is called', () => {
+        const addBotSpy = spyOn(component.addBot, 'emit').and.callThrough();
+
+        component.onAddBot();
+
+        expect(addBotSpy).toHaveBeenCalled();
+        expect(addBotSpy).toHaveBeenCalledTimes(1);
+    });
 });

@@ -16,7 +16,7 @@ import { GameMode } from '@common/interfaces/map-data';
     imports: [HeaderComponent, FormsModule, ChatComponent, DatePipe],
 })
 export class StatPageComponent {
-    sortingOrder: WritableSignal<Order> = signal(Order.ASCENDING);
+    sortingOrder: WritableSignal<Order> = signal(Order.Ascending);
     sortingStat: WritableSignal<PlayerStatType> = signal(PlayerStatType.Combats);
     playerStatList: Signal<PlayerStatData[]> = computed(() => {
         this.statService.sortPlayerStatsBy(this.sortingStat(), this.sortingOrder());
@@ -34,7 +34,7 @@ export class StatPageComponent {
         if (statType === this.sortingStat()) {
             this.toggleOrder();
         } else {
-            this.sortingOrder.set(Order.ASCENDING);
+            this.sortingOrder.set(Order.Ascending);
         }
         this.updateSortingCriteria(statType);
     }
@@ -44,8 +44,8 @@ export class StatPageComponent {
     }
 
     toggleOrder() {
-        const isAscending = this.sortingOrder() === Order.ASCENDING;
-        const inverseOrder = isAscending ? Order.DESCENDING : Order.ASCENDING;
+        const isAscending = this.sortingOrder() === Order.Ascending;
+        const inverseOrder = isAscending ? Order.Descending : Order.Ascending;
         this.sortingOrder.set(inverseOrder);
     }
 

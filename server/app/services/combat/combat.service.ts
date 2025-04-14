@@ -157,7 +157,6 @@ export class CombatService {
 
     private startCombatEndEscape(match: Match) {
         this.chatService.logCombatEnd(match, this.getInactivePlayerData(match), false);
-
         match.data.state = MatchState.CombatEnd;
         this.trackingService.updateEscapes(match, this.getInactivePlayerData(match));
         match.sendUpdate();

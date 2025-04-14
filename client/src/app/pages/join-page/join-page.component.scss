@@ -78,7 +78,7 @@ $clip-path: polygon(
 
 #main-container {
     position: relative;
-    background-color: rgb(131, 164, 250);
+    background-color: #83a4fa;
     width: 80vh;
     aspect-ratio: 16/9;
 
@@ -140,6 +140,7 @@ $clip-path: polygon(
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 0 0 0 5px;
 }
 
 #input {

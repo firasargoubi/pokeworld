@@ -77,20 +77,6 @@ describe('GameCardComponent', () => {
         expect(modeElement.nativeElement.textContent.trim()).toBe(MOCK_GAME_DATAS[0].mapData.gameMode);
     });
 
-    it('should display edition-buttons only when isAdminView is true', () => {
-        component.isAdminView = true;
-        fixture.detectChanges();
-
-        let editionIcons = fixture.debugElement.query(By.css('.edition-buttons'));
-        expect(editionIcons).toBeTruthy();
-
-        component.isAdminView = false;
-        fixture.detectChanges();
-
-        editionIcons = fixture.debugElement.query(By.css('.edition-buttons'));
-        expect(editionIcons).toBeFalsy();
-    });
-
     it('should set thumbnailUrl on ngOnInit', async () => {
         const mockThumbnailUrl = 'data:image/png;base64,mockthumbnail';
         thumbnailServiceSpy.getThumbnail.and.returnValue(Promise.resolve(mockThumbnailUrl));

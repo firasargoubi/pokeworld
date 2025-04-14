@@ -17,7 +17,13 @@
                 }
                 <div class="tile-image" [style.backgroundImage]="'url(' + tile.tile + ')'"></div>
                 @if (tile.item) {
-                <app-item [itemType]="tile.item" [x]="x" [y]="y" [showDescription]="isEditor"></app-item>
+                <app-item
+                    [itemType]="tile.item"
+                    [x]="x"
+                    [y]="y"
+                    [showDescription]="isEditor"
+                    [class.self-spawn-point]="this.matchService.selfPlayer.spawnPoint.x === x && this.matchService.selfPlayer.spawnPoint.y === y"
+                ></app-item>
                 } @if (tile.overlay) {
                 <div class="tile-image tile-overlay"></div>
                 } @if (tile.player) {

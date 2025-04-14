@@ -33,7 +33,7 @@ export class StatService {
         this.playerStats.sort((playerX, playerY) => {
             const ascendingComparator = playerY[statType] - playerX[statType];
             const descendingComparator = playerX[statType] - playerY[statType];
-            return order === Order.ASCENDING ? ascendingComparator : descendingComparator;
+            return order === Order.Ascending ? ascendingComparator : descendingComparator;
         });
     }
 

@@ -12,7 +12,7 @@
                 <div class="access-instruction">
                     <div class="lock-container" (click)="this.toggleLockRoom()">
                         @if (this.matchService.data.lobbyData.isLocked) {
-                            <div class="lock-icon"></div>
+                        <div class="lock-icon"></div>
                         } @else {
                         <div class="unlock-icon"></div>
                         }
@@ -25,7 +25,7 @@
                 <div class="access-instruction">
                     <div class="empty-lock-container">
                         @if (this.matchService.data.lobbyData.isLocked) {
-                            <div class="lock-icon"></div>
+                        <div class="lock-icon"></div>
                         } @else {
                         <div class="unlock-icon"></div>
                         }
@@ -39,13 +39,14 @@
 
             <div id="players-list">
                 @for (player of visualData.players; track $index) {
-                    <div class="player-card-container">
-                        <app-player-card
-                            [player]="player"
-                            [displayKickButton]="visualData.isSelfHost"
-                            [onClick]="kickPlayer.bind(this, player.id)"
-                        ></app-player-card>
-                    </div>
+                <div class="player-card-container">
+                    <app-player-card
+                        [player]="player"
+                        [displayKickButton]="visualData.isSelfHost"
+                        [onClick]="kickPlayer.bind(this, player.id)"
+                        (addBot)="this.showBotCreationPopup()"
+                    ></app-player-card>
+                </div>
                 }
             </div>
         </div>
@@ -54,17 +55,13 @@
         <app-chat></app-chat>
     </div>
     @if (visualData.isSelfHost) {
-    <div id="poke-button-bot">
-        <app-pokeball-button [buttonContent]="'AJOUTER UN ROBOT'" [onClickAction]="this.showBotCreationPopup.bind(this)"></app-pokeball-button>
-    </div>
     <div id="poke-button">
-        <app-pokeball-button [buttonContent]="'LANCER LA PARTIE'" [onClickAction]="this.startMatchButton.bind(this)"></app-pokeball-button>
+        <app-pokeball-button [buttonContent]="'LANCER'" [onClickAction]="this.startMatchButton.bind(this)"></app-pokeball-button>
     </div>
-    } @if (showBotPopup) {
-    <div id="creation-bot-popup" (click)="showBotPopup = false">
-        <div (click)="$event.stopPropagation()">
+    }
+    <div id="creation-bot-popup" [class.visible]="showBotPopup" (click)="this.showBotPopup = false">
+        <div class="popup-content" (click)="$event.stopPropagation()">
             <app-create-bot-popup (botTypeSelected)="handleBotTypeSelected($event)"></app-create-bot-popup>
         </div>
     </div>
-    }
 </div>

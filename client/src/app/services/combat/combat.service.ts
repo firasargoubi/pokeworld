@@ -33,7 +33,8 @@ export class CombatService {
     hasPlayerHealed(playerIndex: number): boolean {
         const previousPlayerData = this.lastCombatData.playersCombatData.find((data) => data.playerIndex === playerIndex);
         const currentPlayerData = this.matchService.data.combatData.playersCombatData.find((data) => data.playerIndex === playerIndex);
-        if (!previousPlayerData || !currentPlayerData || this.lastCombatData.lastCombatAction === CombatAction.None) {
+        const isCombatStart = this.matchService.data.combatData.lastCombatAction === CombatAction.None;
+        if (!previousPlayerData || !currentPlayerData || isCombatStart) {
             return false;
         }
 

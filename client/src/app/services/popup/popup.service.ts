@@ -86,6 +86,9 @@ export class PopupService {
         popupComponentRef.instance.message = currentMessage.message;
         popupComponentRef.instance.hasCloseButton = currentMessage.hasCloseButton;
         popupComponentRef.instance.isConfirmation = currentMessage.isConfirmation;
+        if (currentMessage.popupColor) {
+            popupComponentRef.instance.popupColor = currentMessage.popupColor;
+        }
         popupComponentRef.instance.closed.subscribe((confirmed: boolean) => {
             this.handlePopupClose(confirmed, overlayRef, currentMessage);
         });

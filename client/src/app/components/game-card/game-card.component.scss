@@ -1,26 +1,39 @@
-$corner-square-size: 0.5vw;
 $big-stripe-size: 64%;
 
-$blue-backround-color: rgb(106, 183, 215);
+$blue-backround-color: #6ab7d7;
+$inner-shadow-width: min(0.5vw, 1vh);
 
-$blue-main-color: rgb(123, 206, 230);
-$blue-sub-color: rgb(170, 231, 247);
-$blue-inner-border-color: rgb(170, 231, 247) rgb(75, 166, 198) rgb(75, 166, 198) rgb(170, 231, 247);
+$blue-main-color: #7bcee6;
+$blue-sub-color: #aae7f7;
+$blue-inner-shadow:
+    inset $inner-shadow-width 0 0 0 #aae7f7,
+    inset calc($inner-shadow-width * -1) 0 0 0 #4ba6c6,
+    inset 0 $inner-shadow-width 0 0 #aae7f7,
+    inset 0 calc($inner-shadow-width * -1) 0 0 #4ba6c6;
 
 $green-main-color: rgb(125, 214, 136);
 $green-sub-color: rgb(179, 246, 168);
 $green-border-color: rgb(249, 248, 128);
-$green-inner-border-color: rgb(179, 246, 168) rgb(122, 151, 101) rgb(122, 151, 101) rgb(179, 246, 168);
+$green-inner-shadow:
+    inset $inner-shadow-width 0 0 0 #b3f6a8,
+    inset calc($inner-shadow-width * -1) 0 0 0 #7a9765,
+    inset 0 $inner-shadow-width 0 0 #b3f6a8,
+    inset 0 calc($inner-shadow-width * -1) 0 0 #7a9765;
 
 $pink-main-color: rgb(247, 186, 147);
 $pink-sub-color: rgb(247, 209, 216);
 $pink-border-color: rgb(249, 248, 128);
-$pink-inner-border-color: rgb(247, 209, 216) rgb(231, 163, 131) rgb(231, 163, 131) rgb(247, 209, 216);
+$pink-inner-shadow:
+    inset $inner-shadow-width 0 0 0 #f7d1d8,
+    inset calc($inner-shadow-width * -1) 0 0 0 #e7a383,
+    inset 0 $inner-shadow-width 0 0 #f7d1d8,
+    inset 0 calc($inner-shadow-width * -1) 0 0 #e7a383;
 
 $card-width: 100%;
 $card-border-color: rgb(246, 119, 56);
-$card-body-border-width: 0.7vw;
-$description-width: 15vw;
+$card-body-border-width: min(0.7vw, 0.7vh);
+$corner-square-size: min(0.7vw, 0.7vh);
+$description-width: min(25vw, 25vh);
 
 $text-shadow-color: rgb(112, 112, 112);
 
@@ -65,35 +78,41 @@ $clip-path: polygon(
 .card-body {
     width: 100%;
     height: 100%;
-    border: $card-body-border-width solid;
     display: grid;
     grid-template-rows: 65% 35%;
-    border-color: $blue-inner-border-color;
+    padding: $inner-shadow-width;
+
+    background: linear-gradient(to right, #aae7f7, #4ba6c6);
+    box-shadow: $blue-inner-shadow;
     overflow: visible;
 }
 
 .green-card .card-body {
-    border-color: $green-inner-border-color;
+    background: linear-gradient(to right, #b3f6a8, #7a9765);
+    box-shadow: $green-inner-shadow;
 }
 
 .pink-card .card-body {
-    border-color: $pink-inner-border-color;
+    background: linear-gradient(to right, #f7d1d8, #e7a383);
+    box-shadow: $pink-inner-shadow;
 }
 
 .game-thumbnail {
     position: relative;
     height: 100%;
     width: auto;
-    overflow: visible;
     background-color: $blue-backround-color;
+
+    overflow: visible;
 }
 
 .thumbnail {
     height: 100%;
     width: 100%;
-    background-position: center;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
     background-size: cover;
-    background-repeat: no-repeat;
     opacity: 0;
     transition: opacity 0.36s;
 }
@@ -108,7 +127,7 @@ $clip-path: polygon(
 
 .game-name {
     position: absolute;
-    font-size: 3vw;
+    font-size: min(3vw, 4.5vh);
     font-weight: bolder;
     text-shadow: 0.25vw 0 0 $text-shadow-color;
     letter-spacing: 0.2vw;
@@ -120,6 +139,7 @@ $clip-path: polygon(
     word-wrap: break-word;
     overflow-wrap: break-word;
     display: block;
+    overflow: visible;
     z-index: 1;
 }
 
@@ -127,8 +147,8 @@ $clip-path: polygon(
     position: absolute;
     bottom: 2px;
     right: 7px;
-    font-size: 3vw;
-    text-shadow: 0.3vw 0 0 $text-shadow-color;
+    font-size: min(3vw, 4.5vh);
+    text-shadow: 0.2vw 0 0 $text-shadow-color;
     letter-spacing: 0.1vw;
     overflow: visible;
     z-index: 1;
@@ -182,18 +202,16 @@ $clip-path: polygon(
 .game-info {
     height: $big-stripe-size;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-left: 1.5vw;
+    justify-content: space-between;
+    padding: 2vh 2vh;
+    width: 100%;
 }
 
 .game-mode {
-    position: absolute;
-    height: 2vw;
-    width: 5.3vw;
+    position: relative;
+    height: 80%;
+    aspect-ratio: 5.3/2;
     overflow: visible;
-    left: 10px;
-    top: 1.7vw;
 }
 
 .mode-name {
@@ -201,7 +219,7 @@ $clip-path: polygon(
     top: 50%;
     left: 50%;
     transform: translate(-46%, -52%);
-    font-size: 2.3vw;
+    font-size: min(2.7vw, 4.5vh);
     text-align: center;
     z-index: 2;
     -webkit-text-stroke: 0.4vw #636776;
@@ -232,32 +250,28 @@ $clip-path: polygon(
 }
 
 .last-edited {
-    position: absolute;
-    right: 10px;
-    top: 1.9vw;
-    font-size: 1.6vw;
+    font-size: min(1.9vw, 2.6vh);
     letter-spacing: 0.2;
     text-shadow: 0.15vw 0 0 $text-shadow-color;
+    width: 60%;
+    overflow: visible;
+    text-align: end;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .game-interaction {
     display: flex;
     flex-direction: row;
-    gap: 5vw;
-    justify-content: space-around;
+    gap: min(1vw, 1vh);
+    justify-content: center;
     align-items: center;
 }
 
-.edition-buttons {
-    height: 2.4vw;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    gap: 1vw;
-}
-
 .card-button {
-    width: 4.7vw;
+    width: min(5.5vw, 7vh);
+    aspect-ratio: 18 / 9;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -277,12 +291,12 @@ $clip-path: polygon(
 }
 
 .card-button:active .button-container,
-.card-singel-button:active .button-container {
+.card-single-button:active .button-container {
     rotate: 180deg;
 }
 
 .card-button:hover .button-container,
-.card-singel-button:hover .button-container {
+.card-single-button:hover .button-container {
     filter: brightness(1.15);
 }
 
@@ -296,7 +310,7 @@ $clip-path: polygon(
     user-select: none;
 }
 
-.card-singel-button {
+.card-single-button {
     position: absolute;
     bottom: 10%;
     display: flex;
@@ -306,7 +320,7 @@ $clip-path: polygon(
     cursor: pointer;
 }
 
-.card-singel-button .button-container {
+.card-single-button .button-container {
     height: 100%;
     width: 100%;
     background-image: url('../../../assets/images/menu/buttons/admin-button/blue-background-highlight.png');
@@ -315,15 +329,15 @@ $clip-path: polygon(
     background-repeat: no-repeat;
 }
 
-.green-card .card-singel-button .button-container {
+.green-card .card-single-button .button-container {
     background-image: url('../../../assets/images/menu/buttons/admin-button/green-background-highlight.png');
 }
 
-.pink-card .card-singel-button .button-container {
+.pink-card .card-single-button .button-container {
     background-image: url('../../../assets/images/menu/buttons/admin-button/red-background-highlight.png');
 }
 
-.card-singel-button p {
+.card-single-button p {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -332,17 +346,18 @@ $clip-path: polygon(
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.4vw;
+    font-size: min(2.4vw, 3.5vh);
+    text-shadow: 0.23vw 0 0 $text-shadow-color;
     z-index: 1;
 }
 
 .card-description {
-    font-size: 1.4vw;
+    font-size: min(1.4vw, 2.1vh);
     width: 0;
     height: calc(100% - $corner-square-size * 2);
     position: absolute;
     z-index: 2;
-    right: -$description-width;
+    right: calc($description-width * -1);
     top: $corner-square-size;
     opacity: 1;
     overflow: hidden;
@@ -378,7 +393,7 @@ $clip-path: polygon(
 }
 
 .card-description * {
-    left: -$description-width;
+    left: calc($description-width * -1);
 }
 
 .hovered {
@@ -390,7 +405,7 @@ $clip-path: polygon(
 }
 
 .pink-card .card-description {
-    left: -$description-width;
+    left: calc($description-width * -1);
 
     .card-description-body {
         left: $description-width;

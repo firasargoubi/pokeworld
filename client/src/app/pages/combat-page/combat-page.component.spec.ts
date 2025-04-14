@@ -1,6 +1,8 @@
+import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { Timer } from '@app/classes/timer/timer';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
@@ -9,6 +11,15 @@ import { ItemType } from '@common/interfaces/item-type.enum';
 import { PlayerCombatData } from '@common/interfaces/match-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { CombatPageComponent } from './combat-page.component';
+
+@Component({
+    selector: 'app-chat',
+    standalone: true,
+    template: '',
+})
+class MockChatComponent {
+    @Input() onClickAction?: () => void;
+}
 
 describe('CombatPageComponent', () => {
     let component: CombatPageComponent;
@@ -40,6 +51,11 @@ describe('CombatPageComponent', () => {
                 { provide: Router, useValue: mockRouter },
             ],
         }).compileComponents();
+
+        TestBed.overrideComponent(CombatPageComponent, {
+            add: { imports: [MockChatComponent] },
+            remove: { imports: [ChatComponent] },
+        });
 
         fixture = TestBed.createComponent(CombatPageComponent);
         component = fixture.componentInstance;
@@ -122,5 +138,12 @@ describe('CombatPageComponent', () => {
 
         expect(component.visualData.enemyImage).toEqual(AVATAR_DATA.missingNo.backGif);
         expect(component.visualData.selfImage).toEqual(AVATAR_DATA.missingNo.backGif);
+    });
+
+    it('should set displayChat to false when hideChat is called', () => {
+        component.displayChat = true;
+        expect(component.displayChat).toBeTrue();
+        component.hideChat();
+        expect(component.displayChat).toBeFalse();
     });
 });

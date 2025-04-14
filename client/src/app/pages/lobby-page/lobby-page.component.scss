@@ -28,7 +28,7 @@ $clip-path: polygon(
 $inner-border-width: 0.5vw;
 $text-shadow-color: rgb(112, 112, 112);
 
-$player-list-height: calc((100vh - 6vw) * 0.90);
+$player-list-height: calc((100vh - 6vw) * 0.9);
 $player-list-width: 52vw;
 $player-card-height-1: calc($player-list-height * 0.166666);
 $player-card-height-2: calc($player-list-width * 0.143333);
@@ -148,7 +148,7 @@ $player-card-width: calc($player-card-height * 6.97674418605);
 }
 
 #poke-button-bot {
-    z-index: 999;
+    z-index: 10;
     position: absolute;
     bottom: 4%;
     left: 62%;
@@ -210,25 +210,13 @@ $player-card-width: calc($player-card-height * 6.97674418605);
 }
 
 #poke-button {
-    z-index: 999;
+    z-index: 2;
     position: absolute;
     right: 5%;
     bottom: 4%;
-    width: 22vw;
     height: 4.1vw;
+    aspect-ratio: 42/10;
     overflow: visible;
-}
-#poke-button-bot {
-    z-index: 999;
-    position: absolute;
-    width: 22vw;
-    height: 4.1vw;
-    overflow: visible;
-}
-
-app-pokeball-button {
-    width: 22vw;
-    height: 4.1vw;
 }
 
 @keyframes fall {
@@ -270,6 +258,9 @@ app-player-card {
     margin: 0 0 1.8% 0;
     bottom: 1%;
     left: 6%;
+    opacity: 1;
+    transform-origin: bottom left;
+    transform: scale(1);
 }
 
 .lock-icon {
@@ -298,9 +289,36 @@ app-player-card {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0);
     z-index: 1000;
     display: flex;
     justify-content: center;
     align-items: center;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+        opacity 0.3s ease-in-out,
+        background-color 0.3s ease-in-out;
+
+    &.visible {
+        opacity: 1;
+        background-color: rgba(0, 0, 0, 0.5);
+        pointer-events: auto;
+        animation: popupIn 0.2s steps(8, end) forwards;
+    }
+}
+
+@keyframes popupIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.04);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

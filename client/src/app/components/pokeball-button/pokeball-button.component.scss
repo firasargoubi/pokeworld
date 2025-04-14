@@ -73,12 +73,20 @@ $scale: min(40vw, 60vh);
 }
 
 .pokeball-button-content p {
-    font-size: calc($scale * 0.09);
-    width: auto;
+    font-size: clamp(1rem, 5vmin, 6vh);
+    width: 100%;
     text-align: center;
     user-select: none;
-    width: 100%;
-    transform: translateY(-0.78%);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 10px;
+    box-sizing: border-box;
 }
 
 .pokeball-button-end {

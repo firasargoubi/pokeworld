@@ -75,9 +75,7 @@ export class LobbyPageComponent {
     }
 
     showBotCreationPopup() {
-        if (this.matchService.data.players.length < MAX_PLAYERS[this.matchService.data.gameData.mapData.size]) {
-            this.showBotPopup = true;
-        }
+        this.showBotPopup = true;
     }
 
     handleBotTypeSelected(botType: PlayerType) {

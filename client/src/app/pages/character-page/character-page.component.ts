@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -35,6 +35,13 @@ export class CharacterPageComponent {
             this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.updateAvatarList.bind(this));
         } else {
             this.router.navigate([PageEndpoint.Menu]);
+        }
+    }
+
+    @HostListener('document:keydown', ['$event'])
+    onKeyDown(event: KeyboardEvent) {
+        if (event.key === 'Enter') {
+            this.joinLobby();
         }
     }
 
@@ -83,7 +90,7 @@ export class CharacterPageComponent {
             .map((avatar) => ({
                 avatar,
                 name: AVATAR_DATA[avatar].name,
-                image: AVATAR_DATA[avatar].image,
+                image: AVATAR_DATA[avatar].imageCentered,
                 isLocked: lockedAvatars.includes(avatar),
                 isSelected: selfAvatar === avatar,
             }));
