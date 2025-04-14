@@ -3,7 +3,7 @@ import { GameData } from './game-data';
 import { PlayerData } from './player-data';
 import { Position } from './position';
 import { TileType } from './tile-type.enum';
-import { WinnerData, TrackingPlayerData } from './track-data';
+import { TrackingPlayerData, WinnerData } from './track-data';
 
 export interface MatchData {
     code: string;
@@ -75,7 +75,7 @@ export enum MatchState {
     TurnStart = 'turnStart',
     TurnWait = 'turnWait',
     MovementAnimation = 'movementAnimation',
-    ItemDropSelection = 'itemDropSelection',
+    ItemWait = 'itemDropSelection',
     CombatWait = 'combatWait',
     CombatAnimation = 'combatAnimation',
     CombatEnd = 'combatEnd',

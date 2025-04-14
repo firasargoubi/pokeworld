@@ -50,7 +50,7 @@ export class ItemService {
         );
 
         if (player.items.length > MAX_ITEMS) {
-            match.data.state = MatchState.ItemDropSelection;
+            match.data.state = MatchState.ItemWait;
             return;
         }
 

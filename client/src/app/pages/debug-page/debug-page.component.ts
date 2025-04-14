@@ -33,12 +33,12 @@ export class DebugPageComponent {
         }
     }
 
-    createMatch(index: number): void {
+    createMatch(index: number) {
         const gameData = DEBUG_GAMES[index];
         this.socketService.emit(MatchEvent.CreateMatch, gameData, this.onJoinMatch.bind(this));
     }
 
-    private joinMatch(): void {
+    private joinMatch() {
         this.socketService.emit(MatchEvent.JoinMatch, this.matchCodeInput, this.onJoinMatch.bind(this));
     }
 

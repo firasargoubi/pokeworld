@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { PopupMessage } from '@app/interfaces/popup-message';
+import { PopupMessage } from '@app/consts/popup-message.const';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -17,6 +17,7 @@ import { GameData } from '@common/interfaces/game-data';
 })
 export class CreatePageComponent implements OnInit {
     games: GameData[] = [];
+    private isCreatingMatch = false;
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);
     private matchService: MatchService = inject(MatchService);
@@ -36,8 +37,12 @@ export class CreatePageComponent implements OnInit {
         return classes[classIndex];
     }
 
-    createMatch(gameData: GameData) {
-        this.matchService.createMatch(gameData);
+    async createMatch(gameData: GameData) {
+        if (!this.isCreatingMatch) {
+            this.isCreatingMatch = true;
+            await this.matchService.createMatch(gameData);
+            this.isCreatingMatch = false;
+        }
     }
 
     private loadGames() {
@@ -46,12 +51,7 @@ export class CreatePageComponent implements OnInit {
                 this.games = games.filter((game) => game.isVisible);
             },
             error: () => {
-                const popupMessage: PopupMessage = {
-                    message: 'Erreur de connection avec le serveur',
-                    hasCloseButton: true,
-                    isConfirmation: false,
-                };
-                this.popupService.showPopup(popupMessage);
+                this.popupService.showPopup({ message: PopupMessage.ConnectionError, hasCloseButton: true, isConfirmation: false });
             },
         });
     }

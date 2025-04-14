@@ -130,10 +130,10 @@ describe('ItemService', () => {
         expect(playerData.items).toContain(itemType);
         expect(mockMatch.data.gameData.mapData.items[itemType]).toEqual([{ x: 3, y: 3 }]);
         expect(computeItemsSpy.calledWith(playerData)).toBe(true);
-        expect(mockMatch.data.state).not.toBe(MatchState.ItemDropSelection);
+        expect(mockMatch.data.state).not.toBe(MatchState.ItemWait);
     });
 
-    it('handleItemAddition should change state to ItemDropSelection when exceeding MAX_ITEMS', () => {
+    it('handleItemAddition should change state to ItemWait when exceeding MAX_ITEMS', () => {
         const playerData = {
             ...structuredClone(MOCK_PLAYER_DATAS[0]),
             items: new Array(MAX_ITEMS).fill(ItemType.Item1),
@@ -152,7 +152,7 @@ describe('ItemService', () => {
         expect(playerData.items).toContain(itemType);
         expect(mockMatch.data.gameData.mapData.items[itemType]).toEqual([]);
         expect(computeItemsSpy.called).toBe(false);
-        expect(mockMatch.data.state).toBe(MatchState.ItemDropSelection);
+        expect(mockMatch.data.state).toBe(MatchState.ItemWait);
     });
 
     it('forceItemDrop should drop excess item and continue turn', () => {

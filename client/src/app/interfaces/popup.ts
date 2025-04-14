@@ -1,4 +1,4 @@
-export interface PopupMessage {
+export interface Popup {
     message: string;
     hasCloseButton: boolean;
     isConfirmation: boolean;

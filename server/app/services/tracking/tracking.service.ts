@@ -14,7 +14,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 export class TrackingService {
     @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
 
-    startTrackingMatch(match: Match): void {
+    startTrackingMatch(match: Match) {
         match.data.trackingData.startTime = Date.now();
         match.data.trackingData.players = match.data.players
             .filter((player) => player.isConnected)
@@ -26,11 +26,11 @@ export class TrackingService {
             }));
     }
 
-    stopTrackingMatch(match: Match): void {
+    stopTrackingMatch(match: Match) {
         match.data.trackingData.endTime = Date.now();
     }
 
-    updateHps(match: Match, attackResult: number): void {
+    updateHps(match: Match, attackResult: number) {
         const attacked = this.combatService.getInactivePlayerData(match);
         const attacker = this.combatService.getActivePlayerData(match);
         const attackedId = match.data.players[attacked.playerIndex].id;
@@ -39,12 +39,12 @@ export class TrackingService {
         this.getPlayerStat(match, attackerId).hpInflicted += Math.min(attackResult, attacked.currentHealth);
     }
 
-    updateEscapes(match: Match, player: PlayerCombatData): void {
+    updateEscapes(match: Match, player: PlayerCombatData) {
         const escaperId = match.data.players[player.playerIndex].id;
         this.getPlayerStat(match, escaperId).escapes++;
     }
 
-    updateCombats(match: Match, winner: PlayerCombatData, loser: PlayerCombatData): void {
+    updateCombats(match: Match, winner: PlayerCombatData, loser: PlayerCombatData) {
         const winnerId = match.data.players[winner.playerIndex].id;
         const loserId = match.data.players[loser.playerIndex].id;
         this.getPlayerStat(match, winnerId).victories++;
@@ -53,17 +53,17 @@ export class TrackingService {
         this.getPlayerStat(match, loserId).combats++;
     }
 
-    updateRounds(match: Match): void {
+    updateRounds(match: Match) {
         ++match.data.trackingData.rounds;
     }
 
-    updateWinner(match: Match, winner: PlayerData): void {
+    updateWinner(match: Match, winner: PlayerData) {
         const standingTile = match.data.gameData.mapData.tiles[winner.position.x][winner.position.y];
         const name = match.data.gameData.mapData.gameMode === GameMode.FFA ? winner.name : winner.team;
         match.data.trackingData.matchWinner = { id: winner.id, avatar: winner.avatar, name, tile: standingTile };
     }
 
-    updateItems(match: Match, item: ItemType, playerId: string): void {
+    updateItems(match: Match, item: ItemType, playerId: string) {
         const itemList = this.getPlayerStat(match, playerId).pickedUpItems;
         const isNewItem = !itemList.includes(item);
         if (isNewItem) {
@@ -75,7 +75,7 @@ export class TrackingService {
         }
     }
 
-    updateGroundTiles(match: Match, position: Position, playerId: string): void {
+    updateGroundTiles(match: Match, position: Position, playerId: string) {
         const tilePositions = match.data.gameData.mapData.tiles;
         const targetTile = tilePositions[position.x][position.y];
         if (targetTile !== TileType.Bridge) {
@@ -86,7 +86,7 @@ export class TrackingService {
         }
     }
 
-    updateToggledBridges(match: Match, position: Position): void {
+    updateToggledBridges(match: Match, position: Position) {
         const visitedBridges = match.data.trackingData.coveredBridges;
         this.addPosIfNew(position, visitedBridges);
     }
@@ -95,7 +95,7 @@ export class TrackingService {
         return match.data.trackingData.players.find((player) => player.id === playerId);
     }
 
-    private addPosIfNew(targetPosition: Position, visitedPositions: Position[]): void {
+    private addPosIfNew(targetPosition: Position, visitedPositions: Position[]) {
         const isNewPosition = !visitedPositions.some((position) => targetPosition.x === position.x && targetPosition.y === position.y);
         if (isNewPosition) {
             visitedPositions.push(targetPosition);

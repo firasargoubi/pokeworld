@@ -5,15 +5,15 @@
     <div id="join-page-border">
         <div id="join-page-body">
             <div id="main-container">
-                <input id="input" [(ngModel)]="gameCode" maxlength="{{codeLength}}" autofocus (keyup)="joinMatch($event)" />
+                <input id="input" [(ngModel)]="matchCode" maxlength="{{codeLength}}" autofocus (keyup)="joinMatch($event)" />
                 <div id="main-container-body">
                     <p id="main-message">Entrez votre code d'accès</p>
 
                     <div id="visual-input-container">
-                        <div class="number">{{ this.gameCode[0] }}</div>
-                        <div class="number">{{ this.gameCode[1] }}</div>
-                        <div class="number">{{ this.gameCode[2] }}</div>
-                        <div class="number">{{ this.gameCode[3] }}</div>
+                        <div class="number">{{ this.matchCode[0] }}</div>
+                        <div class="number">{{ this.matchCode[1] }}</div>
+                        <div class="number">{{ this.matchCode[2] }}</div>
+                        <div class="number">{{ this.matchCode[3] }}</div>
                     </div>
 
                     <p id="main-message">Appuyer sur Entrer pour valider</p>

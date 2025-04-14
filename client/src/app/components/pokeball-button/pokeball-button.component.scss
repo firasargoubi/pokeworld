@@ -1,3 +1,5 @@
+$scale: min(40vw, 60vh);
+
 .pokeball-button {
     display: inline-flex;
     position: absolute;
@@ -71,11 +73,12 @@
 }
 
 .pokeball-button-content p {
-    font-size: min(2vw, 6vh);
+    font-size: calc($scale * 0.09);
     width: auto;
     text-align: center;
     user-select: none;
     width: 100%;
+    transform: translateY(-0.78%);
 }
 
 .pokeball-button-end {

@@ -94,6 +94,15 @@ describe('PlayPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('should update avatar list on construction', () => {
+        fixture.destroy();
+        mockMatchService.isInMatch.and.returnValue(true);
+        fixture = TestBed.createComponent(PlayPageComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+        expect(component).toBeTruthy();
+    });
+
     it('should toggle debug mode d key press', () => {
         const mockEvent = new KeyboardEvent('keydown', { key: 'D' });
         component.onKeyDown(mockEvent);

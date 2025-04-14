@@ -1,25 +1,31 @@
-<div id="pop-up">
-    <div id="details">
-        <div id="infos">
-            <div class="options">
-                Taille de la grille : @for (size of possibleSizes; track $index) {
-                <div class="option" (click)="onSizeSelection(size.value)">
-                    <div class="check-box" [ngClass]="size.value === mapSize ? 'selected' : ''"></div>
-                    <p>{{ size.value }}x{{ size.value }}</p>
-                </div>
+<div class="pop-up-container">
+    <div class="pop-up">
+        <div class="title">Nouveau jeu</div>
+        <div class="options">
+            <div class="option-col">
+                <div class="option-title">Taille de la grille :</div>
+                @for (size of possibleSizes; track $index) {
+                    <div class="option" (click)="onSizeSelection(size.value)">
+                        <div class="check-box" [ngClass]="size.value === mapSize ? 'selected' : ''"></div>
+                        <p>{{ size.value }}x{{ size.value }}</p>
+                    </div>
                 }
             </div>
-            <div class="options">
-                Mode de jeu : @for (mode of possibleModes; track $index) {
-                <div class="option">
-                    <div class="check-box" (click)="onModeSelection(mode.value)" [ngClass]="mode.key === gameMode ? 'selected' : ''"></div>
-
-                    <p>{{ mode.key }}</p>
-                </div>
+            <div class="option-col">
+            <div class="option-title">Mode de jeu :</div>
+                @for (mode of possibleModes; track $index) {
+                    <div class="option" (click)="onModeSelection(mode.value)">
+                        <div class="check-box" [ngClass]="mode.key === gameMode ? 'selected' : ''"></div>
+                        <p>{{ mode.key }}</p>
+                    </div>
                 }
             </div>
         </div>
+        <div class="button-section">
+            <div class="button">
+                <app-pokeball-button [buttonContent]="'Valider'" [delay]="0" [onClickAction]="onValiderSelection.bind(this)"></app-pokeball-button>
+            </div>
+        </div>
     </div>
-    <app-pokeball-button [buttonContent]="'Valider'" [delay]="0" [onClickAction]="onValiderSelection.bind(this)"></app-pokeball-button>
-    <img id="moltres" src="./assets/images/menu/pokemons/normal/moltres.png" />
+    <div class="pokemon-image"></div>
 </div>

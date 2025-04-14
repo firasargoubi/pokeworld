@@ -68,4 +68,15 @@ describe('DebugPageComponent', () => {
             component['askCopyPermission'](code);
         }).not.toThrow();
     });
+
+    it('should copy text to clipboard using execCommand when successful', () => {
+        const execCommandSpy = spyOn(document, 'execCommand').and.returnValue(true);
+        const clipboardWriteSpy = spyOn(navigator.clipboard, 'writeText');
+        const testText = 'test-code';
+
+        component['copyToClipboard'](testText);
+
+        expect(execCommandSpy).toHaveBeenCalledWith('copy');
+        expect(clipboardWriteSpy).not.toHaveBeenCalled();
+    });
 });

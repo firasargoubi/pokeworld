@@ -3,11 +3,11 @@ import { Component, ComponentRef } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
+import { Popup } from '@app/interfaces/popup';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Subject } from 'rxjs';
 import { PopupService } from './popup.service';
 import { POPUP_DELAY } from './popup.service.const';
-import { PopupMessage } from '@app/interfaces/popup-message';
 
 @Component({
     selector: 'app-warning-confirmation-popup',
@@ -60,7 +60,7 @@ describe('PopupService', () => {
     });
 
     it('should clear messages and overlays on clearMessages', () => {
-        const popupMessage: PopupMessage = {
+        const popupMessage: Popup = {
             message: 'Test message',
             hasCloseButton: true,
             isConfirmation: false,
@@ -73,7 +73,7 @@ describe('PopupService', () => {
     });
 
     it('should keep overlayRefs on navigation when keepMessages is called', () => {
-        const popupMessage: PopupMessage = {
+        const popupMessage: Popup = {
             message: 'Test message',
             hasCloseButton: true,
             isConfirmation: false,
@@ -87,7 +87,7 @@ describe('PopupService', () => {
 
     it('should execute action on confirmation', fakeAsync(() => {
         const actionSpy = jasmine.createSpy('action');
-        const popupMessage: PopupMessage = {
+        const popupMessage: Popup = {
             message: 'Test message',
             hasCloseButton: true,
             isConfirmation: true,
@@ -107,7 +107,7 @@ describe('PopupService', () => {
     }));
 
     it('should auto-close regular popup after delay', fakeAsync(() => {
-        const popupMessage: PopupMessage = {
+        const popupMessage: Popup = {
             message: 'Regular message',
             hasCloseButton: false,
             isConfirmation: false,
@@ -120,7 +120,7 @@ describe('PopupService', () => {
     }));
 
     it('should adjust z-index correctly', () => {
-        const popupMessage: PopupMessage = {
+        const popupMessage: Popup = {
             message: 'Test message',
             hasCloseButton: true,
             isConfirmation: false,
@@ -134,7 +134,7 @@ describe('PopupService', () => {
     });
 
     it('should clear messages on navigation by default', () => {
-        const popupMessage: PopupMessage = {
+        const popupMessage: Popup = {
             message: 'Test message',
             hasCloseButton: true,
             isConfirmation: false,
@@ -168,7 +168,7 @@ describe('PopupService', () => {
     }));
 
     it('should set and reset z-index correctly', () => {
-        const popupMessage: PopupMessage = {
+        const popupMessage: Popup = {
             message: 'Test message',
             hasCloseButton: true,
             isConfirmation: false,
@@ -182,7 +182,7 @@ describe('PopupService', () => {
     });
 
     it('should access popup components via getter', () => {
-        const popupMessage: PopupMessage = {
+        const popupMessage: Popup = {
             message: 'Test message',
             hasCloseButton: true,
             isConfirmation: false,
@@ -196,7 +196,7 @@ describe('PopupService', () => {
     it('should return null when no popups are active', () => {
         expect(service.popupComponents.length).toBe(0);
 
-        const popupMessage: PopupMessage = {
+        const popupMessage: Popup = {
             message: 'Test message',
             hasCloseButton: true,
             isConfirmation: false,

@@ -1,11 +1,10 @@
 $height: 7vh;
 $width: 100vw;
-$font-size: min(10vw, calc($height * 0.81));
 $button-height: calc($height * 0.94);
 $button-width: calc($height * 1.5);
 $padding-left: $button-width + calc($height * 0.05);
-$text-border-right: calc($height * 0.07);
-$text-border-bot: calc($height * 0.025);
+$text-border-right: calc(var(--font-size) * 0.086);
+$text-border-bot: calc(var(--font-size) * 0.03);
 
 $header-center-1: '../../../assets/images/menu/headers/header-center-1.png';
 $header-center-2: '../../../assets/images/menu/headers/header-center-2.png';
@@ -37,10 +36,17 @@ div {
     user-select: none;
     line-height: $button-height;
     text-transform: uppercase;
-    font-size: $font-size;
-    letter-spacing: calc($font-size * 0.04);
+    letter-spacing: calc(var(--font-size) * 0.04);
     color: $text-color;
-    text-shadow: $text-border-right $text-border-bot 0 $text-border-color;
+    --font-size: min(10vw, calc(7vh * 0.81));
+    --text-shadow-color: hsl(53, 40%, 50%);
+    font-size: var(--font-size);
+    text-shadow:
+        calc(var(--font-size) * 0.0172) calc(var(--font-size) * 0.006) 0 var(--text-shadow-color),
+        calc(var(--font-size) * 0.0344) calc(var(--font-size) * 0.012) 0 var(--text-shadow-color),
+        calc(var(--font-size) * 0.0516) calc(var(--font-size) * 0.018) 0 var(--text-shadow-color),
+        calc(var(--font-size) * 0.0688) calc(var(--font-size) * 0.024) 0 var(--text-shadow-color),
+        calc(var(--font-size) * 0.0860) calc(var(--font-size) * 0.030) 0 var(--text-shadow-color);
 }
 
 .header-button {
@@ -116,6 +122,6 @@ div {
     height: $height;
     width: auto;
     padding-left: $padding-left;
-    padding-right: calc($font-size * 0.2);
+    padding-right: calc(var(--font-size) * 0.2);
     background-image: url($header-left);
 }

@@ -7,9 +7,8 @@ import { ItemDropPopupComponent } from '@app/components/item-drop-popup/item-dro
 import { ItemComponent } from '@app/components/item/item.component';
 import { MapComponent } from '@app/components/map/map.component';
 import { DEFAULT_PLAY_VISUAL_DATA } from '@app/consts/play-data.const';
-import { ConfirmationMessage } from '@app/interfaces/confirmation-message.enum';
+import { PopupMessage } from '@app/consts/popup-message.const';
 import { PlayVisualData } from '@app/interfaces/play-visual-data';
-import { PopupMessage } from '@app/interfaces/popup-message';
 import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
@@ -38,25 +37,22 @@ export class PlayPageComponent {
     private router: Router = inject(Router);
 
     constructor() {
-        if (!this.matchService.isInMatch()) {
+        if (this.matchService.isInMatch()) {
+            this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
+            this.onMatchUpdate();
+            this.generateThumbnail();
+        } else {
             this.router.navigate([PageEndpoint.Menu]);
         }
-        this.onMatchUpdate();
-        this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.onMatchUpdate.bind(this));
-        this.generateThumbnail();
     }
 
     @HostListener('document:keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
         const activeElement = document.activeElement as HTMLElement;
-        const isInputElement = activeElement.tagName === 'INPUT';
-        if (isInputElement) {
-            return;
-        }
-        if (!event.repeat) {
-            if (event.key === 'd' || event.key === 'D') {
-                this.playService.changeDebugMode();
-            }
+        const isChatFocussed = activeElement.tagName === 'INPUT';
+        const isDKeyPressed = event.key === 'd' || event.key === 'D';
+        if (!isChatFocussed && !event.repeat && isDKeyPressed) {
+            this.playService.changeDebugMode();
         }
     }
 
@@ -75,20 +71,19 @@ export class PlayPageComponent {
     }
 
     surrenderButton() {
-        const popupMessage: PopupMessage = {
-            message: ConfirmationMessage.Surrender,
+        this.popupService.showPopup({
+            message: PopupMessage.Surrender,
             hasCloseButton: true,
             isConfirmation: true,
             action: this.matchService.leaveMatch.bind(this.matchService),
-        };
-        this.popupService.showPopup(popupMessage);
+        });
     }
 
-    showTileDescription(event: MouseEvent): void {
+    showTileDescription(event: MouseEvent) {
         this.tileDescriptionService.displayTileDescription(event);
     }
 
-    hideTileDescription(): void {
+    hideTileDescription() {
         this.tileDescriptionService.hideTileDescription();
     }
 

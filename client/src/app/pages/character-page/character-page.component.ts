@@ -5,9 +5,8 @@ import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { DEFAULT_CHARACTER_VISUAL_DATA } from '@app/consts/player-data.const';
+import { PopupMessage } from '@app/consts/popup-message.const';
 import { CharacterVisualData } from '@app/interfaces/character-visual-data';
-import { ConfirmationMessage } from '@app/interfaces/confirmation-message.enum';
-import { PopupMessage } from '@app/interfaces/popup-message';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -31,21 +30,21 @@ export class CharacterPageComponent {
     private router: Router = inject(Router);
 
     constructor() {
-        if (!this.matchService.isInMatch()) {
+        if (this.matchService.isInMatch()) {
+            this.updateAvatarList();
+            this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.updateAvatarList.bind(this));
+        } else {
             this.router.navigate([PageEndpoint.Menu]);
         }
-        this.updateAvatarList();
-        this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.updateAvatarList.bind(this));
     }
 
     goToMenu() {
-        const popupMessage: PopupMessage = {
-            message: ConfirmationMessage.Quit,
+        this.popupService.showPopup({
+            message: PopupMessage.Quit,
             hasCloseButton: true,
             isConfirmation: true,
-            action: () => this.matchService.leaveMatch(),
-        };
-        this.popupService.showPopup(popupMessage);
+            action: this.matchService.leaveMatch.bind(this.matchService),
+        });
     }
 
     toggleBonusDice() {
@@ -55,12 +54,11 @@ export class CharacterPageComponent {
     joinLobby() {
         const warnings = this.getWarnings();
         if (warnings.length > 0) {
-            const popupMessage: PopupMessage = {
+            this.popupService.showPopup({
                 message: warnings.join('\n'),
                 hasCloseButton: true,
                 isConfirmation: false,
-            };
-            this.popupService.showPopup(popupMessage);
+            });
         } else {
             const playerData = this.getPlayerData();
             this.lobbyService.joinLobby(playerData);

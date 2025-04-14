@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, inject, OnInit, signal, Signal, WritableSignal } from '@angular/core';
+import { Component, computed, inject, signal, Signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { HeaderComponent } from '@app/components/header/header.component';
@@ -15,7 +15,7 @@ import { GameMode } from '@common/interfaces/map-data';
     styleUrls: ['./stat-page.component.scss'],
     imports: [HeaderComponent, FormsModule, ChatComponent, DatePipe],
 })
-export class StatPageComponent implements OnInit {
+export class StatPageComponent {
     sortingOrder: WritableSignal<Order> = signal(Order.ASCENDING);
     sortingStat: WritableSignal<PlayerStatType> = signal(PlayerStatType.Combats);
     playerStatList: Signal<PlayerStatData[]> = computed(() => {
@@ -24,14 +24,13 @@ export class StatPageComponent implements OnInit {
     });
     playerStatTypes: PlayerStatType[] = Object.values(PlayerStatType);
     statService: StatService = inject(StatService);
-
     private matchService: MatchService = inject(MatchService);
 
-    ngOnInit(): void {
+    constructor() {
         this.statService.initializeData();
     }
 
-    updateSorting(statType: PlayerStatType): void {
+    updateSorting(statType: PlayerStatType) {
         if (statType === this.sortingStat()) {
             this.toggleOrder();
         } else {
@@ -40,17 +39,17 @@ export class StatPageComponent implements OnInit {
         this.updateSortingCriteria(statType);
     }
 
-    updateSortingCriteria(statType: PlayerStatType): void {
+    updateSortingCriteria(statType: PlayerStatType) {
         this.sortingStat.set(statType);
     }
 
-    toggleOrder(): void {
+    toggleOrder() {
         const isAscending = this.sortingOrder() === Order.ASCENDING;
         const inverseOrder = isAscending ? Order.DESCENDING : Order.ASCENDING;
         this.sortingOrder.set(inverseOrder);
     }
 
-    navigateToMenu(): void {
+    navigateToMenu() {
         this.matchService.leaveMatch();
     }
 

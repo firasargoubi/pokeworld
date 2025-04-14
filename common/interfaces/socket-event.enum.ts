@@ -34,5 +34,5 @@ export enum CombatEvent {
 }
 
 export enum ChatEvent {
-    NewMessage = 'newMessage',
+    Message = 'message',
 }

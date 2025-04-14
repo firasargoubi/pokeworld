@@ -111,7 +111,7 @@ export class GameValidationService {
         return mapValidationResult;
     }
 
-    private handleTile(tileHandler: TileHandler): void {
+    private handleTile(tileHandler: TileHandler) {
         const { position, map, tilesCount, bridgeStatus } = tileHandler;
         const tileType = map.tiles[position.x][position.y];
         tilesCount.nbTilesTotal++;
@@ -209,7 +209,7 @@ export class GameValidationService {
         return { x: startX, y: startY };
     }
 
-    private dfs(map: MapData, position: Position, visited: boolean[][]): void {
+    private dfs(map: MapData, position: Position, visited: boolean[][]) {
         const { x, y } = position;
         const xOutOfBounds = x < 0 || x >= map.tiles.length;
         const yOutOfBounds = y < 0 || y >= map.tiles[0].length;

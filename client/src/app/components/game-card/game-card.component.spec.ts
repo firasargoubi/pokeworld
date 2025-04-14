@@ -100,7 +100,7 @@ describe('GameCardComponent', () => {
             return 0;
         });
 
-        component.ngOnInit();
+        component.ngAfterViewInit();
         await fixture.whenStable();
         fixture.detectChanges();
 
