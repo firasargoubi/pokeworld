@@ -13,7 +13,7 @@ export class MatchGateway {
     @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
 
     @SubscribeMessage(MatchEvent.CreateMatch)
-    createMatch(socket: Socket, gameData: GameData): MatchData | null {
+    async createMatch(socket: Socket, gameData: GameData): Promise<MatchData | null> {
         return this.matchService.createMatch(socket.id, gameData);
     }
 

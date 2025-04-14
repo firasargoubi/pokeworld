@@ -12,4 +12,6 @@ export enum Message {
     NotEnoughPlayers = 'La partie doit avoir au moins 2 joueurs pour débuter',
     NotLocked = 'La partie doit être verouillée pour débuter',
     NotEvenPlayers = 'Le mode CTF nécessite un nombre pair de joueurs',
+    DeletedGame = 'Le jeu a été supprimé',
+    InvisibleGame = "Le jeu n'est plus visible",
 }

@@ -12,11 +12,15 @@ export class GameService {
         return this.gameModel.find().exec();
     }
 
+    async findGame(id: string): Promise<Game> {
+        return await this.gameModel.findById(id).exec();
+    }
+
     async getGame(id: string): Promise<Game> {
         if (!isValidObjectId(id)) {
             throw new BadRequestException(`Invalid ID format: ${id}`);
         }
-        const game = await this.gameModel.findById(id).exec();
+        const game = await this.findGame(id);
         if (!game) {
             throw new NotFoundException(`Game with ID ${id} not found.`);
         }

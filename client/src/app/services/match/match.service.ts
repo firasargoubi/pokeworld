@@ -40,12 +40,12 @@ export class MatchService {
         this.router.events.subscribe(this.onNavigationUpdate.bind(this));
     }
 
-    async createMatch(gameData: GameData) {
-        await this.socketService.emit(MatchEvent.CreateMatch, gameData, this.onMatchJoined.bind(this));
+    async createMatch(gameData: GameData): Promise<boolean> {
+        return await this.socketService.emit(MatchEvent.CreateMatch, gameData, this.onMatchJoined.bind(this));
     }
 
-    async joinMatch(matchCode: string) {
-        await this.socketService.emit(MatchEvent.JoinMatch, matchCode, this.onMatchJoined.bind(this));
+    async joinMatch(matchCode: string): Promise<boolean> {
+        return await this.socketService.emit(MatchEvent.JoinMatch, matchCode, this.onMatchJoined.bind(this));
     }
 
     leaveMatch() {
@@ -103,11 +103,9 @@ export class MatchService {
         }
     }
 
-    private onMatchJoined(matchData: MatchData | null) {
-        if (matchData !== null) {
-            this.onUpdate(matchData);
-            this.router.navigate([PageEndpoint.Character]);
-        }
+    private onMatchJoined(matchData: MatchData) {
+        this.onUpdate(matchData);
+        this.router.navigate([PageEndpoint.Character]);
     }
 
     private onDisconnect() {
