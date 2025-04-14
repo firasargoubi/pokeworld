@@ -1,5 +1,6 @@
 <div id="combat-page" [ngClass]="{ 'not-current-turn': !visualData.isSelfTurn || matchService.data.state !== 'combatWait' }">
     <div id="timer">
+        @if( this.matchService.data.playData.isDebugMode ){ (DEBUG) }
         {{ combatService.timer.currentTime }}/{{ combatService.timer.maxTime }}
         <div class="timer-container">
             <div
@@ -9,8 +10,6 @@
                     '--max-time': combatService.timer.maxTime
                 }"
             ></div>
-
-            <div class="timer-border"></div>
         </div>
     </div>
     <div id="enemy-container">
@@ -59,11 +58,10 @@
             <img
                 class="pokemon-gif"
                 src="{{ visualData.enemyImage }}"
-                [ngClass]="{
-                    'pokemon-evolved-gif': this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar
-                        .toString()
-                        .includes('-evolved')
-                }"
+                [class.pokemon-evolved-gif]="
+                    this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar.toString().includes('-evolved')
+                "
+                [class.mew]="this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar.toString() === 'avatar12'"
             />
         </span>
     </div>
@@ -79,11 +77,10 @@
             <img
                 class="pokemon-gif"
                 src="{{ visualData.selfImage }}"
-                [ngClass]="{
-                    'pokemon-evolved-gif': this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar
-                        .toString()
-                        .includes('-evolved')
-                }"
+                [class.pokemon-evolved-gif]="
+                    this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar.toString().includes('-evolved')
+                "
+                [class.mew]="this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar.toString() === 'avatar12'"
             />
         </span>
     </div>
@@ -109,8 +106,22 @@
                     {{ visualData.selfPlayer.currentHealth }}/{{ matchService.data.players[visualData.selfPlayer.playerIndex].health }}
                 </p>
             </div>
+            @if (['successAttack', 'failAttack'].includes(matchService.data.combatData.lastCombatAction)) { @if (!visualData.isSelfTurn) {
+            <p class="dice-bonus">Dé attaque: +{{ matchService.data.combatData.lastRolledAttack }}</p>
+            } @else {
+            <p class="dice-bonus">Dé défense: +{{ matchService.data.combatData.lastRolledDefense }}</p>
+            } }
         </div>
     </div>
+
+    <div class="chat-button" (click)="displayChat = true" [class.disabel]="displayChat">
+        <img class="button-icon" src="./assets/images/menu/icons/mail.png" />
+        <div class="button-background"></div>
+    </div>
+    <div class="chat-container" [class.disabel]="!displayChat">
+        <app-chat [onClickAction]="hideChat.bind(this)"></app-chat>
+    </div>
+
     <div id="combat-footer">
         <div id="action-container">
             <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png" />
@@ -133,10 +144,7 @@
                     <span class="stat-label"
                         >Attaque @if (matchService.data.players[visualData.selfPlayer.playerIndex].attackDice === 4) { (D4) } @else { (D6) }
                     </span>
-                    @if (!visualData.isSelfTurn && ['successAttack', 'failAttack'].includes(matchService.data.combatData.lastCombatAction)) {
-                    <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledAttack }}</span>
-                    }
-                    <span class="stat-value" [ngClass]="{ buff: visualData.selfPlayer.attack > 4 }"
+                    <span class="stat-value" [ngClass]="{ buff: visualData.selfPlayer.attack > 4, nerf: visualData.selfPlayer.attack < 4 }"
                         >{{ visualData.selfPlayer.attack }}<span>/4</span></span
                     >
                 </div>
@@ -144,10 +152,7 @@
                     <span class="stat-label"
                         >Défense @if (matchService.data.players[visualData.selfPlayer.playerIndex].defenseDice === 4) { (D4) } @else { (D6) }</span
                     >
-                    @if (visualData.isSelfTurn && ['successAttack', 'failAttack'].includes(matchService.data.combatData.lastCombatAction)) {
-                    <span class="bonus-value">Dé: +{{ matchService.data.combatData.lastRolledDefense }}</span>
-                    }
-                    <span class="stat-value" [ngClass]="{ buff: visualData.selfPlayer.defense > 4 }"
+                    <span class="stat-value" [ngClass]="{ buff: visualData.selfPlayer.defense > 4, nerf: visualData.selfPlayer.defense < 4 }"
                         >{{ visualData.selfPlayer.defense }}<span>/4</span></span
                     >
                 </div>

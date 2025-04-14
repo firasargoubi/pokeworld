@@ -8,7 +8,7 @@ $clip-size: calc($scale * 0.02);
 
 $border-color: #49485e;
 
-$background-image: '../../../assets/images/menu/containers/orange/orange-scrare-body.png';
+$background-image: '../../../assets/images/menu/containers/gray/gray-scrare-body.png';
 
 .pop-up {
     position: absolute;
@@ -36,6 +36,13 @@ $background-image: '../../../assets/images/menu/containers/orange/orange-scrare-
         $clip-size $clip-size
     );
     box-sizing: border-box;
+
+    padding: 1.2vw;
+    box-shadow:
+        inset 0.5vw 0 0 0 #ababab,
+        inset -0.5vw 0 0 0 #6b6b6b,
+        inset 0 0.5vw 0 0 #ababab,
+        inset 0 -0.5vw 0 0 #6b6b6b;
 }
 
 .title {
@@ -47,24 +54,17 @@ $background-image: '../../../assets/images/menu/containers/orange/orange-scrare-
 }
 
 .button-section {
-    margin-top: calc($inner-height * 0.09);
     height: calc($inner-height * 0.2);
-    width: $inner-width;
+    width: 100%;
     overflow: visible;
+    display: flex;
+    justify-content: center;
 }
 
 .button {
     position: relative;
-    margin-left: calc($inner-width * 0.5 - 0.5 * $inner-width * 0.5);
-    width: calc($inner-width * 0.5);
     height: calc($inner-height * 0.18);
-    overflow: visible;
-}
-
-
-app-pokeball-button {
-    width: calc($inner-width * 0.5);
-    height: calc($inner-height * 0.18);
+    aspect-ratio: 29/7;
     overflow: visible;
 }
 

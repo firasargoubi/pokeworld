@@ -119,4 +119,11 @@ describe('CharacterPageComponent', () => {
 
         expect(mockPopupService.showPopup).toHaveBeenCalled();
     });
+
+    it('should call joinLobby when Enter key is pressed', () => {
+        spyOn(component, 'joinLobby');
+        const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
+        component.onKeyDown(enterEvent);
+        expect(component.joinLobby).toHaveBeenCalled();
+    });
 });

@@ -19,9 +19,9 @@ export class MapComponent {
     @Input() isEditor: boolean = false;
     mapService: MapService = inject(MapService);
     avatarVisualEffect = AvatarVisualEffect;
+    matchService: MatchService = inject(MatchService);
     private playService: PlayService = inject(PlayService);
     private lastHover: Position = structuredClone(OUTSIDE_OF_MAP);
-    private matchService: MatchService = inject(MatchService);
 
     onHover(position: Position) {
         const hoveringLastTile = this.lastHover.x !== position.x || this.lastHover.y !== position.y;

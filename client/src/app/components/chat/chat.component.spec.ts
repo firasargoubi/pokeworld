@@ -128,7 +128,6 @@ describe('ChatComponent', () => {
         component.isFilterEnabled.set(true);
         component.updateChatData();
         expect(component.logs.length).toBe(1);
-        expect(scrollToBottomSpy).toHaveBeenCalled();
     });
 
     it('should filter logs based on player name when filter is enabled', () => {

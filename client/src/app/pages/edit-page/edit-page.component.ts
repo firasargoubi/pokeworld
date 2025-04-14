@@ -9,6 +9,7 @@ import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
 import { ITEM_DESCRIPTION } from '@app/consts/item-data.const';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { EditorEvent, EditorItem, EditorVisualData } from '@app/interfaces/editor';
+import { PopupColor } from '@app/interfaces/popup';
 import { EditorService } from '@app/services/editor/editor.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
@@ -61,7 +62,12 @@ export class EditPageComponent {
     async saveButton() {
         const isGameSaved = await this.editorService.saveGame();
         if (isGameSaved) {
-            this.popupService.showPopup({ message: PopupMessage.SuccessfulSave, hasCloseButton: true, isConfirmation: false });
+            this.popupService.showPopup({
+                message: PopupMessage.SuccessfulSave,
+                hasCloseButton: true,
+                isConfirmation: false,
+                popupColor: PopupColor.Green,
+            });
             this.popupService.keepMessages();
             this.goToAdminPage();
         }

@@ -124,6 +124,8 @@ app-map {
 }
 
 .editor-right {
+    vertical-align: top;
+    overflow: visible;
     display: inline-block;
     height: $final-side-height;
     width: $final-side-width;
@@ -134,6 +136,7 @@ app-map {
 }
 
 .tool-square {
+    overflow: visible;
     height: $final-side-width;
     width: $final-side-width;
     margin-bottom: $margin-top;
@@ -148,14 +151,16 @@ app-map {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    margin: $tile-padding;
+    padding: $tile-padding;
+    overflow: visible;
 }
 
 .item-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    margin: $item-padding;
+    padding: $item-padding;
+    overflow: visible;
 }
 
 .tile-grid .grid-square {
@@ -168,10 +173,12 @@ app-map {
     height: $item-size;
     width: $item-size;
     cursor: grab;
+    overflow: visible;
 }
 
 .grid-square * {
     pointer-events: none;
+    overflow: visible;
 }
 
 .tool {
@@ -189,7 +196,6 @@ app-map {
 }
 
 .tool-description {
-    display: none;
     position: absolute;
     z-index: 999;
     grid-row: 1;
@@ -209,6 +215,10 @@ app-map {
     color: black;
     text-transform: none;
     white-space: normal;
+    opacity: 0;
+    transition:
+        opacity ease 0.2s,
+        visibility 0s;
 }
 
 ::ng-deep b {
@@ -217,11 +227,14 @@ app-map {
 }
 
 .grid-square:hover .tool-description {
-    display: block;
+    opacity: 1;
+    transition:
+        opacity 0.6s ease 0.6s,
+        visibility 0.6s 0.6s;
 }
 
 .grab .grid-square:hover .tool-description {
-    display: none;
+    opacity: 0;
 }
 
 app-item {

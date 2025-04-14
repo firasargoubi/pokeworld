@@ -6,8 +6,10 @@
         <main class="flex-container">
             <section id="avatar-info-container" class="flex-container">
                 <div id="player-name-avatar">
-                    <img src="{{ visualData.selfAvatarimage }}" id="selected-avatar" />
-                    <img src="./assets/images/menu/stat-bar/shadow.png" id="avatar-shadow" />
+                    <div id="self-avatar-container">
+                        <img src="{{ visualData.selfAvatarimage }}" id="self-avatar" />
+                        <img src="./assets/images/menu/stat-bar/shadow.png" id="avatar-shadow" />
+                    </div>
                     <span id="name-form">
                         <input
                             id="name-input"
@@ -17,68 +19,96 @@
                             placeholder="Entrez votre pseudo"
                             autofocus
                             autocomplete="off"
+                            style="text-transform: uppercase"
                         />
                         <p id="input-border">--------------------</p>
                     </span>
                 </div>
-                <div id="player-stats">
-                    <div class="stat-container" title="Points de vie du personnage">
-                        <span class="stat-bar-container">
-                            <img src="./assets/images/menu/stat-bar/hp-bar.png" class="bar-icon" />
-                            <div class="stat-bar"></div>
-                            <div class="bonus-bar" [class.bonus-active]="visualData.isHpSelected">
-                                <span class="point-value">4 HP</span>
-                                <span class="point-value bonus-value">6 HP</span>
+                <div id="stats-selection-container">
+                    <div id="bonus-selection-container">
+                        <div class="label">SELECTIONNEZ VOTRE BONUS:</div>
+                        <div class="slections-container">
+                            <div
+                                class="stat-container stat-container-bonus-1"
+                                [ngClass]="{ unselected: !visualData.isHpSelected }"
+                                (click)="visualData.isHpSelected = true"
+                            >
+                                <img src="./assets/images/menu/icons/heart.png" class="stat-icon" />
+                                <div class="stat-body">
+                                    <div class="stat-label">+2 HP</div>
+                                    <div class="stat-value">{{ visualData.isHpSelected ? '6/6' : '4/4' }}</div>
+                                </div>
                             </div>
-                        </span>
-                        <input [(ngModel)]="visualData.isHpSelected" [value]="true" type="radio" id="life" class="bonus-button" />
+                            <div class="stat-separator">
+                                <img src="./assets/images/menu/icons/arrows/double-arrow.png" class="separator-icon" />
+                            </div>
+                            <div
+                                class="stat-container stat-container-bonus-2"
+                                [ngClass]="{ unselected: visualData.isHpSelected }"
+                                (click)="visualData.isHpSelected = false"
+                            >
+                                <img src="./assets/images/menu/icons/lightning.png" class="stat-icon" />
+                                <div class="stat-body">
+                                    <div class="stat-label">+2 VIT</div>
+                                    <div class="stat-value">{{ !visualData.isHpSelected ? '6/6' : '4/4' }}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="stat-container" title="Capacite de mouvement du personnage">
-                        <span class="stat-bar-container">
-                            <img src="./assets/images/menu/stat-bar/vit-bar.png" class="bar-icon" />
-                            <div class="stat-bar"></div>
-                            <div class="bonus-bar" [class.bonus-active]="!visualData.isHpSelected">
-                                <span class="point-value">4 MS</span>
-                                <span class="point-value bonus-value">6 MS</span>
+                    <div id="bonus-selection-container">
+                        <div class="label">SELECTIONNEZ VOS DÉS:</div>
+                        <div class="slections-container">
+                            <div class="stat-container stat-container-dice-1" (click)="toggleBonusDice()">
+                                <img
+                                    src="./assets/images/menu/icons/d6-dice.png"
+                                    class="stat-icon d6-icon"
+                                    [ngClass]="{ visible: visualData.isAttackSelected, hidden: !visualData.isAttackSelected }"
+                                />
+                                <img
+                                    src="./assets/images/menu/icons/d4-dice.png"
+                                    class="stat-icon d4-icon"
+                                    [ngClass]="{ visible: !visualData.isAttackSelected, hidden: visualData.isAttackSelected }"
+                                />
+                                <div class="stat-body">
+                                    <div class="stat-label">ATTAQUE</div>
+                                    <div class="stat-value">4/4</div>
+                                </div>
                             </div>
-                        </span>
-                        <input [(ngModel)]="visualData.isHpSelected" [value]="false" type="radio" value="speed" id="speed" class="bonus-button" />
-                    </div>
-
-                    <div class="stat-container" title="Puissance d'attaque du personnage">
-                        <span class="stat-bar-container">
-                            <img src="./assets/images/menu/stat-bar/atq-bar.png" class="bar-icon" />
-                            <div class="stat-bar"></div>
-                            <div class="bonus-bar">
-                                <span class="point-value">4 AD</span>
+                            <div class="stat-separator">
+                                <img src="./assets/images/menu/icons/arrows/double-arrow.png" class="separator-icon" />
                             </div>
-                        </span>
-                        <span class="dice-icon" [class.dice-icon-6]="visualData.isAttackSelected" (click)="toggleBonusDice()"></span>
-                    </div>
-
-                    <div class="stat-container" title="Capacité de défense du personnage">
-                        <span class="stat-bar-container">
-                            <img src="./assets/images/menu/stat-bar/def-bar.png" class="bar-icon" />
-                            <div class="stat-bar"></div>
-                            <div class="bonus-bar">
-                                <span class="point-value">4 DP</span>
+                            <div class="stat-container stat-container-dice-2" (click)="toggleBonusDice()">
+                                <img
+                                    src="./assets/images/menu/icons/d6-dice.png"
+                                    class="stat-icon d6-icon"
+                                    [ngClass]="{ visible: !visualData.isAttackSelected, hidden: visualData.isAttackSelected }"
+                                />
+                                <img
+                                    src="./assets/images/menu/icons/d4-dice.png"
+                                    class="stat-icon d4-icon"
+                                    [ngClass]="{ visible: visualData.isAttackSelected, hidden: !visualData.isAttackSelected }"
+                                />
+                                <div class="stat-body">
+                                    <div class="stat-label">DEFENSE</div>
+                                    <div class="stat-value">4/4</div>
+                                </div>
                             </div>
-                        </span>
-                        <span class="dice-icon" [class.dice-icon-6]="!visualData.isAttackSelected" (click)="toggleBonusDice()"></span>
+                        </div>
                     </div>
                 </div>
             </section>
             <section id="avatar-selection-container">
                 <div id="avatar-list">
                     @for(avatar of visualData.avatarList; track avatar.name) {
-                        <div
-                            class="avatar-container" [class.locked]="avatar.isLocked" [class.selected]="avatar.isSelected"
-                            (click)="changeAvatar(avatar.avatar)"
-                            title="{{ avatar.name }}"
-                        >
-                            <img src="{{ avatar.image }}" class="avatar-select" />
-                        </div>
+                    <div
+                        class="avatar-container"
+                        [class.locked]="avatar.isLocked"
+                        [class.selected]="avatar.isSelected"
+                        (click)="changeAvatar(avatar.avatar)"
+                        title="{{ avatar.name }}"
+                    >
+                        <img src="{{ avatar.image }}" class="avatar-select" />
+                    </div>
                     }
                 </div>
             </section>
@@ -86,7 +116,9 @@
     </div>
     <footer id="page-footer">
         <div class="flex-container">
-            <button type="button" class="start-btn" [class.disabled]="!nameForm.valid || !visualData.isAvatarSelected" (click)="joinLobby()">START GAME</button>
+            <button type="button" class="start-btn" [class.disabled]="!nameForm.valid || !visualData.isAvatarSelected" (click)="joinLobby()">
+                START GAME
+            </button>
         </div>
     </footer>
 </div>

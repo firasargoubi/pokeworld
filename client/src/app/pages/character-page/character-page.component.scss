@@ -17,6 +17,55 @@ $font-family-title: 'pixel';
 
 $card-width: 26vw;
 
+$corner-square-size: min(0.5vh, 0.5vw);
+$inner-shadow-width: 0.4vw;
+$clip-path: polygon(
+    $corner-square-size 0%,
+    calc(100% - #{$corner-square-size}) 0%,
+
+    calc(100% - #{$corner-square-size}) $corner-square-size,
+    100% $corner-square-size,
+
+    100% calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) 100%,
+    $corner-square-size 100%,
+
+    $corner-square-size calc(100% - #{$corner-square-size}),
+    0% calc(100% - #{$corner-square-size}),
+    0% $corner-square-size,
+    $corner-square-size $corner-square-size
+);
+
+$border-color1: #f67738;
+$border-color2: #48485f;
+$green-inner-shadow:
+    inset $inner-shadow-width 0 0 0 #b3f6a8,
+    inset calc($inner-shadow-width * -1) 0 0 0 #7a9765,
+    inset 0 $inner-shadow-width 0 0 #b3f6a8,
+    inset 0 calc($inner-shadow-width * -1) 0 0 #7a9765;
+
+$pink-main-color: rgb(247, 186, 147);
+$pink-inner-shadow:
+    inset $inner-shadow-width 0 0 0 #f7d1d8,
+    inset calc($inner-shadow-width * -1) 0 0 0 #e7a383,
+    inset 0 $inner-shadow-width 0 0 #f7d1d8,
+    inset 0 calc($inner-shadow-width * -1) 0 0 #e7a383;
+
+$blue-main-color: #83a4fa;
+$blue-inner-shadow:
+    inset $inner-shadow-width 0 0 0 #80c0d8,
+    inset calc($inner-shadow-width * -1) 0 0 0 #2878b0,
+    inset 0 $inner-shadow-width 0 0 #80c0d8,
+    inset 0 calc($inner-shadow-width * -1) 0 0 #2878b0;
+
+$orange-main-color: #d0a236;
+$orange-inner-shadow:
+    inset $inner-shadow-width 0 0 0 #d0a236,
+    inset calc($inner-shadow-width * -1) 0 0 0 #9f4c0f,
+    inset 0 $inner-shadow-width 0 0 #d0a236,
+    inset 0 calc($inner-shadow-width * -1) 0 0 #9f4c0f;
+
 p {
     font-size: 40px;
 }
@@ -56,225 +105,258 @@ main {
 #player-name-avatar {
     position: relative;
     display: flex;
-    column-gap: 50px;
+    justify-content: start;
+    align-items: center;
     margin: 0 $page-border-width $page-border-width 0;
     background-color: rgb(145, 222, 145);
     border: $page-border-width solid $wheat-border-color;
     box-shadow: 0 0 0 $page-border-width $gray-border-color;
     height: 20vh;
+    overflow: visible;
 }
 
-#selected-avatar {
+#self-avatar-container {
+    position: relative;
     height: 100%;
-    width: auto;
     aspect-ratio: 1/1;
-    object-fit: cover;
-    z-index: 1;
+    overflow: visible;
 }
 
-#name-form {
-    display: flex;
-    flex-direction: column;
-    row-gap: 10px;
-    align-self: center;
-    width: 80%;
-    height: 15vh;
-    justify-content: center;
+#self-avatar {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 150%;
+    z-index: 2;
 }
 
 #avatar-shadow {
-    height: 15%;
-    width: auto;
     position: absolute;
-    left: 3.5vh;
-    bottom: 2.4vh;
-    filter: brightness(0.7);
+    bottom: -1%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    width: 70%;
+    filter: brightness(0.9);
+}
+
+$name-font-size: 3vw;
+$name-letter-spacing: 1vw;
+$name-text-indent: 0.5vw;
+
+#name-form {
+    display: flex;
+    background: none;
+    flex-direction: column;
+    row-gap: 0.2vw;
+    align-self: center;
+    flex: 1;
+    height: 100%;
+    justify-content: center;
+    padding: 0 0 0 2vw;
 }
 
 #name-input {
-    font-family: $font-family-title;
+    font-family: 'pixel-monospace';
     background: none;
     border: none;
-    padding: 0;
-    margin: 0;
-    height: 5vh;
-    width: 29ch;
-    font-size: 5vh;
-    letter-spacing: 1vh;
-    font-family: 'pixel';
-    text-shadow: 3px 0 0 rgba(0, 0, 0, 0.5);
+    font-size: $name-font-size;
+    letter-spacing: $name-letter-spacing;
+    text-indent: $name-text-indent;
+    text-shadow: 0.2vw 0 0 rgba(0, 0, 0, 0.5);
     outline: none;
 }
+
 #name-input::placeholder {
     color: rgb(0, 0, 0, 0.2);
     text-shadow: 0px 0 0 rgba(0, 0, 0, 0.5);
+    text-indent: $name-text-indent;
 }
 
 #input-border {
-    font-family: $font-family-title;
-    height: 0.3vh;
-    font-size: 5vh;
-    letter-spacing: 1vh;
+    font-family: 'pixel-monospace';
+    height: 0.8vh;
+    font-size: $name-font-size;
+    letter-spacing: $name-letter-spacing;
+    text-indent: $name-text-indent;
     color: white;
     line-height: 0;
-    width: 29ch;
+    user-select: none;
 }
 
-#player-stats {
+#stats-selection-container {
     width: calc(100% - $page-border-width);
     height: 100%;
-    padding: 2vw;
-    display: flex;
-    overflow: visible;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
     border: $wheat-border-color solid $page-border-width;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1.5vh;
+}
+
+#bonus-selection-container {
+    width: 100%;
+    height: 100%;
+}
+
+.label {
+    width: 100%;
+    height: 20%;
+    padding: 0 0 0 2vw;
+    font-size: min(5vh, 5vw);
+    text-shadow: 0.25vw 0 0 $text-shadow-color;
+    display: flex;
+    align-items: center;
+}
+
+.slections-container {
+    width: 100%;
+    height: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 2vw;
+    overflow: visible;
+}
+
+.stat-separator {
+    width: 15%;
+    height: 100%;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    padding: 0 3% 0 0;
+}
+
+.separator-icon {
+    width: 65%;
+    user-select: none;
+    pointer-events: none;
 }
 
 .stat-container {
-    width: 100%;
-    height: 7vh;
-    margin: 10px 0;
-    align-items: start;
-    overflow: visible;
     position: relative;
-    display: flex;
-    justify-content: start;
-}
-
-.stat-bar-container {
-    position: relative;
-    height: 100%;
-    width: 70%;
-    display: flex;
-    padding: 0 15px;
+    width: min(45vw, 45vh);
+    aspect-ratio: 449/188;
     overflow: visible;
-}
 
-.bar-icon {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-}
-.stat-bar {
-    height: 100%;
-    background-color: green;
-    flex: 4;
-}
-
-.bonus-bar {
-    position: relative;
-    height: 100%;
-    flex: 2;
-    background-color: gray;
-    overflow: visible;
-}
-
-.bonus-bar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 0%;
-    height: 100%;
-    background-color: gold;
-    transition: width 0.5s ease-in-out;
-}
-
-.point-value {
-    position: absolute;
-    bottom: -6vh;
-    right: 0;
-    font-size: 3em;
-    font-weight: bolder;
-    color: rgb(255, 255, 255);
-    text-shadow: 4px 0 0 $text-shadow-color;
-    z-index: 2;
-    opacity: 1;
-}
-
-.bonus-value {
-    opacity: 0;
-}
-
-.bonus-active .point-value {
-    opacity: 0;
-}
-
-.bonus-active .bonus-value {
-    opacity: 1;
-}
-
-.bonus-bar.bonus-active::before {
-    width: 100%;
-}
-
-.bonus-button {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    height: 80%;
-    width: auto;
-    aspect-ratio: 3/2;
-    margin: 0 0 0 30px;
-    background-image: url('../../../assets/images/menu/stat-bar/bonus-point.png');
-    background-size: 100% 100%;
-    display: inline-block;
-    cursor: pointer;
-    align-self: center;
-}
-
-.bonus-button:hover {
-    filter: brightness(1.15);
-}
-
-.bonus-button:checked {
-    opacity: 0;
-    cursor: default;
-}
-
-.bonus-button:checked:hover {
-    filter: brightness(1);
-}
-
-.dice-icon {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    height: 100%;
-    width: auto;
-    aspect-ratio: 1/1;
-    z-index: 2;
-    margin: 0 0 0 30px;
-    background-color: 0;
-    background-size: cover;
-    background-image: url('../../../assets/images/menu/stat-bar/inverted-dice-4.png');
-    rotate: 0deg;
-    cursor: pointer;
     transition:
-        rotate 0.5s ease-in-out,
-        background-image 0.5s ease-in-out;
+        filter 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+        opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+        transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.dice-icon:hover {
-    filter: brightness(0.8);
+.stat-container-dice-1,
+.stat-container-dice-2 {
+    cursor: pointer;
 }
 
-.dice-icon-6 {
-    background-image: url('../../../assets/images/menu/stat-bar/dice-six-faces-six.png');
-    rotate: 45deg;
+.stat-container-dice-1:hover,
+.stat-container-dice-2:hover {
+    filter: brightness(1.1);
+    transform: scale(1.01);
 }
 
-.hp-points {
+.stat-container-dice-1:active,
+.stat-container-dice-2:active {
+    filter: brightness(1.2);
+}
+
+.unselected {
+    filter: brightness(0.4);
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+.unselected:hover {
+    filter: brightness(0.5);
+    opacity: 0.85;
+    transform: scale(1.01);
+}
+
+.stat-body {
+    width: 100%;
+    height: 100%;
+
+    padding: 3%;
+    border: calc($corner-square-size * 2) solid $border-color1;
+    clip-path: $clip-path;
+
+    background-image: url('../../../assets/images/menu/containers/pink/pink-scrare-body.png');
+    background-size: 100% 200%;
+    background-position: center 60%;
+    background-repeat: no-repeat;
+
+    padding: 1.2vw;
+    box-shadow: $pink-inner-shadow;
+}
+
+.stat-container-bonus-2 .stat-body {
+    background-image: url('../../../assets/images/menu/containers/green/green-scrare-body.png');
+    box-shadow: $green-inner-shadow;
+}
+
+.stat-container-dice-1 .stat-body {
+    border-color: $border-color2;
+    background-image: url('../../../assets/images/menu/containers/dark-blue/dark-blue-scrare-body.png');
+    box-shadow: $blue-inner-shadow;
+}
+
+.stat-container-dice-2 .stat-body {
+    border-color: $border-color2;
+    background-image: url('../../../assets/images/menu/containers/orange/orange-scrare-body.png');
+    box-shadow: $orange-inner-shadow;
+}
+
+.stat-label {
     position: absolute;
-    color: red;
-    bottom: 0px;
-    right: 0px;
-    z-index: 10;
+    left: 10%;
+    top: 10%;
+    font-size: min(6vh, 5vw);
+    text-shadow: 0.25vw 0 0 $text-shadow-color;
+}
+
+.stat-value {
+    position: absolute;
+    left: 5%;
+    bottom: 7%;
+    font-size: min(5vh, 4vw);
+    text-shadow: 0.25vw 0 0 $text-shadow-color;
+}
+
+.stat-icon {
+    position: absolute;
+    top: 50%;
+    right: -7%;
+    transform: translateY(-50%);
+    z-index: 2;
+    height: 100%;
+    transition: all 0.5s ease-in-out;
+}
+
+.stat-container-bonus-2 .stat-icon {
+    height: 120%;
+    right: 0%;
+}
+
+.stat-icon.visible {
+    opacity: 1;
+    transform: translateY(-50%) scale(1) rotate(0deg);
+}
+
+.stat-icon.hidden {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.5) rotate(180deg);
+}
+.d4-icon {
+    height: 120%;
+}
+
+.d6-icon {
+    height: 90%;
+    right: 3%;
+    rotate: 23.38deg;
 }
 
 #avatar-selection-container {
@@ -309,7 +391,7 @@ main {
 }
 
 .avatar-container {
-    width: 100%;
+    width: min(8vw, 17vh);
     aspect-ratio: 1/1;
     display: flex;
     flex-direction: column;
@@ -317,6 +399,7 @@ main {
     border: 0.6vw solid rgba(0, 0, 0, 0);
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 
 .selected,
@@ -327,8 +410,14 @@ main {
         0 0.6vw 0 $text-shadow-color;
 }
 
+:not(.locked).avatar-container:active img {
+    filter: brightness(1.2);
+    transition: filter 0.2s ease-in-out 0.2;
+}
+
 .locked {
     filter: grayscale(1);
+    cursor: not-allowed;
 }
 
 .flex-container {
@@ -337,16 +426,10 @@ main {
 }
 
 .avatar-select {
-    width: 150%;
-    height: 150%;
+    width: 80%;
+    height: 80%;
     aspect-ratio: 1/1;
     object-fit: cover;
-}
-
-.warning {
-    font-size: 20px;
-    color: red;
-    line-height: 50px;
 }
 
 @keyframes fall {
@@ -381,22 +464,6 @@ main {
 
 #page-footer .disabled {
     background-image: url('../../../assets/images/menu/buttons/admin-button/red-background-highlight.png');
-}
-
-.error-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 100%;
-    padding: 6vw;
-    user-select: none;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1vw;
-    align-items: center;
-    z-index: 5;
 }
 
 app-warning-confirmation-popup {

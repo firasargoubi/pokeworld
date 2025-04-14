@@ -3,7 +3,7 @@ import { Component, ComponentRef } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
-import { Popup } from '@app/interfaces/popup';
+import { Popup, PopupColor } from '@app/interfaces/popup';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Subject } from 'rxjs';
 import { PopupService } from './popup.service';
@@ -316,6 +316,7 @@ describe('PopupService', () => {
             message: 'regular message without keyword',
             hasCloseButton: true,
             isConfirmation: false,
+            popupColor: PopupColor.Green,
         };
         service.showPopup(otherMessage);
         tick();

@@ -129,7 +129,7 @@ export class PlayService {
     private startItemDrop(match: Match, playerId: string) {
         this.setTimeLeft(match);
         match.sendUpdate();
-        match.setTimeout(this.itemService.forceItemDrop.bind(this, match, playerId), DROP_ITEMS_DURATION);
+        match.setTimeout(this.itemService.forceItemDrop.bind(this.itemService, match, playerId), DROP_ITEMS_DURATION);
     }
 
     private continueTurnWait(match: Match) {

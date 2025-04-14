@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { NavigationStart, Router, Event as RouterEvent } from '@angular/router';
 import { DEFAULT_GAME_DATA } from '@app/consts/game-data.const';
 import { PopupMessage } from '@app/consts/popup-message.const';
+import { PopupColor } from '@app/interfaces/popup';
 import { ChatService } from '@app/services/chat/chat.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
@@ -9,6 +10,7 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { DEFAULT_MATCH_DATA, DEFAULT_SELF_INDEX } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA, MAX_ITEMS } from '@common/consts/player-data.const';
+import { WARNING_MESSAGES } from '@common/consts/warning-messages';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
@@ -131,6 +133,7 @@ export class MatchService {
             message: messageFromServer.message,
             hasCloseButton: messageFromServer.hasCloseButton,
             isConfirmation: false,
+            popupColor: WARNING_MESSAGES.includes(messageFromServer.message) ? PopupColor.Orange : PopupColor.Blue,
         });
     }
 

@@ -119,11 +119,11 @@ describe('StatService', () => {
             service.playerStats.forEach((player, i) => (player.VICTOIRES = playerVictories[i]));
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             playerVictories = [9, 5, 1];
-            service.sortPlayerStatsBy(PlayerStatType.Victories, Order.ASCENDING);
+            service.sortPlayerStatsBy(PlayerStatType.Victories, Order.Ascending);
             expect(service.playerStats.map((p) => p[PlayerStatType.Victories])).toEqual(playerVictories);
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             playerVictories = [1, 5, 9];
-            service.sortPlayerStatsBy(PlayerStatType.Victories, Order.DESCENDING);
+            service.sortPlayerStatsBy(PlayerStatType.Victories, Order.Descending);
             expect(service.playerStats.map((p) => p[PlayerStatType.Victories])).toEqual(playerVictories);
         });
 

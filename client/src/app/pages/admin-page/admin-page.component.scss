@@ -53,10 +53,11 @@ $card-width: 26vw;
 
 #game-grid {
     display: grid;
-    width: max-content;
-    margin: 5vh auto 20vh;
-    grid-template-columns: repeat(3, $card-width);
-    gap: 30px;
+    width: 90%;
+    max-width: 120vh;
+    margin: 2vh auto 20vh;
+    grid-template-columns: repeat(3, 1fr);
+    gap: min(3vw, 3vh);
     place-items: center;
 }
 
@@ -70,28 +71,32 @@ $card-width: 26vw;
     position: absolute;
     right: 5%;
     bottom: 7%;
-    width: 22.5vw;
-    height: 4.5vw;
+    height: min(4.5vw, 6.5vh);
+    aspect-ratio: 17/3;
     overflow: visible;
 }
 
 #creation-game-popup {
-    display: block;
-    z-index: 1;
-    position: fixed;
-    padding-top: 5%;
+    position: absolute;
+    display: flex;
+    z-index: 10;
     top: 0;
     left: 0;
     background-color: rgba($color: #000000, $alpha: 0.5);
     height: 100%;
     width: 100%;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
 
-    // Initial state avant l'animation
     opacity: 0;
     transform: scale(0.95);
 
-    // Animation déclenchée dès l'affichage
     animation: popupIn 0.2s steps(8, end) forwards;
+}
+
+#creation-game-popup * {
+    overflow: visible;
 }
 
 @keyframes popupIn {

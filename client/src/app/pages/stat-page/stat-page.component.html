@@ -20,7 +20,14 @@
 
                         @for(statType of playerStatTypes; track statType){
                         <div class="stat-column">
-                            <div class="stat-title" (click)="updateSorting(statType)">{{ statType }} ></div>
+                            <div class="stat-title" (click)="updateSorting(statType)">
+                                {{ statType }}
+                                <div
+                                    class="sort-icon"
+                                    [class.ascending]="this.sortingStat() === statType && this.sortingOrder() === 'ascending'"
+                                    [class.descending]="this.sortingStat() === statType && this.sortingOrder() === 'descending'"
+                                ></div>
+                            </div>
                             <div class="stat-container">
                                 @for(player of playerStatList() ; track player.id){
                                 <div class="stat-value" [class.self]="isSelfPlayer(player.id)">{{ player[statType] }}</div>
@@ -74,8 +81,14 @@
                         <div class="match-winner-container">
                             <div class="winner-title">{{ statService.winnerData.name.toUpperCase() }}</div>
                             <img class="winner-battle-platform" src="{{ statService.winnerData.tileImage }}" />
-                            <img class="winner-avatar" src="{{ statService.winnerData.avatarImage }}" />
+                            <img
+                                class="winner-avatar"
+                                src="{{ statService.winnerData.avatarImage }}"
+                                [class.evolved]="statService.winnerData.avatarImage.toString().includes('evolved')"
+                            />
                         </div>
+
+                        <div id="quit-button" (click)="navigateToMenu()">< QUITTER</div>
                     </div>
                     <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
                 </div>

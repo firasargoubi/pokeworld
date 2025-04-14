@@ -1,4 +1,4 @@
-$player-list-height: calc((100vh - 6vw) * 0.90);
+$player-list-height: calc((100vh - 6vw) * 0.9);
 $player-list-width: 52vw;
 $player-card-height-1: calc($player-list-height * 0.166666);
 $player-card-height-2: calc($player-list-width * 0.143333);
@@ -159,18 +159,22 @@ $text-shadow-color: rgb(112, 112, 112);
     top: 7%;
     left: 11%;
     font-size: calc(2 * $scale);
-    text-shadow: calc(0.25 * $scale) 0 0 $text-shadow-color;
+    text-shadow: calc(0.19 * $scale) 0 0 $text-shadow-color;
     display: flex;
     justify-content: start;
-    gap: calc(1 * $scale);
-    height: 50%;
-    width: 80%;
+    gap: calc(1.5 * $scale);
+    width: 45%;
     z-index: 3;
     user-select: none;
+
+    flex-wrap: wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .player-card .crown {
-    height: 100%;
+    height: calc(2 * $scale);
+    margin: auto 0;
     aspect-ratio: 1/1;
     background-image: url('../../../assets/images/menu/icons/crown.png');
     background-size: 100% 100%;
@@ -218,20 +222,52 @@ $text-shadow-color: rgb(112, 112, 112);
     position: absolute;
     right: 0;
     bottom: -130%;
-    font-size: calc(2.00 * $scale);
+    font-size: calc(2 * $scale);
     text-shadow: calc(0.25 * $scale) 0 0 $text-shadow-color;
     user-select: none;
 }
 
 .is-disconnected {
-    transform: translateX(80%);
+    transform: translateX(78.5%);
     filter: brightness(0.4);
+    transition:
+        transform 0.18s ease,
+        filter 0.18s ease;
+}
+
+.display-ban-button.is-disconnected:hover {
+    transform: translateX(50%);
+    filter: brightness(0.6);
+    cursor: pointer;
+}
+
+.display-ban-button.is-disconnected:active {
+    transform: translateX(50%);
+    filter: brightness(0.8);
+    transition:
+        transform 0.11s ease,
+        filter 0.11s ease;
 }
 
 .is-disconnected .avatar,
 .is-disconnected .player-card *,
+.player-card .add-instruction,
 .is-disconnected .ban-button {
     display: none;
+}
+
+.display-ban-button.is-disconnected .player-card .add-instruction {
+    position: absolute;
+    top: 50%;
+    left: 11%;
+    transform: translateY(-50%);
+    text-align: left;
+    font-size: calc(3.5 * $scale);
+    text-shadow: calc(0.4 * $scale) 0 0 $text-shadow-color;
+    color: #ffffff;
+    user-select: none;
+    display: block;
+    word-spacing: calc(-0.015 * $scale);
 }
 
 .player-card .bot-type {

@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { NavigationStart, Router } from '@angular/router';
+import { PopupColor } from '@app/interfaces/popup';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { MAX_ITEMS } from '@common/consts/player-data.const';
+import { WARNING_MESSAGES } from '@common/consts/warning-messages';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchState } from '@common/interfaces/match-data';
 import { MessageFromServer } from '@common/interfaces/message-from-server';
@@ -227,5 +229,22 @@ describe('MatchService', () => {
         expect(popupServiceSpy.showPopup).toHaveBeenCalled();
 
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith(jasmine.objectContaining(messageFromServer));
+    });
+
+    it('should show orange popup when message is in WARNING_MESSAGES', () => {
+        const warningMessage = WARNING_MESSAGES[0];
+        const messageFromServer = {
+            message: warningMessage,
+            hasCloseButton: true,
+        } as MessageFromServer;
+
+        service['onMessage'](messageFromServer);
+
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith({
+            message: warningMessage,
+            hasCloseButton: true,
+            isConfirmation: false,
+            popupColor: PopupColor.Orange,
+        });
     });
 });
