@@ -83,7 +83,9 @@ export class LobbyService {
                 botData.type = botType;
                 match.data.players.push(botData);
                 this.matchService.addPlayerToMatchCode(botData.id, match.data.code);
-                match.changeLockStatus(false);
+                if (match.isFull()) {
+                    match.changeLockStatus(true);
+                }
                 match.sendUpdate();
             }
         }

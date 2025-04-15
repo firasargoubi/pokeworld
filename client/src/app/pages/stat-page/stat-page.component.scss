@@ -166,7 +166,7 @@ $clip-path: polygon(
 }
 
 .sort-icon {
-    height: 0;
+    height: 100%;
     aspect-ratio: 1/1;
     background-size: 55% 55%;
     background-position: center;
@@ -174,12 +174,10 @@ $clip-path: polygon(
 }
 
 .sort-icon.ascending {
-    height: 100%;
     background-image: url('../../../assets/images/menu/icons/arrows/sort-asc.png');
 }
 
 .sort-icon.descending {
-    height: 100%;
     background-image: url('../../../assets/images/menu/icons/arrows/sort-des.png');
 }
 
@@ -187,7 +185,6 @@ $clip-path: polygon(
     display: flex;
     flex-direction: column;
     justify-content: start;
-    row-gap: 10px;
     align-items: center;
     height: 100%;
     padding: 0.5vh 0;
@@ -306,8 +303,8 @@ $surrender-button-click: '../../../assets/images/menu/buttons/play/surrender-but
     position: absolute;
     bottom: 6vh;
     left: 1vw;
-    height: min(6vh, 6vw);
-    width: min(25vh, 25vw);
+    height: min(5.5vh, 5.5vw);
+    width: min(24.5vh, 24.5vw);
 
     display: flex;
     justify-content: center;
@@ -315,6 +312,7 @@ $surrender-button-click: '../../../assets/images/menu/buttons/play/surrender-but
 
     font-size: min(3.5vh, 3.5vw);
     color: black;
+    background-color: white;
 
     background-image: url($surrender-button);
     background-size: 100% 100%;

@@ -2,13 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchData } from '@common/interfaces/match-data';
 import { LobbyEvent, MatchEvent } from '@common/interfaces/socket-event.enum';
 import { DEBUG_GAMES, DEBUG_PLAYERS } from './debug-page.component.const';
+import { GameSaveService } from '@app/services/game-save/game-save.service';
 
 @Component({
     selector: 'app-debug-page',

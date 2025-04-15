@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { LobbyService } from './lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { MatchState } from '@common/interfaces/match-data';
 import { Avatar, PlayerType } from '@common/interfaces/player-data';
 import { LobbyEvent } from '@common/interfaces/socket-event.enum';
-import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
-import { MatchState } from '@common/interfaces/match-data';
+import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
+import { LobbyService } from './lobby.service';
 
 describe('LobbyService', () => {
     let service: LobbyService;

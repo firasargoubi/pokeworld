@@ -91,7 +91,7 @@ app-item,
 }
 
 .self-spawn-point {
-    filter: invert(1);
+    filter: hue-rotate(210deg) brightness(1.2);
 }
 
 .tile-border {

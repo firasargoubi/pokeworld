@@ -84,6 +84,11 @@ $combat-info-height: 28vh;
     }
 }
 
+.debug-info {
+    margin: 0 0.5vw 0 0;
+    color: #e00004;
+}
+
 #enemy-container {
     position: absolute;
     top: 20vh;

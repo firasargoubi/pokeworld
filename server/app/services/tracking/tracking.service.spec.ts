@@ -5,13 +5,13 @@ import { DEFAULT_PLAYER_TRACKING_DATA } from '@common/consts/track-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
 import { MatchData } from '@common/interfaces/match-data';
+import { Team } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS, MOCK_PLAYER_COMBAT_DATAS } from '@common/test-consts/mock-matches';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
 import { TrackingService } from './tracking.service';
-import { Team } from '@common/interfaces/player-data';
 
 describe('TrackingService', () => {
     let service: TrackingService;

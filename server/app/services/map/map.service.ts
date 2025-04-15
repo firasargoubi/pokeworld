@@ -251,8 +251,12 @@ export class MapService {
     }
 
     private isTileOccupiedByObject(matchData: MatchData, position: Position, ignoreSpawnpoints: boolean = false): boolean {
+        const curentPlayer = matchData.players[matchData.playData.activePlayerIndex];
         for (const [itemType, items] of Object.entries(matchData.gameData.mapData.items)) {
-            if (ignoreSpawnpoints && itemType === ItemType.Spawn) {
+            const isCurentPlayerSpawnpoint = curentPlayer.spawnPoint.x === position.x && curentPlayer.spawnPoint.y === position.y;
+            const isCapturingFlag = isCurentPlayerSpawnpoint && curentPlayer.items.includes(ItemType.Flag);
+
+            if (ignoreSpawnpoints && itemType === ItemType.Spawn && !isCapturingFlag) {
                 continue;
             }
 
