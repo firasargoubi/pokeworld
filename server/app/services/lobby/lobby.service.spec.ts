@@ -45,7 +45,8 @@ describe('LobbyService', () => {
     });
 
     beforeEach(() => {
-        mockMatch.data = structuredClone(MOCK_MATCH_DATAS[0]);
+        mockMatch = createStubInstance<Match>(Match);
+        mockMatch.data = structuredClone(MOCK_MATCH_DATAS[1]);
     });
 
     afterEach(() => {
@@ -211,7 +212,7 @@ describe('LobbyService', () => {
                 return count + mockMatch.data.gameData.mapData.items[itemType].length;
             }, 0);
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- Number of items distributed
         expect(totalDistributed).toBe(3);
 
         const randomItemsCount = Object.values(REGULAR_ITEMS)
@@ -223,10 +224,14 @@ describe('LobbyService', () => {
         expect(randomItemsCount).toBe(0);
     });
 
-    it('should add bot when match is not full and bot data is available', () => {
-        mockMatch.isFull.returns(false);
+    it('should change lock status to true when adding a bot makes the match full', () => {
+        mockMatch.isFull.onCall(0).returns(false);
+        mockMatch.isFull.onCall(1).returns(true);
         mockBotService.getBotData.returns(structuredClone(MOCK_PLAYER_DATAS[0]));
+
         service.addBot(mockMatch, PlayerType.BotAggressive);
+        expect(mockMatchService.addPlayerToMatchCode.called).toBeTruthy();
+        expect(mockMatch.changeLockStatus.calledWith(true)).toBeTruthy();
         expect(mockMatch.sendUpdate.called).toBeTruthy();
     });
 });

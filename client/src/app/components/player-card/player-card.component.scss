@@ -163,7 +163,7 @@ $text-shadow-color: rgb(112, 112, 112);
     text-shadow: calc(0.19 * $scale) 0 0 $text-shadow-color;
     display: flex;
     justify-content: start;
-    gap: calc(1.5 * $scale);
+    gap: calc(0.4 * $scale);
     width: 45%;
     z-index: 3;
     user-select: none;
@@ -175,7 +175,7 @@ $text-shadow-color: rgb(112, 112, 112);
 
 .player-card .crown {
     height: calc(2 * $scale);
-    margin: auto 0;
+    margin: auto calc(0.2 * $scale);
     aspect-ratio: 1/1;
     background-image: url('../../../assets/images/menu/icons/crown.png');
     background-size: 100% 100%;
@@ -184,6 +184,20 @@ $text-shadow-color: rgb(112, 112, 112);
     opacity: 0;
 }
 
+.player-card .bot-icon-aggresive,
+.player-card .bot-icon-defensive {
+    height: calc(2 * $scale);
+    margin: auto 0;
+    aspect-ratio: 1/1;
+    background-image: url('../../../assets/images/menu/icons/bot-aggressive.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.player-card .bot-icon-defensive {
+    background-image: url('../../../assets/images/menu/icons/bot-defensive.png');
+}
 .is-host .player-card .crown {
     opacity: 1;
 }
@@ -273,7 +287,7 @@ $text-shadow-color: rgb(112, 112, 112);
 
 .player-card .bot-type {
     font-size: calc(1.5 * $scale);
-    color: #50d16c;
+    color: #69c5fb;
     text-shadow: calc(0.17 * $scale) calc(0.05 * $scale) 0 $text-shadow-color;
     margin-top: calc(0.29 * $scale);
     margin-left: calc(0.1 * $scale);

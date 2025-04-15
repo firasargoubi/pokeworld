@@ -18,9 +18,13 @@
         <span class="player-name">
             {{ player.name }}
             @if (player.playerType === 'botAggressive') {
+            <span class="bot-icon-aggresive"></span>
             <span class="bot-type aggresive">Agressif</span>
+
             } @if (player.playerType === 'botDefensive') {
+            <span class="bot-icon-defensive"></span>
             <span class="bot-type">Défensif</span>
+
             }
             <div class="crown"></div>
         </span>
