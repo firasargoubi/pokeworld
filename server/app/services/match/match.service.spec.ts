@@ -141,6 +141,23 @@ describe('MatchService', () => {
         expect(mockMatch.clearTimeout.calledOnce).toBe(true);
     });
 
+    it('should deactivate debug mode when host leaves and debug mode is active', () => {
+        const hostPlayerId = 'hostPlayer';
+        mockMatch.data.playData.isDebugMode = true;
+        mockMatch.isHost.returns(true);
+        mockMatch.getConnectedPlayerCount.returns(1);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'getMatchFromPlayerId').returns(mockMatch);
+
+        service.leaveMatch(hostPlayerId);
+
+        expect(mockPlayService.changeDebugMode.calledWith(mockMatch, hostPlayerId, false)).toBe(true);
+        expect(mockMatchGateway.disconnectPlayer.calledWith(hostPlayerId)).toBe(true);
+        expect(mockChatService.logPlayerLeft.calledWith(mockMatch, hostPlayerId)).toBe(true);
+        expect(mockMatch.leave.calledWith(hostPlayerId)).toBe(true);
+    });
+
     it('disconnect player should remove player from map and disconnect', () => {
         const playerId = 'player1';
         service['playerToMatchCode'].set(playerId, '1234');

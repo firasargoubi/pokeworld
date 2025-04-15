@@ -3,9 +3,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { Timer } from '@app/classes/timer/timer';
 import { ChatComponent } from '@app/components/chat/chat.component';
+import { PopupColor } from '@app/interfaces/popup';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
+import { PopupService } from '@app/services/popup/popup.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatAction, MatchData, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
@@ -29,6 +31,7 @@ describe('CombatPageComponent', () => {
     let mockPlayService: jasmine.SpyObj<PlayService>;
     let mockRouter: jasmine.SpyObj<Router>;
     let mockTimer: jasmine.SpyObj<Timer>;
+    let popupServiceSpy: jasmine.SpyObj<PopupService>;
 
     beforeEach(async () => {
         mockMatchService = jasmine.createSpyObj('MatchService', ['isInMatch', 'isState'], {
@@ -39,6 +42,7 @@ describe('CombatPageComponent', () => {
         mockPlayService = jasmine.createSpyObj('PlayService', ['changeDebugMode']);
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         mockTimer = jasmine.createSpyObj('Timer', ['maxTime']);
+        popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'keepMessages']);
 
         mockCombatService.timer = mockTimer;
 
@@ -49,6 +53,7 @@ describe('CombatPageComponent', () => {
                 { provide: CombatService, useValue: mockCombatService },
                 { provide: PlayService, useValue: mockPlayService },
                 { provide: Router, useValue: mockRouter },
+                { provide: PopupService, useValue: popupServiceSpy },
             ],
         }).compileComponents();
 
@@ -158,5 +163,72 @@ describe('CombatPageComponent', () => {
         mockMatchService.data.state = MatchState.CombatAnimation;
         result = component['hasPlayerHealed'](oldMatchData, playerData);
         expect(result).toBeFalse();
+    });
+
+    it('should display winner popup with enemy name when self player health is 0', () => {
+        component.visualData.selfPlayer = {
+            playerIndex: 0,
+            currentHealth: 0,
+        } as PlayerCombatData;
+
+        component.visualData.enemyPlayer = {
+            playerIndex: 1,
+            currentHealth: 5,
+        } as PlayerCombatData;
+
+        mockMatchService.data.players[1].name = 'Enemy Player';
+
+        component['displayPopupMessage']();
+
+        expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith({
+            message: 'Enemy Player a gagné la partie',
+            hasCloseButton: true,
+            isConfirmation: false,
+            popupColor: PopupColor.Blue,
+        });
+    });
+
+    it('should display winner popup with self name when enemy player health is 0', () => {
+        component.visualData.selfPlayer = {
+            playerIndex: 0,
+            currentHealth: 5,
+        } as PlayerCombatData;
+
+        component.visualData.enemyPlayer = {
+            playerIndex: 1,
+            currentHealth: 0,
+        } as PlayerCombatData;
+
+        mockMatchService.data.players[0].name = 'Self Player';
+        component['displayPopupMessage']();
+        expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith({
+            message: 'Self Player a gagné la partie',
+            hasCloseButton: true,
+            isConfirmation: false,
+            popupColor: PopupColor.Blue,
+        });
+    });
+
+    it('should display "Aucun gagnant" when neither player health is 0', () => {
+        component.visualData.selfPlayer = {
+            playerIndex: 0,
+            currentHealth: 3,
+        } as PlayerCombatData;
+
+        component.visualData.enemyPlayer = {
+            playerIndex: 1,
+            currentHealth: 2,
+        } as PlayerCombatData;
+
+        component['displayPopupMessage']();
+        expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
+        expect(popupServiceSpy.showPopup).toHaveBeenCalledWith({
+            message: 'Aucun gagnant',
+            hasCloseButton: true,
+            isConfirmation: false,
+            popupColor: PopupColor.Blue,
+        });
     });
 });

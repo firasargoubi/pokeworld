@@ -6,9 +6,11 @@ import { ChatComponent } from '@app/components/chat/chat.component';
 import { DEFAULT_COMBAT_VISUAL_DATA } from '@app/consts/combat-data.const';
 import { BATTLE_PLATFORM_IMAGES } from '@app/consts/images.const';
 import { CombatVisualData } from '@app/interfaces/combat-visual-data';
+import { PopupColor } from '@app/interfaces/popup';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
+import { PopupService } from '@app/services/popup/popup.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -27,6 +29,7 @@ export class CombatPageComponent {
     displayChat: boolean = false;
     private playService: PlayService = inject(PlayService);
     private router: Router = inject(Router);
+    private popupService: PopupService = inject(PopupService);
 
     constructor() {
         if (this.matchService.isInMatch()) {
@@ -76,7 +79,35 @@ export class CombatPageComponent {
     private checkForRedirect() {
         const isMatchInCombatState = this.matchService.isState([MatchState.CombatWait, MatchState.CombatAnimation, MatchState.CombatEnd]);
         if (!isMatchInCombatState) {
+            this.displayPopupMessage();
             this.router.navigate([PageEndpoint.Play]);
+        }
+    }
+
+    private displayPopupMessage() {
+        let winnerName = '';
+        if (this.visualData.selfPlayer.currentHealth <= 0) {
+            winnerName = this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].name;
+        } else if (this.visualData.enemyPlayer.currentHealth <= 0) {
+            winnerName = this.matchService.data.players[this.visualData.selfPlayer.playerIndex].name;
+        }
+
+        if (winnerName) {
+            this.popupService.keepMessages();
+            this.popupService.showPopup({
+                message: `${winnerName} a gagné la partie`,
+                hasCloseButton: true,
+                isConfirmation: false,
+                popupColor: PopupColor.Blue,
+            });
+        } else {
+            this.popupService.keepMessages();
+            this.popupService.showPopup({
+                message: 'Aucun gagnant',
+                hasCloseButton: true,
+                isConfirmation: false,
+                popupColor: PopupColor.Blue,
+            });
         }
     }
 
