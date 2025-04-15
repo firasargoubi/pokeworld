@@ -85,6 +85,9 @@ export class MatchService {
         const match = this.getMatchFromPlayerId(playerId);
         this.disconnectPlayer(playerId);
         if (match) {
+            if (match.isHost(playerId) && match.data.playData.isDebugMode) {
+                this.playService.changeDebugMode(match, playerId, false);
+            }
             this.chatService.logPlayerLeft(match, playerId);
             match.leave(playerId);
             if (match.getConnectedPlayerCount() === 0) {

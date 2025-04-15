@@ -38,7 +38,9 @@ export class ItemService {
     forceItemDrop(match: Match, playerId: string) {
         match.data.state = MatchState.TurnWait;
         const player = match.getPlayer(playerId);
-        this.dropItems(match, playerId, [player.items[MAX_ITEMS]]);
+        if (player.isConnected) {
+            this.dropItems(match, playerId, [player.items[MAX_ITEMS]]);
+        }
         this.playService.continueTurn(match);
     }
 
