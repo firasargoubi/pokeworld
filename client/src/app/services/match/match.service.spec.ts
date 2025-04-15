@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { NavigationStart, Router } from '@angular/router';
-import { PopupColor } from '@app/interfaces/popup';
+import { Popup, PopupColor } from '@app/interfaces/popup';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -10,6 +10,7 @@ import { WARNING_MESSAGES } from '@common/consts/warning-messages';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchState } from '@common/interfaces/match-data';
 import { MessageFromServer } from '@common/interfaces/message-from-server';
+import { Message } from '@common/interfaces/message.enum';
 import { PlayerData } from '@common/interfaces/player-data';
 import { MatchEvent } from '@common/interfaces/socket-event.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
@@ -189,6 +190,28 @@ describe('MatchService', () => {
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalled();
         expect(service['resetMatchData']).toHaveBeenCalled();
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
+    });
+
+    it('on removed from match should navigate to join page and handle popup action when locked from lobby', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(service, 'isInMatch').and.returnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(service, 'resetMatchData');
+        const reason = Message.LockedFromLobby;
+
+        let popupConfig: Popup;
+
+        popupServiceSpy.showPopup.and.callFake((config) => {
+            popupConfig = config;
+            if (popupConfig.action) {
+                popupConfig.action();
+            }
+        });
+
+        service['onRemovedFromMatch'](reason);
+        expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Join]);
+
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 

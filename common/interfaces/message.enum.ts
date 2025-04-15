@@ -5,7 +5,7 @@ export enum Message {
     AlreadyInMatch = 'Vous êtes déjà dans une partie',
     InvalidMatchCode = "La partie n'existe pas",
     RoomLocked = 'La partie est verrouillée',
-    LockedFromLobby = "Le jeu s'est verrouillé pendant que vous choisissiez votre personnage",
+    LockedFromLobby = "Le jeu s'est verrouillé pendant que vous choisissiez votre personnage, souhaitez-vous revenir au menu principal ?",
     LastPlayerRemaining = 'La partie est terminée car tous les autres joueurs ont quitté',
     DebugModeOn = 'Le mode de debug a été activé',
     DebugModeOff = 'Le mode de debug a été désactivé',

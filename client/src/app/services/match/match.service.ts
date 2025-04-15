@@ -15,6 +15,7 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { MessageFromServer } from '@common/interfaces/message-from-server';
+import { Message } from '@common/interfaces/message.enum';
 import { PlayerData } from '@common/interfaces/player-data';
 import { MatchEvent } from '@common/interfaces/socket-event.enum';
 import { Subject } from 'rxjs';
@@ -137,9 +138,21 @@ export class MatchService {
     private onRemovedFromMatch(reason: string) {
         if (this.isInMatch()) {
             this.popupService.keepMessages();
-            this.popupService.showPopup({ message: reason, hasCloseButton: true, isConfirmation: false });
+            if (reason === Message.LockedFromLobby) {
+                this.router.navigate([PageEndpoint.Join]);
+                this.popupService.showPopup({
+                    message: reason,
+                    hasCloseButton: true,
+                    isConfirmation: true,
+                    action: () => {
+                        this.router.navigate([PageEndpoint.Menu]);
+                    },
+                });
+            } else {
+                this.router.navigate([PageEndpoint.Menu]);
+                this.popupService.showPopup({ message: reason, hasCloseButton: true, isConfirmation: false });
+            }
             this.resetMatchData();
-            this.router.navigate([PageEndpoint.Menu]);
         }
     }
 
