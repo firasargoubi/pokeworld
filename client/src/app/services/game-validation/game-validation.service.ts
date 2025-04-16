@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MAX_ITEM_COUNT } from '@app/consts/item-data.const';
+import { MAX_ITEM_COUNT } from '@common/consts/item-data.const';
 import {
     BridgeValidationError,
     ErrorMessage,
@@ -38,23 +38,25 @@ export class GameValidationService {
         const errors: string[] = [];
 
         for (const [key, value] of Object.entries(validationResult)) {
-            if (!value.isValid) {
-                if (key === 'terrainCoverage') {
-                    errors.push(`  - ${ErrorMessage.TerrainCoverage} (${value.coveragePercentage}%)`);
-                } else if (key === 'tilesAccessibility') {
-                    errors.push(`  - ${ErrorMessage.TilesAccessibility}`);
-                } else if (key === 'items') {
-                    errors.push(`  - ${ErrorMessage.Items} (${value.misplacedItems.length})`);
-                } else if (key === 'bridge') {
-                    value.errors.forEach((error: BridgeValidationError) => {
-                        errors.push(`  - ${ErrorMessage.Bridge} [${error.x},${error.y}]: ${error.errorMessage}`);
-                    });
-                } else if (key === 'mode') {
-                    errors.push(`  - ${ErrorMessage.Mode}`);
-                } else {
-                    const errorMessage: ValidationStatus = value;
-                    errors.push(`  - ${key}: ${errorMessage.errorMessage}`);
-                }
+            if (value.isValid) {
+                continue;
+            }
+
+            if (key === 'terrainCoverage') {
+                errors.push(`  - ${ErrorMessage.TerrainCoverage} (${value.coveragePercentage}%)`);
+            } else if (key === 'tilesAccessibility') {
+                errors.push(`  - ${ErrorMessage.TilesAccessibility}`);
+            } else if (key === 'items') {
+                errors.push(`  - ${ErrorMessage.Items} (${value.misplacedItems.length})`);
+            } else if (key === 'bridge') {
+                value.errors.forEach((error: BridgeValidationError) => {
+                    errors.push(`  - ${ErrorMessage.Bridge} [${error.x},${error.y}]: ${error.errorMessage}`);
+                });
+            } else if (key === 'mode') {
+                errors.push(`  - ${ErrorMessage.Mode}`);
+            } else {
+                const errorMessage: ValidationStatus = value;
+                errors.push(`  - ${key}: ${errorMessage.errorMessage}`);
             }
         }
 
@@ -117,6 +119,7 @@ export class GameValidationService {
         const { position, map, tilesCount, bridgeStatus } = tileHandler;
         const tileType = map.tiles[position.x][position.y];
         tilesCount.nbTilesTotal++;
+        const isTerrainTile = [TileType.Grass, TileType.Path, TileType.Bush].includes(tileType);
 
         if (tileType === TileType.Water) {
             tilesCount.nbWater++;
@@ -127,7 +130,7 @@ export class GameValidationService {
                 bridgeStatus.errors.push(result);
             }
             tilesCount.nbBridge++;
-        } else if (tileType === TileType.Grass || tileType === TileType.Path || tileType === TileType.Bush) {
+        } else if (isTerrainTile) {
             tilesCount.nbTerrain++;
         }
     }

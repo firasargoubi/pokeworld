@@ -34,6 +34,18 @@ export const ITEM_DESCRIPTION: Map<ItemType, string> = new Map([
     [ItemType.Flag, "<b>Drapeau:</b> Objectif Capture the Flag<br>L'objectif principal à capturer dans le mode de jeu CTF."],
 ]);
 
+export const ITEM_NAME: Record<ItemType, string> = {
+    [ItemType.Item1]: 'Shiny Charm',
+    [ItemType.Item2]: 'Evo Gem',
+    [ItemType.Item3]: 'Bush Boost',
+    [ItemType.Item4]: 'Healing Berry',
+    [ItemType.Item5]: 'PokeBall',
+    [ItemType.Item6]: 'Invisibility Mantle',
+    [ItemType.Random]: 'Item aléatoire',
+    [ItemType.Spawn]: 'Point de départ',
+    [ItemType.Flag]: 'Drapeau',
+};
+
 export const MAX_ITEM_COUNT: Record<MapSize, Record<ItemType, number>> = {
     [MapSize.Small]: {
         [ItemType.Item1]: 1,

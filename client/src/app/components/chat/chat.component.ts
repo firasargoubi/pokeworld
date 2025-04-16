@@ -69,7 +69,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         }
     }
 
-    updateChatData() {
+    private updateChatData() {
         this.chatMessages = this.matchService.data.chatData;
         this.filterLogs();
         this.shouldScrollToBottom = true;

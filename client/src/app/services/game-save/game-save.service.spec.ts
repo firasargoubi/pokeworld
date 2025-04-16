@@ -83,38 +83,6 @@ describe('GameSave', () => {
         req.flush(newGame);
     });
 
-    it('should create a new game', () => {
-        const newGame: GameData = mockGames[0];
-
-        service.addGame(newGame).subscribe({
-            next: (response: GameData) => {
-                expect(response).toEqual(newGame);
-            },
-            error: fail,
-        });
-
-        const req = httpMock.expectOne(`${baseUrl}/games`);
-        expect(req.request.method).toBe('POST');
-        expect(req.request.body).toEqual(newGame);
-        req.flush(newGame);
-    });
-
-    it('should update an existing game', () => {
-        const updatedGame: GameData = mockGames[0];
-
-        service.updateGame(updatedGame._id, updatedGame).subscribe({
-            next: (response: GameData) => {
-                expect(response).toEqual(updatedGame);
-            },
-            error: fail,
-        });
-
-        const req = httpMock.expectOne(`${baseUrl}/games/${updatedGame._id}`);
-        expect(req.request.method).toBe('PATCH');
-        expect(req.request.body).toEqual(updatedGame);
-        req.flush(updatedGame);
-    });
-
     it('should toggle visibility of a game', () => {
         const toggledGame = { ...mockGames[0], isVisible: !mockGames[0].isVisible };
 

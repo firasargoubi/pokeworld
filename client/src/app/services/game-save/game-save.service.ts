@@ -24,14 +24,6 @@ export class GameSaveService {
         return this.http.put<GameData>(`${this.baseUrl}/${ApiEndpoint.Games}`, gameData);
     }
 
-    addGame(gameData: GameData): Observable<GameData> {
-        return this.http.post<GameData>(`${this.baseUrl}/${ApiEndpoint.Games}`, gameData);
-    }
-
-    updateGame(gameId: string, gameData: GameData): Observable<GameData> {
-        return this.http.patch<GameData>(`${this.baseUrl}/${ApiEndpoint.Games}/${gameId}`, gameData);
-    }
-
     toggleVisibility(gameId: string): Observable<GameData> {
         return this.http.patch<GameData>(`${this.baseUrl}/${ApiEndpoint.Games}/${gameId}/${ApiEndpoint.Toggle}`, {});
     }

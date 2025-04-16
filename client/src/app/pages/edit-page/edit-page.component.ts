@@ -6,7 +6,7 @@ import { ItemComponent } from '@app/components/item/item.component';
 import { MapComponent } from '@app/components/map/map.component';
 import { DEFAULT_EDITOR_DATA, EDITOR_ERASE_TILE, ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from '@app/consts/editor-data.const';
 import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
-import { ITEM_DESCRIPTION } from '@app/consts/item-data.const';
+import { ITEM_DESCRIPTION } from '@common/consts/item-data.const';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { EditorEvent, EditorItem, EditorVisualData } from '@app/interfaces/editor';
 import { PopupColor } from '@app/interfaces/popup';
@@ -192,7 +192,8 @@ export class EditPageComponent {
     }
 
     private clickOnItem(editorEvent: EditorEvent) {
-        if (this.editorService.getRemainingItemCount(editorEvent.item as ItemType, this.editorVisualData.dragItem) > 0) {
+        const remainingItemCount = this.editorService.getRemainingItemCount(editorEvent.item as ItemType, this.editorVisualData.dragItem);
+        if (remainingItemCount > 0) {
             this.editorService.resetLastPicked();
             this.setActiveItem(editorEvent.item, editorEvent);
             this.updateItems();

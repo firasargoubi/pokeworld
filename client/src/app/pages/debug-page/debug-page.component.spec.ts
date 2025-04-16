@@ -65,17 +65,6 @@ describe('DebugPageComponent', () => {
         expect(mockRouter.navigate).toHaveBeenCalled();
     });
 
-    it('should copy text to clipboard using execCommand when successful', () => {
-        const execCommandSpy = spyOn(document, 'execCommand').and.returnValue(true);
-        const clipboardWriteSpy = spyOn(navigator.clipboard, 'writeText');
-        const testText = 'test-code';
-
-        component['copyToClipboard'](testText);
-
-        expect(execCommandSpy).toHaveBeenCalledWith('copy');
-        expect(clipboardWriteSpy).not.toHaveBeenCalled();
-    });
-
     it('should create match when visible game is found', () => {
         const game = structuredClone(MOCK_GAME_DATAS[0]);
         game.isVisible = true;

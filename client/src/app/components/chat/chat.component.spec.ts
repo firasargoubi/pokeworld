@@ -119,14 +119,14 @@ describe('ChatComponent', () => {
     });
 
     it('should update chat messages and logs from match service', () => {
-        component.updateChatData();
+        component['updateChatData']();
 
         expect(component.chatMessages).toEqual(mockChatData);
         expect(component.logs.length).toBe(2);
         expect(scrollToBottomSpy).toHaveBeenCalled();
 
         component.isFilterEnabled.set(true);
-        component.updateChatData();
+        component['updateChatData']();
         expect(component.logs.length).toBe(1);
     });
 

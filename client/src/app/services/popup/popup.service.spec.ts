@@ -276,7 +276,7 @@ describe('PopupService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'setOverlayZIndexLow');
 
-        service.removeMessagesByFilter((msg) => msg.includes('debug'));
+        service['removeMessagesByFilter']((msg) => msg.includes('debug'));
 
         expect(service['messages'].length).toBe(1);
         expect(service['messages'][0].message).toBe('other message');
@@ -286,7 +286,7 @@ describe('PopupService', () => {
         expect(service['setOverlayZIndexLow']).not.toHaveBeenCalled();
 
         service['overlayRefs'][0].componentRef.instance.message = 'debug too';
-        service.removeMessagesByFilter((msg) => msg.includes('debug') || msg.includes('other'));
+        service['removeMessagesByFilter']((msg) => msg.includes('debug') || msg.includes('other'));
         expect(service['setOverlayZIndexLow']).toHaveBeenCalled();
         expect(service['overlayRefs'].length).toBe(0);
     });

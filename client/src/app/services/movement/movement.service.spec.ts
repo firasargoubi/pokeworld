@@ -99,36 +99,6 @@ describe('MovementService', () => {
         expect(actions.length).toBe(2);
     });
 
-    it('get possible moves debug should return all accessible empty tiles', () => {
-        const moves = service.getPossibleMovesDebug(mockMatchData);
-        expect(moves).toBeDefined();
-        expect(moves.every((p) => p.x >= 0 && p.x < size && p.y >= 0 && p.y < size)).toBeTrue();
-    });
-
-    it('get nearest empty tile should return nearest valid tile', () => {
-        const currentPos: Position = { x: 1, y: 1 };
-        const result = service.getNearestEmptyTile(mockMatchData, currentPos);
-        expect(result).toEqual(jasmine.objectContaining({ x: jasmine.any(Number), y: jasmine.any(Number) }));
-    });
-
-    it('is tile valid for movement should check if tile is accessible and not occupied', () => {
-        const position: Position = { x: 0, y: 1 };
-        const isValid = service['isTileValidForMovement'](mockMatchData, position);
-        expect(isValid).toBeTrue();
-    });
-
-    it('enqueue valid neighbors should add valid neighbors to queue', () => {
-        const position: Position = { x: 1, y: 1 };
-        const visitedQueue = {
-            visited: Array(size)
-                .fill(null)
-                .map(() => Array(size).fill(false)),
-            queue: [] as Position[],
-        };
-        service['enqueueValidNeighbors'](mockMatchData, position, visitedQueue);
-        expect(visitedQueue.queue.length).toBeGreaterThan(0);
-    });
-
     it('is tile a bridge should detect bridge tiles', () => {
         const position: Position = { x: 1, y: 1 };
         const isBridge = service['hasActivatableBridge'](mockMatchData, position);
@@ -195,12 +165,6 @@ describe('MovementService', () => {
         expect(isOccupied).toBeTrue();
     });
 
-    it('is tile occupied by object should detect item presence', () => {
-        const position: Position = { x: 0, y: 0 };
-        const isOccupied = service['isTileOccupiedByObject'](mockMatchData, position);
-        expect(isOccupied).toBeTrue();
-    });
-
     it('is out of bounds should check map boundaries', () => {
         const position: Position = { x: 3, y: 3 };
         const isOut = service['isOutOfBounds'](mockMatchData, position);
@@ -211,12 +175,6 @@ describe('MovementService', () => {
         const position: Position = { x: 0, y: 1 };
         const cost = service['getMovementCost'](mockMatchData, position);
         expect(cost).toBeDefined();
-    });
-
-    it('is tile accessible should check tile accessibility', () => {
-        const position: Position = { x: 0, y: 1 };
-        const isAccessible = service['isTileAccessible'](mockMatchData, position);
-        expect(isAccessible).toBeTrue();
     });
 
     it('p to key should convert position to string key', () => {

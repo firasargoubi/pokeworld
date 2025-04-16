@@ -52,9 +52,9 @@ export class PlayPageComponent {
     @HostListener('document:keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
         const activeElement = document.activeElement as HTMLElement;
-        const isChatFocussed = activeElement.tagName === 'INPUT';
+        const isChatFocused = activeElement.tagName === 'INPUT';
         const isDKeyPressed = event.key === 'd' || event.key === 'D';
-        if (!isChatFocussed && !event.repeat && isDKeyPressed) {
+        if (!isChatFocused && !event.repeat && isDKeyPressed) {
             this.playService.changeDebugMode();
         }
     }

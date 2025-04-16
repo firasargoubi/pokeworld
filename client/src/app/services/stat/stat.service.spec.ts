@@ -26,13 +26,13 @@ describe('StatService', () => {
     });
 
     beforeEach(() => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'getTotalTiles').and.callThrough();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'getWinnerAssets').and.callThrough();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'getGlobalStats').and.callThrough();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'getPlayerStats').and.callThrough();
         service.initializeData();
     });
@@ -122,7 +122,7 @@ describe('StatService', () => {
 
     it('should compute player stats correctly', () => {
         const mockTileRatio = 42.3;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'getTileRatio').and.returnValue(mockTileRatio);
 
         const playerStats = service['getPlayerStats']();
@@ -154,13 +154,13 @@ describe('StatService', () => {
         const mockRounds = 5;
         const mockFlagHolders = 3;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'getGameDuration').and.returnValue(mockDuration);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'getBridgeRatio').and.returnValue(mockBridgeRatio);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'getTileRatio').and.returnValue(mockTileRatio);
 
         service['trackingData'] = { ...service['trackingData'], rounds: mockRounds, flagHoldersCount: mockFlagHolders, coveredGroundTiles: [] };

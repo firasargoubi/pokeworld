@@ -1,11 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from '@app/consts/editor-data.const';
-import { MAX_ITEM_COUNT } from '@app/consts/item-data.const';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { MAX_ITEM_COUNT } from '@common/consts/item-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
 import { Position } from '@common/interfaces/position';

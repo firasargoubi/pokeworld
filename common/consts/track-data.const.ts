@@ -4,6 +4,7 @@ import { Avatar } from '../interfaces/player-data';
 import { TileType } from '../interfaces/tile-type.enum';
 
 export const PERCENTAGE_FACTOR = 100;
+export const DECIMAL_FACTOR = 100;
 export const SPAWN_POSITION = 1;
 
 export const DEFAULT_WINNER_DATA: WinnerData = {

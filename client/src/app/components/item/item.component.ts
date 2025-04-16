@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { ITEM_IMAGES } from '@app/consts/images.const';
-import { ITEM_DESCRIPTION } from '@app/consts/item-data.const';
+import { ITEM_DESCRIPTION } from '@common/consts/item-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 
 @Component({

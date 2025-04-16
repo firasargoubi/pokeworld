@@ -214,7 +214,7 @@ describe('TrackingService', () => {
 
         const positions = [{ x: 0, y: 0 }];
         service.updateGroundTiles(match, positions, playerId);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const addPosIfNewSpy = jest.spyOn(service as any, 'addPosIfNew');
         expect(addPosIfNewSpy).not.toBeCalled();
         expect(matchData.trackingData.coveredGroundTiles.length).toBe(0);
