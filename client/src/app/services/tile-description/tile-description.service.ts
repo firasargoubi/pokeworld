@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { RIGHT_CLICK_ITEM_DESCRIPTION } from '@app/consts/item-data.const';
 import { RIGHT_CLICK_TILE_DESCRIPTION } from '@app/consts/tile-data.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MatchService } from '@app/services/match/match.service';
+import { RIGHT_CLICK_ITEM_DESCRIPTION } from '@common/consts/item-data.const';
 import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { PlayerData } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';

@@ -9,13 +9,12 @@ export const COMBAT_TURN_DURATION = 5000;
 export const COMBAT_SHORT_TURN_DURATION = 3000;
 export const COMBAT_ANIMATION_DURATION = 500;
 export const COMBAT_END_DURATION = 2000;
-export const COMBAT_BOT_DURATION = 50;
+export const COMBAT_BOT_DURATION = 500;
 
 export const DEFAULT_ATTACK = 4;
 export const DEFAULT_DEFENSE = 4;
 export const DEFAULT_ESCAPES = 2;
 export const DEFAULT_ESCAPE_CHANCES = 0.3;
-
 
 export const ITEM1_ATTACK_BONUS = 1;
 export const ITEM1_DEFENSE_BONUS = 1;
@@ -31,7 +30,6 @@ export const ITEM5_ESCAPE_CHANCES_BONUS = 0.2;
 
 export const HEALING_ITEM_RATIO = 0.5;
 export const ITEM4_HEALING_BONUS = 1;
-
 
 export const DEFAULT_PLAYER_COMBAT_DATA: PlayerCombatData = {
     playerIndex: 0,

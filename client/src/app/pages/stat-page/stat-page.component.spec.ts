@@ -64,18 +64,28 @@ describe('StatPageComponent', () => {
         expect(component).toBeTruthy();
         expect(statServiceSpy.initializeData).toHaveBeenCalled();
     });
+    it('should navigate to menu when not in match', () => {
+        matchServiceSpy.isInMatch.and.returnValue(false);
+
+        const navigateToMenuSpy = spyOn(StatPageComponent.prototype, 'navigateToMenu');
+
+        fixture = TestBed.createComponent(StatPageComponent);
+        component = fixture.componentInstance;
+
+        expect(navigateToMenuSpy).toHaveBeenCalled();
+    });
 
     it('should update sortingStat when updateSortingCriteria is called', () => {
         const newStatType = PlayerStatType.Victories;
-        component.updateSortingCriteria(newStatType);
+        component['updateSortingCriteria'](newStatType);
         expect(component.sortingStat()).toBe(newStatType);
     });
 
     it('should toggle order correctly', () => {
         expect(component.sortingOrder()).toBe(Order.Ascending);
-        component.toggleOrder();
+        component['toggleOrder']();
         expect(component.sortingOrder()).toBe(Order.Descending);
-        component.toggleOrder();
+        component['toggleOrder']();
         expect(component.sortingOrder()).toBe(Order.Ascending);
     });
 

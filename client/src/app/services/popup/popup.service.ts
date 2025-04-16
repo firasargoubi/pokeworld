@@ -53,7 +53,7 @@ export class PopupService {
         this.keepMessagesOnNavigation = true;
     }
 
-    removeMessagesByFilter(filterFn: (message: string) => boolean) {
+    private removeMessagesByFilter(filterFn: (message: string) => boolean) {
         this.messages = this.messages.filter((popup) => !filterFn(popup.message));
 
         const popupsToRemove = this.overlayRefs.filter(({ componentRef }) => filterFn(componentRef.instance.message));

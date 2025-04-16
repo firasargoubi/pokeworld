@@ -80,9 +80,9 @@ describe('CombatPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('on key down should call change debug mode', () => {
-        const event = new KeyboardEvent('keydown', { key: 'D', repeat: false });
-        component.onKeyDown(event);
+    it('should toggle debug mode d key press', () => {
+        const mockEvent = new KeyboardEvent('keydown', { key: 'D' });
+        component.onKeyDown(mockEvent);
         expect(mockPlayService.changeDebugMode).toHaveBeenCalled();
     });
 
@@ -182,7 +182,7 @@ describe('CombatPageComponent', () => {
 
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith({
-            message: 'Enemy Player a gagné la partie',
+            message: 'Enemy Player a gagné le combat',
             hasCloseButton: true,
             isConfirmation: false,
             popupColor: PopupColor.Blue,
@@ -204,7 +204,7 @@ describe('CombatPageComponent', () => {
         component['displayPopupMessage']();
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith({
-            message: 'Self Player a gagné la partie',
+            message: 'Self Player a gagné le combat',
             hasCloseButton: true,
             isConfirmation: false,
             popupColor: PopupColor.Blue,
@@ -230,5 +230,53 @@ describe('CombatPageComponent', () => {
             isConfirmation: false,
             popupColor: PopupColor.Blue,
         });
+    });
+
+    it('should ignore repeated key events', () => {
+        mockPlayService.changeDebugMode.calls.reset();
+
+        const repeatedKeyEvent = new KeyboardEvent('keydown', {
+            key: 'd',
+            repeat: true,
+        });
+
+        component.onKeyDown(repeatedKeyEvent);
+
+        expect(mockPlayService.changeDebugMode).not.toHaveBeenCalled();
+    });
+
+    it('should not process key D when focus is on an INPUT element', () => {
+        const inputElement = document.createElement('input');
+        document.body.appendChild(inputElement);
+        inputElement.focus();
+
+        const keyEvent = new KeyboardEvent('keydown', { key: 'd' });
+        component.onKeyDown(keyEvent);
+
+        expect(mockPlayService.changeDebugMode).not.toHaveBeenCalled();
+
+        document.body.removeChild(inputElement);
+    });
+
+    it('should redirect and show popup when match state is not in combat', () => {
+        mockMatchService.isState.and.returnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        const displayPopupSpy = spyOn<any>(component, 'displayPopupMessage');
+
+        component['checkForRedirect']();
+
+        expect(mockMatchService.isState).toHaveBeenCalledWith([MatchState.TurnWait, MatchState.TurnStart, MatchState.MatchEnd]);
+        expect(displayPopupSpy).toHaveBeenCalled();
+    });
+
+    it('should not redirect when match state is still in combat', () => {
+        mockMatchService.isState.and.returnValue(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        const displayPopupSpy = spyOn<any>(component, 'displayPopupMessage');
+
+        component['checkForRedirect']();
+
+        expect(mockMatchService.isState).toHaveBeenCalledWith([MatchState.TurnWait, MatchState.TurnStart, MatchState.MatchEnd]);
+        expect(displayPopupSpy).not.toHaveBeenCalled();
     });
 });

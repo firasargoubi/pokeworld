@@ -58,11 +58,11 @@ export class CombatService {
     }
 
     startCombatEndDeath(match: Match) {
-        this.chatService.logCombatEnd(match, this.getActivePlayerData(match), true);
-        match.data.state = MatchState.CombatEnd;
-        match.data.combatData.lastCombatAction = CombatAction.None;
         const winner = this.getInactivePlayerData(match);
         const loser = this.getActivePlayerData(match);
+        this.chatService.logCombatEnd(match, winner, true);
+        match.data.state = MatchState.CombatEnd;
+        match.data.combatData.lastCombatAction = CombatAction.None;
         this.trackingService.updateCombats(match, winner, loser);
         match.data.players[winner.playerIndex].combatsWon += 1;
         loser.currentHealth = 0;
@@ -101,7 +101,7 @@ export class CombatService {
 
     private getTimeoutDuration(match: Match, duration: number): number {
         const firstPlayer = match.data.players[match.data.combatData.playersCombatData[0].playerIndex];
-        const secondPlayer = match.data.players[match.data.combatData.playersCombatData[0].playerIndex];
+        const secondPlayer = match.data.players[match.data.combatData.playersCombatData[1].playerIndex];
         const hasTwoBots = firstPlayer.type !== PlayerType.Player && secondPlayer.type !== PlayerType.Player;
         return hasTwoBots ? COMBAT_BOT_DURATION : duration;
     }

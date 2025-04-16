@@ -10,6 +10,7 @@ import { GameData } from '@common/interfaces/game-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { of, throwError } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
+import { VisibilityEvent } from '@app/interfaces/visibility-event';
 @Component({
     selector: 'app-game-card',
     standalone: true,
@@ -103,7 +104,7 @@ describe('AdminPageComponent', () => {
     });
 
     it('should toggle visibility successfully', () => {
-        const event = { id: '123', isVisible: true };
+        const event: VisibilityEvent = { id: '123', isVisible: true };
         component.toggleVisibility(event);
         expect(gameSaveServiceSpy.toggleVisibility).toHaveBeenCalledWith(event.id);
     });
@@ -112,7 +113,8 @@ describe('AdminPageComponent', () => {
         const errorResponse = new HttpErrorResponse({ error: 'Server error', status: 500 });
         gameSaveServiceSpy.toggleVisibility.and.returnValue(throwError(() => errorResponse));
 
-        component.toggleVisibility({ id: structuredClone(MOCK_GAME_DATAS)[0]._id, isVisible: true });
+        const event: VisibilityEvent = { id: structuredClone(MOCK_GAME_DATAS)[0]._id, isVisible: true };
+        component.toggleVisibility(event);
 
         expect(popupServiceSpy.showPopup).toHaveBeenCalled();
     });

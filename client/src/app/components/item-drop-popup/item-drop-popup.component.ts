@@ -13,7 +13,7 @@ import { ItemType } from '@common/interfaces/item-type.enum';
     imports: [ItemComponent, PokeballButtonComponent, CommonModule],
 })
 export class ItemDropPopupComponent {
-    @Input() inventoryItems: ItemType[] = [ItemType.Item1, ItemType.Item2, ItemType.Item3];
+    @Input() inventoryItems: ItemType[] = [];
     selectedItem: number = MAX_ITEMS;
     private playService: PlayService = inject(PlayService);
 

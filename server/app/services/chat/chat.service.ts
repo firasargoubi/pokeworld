@@ -1,5 +1,5 @@
 import { Match } from '@app/classes/match/match';
-import { ITEM_NAME } from '@app/consts/item-name.const';
+import { ITEM_NAME } from '@common/consts/item-data.const';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -94,10 +94,10 @@ export class ChatService {
         this.addLogToMatch(match, message, this.getConcernedPlayers(match));
     }
 
-    logCombatEnd(match: Match, concernedPlayer: PlayerCombatData, isDead: boolean) {
-        const concernedPlayerName = this.getPlayerName(match, concernedPlayer);
-        const message = isDead ? `${concernedPlayerName} a été vaincu` : `${concernedPlayerName} s'est enfui du combat`;
-        this.addLogToMatch(match, message, this.getConcernedPlayers(match));
+    logCombatEnd(match: Match, concernedPlayers: PlayerCombatData, isDead: boolean) {
+        const activePlayerName = this.getPlayerName(match, concernedPlayers);
+        const message = isDead ? `${activePlayerName} a gagné le combat` : `${activePlayerName} s'est enfui du combat`;
+        this.addLogToMatch(match, message);
     }
 
     logPlayerLeft(match: Match, playerId: string) {

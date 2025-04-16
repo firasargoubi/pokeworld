@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { Position } from '@common/interfaces/position';
-import { RIGHT_CLICK_ITEM_DESCRIPTION } from '@app/consts/item-data.const';
+import { RIGHT_CLICK_ITEM_DESCRIPTION } from '@common/consts/item-data.const';
 import { RIGHT_CLICK_TILE_DESCRIPTION } from '@app/consts/tile-data.const';
 import { MatchService } from '@app/services/match/match.service';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -65,7 +65,7 @@ describe('TileDescriptionService', () => {
             bottom: 900,
             x: 100,
             y: 100,
-        };
+        } as DOMRect;
         const mockElement = document.createElement('div');
         Object.defineProperty(mockElement, 'getBoundingClientRect', {
             value: () => mockMapRect,

@@ -4,7 +4,7 @@ import { GlobalStatData, Order, PlayerStatData, TotalTiles, WinnerVisualData } f
 import { PlayerStatType } from '@app/interfaces/stat-type.enum';
 import { MatchService } from '@app/services/match/match.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
-import { PERCENTAGE_FACTOR } from '@common/consts/track-data.const';
+import { DECIMAL_FACTOR, PERCENTAGE_FACTOR } from '@common/consts/track-data.const';
 import { TrackingData } from '@common/interfaces/match-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
@@ -97,7 +97,7 @@ export class StatService {
     }
 
     private getRatio(currentElements: number, totalElements: number): number {
-        return Math.round((currentElements / totalElements) * PERCENTAGE_FACTOR);
+        return Math.round((currentElements / totalElements) * PERCENTAGE_FACTOR * DECIMAL_FACTOR) / DECIMAL_FACTOR;
     }
 
     private getTotalTiles(): TotalTiles {

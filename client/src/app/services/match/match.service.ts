@@ -96,10 +96,8 @@ export class MatchService {
     }
 
     private onNavigationUpdate(event: RouterEvent) {
-        if (event instanceof NavigationStart) {
-            if (event.navigationTrigger !== 'imperative') {
-                this.leaveMatch();
-            }
+        if (event instanceof NavigationStart && event.navigationTrigger !== 'imperative') {
+            this.leaveMatch();
         }
     }
 

@@ -23,12 +23,15 @@ export class StatPageComponent {
         return this.statService.playerStats;
     });
     playerStatTypes: PlayerStatType[] = Object.values(PlayerStatType);
-    statService: StatService = inject(StatService);
-    private matchService: MatchService = inject(MatchService);
+
+    readonly statService: StatService = inject(StatService);
+    private readonly matchService: MatchService = inject(MatchService);
 
     constructor() {
         if (this.matchService.isInMatch()) {
             this.statService.initializeData();
+        } else {
+            this.navigateToMenu();
         }
     }
 
@@ -41,16 +44,6 @@ export class StatPageComponent {
         this.updateSortingCriteria(statType);
     }
 
-    updateSortingCriteria(statType: PlayerStatType) {
-        this.sortingStat.set(statType);
-    }
-
-    toggleOrder() {
-        const isAscending = this.sortingOrder() === Order.Ascending;
-        const inverseOrder = isAscending ? Order.Descending : Order.Ascending;
-        this.sortingOrder.set(inverseOrder);
-    }
-
     navigateToMenu() {
         this.matchService.leaveMatch();
     }
@@ -61,5 +54,15 @@ export class StatPageComponent {
 
     isModeCTF(): boolean {
         return this.matchService.data.gameData.mapData.gameMode === GameMode.CTF;
+    }
+
+    private toggleOrder() {
+        const isAscending = this.sortingOrder() === Order.Ascending;
+        const inverseOrder = isAscending ? Order.Descending : Order.Ascending;
+        this.sortingOrder.set(inverseOrder);
+    }
+
+    private updateSortingCriteria(statType: PlayerStatType) {
+        this.sortingStat.set(statType);
     }
 }

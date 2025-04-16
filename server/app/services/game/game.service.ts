@@ -13,7 +13,7 @@ export class GameService {
     }
 
     async findGame(id: string): Promise<Game> {
-        return await this.gameModel.findById(id).exec();
+        return this.gameModel.findById(id).exec();
     }
 
     async getGame(id: string): Promise<Game> {

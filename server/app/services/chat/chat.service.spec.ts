@@ -1,6 +1,6 @@
 import { Match } from '@app/classes/match/match';
-import { ITEM_NAME } from '@app/consts/item-name.const';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
+import { ITEM_NAME } from '@common/consts/item-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatData, PlayerCombatData } from '@common/interfaces/match-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
@@ -220,7 +220,7 @@ describe('ChatService', () => {
         sandbox.stub(service as any, 'getConcernedPlayers').returns(['Player1', 'Player2']);
 
         service.logCombatEnd(mockMatch, playerData, true);
-        expect(addLogToMatchStub.firstCall.args[1]).toBe('CombatPlayer a été vaincu');
+        expect(addLogToMatchStub.firstCall.args[1]).toBe('CombatPlayer a gagné le combat');
 
         service.logCombatEnd(mockMatch, playerData, false);
         expect(addLogToMatchStub.secondCall.args[1]).toBe("CombatPlayer s'est enfui du combat");

@@ -44,10 +44,11 @@ export class CombatPageComponent {
 
     @HostListener('document:keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
-        if (!event.repeat) {
-            if (event.key === 'd' || event.key === 'D') {
-                this.playService.changeDebugMode();
-            }
+        const activeElement = document.activeElement as HTMLElement;
+        const isChatFocussed = activeElement.tagName === 'INPUT';
+        const isDKeyPressed = event.key === 'd' || event.key === 'D';
+        if (!isChatFocussed && !event.repeat && isDKeyPressed) {
+            this.playService.changeDebugMode();
         }
     }
 
@@ -77,8 +78,8 @@ export class CombatPageComponent {
     }
 
     private checkForRedirect() {
-        const isMatchInCombatState = this.matchService.isState([MatchState.CombatWait, MatchState.CombatAnimation, MatchState.CombatEnd]);
-        if (!isMatchInCombatState) {
+        const isNotIncombat = this.matchService.isState([MatchState.TurnWait, MatchState.TurnStart, MatchState.MatchEnd]);
+        if (isNotIncombat) {
             this.displayPopupMessage();
             this.router.navigate([PageEndpoint.Play]);
         }
@@ -95,7 +96,7 @@ export class CombatPageComponent {
         if (winnerName) {
             this.popupService.keepMessages();
             this.popupService.showPopup({
-                message: `${winnerName} a gagné la partie`,
+                message: `${winnerName} a gagné le combat`,
                 hasCloseButton: true,
                 isConfirmation: false,
                 popupColor: PopupColor.Blue,

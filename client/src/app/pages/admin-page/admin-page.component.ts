@@ -7,6 +7,7 @@ import { GameCardComponent } from '@app/components/game-card/game-card.component
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { PopupMessage } from '@app/consts/popup-message.const';
+import { VisibilityEvent } from '@app/interfaces/visibility-event';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
@@ -21,9 +22,9 @@ import { GameData } from '@common/interfaces/game-data';
 export class AdminPageComponent implements OnInit {
     games: GameData[] = [];
     isCreationMode: boolean = false;
-    private router: Router = inject(Router);
-    private gameSaveService: GameSaveService = inject(GameSaveService);
-    private popupService: PopupService = inject(PopupService);
+    private readonly router: Router = inject(Router);
+    private readonly gameSaveService: GameSaveService = inject(GameSaveService);
+    private readonly popupService: PopupService = inject(PopupService);
 
     @HostListener('document:keydown.escape')
     onEscapeKeydown() {
@@ -51,7 +52,7 @@ export class AdminPageComponent implements OnInit {
         });
     }
 
-    toggleVisibility(event: { id: string; isVisible: boolean }) {
+    toggleVisibility(event: VisibilityEvent) {
         this.gameSaveService.toggleVisibility(event.id).subscribe({
             error: (error: HttpErrorResponse) => {
                 this.handleNotFoundError(error);

@@ -244,7 +244,7 @@ describe('EditPageComponent', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const updateItemsSpy = spyOn<any>(component, 'updateItems');
         component.editorVisualData.dragItem = ItemType.Item1;
-        const editorEventWithPosition = { tilePosition: { x: 2, y: 2 }, mousePosition: null, tile: null, item: null };
+        const editorEventWithPosition: EditorEvent = { tilePosition: { x: 2, y: 2 }, mousePosition: null, tile: null, item: null };
 
         component['dropItem'](editorEventWithPosition);
 
@@ -314,7 +314,7 @@ describe('EditPageComponent', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(component, 'getRemainingItemCount').and.returnValue(1);
 
-        const editorEvent = { tilePosition: null, mousePosition: null, tile: null, item: ItemType.Item1 };
+        const editorEvent: EditorEvent = { tilePosition: null, mousePosition: null, tile: null, item: ItemType.Item1 };
         editorServiceSpy.getRemainingItemCount.and.returnValue(1);
         component['clickOnItem'](editorEvent);
 
@@ -340,7 +340,7 @@ describe('EditPageComponent', () => {
         component.editorVisualData.dragItem = ItemType.Item2;
         component.editorVisualData.dragItemImage = 'initialImage';
 
-        const editorEvent = { tilePosition: null, mousePosition: { x: 0, y: 0 }, tile: null, item: null };
+        const editorEvent: EditorEvent = { tilePosition: null, mousePosition: { x: 0, y: 0 }, tile: null, item: null };
         component['setActiveItem'](ItemType.Item1, editorEvent);
         expect(component.editorVisualData.dragItem).toBe(ItemType.Item1);
         expect(component.editorVisualData.dragItemImage).toBe(ITEM_IMAGES.get(ItemType.Item1) as string);
@@ -355,7 +355,7 @@ describe('EditPageComponent', () => {
         const clickOnMapItemSpy = spyOn<any>(component, 'clickOnMapItem');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const updatePaintingTileSpy = spyOn<any>(component, 'updatePaintingTile');
-        const editorEvent = { tilePosition: { x: 1, y: 1 }, mousePosition: null, tile: null, item: null };
+        const editorEvent: EditorEvent = { tilePosition: { x: 1, y: 1 }, mousePosition: null, tile: null, item: null };
 
         gameDataServiceSpy.getItem.and.returnValue(ItemType.Item1);
         component['clickOnMap'](editorEvent, true);
@@ -371,7 +371,7 @@ describe('EditPageComponent', () => {
     it('should pick item on left click, remove item on right click', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const pickItemSpy = spyOn<any>(component, 'pickItem');
-        const editorEvent = { tilePosition: { x: 1, y: 1 }, mousePosition: null, tile: null, item: null };
+        const editorEvent: EditorEvent = { tilePosition: { x: 1, y: 1 }, mousePosition: null, tile: null, item: null };
 
         component['clickOnMapItem'](editorEvent, true);
         expect(pickItemSpy).toHaveBeenCalledWith(editorEvent);
@@ -383,7 +383,7 @@ describe('EditPageComponent', () => {
     it('should pick item and update active state', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const setActiveItemSpy = spyOn<any>(component, 'setActiveItem');
-        const editorEvent = { tilePosition: { x: 1, y: 1 }, mousePosition: null, tile: null, item: null };
+        const editorEvent: EditorEvent = { tilePosition: { x: 1, y: 1 }, mousePosition: null, tile: null, item: null };
 
         gameDataServiceSpy.getItem.and.returnValue(ItemType.Item1);
         component['pickItem'](editorEvent);

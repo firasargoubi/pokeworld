@@ -88,11 +88,9 @@ export class LobbyPageComponent {
         textarea.value = text;
         document.body.appendChild(textarea);
         textarea.select();
-        const success = document.execCommand('copy');
+        document.execCommand('copy');
         document.body.removeChild(textarea);
-        if (!success) {
-            navigator.clipboard.writeText(text).then().catch(this.askCopyPermission.bind(this, text));
-        }
+        navigator.clipboard.writeText(text).then().catch(this.askCopyPermission.bind(this, text));
     }
 
     private askCopyPermission(text: string) {
@@ -117,7 +115,9 @@ export class LobbyPageComponent {
                 playerType: p.type,
             }))
             .filter((p) => p.isConnected);
-        while (this.visualData.players.length < MAX_PLAYERS[this.matchService.data.gameData.mapData.size]) {
+        const playersVisualData = this.visualData.players;
+        const maxPlayersCount = MAX_PLAYERS[this.matchService.data.gameData.mapData.size];
+        while (playersVisualData.length < maxPlayersCount) {
             this.visualData.players.push({ ...this.visualData.players[0], isHost: false, isSelf: false, isConnected: false });
         }
     }
