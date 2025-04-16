@@ -27,7 +27,6 @@ export class LobbyService {
 
         if (isHost && !isTryingToKickThemselve) {
             match.kickPlayer(targetPlayerId, Message.Kick);
-
             match.sendUpdate();
         }
     }
@@ -123,7 +122,7 @@ export class LobbyService {
         }
     }
 
-    private sortPlayers(match: Match) {
+    private sortPlayers(match: Match): void {
         const hostPlayerId = match.data.players[match.data.lobbyData.hostPlayerIndex].id;
         match.data.players = match.data.players.sort((a: PlayerData, b: PlayerData) => {
             if (a.speed !== b.speed) {
@@ -146,15 +145,14 @@ export class LobbyService {
         });
     }
 
-    private setupRandomItems(match: Match) {
+    private setupRandomItems(match: Match): void {
         const matchData: MatchData = match.data;
         const items = matchData.gameData.mapData.items;
         const unusedItems = REGULAR_ITEMS.filter((itemType) => {
             return !items[itemType] || items[itemType].length === 0;
         });
 
-        const randomThreshold = 0.5;
-        unusedItems.sort(() => Math.random() - randomThreshold);
+        unusedItems.sort(() => Math.random() - RANDOM_THRESHOLD);
 
         for (let i = 0; i < items[ItemType.Random].length; i++) {
             const itemType = unusedItems[i];

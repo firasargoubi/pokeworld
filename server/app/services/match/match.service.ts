@@ -103,11 +103,6 @@ export class MatchService {
         }
     }
 
-    disconnectPlayer(playerId: string) {
-        this.playerToMatchCode.delete(playerId);
-        this.matchGateway.disconnectPlayer(playerId);
-    }
-
     killPlayerCombat(match: Match) {
         this.combatService.startCombatEndDeath(match);
     }
@@ -118,6 +113,11 @@ export class MatchService {
 
     startNextTurn(match: Match) {
         this.playService.startNextTurn(match);
+    }
+
+    private disconnectPlayer(playerId: string) {
+        this.playerToMatchCode.delete(playerId);
+        this.matchGateway.disconnectPlayer(playerId);
     }
 
     private canJoinMatch(playerId: string, matchCode: string): boolean {

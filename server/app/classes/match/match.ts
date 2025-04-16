@@ -38,7 +38,7 @@ export class Match {
     }
 
     setBotTimeout(callback: () => void, duration: number) {
-        if (this.botTimeout === null) {
+        if (!this.botTimeout) {
             this.botTimeout = setTimeout(() => {
                 this.botTimeout = null;
                 callback();
@@ -64,14 +64,10 @@ export class Match {
         }
     }
 
-    leave(playerId: string) {
+    leave(playerId: string): void {
         switch (this.data.state) {
             case MatchState.Lobby:
-                if (this.isHost(playerId)) {
-                    return this.hostLeaveLobby(playerId);
-                } else {
-                    return this.playerLeaveLobby(playerId);
-                }
+                return this.isHost(playerId) ? this.hostLeaveLobby(playerId) : this.playerLeaveLobby(playerId);
             case MatchState.Statistics:
             case MatchState.MatchEnd:
                 return this.playerLeaveStats(playerId);
@@ -110,14 +106,14 @@ export class Match {
     }
 
     clearTimeout() {
-        if (this.timeout !== null) {
+        if (this.timeout) {
             clearTimeout(this.timeout);
             this.timeout = null;
         }
     }
 
     clearBotTimeout() {
-        if (this.botTimeout !== null) {
+        if (this.botTimeout) {
             clearTimeout(this.botTimeout);
             this.botTimeout = null;
         }
@@ -152,11 +148,10 @@ export class Match {
         const playerIndex = this.getPlayerIndex(playerId);
         if (this.data.combatData.playersCombatData[0].playerIndex === playerIndex) {
             this.data.combatData.isSecondPlayerTurn = false;
-            this.matchService.killPlayerCombat(this);
         } else if (this.data.combatData.playersCombatData[1].playerIndex === playerIndex) {
             this.data.combatData.isSecondPlayerTurn = true;
-            this.matchService.killPlayerCombat(this);
         }
+        this.matchService.killPlayerCombat(this);
     }
 
     private playerLeaveStats(playerId: string) {

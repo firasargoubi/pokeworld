@@ -9,3 +9,11 @@ export enum ItemType {
     Spawn = 'Spawn',
     Flag = 'Flag',
 }
+
+export interface ItemEffect {
+    attack: number;
+    defense: number;
+    escapeChances: number;
+    maxEscapes: number;
+    currentEscapes: number;
+}

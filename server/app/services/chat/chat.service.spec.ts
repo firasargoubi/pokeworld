@@ -30,7 +30,8 @@ describe('ChatService', () => {
         }).compile();
 
         service = module.get<ChatService>(ChatService);
-        addLogToMatchStub = sandbox.stub(service, 'addLogToMatch');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        addLogToMatchStub = sandbox.stub(service as any, 'addLogToMatch');
     });
 
     afterEach(() => {
@@ -67,14 +68,14 @@ describe('ChatService', () => {
         const logMessage = 'Test log with players';
         const concernedPlayers = ['Player1', 'Player2'];
 
-        service.addLogToMatch(mockMatch, logMessage, concernedPlayers);
+        service['addLogToMatch'](mockMatch, logMessage, concernedPlayers);
 
         expect(mockMatch.data.logData.length).toBe(1);
         expect(mockMatch.data.logData[0].content).toBe(logMessage);
         expect(mockMatch.data.logData[0].concernedPlayersNamesList).toEqual(concernedPlayers);
         expect(mockMatch.sendUpdate.calledOnce).toBe(true);
 
-        service.addLogToMatch(mockMatch, logMessage);
+        service['addLogToMatch'](mockMatch, logMessage);
         expect(mockMatch.data.logData.length).toBe(2);
         expect(mockMatch.data.logData[1].content).toBe(logMessage);
         expect(mockMatch.data.logData[1].concernedPlayersNamesList).toEqual([]);
