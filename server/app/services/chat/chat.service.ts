@@ -28,16 +28,6 @@ export class ChatService {
         this.addLogToMatch(match, message);
     }
 
-    addLogToMatch(match: Match, message: string, concernedPlayers: string[] = []) {
-        const log: ChatLog = {
-            content: message,
-            timestamp: new Date(),
-            concernedPlayersNamesList: concernedPlayers,
-        };
-        match.data.logData.push(log);
-        match.sendUpdate();
-    }
-
     logDebugMode(match: Match, isDebugMode: boolean) {
         const message = isDebugMode ? Message.DebugModeOn : Message.DebugModeOff;
         this.addLogToMatch(match, message);
@@ -107,6 +97,17 @@ export class ChatService {
             this.addLogToMatch(match, message);
         }
     }
+
+    private addLogToMatch(match: Match, message: string, concernedPlayers: string[] = []) {
+        const log: ChatLog = {
+            content: message,
+            timestamp: new Date(),
+            concernedPlayersNamesList: concernedPlayers,
+        };
+        match.data.logData.push(log);
+        match.sendUpdate();
+    }
+
     private getConcernedPlayers(match: Match): string[] {
         const combatPlayerData = match.data.combatData.playersCombatData;
         return combatPlayerData.map((playerData) => {

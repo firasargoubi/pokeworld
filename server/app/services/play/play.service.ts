@@ -154,7 +154,7 @@ export class PlayService {
             this.trackingService.updateWinner(match, winner);
             this.chatService.logMatchWinner(match, winner.name);
         }
-        return Boolean(winner);
+        return winner !== undefined;
     }
 
     private endMatch(match: Match) {

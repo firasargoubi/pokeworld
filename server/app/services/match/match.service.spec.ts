@@ -162,7 +162,7 @@ describe('MatchService', () => {
         const playerId = 'player1';
         service['playerToMatchCode'].set(playerId, '1234');
 
-        service.disconnectPlayer(playerId);
+        service['disconnectPlayer'](playerId);
 
         expect(service['playerToMatchCode'].has(playerId)).toBe(false);
         expect(mockMatchGateway.disconnectPlayer.calledWith(playerId)).toBe(true);

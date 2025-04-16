@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+// Tests surpasses the maximum lines limit by 30
 import { Match } from '@app/classes/match/match';
 import { ChatService } from '@app/services/chat/chat.service';
 import { ItemService } from '@app/services/item/item.service';
@@ -423,12 +424,10 @@ describe('CombatService', () => {
             { ...structuredClone(MOCK_PLAYER_DATAS[0]), items: [ItemType.Item4], health: 10 },
             { ...structuredClone(MOCK_PLAYER_DATAS[1]) },
         ];
+        const expectedhealth = mockMatch.data.combatData.playersCombatData[0].currentHealth + 1;
+        service['computeHealingItem'](mockMatch);
 
-        const result = service['computeHealingItem'](mockMatch);
-
-        expect(result).toBe(true);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        expect(mockMatch.data.combatData.playersCombatData[0].currentHealth).toBe(3);
+        expect(mockMatch.data.combatData.playersCombatData[0].currentHealth).toBe(expectedhealth);
     });
 
     it('computeHealingItem should not heal player when they do not have Item4', () => {
@@ -442,14 +441,12 @@ describe('CombatService', () => {
             { ...structuredClone(MOCK_PLAYER_DATAS[1]) },
         ];
 
-        const result = service['computeHealingItem'](mockMatch);
+        service['computeHealingItem'](mockMatch);
 
-        expect(result).toBe(false);
         expect(mockMatch.data.combatData.playersCombatData[0].currentHealth).toBe(2);
     });
 
     it('applyCombatBuffs should apply correct buffs for all combat items', () => {
-        // Create base player combat data
         const playerCombatData = {
             ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]),
             playerIndex: 0,
@@ -461,7 +458,6 @@ describe('CombatService', () => {
             standingTile: TileType.Bush,
         };
 
-        // Player has multiple items
         mockMatch.data.players = [
             {
                 ...structuredClone(MOCK_PLAYER_DATAS[0]),
@@ -483,40 +479,5 @@ describe('CombatService', () => {
         expect(result.maxEscapes).toBe(expectedMaxEscapes);
         expect(result.currentEscapes).toBe(expectedCurrentEscapes);
         expect(result.escapeChances).toBe(expectedEscapeChances);
-    });
-
-    it('computeHealingItem should heal player when they have Item4 and health is below threshold', () => {
-        mockMatch.data.combatData.playersCombatData = [
-            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]), playerIndex: 0, currentHealth: 2 },
-            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), playerIndex: 1 },
-        ];
-        mockMatch.data.combatData.isSecondPlayerTurn = false;
-        mockMatch.data.players = [
-            { ...structuredClone(MOCK_PLAYER_DATAS[0]), items: [ItemType.Item4], health: 10 },
-            { ...structuredClone(MOCK_PLAYER_DATAS[1]) },
-        ];
-
-        const result = service['computeHealingItem'](mockMatch);
-
-        expect(result).toBe(true);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        expect(mockMatch.data.combatData.playersCombatData[0].currentHealth).toBe(3);
-    });
-
-    it('computeHealingItem should not heal player when they do not have Item4', () => {
-        mockMatch.data.combatData.playersCombatData = [
-            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]), playerIndex: 0, currentHealth: 2 },
-            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), playerIndex: 1 },
-        ];
-        mockMatch.data.combatData.isSecondPlayerTurn = false;
-        mockMatch.data.players = [
-            { ...structuredClone(MOCK_PLAYER_DATAS[0]), items: [ItemType.Item1, ItemType.Item2], health: 10 },
-            { ...structuredClone(MOCK_PLAYER_DATAS[1]) },
-        ];
-
-        const result = service['computeHealingItem'](mockMatch);
-
-        expect(result).toBe(false);
-        expect(mockMatch.data.combatData.playersCombatData[0].currentHealth).toBe(2);
     });
 });

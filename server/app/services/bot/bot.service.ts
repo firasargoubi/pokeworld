@@ -63,7 +63,7 @@ export class BotService {
     getBotData(match: Match): PlayerData | null {
         let botData = null;
         const avatar = this.getBotAvatar(match);
-        if (avatar !== null) {
+        if (avatar) {
             const hasStrongAttack = Math.random() < RANDOM_THRESHOLD;
             const hasStrongSpeed = Math.random() < RANDOM_THRESHOLD;
             const id = this.getBotId();
@@ -89,7 +89,7 @@ export class BotService {
         }
     }
 
-    private getRandomNumber(min: number, max: number) {
+    private getRandomNumber(min: number, max: number): number {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
@@ -97,7 +97,7 @@ export class BotService {
         return this.actionMap.get(action).bind(this)(match);
     }
 
-    private executeBotAction(player: PlayerData, match: Match) {
+    private executeBotAction(player: PlayerData, match: Match): void {
         for (const botAction of BOT_TURN_PRIORITIES.get(match.data.gameData.mapData.gameMode).get(player.type)) {
             const targetPosition = this.getBotAction(botAction, match);
             if (targetPosition) {
@@ -268,7 +268,7 @@ export class BotService {
         }
     }
 
-    private itemAction(player: PlayerData) {
+    private itemAction(player: PlayerData): void {
         if (player.items.length > MAX_ITEMS) {
             const priorities = BOT_ITEM_PRIORITIES.get(player.type);
             const itemToDrop = player.items.reduce((lowest, current) => {
