@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
+import { AudioService } from '@app/services/audio/audio.service';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -9,7 +10,6 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { PlayerType } from '@common/interfaces/player-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { LobbyPageComponent } from './lobby-page.component';
-import { AudioService } from '@app/services/audio/audio.service';
 
 @Component({
     selector: 'app-chat',
@@ -144,19 +144,8 @@ describe('LobbyPageComponent', () => {
     });
 
     it('copy to clipboard should not throw error', () => {
-        Object.defineProperty(navigator.clipboard, 'writeText', {
-            value: () => ({ then: () => ({ catch: () => true }) }),
-            writable: true,
-        });
-        Object.defineProperty(navigator.clipboard, 'query', {
-            value: () => ({ then: () => ({ catch: () => true }) }),
-            writable: true,
-        });
         expect(() => {
             component['copyToClipboard']('1234');
-        }).not.toThrow();
-        expect(() => {
-            component['askCopyPermission']('1234');
         }).not.toThrow();
     });
 });

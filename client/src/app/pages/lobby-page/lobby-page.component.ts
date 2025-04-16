@@ -101,15 +101,6 @@ export class LobbyPageComponent {
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        navigator.clipboard.writeText(text).then().catch(this.askCopyPermission.bind(this, text));
-    }
-
-    private askCopyPermission(text: string) {
-        navigator.permissions
-            .query({ name: 'clipboard-write' as PermissionName })
-            .then()
-            .catch();
-        navigator.clipboard.writeText(text).then().catch();
     }
 
     private updateVisual() {
