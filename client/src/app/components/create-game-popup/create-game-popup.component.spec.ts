@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { AudioService } from '@app/services/audio/audio.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameMode, MapSize } from '@common/interfaces/map-data';
 import { CreateGamePopupComponent } from './create-game-popup.component';
@@ -8,13 +9,18 @@ describe('CreateGamePopupComponent', () => {
     let component: CreateGamePopupComponent;
     let fixture: ComponentFixture<CreateGamePopupComponent>;
     let routerSpy: jasmine.SpyObj<Router>;
+    let mockAudioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+        mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage']);
 
         await TestBed.configureTestingModule({
             imports: [CreateGamePopupComponent],
-            providers: [{ provide: Router, useValue: routerSpy }],
+            providers: [
+                { provide: Router, useValue: routerSpy },
+                { provide: AudioService, useValue: mockAudioService },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(CreateGamePopupComponent);

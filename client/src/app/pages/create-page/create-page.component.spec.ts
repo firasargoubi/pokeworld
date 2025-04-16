@@ -11,6 +11,7 @@ import { GameData } from '@common/interfaces/game-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { of, throwError } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
+import { AudioService } from '@app/services/audio/audio.service';
 
 @Component({
     selector: 'app-game-card',
@@ -30,6 +31,7 @@ describe('CreatePageComponent', () => {
     let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
     let matchServiceSpy: jasmine.SpyObj<MatchService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
+    let mockAudioService: jasmine.SpyObj<AudioService>;
     let mockGames: GameData[];
 
     beforeEach(async () => {
@@ -39,6 +41,7 @@ describe('CreatePageComponent', () => {
         gameSaveServiceSpy.getAllGames.and.returnValue(of(mockGames));
         matchServiceSpy = jasmine.createSpyObj('MatchService', ['createMatch']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
+        mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage', 'playCombatEffect']);
 
         await TestBed.configureTestingModule({
             providers: [
@@ -46,6 +49,7 @@ describe('CreatePageComponent', () => {
                 { provide: GameSaveService, useValue: gameSaveServiceSpy },
                 { provide: MatchService, useValue: matchServiceSpy },
                 { provide: PopupService, useValue: popupServiceSpy },
+                { provide: AudioService, useValue: mockAudioService },
             ],
         }).compileComponents();
 

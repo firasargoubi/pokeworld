@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { Timer } from '@app/classes/timer/timer';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { PopupColor } from '@app/interfaces/popup';
+import { SoundEffect } from '@app/interfaces/sound-service';
+import { AudioService } from '@app/services/audio/audio.service';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
@@ -31,6 +33,7 @@ describe('CombatPageComponent', () => {
     let mockPlayService: jasmine.SpyObj<PlayService>;
     let mockRouter: jasmine.SpyObj<Router>;
     let mockTimer: jasmine.SpyObj<Timer>;
+    let mockAudioService: jasmine.SpyObj<AudioService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
 
     beforeEach(async () => {
@@ -42,6 +45,7 @@ describe('CombatPageComponent', () => {
         mockPlayService = jasmine.createSpyObj('PlayService', ['changeDebugMode']);
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         mockTimer = jasmine.createSpyObj('Timer', ['maxTime']);
+        mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage', 'playCombatEffect']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'keepMessages']);
 
         mockCombatService.timer = mockTimer;
@@ -53,6 +57,7 @@ describe('CombatPageComponent', () => {
                 { provide: CombatService, useValue: mockCombatService },
                 { provide: PlayService, useValue: mockPlayService },
                 { provide: Router, useValue: mockRouter },
+                { provide: AudioService, useValue: mockAudioService },
                 { provide: PopupService, useValue: popupServiceSpy },
             ],
         }).compileComponents();
@@ -278,5 +283,19 @@ describe('CombatPageComponent', () => {
 
         expect(mockMatchService.isState).toHaveBeenCalledWith([MatchState.TurnWait, MatchState.TurnStart, MatchState.MatchEnd]);
         expect(displayPopupSpy).not.toHaveBeenCalled();
+    });
+
+    it('should play heal effect when there is new healing', () => {
+        component.visualData.isSelfHealing = false;
+        component.visualData.isEnemyHealing = false;
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        spyOn<any>(component, 'hasPlayerHealed').and.returnValues(true, true);
+
+        mockAudioService.playEffect.calls.reset();
+
+        const oldMatchData = structuredClone(MOCK_MATCH_DATAS[0]);
+        component['checkHealingAnimation'](oldMatchData);
+        expect(mockAudioService.playEffect).toHaveBeenCalledWith(SoundEffect.Heal);
     });
 });

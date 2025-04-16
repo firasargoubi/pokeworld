@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PopupMessage } from '@app/consts/popup-message.const';
+import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
+import { AudioService } from '@app/services/audio/audio.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -17,6 +19,7 @@ import { GameData } from '@common/interfaces/game-data';
 })
 export class CreatePageComponent implements OnInit {
     games: GameData[] = [];
+    private readonly audioService: AudioService = inject(AudioService);
     private isCreatingMatch = false;
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);
@@ -24,11 +27,13 @@ export class CreatePageComponent implements OnInit {
     private popupService: PopupService = inject(PopupService);
 
     navigateToMenu() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.router.navigate([PageEndpoint.Menu]);
     }
 
     ngOnInit() {
         this.loadGames();
+        this.audioService.playBackgroundMusic(BackgroundMusic.Home);
     }
 
     getCardColor(index: number): string {

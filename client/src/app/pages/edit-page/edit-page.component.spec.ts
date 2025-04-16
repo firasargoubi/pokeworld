@@ -8,6 +8,7 @@ import { MapComponent } from '@app/components/map/map.component';
 import { EDITOR_ERASE_TILE } from '@app/consts/editor-data.const';
 import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
 import { EditorEvent, EditorTile } from '@app/interfaces/editor';
+import { AudioService } from '@app/services/audio/audio.service';
 import { EditorService } from '@app/services/editor/editor.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
@@ -49,6 +50,7 @@ describe('EditPageComponent', () => {
     let editorServiceSpy: jasmine.SpyObj<EditorService>;
     let gameDataServiceSpy: jasmine.SpyObj<GameDataService>;
     let mapServiceSpy: jasmine.SpyObj<MapService>;
+    let mockAudioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
@@ -62,6 +64,7 @@ describe('EditPageComponent', () => {
             'resetLastPicked',
             'pickItem',
         ]);
+        mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage', 'playBackgroundMusic']);
         gameDataServiceSpy = jasmine.createSpyObj('GameDataService', ['isMapValid', 'isModified', 'getItem', 'setGameData', 'removeItem'], {
             itemUpdate: {
                 subscribe: () => undefined,
@@ -83,6 +86,7 @@ describe('EditPageComponent', () => {
                 { provide: EditorService, useValue: editorServiceSpy },
                 { provide: GameDataService, useValue: gameDataServiceSpy },
                 { provide: MapService, useValue: mapServiceSpy },
+                { provide: AudioService, useValue: mockAudioService },
             ],
         }).compileComponents();
 

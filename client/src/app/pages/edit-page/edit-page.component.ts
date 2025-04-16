@@ -6,14 +6,16 @@ import { ItemComponent } from '@app/components/item/item.component';
 import { MapComponent } from '@app/components/map/map.component';
 import { DEFAULT_EDITOR_DATA, EDITOR_ERASE_TILE, ITEM_POOL_HIGHEST_ITEM, SHARED_ITEM_POOL } from '@app/consts/editor-data.const';
 import { EMPTY_IMAGE, ITEM_IMAGES } from '@app/consts/images.const';
-import { ITEM_DESCRIPTION } from '@common/consts/item-data.const';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { EditorEvent, EditorItem, EditorVisualData } from '@app/interfaces/editor';
 import { PopupColor } from '@app/interfaces/popup';
+import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
+import { AudioService } from '@app/services/audio/audio.service';
 import { EditorService } from '@app/services/editor/editor.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { ITEM_DESCRIPTION } from '@common/consts/item-data.const';
 import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
@@ -30,6 +32,8 @@ import { TileType } from '@common/interfaces/tile-type.enum';
 export class EditPageComponent {
     gameDataService: GameDataService = inject(GameDataService);
     editorVisualData: EditorVisualData = structuredClone(DEFAULT_EDITOR_DATA);
+    readonly audioService: AudioService = inject(AudioService);
+    readonly clickValue = SoundEffect.Click;
     private editorService: EditorService = inject(EditorService);
     private popupService: PopupService = inject(PopupService);
     private mapService: MapService = inject(MapService);
@@ -37,16 +41,19 @@ export class EditPageComponent {
     private initialGameData: GameData = structuredClone(this.gameDataService.gameData);
 
     constructor() {
-        if (!this.gameDataService.isMapValid()) {
+        if (this.gameDataService.isMapValid()) {
+            this.mapService.clearOverlays();
+            this.mapService.setPlayers([]);
+            this.gameDataService.itemUpdate.subscribe(this.updateItems.bind(this));
+            this.updateItems();
+            this.audioService.playBackgroundMusic(BackgroundMusic.Edit);
+        } else {
             this.goToAdminPage();
         }
-        this.mapService.clearOverlays();
-        this.mapService.setPlayers([]);
-        this.gameDataService.itemUpdate.subscribe(this.updateItems.bind(this));
-        this.updateItems();
     }
 
     backButton() {
+        this.audioService.playEffect(SoundEffect.Click);
         if (this.gameDataService.isModified(this.initialGameData)) {
             this.popupService.showPopup({
                 message: PopupMessage.QuitEditPage,
@@ -60,6 +67,7 @@ export class EditPageComponent {
     }
 
     async saveButton() {
+        this.audioService.playEffect(SoundEffect.Click);
         const isGameSaved = await this.editorService.saveGame();
         if (isGameSaved) {
             this.popupService.showPopup({
@@ -74,6 +82,7 @@ export class EditPageComponent {
     }
 
     resetButton() {
+        this.audioService.playEffect(SoundEffect.Click);
         if (this.gameDataService.isModified(this.initialGameData)) {
             this.popupService.showPopup({
                 message: PopupMessage.CancelModification,

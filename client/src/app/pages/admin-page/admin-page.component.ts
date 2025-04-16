@@ -7,7 +7,9 @@ import { GameCardComponent } from '@app/components/game-card/game-card.component
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { PopupMessage } from '@app/consts/popup-message.const';
+import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { VisibilityEvent } from '@app/interfaces/visibility-event';
+import { AudioService } from '@app/services/audio/audio.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
@@ -22,6 +24,7 @@ import { GameData } from '@common/interfaces/game-data';
 export class AdminPageComponent implements OnInit {
     games: GameData[] = [];
     isCreationMode: boolean = false;
+    private readonly audioService: AudioService = inject(AudioService);
     private readonly router: Router = inject(Router);
     private readonly gameSaveService: GameSaveService = inject(GameSaveService);
     private readonly popupService: PopupService = inject(PopupService);
@@ -35,10 +38,12 @@ export class AdminPageComponent implements OnInit {
 
     navigateToMenu() {
         this.router.navigate([PageEndpoint.Menu]);
+        this.audioService.playEffect(SoundEffect.Click);
     }
 
     ngOnInit() {
         this.loadGames();
+        this.audioService.playBackgroundMusic(BackgroundMusic.Home);
     }
 
     editGame(id: string) {
@@ -71,6 +76,7 @@ export class AdminPageComponent implements OnInit {
 
     onCreateGame() {
         this.isCreationMode = !this.isCreationMode;
+        this.audioService.playEffect(SoundEffect.Click);
     }
 
     getCardColor(index: number): string {

@@ -3,8 +3,10 @@ import { Component, computed, inject, signal, Signal, WritableSignal } from '@an
 import { FormsModule } from '@angular/forms';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { SoundEffect } from '@app/interfaces/sound-service';
 import { Order, PlayerStatData } from '@app/interfaces/stat-data';
 import { PlayerStatType } from '@app/interfaces/stat-type.enum';
+import { AudioService } from '@app/services/audio/audio.service';
 import { MatchService } from '@app/services/match/match.service';
 import { StatService } from '@app/services/stat/stat.service';
 import { GameMode } from '@common/interfaces/map-data';
@@ -26,6 +28,7 @@ export class StatPageComponent {
 
     readonly statService: StatService = inject(StatService);
     private readonly matchService: MatchService = inject(MatchService);
+    private readonly audioService: AudioService = inject(AudioService);
 
     constructor() {
         if (this.matchService.isInMatch()) {
@@ -36,6 +39,7 @@ export class StatPageComponent {
     }
 
     updateSorting(statType: PlayerStatType) {
+        this.audioService.playEffect(SoundEffect.Click);
         if (statType === this.sortingStat()) {
             this.toggleOrder();
         } else {
@@ -45,6 +49,7 @@ export class StatPageComponent {
     }
 
     navigateToMenu() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.matchService.leaveMatch();
     }
 

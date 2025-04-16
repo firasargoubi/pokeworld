@@ -10,6 +10,9 @@ import { PlayerInfoPopupComponent } from '@app/components/player-info-popup/play
 import { DEFAULT_PLAY_VISUAL_DATA } from '@app/consts/play-data.const';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { PlayVisualData } from '@app/interfaces/play-visual-data';
+import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
+import { PLAY_PAGE_EFFECT } from '@app/services/audio/audio.const';
+import { AudioService } from '@app/services/audio/audio.service';
 import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
@@ -38,6 +41,8 @@ export class PlayPageComponent {
     private thumbnailService: ThumbnailService = inject(ThumbnailService);
     private mapService: MapService = inject(MapService);
     private router: Router = inject(Router);
+    private readonly audioService: AudioService = inject(AudioService);
+    private lastLogSize: number = 0;
 
     constructor() {
         if (this.matchService.isInMatch()) {
@@ -47,6 +52,8 @@ export class PlayPageComponent {
         } else {
             this.router.navigate([PageEndpoint.Menu]);
         }
+        this.audioService.preloadEffectsForPage(PLAY_PAGE_EFFECT);
+        this.audioService.playBackgroundMusic(BackgroundMusic.Play);
     }
 
     @HostListener('document:keydown', ['$event'])
@@ -60,6 +67,7 @@ export class PlayPageComponent {
     }
 
     actionButton() {
+        this.audioService.playEffect(SoundEffect.Click);
         if (this.mapService.hasActionOverlay()) {
             this.mapService.clearActions();
         } else if (this.visualData.canUseAction) {
@@ -68,12 +76,14 @@ export class PlayPageComponent {
     }
 
     endTurnButton() {
+        this.audioService.playEffect(SoundEffect.Click);
         if (this.visualData.canEndTurn) {
             this.playService.endTurn();
         }
     }
 
     surrenderButton() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.popupService.showPopup({
             message: PopupMessage.Surrender,
             hasCloseButton: true,
@@ -83,6 +93,7 @@ export class PlayPageComponent {
     }
 
     infoButton() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.showPlayerDescription(this.matchService.selfIndex);
     }
 
@@ -108,6 +119,16 @@ export class PlayPageComponent {
     }
 
     private onMatchUpdate() {
+        const lastLog = this.matchService.data.logData[this.matchService.data.logData.length - 1];
+
+        if (
+            lastLog?.content.includes(this.matchService.selfPlayer.name) &&
+            lastLog.content.includes('ramassé') &&
+            this.lastLogSize !== this.matchService.data.logData.length
+        ) {
+            this.lastLogSize = this.matchService.data.logData.length;
+            this.audioService.playEffect(SoundEffect.Item);
+        }
         this.updateVisual();
         this.checkForRedirect();
     }

@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { AudioService } from '@app/services/audio/audio.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { GameCardComponent } from './game-card.component';
@@ -8,14 +9,19 @@ describe('GameCardComponent', () => {
     let component: GameCardComponent;
     let fixture: ComponentFixture<GameCardComponent>;
     let thumbnailServiceSpy: jasmine.SpyObj<ThumbnailService>;
+    let mockAudioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
         thumbnailServiceSpy = jasmine.createSpyObj('ThumbnailService', ['getThumbnail']);
         thumbnailServiceSpy.getThumbnail.and.returnValue(Promise.resolve('data:image/png;base64,mockthumbnail'));
+        mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage']);
 
         await TestBed.configureTestingModule({
             imports: [GameCardComponent],
-            providers: [{ provide: ThumbnailService, useValue: thumbnailServiceSpy }],
+            providers: [
+                { provide: ThumbnailService, useValue: thumbnailServiceSpy },
+                { provide: AudioService, useValue: mockAudioService },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(GameCardComponent);

@@ -1,14 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { AudioService } from '@app/services/audio/audio.service';
 import { WarningConfirmationPopupComponent } from './warning-confirmation-popup.component';
 
 describe('WarningConfirmationPopupComponent', () => {
     let component: WarningConfirmationPopupComponent;
     let fixture: ComponentFixture<WarningConfirmationPopupComponent>;
+    let mockAudioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
+        mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage']);
         await TestBed.configureTestingModule({
             imports: [WarningConfirmationPopupComponent],
+            providers: [{ provide: AudioService, useValue: mockAudioService }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(WarningConfirmationPopupComponent);

@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewChecked, Component, ElementRef, inject, Input, OnInit, ViewChild, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SoundEffect } from '@app/interfaces/sound-service';
+import { AudioService } from '@app/services/audio/audio.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
@@ -22,6 +24,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     maxInputLenght = MAX_MESSAGE_LENGTH;
     chatMessages: ChatMessage[] = [];
     logs: ChatLog[] = [];
+    readonly clickValue = SoundEffect.Click;
+    readonly audioService: AudioService = inject(AudioService);
     private shouldScrollToBottom = false;
     private readonly matchService: MatchService = inject(MatchService);
     private readonly chatService: ChatService = inject(ChatService);
@@ -43,11 +47,13 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     }
 
     switchTab(isChat: boolean) {
+        this.audioService.playEffect(SoundEffect.Click);
         this.chatService.isChatActive.set(isChat);
         this.shouldScrollToBottom = true;
     }
 
     toggleFilter() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.chatService.isFilterEnabled.update((value) => !value);
         this.filterLogs();
         this.shouldScrollToBottom = true;

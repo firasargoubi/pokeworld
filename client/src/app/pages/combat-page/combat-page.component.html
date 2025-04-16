@@ -114,7 +114,7 @@
         </div>
     </div>
 
-    <div class="chat-button" (click)="displayChat = true" [class.disabel]="displayChat">
+    <div class="chat-button" (click)="displayChat = true;this.audioService.playEffect(this.clickValue)" [class.disabel]="displayChat">
         <img class="button-icon" src="./assets/images/menu/icons/mail.png" />
         <div class="button-background"></div>
     </div>

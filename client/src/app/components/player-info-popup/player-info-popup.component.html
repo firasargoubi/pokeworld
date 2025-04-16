@@ -2,7 +2,7 @@
     <div class="self-info-container">
         <div class="self-info-avatar" [style.backgroundImage]="'url(' + avatarData[matchService.data.players[playerIndex].avatar].imageCentered"></div>
         <div class="self-info-name">{{ matchService.data.players[playerIndex].name }}</div>
-        <button class="close-button" (click)="closeButton()">X</button>
+        <button class="close-button" (click)="closeButton();this.audioService.playEffect(this.clickValue)">X</button>
     </div>
     <div class="movement-container hp">
         <div class="movement-text">

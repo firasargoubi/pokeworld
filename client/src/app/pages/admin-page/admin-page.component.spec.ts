@@ -3,6 +3,8 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
+import { VisibilityEvent } from '@app/interfaces/visibility-event';
+import { AudioService } from '@app/services/audio/audio.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
@@ -10,7 +12,6 @@ import { GameData } from '@common/interfaces/game-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { of, throwError } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
-import { VisibilityEvent } from '@app/interfaces/visibility-event';
 @Component({
     selector: 'app-game-card',
     standalone: true,
@@ -24,10 +25,12 @@ describe('AdminPageComponent', () => {
     let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let routerSpy: jasmine.SpyObj<Router>;
+    let mockAudioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
         gameSaveServiceSpy = jasmine.createSpyObj<GameSaveService>('GameSaveService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
+        mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage', 'playBackgroundMusic']);
 
         gameSaveServiceSpy.getAllGames.and.returnValue(of([]));
         gameSaveServiceSpy.getGame.and.returnValue(of({} as GameData));
@@ -42,6 +45,7 @@ describe('AdminPageComponent', () => {
                 { provide: GameSaveService, useValue: gameSaveServiceSpy },
                 { provide: PopupService, useValue: popupServiceSpy },
                 { provide: Router, useValue: routerSpy },
+                { provide: AudioService, useValue: mockAudioService },
             ],
         }).compileComponents();
 
