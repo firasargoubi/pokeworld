@@ -43,6 +43,7 @@
                 class="message-input"
                 (keydown)="sendMessage($event)"
                 [maxLength]="this.maxInputLenght"
+                (click)="this.audioService.playEffect(this.clickValue)"
             />
         </div>
     </div>

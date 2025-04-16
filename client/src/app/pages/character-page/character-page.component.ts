@@ -7,6 +7,8 @@ import { HeaderComponent } from '@app/components/header/header.component';
 import { DEFAULT_CHARACTER_VISUAL_DATA } from '@app/consts/player-data.const';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { CharacterVisualData } from '@app/interfaces/character-visual-data';
+import { SoundEffect } from '@app/interfaces/sound-service';
+import { AudioService } from '@app/services/audio/audio.service';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -24,6 +26,8 @@ import { Avatar, DiceType, PlayerData } from '@common/interfaces/player-data';
 export class CharacterPageComponent {
     nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
     visualData: CharacterVisualData = structuredClone(DEFAULT_CHARACTER_VISUAL_DATA);
+    readonly audioService: AudioService = inject(AudioService);
+    readonly clickValue = SoundEffect.Click;
     private matchService: MatchService = inject(MatchService);
     private popupService: PopupService = inject(PopupService);
     private lobbyService: LobbyService = inject(LobbyService);
@@ -46,6 +50,7 @@ export class CharacterPageComponent {
     }
 
     goToMenu() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.popupService.showPopup({
             message: PopupMessage.Quit,
             hasCloseButton: true,
@@ -55,10 +60,12 @@ export class CharacterPageComponent {
     }
 
     toggleBonusDice() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.visualData.isAttackSelected = !this.visualData.isAttackSelected;
     }
 
     joinLobby() {
+        this.audioService.playEffect(SoundEffect.Click);
         const warnings = this.getWarnings();
         if (warnings.length > 0) {
             this.popupService.showPopup({
@@ -73,6 +80,7 @@ export class CharacterPageComponent {
     }
 
     changeAvatar(avatar: Avatar) {
+        this.audioService.playEffect(SoundEffect.Click);
         const lockedAvatars = this.getLockedAvatars();
         if (!lockedAvatars.includes(avatar)) {
             this.lobbyService.changeAvatar(avatar);

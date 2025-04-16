@@ -5,7 +5,7 @@
     <div id="join-page-border">
         <div id="join-page-body">
             <div id="main-container">
-                <input id="input" [(ngModel)]="matchCode" maxlength="{{codeLength}}" autofocus (keyup)="joinMatch($event)" />
+                <input id="input" [(ngModel)]="matchCode" maxlength="{{codeLength}}" autofocus (keyup)="joinMatch($event)" (click)="this.audioService.playEffect(this.clickValue)"/>
                 <div id="main-container-body">
                     <p id="main-message">Entrez votre code d'accès</p>
 

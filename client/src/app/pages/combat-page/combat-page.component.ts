@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, inject } from '@angular/core';
+import { Component, HostListener, inject, OnDestroy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
@@ -7,6 +7,9 @@ import { DEFAULT_COMBAT_VISUAL_DATA } from '@app/consts/combat-data.const';
 import { BATTLE_PLATFORM_IMAGES } from '@app/consts/images.const';
 import { CombatVisualData } from '@app/interfaces/combat-visual-data';
 import { PopupColor } from '@app/interfaces/popup';
+import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
+import { COMBAT_PAGE_EFFECTS } from '@app/services/audio/audio.const';
+import { AudioService } from '@app/services/audio/audio.service';
 import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
@@ -22,11 +25,15 @@ import { CombatAction, MatchData, MatchState, PlayerCombatData } from '@common/i
     styleUrls: ['./combat-page.component.scss'],
     imports: [CommonModule, ChatComponent],
 })
-export class CombatPageComponent {
+export class CombatPageComponent implements OnDestroy {
     visualData: CombatVisualData = structuredClone(DEFAULT_COMBAT_VISUAL_DATA);
     matchService: MatchService = inject(MatchService);
     combatService: CombatService = inject(CombatService);
     displayChat: boolean = false;
+
+    readonly audioService: AudioService = inject(AudioService);
+    readonly clickValue = SoundEffect.Click;
+
     private playService: PlayService = inject(PlayService);
     private router: Router = inject(Router);
     private popupService: PopupService = inject(PopupService);
@@ -40,6 +47,8 @@ export class CombatPageComponent {
         } else {
             this.router.navigate([PageEndpoint.Menu]);
         }
+        this.audioService.preloadEffectsForPage(COMBAT_PAGE_EFFECTS);
+        this.audioService.playBackgroundMusic(BackgroundMusic.Combat);
     }
 
     @HostListener('document:keydown', ['$event'])
@@ -52,15 +61,22 @@ export class CombatPageComponent {
         }
     }
 
+    ngOnDestroy() {
+        this.audioService.playBackgroundMusic(BackgroundMusic.Home);
+    }
+
     attackButton() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.combatService.attack();
     }
 
     escapeButon() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.combatService.escape();
     }
 
     hideChat() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.displayChat = false;
     }
 
@@ -75,6 +91,7 @@ export class CombatPageComponent {
         this.checkForRedirect();
         this.updatePlayersCombatData();
         this.checkHealingAnimation(oldMatchData);
+        this.audioService.playCombatEffect(oldMatchData);
     }
 
     private checkForRedirect() {
@@ -126,8 +143,17 @@ export class CombatPageComponent {
     }
 
     private checkHealingAnimation(oldMatchData: MatchData) {
-        this.visualData.isSelfHealing = this.hasPlayerHealed(oldMatchData, this.visualData.selfPlayer);
-        this.visualData.isEnemyHealing = this.hasPlayerHealed(oldMatchData, this.visualData.enemyPlayer);
+        const isSelfHealing = this.hasPlayerHealed(oldMatchData, this.visualData.selfPlayer);
+        const isEnemyHealing = this.hasPlayerHealed(oldMatchData, this.visualData.selfPlayer);
+
+        const isSelfHealingNew = !this.visualData.isSelfHealing && isSelfHealing;
+        const isEnemyHealingNew = !this.visualData.isEnemyHealing && isEnemyHealing;
+        if (isSelfHealingNew || isEnemyHealingNew) {
+            this.audioService.playEffect(SoundEffect.Heal);
+        }
+
+        this.visualData.isSelfHealing = isSelfHealing;
+        this.visualData.isEnemyHealing = isEnemyHealing;
     }
 
     private hasPlayerHealed(oldMatchData: MatchData, playerData: PlayerCombatData): boolean {

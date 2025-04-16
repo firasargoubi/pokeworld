@@ -193,3 +193,61 @@ app-menu-button {
 .icon-vulpix {
     background-image: url('../../../assets/images/menu/pokemons/chibi/vulpix.png');
 }
+
+.sound-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 0;
+    background: #4997d0;
+    border: 3px solid rgb(179, 159, 50);
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-family: 'Press Start 2P', monospace;
+    color: white;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    text-shadow: 2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black;
+    box-shadow: 
+        2px 0 0 rgb(228, 203, 62),
+        -2px 0 0 rgb(228, 203, 62),
+        0 2px 0 rgb(228, 203, 62), 
+        0 -2px 0 rgb(228, 203, 62),
+        2px 2px 0 rgb(228, 203, 62),
+        inset 2px 2px 0 rgba(255, 255, 255, 0.3);
+    animation: zooming 3s infinite ease-in-out;
+    transition: all 0.1s steps(1);
+    
+    &::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.1) 2px,
+            rgba(0, 0, 0, 0.1) 4px
+        );
+        pointer-events: none;
+    }
+    
+    &:hover {
+        transform: scale(1.15);
+        background: #ffcb05;
+    }
+    
+    &:active {
+        transform: translate(4px, 4px);
+        box-shadow: 
+            0 0 0 black,
+            inset 4px 4px 0 rgba(0, 0, 0, 0.3);
+    }
+}

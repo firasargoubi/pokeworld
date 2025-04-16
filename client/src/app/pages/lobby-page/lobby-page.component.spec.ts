@@ -9,6 +9,7 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { PlayerType } from '@common/interfaces/player-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { LobbyPageComponent } from './lobby-page.component';
+import { AudioService } from '@app/services/audio/audio.service';
 
 @Component({
     selector: 'app-chat',
@@ -24,6 +25,7 @@ describe('LobbyPageComponent', () => {
     let matchServiceSpy: jasmine.SpyObj<MatchService>;
     let lobbyServiceSpy: jasmine.SpyObj<LobbyService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
+    let mockAudioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
         const mockMatchData = structuredClone(MOCK_MATCH_DATAS[0]);
@@ -38,6 +40,7 @@ describe('LobbyPageComponent', () => {
             selfIndex: 0,
             isHost: () => true,
         });
+        mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage', 'playCombatEffect']);
 
         await TestBed.configureTestingModule({
             imports: [LobbyPageComponent],
@@ -46,6 +49,7 @@ describe('LobbyPageComponent', () => {
                 { provide: PopupService, useValue: popupServiceSpy },
                 { provide: LobbyService, useValue: lobbyServiceSpy },
                 { provide: MatchService, useValue: matchServiceSpy },
+                { provide: AudioService, useValue: mockAudioService },
             ],
         }).compileComponents();
 

@@ -1,6 +1,7 @@
 import { ElementRef, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { AudioService } from '@app/services/audio/audio.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { ChatLog } from '@common/interfaces/chat-message';
@@ -12,6 +13,7 @@ describe('ChatComponent', () => {
     let chatServiceSpy: jasmine.SpyObj<ChatService>;
     let matchServiceSpy: jasmine.SpyObj<MatchService>;
     let scrollToBottomSpy: jasmine.Spy;
+    let mockAudioService: jasmine.SpyObj<AudioService>;
 
     const mockChatData = [
         { sender: 'Player1', content: 'Hello', timestamp: new Date() },
@@ -43,12 +45,14 @@ describe('ChatComponent', () => {
                 },
             },
         });
+        mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage']);
 
         await TestBed.configureTestingModule({
             imports: [ChatComponent, FormsModule],
             providers: [
                 { provide: ChatService, useValue: chatServiceSpy },
                 { provide: MatchService, useValue: matchServiceSpy },
+                { provide: AudioService, useValue: mockAudioService },
             ],
         }).compileComponents();
 

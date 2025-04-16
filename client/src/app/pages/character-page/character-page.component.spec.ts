@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AudioService } from '@app/services/audio/audio.service';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -16,6 +17,7 @@ describe('CharacterPageComponent', () => {
     let mockPopupService: jasmine.SpyObj<PopupService>;
     let mockLobbyService: jasmine.SpyObj<LobbyService>;
     let mockRouter: jasmine.SpyObj<Router>;
+    let mockAudioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
         mockMatchService = jasmine.createSpyObj('MatchService', ['isInMatch', 'leaveMatch', 'selfPlayer', 'selfIndex', 'matchUpdate'], {
@@ -23,6 +25,7 @@ describe('CharacterPageComponent', () => {
             selfPlayer: structuredClone(MOCK_PLAYER_DATAS[0]),
             matchUpdate: { pipe: () => ({ subscribe: () => ({}) }) },
         });
+        mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage']);
         mockPopupService = jasmine.createSpyObj('PopupService', ['showPopup']);
         mockLobbyService = jasmine.createSpyObj('LobbyService', ['joinLobby', 'changeAvatar']);
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
@@ -34,6 +37,7 @@ describe('CharacterPageComponent', () => {
                 { provide: PopupService, useValue: mockPopupService },
                 { provide: LobbyService, useValue: mockLobbyService },
                 { provide: Router, useValue: mockRouter },
+                { provide: AudioService, useValue: mockAudioService },
             ],
         }).compileComponents();
 

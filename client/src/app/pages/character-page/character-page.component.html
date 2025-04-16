@@ -20,6 +20,7 @@
                             autofocus
                             autocomplete="off"
                             style="text-transform: uppercase"
+                            (click)="this.audioService.playEffect(this.clickValue)"
                         />
                         <p id="input-border">----------------</p>
                     </span>
@@ -31,7 +32,7 @@
                             <div
                                 class="stat-container stat-container-bonus-1"
                                 [ngClass]="{ unselected: !visualData.isHpSelected }"
-                                (click)="visualData.isHpSelected = true"
+                                (click)="visualData.isHpSelected = true; this.audioService.playEffect(this.clickValue)"
                             >
                                 <img src="./assets/images/menu/icons/heart.png" class="stat-icon" />
                                 <div class="stat-body">
@@ -45,7 +46,7 @@
                             <div
                                 class="stat-container stat-container-bonus-2"
                                 [ngClass]="{ unselected: visualData.isHpSelected }"
-                                (click)="visualData.isHpSelected = false"
+                                (click)="visualData.isHpSelected = false; this.audioService.playEffect(this.clickValue)"
                             >
                                 <img src="./assets/images/menu/icons/lightning.png" class="stat-icon" />
                                 <div class="stat-body">

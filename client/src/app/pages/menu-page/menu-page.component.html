@@ -1,9 +1,15 @@
-<div class="menu-page">
+<div class="menu-page" (mousedown)="isFirstTime ? onMouseDown() : null">
     <div class="background-container"></div>
     <div class="content-container">
+        @if(isMusicStarted){
+            <div class = "sound-button" (click)="this.disableSound()">♬</div>
+        }
+        @else {
+            <div class = "sound-button" (click)="this.onMouseDown()">🔇</div>
+        }
         <div class="top-container">
             <div class="top-left-container">
-                <div class="logo-container" routerLink="/debug">
+                <div class="logo-container">
                     <p class="team-number">Equipe #204</p>
                 </div>
             </div>
@@ -42,6 +48,7 @@
                 [spriteImage]="'./assets/images/menu/pokemons/normal/blastoise.png'"
                 [textContent]="'Rejoindre <br/>Partie'"
                 [routePath]="pageEndpoint.Join"
+                (click)="this.audioService.playEffect(this.clickValue)"
             >
             </app-menu-button>
 
@@ -50,6 +57,7 @@
                 [spriteImage]="'./assets/images/menu/pokemons/normal/charizard.png'"
                 [textContent]="'Créer <br/>Partie'"
                 [routePath]="pageEndpoint.Create"
+                (click)="this.audioService.playEffect(this.clickValue)"
             >
             </app-menu-button>
 
@@ -58,6 +66,7 @@
                 [spriteImage]="'./assets/images/menu/pokemons/normal/venusaur.png'"
                 [textContent]="'Modifier <br/>Partie'"
                 [routePath]="pageEndpoint.Admin"
+                (click)="this.audioService.playEffect(this.clickValue)"
             >
             </app-menu-button>
         </div>

@@ -7,6 +7,7 @@ import { Order } from '@app/interfaces/stat-data';
 import { PlayerStatType } from '@app/interfaces/stat-type.enum';
 import { MatchService } from '@app/services/match/match.service';
 import { StatService } from '@app/services/stat/stat.service';
+import { AudioService } from '@app/services/audio/audio.service';
 import { GameMode } from '@common/interfaces/map-data';
 import { MatchData } from '@common/interfaces/match-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
@@ -20,6 +21,7 @@ describe('StatPageComponent', () => {
     let fixture: ComponentFixture<StatPageComponent>;
     let matchServiceSpy: jasmine.SpyObj<MatchService>;
     let statServiceSpy: jasmine.SpyObj<StatService>;
+    let mockAudioService: jasmine.SpyObj<AudioService>;
 
     @Component({
         selector: 'app-chat',
@@ -41,11 +43,14 @@ describe('StatPageComponent', () => {
             winnerData: structuredClone(MOCK_WINNER_VISUAL_DATA),
         });
 
+        mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage', 'playCombatEffect']);
+
         await TestBed.configureTestingModule({
             imports: [FormsModule, HeaderComponent, ChatComponent],
             providers: [
                 { provide: MatchService, useValue: matchServiceSpy },
                 { provide: StatService, useValue: statServiceSpy },
+                { provide: AudioService, useValue: mockAudioService },
             ],
         }).compileComponents();
 

@@ -10,6 +10,8 @@ import { PokeballButtonComponent } from '@app/components/pokeball-button/pokebal
 import { DEFAULT_LOBBY_VISUAL_DATA } from '@app/consts/player-data.const';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { LobbyVisualData } from '@app/interfaces/lobby-visual-data';
+import { SoundEffect } from '@app/interfaces/sound-service';
+import { AudioService } from '@app/services/audio/audio.service';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -32,6 +34,7 @@ export class LobbyPageComponent {
     private lobbyService: LobbyService = inject(LobbyService);
     private popupService: PopupService = inject(PopupService);
     private router: Router = inject(Router);
+    private readonly audioService: AudioService = inject(AudioService);
 
     constructor() {
         if (this.matchService.isInMatch()) {
@@ -40,6 +43,8 @@ export class LobbyPageComponent {
         } else {
             this.router.navigate([PageEndpoint.Menu]);
         }
+        this.updateVisual();
+        this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.updateVisual.bind(this));
     }
 
     @HostListener('document:keydown.escape')
@@ -50,10 +55,12 @@ export class LobbyPageComponent {
     }
 
     startMatchButton() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.lobbyService.startMatch();
     }
 
     leaveLobbyButton() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.popupService.showPopup({
             message: PopupMessage.Quit,
             hasCloseButton: true,
@@ -63,18 +70,22 @@ export class LobbyPageComponent {
     }
 
     toggleLockRoom() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.lobbyService.changeLockStatus(!this.matchService.data.lobbyData.isLocked);
     }
 
     kickPlayer(playerId: string) {
+        this.audioService.playEffect(SoundEffect.Click);
         this.lobbyService.kickPlayer(playerId);
     }
 
     copyMatchCode() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.copyToClipboard(this.matchService.data.code);
     }
 
     showBotCreationPopup() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.showBotPopup = true;
     }
 

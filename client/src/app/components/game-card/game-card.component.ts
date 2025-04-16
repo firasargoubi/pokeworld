@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SoundEffect } from '@app/interfaces/sound-service';
 import { VisibilityEvent } from '@app/interfaces/visibility-event';
+import { AudioService } from '@app/services/audio/audio.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { GameData } from '@common/interfaces/game-data';
@@ -24,6 +26,7 @@ export class GameCardComponent implements AfterViewInit {
 
     isHovered: boolean = false;
     thumbnailUrl: string = '';
+    private audioService: AudioService = inject(AudioService);
     private thumbnailService: ThumbnailService = inject(ThumbnailService);
     private gameDataService: GameDataService = inject(GameDataService);
 
@@ -32,19 +35,23 @@ export class GameCardComponent implements AfterViewInit {
     }
 
     onEdit() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.gameDataService.setGameData(this.game);
         this.edit.emit(this.game._id);
     }
     onDelete() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.delete.emit(this.game._id);
     }
 
     onToggleVisibility() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.toggleVisibility.emit({ id: this.game._id, isVisible: this.game.isVisible });
         this.game.isVisible = !this.game.isVisible;
     }
 
     onJoin() {
+        this.audioService.playEffect(SoundEffect.Click);
         this.join.emit(this.game._id);
     }
 

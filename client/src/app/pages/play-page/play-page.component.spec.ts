@@ -6,6 +6,8 @@ import { Timer } from '@app/classes/timer/timer';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { MapComponent } from '@app/components/map/map.component';
 import { PlayerInfoPopupComponent } from '@app/components/player-info-popup/player-info-popup.component';
+import { SoundEffect } from '@app/interfaces/sound-service';
+import { AudioService } from '@app/services/audio/audio.service';
 import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
@@ -55,6 +57,7 @@ describe('PlayPageComponent', () => {
     let mockMapService: jasmine.SpyObj<MapService>;
     let mockRouter: jasmine.SpyObj<Router>;
     let mockTimer: jasmine.SpyObj<Timer>;
+    let mockAudioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(() => {
         mockTimer = jasmine.createSpyObj('Timer', ['isStarted']);
@@ -77,6 +80,7 @@ describe('PlayPageComponent', () => {
         mockThumbnailService = jasmine.createSpyObj('ThumbnailService', ['getThumbnail']);
         mockMapService = jasmine.createSpyObj('MapService', ['hasActionOverlay', 'clearActions']);
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+        mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage']);
 
         TestBed.configureTestingModule({
             imports: [PlayPageComponent, MapComponent],
@@ -88,6 +92,7 @@ describe('PlayPageComponent', () => {
                 { provide: ThumbnailService, useValue: mockThumbnailService },
                 { provide: MapService, useValue: mockMapService },
                 { provide: Router, useValue: mockRouter },
+                { provide: AudioService, useValue: mockAudioService },
             ],
         }).compileComponents();
 
@@ -200,5 +205,14 @@ describe('PlayPageComponent', () => {
     it('should hide info popup on hidePlayerDescription', () => {
         component.hidePlayerDescription();
         expect(component.showPlayerInfoPopup).toBeFalse();
+    });
+    it('should play item sound when player picks up an item', () => {
+        const playerName = 'TestPlayer';
+        mockMatchService.selfPlayer.name = playerName;
+        mockMatchService.data.logData = [{ content: `${playerName} a ramassé un objet`, timestamp: new Date(), concernedPlayersNamesList: [] }];
+        component['lastLogSize'] = 0;
+        component['onMatchUpdate']();
+        expect(mockAudioService.playEffect).toHaveBeenCalledWith(SoundEffect.Item);
+        expect(component['lastLogSize']).toBe(1);
     });
 });
