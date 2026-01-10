@@ -324,4 +324,16 @@ describe('AudioService', () => {
         expect(effectAudioSpy.volume).toBe(expectedVolume);
         expect(setItemSpy).toHaveBeenCalledWith(AUDIO_STORAGE_KEY, JSON.stringify({ music: AUDIO_CONFIG.musicVolume, effects: expectedVolume }));
     });
+
+    it('should use default volumes when localStorage contains invalid JSON', () => {
+        getItemSpy.and.returnValue('invalid json string');
+        getItemSpy.calls.reset();
+        (window.Audio as unknown as jasmine.Spy).calls.reset();
+
+        const freshService = new AudioService();
+
+        expect(getItemSpy).toHaveBeenCalledWith(AUDIO_STORAGE_KEY);
+        expect(freshService.getBackgroundMusicVolume()).toBe(AUDIO_CONFIG.musicVolume);
+        expect(freshService.getEffectsVolume()).toBe(AUDIO_CONFIG.effectsVolume);
+    });
 });
