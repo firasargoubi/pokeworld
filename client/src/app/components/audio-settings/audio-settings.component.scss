@@ -96,6 +96,7 @@ $gray-background-color: linear-gradient(
     text-indent: calc($scale * 0.4);
     text-shadow: calc($scale * 0.3) 0 0 rgba(0, 0, 0, 0.25);
     user-select: none;
+    pointer-events: none;
 }
 
 $progress-color: #ff7700;
