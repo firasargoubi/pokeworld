@@ -1,4 +1,6 @@
-$size: calc(min(55vh, 30.3514vw) * 0.95);
+$base-size: min(1vh, 0.6vw);
+// $size: calc(min(55vh, 30.3514vw) * 0.95);
+$size: calc($base-size * 53);
 $border-corner: calc($size * 0.017);
 $border-width: calc($size * 0.029);
 
@@ -74,8 +76,8 @@ $green-background-color: linear-gradient(
 );
 
 .container {
-    height: $size;
-    width: $size;
+    height: 100%;
+    width: 100%;
     position: relative;
     display: flex;
     cursor: pointer;
@@ -139,8 +141,8 @@ $green-background-color: linear-gradient(
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    width: calc($size - $border-width * 1.5);
-    height: calc($size - $border-width * 1.5);
+    width: calc(100% - calc($border-width * 2));
+    height: calc(100% - calc($border-width * 2));
     margin: auto;
     box-shadow: $blue-inner-shadow;
     overflow: visible;
