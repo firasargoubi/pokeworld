@@ -20,3 +20,11 @@ export const AUDIO_CONFIG = {
     fadeOutDuration: 500,
     fadeStepInterval: 50,
 };
+
+export const COMBAT_LOG_PATTERNS = {
+    attack: 'inflige',
+    flee: "s'est enfui",
+    victory: 'gagné le combat',
+};
+
+export const AUDIO_STORAGE_KEY = 'audio_settings';

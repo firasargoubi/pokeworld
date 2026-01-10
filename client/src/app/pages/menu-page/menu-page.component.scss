@@ -71,6 +71,7 @@ $card-size: calc($bot-height * 0.95);
 }
 
 .top-left-container {
+    position: relative;
     height: $top-height;
     width: $top-left-width;
     display: flex;
@@ -80,7 +81,7 @@ $card-size: calc($bot-height * 0.95);
 .logo-container {
     margin: auto;
     height: calc($top-height * 0.6);
-    width: calc($top-height * 2.0);
+    width: calc($top-height * 2);
     rotate: -3.1deg;
     background-image: url($logo-image);
     background-size: contain;
@@ -104,7 +105,7 @@ $card-size: calc($bot-height * 0.95);
         calc($top-height * 0.14 * 0.0344) calc($top-height * 0.12 * 0.012) 0 rgb(120, 120, 120),
         calc($top-height * 0.14 * 0.0516) calc($top-height * 0.12 * 0.018) 0 rgb(120, 120, 120),
         calc($top-height * 0.14 * 0.0688) calc($top-height * 0.12 * 0.024) 0 rgb(120, 120, 120),
-        calc($top-height * 0.14 * 0.0860) calc($top-height * 0.12 * 0.030) 0 rgb(120, 120, 120);
+        calc($top-height * 0.14 * 0.086) calc($top-height * 0.12 * 0.03) 0 rgb(120, 120, 120);
 }
 
 @keyframes zooming {
@@ -140,9 +141,9 @@ $card-size: calc($bot-height * 0.95);
     width: auto;
     margin: auto 0;
     margin-right: calc($top-height * 0.06);
-    height: calc($top-height * 0.10);
-    line-height: calc($top-height * 0.10);
-    font-size: calc($top-height * 0.10);
+    height: calc($top-height * 0.1);
+    line-height: calc($top-height * 0.1);
+    font-size: calc($top-height * 0.1);
     text-shadow: calc($top-height * 0.00666) 0 0 $text-shadow-color;
 }
 
@@ -194,60 +195,104 @@ app-menu-button {
     background-image: url('../../../assets/images/menu/pokemons/chibi/vulpix.png');
 }
 
-.sound-button {
+$scale: min(1vh, 1vw);
+$inner-border-width: calc(0.4 * $scale);
+
+$border-color2: #48485f;
+
+$corner-square-size: calc($scale * 0.4);
+$clip-path: polygon(
+    $corner-square-size 0%,
+    calc(100% - #{$corner-square-size}) 0%,
+
+    calc(100% - #{$corner-square-size}) $corner-square-size,
+    100% $corner-square-size,
+
+    100% calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) 100%,
+    $corner-square-size 100%,
+
+    $corner-square-size calc(100% - #{$corner-square-size}),
+    0% calc(100% - #{$corner-square-size}),
+    0% $corner-square-size,
+    $corner-square-size $corner-square-size
+);
+
+.settings-button {
     position: absolute;
-    top: 20px;
-    left: 20px;
-    width: 50px;
-    height: 50px;
+    top: 10%;
+    left: 2%;
+    width: min(7vw, 7vh);
+    aspect-ratio: 1 / 1;
+
+    border: calc($corner-square-size * 2) solid $border-color2;
+    clip-path: $clip-path;
+
+    box-shadow:
+        inset $inner-border-width 0 0 0 hsl(196, 0%, 67%),
+        inset calc(-1 * $inner-border-width) 0 0 0 hsl(205, 0%, 42%),
+        inset 0 $inner-border-width 0 0 hsl(196, 0%, 67%),
+        inset 0 calc(-1 * $inner-border-width) 0 0 hsl(205, 0%, 42%);
+
     border-radius: 0;
-    background: #4997d0;
-    border: 3px solid rgb(179, 159, 50);
+    background: rgb(136, 136, 136);
     cursor: pointer;
-    z-index: 1000;
+    z-index: 10;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 24px;
-    font-family: 'Press Start 2P', monospace;
-    color: white;
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    text-shadow: 2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black;
-    box-shadow: 
-        2px 0 0 rgb(228, 203, 62),
-        -2px 0 0 rgb(228, 203, 62),
-        0 2px 0 rgb(228, 203, 62), 
-        0 -2px 0 rgb(228, 203, 62),
-        2px 2px 0 rgb(228, 203, 62),
-        inset 2px 2px 0 rgba(255, 255, 255, 0.3);
-    animation: zooming 3s infinite ease-in-out;
-    transition: all 0.1s steps(1);
-    
-    &::after {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.1) 2px,
-            rgba(0, 0, 0, 0.1) 4px
-        );
-        pointer-events: none;
-    }
-    
+    opacity: 0.5;
+    transition:
+        opacity 0.3s,
+        filter 0.3s;
+
     &:hover {
-        transform: scale(1.15);
-        background: #ffcb05;
+        opacity: 1;
     }
-    
     &:active {
-        transform: translate(4px, 4px);
-        box-shadow: 
-            0 0 0 black,
-            inset 4px 4px 0 rgba(0, 0, 0, 0.3);
+        filter: brightness(0.7);
+    }
+}
+
+.icon-settings {
+    width: 70%;
+    height: 70%;
+    background-image: url('../../../assets/images/menu/icons/settings/settings.svg');
+    filter: invert(1);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.audio-settings-container {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 11;
+    background-color: rgba($color: #000000, $alpha: 0.5);
+    backdrop-filter: blur(min(0.5vh, 0.5vw));
+}
+
+.audio-settings {
+    opacity: 0;
+    transform: scale(0.96);
+    animation: audio-overlay-in 0.2s forwards ease-in-out;
+}
+
+@keyframes audio-overlay-in {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
     }
 }

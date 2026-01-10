@@ -13,3 +13,8 @@ export enum BackgroundMusic {
     Combat = 'combat.mp3',
     Edit = 'edit.mp3',
 }
+
+export interface AudioSettings {
+    music: number;
+    effects: number;
+}
