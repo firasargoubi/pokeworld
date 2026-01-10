@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AudioSettingsComponent } from '@app/components/audio-settings/audio-settings.component';
-import { ChatComponent } from '@app/components/chat/chat.component';
 import { MenuButtonComponent } from '@app/components/menu-button/menu-button.component';
 import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
@@ -11,7 +10,7 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
     selector: 'app-menu-page',
     templateUrl: './menu-page.component.html',
     styleUrls: ['./menu-page.component.scss'],
-    imports: [MenuButtonComponent, RouterModule, AudioSettingsComponent, ChatComponent],
+    imports: [MenuButtonComponent, RouterModule, AudioSettingsComponent],
 })
 export class MenuPageComponent {
     pageEndpoint = PageEndpoint;
