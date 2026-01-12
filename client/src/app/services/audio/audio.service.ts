@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AudioSettings, BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { MatchData } from '@common/interfaces/match-data';
-import { AUDIO_CONFIG, AUDIO_STORAGE_KEY, COMBAT_LOG_PATTERNS, SOUND_EFFECTS_MAP } from './audio.const';
+import { AUDIO_CONFIG, AUDIO_LOCAL_STORAGE_KEY, COMBAT_LOG_PATTERNS, SOUND_EFFECTS_MAP } from './audio.const';
 
 @Injectable({
     providedIn: 'root',
@@ -115,19 +115,19 @@ export class AudioService {
 
     private saveSettings(): void {
         const settings: AudioSettings = {
-            music: this.backgroundMusicVolume,
-            effects: this.effectsVolume,
+            musicVolume: this.backgroundMusicVolume,
+            effectsVolume: this.effectsVolume,
         };
-        localStorage.setItem(AUDIO_STORAGE_KEY, JSON.stringify(settings));
+        localStorage.setItem(AUDIO_LOCAL_STORAGE_KEY, JSON.stringify(settings));
     }
 
     private loadSavedVolumes(): void {
-        const storedSettings = localStorage.getItem(AUDIO_STORAGE_KEY);
+        const storedSettings = localStorage.getItem(AUDIO_LOCAL_STORAGE_KEY);
         if (storedSettings !== null) {
             try {
                 const settings: AudioSettings = JSON.parse(storedSettings);
-                this.backgroundMusicVolume = settings.music;
-                this.effectsVolume = settings.effects;
+                this.backgroundMusicVolume = settings.musicVolume;
+                this.effectsVolume = settings.effectsVolume;
             } catch (error) {
                 this.backgroundMusicVolume = AUDIO_CONFIG.musicVolume;
                 this.effectsVolume = AUDIO_CONFIG.effectsVolume;

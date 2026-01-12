@@ -27,4 +27,4 @@ export const COMBAT_LOG_PATTERNS = {
     victory: 'gagné le combat',
 };
 
-export const AUDIO_STORAGE_KEY = 'audio_settings';
+export const AUDIO_LOCAL_STORAGE_KEY = 'audio_settings';

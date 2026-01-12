@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { MatchData } from '@common/interfaces/match-data';
-import { AUDIO_CONFIG, AUDIO_STORAGE_KEY, COMBAT_LOG_PATTERNS, SOUND_EFFECTS_MAP } from './audio.const';
+import { AUDIO_CONFIG, AUDIO_LOCAL_STORAGE_KEY, COMBAT_LOG_PATTERNS, SOUND_EFFECTS_MAP } from './audio.const';
 import { AudioService } from './audio.service';
 
 describe('AudioService', () => {
@@ -61,7 +61,7 @@ describe('AudioService', () => {
 
     it('should preload click effect in constructor', () => {
         const freshService = new AudioService();
-        expect(getItemSpy).toHaveBeenCalledWith(AUDIO_STORAGE_KEY);
+        expect(getItemSpy).toHaveBeenCalledWith(AUDIO_LOCAL_STORAGE_KEY);
         expect(window.Audio).toHaveBeenCalledWith(`assets/audio/effects/${SOUND_EFFECTS_MAP[SoundEffect.Click]}`);
         expect(freshService).toBeTruthy();
     });
@@ -72,8 +72,8 @@ describe('AudioService', () => {
         const storedEffectsVolume = AUDIO_CONFIG.effectsVolume - delta;
 
         const storedSettings = JSON.stringify({
-            music: storedMusicVolume,
-            effects: storedEffectsVolume,
+            musicVolume: storedMusicVolume,
+            effectsVolume: storedEffectsVolume,
         });
 
         getItemSpy.and.returnValue(storedSettings);
@@ -82,7 +82,7 @@ describe('AudioService', () => {
 
         const freshService = new AudioService();
 
-        expect(getItemSpy).toHaveBeenCalledWith(AUDIO_STORAGE_KEY);
+        expect(getItemSpy).toHaveBeenCalledWith(AUDIO_LOCAL_STORAGE_KEY);
         expect(freshService.getBackgroundMusicVolume()).toBe(storedMusicVolume);
         expect(freshService.getEffectsVolume()).toBe(storedEffectsVolume);
     });
@@ -263,7 +263,10 @@ describe('AudioService', () => {
 
         expect(service['backgroundMusicVolume']).toBe(newVolume);
         expect(audioElementSpy.volume).toBe(newVolume);
-        expect(setItemSpy).toHaveBeenCalledWith(AUDIO_STORAGE_KEY, JSON.stringify({ music: newVolume, effects: AUDIO_CONFIG.effectsVolume }));
+        expect(setItemSpy).toHaveBeenCalledWith(
+            AUDIO_LOCAL_STORAGE_KEY,
+            JSON.stringify({ musicVolume: newVolume, effectsVolume: AUDIO_CONFIG.effectsVolume }),
+        );
     });
 
     it('should set background music volume without updating audio element when no music is playing', () => {
@@ -273,7 +276,10 @@ describe('AudioService', () => {
         service.setBackgroundMusicVolume(newVolume);
 
         expect(service['backgroundMusicVolume']).toBe(newVolume);
-        expect(setItemSpy).toHaveBeenCalledWith(AUDIO_STORAGE_KEY, JSON.stringify({ music: newVolume, effects: AUDIO_CONFIG.effectsVolume }));
+        expect(setItemSpy).toHaveBeenCalledWith(
+            AUDIO_LOCAL_STORAGE_KEY,
+            JSON.stringify({ musicVolume: newVolume, effectsVolume: AUDIO_CONFIG.effectsVolume }),
+        );
     });
 
     it('should use current volume when no parameter is provided to setBackgroundMusicVolume', () => {
@@ -284,7 +290,10 @@ describe('AudioService', () => {
         service.setBackgroundMusicVolume();
 
         expect(audioElementSpy.volume).toBe(expectedVolume);
-        expect(setItemSpy).toHaveBeenCalledWith(AUDIO_STORAGE_KEY, JSON.stringify({ music: expectedVolume, effects: AUDIO_CONFIG.effectsVolume }));
+        expect(setItemSpy).toHaveBeenCalledWith(
+            AUDIO_LOCAL_STORAGE_KEY,
+            JSON.stringify({ musicVolume: expectedVolume, effectsVolume: AUDIO_CONFIG.effectsVolume }),
+        );
     });
 
     it('should set and persist effects volume for loaded effects', () => {
@@ -295,7 +304,10 @@ describe('AudioService', () => {
 
         expect(service['effectsVolume']).toBe(newVolume);
         expect(effectAudioSpy.volume).toBe(newVolume);
-        expect(setItemSpy).toHaveBeenCalledWith(AUDIO_STORAGE_KEY, JSON.stringify({ music: AUDIO_CONFIG.musicVolume, effects: newVolume }));
+        expect(setItemSpy).toHaveBeenCalledWith(
+            AUDIO_LOCAL_STORAGE_KEY,
+            JSON.stringify({ musicVolume: AUDIO_CONFIG.musicVolume, effectsVolume: newVolume }),
+        );
     });
 
     it('should set effects volume for all loaded effects', () => {
@@ -322,7 +334,10 @@ describe('AudioService', () => {
         service.setEffectsVolume();
 
         expect(effectAudioSpy.volume).toBe(expectedVolume);
-        expect(setItemSpy).toHaveBeenCalledWith(AUDIO_STORAGE_KEY, JSON.stringify({ music: AUDIO_CONFIG.musicVolume, effects: expectedVolume }));
+        expect(setItemSpy).toHaveBeenCalledWith(
+            AUDIO_LOCAL_STORAGE_KEY,
+            JSON.stringify({ musicVolume: AUDIO_CONFIG.musicVolume, effectsVolume: expectedVolume }),
+        );
     });
 
     it('should use default volumes when localStorage contains invalid JSON', () => {
@@ -332,7 +347,7 @@ describe('AudioService', () => {
 
         const freshService = new AudioService();
 
-        expect(getItemSpy).toHaveBeenCalledWith(AUDIO_STORAGE_KEY);
+        expect(getItemSpy).toHaveBeenCalledWith(AUDIO_LOCAL_STORAGE_KEY);
         expect(freshService.getBackgroundMusicVolume()).toBe(AUDIO_CONFIG.musicVolume);
         expect(freshService.getEffectsVolume()).toBe(AUDIO_CONFIG.effectsVolume);
     });
