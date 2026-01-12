@@ -10,7 +10,12 @@ describe('MenuPageComponent', () => {
     let mockAudioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
-        mockAudioService = jasmine.createSpyObj('AudioService', ['playBackgroundMusic', 'playEffect', 'setVolumes']);
+        mockAudioService = jasmine.createSpyObj('AudioService', [
+            'playBackgroundMusic',
+            'playEffect',
+            'setBackgroundMusicVolume',
+            'setEffectsVolume',
+        ]);
 
         await TestBed.configureTestingModule({
             imports: [RouterModule.forRoot([]), MenuPageComponent],
@@ -30,13 +35,13 @@ describe('MenuPageComponent', () => {
         component.onMouseDown();
 
         expect(mockAudioService.playBackgroundMusic).toHaveBeenCalledWith(BackgroundMusic.Home);
-        expect(mockAudioService.setVolumes).toHaveBeenCalled();
-        expect(component.isMusicStarted).toBeTrue();
+        expect(mockAudioService.setBackgroundMusicVolume).toHaveBeenCalled();
+        expect(mockAudioService.setEffectsVolume).toHaveBeenCalled();
         expect(component.isFirstTime).toBeFalse();
     });
 
     it('should not replay music if already started', () => {
-        component.isMusicStarted = true;
+        component.isFirstTime = false;
         mockAudioService.playBackgroundMusic.calls.reset();
 
         component.onMouseDown();
@@ -45,17 +50,16 @@ describe('MenuPageComponent', () => {
         expect(component.isFirstTime).toBeFalse();
     });
 
-    it('should disable sound when disableSound is called', () => {
-        component.disableSound();
+    it('should toggle audio settings and play click effect', () => {
+        component.toggleAudioSettings();
 
-        expect(mockAudioService.playEffect).toHaveBeenCalledWith(component.clickValue);
-        expect(mockAudioService.setVolumes).toHaveBeenCalledWith(0, 0);
-        expect(component.isMusicStarted).toBeFalse();
+        expect(mockAudioService.playEffect).toHaveBeenCalledWith(SoundEffect.Click);
+        expect(component.isAudioSettingsVisible).toBeTrue();
     });
 
     it('should have correct initial values', () => {
-        expect(component.isMusicStarted).toBeFalse();
         expect(component.isFirstTime).toBeTrue();
         expect(component.clickValue).toBe(SoundEffect.Click);
+        expect(component.isAudioSettingsVisible).toBeFalse();
     });
 });

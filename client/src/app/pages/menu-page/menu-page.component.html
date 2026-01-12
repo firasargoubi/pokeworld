@@ -1,20 +1,26 @@
 <div class="menu-page" (mousedown)="isFirstTime ? onMouseDown() : null">
     <div class="background-container"></div>
     <div class="content-container">
-        @if(isMusicStarted){
-            <div class = "sound-button" (click)="this.disableSound()">♬</div>
-        }
-        @else {
-            <div class = "sound-button" (click)="this.onMouseDown()">🔇</div>
+        @if(isAudioSettingsVisible) {
+        <div class="audio-settings-container" (click)="this.toggleAudioSettings()">
+            <app-audio-settings class="audio-settings" (click)="$event.stopPropagation()"></app-audio-settings>
+        </div>
         }
         <div class="top-container">
             <div class="top-left-container">
+                <div class="settings-button" (click)="this.toggleAudioSettings()">
+                    <div class="icon-settings"></div>
+                </div>
                 <div class="logo-container">
-                    <p class="team-number">Equipe #204</p>
+                    <p class="team-number">Equipe #110</p>
                 </div>
             </div>
 
             <div class="top-right-container">
+                <div>
+                    <div class="top-right-text">Kallel Mohamed Abdellatif</div>
+                    <div class="icon-cubone pokemon-icon"></div>
+                </div>
                 <div>
                     <div class="top-right-text">Mohamed Omar Zedek</div>
                     <div class="icon-magikarp pokemon-icon"></div>
@@ -28,12 +34,17 @@
                     <div class="icon-mew pokemon-icon"></div>
                 </div>
                 <div>
+                    <div class="top-right-text">Samer Chebair</div>
+                    <div class="icon-eevee pokemon-icon"></div>
+                </div>
+
+                <div>
                     <div class="top-right-text">Selim Mahjoub</div>
                     <div class="icon-psyduck pokemon-icon"></div>
                 </div>
                 <div>
-                    <div class="top-right-text">Samer Chebair</div>
-                    <div class="icon-eevee pokemon-icon"></div>
+                    <div class="top-right-text">Firas Argoubi</div>
+                    <div class="icon-poliwag pokemon-icon"></div>
                 </div>
                 <div>
                     <div class="top-right-text">Aziz Maaref</div>
