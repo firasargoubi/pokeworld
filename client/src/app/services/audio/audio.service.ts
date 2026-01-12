@@ -11,7 +11,7 @@ export class AudioService {
     private effects: Map<SoundEffect, HTMLAudioElement> = new Map();
     private currentTrack: BackgroundMusic | null = null;
     private previousLogSize = 0;
-    private backgroundMusicVolume = AUDIO_CONFIG.musicVolume;
+    private backgroundMusicVolume = AUDIO_CONFIG.backgroundMusicVolume;
     private effectsVolume = AUDIO_CONFIG.effectsVolume;
 
     constructor() {
@@ -115,7 +115,7 @@ export class AudioService {
 
     private saveSettings(): void {
         const settings: AudioSettings = {
-            musicVolume: this.backgroundMusicVolume,
+            backgroundMusicVolume: this.backgroundMusicVolume,
             effectsVolume: this.effectsVolume,
         };
         localStorage.setItem(AUDIO_LOCAL_STORAGE_KEY, JSON.stringify(settings));
@@ -126,10 +126,10 @@ export class AudioService {
         if (storedSettings !== null) {
             try {
                 const settings: AudioSettings = JSON.parse(storedSettings);
-                this.backgroundMusicVolume = settings.musicVolume;
+                this.backgroundMusicVolume = settings.backgroundMusicVolume;
                 this.effectsVolume = settings.effectsVolume;
             } catch (error) {
-                this.backgroundMusicVolume = AUDIO_CONFIG.musicVolume;
+                this.backgroundMusicVolume = AUDIO_CONFIG.backgroundMusicVolume;
                 this.effectsVolume = AUDIO_CONFIG.effectsVolume;
             }
         }

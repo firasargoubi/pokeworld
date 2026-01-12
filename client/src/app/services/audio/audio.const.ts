@@ -14,7 +14,7 @@ export const PLAY_PAGE_EFFECT: SoundEffect[] = [SoundEffect.Item];
 export const COMBAT_PAGE_EFFECTS: SoundEffect[] = [SoundEffect.Attack, SoundEffect.Death, SoundEffect.Heal, SoundEffect.Flee];
 
 export const AUDIO_CONFIG = {
-    musicVolume: 0.2,
+    backgroundMusicVolume: 0.2,
     effectsVolume: 0.8,
     fadeInDuration: 1000,
     fadeOutDuration: 500,

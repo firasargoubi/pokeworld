@@ -68,11 +68,11 @@ describe('AudioService', () => {
 
     it('should load saved volumes from localStorage when available', () => {
         const delta = 0.1;
-        const storedMusicVolume = AUDIO_CONFIG.musicVolume + delta;
+        const storedMusicVolume = AUDIO_CONFIG.backgroundMusicVolume + delta;
         const storedEffectsVolume = AUDIO_CONFIG.effectsVolume - delta;
 
         const storedSettings = JSON.stringify({
-            musicVolume: storedMusicVolume,
+            backgroundMusicVolume: storedMusicVolume,
             effectsVolume: storedEffectsVolume,
         });
 
@@ -135,7 +135,7 @@ describe('AudioService', () => {
 
         expect(window.Audio).toHaveBeenCalledWith(`assets/audio/music/${BackgroundMusic.Home}`);
         expect(audioElementSpy.loop).toBeTrue();
-        expect(audioElementSpy.volume).toBe(AUDIO_CONFIG.musicVolume);
+        expect(audioElementSpy.volume).toBe(AUDIO_CONFIG.backgroundMusicVolume);
         expect(audioElementSpy.play).toHaveBeenCalled();
         expect(service['currentTrack']).toBe(BackgroundMusic.Home);
     });
@@ -257,7 +257,7 @@ describe('AudioService', () => {
 
     it('should set and persist background music volume', () => {
         service['backgroundMusic'] = audioElementSpy;
-        const newVolume = AUDIO_CONFIG.musicVolume / 2;
+        const newVolume = AUDIO_CONFIG.backgroundMusicVolume / 2;
 
         service.setBackgroundMusicVolume(newVolume);
 
@@ -265,20 +265,20 @@ describe('AudioService', () => {
         expect(audioElementSpy.volume).toBe(newVolume);
         expect(setItemSpy).toHaveBeenCalledWith(
             AUDIO_LOCAL_STORAGE_KEY,
-            JSON.stringify({ musicVolume: newVolume, effectsVolume: AUDIO_CONFIG.effectsVolume }),
+            JSON.stringify({ backgroundMusicVolume: newVolume, effectsVolume: AUDIO_CONFIG.effectsVolume }),
         );
     });
 
     it('should set background music volume without updating audio element when no music is playing', () => {
         service['backgroundMusic'] = null;
-        const newVolume = AUDIO_CONFIG.musicVolume / 2;
+        const newVolume = AUDIO_CONFIG.backgroundMusicVolume / 2;
 
         service.setBackgroundMusicVolume(newVolume);
 
         expect(service['backgroundMusicVolume']).toBe(newVolume);
         expect(setItemSpy).toHaveBeenCalledWith(
             AUDIO_LOCAL_STORAGE_KEY,
-            JSON.stringify({ musicVolume: newVolume, effectsVolume: AUDIO_CONFIG.effectsVolume }),
+            JSON.stringify({ backgroundMusicVolume: newVolume, effectsVolume: AUDIO_CONFIG.effectsVolume }),
         );
     });
 
@@ -292,7 +292,7 @@ describe('AudioService', () => {
         expect(audioElementSpy.volume).toBe(expectedVolume);
         expect(setItemSpy).toHaveBeenCalledWith(
             AUDIO_LOCAL_STORAGE_KEY,
-            JSON.stringify({ musicVolume: expectedVolume, effectsVolume: AUDIO_CONFIG.effectsVolume }),
+            JSON.stringify({ backgroundMusicVolume: expectedVolume, effectsVolume: AUDIO_CONFIG.effectsVolume }),
         );
     });
 
@@ -306,7 +306,7 @@ describe('AudioService', () => {
         expect(effectAudioSpy.volume).toBe(newVolume);
         expect(setItemSpy).toHaveBeenCalledWith(
             AUDIO_LOCAL_STORAGE_KEY,
-            JSON.stringify({ musicVolume: AUDIO_CONFIG.musicVolume, effectsVolume: newVolume }),
+            JSON.stringify({ backgroundMusicVolume: AUDIO_CONFIG.backgroundMusicVolume, effectsVolume: newVolume }),
         );
     });
 
@@ -336,7 +336,7 @@ describe('AudioService', () => {
         expect(effectAudioSpy.volume).toBe(expectedVolume);
         expect(setItemSpy).toHaveBeenCalledWith(
             AUDIO_LOCAL_STORAGE_KEY,
-            JSON.stringify({ musicVolume: AUDIO_CONFIG.musicVolume, effectsVolume: expectedVolume }),
+            JSON.stringify({ backgroundMusicVolume: AUDIO_CONFIG.backgroundMusicVolume, effectsVolume: expectedVolume }),
         );
     });
 
@@ -348,7 +348,7 @@ describe('AudioService', () => {
         const freshService = new AudioService();
 
         expect(getItemSpy).toHaveBeenCalledWith(AUDIO_LOCAL_STORAGE_KEY);
-        expect(freshService.getBackgroundMusicVolume()).toBe(AUDIO_CONFIG.musicVolume);
+        expect(freshService.getBackgroundMusicVolume()).toBe(AUDIO_CONFIG.backgroundMusicVolume);
         expect(freshService.getEffectsVolume()).toBe(AUDIO_CONFIG.effectsVolume);
     });
 });
