@@ -19,6 +19,7 @@ export class GameCardComponent implements AfterViewInit {
     @Input() game: GameData;
     @Input() isAdminView: boolean = false;
     @Input() cardColor: string = 'blue-card';
+    @Input() isLastInRow: boolean = false;
     @Output() edit = new EventEmitter<string>();
     @Output() delete = new EventEmitter<string>();
     @Output() toggleVisibility = new EventEmitter<VisibilityEvent>();
