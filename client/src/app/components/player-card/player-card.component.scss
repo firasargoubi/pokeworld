@@ -1,31 +1,118 @@
-$player-list-height: calc((100vh - 6vw) * 0.9);
-$player-list-width: 52vw;
-$player-card-height-1: calc($player-list-height * 0.166666);
-$player-card-height-2: calc($player-list-width * 0.143333);
-$player-card-height: min($player-card-height-1, $player-card-height-2);
-$scale: calc($player-card-height * 0.15);
-$corner-square-size: calc(0.3 * $scale);
+$base-size: min(1vh, 1vw);
+
+$corner-square-size: calc(0.5 * $base-size);
+$inner-shadow-width: calc(0.7 * $base-size);
+$button-cutout-size: calc($base-size * 0.4);
+
+$color-text-shadow: rgb(112, 112, 112);
+$color-white: #ffffff;
+
+$color-border-blue: #48485f;
+$color-border-self: #f87030;
+
+$color-blue-shadow-light: #80c0d8;
+$color-blue-shadow-dark: #2878b0;
+
+$color-pink-shadow-light: rgb(247, 209, 216);
+$color-pink-shadow-dark: rgb(231, 163, 131);
+
+$color-gray-shadow-light: hsl(196, 0%, 67%);
+$color-gray-shadow-dark: hsl(205, 0%, 42%);
+
+$color-hp: #50d16c;
+
+$color-bot-type: #69c5fb;
+$color-bot-type-aggro: #ff8983;
+
+$color-ban-top: #f8d030;
+$color-ban-mid: #f05030;
+$color-ban-bottom: #404040;
+
+$img-icon-ban: '../../../assets/images/menu/icons/ban/user-minus.png';
+$img-avatar-frame: '../../../assets/images/menu/containers/dark-blue/party-ball.png';
+$img-icon-crown: '../../../assets/images/menu/icons/crown.png';
+$img-icon-bot-aggro: '../../../assets/images/menu/icons/bot-aggressive.png';
+$img-icon-bot-def: '../../../assets/images/menu/icons/bot-defensive.png';
+$img-hp-bar: '../../../assets/images/menu/stat-bar/hp-bar.png';
+
 $clip-path: polygon(
     $corner-square-size 0%,
     calc(100% - #{$corner-square-size}) 0%,
-
     calc(100% - #{$corner-square-size}) $corner-square-size,
     100% $corner-square-size,
-
     100% calc(100% - #{$corner-square-size}),
     calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
     calc(100% - #{$corner-square-size}) 100%,
     $corner-square-size 100%,
-
     $corner-square-size calc(100% - #{$corner-square-size}),
     0% calc(100% - #{$corner-square-size}),
     0% $corner-square-size,
     $corner-square-size $corner-square-size
 );
 
-$inner-border-width: calc(0.3 * $scale);
+$bg-ban: linear-gradient(
+    to bottom,
+    $color-ban-top 0,
+    $color-ban-top $button-cutout-size,
+    $color-ban-mid $button-cutout-size,
+    $color-ban-mid calc(100% - $button-cutout-size),
+    $color-ban-bottom calc(100% - $button-cutout-size),
+    $color-ban-bottom 100%
+);
 
-$text-shadow-color: rgb(112, 112, 112);
+$bg-player-pink: linear-gradient(
+    to bottom,
+    #f8b890 0,
+    #f8b890 60%,
+    #f8d0d8 60%,
+    #f7d1d8 calc(60% + calc($inner-shadow-width * 0.7)),
+    #f8b890 calc(60% + calc($inner-shadow-width * 0.7)),
+    #f8b890 calc(60% + calc($inner-shadow-width * 0.7 * 2)),
+    #f7d1d8 calc(60% + calc($inner-shadow-width * 0.7 * 2)),
+    #f7d1d8 100%
+);
+
+$bg-player-blue: linear-gradient(
+    to bottom,
+    #3890d8 0,
+    #3890d8 60%,
+    $color-blue-shadow-light 60%,
+    $color-blue-shadow-light calc(60% + calc($inner-shadow-width * 0.7)),
+    #3890d8 calc(60% + calc($inner-shadow-width * 0.7)),
+    #3890d8 calc(60% + calc($inner-shadow-width * 0.7 * 2)),
+    $color-blue-shadow-light calc(60% + calc($inner-shadow-width * 0.7 * 2)),
+    $color-blue-shadow-light 100%
+);
+
+$bg-player-gray: linear-gradient(
+    to bottom,
+    #888888 0,
+    #888888 60%,
+    #ababab 60%,
+    #ababab calc(60% + calc($inner-shadow-width * 0.7)),
+    #888888 calc(60% + calc($inner-shadow-width * 0.7)),
+    #888888 calc(60% + calc($inner-shadow-width * 0.7 * 2)),
+    #ababab calc(60% + calc($inner-shadow-width * 0.7 * 2)),
+    #ababab 100%
+);
+
+$shadow-inner-blue:
+    inset $inner-shadow-width 0 0 0 $color-blue-shadow-light,
+    inset calc(-1 * $inner-shadow-width) 0 0 0 $color-blue-shadow-dark,
+    inset 0 $inner-shadow-width 0 0 $color-blue-shadow-light,
+    inset 0 calc(-1 * $inner-shadow-width) 0 0 $color-blue-shadow-dark;
+
+$shadow-inner-pink:
+    inset $inner-shadow-width 0 0 0 $color-pink-shadow-light,
+    inset calc(-1 * $inner-shadow-width) 0 0 0 $color-pink-shadow-dark,
+    inset 0 $inner-shadow-width 0 0 $color-pink-shadow-light,
+    inset 0 calc(-1 * $inner-shadow-width) 0 0 $color-pink-shadow-dark;
+
+$shadow-inner-gray:
+    inset $inner-shadow-width 0 0 0 $color-gray-shadow-light,
+    inset calc(-1 * $inner-shadow-width) 0 0 0 $color-gray-shadow-dark,
+    inset 0 $inner-shadow-width 0 0 $color-gray-shadow-light,
+    inset 0 calc(-1 * $inner-shadow-width) 0 0 $color-gray-shadow-dark;
 
 .player-component {
     height: 100%;
@@ -37,45 +124,79 @@ $text-shadow-color: rgb(112, 112, 112);
     transform: translate(0%);
 }
 
-.ban-button {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
-
 .display-ban-button {
     grid-template-columns: 5% 87% 8%;
 }
 
-.ban-icon {
+.ban-button {
     height: 100%;
-    width: 80%;
-    background-image: url('../../../assets/images/menu/icons/kick.png');
-    background-size: 100% 100%;
+    width: 90%;
+    justify-self: end;
+
+    aspect-ratio: 30/9;
+    display: grid;
+    place-items: center;
+    grid-template-columns: $button-cutout-size 1fr $button-cutout-size;
+
+    cursor: pointer;
+    user-select: none;
+}
+
+.ban-button * {
+    transition: filter 0.3s ease;
+}
+
+.ban-button:hover * {
+    filter: brightness(1.1);
+}
+
+.ban-button:active * {
+    rotate: 180deg;
+    filter: brightness(0.98);
+}
+
+.ban-button .button-edge {
+    width: 100%;
+    height: calc(100% - $button-cutout-size * 2);
+    background: $bg-ban;
+    margin-right: calc($button-cutout-size * -0.2);
+}
+
+.ban-button .button-edge:last-child {
+    margin-left: calc($button-cutout-size * -0.2);
+    margin-right: 0;
+}
+
+.ban-button .button-body {
+    width: 100%;
+    height: 100%;
+    background: $bg-ban;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ban-button .icon {
+    height: 70%;
+    aspect-ratio: 1/1;
+    background-image: url($img-icon-ban);
+    background-size: 80% auto;
     background-position: center;
     background-repeat: no-repeat;
-    cursor: pointer;
+    filter: brightness(0) saturate(100%) invert(54%) sepia(73%) saturate(2395%) hue-rotate(340deg) brightness(150%) contrast(101%);
 }
 
-.ban-icon:hover {
-    filter: brightness(1.2);
-}
-
-.ban-icon:active {
-    rotate: 180deg;
-}
-
-.is-host .ban-icon {
+.is-host .ban-button {
     user-select: none;
     cursor: not-allowed;
 }
 
-.is-host .ban-icon:hover {
+.is-host .ban-button:hover .button-body,
+.is-host .ban-button:hover .button-edge {
     filter: brightness(1);
 }
 
-.is-host .ban-icon:active {
+.is-host .ban-button:active * {
     rotate: 0deg;
 }
 
@@ -84,65 +205,50 @@ $text-shadow-color: rgb(112, 112, 112);
     height: 100%;
     width: 100%;
 
-    border: calc($corner-square-size * 2) solid #48485f;
+    border: calc($corner-square-size * 2) solid $color-border-blue;
     clip-path: $clip-path;
 
-    background-image: url('../../../assets/images/menu/containers/dark-blue/dark-blue-scrare-body.png');
-    background-size: 100% 100%;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: $bg-player-blue;
     overflow: visible;
 
-    padding: $inner-border-width;
-    box-shadow:
-        inset $inner-border-width 0 0 0 #80c0d8,
-        inset calc(-1 * $inner-border-width) 0 0 0 #2878b0,
-        inset 0 $inner-border-width 0 0 #80c0d8,
-        inset 0 calc(-1 * $inner-border-width) 0 0 #2878b0;
+    box-shadow: $shadow-inner-blue;
+
+    display: grid;
+    grid-template-columns: 50% 50%;
+    padding: 0 0 0 13%;
 }
 
 .is-self-player-card .player-card {
-    border: calc($corner-square-size * 2) solid #f87030;
+    border: calc($corner-square-size * 2) solid $color-border-self;
     clip-path: $clip-path;
 
-    background-image: url('../../../assets/images/menu/containers/pink/pink-scrare-body.png');
-    background-size: 100% 100%;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: $bg-player-pink;
     overflow: visible;
 
-    padding: $inner-border-width;
-    box-shadow:
-        inset $inner-border-width 0 0 0 rgb(247, 209, 216),
-        inset calc(-1 * $inner-border-width) 0 0 0 rgb(231, 163, 131),
-        inset 0 $inner-border-width 0 0 rgb(247, 209, 216),
-        inset 0 calc(-1 * $inner-border-width) 0 0 rgb(231, 163, 131);
+    box-shadow: $shadow-inner-pink;
 }
 
 .is-bot .player-card {
-    background-image: url('../../../assets/images/menu/containers/gray/gray-scrare-body.png');
-    box-shadow:
-        inset $inner-border-width 0 0 0 hsl(196, 0%, 67%),
-        inset calc(-1 * $inner-border-width) 0 0 0 hsl(205, 0%, 42%),
-        inset 0 $inner-border-width 0 0 hsl(196, 0%, 67%),
-        inset 0 calc(-1 * $inner-border-width) 0 0 hsl(205, 0%, 42%);
+    background: $bg-player-gray;
+    box-shadow: $shadow-inner-gray;
 }
 
 .avatar-container {
     height: 100%;
     aspect-ratio: 1/1;
     z-index: 2;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
+    position: relative;
     overflow: visible;
 
-    background-image: url('../../../assets/images/menu/containers/dark-blue/party-ball.png');
+    background-image: url($img-avatar-frame);
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
-    overflow: visible;
-    position: relative;
 }
 
 .avatar-container .avatar {
@@ -156,73 +262,76 @@ $text-shadow-color: rgb(112, 112, 112);
 }
 
 .player-card .player-name {
-    position: absolute;
-    top: 7%;
-    left: 11%;
-    font-size: calc(2 * $scale);
-    text-shadow: calc(0.19 * $scale) 0 0 $text-shadow-color;
+    margin: $inner-shadow-width 0 0 0;
+
+    font-size: calc(3 * $base-size);
+    letter-spacing: calc(0.2 * $base-size);
+    text-shadow: calc(0.25 * $base-size) 0 0 $color-text-shadow;
+
     display: flex;
     justify-content: start;
-    gap: calc(0.4 * $scale);
-    width: 45%;
-    z-index: 3;
-    user-select: none;
+    align-items: center;
+    gap: calc(0.5 * $base-size);
 
+    width: 100%;
+    height: fit-content;
+    z-index: 3;
+
+    user-select: none;
     flex-wrap: wrap;
     overflow-wrap: break-word;
-    word-break: break-word;
+    word-break: break-all;
 }
 
 .player-card .crown {
-    height: calc(2 * $scale);
-    margin: auto calc(0.2 * $scale);
+    height: calc(2 * $base-size);
     aspect-ratio: 1/1;
-    background-image: url('../../../assets/images/menu/icons/crown.png');
+    background-image: url($img-icon-crown);
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
     opacity: 0;
 }
 
-.player-card .bot-icon-aggresive,
-.player-card .bot-icon-defensive {
-    height: calc(2 * $scale);
-    margin: auto 0;
-    aspect-ratio: 1/1;
-    background-image: url('../../../assets/images/menu/icons/bot-aggressive.png');
-    background-size: 100% 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-.player-card .bot-icon-defensive {
-    background-image: url('../../../assets/images/menu/icons/bot-defensive.png');
-}
 .is-host .player-card .crown {
     opacity: 1;
 }
 
-.player-card .hp-bar {
-    position: absolute;
-    bottom: 52%;
-    right: 4%;
-    width: 38%;
-    aspect-ratio: 20/1.4;
-    background-image: url('../../../assets/images/menu/stat-bar/hp-bar.png');
+.player-card .bot-icon-aggresive,
+.player-card .bot-icon-defensive {
+    height: calc(2.5 * $base-size);
+    margin: auto 0;
+    aspect-ratio: 1/1;
+    background-image: url($img-icon-bot-aggro);
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+.player-card .bot-icon-defensive {
+    background-image: url($img-icon-bot-def);
+}
+
+.player-card .hp-bar {
+    width: 90%;
+    aspect-ratio: 20/1.4;
+    padding: 0 3% 0 0;
+    align-self: flex-end;
+    justify-self: end;
     display: flex;
     justify-content: end;
+    flex-direction: column;
     overflow: visible;
 }
 
 .player-card .hp-bar .hp-backround {
-    background-color: #727272;
-    width: 77%;
-    height: 100%;
-    margin: 2%;
-    z-index: -1;
+    background-image: url($img-hp-bar);
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    aspect-ratio: 20/2;
+    padding: 2%;
     display: flex;
     justify-content: start;
 }
@@ -230,16 +339,18 @@ $text-shadow-color: rgb(112, 112, 112);
 .player-card .hp-bar .hp-backround .hp-progress {
     height: 100%;
     width: 100%;
-    background-color: #50d16c;
+    background-color: $color-hp;
+    z-index: -1;
 }
 
 .hp-value {
-    position: absolute;
-    right: 0;
-    bottom: -130%;
-    font-size: calc(2 * $scale);
-    text-shadow: calc(0.25 * $scale) 0 0 $text-shadow-color;
+    height: fit-content;
+    font-size: calc(3 * $base-size);
+    line-height: calc(2.5 * $base-size);
+    text-shadow: calc(0.25 * $base-size) 0 0 $color-text-shadow;
     user-select: none;
+    text-align: end;
+    padding: 0 5% 0 0;
 }
 
 .is-disconnected {
@@ -272,27 +383,25 @@ $text-shadow-color: rgb(112, 112, 112);
 }
 
 .display-ban-button.is-disconnected .player-card .add-instruction {
-    position: absolute;
-    top: 50%;
-    left: 11%;
-    transform: translateY(-50%);
+    transform: translateX(-4%);
+    display: flex;
+    align-items: center;
     text-align: left;
-    font-size: calc(3.5 * $scale);
-    text-shadow: calc(0.4 * $scale) 0 0 $text-shadow-color;
-    color: #ffffff;
+    font-size: calc(5 * $base-size);
+    text-shadow: calc(0.4 * $base-size) 0 0 $color-text-shadow;
+    color: $color-white;
     user-select: none;
-    display: block;
-    word-spacing: calc(-0.015 * $scale);
+    word-spacing: calc(-0.015 * $base-size);
 }
 
 .player-card .bot-type {
-    font-size: calc(1.5 * $scale);
-    color: #69c5fb;
-    text-shadow: calc(0.17 * $scale) calc(0.05 * $scale) 0 $text-shadow-color;
-    margin-top: calc(0.29 * $scale);
-    margin-left: calc(0.1 * $scale);
+    font-size: calc(1.5 * $base-size);
+    color: $color-bot-type;
+    text-shadow: calc(0.17 * $base-size) calc(0.05 * $base-size) 0 $color-text-shadow;
+    margin-top: calc(0.29 * $base-size);
+    margin-left: calc(0.1 * $base-size);
 }
 
 .player-card .aggresive {
-    color: #ff8983;
+    color: $color-bot-type-aggro;
 }
