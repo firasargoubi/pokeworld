@@ -2,39 +2,31 @@
     <div id="lobby-header">
         <app-header [onClick]="this.leaveLobbyButton.bind(this)" [stepNumber]="'3'" [title]="'Page d\'attente'"></app-header>
     </div>
-
     <div id="lobby-border">
         <div id="lobby-body">
             <div class="access-code-container">
                 <p class="access-title">Votre code d'accès</p>
                 <p class="access-code">{{ matchService.data.code }}</p>
-                @if (visualData.isSelfHost) {
-                <div class="access-instruction">
-                    <div class="lock-container" (click)="this.toggleLockRoom()">
-                        @if (this.matchService.data.lobbyData.isLocked) {
-                        <div class="lock-icon"></div>
-                        } @else {
-                        <div class="unlock-icon"></div>
-                        }
+                <div class="spacer"></div>
+                <div class="access-interactions">
+                    <div class="button-container lock" [class.disabled]="!visualData.isSelfHost" (click)="toggleLockRoom()">
+                        <div class="button-edge"></div>
+                        <div class="button-body">
+                            @if (this.matchService.data.lobbyData.isLocked) {
+                            <div class="icon lock-icon"></div>
+                            } @else {
+                            <div class="icon unlock-icon"></div>
+                            }
+                        </div>
+                        <div class="button-edge"></div>
                     </div>
-                    <div class="copy-container" (click)="this.copyMatchCode()">
-                        <img src="./assets/images/menu/icons/copy.png" />
-                    </div>
-                </div>
-                } @else{
-                <div class="access-instruction">
-                    <div class="empty-lock-container">
-                        @if (this.matchService.data.lobbyData.isLocked) {
-                        <div class="lock-icon"></div>
-                        } @else {
-                        <div class="unlock-icon"></div>
-                        }
-                    </div>
-                    <div class="copy-container" (click)="this.copyMatchCode()">
-                        <img src="./assets/images/menu/icons/copy.png" />
+
+                    <div class="button-container copy" (click)="this.copyMatchCode()">
+                        <div class="button-edge"></div>
+                        <div class="button-body"><div class="icon copy-icon"></div></div>
+                        <div class="button-edge"></div>
                     </div>
                 </div>
-                }
             </div>
 
             <div id="players-list">
@@ -56,7 +48,7 @@
     </div>
     @if (visualData.isSelfHost) {
     <div id="poke-button">
-        <app-pokeball-button [buttonContent]="'LANCER'" [onClickAction]="this.startMatchButton.bind(this)"></app-pokeball-button>
+        <app-pokeball-button [buttonContent]="'LANCER'" [onClickAction]="this.startMatchButton.bind(this)" [scale]="0.3"></app-pokeball-button>
     </div>
     }
     <div id="creation-bot-popup" [class.visible]="showBotPopup" (click)="this.showBotPopup = false">
