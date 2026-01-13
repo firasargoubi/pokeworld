@@ -1,126 +1,196 @@
-$gray-border-color: #636776;
-$wheat-border-color: #e9f6f7;
-$stripes-color1: #9be6d2;
-$stripes-color2: #abeeda;
+$color-border-gray: #636776;
+$color-border-wheat: #e9f6f7;
 
-$violet-stripes-color1: rgb(199, 169, 229);
-$violet-stripes-color2: rgb(174, 137, 204);
+$color-stripes-green-1: #9be6d2;
+$color-stripes-green-2: #abeeda;
+$color-stripes-violet-1: rgb(199, 169, 229);
+$color-stripes-violet-2: rgb(174, 137, 204);
 
-$text-shadow-color: rgb(112, 112, 112);
+$color-shadow-text: rgba(63, 63, 63, 0.5);
 
-$page-border-width: 10px;
-$padding-wheat-border: 0.7vw;
-$stripes-size: 0.7vw;
-$font-size-header: 6.5vh;
+$color-border-stat-1: #f67738;
+$color-border-stat-2: #48485f;
 
-$font-family-title: 'pixel';
+$base-size: min(1vh, 0.6vw);
+$stripes-size: calc($base-size);
 
-$card-width: 26vw;
+$corner-square-size: calc($base-size * 0.7);
+$inner-shadow-width: calc($base-size * 0.8);
 
-$corner-square-size: min(0.5vh, 0.5vw);
-$inner-shadow-width: 0.4vw;
+$animation-fall: fall 2s linear infinite;
+$shadow-outline: 0 0 0 $base-size $color-border-gray;
+
 $clip-path: polygon(
     $corner-square-size 0%,
     calc(100% - #{$corner-square-size}) 0%,
-
     calc(100% - #{$corner-square-size}) $corner-square-size,
     100% $corner-square-size,
-
     100% calc(100% - #{$corner-square-size}),
     calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
     calc(100% - #{$corner-square-size}) 100%,
     $corner-square-size 100%,
-
     $corner-square-size calc(100% - #{$corner-square-size}),
     0% calc(100% - #{$corner-square-size}),
     0% $corner-square-size,
     $corner-square-size $corner-square-size
 );
 
-$border-color1: #f67738;
-$border-color2: #48485f;
-$green-inner-shadow:
+$shadow-inner-green:
     inset $inner-shadow-width 0 0 0 #b3f6a8,
     inset calc($inner-shadow-width * -1) 0 0 0 #7a9765,
     inset 0 $inner-shadow-width 0 0 #b3f6a8,
     inset 0 calc($inner-shadow-width * -1) 0 0 #7a9765;
 
-$pink-main-color: rgb(247, 186, 147);
-$pink-inner-shadow:
+$shadow-inner-pink:
     inset $inner-shadow-width 0 0 0 #f7d1d8,
     inset calc($inner-shadow-width * -1) 0 0 0 #e7a383,
     inset 0 $inner-shadow-width 0 0 #f7d1d8,
     inset 0 calc($inner-shadow-width * -1) 0 0 #e7a383;
 
-$blue-main-color: #83a4fa;
-$blue-inner-shadow:
+$shadow-inner-blue:
     inset $inner-shadow-width 0 0 0 #80c0d8,
     inset calc($inner-shadow-width * -1) 0 0 0 #2878b0,
     inset 0 $inner-shadow-width 0 0 #80c0d8,
     inset 0 calc($inner-shadow-width * -1) 0 0 #2878b0;
 
-$orange-main-color: #d0a236;
-$orange-inner-shadow:
+$shadow-inner-orange:
     inset $inner-shadow-width 0 0 0 #d0a236,
     inset calc($inner-shadow-width * -1) 0 0 0 #9f4c0f,
     inset 0 $inner-shadow-width 0 0 #d0a236,
     inset 0 calc($inner-shadow-width * -1) 0 0 #9f4c0f;
 
+$bg-stat-pink: linear-gradient(
+    to bottom,
+    #f8b890 0,
+    #f8b890 60%,
+    #f8d0d8 60%,
+    #f7d1d8 calc(60% + calc($inner-shadow-width * 0.7)),
+    #f8b890 calc(60% + calc($inner-shadow-width * 0.7)),
+    #f8b890 calc(60% + calc($inner-shadow-width * 0.7 * 2)),
+    #f7d1d8 calc(60% + calc($inner-shadow-width * 0.7 * 2)),
+    #f7d1d8 100%
+);
+
+$bg-stat-green: linear-gradient(
+    to bottom,
+    #78d880 0,
+    #78d880 60%,
+    #b3f6a8 60%,
+    #b3f6a8 calc(60% + calc($inner-shadow-width * 0.7)),
+    #78d880 calc(60% + calc($inner-shadow-width * 0.7)),
+    #78d880 calc(60% + calc($inner-shadow-width * 0.7 * 2)),
+    #b3f6a8 calc(60% + calc($inner-shadow-width * 0.7 * 2)),
+    #b3f6a8 100%
+);
+
+$bg-stat-blue: linear-gradient(
+    to bottom,
+    #3890d8 0,
+    #3890d8 60%,
+    #80c0d8 60%,
+    #80c0d8 calc(60% + calc($inner-shadow-width * 0.7)),
+    #3890d8 calc(60% + calc($inner-shadow-width * 0.7)),
+    #3890d8 calc(60% + calc($inner-shadow-width * 0.7 * 2)),
+    #80c0d8 calc(60% + calc($inner-shadow-width * 0.7 * 2)),
+    #80c0d8 100%
+);
+
+$bg-stat-orange: linear-gradient(
+    to bottom,
+    #c06810 0,
+    #c06810 60%,
+    #d0a236 60%,
+    #d0a236 calc(60% + calc($inner-shadow-width * 0.7)),
+    #c06810 calc(60% + calc($inner-shadow-width * 0.7)),
+    #c06810 calc(60% + calc($inner-shadow-width * 0.7 * 2)),
+    #d0a236 calc(60% + calc($inner-shadow-width * 0.7 * 2)),
+    #d0a236 100%
+);
+
+$name-font-size: min(7vh, 4.5vw);
+$name-letter-spacing: calc($name-font-size * 0.4);
+$name-text-indent: calc($name-font-size * 0.1);
+
+$button-cutout-size: calc($base-size * 0.5);
+
+$bg-button-blue: linear-gradient(
+    to bottom,
+    #7bcee6 0,
+    #7bcee6 $button-cutout-size,
+    #4ba6c6 $button-cutout-size,
+    #4ba6c6 calc(100% - $button-cutout-size),
+    #2a7a99 calc(100% - $button-cutout-size),
+    #2a7a99 100%
+);
+
+$bg-button-red: linear-gradient(
+    to bottom,
+    #ff7b7b 0,
+    #ff7b7b $button-cutout-size,
+    #d43a3a $button-cutout-size,
+    #d43a3a calc(100% - $button-cutout-size),
+    #a01818 calc(100% - $button-cutout-size),
+    #a01818 100%
+);
+
 p {
     font-size: 40px;
 }
 
-#page-header {
-    height: 7vh;
-}
-
-#ps-page-body {
-    position: relative;
-    height: 100%;
-    overflow-y: hidden;
-    height: calc(100vh - 17vh);
-    border: $page-border-width solid $gray-border-color;
-    background: repeating-linear-gradient(
-        0deg,
-        $stripes-color1,
-        $stripes-color1 $stripes-size,
-        $stripes-color2 $stripes-size,
-        $stripes-color2 $stripes-size * 2
-    );
-    background-size: 100% ($stripes-size * 2);
-    animation: fall 2s linear infinite;
-    box-sizing: border-box;
+#character-page-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
 }
 
 main {
     height: 100%;
 }
 
+#character-page-body {
+    position: relative;
+    height: 100%;
+    overflow-y: hidden;
+    flex: 1;
+    border: $base-size solid $color-border-gray;
+    background: repeating-linear-gradient(
+        0deg,
+        $color-stripes-green-1,
+        $color-stripes-green-1 $stripes-size,
+        $color-stripes-green-2 $stripes-size,
+        $color-stripes-green-2 calc(#{$stripes-size} * 2)
+    );
+    background-size: 100% (calc(#{$stripes-size} * 2));
+    animation: $animation-fall;
+    box-sizing: border-box;
+}
+
 #avatar-info-container {
     display: flex;
     flex-direction: column;
     justify-content: start;
-    flex: 2;
+    flex: 1;
 }
+
 #player-name-avatar {
     position: relative;
     display: flex;
     justify-content: start;
     align-items: center;
-    margin: 0 $page-border-width $page-border-width 0;
+    margin: 0 $base-size $base-size 0;
     background-color: rgb(145, 222, 145);
-    border: $page-border-width solid $wheat-border-color;
-    box-shadow: 0 0 0 $page-border-width $gray-border-color;
-    height: 20vh;
+    border: $base-size solid $color-border-wheat;
+    box-shadow: $shadow-outline;
+    height: min(20vh, 15vw);
     overflow: visible;
 }
 
 #self-avatar-container {
     position: relative;
-    height: 100%;
+    height: min(100%, 14vw);
     aspect-ratio: 1/1;
     overflow: visible;
-    margin-left: 2%;
 }
 
 #self-avatar {
@@ -144,10 +214,6 @@ main {
     user-select: none;
 }
 
-$name-font-size: 3vw;
-$name-letter-spacing: 1vw;
-$name-text-indent: 0.5vw;
-
 #name-form {
     display: flex;
     background: none;
@@ -167,7 +233,7 @@ $name-text-indent: 0.5vw;
     font-size: $name-font-size;
     letter-spacing: $name-letter-spacing;
     text-indent: $name-text-indent;
-    text-shadow: 0.2vw 0 0 rgba(0, 0, 0, 0.5);
+    text-shadow: calc($name-font-size * 0.05) 0 0 rgba(0, 0, 0, 0.5);
     outline: none;
 }
 
@@ -178,9 +244,9 @@ $name-text-indent: 0.5vw;
     user-select: none;
 }
 
-#input-border {
+#name-input-border {
     font-family: 'pixel-monospace';
-    height: 0.8vh;
+    height: calc($base-size * 1);
     font-size: $name-font-size;
     letter-spacing: $name-letter-spacing;
     text-indent: $name-text-indent;
@@ -190,68 +256,50 @@ $name-text-indent: 0.5vw;
 }
 
 #stats-selection-container {
-    width: calc(100% - $page-border-width);
+    width: calc(100% - $base-size);
     height: 100%;
-    border: $wheat-border-color solid $page-border-width;
+    border: $color-border-wheat solid $base-size;
     display: grid;
     grid-template-columns: repeat(1, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 1.5vh;
 }
 
 #bonus-selection-container {
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .label {
     width: 100%;
-    height: 20%;
-    padding: 0 0 0 2vw;
+    height: calc($base-size * 6);
+    padding: 0 0 0 calc($base-size * 3);
     display: flex;
     align-items: center;
     user-select: none;
-    font-size: min(5vh, 5vw);
-    text-shadow:
-        calc(min(5vh, 5vw) * 0.8 * 0.0172) calc(min(5vh, 5vw) * 0.8 * 0.006) 0 rgb(147, 147, 147),
-        calc(min(5vh, 5vw) * 0.8 * 0.0344) calc(min(5vh, 5vw) * 0.8 * 0.012) 0 rgb(147, 147, 147),
-        calc(min(5vh, 5vw) * 0.8 * 0.0516) calc(min(5vh, 5vw) * 0.8 * 0.018) 0 rgb(147, 147, 147),
-        calc(min(5vh, 5vw) * 0.8 * 0.0688) calc(min(5vh, 5vw) * 0.8 * 0.024) 0 rgb(147, 147, 147),
-        calc(min(5vh, 5vw) * 0.8 * 0.0860) calc(min(5vh, 5vw) * 0.8 * 0.030) 0 rgb(147, 147, 147);
+    font-size: calc($base-size * 6);
+    text-shadow: calc($base-size * 0.5) 0 0 $color-shadow-text;
+    letter-spacing: calc($base-size * 0.3);
 }
 
 .selections-container {
     width: 100%;
-    height: 80%;
+    flex: 1;
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
     align-items: center;
-    padding: 0 2vw;
     overflow: visible;
-}
-
-.stat-separator {
-    width: 15%;
-    height: 100%;
-    display: flex;
-    justify-content: end;
-    align-items: center;
-    padding: 0 3% 0 0;
-}
-
-.separator-icon {
-    width: 65%;
-    user-select: none;
-    pointer-events: none;
 }
 
 .stat-container {
     position: relative;
-    width: min(45vw, 45vh);
-    aspect-ratio: 449/188;
+    width: 45%;
+    aspect-ratio: 20/9;
+    max-width: calc($base-size * 45);
     overflow: visible;
     user-select: none;
-
     transition:
         filter 0.4s cubic-bezier(0.25, 1, 0.5, 1),
         opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
@@ -294,48 +342,39 @@ $name-text-indent: 0.5vw;
 .stat-body {
     width: 100%;
     height: 100%;
-
     padding: 3%;
-    border: calc($corner-square-size * 2) solid $border-color1;
+    border: calc($corner-square-size * 2) solid $color-border-stat-1;
     clip-path: $clip-path;
-
-    background-image: url('../../../assets/images/menu/containers/pink/pink-scrare-body.png');
+    background: $bg-stat-pink;
     background-size: 100% 200%;
     background-position: center 60%;
     background-repeat: no-repeat;
-
-    padding: 1.2vw;
-    box-shadow: $pink-inner-shadow;
+    box-shadow: $shadow-inner-pink;
 }
 
 .stat-container-bonus-2 .stat-body {
-    background-image: url('../../../assets/images/menu/containers/green/green-scrare-body.png');
-    box-shadow: $green-inner-shadow;
+    background: $bg-stat-green;
+    box-shadow: $shadow-inner-green;
 }
 
 .stat-container-dice-1 .stat-body {
-    border-color: $border-color2;
-    background-image: url('../../../assets/images/menu/containers/dark-blue/dark-blue-scrare-body.png');
-    box-shadow: $blue-inner-shadow;
+    border-color: $color-border-stat-2;
+    background: $bg-stat-blue;
+    box-shadow: $shadow-inner-blue;
 }
 
 .stat-container-dice-2 .stat-body {
-    border-color: $border-color2;
-    background-image: url('../../../assets/images/menu/containers/orange/orange-scrare-body.png');
-    box-shadow: $orange-inner-shadow;
+    border-color: $color-border-stat-2;
+    background: $bg-stat-orange;
+    box-shadow: $shadow-inner-orange;
 }
 
 .stat-label {
     position: absolute;
     left: 11%;
     top: 15%;
-    font-size: min(6vh, 5vw);
-    text-shadow:
-        calc(min(6vh, 5vw) * 0.9 * 0.0172) calc(min(6vh, 5vw) * 0.9 * 0.006) 0 rgb(135, 135, 135),
-        calc(min(6vh, 5vw) * 0.9 * 0.0344) calc(min(6vh, 5vw) * 0.9 * 0.012) 0 rgb(135, 135, 135),
-        calc(min(6vh, 5vw) * 0.9 * 0.0516) calc(min(6vh, 5vw) * 0.9 * 0.018) 0 rgb(135, 135, 135),
-        calc(min(6vh, 5vw) * 0.9 * 0.0688) calc(min(6vh, 5vw) * 0.9 * 0.024) 0 rgb(135, 135, 135),
-        calc(min(6vh, 5vw) * 0.9 * 0.0860) calc(min(6vh, 5vw) * 0.9 * 0.030) 0 rgb(135, 135, 135);
+    font-size: calc($base-size * 6);
+    text-shadow: calc($base-size * 0.5) 0 rgb(135, 135, 135);
 }
 
 .stat-label-dice {
@@ -346,8 +385,8 @@ $name-text-indent: 0.5vw;
     position: absolute;
     left: 5%;
     bottom: 7%;
-    font-size: min(5vh, 4vw);
-    text-shadow: 0.25vw 0 0 $text-shadow-color;
+    font-size: calc($base-size * 6);
+    text-shadow: calc($base-size * 0.5) 0 rgb(135, 135, 135);
 }
 
 .stat-icon {
@@ -397,53 +436,67 @@ $name-text-indent: 0.5vw;
 #avatar-selection-container {
     display: flex;
     flex-direction: column;
-    flex: 1;
+    width: calc($base-size * 50);
     border-width: 5px;
     border-style: solid;
-    border: $page-border-width solid $wheat-border-color;
-    box-shadow: 0 0 0 $page-border-width $gray-border-color;
+    border: $base-size solid $color-border-wheat;
+    box-shadow: $shadow-outline;
     background: repeating-linear-gradient(
         0deg,
-        $violet-stripes-color1,
-        $violet-stripes-color1 $stripes-size,
-        $violet-stripes-color2 $stripes-size,
-        $violet-stripes-color2 $stripes-size * 2
+        $color-stripes-violet-1,
+        $color-stripes-violet-1 $stripes-size,
+        $color-stripes-violet-2 $stripes-size,
+        $color-stripes-violet-2 calc(#{$stripes-size} * 2)
     );
-    background-size: 100% ($stripes-size * 2);
-    animation: fall 2s linear infinite;
+    background-size: 100% (calc(#{$stripes-size} * 2));
+    animation: $animation-fall;
 }
 
 #avatar-list {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-    gap: 2vw;
+    gap: calc($base-size * 1.2);
     width: 100%;
     height: 100%;
-    padding: 1vw 2vw;
+    padding: calc($base-size * 1) calc($base-size * 2);
     justify-content: center;
     align-items: center;
     user-select: none;
+
+    @media (aspect-ratio < 5/4) {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+        gap: 0vh;
+
+        .avatar-container {
+            width: calc($base-size * 20);
+        }
+    }
 }
 
 .avatar-container {
-    width: min(8vw, 17vh);
+    width: calc($base-size * 13);
     aspect-ratio: 1/1;
     display: flex;
     flex-direction: column;
     align-self: center;
-    border: 0.6vw solid rgba(0, 0, 0, 0);
+    border: calc($base-size * 1) solid transparent;
+    box-sizing: border-box;
     justify-content: center;
     align-items: center;
+    margin: auto;
     cursor: pointer;
+    transition:
+        border 0.2s ease-in-out,
+        box-shadow 0.2s ease-in-out;
 }
 
 .selected,
 :not(.locked).avatar-container:hover {
-    border: 0.5vw solid white;
+    border: calc($base-size * 1) solid white;
     box-shadow:
-        0.3vw 0 0 $text-shadow-color,
-        0 0.3vw 0 $text-shadow-color;
+        calc($base-size * 1) 0 0 $color-shadow-text,
+        0 calc($base-size * 1) 0 $color-shadow-text;
 }
 
 :not(.locked).avatar-container:active img {
@@ -456,7 +509,7 @@ $name-text-indent: 0.5vw;
     cursor: not-allowed;
 }
 
-.flex-container {
+.character-page-main {
     display: flex;
     justify-content: center;
 }
@@ -469,49 +522,108 @@ $name-text-indent: 0.5vw;
     pointer-events: none;
 }
 
+#page-footer {
+    position: relative;
+    width: 100%;
+    height: calc($base-size * 11);
+    background-color: $color-border-gray;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.main-button-container {
+    height: 65%;
+    aspect-ratio: 40/9;
+    display: grid;
+    place-items: center;
+    grid-template-columns: $button-cutout-size 1fr $button-cutout-size;
+    cursor: pointer;
+}
+
+.main-button-container * {
+    transition: filter 0.2s ease-in-out;
+}
+
+.main-button-container:hover * {
+    filter: brightness(1.1);
+}
+
+.main-button-container:active * {
+    rotate: 180deg;
+    filter: brightness(0.98);
+}
+
+.main-button-container .button-edge {
+    width: 100%;
+    height: calc(100% - $button-cutout-size * 2);
+    background: $bg-button-blue;
+    margin-right: calc($button-cutout-size * -0.2);
+}
+
+.main-button-container .button-edge:last-child {
+    margin-left: calc($button-cutout-size * -0.2);
+    margin-right: 0;
+}
+
+.main-button-container .button-body {
+    width: 100%;
+    height: 100%;
+    background: $bg-button-blue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-button-container p {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc($base-size * 4);
+    text-shadow: calc($base-size * 0.3) 0 0 $color-shadow-text;
+    z-index: 1;
+    user-select: none;
+}
+
+#page-footer .disabled div {
+    background: $bg-button-red;
+}
+
+#page-footer .disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+app-warning-confirmation-popup {
+    flex-shrink: 0;
+}
+
 @keyframes fall {
     from {
         background-position: 0 0;
     }
 
     to {
-        background-position: 0 $stripes-size * 2;
+        background-position: 0 calc(#{$stripes-size} * 2);
     }
 }
 
-#page-footer {
-    width: 100%;
-    height: 10vh;
-    background-color: $gray-border-color;
-    display: flex;
-    justify-content: space-around;
-}
+@media (aspect-ratio < 14/16) {
+    .selections-container {
+        flex-direction: column;
+        justify-content: center;
+        row-gap: calc($base-size * 5);
+    }
 
-.start-btn {
-    font-family: $font-family-title;
-    height: 7vh;
-    font-size: 5vh;
-    width: 17vw;
-    border-style: none;
-    background-image: url('../../../assets/images/menu/buttons/admin-button/light-green-background-highlight.png');
-    background-size: 100% 100%;
-    align-self: center;
-    cursor: pointer;
-    user-select: none;
-}
+    .stat-container {
+        width: 80%;
+        max-width: calc($base-size * 85);
+        aspect-ratio: 30/10;
+    }
 
-.start-btn:not(.disabled):hover {
-    filter: saturate(0.98) brightness(1.08) grayscale(0.03);
-}
-
-.start-btn:not(.disabled):active {
-    filter: saturate(0.96) brightness(1.16) grayscale(0.06);
-}
-
-#page-footer .disabled {
-    background-image: url('../../../assets/images/menu/buttons/admin-button/red-background-highlight.png');
-}
-
-app-warning-confirmation-popup {
-    flex-shrink: 0;
+    #page-footer {
+        height: calc($base-size * 21);
+    }
 }
