@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
+import { AudioSettings, BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { MatchData } from '@common/interfaces/match-data';
-import { AUDIO_CONFIG, SOUND_EFFECTS_MAP } from './audio.const';
+import { AUDIO_CONFIG, AUDIO_LOCAL_STORAGE_KEY, COMBAT_LOG_PATTERNS, SOUND_EFFECTS_MAP } from './audio.const';
 
 @Injectable({
     providedIn: 'root',
@@ -11,10 +11,11 @@ export class AudioService {
     private effects: Map<SoundEffect, HTMLAudioElement> = new Map();
     private currentTrack: BackgroundMusic | null = null;
     private previousLogSize = 0;
-    private backgroundVolume = AUDIO_CONFIG.musicVolume;
+    private backgroundMusicVolume = AUDIO_CONFIG.backgroundMusicVolume;
     private effectsVolume = AUDIO_CONFIG.effectsVolume;
 
     constructor() {
+        this.loadSavedVolumes();
         this.preloadEffectsForPage([SoundEffect.Click]);
     }
 
@@ -43,7 +44,7 @@ export class AudioService {
         const fullPath = `assets/audio/music/${music}`;
         const audio = new Audio(fullPath);
         audio.loop = true;
-        audio.volume = this.backgroundVolume;
+        audio.volume = this.backgroundMusicVolume;
 
         audio.play().catch((error) => {
             return error;
@@ -74,11 +75,11 @@ export class AudioService {
 
         const logText = lastLog.content.toLowerCase();
 
-        if (logText.includes('inflige')) {
+        if (logText.includes(COMBAT_LOG_PATTERNS.attack)) {
             this.playEffect(SoundEffect.Attack);
-        } else if (logText.includes("s'est enfui")) {
+        } else if (logText.includes(COMBAT_LOG_PATTERNS.flee)) {
             this.playEffect(SoundEffect.Flee);
-        } else if (logText.includes('gagné le combat')) {
+        } else if (logText.includes(COMBAT_LOG_PATTERNS.victory)) {
             if (this.backgroundMusic) {
                 this.backgroundMusic.volume = 0;
             }
@@ -88,14 +89,49 @@ export class AudioService {
         this.previousLogSize = currentLogs.length;
     }
 
-    setVolumes(musicVolume: number = AUDIO_CONFIG.musicVolume, effectsVolume: number = AUDIO_CONFIG.effectsVolume): void {
+    setBackgroundMusicVolume(volume: number = this.backgroundMusicVolume): void {
+        this.backgroundMusicVolume = volume;
+        this.saveSettings();
         if (this.backgroundMusic) {
-            this.backgroundMusic.volume = musicVolume;
-            this.backgroundVolume = musicVolume;
+            this.backgroundMusic.volume = volume;
         }
+    }
+
+    setEffectsVolume(volume: number = this.effectsVolume): void {
+        this.effectsVolume = volume;
+        this.saveSettings();
         this.effects.forEach((audioEffect) => {
-            audioEffect.volume = effectsVolume;
-            this.effectsVolume = effectsVolume;
+            audioEffect.volume = volume;
         });
+    }
+
+    getBackgroundMusicVolume(): number {
+        return this.backgroundMusicVolume;
+    }
+
+    getEffectsVolume(): number {
+        return this.effectsVolume;
+    }
+
+    private saveSettings(): void {
+        const settings: AudioSettings = {
+            backgroundMusicVolume: this.backgroundMusicVolume,
+            effectsVolume: this.effectsVolume,
+        };
+        localStorage.setItem(AUDIO_LOCAL_STORAGE_KEY, JSON.stringify(settings));
+    }
+
+    private loadSavedVolumes(): void {
+        const storedSettings = localStorage.getItem(AUDIO_LOCAL_STORAGE_KEY);
+        if (storedSettings !== null) {
+            try {
+                const settings: AudioSettings = JSON.parse(storedSettings);
+                this.backgroundMusicVolume = settings.backgroundMusicVolume;
+                this.effectsVolume = settings.effectsVolume;
+            } catch (error) {
+                this.backgroundMusicVolume = AUDIO_CONFIG.backgroundMusicVolume;
+                this.effectsVolume = AUDIO_CONFIG.effectsVolume;
+            }
+        }
     }
 }

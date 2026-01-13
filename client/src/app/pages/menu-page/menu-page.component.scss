@@ -1,16 +1,5 @@
-// Adjustable measures
-$top-max-height: 45vh;
-$top-max-width: 100vw;
-$top-aspect-ratio: 5;
-$top-left-ratio: 0.58;
-$bot-max-height: 55vh;
-$bot-max-width: 95vw;
-$bot-aspect-ratio: 3.13;
-
-// Adjustable colors
 $text-shadow-color: rgb(112, 112, 112);
 
-// Assets
 $background-image: '../../../assets/images/menu/backgrounds/main-menu.png';
 $logo-image: '../../../assets/images/menu/logos/main-logo.png';
 $icon-magikarp: '../../../assets/images/menu/pokemons/chibi/magikarp.png';
@@ -19,15 +8,11 @@ $icon-mew: '../../../assets/images/menu/pokemons/chibi/mew.png';
 $icon-psyduck: '../../../assets/images/menu/pokemons/chibi/psyduck.png';
 $icon-eevee: '../../../assets/images/menu/pokemons/chibi/eevee.png';
 $icon-vulpix: '../../../assets/images/menu/pokemons/chibi/vulpix.png';
+$icon-poliwag: '../../../assets/images/menu/pokemons/chibi/poliwag.png';
+$icon-cubone: '../../../assets/images/menu/pokemons/chibi/cubone.png';
+$icon-settings: '../../../assets/images/menu/icons/settings/settings.svg';
 
-// Computed measures
-$top-height: min($top-max-height, calc($top-max-width / $top-aspect-ratio));
-$top-width: calc($top-height * $top-aspect-ratio);
-$bot-height: min($bot-max-height, calc($bot-max-width / $bot-aspect-ratio));
-$bot-width: calc($bot-height * $bot-aspect-ratio);
-$top-left-width: calc($top-width * $top-left-ratio);
-$top-right-width: calc($top-width - $top-left-width);
-$card-size: calc($bot-height * 0.95);
+$base-size: min(1vh, 0.6vw);
 
 .menu-page {
     height: 100vh;
@@ -40,6 +25,11 @@ $card-size: calc($bot-height * 0.95);
     left: 0;
     height: 100vh;
     width: 100vw;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .background-container {
@@ -57,30 +47,33 @@ $card-size: calc($bot-height * 0.95);
 
 .top-container {
     display: flex;
-    height: $top-height;
-    width: $top-width;
-    margin-left: calc((100vw - $top-width) * 0.5);
+    width: 100%;
+    max-width: calc($base-size * 200);
+    height: fit-content;
+    justify-content: space-between;
+    overflow: visible;
+    margin: calc($base-size * 2) 0 0 0;
 }
 
 .bot-container {
-    margin-top: calc(100vh - $top-height - $bot-height);
-    margin-left: calc((100vw - $bot-width) * 0.5);
-    height: $bot-height;
-    width: $bot-width;
+    height: calc($base-size * 55);
+    width: 100%;
     overflow: visible;
 }
 
 .top-left-container {
-    height: $top-height;
-    width: $top-left-width;
+    position: relative;
+    height: 100%;
+    width: 60%;
     display: flex;
     overflow: visible;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .logo-container {
-    margin: auto;
-    height: calc($top-height * 0.6);
-    width: calc($top-height * 2.0);
+    height: calc($base-size * 22);
+    aspect-ratio: 30/9;
     rotate: -3.1deg;
     background-image: url($logo-image);
     background-size: contain;
@@ -90,21 +83,14 @@ $card-size: calc($bot-height * 0.95);
 }
 
 .team-number {
-    margin-top: calc($top-height * 0.4);
-    margin-left: calc($top-height * 1.4);
-    height: calc($top-height * 0.21);
-    width: calc($top-height * 1.01);
-    line-height: calc($top-height * 0.18);
+    position: absolute;
+    bottom: calc($base-size * 0);
+    right: calc($base-size * -7);
     rotate: -12.1deg;
     user-select: none;
     animation: zooming 3s infinite ease-in-out;
-    font-size: calc($top-height * 0.18);
-    text-shadow:
-        calc($top-height * 0.14 * 0.0172) calc($top-height * 0.12 * 0.006) 0 rgb(120, 120, 120),
-        calc($top-height * 0.14 * 0.0344) calc($top-height * 0.12 * 0.012) 0 rgb(120, 120, 120),
-        calc($top-height * 0.14 * 0.0516) calc($top-height * 0.12 * 0.018) 0 rgb(120, 120, 120),
-        calc($top-height * 0.14 * 0.0688) calc($top-height * 0.12 * 0.024) 0 rgb(120, 120, 120),
-        calc($top-height * 0.14 * 0.0860) calc($top-height * 0.12 * 0.030) 0 rgb(120, 120, 120);
+    font-size: calc($base-size * 7);
+    text-shadow: calc($base-size * 0.43) 0 0 rgb(120, 120, 120);
 }
 
 @keyframes zooming {
@@ -120,134 +106,215 @@ $card-size: calc($bot-height * 0.95);
 }
 
 .top-right-container {
-    height: $top-height;
-    width: $top-right-width;
-    padding-top: calc($top-height * 0.08);
-    padding-right: calc($top-height * 0.08);
+    height: 100%;
+    width: fit-content;
+    padding-right: calc($base-size * 2);
     display: flex;
     flex-direction: column;
+    gap: calc($base-size * 0.2);
+    overflow: visible;
 }
 
 .top-right-container > div {
     margin-left: auto;
     width: auto;
-    height: calc($top-height * 0.13);
     display: flex;
+    align-items: center;
+    gap: calc($base-size * 1.5);
+    overflow: visible;
 }
 
 .top-right-text {
     display: inline-block;
     width: auto;
-    margin: auto 0;
-    margin-right: calc($top-height * 0.06);
-    height: calc($top-height * 0.10);
-    line-height: calc($top-height * 0.10);
-    font-size: calc($top-height * 0.10);
-    text-shadow: calc($top-height * 0.00666) 0 0 $text-shadow-color;
+    height: 100%;
+    font-size: calc($base-size * 4);
+    text-shadow: calc($base-size * 0.43) 0 0 $text-shadow-color;
+    display: flex;
+    align-items: center;
 }
 
 .pokemon-icon {
     display: inline-block;
-    margin: calc($top-height * 0.01);
-    width: calc($top-height * 0.11);
-    height: calc($top-height * 0.11);
+    width: calc($base-size * 4);
+    height: calc($base-size * 4);
     background-position: center;
     background-size: contain;
     background-repeat: no-repeat;
 }
 
+.top-right-container > div:hover .pokemon-icon {
+    animation: bounce 0.6s infinite;
+    will-change: transform;
+}
+
+@keyframes bounce {
+    0% {
+        transform: translate(0, 0);
+    }
+    30% {
+        transform: translate(calc($base-size * -1), calc($base-size * -1));
+    }
+    50% {
+        transform: translate(0, 0);
+    }
+    80% {
+        transform: translate(calc($base-size * 1), calc($base-size * -1));
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
 .bot-container {
-    height: $bot-height;
-    width: $bot-width;
+    height: calc($base-size * 50);
+    width: 100%;
     display: flex;
     overflow: visible;
-    justify-content: space-evenly;
+    justify-content: center;
+    align-items: center;
+    gap: calc($base-size * 5);
+    margin: 0 0 calc($base-size * 5) 0;
 }
 
 app-menu-button {
-    height: $card-size;
-    width: $card-size;
+    height: 100%;
+    aspect-ratio: 1/1;
     overflow: visible;
 }
 
 .icon-magikarp {
-    background-image: url('../../../assets/images/menu/pokemons/chibi/magikarp.png');
+    background-image: url($icon-magikarp);
 }
 
 .icon-pikachu {
-    background-image: url('../../../assets/images/menu/pokemons/chibi/pikachu.png');
+    background-image: url($icon-pikachu);
 }
 
 .icon-mew {
-    background-image: url('../../../assets/images/menu/pokemons/chibi/mew.png');
+    background-image: url($icon-mew);
 }
 
 .icon-psyduck {
-    background-image: url('../../../assets/images/menu/pokemons/chibi/psyduck.png');
+    background-image: url($icon-psyduck);
 }
 
 .icon-eevee {
-    background-image: url('../../../assets/images/menu/pokemons/chibi/eevee.png');
+    background-image: url($icon-eevee);
 }
 
 .icon-vulpix {
-    background-image: url('../../../assets/images/menu/pokemons/chibi/vulpix.png');
+    background-image: url($icon-vulpix);
 }
 
-.sound-button {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    width: 50px;
-    height: 50px;
+.icon-poliwag {
+    background-image: url($icon-poliwag);
+}
+
+.icon-cubone {
+    background-image: url($icon-cubone);
+}
+
+$inner-border-width: calc(0.6 * $base-size);
+
+$border-color2: #48485f;
+
+$corner-square-size: calc($base-size * 0.45);
+$clip-path: polygon(
+    $corner-square-size 0%,
+    calc(100% - #{$corner-square-size}) 0%,
+
+    calc(100% - #{$corner-square-size}) $corner-square-size,
+    100% $corner-square-size,
+
+    100% calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) calc(100% - #{$corner-square-size}),
+    calc(100% - #{$corner-square-size}) 100%,
+    $corner-square-size 100%,
+
+    $corner-square-size calc(100% - #{$corner-square-size}),
+    0% calc(100% - #{$corner-square-size}),
+    0% $corner-square-size,
+    $corner-square-size $corner-square-size
+);
+
+.settings-button {
+    width: calc($base-size * 10);
+    margin: 0 calc($base-size * 2) auto calc($base-size * 2);
+    aspect-ratio: 1 / 1;
+
+    border: calc($corner-square-size * 2) solid $border-color2;
+    clip-path: $clip-path;
+
+    box-shadow:
+        inset $inner-border-width 0 0 0 hsl(196, 0%, 67%),
+        inset calc(-1 * $inner-border-width) 0 0 0 hsl(205, 0%, 42%),
+        inset 0 $inner-border-width 0 0 hsl(196, 0%, 67%),
+        inset 0 calc(-1 * $inner-border-width) 0 0 hsl(205, 0%, 42%);
+
     border-radius: 0;
-    background: #4997d0;
-    border: 3px solid rgb(179, 159, 50);
+    background: rgb(136, 136, 136);
     cursor: pointer;
-    z-index: 1000;
+    z-index: 10;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 24px;
-    font-family: 'Press Start 2P', monospace;
-    color: white;
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    text-shadow: 2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black;
-    box-shadow: 
-        2px 0 0 rgb(228, 203, 62),
-        -2px 0 0 rgb(228, 203, 62),
-        0 2px 0 rgb(228, 203, 62), 
-        0 -2px 0 rgb(228, 203, 62),
-        2px 2px 0 rgb(228, 203, 62),
-        inset 2px 2px 0 rgba(255, 255, 255, 0.3);
-    animation: zooming 3s infinite ease-in-out;
-    transition: all 0.1s steps(1);
-    
-    &::after {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.1) 2px,
-            rgba(0, 0, 0, 0.1) 4px
-        );
-        pointer-events: none;
-    }
-    
+    opacity: 0.5;
+    transition:
+        opacity 0.3s,
+        filter 0.3s;
+
     &:hover {
-        transform: scale(1.15);
-        background: #ffcb05;
+        opacity: 1;
     }
-    
     &:active {
-        transform: translate(4px, 4px);
-        box-shadow: 
-            0 0 0 black,
-            inset 4px 4px 0 rgba(0, 0, 0, 0.3);
+        filter: brightness(0.7);
+        box-shadow:
+            inset $inner-border-width 0 0 0 #6b6b6b,
+            inset calc(-1 * $inner-border-width) 0 0 0 #ababab,
+            inset 0 $inner-border-width 0 0 #6b6b6b,
+            inset 0 calc(-1 * $inner-border-width) 0 0 #ababab;
+    }
+}
+
+.icon-settings {
+    width: 70%;
+    height: 70%;
+    background-image: url($icon-settings);
+    filter: invert(1);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.audio-settings-container {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 11;
+    background-color: rgba($color: #000000, $alpha: 0.5);
+    backdrop-filter: blur(min(0.5vh, 0.5vw));
+}
+
+.audio-settings {
+    opacity: 0;
+    transform: scale(0.96);
+    animation: audio-overlay-in 0.2s forwards ease-in-out;
+}
+
+@keyframes audio-overlay-in {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
     }
 }

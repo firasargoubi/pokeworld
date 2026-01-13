@@ -1,17 +1,15 @@
-$gray-border-color: #636776;
-$wheat-border-color: #e9f6f7;
-$stripes-color1: #93d7eb;
-$stripes-color2: #ace6f6;
+$border-gray: #636776;
+$border-wheat: #e9f6f7;
+$stripe-a: #93d7eb;
+$stripe-b: #ace6f6;
 $text-shadow-color: rgb(112, 112, 112);
 
-$page-border-width: 10px;
-$padding-wheat-border: 0.7vw;
-$stripes-size: 0.7vw;
-$font-size-header: 6.5vh;
+$base-size: min(1vh, 1vw);
+$page-border-width: min(1vh, 2vw);
+$stripe-size: calc($page-border-width);
+$stripe-step: calc($stripe-size * 2);
 
-$font-family-title: 'pixel';
-
-$corner-square-size: 1vh;
+$corner-square-size: min(1vh, 1.2vw);
 $clip-path: polygon(
     $corner-square-size 0%,
     calc(100% - #{$corner-square-size}) 0%,
@@ -30,32 +28,50 @@ $clip-path: polygon(
     $corner-square-size $corner-square-size
 );
 
-#join-page-header {
-    height: 7vh;
+$container-width: calc($base-size * 80);
+$container-bg: #83a4fa;
+$container-border-color: #48485f;
+$container-bg-image: url('../../../assets/images/menu/containers/dark-blue/dark-blue-scrare-body.png');
+
+$inset-offset: calc(#{$corner-square-size} * 0.9);
+$inset-offset-neg: calc(#{$corner-square-size} * -0.9);
+$inset-light: #80c0d8;
+$inset-dark: #2878b0;
+
+$text-shadow-offset: calc($base-size * 0.4);
+
+$container-padding: calc($base-size * 0.5);
+$container-body-padding-bottom: 4%;
+
+$visual-number-width: 7%;
+$visual-number-margin-x: calc($base-size * 1);
+$visual-number-border-width: calc($base-size * 0.6);
+$visual-number-font-size: calc($base-size * 10);
+$visual-number-padding-left: calc($base-size * 0.5);
+
+#join-page-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
 }
 
 #join-page-border {
-    height: calc(100vh - 7vh);
-    border: $page-border-width solid $gray-border-color;
+    flex: 1;
+    border: $page-border-width solid $border-gray;
 }
 
 #join-page-body {
     position: relative;
     height: 100%;
     overflow-y: scroll;
-    background: repeating-linear-gradient(
-        0deg,
-        $stripes-color1,
-        $stripes-color1 $stripes-size,
-        $stripes-color2 $stripes-size,
-        $stripes-color2 $stripes-size * 2
-    );
-    background-size: 100% ($stripes-size * 2);
+    background: repeating-linear-gradient(0deg, $stripe-a, $stripe-a $stripe-size, $stripe-b $stripe-size, $stripe-b $stripe-step);
+    background-size: 100% $stripe-step;
     animation: fall 2s linear infinite;
     box-sizing: border-box;
 
-    border: $page-border-width solid $wheat-border-color;
-    padding: $page-border-width $page-border-width;
+    border: $page-border-width solid $border-wheat;
+    padding: calc($page-border-width * 3);
 
     display: flex;
     justify-content: center;
@@ -66,9 +82,8 @@ $clip-path: polygon(
     from {
         background-position: 0 0;
     }
-
     to {
-        background-position: 0 $stripes-size * 2;
+        background-position: 0 $stripe-step;
     }
 }
 
@@ -78,69 +93,79 @@ $clip-path: polygon(
 
 #main-container {
     position: relative;
-    background-color: #83a4fa;
-    width: 80vh;
+    background-color: $container-bg;
+    width: $container-width;
     aspect-ratio: 16/9;
+    max-height: 100%;
 
-    border: calc($corner-square-size * 2) solid #48485f;
+    border: calc($corner-square-size * 2) solid $container-border-color;
     clip-path: $clip-path;
 
-    background-image: url('../../../assets/images/menu/containers/dark-blue/dark-blue-scrare-body.png');
+    background-image: $container-bg-image;
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+@media (aspect-ratio < 10/16) {
+    #main-container {
+        aspect-ratio: 10/9;
+    }
 }
 
 #main-container-body {
     position: relative;
     height: 100%;
     width: 100%;
-    padding: 0.5vw;
+    padding: $container-padding;
     box-shadow:
-        inset 0.5vw 0 0 0 #80c0d8,
-        inset -0.5vw 0 0 0 #2878b0,
-        inset 0 0.5vw 0 0 #80c0d8,
-        inset 0 -0.5vw 0 0 #2878b0;
+        inset $inset-offset 0 0 0 $inset-light,
+        inset $inset-offset-neg 0 0 0 $inset-dark,
+        inset 0 $inset-offset 0 0 $inset-light,
+        inset 0 $inset-offset-neg 0 0 $inset-dark;
 
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 
-    padding: 0 0 4% 0;
+    padding: 0 0 $container-body-padding-bottom 0;
 }
 
 #main-message {
     width: 100%;
     height: 25%;
-    font-size: 2.5vw;
-    text-shadow: 0.25vw 0 0 $text-shadow-color;
+    font-size: calc($container-padding * 8);
+    text-shadow: $text-shadow-offset 0 0 $text-shadow-color;
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
     text-wrap: balance;
+    padding: 0 1vw;
+    word-break: break-word;
 }
 
 #visual-input-container {
     position: relative;
     display: flex;
     justify-content: center;
-    height: 24%;
+    height: 30%;
+    overflow: visible;
 }
 
 #visual-input-container .number {
     height: 100%;
-    width: 7%;
-    margin: 0 10px;
-    border: solid white;
-    border-width: 0 0 5px 0;
-    font-size: 4rem;
-    text-shadow: 0.25vw 0 0 $text-shadow-color;
+    width: $visual-number-width;
+    margin: 0 $visual-number-margin-x;
+    border: none;
+    border-bottom: $visual-number-border-width solid white;
+    font-size: $visual-number-font-size;
+    text-shadow: $text-shadow-offset 0 0 $text-shadow-color;
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: 0 0 0 5px;
+    align-items: end;
+    padding-left: $visual-number-padding-left;
+    overflow: visible;
 }
 
 #input {

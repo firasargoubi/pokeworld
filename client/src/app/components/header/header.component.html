@@ -1,10 +1,16 @@
 <header>
-    <div class="header-left"></div>
-    <div class="header-right"></div>
-    <div [class]="'header-center-' + stepNumber"></div>
-    <div class="header-text"><div class="title">{{ title }}</div></div>
-    <div class="header-button" (click)="onClick()">
-        <div class="button-underlay"></div>
-        <div class="button-text"><</div>
+    <div class="header-left">
+        <div class="header-button pixel-corners" (click)="onClick()">
+            <div class="icon-back">&lt;</div>
+        </div>
+        <div class="header-text">
+            <div class="title">{{ title }}</div>
+        </div>
     </div>
+
+    <div class="header-center" [class]="'header-center-' + stepNumber">
+        <img src="assets/images/menu/headers/header-center-1.png" />
+    </div>
+
+    <div class="header-right"></div>
 </header>

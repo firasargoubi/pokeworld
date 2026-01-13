@@ -1,0 +1,52 @@
+<div class="settings-body">
+    <div class="settings-title">Paramètres Audio</div>
+    <div class="settings-container">
+        <div class="setting-line">
+            <label for="volMusic">Musique</label>
+            <input
+                #music
+                id="volMusic"
+                type="range"
+                min="0"
+                max="100"
+                [value]="audioService.getBackgroundMusicVolume() * 100"
+                [style.--fill]="audioService.getBackgroundMusicVolume() * 100 + '%'"
+                (input)="onVolumeChange(music.valueAsNumber, effects.valueAsNumber)"
+                (click)="playClickSound()"
+            />
+            <div class="mute-button" (mousedown)="onMuteMusic()">
+                <div
+                    class="volume-icon"
+                    [class.muted]="audioService.getBackgroundMusicVolume() === 0"
+                    [class.low-volume]="audioService.getBackgroundMusicVolume() > 0 && audioService.getBackgroundMusicVolume() <= 0.5"
+                    [class.medium-volume]="audioService.getBackgroundMusicVolume() > 0.5 && audioService.getBackgroundMusicVolume() <= 0.8"
+                    [class.high-volume]="audioService.getBackgroundMusicVolume() > 0.8"
+                ></div>
+            </div>
+        </div>
+
+        <div class="setting-line">
+            <label for="volEffects">Effets</label>
+            <input
+                #effects
+                id="volEffects"
+                type="range"
+                min="0"
+                max="100"
+                [value]="audioService.getEffectsVolume() * 100"
+                [style.--fill]="audioService.getEffectsVolume() * 100 + '%'"
+                (input)="onVolumeChange(music.valueAsNumber, effects.valueAsNumber)"
+                (click)="playClickSound()"
+            />
+            <div class="mute-button" (mousedown)="onMuteEffects()">
+                <div
+                    class="volume-icon"
+                    [class.muted]="audioService.getEffectsVolume() === 0"
+                    [class.low-volume]="audioService.getEffectsVolume() > 0 && audioService.getEffectsVolume() <= 0.5"
+                    [class.medium-volume]="audioService.getEffectsVolume() > 0.5 && audioService.getEffectsVolume() <= 0.8"
+                    [class.high-volume]="audioService.getEffectsVolume() > 0.8"
+                ></div>
+            </div>
+        </div>
+    </div>
+</div>
