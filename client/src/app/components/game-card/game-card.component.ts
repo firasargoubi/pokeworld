@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@app/consts/ui.const';
 import { SoundEffect } from '@app/interfaces/sound-service';
@@ -17,7 +17,7 @@ import { MapSize } from '@common/interfaces/map-data';
     imports: [FormsModule, CommonModule],
     standalone: true,
 })
-export class GameCardComponent implements OnInit, AfterViewInit {
+export class GameCardComponent implements AfterViewInit {
     @Input() game: GameData;
     @Input() isAdminView: boolean = false;
     @Input() index: number = 0;
@@ -32,10 +32,6 @@ export class GameCardComponent implements OnInit, AfterViewInit {
     private audioService: AudioService = inject(AudioService);
     private thumbnailService: ThumbnailService = inject(ThumbnailService);
     private gameDataService: GameDataService = inject(GameDataService);
-
-    ngOnInit() {
-        this.cardColor = this.getCardColor();
-    }
 
     ngAfterViewInit() {
         setTimeout(this.generateThumbnail.bind(this), 1);
