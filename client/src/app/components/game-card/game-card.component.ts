@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@app/consts/ui.const';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { VisibilityEvent } from '@app/interfaces/visibility-event';
 import { AudioService } from '@app/services/audio/audio.service';
@@ -19,7 +20,7 @@ import { MapSize } from '@common/interfaces/map-data';
 export class GameCardComponent implements OnInit, AfterViewInit {
     @Input() game: GameData;
     @Input() isAdminView: boolean = false;
-    @Input() isLastInRow: boolean = false;
+    @Input() index: number = 0;
     @Output() edit = new EventEmitter<string>();
     @Output() delete = new EventEmitter<string>();
     @Output() toggleVisibility = new EventEmitter<VisibilityEvent>();
@@ -72,6 +73,12 @@ export class GameCardComponent implements OnInit, AfterViewInit {
     formatDate(dateString: string | Date): string {
         const date = new Date(dateString);
         return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    isAtRowEnd(): boolean {
+        const viewportWidth = window.innerWidth;
+        const rowLength = viewportWidth < TABLET_BREAKPOINT ? GAME_CARD_ROW_LENGTHS.tablet : GAME_CARD_ROW_LENGTHS.desktop;
+        return (this.index + 1) % rowLength === 0;
     }
 
     private async generateThumbnail() {

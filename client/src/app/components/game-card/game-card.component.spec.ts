@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@app/consts/ui.const';
 import { AudioService } from '@app/services/audio/audio.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { MapSize } from '@common/interfaces/map-data';
@@ -110,5 +111,42 @@ describe('GameCardComponent', () => {
 
         component.game.mapData.size = MapSize.Large;
         expect(component['getCardColor']()).toBe('pink-card');
+    });
+
+    it('should correctly identify last item in row for desktop', () => {
+        spyOnProperty(window, 'innerWidth', 'get').and.returnValue(TABLET_BREAKPOINT);
+        const desktopRowLength = GAME_CARD_ROW_LENGTHS.desktop;
+
+        component.index = desktopRowLength - 1;
+        expect(component.isAtRowEnd()).toBe(true);
+
+        component.index = desktopRowLength * 2 - 1;
+        expect(component.isAtRowEnd()).toBe(true);
+
+        component.index = 0;
+        expect(component.isAtRowEnd()).toBe(false);
+
+        component.index = 1;
+        expect(component.isAtRowEnd()).toBe(false);
+
+        component.index = desktopRowLength;
+        expect(component.isAtRowEnd()).toBe(false);
+    });
+
+    it('should correctly identify last item in row for tablet', () => {
+        spyOnProperty(window, 'innerWidth', 'get').and.returnValue(TABLET_BREAKPOINT - 1);
+        const tabletRowLength = GAME_CARD_ROW_LENGTHS.tablet;
+
+        component.index = tabletRowLength - 1;
+        expect(component.isAtRowEnd()).toBe(true);
+
+        component.index = tabletRowLength * 2 - 1;
+        expect(component.isAtRowEnd()).toBe(true);
+
+        component.index = 0;
+        expect(component.isAtRowEnd()).toBe(false);
+
+        component.index = tabletRowLength;
+        expect(component.isAtRowEnd()).toBe(false);
     });
 });

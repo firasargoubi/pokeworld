@@ -178,6 +178,7 @@ $bg-btn-red: linear-gradient(
     width: auto;
     background-color: $color-blue-bg;
     overflow: visible;
+    transition: filter 0.2s;
 }
 
 .thumbnail {
