@@ -1,7 +1,7 @@
 <div id="admin-page-container">
-    <div id="creation-game-popup" (click)="onCreateGame()" [ngStyle]="{ display: isCreationMode ? 'flex' : 'none' }">
-        <div (click)="$event.stopPropagation()">
-            <app-create-game-popup></app-create-game-popup>
+    <div id="creation-game-popup" [ngStyle]="{ display: isCreationMode ? 'flex' : 'none' }">
+        <div id="popup-content" (click)="onCreateGame()">
+            <app-create-game-popup (click)="$event.stopPropagation()"></app-create-game-popup>
         </div>
     </div>
     <div id="admin-page-header">
@@ -14,7 +14,8 @@
                 <app-game-card
                     [game]="game"
                     [isAdminView]="true"
-                    [cardColor]="getCardColor(i)"
+                    [cardColor]="getCardColor(game)"
+                    [isLastInRow]="isLastInRow(i)"
                     (edit)="editGame($event)"
                     (delete)="deleteGame($event, game.name)"
                     (toggleVisibility)="toggleVisibility($event)"
@@ -25,6 +26,11 @@
         </div>
     </div>
     <div id="poke-button">
-        <app-pokeball-button [buttonContent]="'NOUVEAU JEU'" [delay]="100" [onClickAction]="onCreateGame.bind(this)"></app-pokeball-button>
+        <app-pokeball-button
+            [buttonContent]="'NOUVEAU JEU'"
+            [delay]="100"
+            [onClickAction]="onCreateGame.bind(this)"
+            [scale]="0.4"
+        ></app-pokeball-button>
     </div>
 </div>

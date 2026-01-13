@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PopupMessage } from '@app/consts/popup-message.const';
+import { GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@app/consts/ui.const';
 import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
@@ -10,6 +11,7 @@ import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
+import { MapSize } from '@common/interfaces/map-data';
 
 @Component({
     selector: 'app-create-page',
@@ -36,10 +38,17 @@ export class CreatePageComponent implements OnInit {
         this.audioService.playBackgroundMusic(BackgroundMusic.Home);
     }
 
-    getCardColor(index: number): string {
+    getCardColor(game: GameData): string {
         const classes = ['blue-card', 'green-card', 'pink-card'];
-        const classIndex = index % classes.length;
-        return classes[classIndex];
+        if (game.mapData.size === MapSize.Small) return classes[0];
+        else if (game.mapData.size === MapSize.Medium) return classes[1];
+        else return classes[2];
+    }
+
+    isLastInRow(index: number): boolean {
+        const viewportWidth = window.innerWidth;
+        const rowLength = viewportWidth < TABLET_BREAKPOINT ? GAME_CARD_ROW_LENGTHS.tablet : GAME_CARD_ROW_LENGTHS.desktop;
+        return (index + 1) % rowLength === 0;
     }
 
     async createMatch(gameData: GameData) {

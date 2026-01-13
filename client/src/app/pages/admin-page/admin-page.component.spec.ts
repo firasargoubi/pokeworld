@@ -3,12 +3,14 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
+import { GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@app/consts/ui.const';
 import { VisibilityEvent } from '@app/interfaces/visibility-event';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
+import { MapSize } from '@common/interfaces/map-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { of, throwError } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
@@ -163,12 +165,6 @@ describe('AdminPageComponent', () => {
         expect(component.isCreationMode).toBeFalse();
     });
 
-    it('should return the correct background class based on index', () => {
-        expect(component.getCardColor(0)).toBe('blue-card');
-        expect(component.getCardColor(1)).toBe('green-card');
-        expect(component.getCardColor(2)).toBe('pink-card');
-    });
-
     it('should call loadGames when handleNotFoundError is called', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const loadGamesSpy = spyOn<any>(component, 'loadGames');
@@ -212,5 +208,37 @@ describe('AdminPageComponent', () => {
         document.dispatchEvent(escapeEvent);
 
         expect(component.isCreationMode).toBeFalse();
+    });
+
+    it('should return correct card color based on map size', () => {
+        const mockGames = structuredClone(MOCK_GAME_DATAS);
+        const smallGame = { ...mockGames[0], mapData: { ...mockGames[0].mapData, size: MapSize.Small } };
+        const mediumGame = { ...mockGames[0], mapData: { ...mockGames[0].mapData, size: MapSize.Medium } };
+        const largeGame = { ...mockGames[0], mapData: { ...mockGames[0].mapData, size: MapSize.Large } };
+
+        expect(component.getCardColor(smallGame)).toBe('blue-card');
+        expect(component.getCardColor(mediumGame)).toBe('green-card');
+        expect(component.getCardColor(largeGame)).toBe('pink-card');
+    });
+
+    it('should correctly identify last item in row for both desktop', () => {
+        spyOnProperty(window, 'innerWidth', 'get').and.returnValue(TABLET_BREAKPOINT);
+        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.desktop - 1)).toBe(true);
+        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.desktop + 2)).toBe(true);
+        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.desktop * 2 + 2)).toBe(true);
+        expect(component.isLastInRow(0)).toBe(false);
+        expect(component.isLastInRow(1)).toBe(false);
+        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.desktop)).toBe(false);
+        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.desktop + 1)).toBe(false);
+    });
+
+    it('should correctly identify last item in row for both tablet', () => {
+        spyOnProperty(window, 'innerWidth', 'get').and.returnValue(TABLET_BREAKPOINT - 1);
+        expect(component.isLastInRow(1)).toBe(true);
+        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.tablet + 1)).toBe(true);
+        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.tablet * 2 + 1)).toBe(true);
+        expect(component.isLastInRow(0)).toBe(false);
+        expect(component.isLastInRow(2)).toBe(false);
+        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.tablet * 2)).toBe(false);
     });
 });
