@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PopupMessage } from '@app/consts/popup-message.const';
-import { GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@app/consts/ui.const';
 import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
@@ -35,12 +34,6 @@ export class CreatePageComponent implements OnInit {
     ngOnInit() {
         this.loadGames();
         this.audioService.playBackgroundMusic(BackgroundMusic.Home);
-    }
-
-    isLastInRow(index: number): boolean {
-        const viewportWidth = window.innerWidth;
-        const rowLength = viewportWidth < TABLET_BREAKPOINT ? GAME_CARD_ROW_LENGTHS.tablet : GAME_CARD_ROW_LENGTHS.desktop;
-        return (index + 1) % rowLength === 0;
     }
 
     async createMatch(gameData: GameData) {

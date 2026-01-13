@@ -7,7 +7,6 @@ import { GameCardComponent } from '@app/components/game-card/game-card.component
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { PopupMessage } from '@app/consts/popup-message.const';
-import { GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@app/consts/ui.const';
 import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { VisibilityEvent } from '@app/interfaces/visibility-event';
 import { AudioService } from '@app/services/audio/audio.service';
@@ -78,12 +77,6 @@ export class AdminPageComponent implements OnInit {
     onCreateGame() {
         this.isCreationMode = !this.isCreationMode;
         this.audioService.playEffect(SoundEffect.Click);
-    }
-
-    isLastInRow(index: number): boolean {
-        const viewportWidth = window.innerWidth;
-        const rowLength = viewportWidth < TABLET_BREAKPOINT ? GAME_CARD_ROW_LENGTHS.tablet : GAME_CARD_ROW_LENGTHS.desktop;
-        return (index + 1) % rowLength === 0;
     }
 
     private loadGames() {

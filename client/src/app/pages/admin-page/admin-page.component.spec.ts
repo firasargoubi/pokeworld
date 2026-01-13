@@ -3,7 +3,6 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
-import { GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@app/consts/ui.const';
 import { VisibilityEvent } from '@app/interfaces/visibility-event';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
@@ -207,26 +206,5 @@ describe('AdminPageComponent', () => {
         document.dispatchEvent(escapeEvent);
 
         expect(component.isCreationMode).toBeFalse();
-    });
-
-    it('should correctly identify last item in row for both desktop', () => {
-        spyOnProperty(window, 'innerWidth', 'get').and.returnValue(TABLET_BREAKPOINT);
-        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.desktop - 1)).toBe(true);
-        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.desktop + 2)).toBe(true);
-        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.desktop * 2 + 2)).toBe(true);
-        expect(component.isLastInRow(0)).toBe(false);
-        expect(component.isLastInRow(1)).toBe(false);
-        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.desktop)).toBe(false);
-        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.desktop + 1)).toBe(false);
-    });
-
-    it('should correctly identify last item in row for both tablet', () => {
-        spyOnProperty(window, 'innerWidth', 'get').and.returnValue(TABLET_BREAKPOINT - 1);
-        expect(component.isLastInRow(1)).toBe(true);
-        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.tablet + 1)).toBe(true);
-        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.tablet * 2 + 1)).toBe(true);
-        expect(component.isLastInRow(0)).toBe(false);
-        expect(component.isLastInRow(2)).toBe(false);
-        expect(component.isLastInRow(GAME_CARD_ROW_LENGTHS.tablet * 2)).toBe(false);
     });
 });

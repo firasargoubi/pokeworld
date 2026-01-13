@@ -75,6 +75,13 @@ export class GameCardComponent implements OnInit, AfterViewInit {
         return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
+    getCardColor(): string {
+        const classes = ['blue-card', 'green-card', 'pink-card'];
+        if (this.game.mapData.size === MapSize.Small) return classes[0];
+        else if (this.game.mapData.size === MapSize.Medium) return classes[1];
+        else return classes[2];
+    }
+
     isAtRowEnd(): boolean {
         const viewportWidth = window.innerWidth;
         const rowLength = viewportWidth < TABLET_BREAKPOINT ? GAME_CARD_ROW_LENGTHS.tablet : GAME_CARD_ROW_LENGTHS.desktop;
@@ -83,12 +90,5 @@ export class GameCardComponent implements OnInit, AfterViewInit {
 
     private async generateThumbnail() {
         this.thumbnailUrl = await this.thumbnailService.getThumbnail(this.game.mapData, true);
-    }
-
-    private getCardColor(): string {
-        const classes = ['blue-card', 'green-card', 'pink-card'];
-        if (this.game.mapData.size === MapSize.Small) return classes[0];
-        else if (this.game.mapData.size === MapSize.Medium) return classes[1];
-        else return classes[2];
     }
 }
