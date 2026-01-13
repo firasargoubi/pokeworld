@@ -10,7 +10,6 @@ import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
-import { MapSize } from '@common/interfaces/map-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { of, throwError } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
@@ -208,17 +207,6 @@ describe('AdminPageComponent', () => {
         document.dispatchEvent(escapeEvent);
 
         expect(component.isCreationMode).toBeFalse();
-    });
-
-    it('should return correct card color based on map size', () => {
-        const mockGames = structuredClone(MOCK_GAME_DATAS);
-        const smallGame = { ...mockGames[0], mapData: { ...mockGames[0].mapData, size: MapSize.Small } };
-        const mediumGame = { ...mockGames[0], mapData: { ...mockGames[0].mapData, size: MapSize.Medium } };
-        const largeGame = { ...mockGames[0], mapData: { ...mockGames[0].mapData, size: MapSize.Large } };
-
-        expect(component.getCardColor(smallGame)).toBe('blue-card');
-        expect(component.getCardColor(mediumGame)).toBe('green-card');
-        expect(component.getCardColor(largeGame)).toBe('pink-card');
     });
 
     it('should correctly identify last item in row for both desktop', () => {

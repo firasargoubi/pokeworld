@@ -15,7 +15,6 @@ import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
-import { MapSize } from '@common/interfaces/map-data';
 
 @Component({
     selector: 'app-admin-page',
@@ -79,13 +78,6 @@ export class AdminPageComponent implements OnInit {
     onCreateGame() {
         this.isCreationMode = !this.isCreationMode;
         this.audioService.playEffect(SoundEffect.Click);
-    }
-
-    getCardColor(game: GameData): string {
-        const classes = ['blue-card', 'green-card', 'pink-card'];
-        if (game.mapData.size === MapSize.Small) return classes[0];
-        else if (game.mapData.size === MapSize.Medium) return classes[1];
-        else return classes[2];
     }
 
     isLastInRow(index: number): boolean {

@@ -10,7 +10,6 @@ import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
-import { MapSize } from '@common/interfaces/map-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { of, throwError } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
@@ -82,16 +81,6 @@ describe('CreatePageComponent', () => {
     it('should navigate to menu when navigate to menu is called', () => {
         component.navigateToMenu();
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
-    });
-
-    it('should return correct card color based on map size', () => {
-        const smallGame = { ...mockGames[0], mapData: { ...mockGames[0].mapData, size: MapSize.Small } };
-        const mediumGame = { ...mockGames[0], mapData: { ...mockGames[0].mapData, size: MapSize.Medium } };
-        const largeGame = { ...mockGames[0], mapData: { ...mockGames[0].mapData, size: MapSize.Large } };
-
-        expect(component.getCardColor(smallGame)).toBe('blue-card');
-        expect(component.getCardColor(mediumGame)).toBe('green-card');
-        expect(component.getCardColor(largeGame)).toBe('pink-card');
     });
 
     it('should correctly identify last item in row for both desktop', () => {

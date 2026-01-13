@@ -11,7 +11,6 @@ import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
-import { MapSize } from '@common/interfaces/map-data';
 
 @Component({
     selector: 'app-create-page',
@@ -36,13 +35,6 @@ export class CreatePageComponent implements OnInit {
     ngOnInit() {
         this.loadGames();
         this.audioService.playBackgroundMusic(BackgroundMusic.Home);
-    }
-
-    getCardColor(game: GameData): string {
-        const classes = ['blue-card', 'green-card', 'pink-card'];
-        if (game.mapData.size === MapSize.Small) return classes[0];
-        else if (game.mapData.size === MapSize.Medium) return classes[1];
-        else return classes[2];
     }
 
     isLastInRow(index: number): boolean {

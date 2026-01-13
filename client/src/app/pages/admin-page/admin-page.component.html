@@ -14,7 +14,6 @@
                 <app-game-card
                     [game]="game"
                     [isAdminView]="true"
-                    [cardColor]="getCardColor(game)"
                     [isLastInRow]="isLastInRow(i)"
                     (edit)="editGame($event)"
                     (delete)="deleteGame($event, game.name)"
