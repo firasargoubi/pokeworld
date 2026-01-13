@@ -1,4 +1,4 @@
-<div [ngClass]="['card-global-container', cardColor, this.getCardColor() ? 'last-in-row' : '']">
+<div [ngClass]="['card-global-container', this.getCardColor(), this.isAtRowEnd() ? 'last-in-row' : '']">
     <div class="card-description" [ngClass]="{ hovered: isHovered }" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
         <div class="card-description-body">
             <img src="./assets/images/menu/containers/description/battle-player-safari.png" />
