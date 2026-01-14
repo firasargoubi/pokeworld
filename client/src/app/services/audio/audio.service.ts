@@ -90,18 +90,18 @@ export class AudioService {
     }
 
     setBackgroundMusicVolume(volume: number = this.backgroundMusicVolume): void {
-        this.backgroundMusicVolume = volume;
+        this.backgroundMusicVolume = this.validateVolume(volume, AUDIO_CONFIG.backgroundMusicVolume);
         this.saveSettings();
         if (this.backgroundMusic) {
-            this.backgroundMusic.volume = volume;
+            this.backgroundMusic.volume = this.backgroundMusicVolume;
         }
     }
 
     setEffectsVolume(volume: number = this.effectsVolume): void {
-        this.effectsVolume = volume;
+        this.effectsVolume = this.validateVolume(volume, AUDIO_CONFIG.effectsVolume);
         this.saveSettings();
         this.effects.forEach((audioEffect) => {
-            audioEffect.volume = volume;
+            audioEffect.volume = this.effectsVolume;
         });
     }
 
@@ -121,13 +121,19 @@ export class AudioService {
         localStorage.setItem(AUDIO_LOCAL_STORAGE_KEY, JSON.stringify(settings));
     }
 
+    private validateVolume(volume: number, defaultValue: number): number {
+        const isValidNumber = typeof volume === 'number' && isFinite(volume);
+        const isInRange = volume >= 0 && volume <= 1;
+        return isValidNumber && isInRange ? volume : defaultValue;
+    }
+
     private loadSavedVolumes(): void {
         const storedSettings = localStorage.getItem(AUDIO_LOCAL_STORAGE_KEY);
         if (storedSettings !== null) {
             try {
                 const settings: AudioSettings = JSON.parse(storedSettings);
-                this.backgroundMusicVolume = settings.backgroundMusicVolume;
-                this.effectsVolume = settings.effectsVolume;
+                this.backgroundMusicVolume = this.validateVolume(settings.backgroundMusicVolume, AUDIO_CONFIG.backgroundMusicVolume);
+                this.effectsVolume = this.validateVolume(settings.effectsVolume, AUDIO_CONFIG.effectsVolume);
             } catch (error) {
                 this.backgroundMusicVolume = AUDIO_CONFIG.backgroundMusicVolume;
                 this.effectsVolume = AUDIO_CONFIG.effectsVolume;

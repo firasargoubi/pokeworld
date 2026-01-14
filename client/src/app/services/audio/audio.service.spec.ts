@@ -351,4 +351,13 @@ describe('AudioService', () => {
         expect(freshService.getBackgroundMusicVolume()).toBe(AUDIO_CONFIG.backgroundMusicVolume);
         expect(freshService.getEffectsVolume()).toBe(AUDIO_CONFIG.effectsVolume);
     });
+
+    it('should use default value when volume is NaN', () => {
+        service['backgroundMusic'] = audioElementSpy;
+
+        service.setBackgroundMusicVolume(NaN);
+
+        expect(service['backgroundMusicVolume']).toBe(AUDIO_CONFIG.backgroundMusicVolume);
+        expect(audioElementSpy.volume).toBe(AUDIO_CONFIG.backgroundMusicVolume);
+    });
 });
