@@ -13,6 +13,7 @@ $color-border-stat-2: #48485f;
 
 $base-size: min(1vh, 0.6vw);
 $stripes-size: calc($base-size);
+$footer-size: min(1vh, 2vw);
 
 $corner-square-size: calc($base-size * 0.7);
 $inner-shadow-width: calc($base-size * 0.8);
@@ -111,7 +112,7 @@ $name-font-size: min(7vh, 4.5vw);
 $name-letter-spacing: calc($name-font-size * 0.4);
 $name-text-indent: calc($name-font-size * 0.1);
 
-$button-cutout-size: calc($base-size * 0.5);
+$button-cutout-size: calc($footer-size * 0.6);
 
 $bg-button-blue: linear-gradient(
     to bottom,
@@ -259,9 +260,8 @@ main {
     width: calc(100% - $base-size);
     height: 100%;
     border: $color-border-wheat solid $base-size;
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+    display: flex;
+    flex-direction: column;
 }
 
 #bonus-selection-container {
@@ -525,7 +525,7 @@ main {
 #page-footer {
     position: relative;
     width: 100%;
-    height: calc($base-size * 11);
+    height: calc($footer-size * 11);
     background-color: $color-border-gray;
     display: flex;
     justify-content: space-around;
@@ -581,8 +581,8 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: calc($base-size * 4);
-    text-shadow: calc($base-size * 0.3) 0 0 $color-shadow-text;
+    font-size: calc($footer-size * 4);
+    text-shadow: calc($footer-size * 0.4) 0 0 $color-shadow-text;
     z-index: 1;
     user-select: none;
 }
@@ -611,19 +611,27 @@ app-warning-confirmation-popup {
 }
 
 @media (aspect-ratio < 14/16) {
+    #stats-selection-container {
+        padding: calc($base-size * 5) 0 0 0;
+        gap: calc($base-size * 5);
+    }
+
+    #bonus-selection-container {
+        height: fit-content;
+        gap: calc($base-size * 5);
+        overflow: visible;
+    }
+
     .selections-container {
         flex-direction: column;
-        justify-content: center;
+        justify-content: start;
         row-gap: calc($base-size * 5);
+        flex: none;
     }
 
     .stat-container {
         width: 80%;
         max-width: calc($base-size * 85);
-        aspect-ratio: 30/10;
-    }
-
-    #page-footer {
-        height: calc($base-size * 21);
+        height: calc($base-size * 22);
     }
 }
