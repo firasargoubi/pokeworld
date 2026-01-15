@@ -231,13 +231,13 @@ $bg-btn-red: linear-gradient(
 .thumbnail-separator {
     position: absolute;
     height: 100%;
-    width: 2vw;
-    right: -2vw;
+    width: calc($corner-square-size * 4);
+    right: calc($corner-square-size * -4);
     top: 0;
 }
 
-.pink-card .thumbnail-separator {
-    left: -2vw;
+.last-in-row .thumbnail-separator {
+    left: calc($corner-square-size * -4);
 }
 
 .game-details {
@@ -322,7 +322,7 @@ $bg-btn-red: linear-gradient(
     left: 50%;
     transform: translate(-50%, -50%);
     height: calc(var(--base-size) * 2.5);
-    width: 85%;
+    width: 90%;
     background-color: $color-gray-border;
     z-index: 0;
 }
