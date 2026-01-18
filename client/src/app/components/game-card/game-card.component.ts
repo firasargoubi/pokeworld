@@ -1,14 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@app/consts/ui.const';
+import { CARD_SIZE_TO_COLOR, GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@app/consts/ui.const';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { VisibilityEvent } from '@app/interfaces/visibility-event';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { GameData } from '@common/interfaces/game-data';
-import { MapSize } from '@common/interfaces/map-data';
 
 @Component({
     selector: 'app-game-card',
@@ -72,10 +71,7 @@ export class GameCardComponent implements AfterViewInit {
     }
 
     getCardColor(): string {
-        const classes = ['blue-card', 'green-card', 'pink-card'];
-        if (this.game.mapData.size === MapSize.Small) return classes[0];
-        else if (this.game.mapData.size === MapSize.Medium) return classes[1];
-        else return classes[2];
+        return CARD_SIZE_TO_COLOR[this.game.mapData.size];
     }
 
     isAtRowEnd(): boolean {
