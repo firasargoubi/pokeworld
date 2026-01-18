@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { POKE_BUTTON_DEFAULT_SCALE } from '@app/consts/ui.const';
 
 @Component({
     selector: 'app-pokeball-button',
@@ -12,6 +13,7 @@ export class PokeballButtonComponent {
     @Input() buttonContent: string = 'BUTTON';
     @Input() delay: number = 0;
     @Input() onClickAction?: () => void;
+    @Input() scale: number = POKE_BUTTON_DEFAULT_SCALE;
 
     isActive: boolean = false;
 

@@ -163,12 +163,6 @@ describe('AdminPageComponent', () => {
         expect(component.isCreationMode).toBeFalse();
     });
 
-    it('should return the correct background class based on index', () => {
-        expect(component.getCardColor(0)).toBe('blue-card');
-        expect(component.getCardColor(1)).toBe('green-card');
-        expect(component.getCardColor(2)).toBe('pink-card');
-    });
-
     it('should call loadGames when handleNotFoundError is called', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const loadGamesSpy = spyOn<any>(component, 'loadGames');

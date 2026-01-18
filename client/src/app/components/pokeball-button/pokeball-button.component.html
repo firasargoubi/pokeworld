@@ -1,22 +1,20 @@
 <div
-    class="pokeball-button"
+    class="pokeball-button-container"
     [ngClass]="{ 'active-pokeball-button': isActive }"
+    [style.--scale]="scale"
     (mousedown)="onMouseDown($event)"
     (mouseup)="onMouseUp()"
     (mouseleave)="onMouseLeave()"
 >
-    <div class="pokeball-button-start">
-        <img class="pokeball-button-icon" src="./assets/images/menu/buttons/poke-button/party-ball.png" />
-        <img class="pokeball-active-button-icon" src="./assets/images/menu/buttons/poke-button/party-ball-sel.png" />
-        <div class="pokeball-border-start"></div>
+    <div class="button-icon">
+        <img class="active-icon" src="./assets/images/menu/buttons/poke-button/party-ball-sel.png" />
+        <img class="inactive-icon" src="./assets/images/menu/buttons/poke-button/party-ball.png" />
     </div>
-    <div class="pokeball-button-spacer"></div>
-
-    <div class="pokeball-button-content">
-        <p>
-            {{ buttonContent }}
-        </p>
+    <div class="pokeball-button">
+        <div class="pokeball-button-body">
+            <p>
+                {{ buttonContent }}
+            </p>
+        </div>
     </div>
-
-    <div class="pokeball-button-end"></div>
 </div>

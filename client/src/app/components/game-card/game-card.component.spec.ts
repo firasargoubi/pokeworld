@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@app/consts/ui.const';
 import { AudioService } from '@app/services/audio/audio.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
+import { MapSize } from '@common/interfaces/map-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { GameCardComponent } from './game-card.component';
 
@@ -98,5 +100,53 @@ describe('GameCardComponent', () => {
 
         expect(thumbnailServiceSpy.getThumbnail).toHaveBeenCalledWith(component.game.mapData, true);
         expect(component.thumbnailUrl).toBe(mockThumbnailUrl);
+    });
+
+    it('should return correct card color based on map size', () => {
+        component.game.mapData.size = MapSize.Small;
+        expect(component['getCardColor']()).toBe('blue-card');
+
+        component.game.mapData.size = MapSize.Medium;
+        expect(component['getCardColor']()).toBe('green-card');
+
+        component.game.mapData.size = MapSize.Large;
+        expect(component['getCardColor']()).toBe('pink-card');
+    });
+
+    it('should correctly identify last item in row for desktop', () => {
+        spyOnProperty(window, 'innerWidth', 'get').and.returnValue(TABLET_BREAKPOINT);
+        const desktopRowLength = GAME_CARD_ROW_LENGTHS.desktop;
+
+        component.index = desktopRowLength - 1;
+        expect(component.isAtRowEnd()).toBe(true);
+
+        component.index = desktopRowLength * 2 - 1;
+        expect(component.isAtRowEnd()).toBe(true);
+
+        component.index = 0;
+        expect(component.isAtRowEnd()).toBe(false);
+
+        component.index = 1;
+        expect(component.isAtRowEnd()).toBe(false);
+
+        component.index = desktopRowLength;
+        expect(component.isAtRowEnd()).toBe(false);
+    });
+
+    it('should correctly identify last item in row for tablet', () => {
+        spyOnProperty(window, 'innerWidth', 'get').and.returnValue(TABLET_BREAKPOINT - 1);
+        const tabletRowLength = GAME_CARD_ROW_LENGTHS.tablet;
+
+        component.index = tabletRowLength - 1;
+        expect(component.isAtRowEnd()).toBe(true);
+
+        component.index = tabletRowLength * 2 - 1;
+        expect(component.isAtRowEnd()).toBe(true);
+
+        component.index = 0;
+        expect(component.isAtRowEnd()).toBe(false);
+
+        component.index = tabletRowLength;
+        expect(component.isAtRowEnd()).toBe(false);
     });
 });

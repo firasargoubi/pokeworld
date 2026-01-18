@@ -36,12 +36,6 @@ export class CreatePageComponent implements OnInit {
         this.audioService.playBackgroundMusic(BackgroundMusic.Home);
     }
 
-    getCardColor(index: number): string {
-        const classes = ['blue-card', 'green-card', 'pink-card'];
-        const classIndex = index % classes.length;
-        return classes[classIndex];
-    }
-
     async createMatch(gameData: GameData) {
         if (!this.isCreatingMatch) {
             this.isCreatingMatch = true;

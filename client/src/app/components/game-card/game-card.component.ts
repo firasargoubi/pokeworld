@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CARD_SIZE_TO_COLOR, GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@app/consts/ui.const';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { VisibilityEvent } from '@app/interfaces/visibility-event';
 import { AudioService } from '@app/services/audio/audio.service';
@@ -18,7 +19,7 @@ import { GameData } from '@common/interfaces/game-data';
 export class GameCardComponent implements AfterViewInit {
     @Input() game: GameData;
     @Input() isAdminView: boolean = false;
-    @Input() cardColor: string = 'blue-card';
+    @Input() index: number = 0;
     @Output() edit = new EventEmitter<string>();
     @Output() delete = new EventEmitter<string>();
     @Output() toggleVisibility = new EventEmitter<VisibilityEvent>();
@@ -26,6 +27,7 @@ export class GameCardComponent implements AfterViewInit {
 
     isHovered: boolean = false;
     thumbnailUrl: string = '';
+    cardColor: string = 'blue-card';
     private audioService: AudioService = inject(AudioService);
     private thumbnailService: ThumbnailService = inject(ThumbnailService);
     private gameDataService: GameDataService = inject(GameDataService);
@@ -66,6 +68,16 @@ export class GameCardComponent implements AfterViewInit {
     formatDate(dateString: string | Date): string {
         const date = new Date(dateString);
         return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    getCardColor(): string {
+        return CARD_SIZE_TO_COLOR[this.game.mapData.size];
+    }
+
+    isAtRowEnd(): boolean {
+        const viewportWidth = window.innerWidth;
+        const rowLength = viewportWidth < TABLET_BREAKPOINT ? GAME_CARD_ROW_LENGTHS.tablet : GAME_CARD_ROW_LENGTHS.desktop;
+        return (this.index + 1) % rowLength === 0;
     }
 
     private async generateThumbnail() {

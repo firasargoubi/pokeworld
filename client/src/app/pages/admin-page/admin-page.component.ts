@@ -79,12 +79,6 @@ export class AdminPageComponent implements OnInit {
         this.audioService.playEffect(SoundEffect.Click);
     }
 
-    getCardColor(index: number): string {
-        const classes = ['blue-card', 'green-card', 'pink-card'];
-        const classIndex = index % classes.length;
-        return classes[classIndex];
-    }
-
     private loadGames() {
         this.gameSaveService.getAllGames().subscribe({
             next: (games) => {

@@ -1,10 +1,10 @@
-<div>
+<div id="character-page-container">
     <div id="page-header">
         <app-header [onClick]="this.goToMenu.bind(this)" [stepNumber]="'2'" [title]="'SELECTIONNEZ VOTRE PERSONNAGE'"></app-header>
     </div>
-    <div id="ps-page-body">
-        <main class="flex-container">
-            <section id="avatar-info-container" class="flex-container">
+    <div id="character-page-body">
+        <main class="character-page-main">
+            <section id="avatar-info-container">
                 <div id="player-name-avatar">
                     <div id="self-avatar-container">
                         <img src="{{ visualData.selfAvatarimage }}" id="self-avatar" />
@@ -22,7 +22,7 @@
                             style="text-transform: uppercase"
                             (click)="this.audioService.playEffect(this.clickValue)"
                         />
-                        <p id="input-border">----------------</p>
+                        <p id="name-input-border">----------------</p>
                     </span>
                 </div>
                 <div id="stats-selection-container">
@@ -39,9 +39,6 @@
                                     <div class="stat-label">+2 HP</div>
                                     <div class="stat-value">{{ visualData.isHpSelected ? '6/6' : '4/4' }}</div>
                                 </div>
-                            </div>
-                            <div class="stat-separator">
-                                <img src="./assets/images/menu/icons/arrows/double-arrow.png" class="separator-icon" />
                             </div>
                             <div
                                 class="stat-container stat-container-bonus-2"
@@ -74,9 +71,6 @@
                                     <div class="stat-label stat-label-dice">ATTAQUE</div>
                                     <div class="stat-value">4/4</div>
                                 </div>
-                            </div>
-                            <div class="stat-separator">
-                                <img src="./assets/images/menu/icons/arrows/double-arrow.png" class="separator-icon" />
                             </div>
                             <div class="stat-container stat-container-dice-2" (click)="toggleBonusDice()">
                                 <img
@@ -116,10 +110,10 @@
         </main>
     </div>
     <footer id="page-footer">
-        <div class="flex-container">
-            <button type="button" class="start-btn" [class.disabled]="!nameForm.valid || !visualData.isAvatarSelected" (click)="joinLobby()">
-                START GAME
-            </button>
+        <div class="main-button-container" [class.disabled]="!nameForm.valid || !visualData.isAvatarSelected" (click)="joinLobby()">
+            <div class="button-edge"></div>
+            <div class="button-body"><p>START GAME</p></div>
+            <div class="button-edge"></div>
         </div>
     </footer>
 </div>

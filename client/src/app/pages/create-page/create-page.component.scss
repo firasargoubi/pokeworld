@@ -1,43 +1,46 @@
-$gray-border-color: #636776;
-$wheat-border-color: #e9f6f7;
-$stripes-color1: #e6da9b;
-$stripes-color2: #eee7ab;
-$text-shadow-color: rgb(112, 112, 112);
+$base-size: min(1vh, 1vw);
+$page-border-width: min(1vh, 2vw);
 
-$page-border-width: 10px;
-$padding-wheat-border: 0.7vw;
-$stripes-size: 0.7vw;
-$font-size-header: 6.5vh;
+$color-border-gray: #636776;
+$color-border-wheat: #e9f6f7;
 
-$font-family-title: 'pixel';
+$color-stripes-1: #e6da9b;
+$color-stripes-2: #eee7ab;
 
-$card-width: 26vw;
+$stripe-size: $page-border-width;
+$stripe-step: calc(#{$stripe-size} * 2);
 
-#create-page-header {
-    height: 7vh;
+$bg-stripes: repeating-linear-gradient(
+    0deg,
+    $color-stripes-1,
+    $color-stripes-1 $stripe-size,
+    $color-stripes-2 $stripe-size,
+    $color-stripes-2 $stripe-step
+);
+
+#create-page-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
 }
 
 #admin-page-border {
-    height: calc(100vh - 7vh);
-    border: $page-border-width solid $gray-border-color;
+    flex: 1;
+    border: $page-border-width solid $color-border-gray;
 }
 
 #admin-page-body {
     position: relative;
     height: 100%;
     overflow-y: scroll;
-    background: repeating-linear-gradient(
-        0deg,
-        $stripes-color1,
-        $stripes-color1 $stripes-size,
-        $stripes-color2 $stripes-size,
-        $stripes-color2 $stripes-size * 2
-    );
-    background-size: 100% ($stripes-size * 2);
-    animation: fall 2s linear infinite;
-    box-sizing: border-box;
 
-    border: $page-border-width solid $wheat-border-color;
+    background: $bg-stripes;
+    background-size: 100% $stripe-step;
+    animation: fall 2s linear infinite;
+
+    box-sizing: border-box;
+    border: $page-border-width solid $color-border-wheat;
     padding: $page-border-width $page-border-width;
 }
 
@@ -47,7 +50,7 @@ $card-width: 26vw;
     }
 
     to {
-        background-position: 0 $stripes-size * 2;
+        background-position: 0 $stripe-step;
     }
 }
 
@@ -57,23 +60,19 @@ $card-width: 26vw;
 
 #game-grid {
     display: grid;
-    width: 90%;
-    max-width: 120vh;
-    margin: 2vh auto 20vh;
+    width: calc($base-size * 90);
+    margin: calc($base-size * 2) auto calc($base-size * 20);
     grid-template-columns: repeat(3, 1fr);
-    gap: min(3vw, 3vh);
+    gap: calc($base-size * 3);
     place-items: center;
+
+    @media (max-width: 600px) {
+        grid-template-columns: repeat(2, 1fr);
+        width: calc($base-size * 85);
+    }
 }
 
 #game-grid * {
     width: 100%;
     overflow: visible;
-}
-
-#poke-button {
-    position: absolute;
-    right: 5%;
-    bottom: 7%;
-    width: 20.5vw;
-    height: 4.5vw;
 }

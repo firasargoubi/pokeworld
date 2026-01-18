@@ -1,72 +1,109 @@
 $scale: calc(min(40vw, 60vh) * 0.84);
+
 $height: calc($scale * 1.1);
 $width: calc($scale * 1.9);
-$border-size: calc($scale * 0.039);
-$inner-height: calc($height - 2 * $border-size);
-$inner-width: calc($width - 2 * $border-size);
-$clip-size: calc($scale * 0.02);
 
+$border-size: calc($scale * 0.039);
+$clip-size: calc($scale * 0.02);
 $inner-shadow-width: calc($scale * 0.02);
 
-$border-color: #49485e;
+$inner-height: calc($height - 2 * $border-size);
+$inner-width: calc($width - 2 * $border-size);
 
-$background-image: '../../../assets/images/menu/containers/orange/orange-scrare-body.png';
-$pokemon-image: '../../../assets/images/menu/pokemons/normal/moltres.png';
+$color-border: #49485e;
+$color-bg-main: #c06810;
+$color-accent: #d0a236;
+$color-accent-dark: #9f4c0f;
+
+$color-shadow-text: #707070;
+$color-white: #ffffff;
+
+$img-pokemon: '../../../assets/images/menu/pokemons/normal/moltres.png';
+
+$clip-path: polygon(
+    $clip-size 0%,
+    calc(100% - #{$clip-size}) 0%,
+    calc(100% - #{$clip-size}) $clip-size,
+    100% $clip-size,
+    100% calc(100% - #{$clip-size}),
+    calc(100% - #{$clip-size}) calc(100% - #{$clip-size}),
+    calc(100% - #{$clip-size}) 100%,
+    $clip-size 100%,
+    $clip-size calc(100% - #{$clip-size}),
+    0% calc(100% - #{$clip-size}),
+    0% $clip-size,
+    $clip-size $clip-size
+);
+
+$shadow-inner:
+    inset $inner-shadow-width 0 0 0 $color-accent,
+    inset calc($inner-shadow-width * -1) 0 0 0 $color-accent-dark,
+    inset 0 $inner-shadow-width 0 0 $color-accent,
+    inset 0 calc($inner-shadow-width * -1) 0 0 $color-accent-dark;
+
+$bg-spacer: linear-gradient(to bottom, $color-accent 0%, $color-accent 50%, $color-bg-main 50%, $color-bg-main 100%);
 
 .pop-up {
     user-select: none;
     position: absolute;
     top: calc(0.9 * (50vh - 0.5 * $height));
     left: calc(50vw - 0.5 * $width);
+
     height: $height;
     width: $width;
     overflow: visible;
-    background-image: url($background-image);
-    background-repeat: repeat-x;
-    background-size: contain;
-    border: calc($scale * 0.039) solid $border-color;
-    clip-path: polygon(
-        $clip-size 0%,
-        calc(100% - #{$clip-size}) 0%,
-        calc(100% - #{$clip-size}) $clip-size,
-        100% $clip-size,
-        100% calc(100% - #{$clip-size}),
-        calc(100% - #{$clip-size}) calc(100% - #{$clip-size}),
-        calc(100% - #{$clip-size}) 100%,
-        $clip-size 100%,
-        $clip-size calc(100% - #{$clip-size}),
-        0% calc(100% - #{$clip-size}),
-        0% $clip-size,
-        $clip-size $clip-size
-    );
 
-    box-shadow:
-        inset $inner-shadow-width 0 0 0 #d0a236,
-        inset calc($inner-shadow-width * -1) 0 0 0 #9f4c0f,
-        inset 0 $inner-shadow-width 0 0 #d0a236,
-        inset 0 calc($inner-shadow-width * -1) 0 0 #9f4c0f;
+    border: $border-size solid $color-border;
+    clip-path: $clip-path;
 
     box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: calc($inner-shadow-width * 0.9);
+    background-color: $color-bg-main;
+}
+
+.pop-up::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    box-shadow: $shadow-inner;
+    pointer-events: none;
 }
 
 .title {
-    margin-top: calc($inner-height * 0.02);
     height: calc($inner-height * 0.19);
-    width: $inner-width;
+    width: 100%;
+
     font-size: calc($scale * 0.15);
+    text-shadow: calc($inner-height * 0.01) 0 0 $color-shadow-text;
     text-align: center;
+
+    background-color: $color-bg-main;
 }
 
 .options {
-    font-size: calc($scale * 0.07);
     height: calc($inner-height * 0.45);
-    width: $inner-width;
+    width: 100%;
+
     display: flex;
     flex-direction: row;
     justify-content: center;
-    gap: calc($scale * 0.05);
     align-items: center;
-    width: 100%;
+
+    gap: calc($scale * 0.05);
+
+    font-size: calc($scale * 0.07);
+    text-shadow: calc($scale * 0.007) 0 0 $color-shadow-text;
+
+    background-color: $color-bg-main;
 }
 
 .option-col {
@@ -78,67 +115,84 @@ $pokemon-image: '../../../assets/images/menu/pokemons/normal/moltres.png';
     text-align: center;
     height: calc($inner-height * 0.08);
     width: calc($inner-width * 0.35);
+    margin-bottom: calc($inner-height * 0.02);
 }
 
 .option {
-    justify-content: center;
     height: calc($inner-height * 0.1);
     width: calc($inner-width * 0.35);
+
     display: flex;
     flex-direction: row;
-    gap: calc($clip-size * 1.6667);
+    justify-content: center;
     align-items: center;
+
+    gap: calc($clip-size * 1.6667);
     cursor: pointer;
 }
 
 .check-box {
     width: calc($clip-size * 4.3);
     height: calc($clip-size * 4.3);
-    border: calc($clip-size * 0.54) solid white;
+
+    border: calc($clip-size * 0.54) solid $color-white;
     padding: calc($clip-size * 0.47);
+
     background-color: transparent;
-    box-shadow: calc($clip-size * 0.6667) calc($clip-size * 0.6667) 0 rgba(0, 0, 0, 0.6);
+    box-shadow: calc($clip-size * 0.5) 0 0 $color-shadow-text;
+
+    transition: background-color 0.2s ease-in-out;
 }
 
 .selected {
-    background-color: white;
+    background-color: $color-white;
     background-clip: content-box;
+    transition: background-color 0.2s ease-in-out;
 }
 
 .option:hover .check-box {
-    background-color: white;
+    background-color: $color-white;
+}
+
+.spacer {
+    height: calc($inner-shadow-width * 2);
+    width: 100%;
+    background: $bg-spacer;
 }
 
 .button-section {
+    flex: 1;
     position: relative;
-    margin-top: calc($inner-height * 0.06);
-    height: calc($inner-height * 0.2);
-    width: $inner-width;
+    width: 100%;
+
     overflow: visible;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: $color-accent;
 }
 
 .button {
     position: relative;
-    margin-left: calc($inner-width * 0.22);
-    height: calc($inner-height * 0.151);
-    aspect-ratio: 35/8;
-    overflow: visible;
-}
-
-app-pokeball-button {
-    height: calc($inner-height * 0.151);
+    height: calc($inner-height * 0.18);
+    width: calc($inner-width * 0.27);
     overflow: visible;
 }
 
 .pokemon-image {
     pointer-events: none;
     position: absolute;
+
     height: calc($scale * 1.1);
     width: calc($scale * 1.1);
+
     top: calc((0.9 * (50vh - 0.5 * $height)) + $scale * 0.4);
     left: calc((50vw - 0.5 * $width) + $scale * 1.25);
+
+    background-image: url($img-pokemon);
+    background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    background-image: url($pokemon-image);
-    background-size: contain;
 }

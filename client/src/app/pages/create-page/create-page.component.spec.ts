@@ -3,6 +3,7 @@ import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
+import { AudioService } from '@app/services/audio/audio.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -11,7 +12,6 @@ import { GameData } from '@common/interfaces/game-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { of, throwError } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
-import { AudioService } from '@app/services/audio/audio.service';
 
 @Component({
     selector: 'app-game-card',
@@ -80,12 +80,6 @@ describe('CreatePageComponent', () => {
     it('should navigate to menu when navigate to menu is called', () => {
         component.navigateToMenu();
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
-    });
-
-    it('should return correct card color', () => {
-        expect(component.getCardColor(0)).toBe('blue-card');
-        expect(component.getCardColor(1)).toBe('green-card');
-        expect(component.getCardColor(2)).toBe('pink-card');
     });
 
     it('should handle error when loadGames fails', () => {

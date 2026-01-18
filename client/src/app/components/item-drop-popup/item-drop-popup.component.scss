@@ -1,4 +1,6 @@
+$base-size: min(1vh, 1vw);
 $corner-square-size: min(1vh, 1vw);
+$inner-border-width: calc(1 * $base-size);
 $clip-path: polygon(
     $corner-square-size 0%,
     calc(100% - #{$corner-square-size}) 0%,
@@ -33,38 +35,21 @@ $text-shadow-color: #707070;
 }
 
 #item-popup {
-    height: min(50vh, 50vw);
+    height: calc($base-size * 40);
     aspect-ratio: 16 / 9;
     overflow: visible;
     z-index: 10;
-}
-
-#popup-background {
-    position: absolute;
-    height: min(50vh, 50vw);
-    aspect-ratio: 16 / 9;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    z-index: 9;
-
-    background-color: rgb(173, 109, 0);
 
     border: calc($corner-square-size * 2) solid #48485f;
     clip-path: $clip-path;
 
-    background-image: url('../../../assets/images/menu/containers/orange/orange-scrare-body.png');
-    background-size: 100% 100%;
-    background-position: center;
-    background-repeat: no-repeat;
+    padding: $inner-border-width;
 
-    padding: 0.5vw;
     box-shadow:
-        inset 0.5vw 0 0 0 #d0a236,
-        inset -0.5vw 0 0 0 #9f4c0f,
-        inset 0 0.5vw 0 0 #d0a236,
-        inset 0 -0.5vw 0 0 #9f4c0f;
+        inset $inner-border-width 0 0 0 #d0a236,
+        inset calc($inner-border-width * -1) 0 0 0 #9f4c0f,
+        inset 0 $inner-border-width 0 0 #d0a236,
+        inset 0 calc($inner-border-width * -1) 0 0 #9f4c0f;
 }
 
 #item-popup-container {
@@ -75,21 +60,22 @@ $text-shadow-color: #707070;
     flex-direction: column;
     justify-content: space-between;
 
-    padding: 4% 4% 6% 4%;
-
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 0.5fr 2fr 0.5fr;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
     overflow: visible;
 }
 
 #item-popup-header {
     width: 100%;
-    height: 100%;
+    height: calc($base-size * 6);
+
+    background-color: #c06810;
 
     text-align: center;
-    font-size: 3vw;
-    text-shadow: 0.35vw 0 0 $text-shadow-color;
+    font-size: calc($base-size * 3);
+    text-shadow: calc($base-size * 0.3) 0 0 $text-shadow-color;
 
     display: flex;
     align-items: end;
@@ -98,39 +84,51 @@ $text-shadow-color: #707070;
 
 #items-container {
     width: 100%;
-    height: 100%;
+    height: calc($base-size * 17);
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 6%;
     overflow: visible;
+
+    background-color: #c06810;
 }
 
-.item-choise {
+.item-choice {
     height: 65%;
     aspect-ratio: 1;
     border: solid rgba(0, 0, 0, 0);
-    border-width: min(1.5vh, 1.5vw);
+    border-width: calc($base-size * 1.2);
     cursor: pointer;
     overflow: visible;
 }
 
 .selected-item,
-.item-choise:hover {
+.item-choice:hover {
     border-color: #ffffff;
     box-shadow:
-        min(1.5vw, 1.5vh) 0 0 $text-shadow-color,
-        0 min(1.5vw, 1.5vh) 0 $text-shadow-color;
+        calc($base-size * 1.2) 0 0 $text-shadow-color,
+        0 calc($base-size * 1.2) 0 $text-shadow-color;
+    transition:
+        border 0.2s ease-in-out,
+        box-shadow 0.2s ease-in-out;
 }
 
-.item-choise:active * {
+.item-choice:active * {
     filter: brightness(1.3);
     transition: filter 0.1s;
 }
 
+#spacer {
+    height: calc($inner-border-width * 2);
+    width: 100%;
+    background: linear-gradient(to bottom, #d0a236 0%, #d0a236 50%, #c06810 50%, #c06810 100%);
+}
+
 #button-container {
     width: 100%;
-    height: 100%;
+    flex: 1;
+    background-color: #d0a236;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -138,8 +136,7 @@ $text-shadow-color: #707070;
 }
 
 #button-container .button {
+    height: calc($base-size * 8);
+    width: calc($base-size * 22);
     position: relative;
-    overflow: visible;
-    height: 100%;
-    aspect-ratio: 13 / 3;
 }
