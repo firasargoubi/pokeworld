@@ -16,12 +16,14 @@ import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
     imports: [CommonModule, FormsModule],
 })
 export class ChatComponent implements OnInit, AfterViewChecked {
-    @Input() onClickAction?: () => void;
+    @Input() hideLabels: boolean = false;
+    @Input() scaleFactor: number = 1;
     @ViewChild('chatContainer') private chatContainerRef: ElementRef;
 
+    isComponentVisible: boolean = false;
     isChatActive: WritableSignal<boolean>;
     isFilterEnabled: WritableSignal<boolean>;
-    maxInputLenght = MAX_MESSAGE_LENGTH;
+    maxInputLength = MAX_MESSAGE_LENGTH;
     chatMessages: ChatMessage[] = [];
     logs: ChatLog[] = [];
     readonly clickValue = SoundEffect.Click;
@@ -73,6 +75,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
             this.chatService.sendMessage(message);
             this.shouldScrollToBottom = true;
         }
+    }
+
+    switchVisibility() {
+        this.audioService.playEffect(SoundEffect.Click);
+        this.isComponentVisible = !this.isComponentVisible;
     }
 
     private updateChatData() {

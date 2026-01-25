@@ -70,7 +70,7 @@ export class CharacterPageComponent {
         if (warnings.length > 0) {
             this.popupService.showPopup({
                 message: warnings.join('\n'),
-                hasCloseButton: true,
+                hasCloseButton: false,
                 isConfirmation: false,
             });
         } else {
@@ -121,10 +121,10 @@ export class CharacterPageComponent {
     private getWarnings() {
         const warningList = [];
         if (!this.nameForm.valid) {
-            warningList.push('Le nom doit contenir entre 3 et 15 caractères');
+            warningList.push('- Le nom doit contenir entre 3 et 15 caractères');
         }
         if (this.matchService.selfPlayer.avatar === Avatar.Default) {
-            warningList.push('Veuillez choisir un avatar');
+            warningList.push('- Veuillez choisir un avatar');
         }
         return warningList;
     }

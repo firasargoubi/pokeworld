@@ -29,7 +29,6 @@ export class CombatPageComponent implements OnDestroy {
     visualData: CombatVisualData = structuredClone(DEFAULT_COMBAT_VISUAL_DATA);
     matchService: MatchService = inject(MatchService);
     combatService: CombatService = inject(CombatService);
-    displayChat: boolean = false;
 
     readonly audioService: AudioService = inject(AudioService);
     readonly clickValue = SoundEffect.Click;
@@ -75,11 +74,6 @@ export class CombatPageComponent implements OnDestroy {
         this.combatService.escape();
     }
 
-    hideChat() {
-        this.audioService.playEffect(SoundEffect.Click);
-        this.displayChat = false;
-    }
-
     private updateImages() {
         this.visualData.selfPlatform = BATTLE_PLATFORM_IMAGES[this.visualData.selfPlayer.standingTile].selfPlatform;
         this.visualData.enemyPlatform = BATTLE_PLATFORM_IMAGES[this.visualData.enemyPlayer.standingTile].enemyPlatform;
@@ -114,7 +108,7 @@ export class CombatPageComponent implements OnDestroy {
             this.popupService.keepMessages();
             this.popupService.showPopup({
                 message: `${winnerName} a gagné le combat`,
-                hasCloseButton: true,
+                hasCloseButton: false,
                 isConfirmation: false,
                 popupColor: PopupColor.Blue,
             });
@@ -122,7 +116,7 @@ export class CombatPageComponent implements OnDestroy {
             this.popupService.keepMessages();
             this.popupService.showPopup({
                 message: 'Aucun gagnant',
-                hasCloseButton: true,
+                hasCloseButton: false,
                 isConfirmation: false,
                 popupColor: PopupColor.Blue,
             });
@@ -144,7 +138,7 @@ export class CombatPageComponent implements OnDestroy {
 
     private checkHealingAnimation(oldMatchData: MatchData) {
         const isSelfHealing = this.hasPlayerHealed(oldMatchData, this.visualData.selfPlayer);
-        const isEnemyHealing = this.hasPlayerHealed(oldMatchData, this.visualData.selfPlayer);
+        const isEnemyHealing = this.hasPlayerHealed(oldMatchData, this.visualData.enemyPlayer);
 
         const isSelfHealingNew = !this.visualData.isSelfHealing && isSelfHealing;
         const isEnemyHealingNew = !this.visualData.isEnemyHealing && isEnemyHealing;

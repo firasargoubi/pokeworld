@@ -345,14 +345,18 @@ describe('GameValidationService', () => {
             },
             mode: { isValid: false, errorMessage: ErrorMessage.MissingRequiredItems },
         };
-        const expectedMessage = `Carte invalide :
-  - name: Le champ ne peut pas être vide
-  - Couverture du terrain insuffisante (20%)
-  - Tuiles inaccessibles
-  - Objets mal placés (2)
-  - Problème de pont en [0,0]: Le pont ne peut pas être placé au bord de la carte
-  - Problème de pont en [1,1]: Le pont doit être placé entre deux tuiles d'eau
-  - Un drapeau doit être placé sur la carte en mode CTF`;
+
+        const expectedErrors = [
+            ` - name: ${ErrorMessage.Empty}`,
+            ` - ${ErrorMessage.TerrainCoverage} (${invalidResult.terrainCoverage.coveragePercentage}%)`,
+            ` - ${ErrorMessage.TilesAccessibility}`,
+            ` - ${ErrorMessage.Items} (${invalidResult.items.misplacedItems.length})`,
+            ` - [${invalidResult.bridge.errors[0].x},${invalidResult.bridge.errors[0].y}]: ${invalidResult.bridge.errors[0].errorMessage}`,
+            ` - [${invalidResult.bridge.errors[1].x},${invalidResult.bridge.errors[1].y}]: ${invalidResult.bridge.errors[1].errorMessage}`,
+            ` - ${ErrorMessage.Mode}`,
+        ];
+        const expectedMessage = 'Carte invalide :\n' + expectedErrors.join('\n');
+
         expect(service.getValidationErrorMessage(invalidResult)).toBe(expectedMessage);
     });
 });

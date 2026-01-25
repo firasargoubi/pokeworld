@@ -591,11 +591,6 @@ main {
     background: $bg-button-red;
 }
 
-#page-footer .disabled {
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
 app-warning-confirmation-popup {
     flex-shrink: 0;
 }

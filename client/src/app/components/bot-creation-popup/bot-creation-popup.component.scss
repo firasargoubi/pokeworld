@@ -50,6 +50,7 @@ $background-image: '../../../assets/images/menu/containers/gray/gray-scrare-body
     background-color: #888888;
     font-size: calc($scale * 0.13);
     text-align: center;
+    user-select: none;
 }
 
 .options {
@@ -62,6 +63,7 @@ $background-image: '../../../assets/images/menu/containers/gray/gray-scrare-body
     justify-content: center;
     gap: calc($scale * 0.1);
     align-items: center;
+    user-select: none;
 }
 
 .option {

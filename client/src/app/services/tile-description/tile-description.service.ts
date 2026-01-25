@@ -33,7 +33,7 @@ export class TileDescriptionService {
                     this.visible = false;
                     return this.matchService.data.players.findIndex((p) => p.id === playerOnTile.id);
                 }
-                this.position = this.calculateDescriptionPosition(tileCoords, mapRect, mapSize);
+                this.position = this.calculateDescriptionPosition(tileCoords, mapSize);
                 this.description = this.getDescription(tileCoords);
                 this.visible = true;
             }
@@ -62,18 +62,17 @@ export class TileDescriptionService {
         return position.x >= 0 && position.x < mapSize && position.y >= 0 && position.y < mapSize;
     }
 
-    private calculateDescriptionPosition(position: Position, mapRect: DOMRect, mapSize: number): Position {
-        const tileWidth = mapRect.width / mapSize;
-        const tileHeight = mapRect.height / mapSize;
+    private calculateDescriptionPosition(position: Position, mapSize: number): Position {
+        const percent = 100;
+        const tileWidth = percent / mapSize;
+        const tileHeight = percent / mapSize;
 
-        const tileTopRightX = mapRect.left + (position.y + 1) * tileWidth;
-        const tileTopRightY = mapRect.top + position.x * tileHeight;
-
-        const offset = 5;
+        const tileTopRightX = (position.y + 1) * tileWidth;
+        const tileTopRightY = position.x * tileHeight;
 
         return {
-            x: tileTopRightX + offset,
-            y: tileTopRightY + offset,
+            x: tileTopRightX,
+            y: tileTopRightY,
         };
     }
 
