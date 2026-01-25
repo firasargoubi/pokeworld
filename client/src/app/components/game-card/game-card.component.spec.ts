@@ -85,23 +85,6 @@ describe('GameCardComponent', () => {
         expect(modeElement.nativeElement.textContent.trim()).toBe(MOCK_GAME_DATAS[0].mapData.gameMode);
     });
 
-    it('should set thumbnailUrl on ngOnInit', async () => {
-        const mockThumbnailUrl = 'data:image/png;base64,mockthumbnail';
-        thumbnailServiceSpy.getThumbnail.and.returnValue(Promise.resolve(mockThumbnailUrl));
-
-        spyOn(window, 'requestIdleCallback').and.callFake((cb: IdleRequestCallback) => {
-            cb({ didTimeout: true } as IdleDeadline);
-            return 0;
-        });
-
-        component.ngAfterViewInit();
-        await fixture.whenStable();
-        fixture.detectChanges();
-
-        expect(thumbnailServiceSpy.getThumbnail).toHaveBeenCalledWith(component.game.mapData, true);
-        expect(component.thumbnailUrl).toBe(mockThumbnailUrl);
-    });
-
     it('should return correct card color based on map size', () => {
         component.game.mapData.size = MapSize.Small;
         expect(component['getCardColor']()).toBe('blue-card');

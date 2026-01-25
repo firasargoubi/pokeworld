@@ -1,5 +1,5 @@
 import { ItemType } from '@common/interfaces/item-type.enum';
-import { MapSize, GameMode } from '@common/interfaces/map-data';
+import { GameMode, MapSize } from '@common/interfaces/map-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
@@ -50,6 +50,10 @@ export class Game {
 
     @ApiProperty()
     _id?: string;
+
+    @ApiProperty({ required: false })
+    @Prop({ required: false })
+    thumbnail?: string;
 }
 
 export const gameSchema = SchemaFactory.createForClass(Game);

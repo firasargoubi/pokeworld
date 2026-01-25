@@ -1,10 +1,10 @@
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { GameMode, MapSize } from '@common/interfaces/map-data';
+import { Position } from '@common/interfaces/position';
+import { TileType } from '@common/interfaces/tile-type.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsEnum, IsObject, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
-import { GAME_NAME_MAX_LENGTH, GAME_DESCRIPTION_MAX_LENGTH } from './game.dto.constants';
-import { Position } from '@common/interfaces/position';
-import { ItemType } from '@common/interfaces/item-type.enum';
-import { MapSize, GameMode } from '@common/interfaces/map-data';
-import { TileType } from '@common/interfaces/tile-type.enum';
+import { GAME_DESCRIPTION_MAX_LENGTH, GAME_NAME_MAX_LENGTH } from './game.dto.constants';
 
 export class MapData {
     @ApiProperty()
@@ -51,4 +51,9 @@ export class CreateGameDto {
     @IsOptional()
     @IsString()
     _id?: string;
+
+    @ApiProperty({ required: false })
+    @IsOptional()
+    @IsString()
+    thumbnail?: string;
 }
