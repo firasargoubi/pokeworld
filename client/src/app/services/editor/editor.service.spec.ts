@@ -6,6 +6,7 @@ import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode, MapSize } from '@common/interfaces/map-data';
 import { Position } from '@common/interfaces/position';
@@ -19,6 +20,7 @@ describe('EditorService', () => {
     let gameValidationServiceSpy: jasmine.SpyObj<GameValidationService>;
     let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
     let gameDataServiceSpy: jasmine.SpyObj<GameDataService>;
+    let thumbnailServiceSpy: jasmine.SpyObj<ThumbnailService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let routerSpy: jasmine.SpyObj<Router>;
 
@@ -32,6 +34,7 @@ describe('EditorService', () => {
                 gameData: structuredClone(MOCK_GAME_DATAS[0]),
             },
         );
+        thumbnailServiceSpy = jasmine.createSpyObj('ThumbnailService', ['getThumbnail']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -41,6 +44,7 @@ describe('EditorService', () => {
                 { provide: GameValidationService, useValue: gameValidationServiceSpy },
                 { provide: GameSaveService, useValue: gameSaveServiceSpy },
                 { provide: GameDataService, useValue: gameDataServiceSpy },
+                { provide: ThumbnailService, useValue: thumbnailServiceSpy },
                 { provide: PopupService, useValue: popupServiceSpy },
                 { provide: Router, useValue: routerSpy },
             ],

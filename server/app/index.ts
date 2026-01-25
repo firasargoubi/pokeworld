@@ -2,12 +2,16 @@ import { AppModule } from '@app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as express from 'express';
 
 const bootstrap = async () => {
     const app = await NestFactory.create(AppModule);
     app.setGlobalPrefix('api');
     app.useGlobalPipes(new ValidationPipe());
     app.enableCors();
+
+    app.use(express.json({ limit: '20mb' }));
+    app.use(express.urlencoded({ limit: '20mb', extended: true }));
 
     const config = new DocumentBuilder()
         .setTitle('Cadriciel Serveur')

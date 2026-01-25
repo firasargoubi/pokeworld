@@ -5,6 +5,7 @@ import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { GameValidationService } from '@app/services/game-validation/game-validation.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { MAX_ITEM_COUNT } from '@common/consts/item-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
@@ -21,6 +22,7 @@ export class EditorService {
     private gameValidationService: GameValidationService = inject(GameValidationService);
     private gameSaveService: GameSaveService = inject(GameSaveService);
     private popupService: PopupService = inject(PopupService);
+    private thumbnailService: ThumbnailService = inject(ThumbnailService);
 
     pickItem(position: Position) {
         this.gameDataService.removeItem(position);
@@ -125,6 +127,7 @@ export class EditorService {
     private async saveGameOnServer(): Promise<boolean> {
         this.gameDataService.gameData.isVisible = false;
         this.gameDataService.gameData.lastEdited = new Date();
+        this.gameDataService.gameData.thumbnail = await this.thumbnailService.getThumbnail(this.gameDataService.gameData.mapData, true);
 
         try {
             await firstValueFrom(this.gameSaveService.saveGame(this.gameDataService.gameData));

@@ -139,6 +139,22 @@ $bg-btn-red: linear-gradient(
 .card-global-container {
     position: relative;
     overflow: visible;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(calc(var(--base-size) * 2));
+    }
+    60% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .game-card {
@@ -189,6 +205,7 @@ $bg-btn-red: linear-gradient(
     background-size: cover;
     opacity: 0;
     transition: opacity 0.36s;
+    background-position: center;
 }
 
 .visible {
