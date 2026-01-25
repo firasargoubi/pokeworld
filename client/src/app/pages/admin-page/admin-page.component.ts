@@ -67,7 +67,7 @@ export class AdminPageComponent implements OnInit {
 
     deleteGame(id: string, name: string) {
         this.popupService.showPopup({
-            message: `${PopupMessage.DeleteGame} ${name}`,
+            message: `${PopupMessage.DeleteGame} \n\t - ${name}`,
             hasCloseButton: true,
             isConfirmation: true,
             action: () => this.confirmDeleteGame(id),

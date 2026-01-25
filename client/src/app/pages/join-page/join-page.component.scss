@@ -143,6 +143,7 @@ $visual-number-padding-left: calc($base-size * 0.5);
     text-wrap: balance;
     padding: 0 1vw;
     word-break: break-word;
+    user-select: none;
 }
 
 #visual-input-container {

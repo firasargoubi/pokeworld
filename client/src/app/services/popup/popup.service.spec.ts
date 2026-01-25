@@ -119,7 +119,7 @@ describe('PopupService', () => {
         expect(service['overlayRefs'].length).toBe(0);
     }));
 
-    it('should adjust z-index correctly', () => {
+    it('should adjust display correctly', () => {
         const popupMessage: Popup = {
             message: 'Test message',
             hasCloseButton: true,
@@ -127,10 +127,10 @@ describe('PopupService', () => {
         };
         service.showPopup(popupMessage);
         const container = overlayContainer.getContainerElement();
-        expect(container.style.zIndex).toBe('99');
+        expect(container.style.display).toBe('flex');
 
-        service['setOverlayZIndexLow']();
-        expect(container.style.zIndex).toBe('-99');
+        service['setOverlayDisplayNone']();
+        expect(container.style.display).toBe('none');
     });
 
     it('should clear messages on navigation by default', () => {
@@ -167,7 +167,7 @@ describe('PopupService', () => {
         expect(service['overlayRefs'].length).toBe(1);
     }));
 
-    it('should set and reset z-index correctly', () => {
+    it('should set and reset display correctly', () => {
         const popupMessage: Popup = {
             message: 'Test message',
             hasCloseButton: true,
@@ -175,10 +175,10 @@ describe('PopupService', () => {
         };
         service.showPopup(popupMessage);
         const container = overlayContainer.getContainerElement();
-        expect(container.style.zIndex).toBe('99');
+        expect(container.style.display).toBe('flex');
 
         service.clearMessages();
-        expect(container.style.zIndex).toBe('-99');
+        expect(container.style.display).toBe('none');
     });
 
     it('should access popup components via getter', () => {
@@ -274,7 +274,7 @@ describe('PopupService', () => {
         ];
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        spyOn<any>(service, 'setOverlayZIndexLow');
+        spyOn<any>(service, 'setOverlayDisplayNone');
 
         service['removeMessagesByFilter']((msg) => msg.includes('debug'));
 
@@ -283,11 +283,11 @@ describe('PopupService', () => {
         expect(mockOverlayRef1.dispose).toHaveBeenCalled();
         expect(mockOverlayRef2.dispose).not.toHaveBeenCalled();
         expect(service['overlayRefs'].length).toBe(1);
-        expect(service['setOverlayZIndexLow']).not.toHaveBeenCalled();
+        expect(service['setOverlayDisplayNone']).not.toHaveBeenCalled();
 
         service['overlayRefs'][0].componentRef.instance.message = 'debug too';
         service['removeMessagesByFilter']((msg) => msg.includes('debug') || msg.includes('other'));
-        expect(service['setOverlayZIndexLow']).toHaveBeenCalled();
+        expect(service['setOverlayDisplayNone']).toHaveBeenCalled();
         expect(service['overlayRefs'].length).toBe(0);
     });
 
@@ -324,4 +324,27 @@ describe('PopupService', () => {
         expect(service.popupComponents[0].message).toBe('new debug info');
         expect(service.popupComponents[1].message).toBe('regular message without keyword');
     }));
+
+    it('should handle overlay click and close popup when clicking on container', () => {
+        const popupMessage: Popup = {
+            message: 'Test message',
+            hasCloseButton: true,
+            isConfirmation: false,
+        };
+
+        service.showPopup(popupMessage);
+
+        const containerElement = overlayContainer.getContainerElement();
+        const overlayRef = service['overlayRefs'][0].overlayRef;
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'handlePopupClose');
+
+        const clickEvent = new MouseEvent('click', { bubbles: true });
+        Object.defineProperty(clickEvent, 'target', { value: containerElement, enumerable: true });
+
+        containerElement.dispatchEvent(clickEvent);
+
+        expect(service['handlePopupClose']).toHaveBeenCalledWith(false, overlayRef, popupMessage);
+    });
 });

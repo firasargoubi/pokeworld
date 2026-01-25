@@ -109,7 +109,7 @@ export class MatchService {
     private onDisconnect() {
         if (this.isInMatch()) {
             this.popupService.keepMessages();
-            this.popupService.showPopup({ message: PopupMessage.ConnectionError, hasCloseButton: true, isConfirmation: false });
+            this.popupService.showPopup({ message: PopupMessage.ConnectionError, hasCloseButton: false, isConfirmation: false });
             this.resetMatchData();
             this.router.navigate([PageEndpoint.Menu]);
         }
@@ -148,7 +148,7 @@ export class MatchService {
                 });
             } else {
                 this.router.navigate([PageEndpoint.Menu]);
-                this.popupService.showPopup({ message: reason, hasCloseButton: true, isConfirmation: false });
+                this.popupService.showPopup({ message: reason, hasCloseButton: false, isConfirmation: false });
             }
             this.resetMatchData();
         }

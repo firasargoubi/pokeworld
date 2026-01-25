@@ -142,13 +142,6 @@ describe('CombatPageComponent', () => {
         expect(component.visualData.selfImage).toEqual(AVATAR_DATA.missingNo.backGif);
     });
 
-    it('should set displayChat to false when hideChat is called', () => {
-        component.displayChat = true;
-        expect(component.displayChat).toBeTrue();
-        component.hideChat();
-        expect(component.displayChat).toBeFalse();
-    });
-
     it('should correctly determine if a player has healed based on health, combat action, and state', () => {
         const playerData: PlayerCombatData = structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]);
         const oldMatchData: MatchData = structuredClone(MOCK_MATCH_DATAS[0]);
@@ -188,7 +181,7 @@ describe('CombatPageComponent', () => {
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith({
             message: 'Enemy Player a gagné le combat',
-            hasCloseButton: true,
+            hasCloseButton: false,
             isConfirmation: false,
             popupColor: PopupColor.Blue,
         });
@@ -210,7 +203,7 @@ describe('CombatPageComponent', () => {
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith({
             message: 'Self Player a gagné le combat',
-            hasCloseButton: true,
+            hasCloseButton: false,
             isConfirmation: false,
             popupColor: PopupColor.Blue,
         });
@@ -231,7 +224,7 @@ describe('CombatPageComponent', () => {
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith({
             message: 'Aucun gagnant',
-            hasCloseButton: true,
+            hasCloseButton: false,
             isConfirmation: false,
             popupColor: PopupColor.Blue,
         });

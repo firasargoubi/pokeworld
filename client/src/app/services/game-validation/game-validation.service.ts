@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { MAX_ITEM_COUNT } from '@common/consts/item-data.const';
 import {
     BridgeValidationError,
     ErrorMessage,
@@ -11,6 +10,7 @@ import {
     ValidationResult,
     ValidationStatus,
 } from '@app/interfaces/game-validation';
+import { MAX_ITEM_COUNT } from '@common/consts/item-data.const';
 import { PERCENTAGE_FACTOR } from '@common/consts/track-data.const';
 import { GameData } from '@common/interfaces/game-data';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -43,20 +43,20 @@ export class GameValidationService {
             }
 
             if (key === 'terrainCoverage') {
-                errors.push(`  - ${ErrorMessage.TerrainCoverage} (${value.coveragePercentage}%)`);
+                errors.push(` - ${ErrorMessage.TerrainCoverage} (${value.coveragePercentage}%)`);
             } else if (key === 'tilesAccessibility') {
-                errors.push(`  - ${ErrorMessage.TilesAccessibility}`);
+                errors.push(` - ${ErrorMessage.TilesAccessibility}`);
             } else if (key === 'items') {
-                errors.push(`  - ${ErrorMessage.Items} (${value.misplacedItems.length})`);
+                errors.push(` - ${ErrorMessage.Items} (${value.misplacedItems.length})`);
             } else if (key === 'bridge') {
                 value.errors.forEach((error: BridgeValidationError) => {
-                    errors.push(`  - ${ErrorMessage.Bridge} [${error.x},${error.y}]: ${error.errorMessage}`);
+                    errors.push(` - [${error.x},${error.y}]: ${error.errorMessage}`);
                 });
             } else if (key === 'mode') {
-                errors.push(`  - ${ErrorMessage.Mode}`);
+                errors.push(` - ${ErrorMessage.Mode}`);
             } else {
                 const errorMessage: ValidationStatus = value;
-                errors.push(`  - ${key}: ${errorMessage.errorMessage}`);
+                errors.push(` - ${key}: ${errorMessage.errorMessage}`);
             }
         }
 

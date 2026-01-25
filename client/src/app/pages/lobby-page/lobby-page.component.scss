@@ -125,7 +125,7 @@ $player-card-width: calc($base-size * 70);
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    margin: 0 0 0 2%;
+    margin: 0 0 0 calc($base-size * 2);
 
     border: calc($corner-square-size * 2) solid $color-access-border;
     clip-path: $clip-path;
@@ -322,7 +322,7 @@ $player-card-width: calc($base-size * 70);
     height: 50vh;
     z-index: 1;
     bottom: 3%;
-    left: 2.3%;
+    left: calc($base-size * 4);
     opacity: 1;
     transform-origin: bottom left;
     transform: scale(1);

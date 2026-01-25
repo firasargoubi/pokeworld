@@ -3,10 +3,10 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { ComponentRef, inject, Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
+import { KEYWORDS_TO_REPLACE } from '@app/consts/popup-message.const';
 import { Popup } from '@app/interfaces/popup';
 import { filter } from 'rxjs/operators';
 import { POPUP_DELAY } from './popup.service.const';
-import { KEYWORDS_TO_REPLACE } from '@app/consts/popup-message.const';
 
 @Injectable({
     providedIn: 'root',
@@ -43,7 +43,7 @@ export class PopupService {
     }
 
     clearMessages() {
-        this.setOverlayZIndexLow();
+        this.setOverlayDisplayNone();
         this.messages = [];
         this.overlayRefs.forEach(({ overlayRef }) => overlayRef.dispose());
         this.overlayRefs = [];
@@ -65,7 +65,7 @@ export class PopupService {
         this.overlayRefs = this.overlayRefs.filter((ref) => !popupsToRemove.includes(ref));
 
         if (this.overlayRefs.length === 0) {
-            this.setOverlayZIndexLow();
+            this.setOverlayDisplayNone();
         }
     }
 
@@ -75,9 +75,10 @@ export class PopupService {
 
         const overlayConfig = new OverlayConfig({
             hasBackdrop: false,
+            positionStrategy: this.overlay.position().global().centerHorizontally().centerVertically(),
         });
         const overlayRef = this.overlay.create(overlayConfig);
-        this.setOverlayZIndexHigh();
+        this.setOverlayDisplayFlex();
 
         const popupPortal = new ComponentPortal(WarningConfirmationPopupComponent);
         const popupComponentRef = overlayRef.attach(popupPortal);
@@ -93,11 +94,25 @@ export class PopupService {
             this.handlePopupClose(confirmed, overlayRef, currentMessage);
         });
 
+        this.handleOverlayClick(overlayRef, currentMessage);
+
         if (!currentMessage.isConfirmation) {
             setTimeout(() => {
                 this.handlePopupClose(false, overlayRef, null);
             }, POPUP_DELAY);
         }
+    }
+
+    private handleOverlayClick(overlayRef: OverlayRef, currentMessage: Popup | null) {
+        const containerElement = this.overlayContainer.getContainerElement();
+        const clickHandler = (event: MouseEvent) => {
+            if (event.target === containerElement) {
+                this.handlePopupClose(false, overlayRef, currentMessage);
+                containerElement.removeEventListener('click', clickHandler);
+            }
+        };
+        containerElement.addEventListener('click', clickHandler);
+        return containerElement;
     }
 
     private handlePopupClose(confirmed: boolean, overlayRef: OverlayRef, message: Popup | null) {
@@ -110,15 +125,15 @@ export class PopupService {
         this.overlayRefs = this.overlayRefs.filter(({ overlayRef: ref }) => ref !== overlayRef);
 
         if (this.overlayRefs.length === 0) {
-            this.setOverlayZIndexLow();
+            this.setOverlayDisplayNone();
         }
     }
 
-    private setOverlayZIndexLow() {
-        this.overlayContainer.getContainerElement().setAttribute('style', 'z-index: -99');
+    private setOverlayDisplayNone() {
+        this.overlayContainer.getContainerElement().setAttribute('style', 'display: none;');
     }
 
-    private setOverlayZIndexHigh() {
-        this.overlayContainer.getContainerElement().setAttribute('style', 'z-index: 99');
+    private setOverlayDisplayFlex() {
+        this.overlayContainer.getContainerElement().setAttribute('style', 'display: flex;');
     }
 }

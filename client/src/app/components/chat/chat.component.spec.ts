@@ -1,6 +1,7 @@
 import { ElementRef, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
@@ -162,5 +163,17 @@ describe('ChatComponent', () => {
         expect(mockElement.nativeElement.scrollTop).toBe(mockElement.nativeElement.scrollHeight);
 
         expect(component['shouldScrollToBottom']).toBeFalse();
+    });
+
+    it('should toggle component visibility', () => {
+        const initialVisibility = component.isComponentVisible;
+        component.switchVisibility();
+
+        expect(mockAudioService.playEffect).toHaveBeenCalledWith(SoundEffect.Click);
+        expect(component.isComponentVisible).toBe(!initialVisibility);
+
+        component.switchVisibility();
+
+        expect(component.isComponentVisible).toBe(initialVisibility);
     });
 });

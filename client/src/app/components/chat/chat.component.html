@@ -1,50 +1,46 @@
-<div class="chat-container">
-    <div class="background-container">
-        <div class="message-background"></div>
-        <div class="input-background"></div>
-    </div>
+<div class="chat-container" [class.hidden]="!this.isComponentVisible" [class.hide-labels]="hideLabels" [style.--scale-factor]="scaleFactor">
+    <div class="chat-toggle-button" (click)="switchVisibility()"></div>
+    <div class="horizontal-border" (click)="switchVisibility()"><p>></p></div>
     <div class="chat-body">
-        <div class="tabs-container">
-            @if (onClickAction) {
-            <div class="tab close-tab" (click)="onClickAction()">X</div>
-            }
-            <div class="tab" [class.active]="isChatActive()" (click)="switchTab(true)">Messagerie</div>
-            <div class="tab" [class.active]="!isChatActive()" (click)="switchTab(false)">Journal</div>
-            @if (!isChatActive()) {
-            <div class="filter-button" [class.active]="isFilterEnabled()" (click)="toggleFilter()">
-                <span class="filter-icon" [class.active]="isFilterEnabled()"></span>
+        <div class="chat-interactions-container">
+            <div class="categories-container">
+                <div class="category-button messages-button" [class.active]="isChatActive()" (click)="switchTab(true)">
+                    <div class="icon"></div>
+                    <p>Messagerie</p>
+                </div>
+                <div class="category-button journal-button" [class.active]="!isChatActive()" (click)="switchTab(false)">
+                    <div class="icon"></div>
+                    <p>Journal</p>
+                </div>
             </div>
-            }
+            <div class="filter-button" [class.filter-active]="isFilterEnabled()" (click)="toggleFilter()">
+                <div class="icon"></div>
+            </div>
         </div>
-        @if (isChatActive()) {
-        <div class="message-container" #chatContainer>
-            @for (message of chatMessages; track $index) {
-            <p class="message">
-                <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}]</span>
-                <span class="message-content sender">{{ message.sender }}:</span>
-                <span class="message-content">{{ message.content }}</span>
+        <div class="chat-messages-container" #chatContainer>
+            @if (isChatActive()) { @for (message of chatMessages; track $index) {
+            <p class="messages">
+                <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
+                <span class="message-content sender">{{ message.sender }}: </span>
+                <span class="message-content message">{{ message.content }}</span>
             </p>
-            }
-        </div>
-        } @else {
-        <div class="message-container" #chatContainer>
-            @for (message of logs; track $index) {
-            <p class="message">
-                <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}]</span>
-                <span class="message-content">{{ message.content }}</span>
+            } } @else { @for (message of logs; track $index) {
+            <p class="messages">
+                <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
+                <span class="message-content message">{{ message.content }}</span>
             </p>
-            }
+            } }
         </div>
-        }
-        <div class="input-container">
+        <div class="chat-input-container">
             <input
                 type="text"
-                placeholder="Entrez message [Enter]"
+                placeholder="> Entrez message [Enter]"
                 class="message-input"
                 (keydown)="sendMessage($event)"
-                [maxLength]="this.maxInputLenght"
+                [maxLength]="this.maxInputLength"
                 (click)="this.audioService.playEffect(this.clickValue)"
             />
         </div>
     </div>
+    <div class="horizontal-border"></div>
 </div>
