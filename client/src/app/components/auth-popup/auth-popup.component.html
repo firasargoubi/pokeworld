@@ -1,0 +1,30 @@
+<div class="editor-left auth-popup">
+    <div class="auth-inner">
+        <div class="left-label">{{ isCreating ? 'Créer un compte' : 'Connexion' }}</div>
+
+        <div class="form-row">
+            <div class="left-label-small">Nom d'utilisateur</div>
+            <input
+                class="input-name"
+                type="text"
+                autocomplete="false"
+                maxlength="20"
+                [(ngModel)]="username"
+                (click)="this.audioService.playEffect(this.clickValue)"
+            />
+        </div>
+
+        <div class="form-row">
+            <div class="left-label-small">Mot de passe</div>
+            <input class="input-password" type="password" [(ngModel)]="password" (click)="this.audioService.playEffect(this.clickValue)" />
+        </div>
+        @if(errorMessage) {
+        <div class="error">{{ errorMessage }}</div>
+        }
+
+        <div class="buttons">
+            <button (click)="primaryAction()" class="save-button">{{ isCreating ? 'Créer un compte' : 'Se connecter' }}</button>
+            <button (click)="toggleAction()" class="change-button">{{ isCreating ? 'Se connecter' : 'Créer un compte' }}</button>
+        </div>
+    </div>
+</div>

@@ -2,12 +2,14 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameController } from './controllers/game/game.controller';
+import { UserController } from './controllers/user/user.controller';
 import { ChatGateway } from './gateways/chat/chat.gateway';
 import { CombatGateway } from './gateways/combat/combat.gateway';
 import { LobbyGateway } from './gateways/lobby/lobby.gateway';
 import { MatchGateway } from './gateways/match/match.gateway';
 import { PlayGateway } from './gateways/play/play.gateway';
 import { Game, gameSchema } from './model/schema/game.schema';
+import { User, userSchema } from './model/schema/user.schema';
 import { BotService } from './services/bot/bot.service';
 import { ChatService } from './services/chat/chat.service';
 import { CombatService } from './services/combat/combat.service';
@@ -18,6 +20,7 @@ import { MapService } from './services/map/map.service';
 import { MatchService } from './services/match/match.service';
 import { PlayService } from './services/play/play.service';
 import { TrackingService } from './services/tracking/tracking.service';
+import { UserService } from './services/user/user.service';
 
 @Module({
     imports: [
@@ -29,9 +32,12 @@ import { TrackingService } from './services/tracking/tracking.service';
                 uri: config.get<string>('DATABASE_CONNECTION_STRING'),
             }),
         }),
-        MongooseModule.forFeature([{ name: Game.name, schema: gameSchema }]),
+        MongooseModule.forFeature([
+            { name: Game.name, schema: gameSchema },
+            { name: User.name, schema: userSchema },
+        ]),
     ],
-    controllers: [GameController],
+    controllers: [GameController, UserController],
     providers: [
         Logger,
 
@@ -44,6 +50,7 @@ import { TrackingService } from './services/tracking/tracking.service';
         ChatService,
         BotService,
         ItemService,
+        UserService,
 
         MatchGateway,
         LobbyGateway,

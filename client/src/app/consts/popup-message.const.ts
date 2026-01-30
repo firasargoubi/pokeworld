@@ -10,6 +10,10 @@ export enum PopupMessage {
     Surrender = 'Voulez-vous vraiment abandonner ?',
     ConnectionError = 'Erreur de connection avec le serveur',
     NameAlreadyExists = 'Le nom est déjà utilisé. Veuillez en choisir un autre.',
+    InvalidCredentials = "Nom d'utilisateur ou mot de passe invalide.",
+    SuccessfulConnection = 'Connecté avec succès !',
+    SuccessfulAccountCreation = 'Compte créé avec succès !',
+    LogoutConfirmation = 'Êtes-vous sûr de vouloir vous déconnecter ?',
 }
 
 export const KEYWORDS_TO_REPLACE = ['debug'];

@@ -1,0 +1,78 @@
+$input-border-color: rgba(255, 255, 255, 0.82);
+$input-bg-normal: hsla(231, 12%, 45%, 0.7);
+$input-bg-active: hsla(231, 12%, 45%, 0.6);
+$font-size: 20px;
+
+.auth-popup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size;
+}
+
+.auth-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: $font-size;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-row input {
+    padding: 8px;
+    border: none;
+    font-size: $font-size;
+    font-family: 'pixel';
+}
+
+.buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+}
+
+.save-button,
+.change-button {
+    display: block;
+    padding: 8px;
+    height: auto;
+    width: auto;
+    text-decoration: none;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background: $input-bg-normal;
+    font-family: 'pixel';
+    font-size: $font-size;
+    cursor: pointer;
+}
+
+.save-button:hover,
+.change-button:hover {
+    border-color: $input-border-color;
+}
+
+.change-button:active {
+    background: $input-bg-active;
+}
+
+.save-button {
+    background: hsl(203, 100%, 38%);
+}
+
+.save-button:active {
+    background: hsl(203, 100%, 42%);
+}
+
+.error {
+    color: #ff6666;
+    font-size: $font-size;
+}
