@@ -128,8 +128,8 @@ pages:
             - public
 
 variables:
-    EC2_USER: ec2-user
     ORIGIN: 'https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}'
+
 
 deploy:server:
     stage: deploy
@@ -139,15 +139,15 @@ deploy:server:
     script:
         - 'which ssh-agent || (apt-get update -qq && apt-get install -qq openssh-client )'
         - eval $(ssh-agent -s)
-        - ssh-add <(echo "$EC2_PEM_FILE_CONTENT")
+        - ssh-add <(echo "$DO_SSH_PRIVATE_KEY")
         - mkdir -p ~/.ssh
         - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
         - |
-            timeout 600 ssh -t -oStrictHostKeyChecking=no -o ServerAliveInterval=15 -o ServerAliveCountMax=5 "${EC2_USER}@${EC2_HOST}" "
+            timeout 600 ssh -t -oStrictHostKeyChecking=no -o ServerAliveInterval=15 -o ServerAliveCountMax=5 "${DO_SSH_USER}@${DO_HOST}" "
                 set -e
 
                 echo 'Update repository cache'
-                sudo yum update -y
+                sudo apt update
 
                 echo 'Setting up swap memory'
                 if test -f '/swapfile'
@@ -166,7 +166,7 @@ deploy:server:
                 then
                     echo 'git is already installed, skipping...'
                 else
-                    sudo yum install -y git
+                    sudo apt install git
                 fi
 
                 echo 'Setting up node'
@@ -186,15 +186,6 @@ deploy:server:
                     echo 'forever is already installed, skipping...'
                 else
                     npm install forever -g
-                fi
-
-                echo 'Setting up amazon-cloudwatch-agent'
-                if yum list installed amazon-cloudwatch-agent &> /dev/null
-                then
-                    echo 'amazon-cloudwatch-agent is already installed, skipping...'
-                else
-                    sudo yum install -y amazon-cloudwatch-agent
-                    sudo amazon-cloudwatch-agent-ctl -a start -m ec2
                 fi
 
                 set -xv
@@ -223,9 +214,6 @@ deploy:server:
                 # Create /var/log/messages file if not exists
                 [[ -f /var/log/messages ]] || sudo touch /var/log/messages
                 sudo chmod 777 /var/log/messages
-                
-                # Refresh amazon-cloudwatch-agent config
-                sudo amazon-cloudwatch-agent-ctl -a fetch-config -s -m ec2 -c file:../amazon-cloudwatch-agent-config.json
 
                 # Launch the server in background and append output to /var/log/messages for CloudWatch
                 PORT=${SERVER_PORT} forever start -a -l /var/log/messages out/server/app/index.js
