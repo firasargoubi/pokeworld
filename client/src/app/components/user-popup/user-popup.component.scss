@@ -1,0 +1,111 @@
+$corner-square-size: calc(0.5 * min(1vh, 1vw));
+$inner-shadow-width: calc(0.7 * min(1vh, 1vw));
+$inset-offset: calc($corner-square-size * 0.9);
+$inset-offset-neg: calc($corner-square-size * -0.9);
+$inset-light: #80c0d8;
+$inset-dark: #2878b0;
+$input-border-color: rgba(255, 255, 255, 0.82);
+$input-bg-normal: hsla(231, 12%, 45%, 0.7);
+$input-bg-active: hsla(231, 12%, 45%, 0.6);
+$font-size: 15px;
+
+.user-popup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 200px;
+    position: relative;
+}
+
+.user-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 80%;
+    text-align: center;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'pixel';
+    font-size: 14px;
+    color: #000;
+    padding: 5px;
+}
+
+.label {
+    font-weight: bold;
+    font-size: $font-size;
+}
+
+.value {
+    font-style: italic;
+    font-size: $font-size;
+}
+
+.avatar-image {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.info-row button {
+    background: linear-gradient(180deg, #7bd1ff, #b1e6ff);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 0;
+    cursor: pointer;
+    font-family: 'pixel';
+    font-size: $font-size;
+    color: #000;
+    width: 100%;
+}
+
+.buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+}
+
+.logout-button {
+    display: block;
+    padding: 8px;
+    height: auto;
+    width: auto;
+    text-decoration: none;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background: $input-bg-normal;
+    font-family: 'pixel';
+    font-size: $font-size;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    border-color: $input-border-color;
+}
+
+.logout-button {
+    background: hsl(203, 100%, 38%);
+}
+
+.logout-button:active {
+    background: hsl(203, 100%, 42%);
+}

@@ -1,0 +1,21 @@
+<div class="user-popup">
+    <div class="user-inner">
+        <div class="user-info">
+            <div class="avatar-box">
+                <img [src]="avatarImage" alt="Avatar" class="avatar-image" />
+            </div>
+
+            <div class="info-row">
+                <span class="label">Nom:</span>
+                <span class="value">{{ currentUser ? currentUser.username : 'None' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">ID:</span>
+                <span class="value">{{ currentUser ? currentUser.userId : 'None' }}</span>
+            </div>
+        </div>
+        <div class="buttons">
+            <button (click)="logout()" class="logout-button">Se déconnecter</button>
+        </div>
+    </div>
+</div>

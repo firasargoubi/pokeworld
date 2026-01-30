@@ -2,12 +2,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
+import { UserService } from '@app/services/user/user.service';
 import { MenuPageComponent } from './menu-page.component';
 
 describe('MenuPageComponent', () => {
     let component: MenuPageComponent;
     let fixture: ComponentFixture<MenuPageComponent>;
     let mockAudioService: jasmine.SpyObj<AudioService>;
+    let mockUserService: jasmine.SpyObj<UserService>;
 
     beforeEach(async () => {
         mockAudioService = jasmine.createSpyObj('AudioService', [
@@ -17,9 +19,18 @@ describe('MenuPageComponent', () => {
             'setEffectsVolume',
         ]);
 
+        mockUserService = jasmine.createSpyObj('UserService', [], {
+            user$: {
+                subscribe: () => undefined,
+            },
+        });
+
         await TestBed.configureTestingModule({
             imports: [RouterModule.forRoot([]), MenuPageComponent],
-            providers: [{ provide: AudioService, useValue: mockAudioService }],
+            providers: [
+                { provide: AudioService, useValue: mockAudioService },
+                { provide: UserService, useValue: mockUserService },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(MenuPageComponent);
