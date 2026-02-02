@@ -95,3 +95,21 @@ body {
 app-warning-confirmation-popup {
     pointer-events: auto;
 }
+
+.chat-container {
+    $base-size: min(1vh, 1vw);
+    position: absolute;
+    width: 50vw;
+    height: 50vh;
+    z-index: 11;
+    bottom: 3%;
+    left: calc($base-size * 4);
+    opacity: 1;
+    transform-origin: bottom left;
+    transform: scale(1);
+    pointer-events: none;
+
+    * {
+        pointer-events: auto;
+    }
+}

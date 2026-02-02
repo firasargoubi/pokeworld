@@ -1,22 +1,33 @@
 import { TestBed } from '@angular/core/testing';
 import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
+import { UserService } from '@app/services/user/user.service';
 import { ChatService } from './chat.service';
 
 describe('ChatService', () => {
     let service: ChatService;
     let mockMatchService: jasmine.SpyObj<MatchService>;
     let mockSocketService: jasmine.SpyObj<SocketService>;
+    let mockUserService: jasmine.SpyObj<UserService>;
 
     beforeEach(() => {
         mockMatchService = jasmine.createSpyObj('MatchService', ['isInMatch'], {
             selfPlayer: { name: 'TestUser' },
         });
 
-        mockSocketService = jasmine.createSpyObj('SocketService', ['emit']);
+        mockSocketService = jasmine.createSpyObj('SocketService', ['emit', 'on']);
+
+        mockUserService = jasmine.createSpyObj('UserService', [], {
+            currentUserSubject: { value: { username: 'TestUser' } },
+        });
 
         TestBed.configureTestingModule({
-            providers: [ChatService, { provide: MatchService, useValue: mockMatchService }, { provide: SocketService, useValue: mockSocketService }],
+            providers: [
+                ChatService,
+                { provide: MatchService, useValue: mockMatchService },
+                { provide: SocketService, useValue: mockSocketService },
+                { provide: UserService, useValue: mockUserService },
+            ],
         });
 
         service = TestBed.inject(ChatService);

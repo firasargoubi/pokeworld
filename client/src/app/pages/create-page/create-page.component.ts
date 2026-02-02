@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PopupMessage } from '@app/consts/popup-message.const';
@@ -15,7 +16,7 @@ import { GameData } from '@common/interfaces/game-data';
     selector: 'app-create-page',
     templateUrl: './create-page.component.html',
     styleUrls: ['./create-page.component.scss'],
-    imports: [GameCardComponent, HeaderComponent],
+    imports: [GameCardComponent, HeaderComponent, ChatComponent],
 })
 export class CreatePageComponent implements OnInit {
     games: GameData[] = [];

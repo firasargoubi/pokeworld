@@ -6,6 +6,15 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { JoinPageComponent } from './join-page.component';
 import { MatchService } from '@app/services/match/match.service';
 import { AudioService } from '@app/services/audio/audio.service';
+import { ChatComponent } from '@app/components/chat/chat.component';
+import { Component } from '@angular/core';
+
+@Component({
+    selector: 'app-chat',
+    standalone: true,
+    template: '',
+})
+class MockChatComponent {}
 
 describe('JoinPageComponent', () => {
     let component: JoinPageComponent;
@@ -27,6 +36,11 @@ describe('JoinPageComponent', () => {
                 { provide: AudioService, useValue: mockAudioService },
             ],
         }).compileComponents();
+
+        TestBed.overrideComponent(JoinPageComponent, {
+            add: { imports: [MockChatComponent] },
+            remove: { imports: [ChatComponent] },
+        });
 
         fixture = TestBed.createComponent(JoinPageComponent);
         component = fixture.componentInstance;

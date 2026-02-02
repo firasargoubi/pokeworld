@@ -3,6 +3,7 @@ import { Component, HostListener, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { DEFAULT_CHARACTER_VISUAL_DATA } from '@app/consts/player-data.const';
 import { PopupMessage } from '@app/consts/popup-message.const';
@@ -19,7 +20,7 @@ import { Avatar, DiceType, PlayerData } from '@common/interfaces/player-data';
 
 @Component({
     selector: 'app-character-page',
-    imports: [ReactiveFormsModule, HeaderComponent, CommonModule, FormsModule],
+    imports: [ReactiveFormsModule, HeaderComponent, CommonModule, FormsModule, ChatComponent],
     templateUrl: './character-page.component.html',
     styleUrl: './character-page.component.scss',
 })

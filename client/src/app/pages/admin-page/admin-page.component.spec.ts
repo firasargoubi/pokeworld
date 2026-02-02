@@ -2,9 +2,11 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { VisibilityEvent } from '@app/interfaces/visibility-event';
 import { AudioService } from '@app/services/audio/audio.service';
+import { ChatService } from '@app/services/chat/chat.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
@@ -18,6 +20,12 @@ import { AdminPageComponent } from './admin-page.component';
     template: '',
 })
 class MockGameCardComponent {}
+@Component({
+    selector: 'app-chat',
+    standalone: true,
+    template: '',
+})
+class MockChatComponent {}
 
 describe('AdminPageComponent', () => {
     let component: AdminPageComponent;
@@ -25,13 +33,14 @@ describe('AdminPageComponent', () => {
     let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let routerSpy: jasmine.SpyObj<Router>;
+    let chatServiceSpy: jasmine.SpyObj<ChatService>;
     let mockAudioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
         gameSaveServiceSpy = jasmine.createSpyObj<GameSaveService>('GameSaveService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage', 'playBackgroundMusic']);
-
+        chatServiceSpy = jasmine.createSpyObj('ChatService', ['sendMessage', 'sendGeneralMessage']);
         gameSaveServiceSpy.getAllGames.and.returnValue(of([]));
         gameSaveServiceSpy.getGame.and.returnValue(of({} as GameData));
         gameSaveServiceSpy.toggleVisibility.and.returnValue(of({} as GameData));
@@ -46,12 +55,13 @@ describe('AdminPageComponent', () => {
                 { provide: PopupService, useValue: popupServiceSpy },
                 { provide: Router, useValue: routerSpy },
                 { provide: AudioService, useValue: mockAudioService },
+                { provide: ChatService, useValue: chatServiceSpy },
             ],
         }).compileComponents();
 
         TestBed.overrideComponent(AdminPageComponent, {
-            add: { imports: [MockGameCardComponent] },
-            remove: { imports: [GameCardComponent] },
+            add: { imports: [MockGameCardComponent, MockChatComponent] },
+            remove: { imports: [GameCardComponent, ChatComponent] },
         });
 
         fixture = TestBed.createComponent(AdminPageComponent);

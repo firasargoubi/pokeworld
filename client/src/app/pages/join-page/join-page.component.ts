@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
@@ -12,7 +13,7 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
     selector: 'app-join-page',
     templateUrl: './join-page.component.html',
     styleUrls: ['./join-page.component.scss'],
-    imports: [HeaderComponent, FormsModule],
+    imports: [HeaderComponent, FormsModule, ChatComponent],
 })
 export class JoinPageComponent implements OnInit {
     matchCode: string = '';

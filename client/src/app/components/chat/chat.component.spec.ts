@@ -6,6 +6,7 @@ import { AudioService } from '@app/services/audio/audio.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { ChatLog } from '@common/interfaces/chat-message';
+import { of } from 'rxjs';
 import { ChatComponent } from './chat.component';
 
 describe('ChatComponent', () => {
@@ -28,9 +29,12 @@ describe('ChatComponent', () => {
     ];
 
     beforeEach(async () => {
-        chatServiceSpy = jasmine.createSpyObj('ChatService', ['sendMessage'], {
+        chatServiceSpy = jasmine.createSpyObj('ChatService', ['sendMessage', 'sendGeneralMessage'], {
             isChatActive: signal(true),
+            isGeneralChatActive: signal(false),
             isFilterEnabled: signal(false),
+            isComponentVisible: signal(true),
+            generalMessages$: of([]),
         });
 
         matchServiceSpy = jasmine.createSpyObj('MatchService', [], {
@@ -71,11 +75,14 @@ describe('ChatComponent', () => {
     });
 
     it('should switch between chat and logs tabs', () => {
-        component.switchTab(false);
+        component.switchTab(false, false);
         expect(component.isChatActive()).toBeFalse();
 
-        component.switchTab(true);
+        component.switchTab(true, false);
         expect(component.isChatActive()).toBeTrue();
+
+        component.switchTab(false, true);
+        expect(component.isGeneralChatActive()).toBeTrue();
     });
 
     it('should toggle filter', () => {

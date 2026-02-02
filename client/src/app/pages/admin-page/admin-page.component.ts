@@ -14,12 +14,13 @@ import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
+import { ChatComponent } from '@app/components/chat/chat.component';
 
 @Component({
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
     styleUrls: ['./admin-page.component.scss'],
-    imports: [GameCardComponent, PokeballButtonComponent, CreateGamePopupComponent, CommonModule, HeaderComponent],
+    imports: [GameCardComponent, PokeballButtonComponent, CreateGamePopupComponent, CommonModule, HeaderComponent, ChatComponent],
 })
 export class AdminPageComponent implements OnInit {
     games: GameData[] = [];

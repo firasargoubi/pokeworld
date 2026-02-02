@@ -7,6 +7,7 @@ import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-chat',
@@ -18,14 +19,17 @@ import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
 export class ChatComponent implements OnInit, AfterViewChecked {
     @Input() hideLabels: boolean = false;
     @Input() scaleFactor: number = 1;
+    @Input() isInGame: boolean = true;
     @ViewChild('chatContainer') private chatContainerRef: ElementRef;
 
     isComponentVisible: boolean = false;
     isChatActive: WritableSignal<boolean>;
+    isGeneralChatActive: WritableSignal<boolean>;
     isFilterEnabled: WritableSignal<boolean>;
     maxInputLength = MAX_MESSAGE_LENGTH;
     chatMessages: ChatMessage[] = [];
     logs: ChatLog[] = [];
+    generalMessages$: Observable<ChatMessage[]>;
     readonly clickValue = SoundEffect.Click;
     readonly audioService: AudioService = inject(AudioService);
     private shouldScrollToBottom = false;
@@ -34,7 +38,13 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
     ngOnInit() {
         this.isChatActive = this.chatService.isChatActive;
+        this.isGeneralChatActive = this.chatService.isGeneralChatActive;
         this.isFilterEnabled = this.chatService.isFilterEnabled;
+        this.isComponentVisible = this.chatService.isComponentVisible();
+        this.generalMessages$ = this.chatService.generalMessages$;
+        this.generalMessages$.subscribe(() => {
+            this.shouldScrollToBottom = true;
+        });
         this.updateChatData();
         this.matchService.matchUpdate.subscribe(() => {
             this.updateChatData();
@@ -48,21 +58,25 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         }
     }
 
-    switchTab(isChat: boolean) {
+    switchTab(isChat: boolean, isGeneral: boolean) {
         this.audioService.playEffect(SoundEffect.Click);
         this.chatService.isChatActive.set(isChat);
+        this.chatService.isGeneralChatActive.set(isGeneral);
         this.shouldScrollToBottom = true;
     }
 
     toggleFilter() {
         this.audioService.playEffect(SoundEffect.Click);
-        this.chatService.isFilterEnabled.update((value) => !value);
+        this.chatService.isFilterEnabled.update((value: boolean) => !value);
         this.filterLogs();
         this.shouldScrollToBottom = true;
     }
 
     sendMessage(event: KeyboardEvent) {
         if (event.key !== 'Enter') {
+            if (this.isGeneralChatActive()) {
+                return;
+            }
             this.isChatActive.set(true);
             return;
         }
@@ -72,7 +86,12 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
         if (message) {
             input.value = '';
-            this.chatService.sendMessage(message);
+            const toGeneral = this.isGeneralChatActive() || !this.isInGame;
+            if (toGeneral) {
+                this.chatService.sendGeneralMessage(message);
+            } else {
+                this.chatService.sendMessage(message);
+            }
             this.shouldScrollToBottom = true;
         }
     }
@@ -80,6 +99,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     switchVisibility() {
         this.audioService.playEffect(SoundEffect.Click);
         this.isComponentVisible = !this.isComponentVisible;
+        this.chatService.isComponentVisible.set(this.isComponentVisible);
     }
 
     private updateChatData() {

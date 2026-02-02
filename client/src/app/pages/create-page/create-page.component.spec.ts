@@ -12,6 +12,7 @@ import { GameData } from '@common/interfaces/game-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { of, throwError } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
+import { ChatComponent } from '@app/components/chat/chat.component';
 
 @Component({
     selector: 'app-game-card',
@@ -23,6 +24,13 @@ class MockGameCardComponent {
     @Input() isAdminView: boolean = false;
     @Input() cardColor: string = 'blue-card';
 }
+
+@Component({
+    selector: 'app-chat',
+    standalone: true,
+    template: '',
+})
+class MockChatComponent {}
 
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
@@ -54,8 +62,8 @@ describe('CreatePageComponent', () => {
         }).compileComponents();
 
         TestBed.overrideComponent(CreatePageComponent, {
-            add: { imports: [MockGameCardComponent] },
-            remove: { imports: [GameCardComponent] },
+            add: { imports: [MockGameCardComponent, MockChatComponent] },
+            remove: { imports: [GameCardComponent, ChatComponent] },
         });
 
         fixture = TestBed.createComponent(CreatePageComponent);

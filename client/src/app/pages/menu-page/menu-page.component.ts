@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AudioSettingsComponent } from '@app/components/audio-settings/audio-settings.component';
 import { AuthPopupComponent } from '@app/components/auth-popup/auth-popup.component';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { MenuButtonComponent } from '@app/components/menu-button/menu-button.component';
 import { UserPopupComponent } from '@app/components/user-popup/user-popup.component';
 import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
@@ -15,7 +16,7 @@ import { UserInfo } from '@common/interfaces/user';
     selector: 'app-menu-page',
     templateUrl: './menu-page.component.html',
     styleUrls: ['./menu-page.component.scss'],
-    imports: [CommonModule, MenuButtonComponent, RouterModule, AudioSettingsComponent, AuthPopupComponent, UserPopupComponent],
+    imports: [CommonModule, MenuButtonComponent, RouterModule, AudioSettingsComponent, AuthPopupComponent, UserPopupComponent, ChatComponent],
 })
 export class MenuPageComponent {
     pageEndpoint = PageEndpoint;
