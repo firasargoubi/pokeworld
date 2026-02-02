@@ -4,27 +4,49 @@
     <div class="chat-body">
         <div class="chat-interactions-container">
             <div class="categories-container">
-                <div class="category-button messages-button" [class.active]="isChatActive()" (click)="switchTab(true)">
+                <div class="category-button messages-button" [class.active]="isGeneralChatActive() || !isInGame" (click)="switchTab(false, true)">
+                    <div class="icon"></div>
+                    <p>Général</p>
+                </div>
+                @if (isInGame) {
+                <div
+                    class="category-button messages-button"
+                    [class.active]="!isGeneralChatActive() && isChatActive()"
+                    (click)="switchTab(true, false)"
+                >
                     <div class="icon"></div>
                     <p>Messagerie</p>
                 </div>
-                <div class="category-button journal-button" [class.active]="!isChatActive()" (click)="switchTab(false)">
+                <div
+                    class="category-button journal-button"
+                    [class.active]="!isGeneralChatActive() && !isChatActive()"
+                    (click)="switchTab(false, false)"
+                >
                     <div class="icon"></div>
                     <p>Journal</p>
                 </div>
+                }
             </div>
+            @if(isInGame){
             <div class="filter-button" [class.filter-active]="isFilterEnabled()" (click)="toggleFilter()">
                 <div class="icon"></div>
             </div>
+            }
         </div>
         <div class="chat-messages-container" #chatContainer>
-            @if (isChatActive()) { @for (message of chatMessages; track $index) {
+            @if (isChatActive() && isInGame) { @for (message of chatMessages; track $index) {
             <p class="messages">
                 <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
                 <span class="message-content sender">{{ message.sender }}: </span>
                 <span class="message-content message">{{ message.content }}</span>
             </p>
-            } } @else { @for (message of logs; track $index) {
+            } } @else if (isGeneralChatActive() || !isInGame) { @for (message of generalMessages$ | async; track $index) {
+            <p class="messages">
+                <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
+                <span class="message-content sender">{{ message.sender }}: </span>
+                <span class="message-content message">{{ message.content }}</span>
+            </p>
+            }} @else { @for (message of logs; track $index) {
             <p class="messages">
                 <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
                 <span class="message-content message">{{ message.content }}</span>

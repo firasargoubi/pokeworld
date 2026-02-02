@@ -35,4 +35,5 @@ export enum CombatEvent {
 
 export enum ChatEvent {
     Message = 'message',
+    GeneralMessage = 'generalMessage',
 }

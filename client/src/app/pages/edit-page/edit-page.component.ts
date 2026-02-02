@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { ItemComponent } from '@app/components/item/item.component';
 import { MapComponent } from '@app/components/map/map.component';
@@ -27,7 +28,7 @@ import { TileType } from '@common/interfaces/tile-type.enum';
     selector: 'app-edit-page',
     templateUrl: './edit-page.component.html',
     styleUrls: ['./edit-page.component.scss'],
-    imports: [HeaderComponent, MapComponent, FormsModule, ItemComponent],
+    imports: [HeaderComponent, MapComponent, FormsModule, ItemComponent, ChatComponent],
 })
 export class EditPageComponent {
     gameDataService: GameDataService = inject(GameDataService);

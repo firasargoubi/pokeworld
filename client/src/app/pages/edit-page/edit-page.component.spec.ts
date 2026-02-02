@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { Component, Input } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
@@ -19,6 +20,7 @@ import { ItemType } from '@common/interfaces/item-type.enum';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { EditPageComponent } from './edit-page.component';
+import { ChatComponent } from '@app/components/chat/chat.component';
 
 @Component({
     selector: 'app-map',
@@ -40,6 +42,12 @@ class MockItemComponent {
     @Input() y: number = 0;
     @Input() showDescription: boolean = false;
 }
+@Component({
+    selector: 'app-chat',
+    standalone: true,
+    template: '',
+})
+class MockChatComponent {}
 
 describe('EditPageComponent', () => {
     let component: EditPageComponent;
@@ -91,8 +99,8 @@ describe('EditPageComponent', () => {
         }).compileComponents();
 
         TestBed.overrideComponent(EditPageComponent, {
-            add: { imports: [MockMapComponent, MockItemComponent] },
-            remove: { imports: [MapComponent, ItemComponent] },
+            add: { imports: [MockMapComponent, MockItemComponent, MockChatComponent] },
+            remove: { imports: [MapComponent, ItemComponent, ChatComponent] },
         });
 
         fixture = TestBed.createComponent(EditPageComponent);

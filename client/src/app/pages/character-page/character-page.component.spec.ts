@@ -9,6 +9,15 @@ import { Avatar } from '@common/interfaces/player-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { CharacterPageComponent } from './character-page.component';
+import { ChatComponent } from '@app/components/chat/chat.component';
+import { Component } from '@angular/core';
+
+@Component({
+    selector: 'app-chat',
+    standalone: true,
+    template: '',
+})
+class MockChatComponent {}
 
 describe('CharacterPageComponent', () => {
     let component: CharacterPageComponent;
@@ -40,6 +49,11 @@ describe('CharacterPageComponent', () => {
                 { provide: AudioService, useValue: mockAudioService },
             ],
         }).compileComponents();
+
+        TestBed.overrideComponent(CharacterPageComponent, {
+            add: { imports: [MockChatComponent] },
+            remove: { imports: [ChatComponent] },
+        });
 
         fixture = TestBed.createComponent(CharacterPageComponent);
         component = fixture.componentInstance;

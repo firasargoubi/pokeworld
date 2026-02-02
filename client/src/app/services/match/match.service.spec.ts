@@ -16,6 +16,7 @@ import { MatchEvent } from '@common/interfaces/socket-event.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MatchService } from './match.service';
+import { ChatService } from '@app/services/chat/chat.service';
 
 describe('MatchService', () => {
     let service: MatchService;
@@ -24,6 +25,7 @@ describe('MatchService', () => {
     let mapServiceSpy: jasmine.SpyObj<MapService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let routerSpy: jasmine.SpyObj<Router>;
+    let chatServiceSpy: jasmine.SpyObj<ChatService>;
 
     beforeEach(() => {
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['emit', 'on'], { selfId: 'selfId' });
@@ -31,6 +33,9 @@ describe('MatchService', () => {
         mapServiceSpy = jasmine.createSpyObj('MapService', ['startMatch', 'setPlayers', 'clearOverlays']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'keepMessages', 'clearMessages']);
         routerSpy = jasmine.createSpyObj('Router', ['navigate'], { events: { subscribe: () => ({}) } });
+        chatServiceSpy = jasmine.createSpyObj('ChatService', ['sendMessage', 'sendGeneralMessage', 'isChatActive', 'isFilterEnabled']);
+        chatServiceSpy.isChatActive = jasmine.createSpyObj('signal', ['get', 'set']);
+        chatServiceSpy.isFilterEnabled = jasmine.createSpyObj('signal', ['get', 'set']);
 
         TestBed.configureTestingModule({
             providers: [
@@ -40,6 +45,7 @@ describe('MatchService', () => {
                 { provide: MapService, useValue: mapServiceSpy },
                 { provide: PopupService, useValue: popupServiceSpy },
                 { provide: Router, useValue: routerSpy },
+                { provide: ChatService, useValue: chatServiceSpy },
             ],
         });
 

@@ -1,5 +1,6 @@
 import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
+import { ChatMessage } from '@common/interfaces/chat-message';
 import { ChatEvent } from '@common/interfaces/socket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -18,5 +19,14 @@ export class ChatGateway {
         if (match) {
             this.chatService.message(match, socket.id, message);
         }
+    }
+    @SubscribeMessage(ChatEvent.GeneralMessage)
+    generalMessage(socket: Socket, chatMessage: ChatMessage) {
+        const chatMessageToSend: ChatMessage = {
+            sender: chatMessage.sender,
+            content: chatMessage.content,
+            timestamp: new Date(),
+        };
+        this.server.emit(ChatEvent.GeneralMessage, chatMessageToSend);
     }
 }
