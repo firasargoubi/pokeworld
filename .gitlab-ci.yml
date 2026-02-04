@@ -7,6 +7,21 @@ cache:
         - server/node_modules/
     policy: pull
 
+.only-client-mobile: &only-client-mobile
+    only:
+        refs:
+            - master
+            - merge_requests
+        changes:
+            - client_mobile/**
+            - common/**
+    cache:
+        key: '${CI_COMMIT_REF_SLUG}-client-mobile'
+        paths:
+            - client_mobile/.pub-cache/
+            - client_mobile/.dart_tool/
+        policy: pull
+
 .only-client: &only-client
     only:
         refs:
@@ -67,6 +82,20 @@ install:server:
             - server/.npm/
         policy: pull-push
 
+install:client-mobile:
+    stage: install
+    image: ghcr.io/cirruslabs/flutter:3.38.9
+    <<: *only-client-mobile
+    script:
+        - cd client_mobile
+        - flutter pub get
+    cache:
+        key: '${CI_COMMIT_REF_SLUG}-client-mobile'
+        paths:
+            - client_mobile/.pub-cache/
+            - client_mobile/.dart_tool/
+        policy: pull-push
+
 lint:client:
     stage: lint
     needs: ['install:client']
@@ -84,6 +113,16 @@ lint:server:
     script:
         - cd server
         - npm run lint
+
+lint:client-mobile:
+    stage: lint
+    image: ghcr.io/cirruslabs/flutter:3.38.9
+    needs: ['install:client-mobile']
+    allow_failure: true
+    <<: *only-client-mobile
+    script:
+        - cd client_mobile
+        - flutter analyze
 
 test:client:
     stage: test
@@ -111,6 +150,17 @@ test:server:
     artifacts:
         paths:
             - server/coverage/
+
+test:client-mobile:
+    stage: test
+    image: ghcr.io/cirruslabs/flutter:3.38.9
+    needs: ['install:client-mobile']
+    <<: *only-client-mobile
+    script:
+        - cd client_mobile
+        - flutter test
+    dependencies:
+        - install:client-mobile
 
 pages:
     stage: deploy
