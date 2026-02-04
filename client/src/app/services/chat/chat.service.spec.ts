@@ -18,7 +18,9 @@ describe('ChatService', () => {
         mockSocketService = jasmine.createSpyObj('SocketService', ['emit', 'on']);
 
         mockUserService = jasmine.createSpyObj('UserService', [], {
-            currentUserSubject: { value: { username: 'TestUser' } },
+            user$: {
+                subscribe: () => undefined,
+            },
         });
 
         TestBed.configureTestingModule({

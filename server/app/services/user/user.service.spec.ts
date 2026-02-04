@@ -1,0 +1,307 @@
+import { CreateUserDto } from '@app/model/dto/user/create-user.dto';
+import { LoginUserDto } from '@app/model/dto/user/login-user.dto';
+import { User, UserDocument, userSchema } from '@app/model/schema/user.schema';
+import { ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { Test, TestingModule } from '@nestjs/testing';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Connection, Model } from 'mongoose';
+import { UserService } from './user.service';
+
+describe('UserService', () => {
+    let service: UserService;
+    let userModel: Model<UserDocument>;
+    let mongoServer: MongoMemoryServer;
+    let connection: Connection;
+
+    beforeAll(async () => {
+        process.env.PASSWORD_PASSKEY = 'test-passkey';
+
+        mongoServer = await MongoMemoryServer.create();
+        const module: TestingModule = await Test.createTestingModule({
+            imports: [
+                MongooseModule.forRootAsync({
+                    useFactory: () => ({
+                        uri: mongoServer.getUri(),
+                    }),
+                }),
+                MongooseModule.forFeature([{ name: User.name, schema: userSchema }]),
+            ],
+            providers: [UserService],
+        }).compile();
+
+        service = module.get<UserService>(UserService);
+        userModel = module.get<Model<UserDocument>>(getModelToken(User.name));
+        connection = await module.get(getConnectionToken());
+    });
+
+    afterEach(async () => {
+        await userModel.deleteMany({});
+    });
+
+    afterAll(async () => {
+        await connection.close();
+        await mongoServer.stop({ doCleanup: true });
+    });
+
+    it('should be defined', () => {
+        expect(service).toBeDefined();
+        expect(userModel).toBeDefined();
+    });
+
+    describe('Socket Management', () => {
+        describe('associateSocket', () => {
+            it('should associate a socket with a user', () => {
+                const userId = 'user123';
+                const socketId = 'socket123';
+
+                service.associateSocket(userId, socketId);
+
+                expect(service.getSocketId(userId)).toBe(socketId);
+            });
+        });
+
+        describe('disassociateSocket', () => {
+            it('should remove socket association', () => {
+                const userId = 'user123';
+                const socketId = 'socket123';
+
+                service.associateSocket(userId, socketId);
+                service.disassociateSocket(userId);
+
+                expect(service.getSocketId(userId)).toBeUndefined();
+            });
+        });
+
+        describe('getSocketId', () => {
+            it('should return socket id for user', () => {
+                const userId = 'user123';
+                const socketId = 'socket123';
+
+                service.associateSocket(userId, socketId);
+
+                expect(service.getSocketId(userId)).toBe(socketId);
+            });
+
+            it('should return undefined for non-existent user', () => {
+                expect(service.getSocketId('nonexistent')).toBeUndefined();
+            });
+        });
+
+        describe('getUserId', () => {
+            it('should return user id for socket', () => {
+                const userId = 'user123';
+                const socketId = 'socket123';
+
+                service.associateSocket(userId, socketId);
+
+                expect(service.getUserId(socketId)).toBe(userId);
+            });
+
+            it('should return undefined for non-existent socket', () => {
+                expect(service.getUserId('nonexistent')).toBeUndefined();
+            });
+        });
+    });
+
+    describe('getAllUsers', () => {
+        it('should return all users without filters', async () => {
+            await service.createUser({ username: 'user1', password: 'pass1' });
+            await service.createUser({ username: 'user2', password: 'pass2' });
+
+            const users = await service.getAllUsers();
+
+            expect(users.length).toBe(2);
+            expect(users[0]).toHaveProperty('userId');
+            expect(users[0]).toHaveProperty('username');
+            expect(users[0]).not.toHaveProperty('passwordHash');
+        });
+
+        it('should return filtered users by isLoggedIn', async () => {
+            await service.createUser({ username: 'user1', password: 'pass1' });
+            const user2 = await service.createUser({ username: 'user2', password: 'pass2' });
+
+            await service.logout(user2.userId);
+
+            const loggedInUsers = await service.getAllUsers({ isLoggedIn: true });
+            const loggedOutUsers = await service.getAllUsers({ isLoggedIn: false });
+
+            expect(loggedInUsers.length).toBe(1);
+            expect(loggedOutUsers.length).toBe(1);
+        });
+
+        it('should return empty array when no users exist', async () => {
+            const users = await service.getAllUsers();
+            expect(users).toEqual([]);
+        });
+    });
+
+    describe('checkUsernameExists', () => {
+        it('should return true if username exists', async () => {
+            await service.createUser({ username: 'testUser', password: 'password123' });
+
+            const exists = await service.checkUsernameExists('testUser');
+
+            expect(exists).toBe(true);
+        });
+
+        it('should return false if username does not exist', async () => {
+            const exists = await service.checkUsernameExists('nonExistent');
+
+            expect(exists).toBe(false);
+        });
+    });
+
+    describe('createUser', () => {
+        it('should create a new user successfully', async () => {
+            const createUserDto: CreateUserDto = {
+                username: 'newUser',
+                password: 'password123',
+            };
+
+            const result = await service.createUser(createUserDto);
+
+            expect(result).toBeDefined();
+            expect(result.username).toBe('newUser');
+            expect(result.userId).toBeDefined();
+            expect(result.isLoggedIn).toBe(true);
+            expect(result).not.toHaveProperty('passwordHash');
+        });
+
+        it('should throw ConflictException if username exists', async () => {
+            const createUserDto: CreateUserDto = {
+                username: 'existingUser',
+                password: 'password123',
+            };
+
+            await service.createUser(createUserDto);
+
+            await expect(service.createUser(createUserDto)).rejects.toThrow(ConflictException);
+            await expect(service.createUser(createUserDto)).rejects.toThrow('Username already exists');
+        });
+
+        it('should hash the password', async () => {
+            const createUserDto: CreateUserDto = {
+                username: 'testUser',
+                password: 'password123',
+            };
+
+            await service.createUser(createUserDto);
+
+            const userInDb = await userModel.findOne({ username: 'testUser' }).exec();
+            expect(userInDb.passwordHash).toBeDefined();
+            expect(userInDb.passwordHash).not.toBe('password123');
+        });
+    });
+
+    describe('login', () => {
+        it('should login user successfully', async () => {
+            const createUserDto: CreateUserDto = {
+                username: 'testUser',
+                password: 'password123',
+            };
+
+            const createdUser = await service.createUser(createUserDto);
+            await service.logout(createdUser.userId);
+
+            const loginUserDto: LoginUserDto = {
+                username: 'testUser',
+                password: 'password123',
+            };
+
+            const result = await service.login(loginUserDto);
+
+            expect(result).toBeDefined();
+            expect(result.username).toBe('testUser');
+            expect(result.isLoggedIn).toBe(true);
+        });
+
+        it('should throw UnauthorizedException for invalid password', async () => {
+            await service.createUser({ username: 'testUser', password: 'password123' });
+
+            const loginUserDto: LoginUserDto = {
+                username: 'testUser',
+                password: 'wrongPassword',
+            };
+
+            await expect(service.login(loginUserDto)).rejects.toThrow(UnauthorizedException);
+            await expect(service.login(loginUserDto)).rejects.toThrow('Invalid credentials or user already connected');
+        });
+
+        it('should throw UnauthorizedException for non-existent user', async () => {
+            const loginUserDto: LoginUserDto = {
+                username: 'nonExistent',
+                password: 'password123',
+            };
+
+            await expect(service.login(loginUserDto)).rejects.toThrow(UnauthorizedException);
+        });
+
+        it('should throw UnauthorizedException if user already logged in', async () => {
+            await service.createUser({ username: 'testUser', password: 'password123' });
+
+            const loginUserDto: LoginUserDto = {
+                username: 'testUser',
+                password: 'password123',
+            };
+
+            await expect(service.login(loginUserDto)).rejects.toThrow(UnauthorizedException);
+        });
+    });
+
+    describe('logout', () => {
+        it('should logout user successfully', async () => {
+            const user = await service.createUser({ username: 'testUser', password: 'password123' });
+            service.associateSocket(user.userId, 'socket123');
+
+            await service.logout(user.userId);
+
+            const userInDb = await userModel.findOne({ userId: user.userId }).exec();
+            expect(userInDb.isLoggedIn).toBe(false);
+            expect(service.getSocketId(user.userId)).toBeUndefined();
+        });
+
+        it('should throw UnauthorizedException if user not found', async () => {
+            await expect(service.logout('nonExistentUserId')).rejects.toThrow(UnauthorizedException);
+            await expect(service.logout('nonExistentUserId')).rejects.toThrow('Invalid user or not currently connected');
+        });
+
+        it('should throw UnauthorizedException if user already logged out', async () => {
+            const user = await service.createUser({ username: 'testUser', password: 'password123' });
+            await service.logout(user.userId);
+
+            await expect(service.logout(user.userId)).rejects.toThrow(UnauthorizedException);
+        });
+
+        it('should logout without error if socket not associated', async () => {
+            const user = await service.createUser({ username: 'testUser', password: 'password123' });
+
+            await expect(service.logout(user.userId)).resolves.not.toThrow();
+        });
+    });
+
+    describe('deleteUser', () => {
+        it('should delete user successfully', async () => {
+            const user = await service.createUser({ username: 'testUser', password: 'password123' });
+
+            await service.deleteUser(user.userId);
+
+            const userCount = await userModel.countDocuments({ userId: user.userId }).exec();
+            expect(userCount).toBe(0);
+        });
+
+        it('should throw NotFoundException if user not found', async () => {
+            await expect(service.deleteUser('nonExistentUserId')).rejects.toThrow(NotFoundException);
+            await expect(service.deleteUser('nonExistentUserId')).rejects.toThrow('User not found');
+        });
+
+        it('should allow deleting user even if logged in', async () => {
+            const user = await service.createUser({ username: 'testUser', password: 'password123' });
+
+            await expect(service.deleteUser(user.userId)).resolves.not.toThrow();
+
+            const userCount = await userModel.countDocuments({ userId: user.userId }).exec();
+            expect(userCount).toBe(0);
+        });
+    });
+});

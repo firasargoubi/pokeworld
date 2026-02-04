@@ -37,3 +37,7 @@ export enum ChatEvent {
     Message = 'message',
     GeneralMessage = 'generalMessage',
 }
+
+export enum UserEvent {
+    Associate = 'associate'
+}
