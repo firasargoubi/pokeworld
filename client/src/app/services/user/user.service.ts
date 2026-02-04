@@ -4,15 +4,19 @@ import { ApiEndpoint } from '@common/interfaces/endpoint.enum';
 import { UserInfo } from '@common/interfaces/user';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { SocketService } from '@app/services/socket/socket.service';
+import { UserEvent } from '@common/interfaces/socket-event.enum';
 
 @Injectable({
     providedIn: 'root',
 })
 export class UserService {
-    readonly currentUserSubject = new BehaviorSubject<UserInfo | null>(this.loadUser());
+    private readonly currentUserSubject = new BehaviorSubject<UserInfo | null>(null);
+    // eslint-disable-next-line @typescript-eslint/member-ordering -- private attribute first
     readonly user$ = this.currentUserSubject.asObservable();
     private readonly baseUrl: string = environment.serverUrl;
     private readonly http: HttpClient = inject(HttpClient);
+    private readonly socketService: SocketService = inject(SocketService);
 
     getAllUsers(): Observable<UserInfo[]> {
         return this.http.get<UserInfo[]>(`${this.baseUrl}/${ApiEndpoint.User}`);
@@ -32,21 +36,7 @@ export class UserService {
     }
 
     setUser(user: UserInfo | null): void {
-        if (user === null) {
-            localStorage.removeItem('user');
-            this.currentUserSubject.next(null);
-        } else {
-            localStorage.setItem('user', JSON.stringify(user));
-            this.currentUserSubject.next(user);
-        }
-    }
-
-    private loadUser(): UserInfo | null {
-        try {
-            const raw = localStorage.getItem('user');
-            return raw ? (JSON.parse(raw) as UserInfo) : null;
-        } catch (error) {
-            return null;
-        }
+        this.currentUserSubject.next(user);
+        this.socketService.emit(UserEvent.Associate, user);
     }
 }

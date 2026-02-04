@@ -1,7 +1,9 @@
 import { MatchService } from '@app/services/match/match.service';
+import { UserService } from '@app/services/user/user.service';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData } from '@common/interfaces/match-data';
-import { MatchEvent } from '@common/interfaces/socket-event.enum';
+import { UserInfo } from '@common/interfaces/user';
+import { MatchEvent, UserEvent } from '@common/interfaces/socket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -11,6 +13,7 @@ import { Server, Socket } from 'socket.io';
 export class MatchGateway {
     @WebSocketServer() private server: Server;
     @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
+    @Inject(forwardRef(() => UserService)) private readonly userService: UserService;
 
     @SubscribeMessage(MatchEvent.CreateMatch)
     async createMatch(socket: Socket, gameData: GameData): Promise<MatchData | null> {
@@ -27,8 +30,19 @@ export class MatchGateway {
         this.matchService.leaveMatch(socket.id);
     }
 
+    @SubscribeMessage(UserEvent.Associate)
+    onUserAssociate(socket: Socket, user: UserInfo) {
+        if (user) {
+            this.userService.associateSocket(user.userId, socket.id);
+        }
+    }
+
     handleDisconnect(socket: Socket) {
         this.leaveMatch(socket);
+        const userId = this.userService.getUserId(socket.id);
+        if (userId) {
+            this.userService.logout(userId);
+        }
     }
 
     connectPlayer(playerId: string, matchCode: string) {

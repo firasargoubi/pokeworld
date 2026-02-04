@@ -4,6 +4,7 @@ import { SocketService } from '@app/services/socket/socket.service';
 import { UserService } from '@app/services/user/user.service';
 import { ChatMessage } from '@common/interfaces/chat-message';
 import { ChatEvent } from '@common/interfaces/socket-event.enum';
+import { UserInfo } from '@common/interfaces/user';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -15,11 +16,15 @@ export class ChatService {
     isFilterEnabled = signal(false);
     isComponentVisible = signal(true);
     generalMessages$: Observable<ChatMessage[]>;
+    user: UserInfo | null = null;
     private readonly generalMessagesSignal = signal<ChatMessage[]>([]);
     private readonly socketService: SocketService = inject(SocketService);
     private readonly userService = inject(UserService);
 
     constructor() {
+        this.userService.user$.subscribe((user) => {
+            this.user = user;
+        });
         this.socketService.on(ChatEvent.GeneralMessage, (chatMessage: ChatMessage) => {
             this.generalMessagesSignal.update((messages) => [...messages, chatMessage]);
         });
@@ -31,7 +36,7 @@ export class ChatService {
     }
 
     sendGeneralMessage(message: string) {
-        const username = this.userService.currentUserSubject.value?.username ?? `User-${this.socketService.selfId}`;
+        const username = this.user ? this.user.username : `User-${this.socketService.selfId}`;
         const chatMessage: ChatMessage = { sender: username, content: message, timestamp: new Date() };
         this.socketService.emit(ChatEvent.GeneralMessage, chatMessage);
     }

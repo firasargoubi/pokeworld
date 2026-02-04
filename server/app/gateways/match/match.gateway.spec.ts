@@ -1,5 +1,6 @@
 import { Match } from '@app/classes/match/match';
 import { MatchService } from '@app/services/match/match.service';
+import { UserService } from '@app/services/user/user.service';
 import { MatchEvent } from '@common/interfaces/socket-event.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
@@ -13,19 +14,26 @@ describe('MatchGateway', () => {
     let mockSocket: SinonStubbedInstance<Socket>;
     let mockServer: SinonStubbedInstance<Server>;
     let mockMatchService: SinonStubbedInstance<MatchService>;
+    let mockUserService: SinonStubbedInstance<UserService>;
     let emitStub: SinonStub;
     let mockMatch: SinonStubbedInstance<Match>;
 
     beforeEach(async () => {
         mockSocket = createStubInstance<Socket>(Socket);
         mockMatchService = createStubInstance<MatchService>(MatchService);
+        mockUserService = createStubInstance<UserService>(UserService);
         mockServer = createStubInstance<Server>(Server);
         emitStub = stub();
         mockMatch = createStubInstance<Match>(Match);
         mockMatchService.getMatchFromPlayerId.returns(mockMatch);
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [MatchGateway, { provide: MatchService, useValue: mockMatchService }, { provide: Server, useValue: mockServer }],
+            providers: [
+                MatchGateway,
+                { provide: UserService, useValue: mockUserService },
+                { provide: MatchService, useValue: mockMatchService },
+                { provide: Server, useValue: mockServer },
+            ],
         }).compile();
 
         gateway = module.get<MatchGateway>(MatchGateway);
@@ -137,5 +145,29 @@ describe('MatchGateway', () => {
         gateway.emitMessage(matchCode, message, hasCloseButton);
 
         expect(mockSocket.emit.calledWith(MatchEvent.Message, expectedPayload)).toBeTruthy();
+    });
+
+    it('should associate user on user associate event', () => {
+        const mockUser = { userId: 'user123', username: 'testUser', passwordHash: 'testHash' };
+        gateway.onUserAssociate(mockSocket, mockUser);
+        expect(mockUserService.associateSocket.calledWith(mockUser.userId, mockSocket.id)).toBeTruthy();
+    });
+
+    it('should not associate user when user is null', () => {
+        gateway.onUserAssociate(mockSocket, null);
+        expect(mockUserService.associateSocket.called).toBeFalsy();
+    });
+
+    it('should logout user on disconnect if userId exists', () => {
+        const userId = 'user123';
+        mockUserService.getUserId.returns(userId);
+        gateway.handleDisconnect(mockSocket);
+        expect(mockUserService.logout.calledWith(userId)).toBeTruthy();
+    });
+
+    it('should not logout user on disconnect if userId does not exist', () => {
+        mockUserService.getUserId.returns(null);
+        gateway.handleDisconnect(mockSocket);
+        expect(mockUserService.logout.called).toBeFalsy();
     });
 });
