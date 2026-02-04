@@ -1,7 +1,8 @@
 import 'dart:async';
 
-import '../interfaces/socket_event_enums.dart';
+import '../consts/socket_event.dart';
 import 'socket_service.dart';
+import 'user_service.dart';
 
 class ChatMessage {
   final String sender;
@@ -48,7 +49,9 @@ class ChatService {
     _socketService.socket.on(ChatEvent.generalMessage.value, (data) {
       if (data is Map<String, dynamic>) {
         final chatMsg = ChatMessage.fromJson(Map<String, dynamic>.from(data));
-        if (chatMsg.sender != _socketService.socket.id) {
+        final isSelfSent =
+            chatMsg.sender == UserService().currentUser.value?.username;
+        if (!isSelfSent) {
           _storedMessages.add(chatMsg);
           _generalMessagesController.add(List.unmodifiable(_storedMessages));
         }
@@ -58,15 +61,16 @@ class ChatService {
 
   void sendGeneralMessage(String message) {
     final timestamp = DateTime.now();
+    final username = UserService().currentUser.value?.username ?? 'Unknown';
     var chatMessage = {
-      'sender': _socketService.socket.id,
+      'sender': username,
       'content': message,
       'timestamp': timestamp.toIso8601String(),
     };
-    _socketService.socket.emit(ChatEvent.generalMessage.value, chatMessage);
+    _socketService.emit(ChatEvent.generalMessage.value, chatMessage);
 
     _storedMessages.add(
-      ChatMessage(sender: 'Me', content: message, timestamp: timestamp),
+      ChatMessage(sender: username, content: message, timestamp: timestamp),
     );
   }
 
