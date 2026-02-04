@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../services/chat_service.dart';
+import '../services/user_service.dart';
+import '../utils/time_utils.dart';
 
 class ChatBox extends StatefulWidget {
   const ChatBox({super.key});
@@ -80,21 +82,24 @@ class _ChatBoxState extends State<ChatBox> {
             itemCount: messages.length,
             itemBuilder: (context, index) {
               final msg = messages[index];
-              final isMe = msg.sender == 'Me';
+              final isSelfSent =
+                  msg.sender == UserService().currentUser.value?.username;
 
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Align(
-                  alignment: isMe
+                  alignment: isSelfSent
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
                   child: Container(
                     padding: const EdgeInsets.all(12.0),
                     decoration: BoxDecoration(
-                      color: isMe ? Colors.blue[100] : Colors.grey[300],
+                      color: isSelfSent ? Colors.blue[100] : Colors.grey[300],
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    child: Text('${msg.sender}: ${msg.content}'),
+                    child: Text(
+                      '[${formatTime(msg.timestamp)}] ${msg.sender}: ${msg.content}',
+                    ),
                   ),
                 ),
               );
