@@ -5,11 +5,14 @@
         <div class="form-row">
             <div class="left-label-small">Nom d'utilisateur</div>
             <input
-                class="input-name"
+                id="username-input"
                 type="text"
-                autocomplete="false"
-                maxlength="20"
-                [(ngModel)]="username"
+                [formControl]="usernameForm"
+                maxlength="{{ visualData.nameMaxLength }}"
+                placeholder="Entrez votre nom"
+                autofocus
+                autocomplete="off"
+                style="text-transform: uppercase"
                 (click)="this.audioService.playEffect(this.clickValue)"
             />
         </div>

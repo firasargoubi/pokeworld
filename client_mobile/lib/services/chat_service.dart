@@ -49,12 +49,8 @@ class ChatService {
     _socketService.socket.on(ChatEvent.generalMessage.value, (data) {
       if (data is Map<String, dynamic>) {
         final chatMsg = ChatMessage.fromJson(Map<String, dynamic>.from(data));
-        final isSelfSent =
-            chatMsg.sender == UserService().currentUser.value?.username;
-        if (!isSelfSent) {
-          _storedMessages.add(chatMsg);
-          _generalMessagesController.add(List.unmodifiable(_storedMessages));
-        }
+        _storedMessages.add(chatMsg);
+        _generalMessagesController.add(List.unmodifiable(_storedMessages));
       }
     });
   }
@@ -68,10 +64,6 @@ class ChatService {
       'timestamp': timestamp.toIso8601String(),
     };
     _socketService.emit(ChatEvent.generalMessage.value, chatMessage);
-
-    _storedMessages.add(
-      ChatMessage(sender: username, content: message, timestamp: timestamp),
-    );
   }
 
   void dispose() {
