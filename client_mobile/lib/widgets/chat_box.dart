@@ -98,7 +98,7 @@ class _ChatBoxState extends State<ChatBox> {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: Text(
-                      '[${formatTime(msg.timestamp)}] ${msg.sender}: ${msg.content}',
+                      '[${formatTime(msg.timestamp.toLocal())}] ${msg.sender}: ${msg.content}',
                     ),
                   ),
                 ),

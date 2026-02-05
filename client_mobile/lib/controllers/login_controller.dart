@@ -3,6 +3,8 @@ import 'package:client_mobile/consts/error_messages.dart';
 import 'package:client_mobile/services/user_service.dart';
 import 'package:flutter/material.dart';
 
+import '../consts/chat_const.dart';
+
 class LoginController {
   final UserService _userService = UserService();
 
@@ -20,12 +22,19 @@ class LoginController {
   }
 
   Future<void> handleSubmit({required Function() onSuccess}) async {
-    final username = usernameController.text.trim();
+    final username = usernameController.text.trim().toUpperCase();
     final password = passwordController.text.trim();
 
     if (username.isEmpty || password.isEmpty) {
       _updateState(() {
         errorMessage = ErrorMessages.emptyFields;
+      });
+      return;
+    }
+
+    if (username.length < minUsernameLength) {
+      _updateState(() {
+        errorMessage = ErrorMessages.shortUsername;
       });
       return;
     }

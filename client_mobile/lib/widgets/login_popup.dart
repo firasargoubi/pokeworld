@@ -1,5 +1,21 @@
 import 'package:client_mobile/controllers/login_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../consts/chat_const.dart';
+
+class UsernameInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return newValue.copyWith(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
+}
 
 class LoginPopup extends StatefulWidget {
   const LoginPopup({super.key});
@@ -40,6 +56,10 @@ class _LoginPopupState extends State<LoginPopup> {
             TextField(
               controller: _controller.usernameController,
               enabled: !_controller.isLoading,
+              inputFormatters: [
+                UsernameInputFormatter(),
+                LengthLimitingTextInputFormatter(maxUsernameLength),
+              ],
               decoration: InputDecoration(
                 labelText: "Nom d'utilisateur",
                 hintText: "Entrez votre nom d'utilisateur",

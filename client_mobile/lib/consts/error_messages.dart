@@ -1,6 +1,8 @@
 class ErrorMessages {
   // Validation errors
   static const String emptyFields = 'Veuillez remplir tous les champs';
+  static const String shortUsername =
+      'Le nom d\'utilisateur doit comporter au moins 3 caractères';
 
   // Authentication errors
   static const String usernameExists = "Ce nom d'utilisateur existe déjà";
