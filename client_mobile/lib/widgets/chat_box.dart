@@ -19,7 +19,9 @@ class _ChatBoxState extends State<ChatBox> {
   final _chatService = ChatService();
 
   StreamSubscription<List<ChatMessage>>? _sub;
+  StreamSubscription<int>? _emojiSub;
   late List<ChatMessage> _messages = _chatService.allMessages;
+  late int _selectedEmojiIndex = _chatService.selectedEmojiIndex;
 
   @override
   void initState() {
@@ -32,6 +34,12 @@ class _ChatBoxState extends State<ChatBox> {
       // Automatically scroll to the bottom when a new message is received
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _scrollToBottom();
+      });
+    });
+
+    _emojiSub = _chatService.selectedEmojiStream.listen((index) {
+      setState(() {
+        _selectedEmojiIndex = index;
       });
     });
 
@@ -57,6 +65,7 @@ class _ChatBoxState extends State<ChatBox> {
   @override
   void dispose() {
     _sub?.cancel();
+    _emojiSub?.cancel();
     _scrollController.dispose();
     _messageController.dispose();
     super.dispose();
@@ -108,24 +117,55 @@ class _ChatBoxState extends State<ChatBox> {
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Row(
+          child: Column(
             children: [
-              Expanded(
-                child: TextField(
-                  controller: _messageController,
-                  decoration: InputDecoration(
-                    hintText: 'Entrez votre message...',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(_chatService.emojis.length, (index) {
+                  final isSelected = _selectedEmojiIndex == index;
+                  return GestureDetector(
+                    onTap: () {
+                      _chatService.selectEmoji(index);
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: isSelected ? Colors.blue : Colors.transparent,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Text(
+                        _chatService.emojis[index],
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 8.0),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _messageController,
+                      decoration: InputDecoration(
+                        hintText: 'Entrez votre message...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      onSubmitted: (_) => _sendMessage(),
                     ),
                   ),
-                  onSubmitted: (_) => _sendMessage(),
-                ),
-              ),
-              const SizedBox(width: 8.0),
-              FloatingActionButton(
-                onPressed: _sendMessage,
-                child: const Icon(Icons.send),
+                  const SizedBox(width: 8.0),
+                  FloatingActionButton(
+                    onPressed: _sendMessage,
+                    child: const Icon(Icons.send),
+                  ),
+                ],
               ),
             ],
           ),
