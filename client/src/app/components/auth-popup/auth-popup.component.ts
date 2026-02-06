@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
-import { FormsModule, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { DEFAULT_CHARACTER_VISUAL_DATA } from '@app/consts/player-data.const';
 import { PopupMessage } from '@app/consts/popup-message.const';
+import { CharacterVisualData } from '@app/interfaces/character-visual-data';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { UserService } from '@app/services/user/user.service';
-import { MIN_NAME_LENGTH, MAX_NAME_LENGTH } from '@common/consts/player-data.const';
-import { CharacterVisualData } from '@app/interfaces/character-visual-data';
-import { DEFAULT_CHARACTER_VISUAL_DATA } from '@app/consts/player-data.const';
+import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/player-data.const';
 
 @Component({
     selector: 'app-auth-popup',
@@ -35,8 +36,14 @@ export class AuthPopupComponent {
 
     submit() {
         this.errorMessage = '';
-        if (!this.usernameForm.valid) {
-            this.errorMessage = '- Le nom doit contenir entre 3 et 15 caractères';
+        if (!this.password.trim() || !this.usernameForm.value.trim()) {
+            this.errorMessage = PopupMessage.EmptyFields;
+            return;
+        } else if (this.usernameForm.value.trim().length !== this.usernameForm.value.length) {
+            this.errorMessage = PopupMessage.UsernameSpaces;
+            return;
+        } else if (!this.usernameForm.valid) {
+            this.errorMessage = PopupMessage.UsernameLength;
             return;
         }
         if (this.isCreating) {
@@ -56,7 +63,9 @@ export class AuthPopupComponent {
                     isConfirmation: false,
                 });
             },
-            error: () => (this.errorMessage = 'Erreur lors de la création du compte'),
+            error: (error: HttpErrorResponse) => {
+                this.handleNotFoundError(error, true);
+            },
         });
     }
 
@@ -70,7 +79,9 @@ export class AuthPopupComponent {
                     isConfirmation: false,
                 });
             },
-            error: () => (this.errorMessage = 'Échec de la connexion'),
+            error: (error: HttpErrorResponse) => {
+                this.handleNotFoundError(error, false);
+            },
         });
     }
 
@@ -87,5 +98,14 @@ export class AuthPopupComponent {
     toggleMode() {
         this.isCreating = !this.isCreating;
         this.errorMessage = '';
+    }
+
+    private handleNotFoundError(error: HttpErrorResponse, isRegister: boolean) {
+        if (error.status === HttpStatusCode.NotFound) {
+            this.errorMessage = PopupMessage.InvalidCredentials;
+        } else if (error.status === HttpStatusCode.Conflict) {
+            if (isRegister) this.errorMessage = PopupMessage.UsernameTaken;
+            else this.errorMessage = PopupMessage.AccountConnected;
+        }
     }
 }
