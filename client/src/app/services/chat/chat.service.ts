@@ -27,7 +27,7 @@ export class ChatService {
             this.user = user;
         });
         this.socketService.on(ChatEvent.GeneralMessage, (chatMessage: ChatMessage) => {
-            this.generalMessagesSignal.update((messages) => [...messages, chatMessage]);
+            if (this.user) this.generalMessagesSignal.update((messages) => [...messages, chatMessage]);
         });
         this.generalMessages$ = toObservable(this.generalMessagesSignal);
     }
