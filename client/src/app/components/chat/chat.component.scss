@@ -386,7 +386,7 @@ $shadow-message: calc(0.1 * $chat-font-size) 0 0 $color-message-shadow;
     width: 100%;
     position: relative;
 
-    line-height: calc($chat-font-size * 0.8);
+    line-height: calc($chat-font-size * 1.5);
     font-size: $chat-font-size;
     white-space: break-spaces;
 
@@ -398,7 +398,7 @@ $shadow-message: calc(0.1 * $chat-font-size) 0 0 $color-message-shadow;
     word-break: break-all;
     display: inline;
     width: auto;
-    height: calc(2.4 * $chat-base-size);
+    height: calc(3 * $chat-base-size);
 }
 
 .timestamp {
