@@ -37,6 +37,7 @@ class ChatService {
   late final SocketService _socketService;
   late final MotionDetectionService _motionDetectionService;
   bool _listenersInitialized = false;
+  StreamSubscription<ShakeEvent>? _motionSubscription;
 
   final _generalMessagesController =
       StreamController<List<ChatMessage>>.broadcast();
@@ -70,9 +71,14 @@ class ChatService {
         _generalMessagesController.add(List.unmodifiable(_storedMessages));
       }
     });
+  }
 
+  void startListeningToMotion() {
+    if (_motionSubscription != null) {
+      return;
+    }
     _motionDetectionService.startListening();
-    _motionDetectionService.onShake.listen((shakeEvent) {
+    _motionSubscription = _motionDetectionService.onShake.listen((shakeEvent) {
       if (shakeEvent.direction == ShakeDirection.horizontal) {
         resendLastMessage();
       } else if (shakeEvent.direction == ShakeDirection.vertical) {
@@ -118,8 +124,22 @@ class ChatService {
     }
   }
 
-  void dispose() {
+  void clearChatHistory() {
+    _storedMessages.clear();
+    _lastSentMessage = null;
+    _generalMessagesController.add(List.unmodifiable(_storedMessages));
+    _selectedEmojiIndex = 0;
+    _selectedEmojiController.add(_selectedEmojiIndex);
+  }
+
+  void stopListeningToMotion() {
+    _motionSubscription?.cancel();
+    _motionSubscription = null;
     _motionDetectionService.stopListening();
+  }
+
+  void dispose() {
+    stopListeningToMotion();
     _generalMessagesController.close();
     _selectedEmojiController.close();
   }
