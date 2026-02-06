@@ -41,7 +41,11 @@ class _HomePageState extends State<HomePage> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return const LoginPopup();
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {},
+          child: const LoginPopup(),
+        );
       },
     );
   }
