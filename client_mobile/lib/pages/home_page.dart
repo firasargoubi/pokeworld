@@ -1,3 +1,4 @@
+import 'package:client_mobile/services/chat_service.dart';
 import 'package:client_mobile/widgets/login_popup.dart';
 import 'package:client_mobile/widgets/user_popup.dart';
 import 'package:flutter/material.dart';
@@ -55,8 +56,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _push(Widget page) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
+  Future<void> _push(Widget page) async {
+    ChatService().stopListeningToMotion();
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
+    if (!mounted) {
+      return;
+    }
+    ChatService().startListeningToMotion();
   }
 
   @override
