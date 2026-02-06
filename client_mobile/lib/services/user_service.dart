@@ -46,10 +46,8 @@ class UserService {
       currentUser.value = user;
       _socketService.emit(UserEvent.associate.value, user);
       return user;
-    } else if (response.statusCode == HttpStatusCode.unauthorized.code) {
-      throw AuthException(AuthError.invalidCredentials);
     } else if (response.statusCode == HttpStatusCode.notFound.code) {
-      throw AuthException(AuthError.userNotFound);
+      throw AuthException(AuthError.invalidCredentials);
     } else if (response.statusCode == HttpStatusCode.conflict.code) {
       throw AuthException(AuthError.alreadyConnected);
     } else {

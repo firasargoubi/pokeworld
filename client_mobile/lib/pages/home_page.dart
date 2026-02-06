@@ -2,8 +2,8 @@ import 'package:client_mobile/widgets/login_popup.dart';
 import 'package:client_mobile/widgets/user_popup.dart';
 import 'package:flutter/material.dart';
 
+import '../widgets/chat_box.dart';
 import '../widgets/menu_button.dart';
-import './chat_page.dart';
 import './create_page.dart';
 import './join_page.dart';
 
@@ -27,7 +27,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _maybeShowLoginPopup() {
-     if (!mounted) return;
+    if (!mounted) return;
     if (shouldShowLoginPopup && !_didShowLoginPopup) {
       _didShowLoginPopup = true;
       _showLoginPopup();
@@ -59,7 +59,6 @@ class _HomePageState extends State<HomePage> {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,78 +74,56 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniStartTop,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final isWide = constraints.maxWidth >= 700;
-            final buttons = [
-              MenuButton(
-                text: 'Rejoindre Partie',
-                color: Colors.lightBlue,
-                onPressed: () => _push(const JoinPage()),
-              ),
-              MenuButton(
-                text: 'Créer Partie',
-                color: Colors.orange,
-                onPressed: () => _push(const CreatePage()),
-              ),
-              MenuButton(
-                text: 'Clavardage',
-                color: Colors.green,
-                onPressed: () => _push(const ChatPage()),
-              ),
-            ];
-            return Center(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Pokeworld',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: IntrinsicHeight(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'Pokeworld',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 48,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                              const SizedBox(height: 32),
+                              MenuButton(
+                                text: 'Rejoindre Partie',
+                                color: Colors.lightBlue,
+                                onPressed: () => _push(const JoinPage()),
+                              ),
+                              const SizedBox(height: 16),
+                              MenuButton(
+                                text: 'Créer Partie',
+                                color: Colors.orange,
+                                onPressed: () => _push(const CreatePage()),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 32),
-                      if (isWide)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: buttons
-                              .map(
-                                (b) => Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                    ),
-                                    child: b,
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                        )
-                      else
-                        Column(
-                          children: buttons
-                              .map(
-                                (b) => Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 8,
-                                  ),
-                                  child: b,
-                                ),
-                              )
-                              .toList(),
-                        ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ),
-            );
-          },
+              const SizedBox(width: 24),
+              const Expanded(child: ChatBox()),
+            ],
+          ),
         ),
       ),
     );

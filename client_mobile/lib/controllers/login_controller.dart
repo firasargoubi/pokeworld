@@ -22,21 +22,29 @@ class LoginController {
   }
 
   Future<void> handleSubmit({required Function() onSuccess}) async {
-    final username = usernameController.text.trim().toUpperCase();
-    final password = passwordController.text.trim();
+    final rawUsername = usernameController.text.toUpperCase();
+    final trimmedUsername = rawUsername.trim();
+    final rawPassword = passwordController.text;
+    final trimmedPassword = rawPassword.trim();
 
-    if (username.isEmpty || password.isEmpty) {
+    if (rawUsername.isEmpty || rawPassword.isEmpty) {
       _updateState(() {
         errorMessage = ErrorMessages.emptyFields;
       });
       return;
     }
 
-    if (username.length < minUsernameLength) {
-      _updateState(() {
-        errorMessage = ErrorMessages.shortUsername;
-      });
-      return;
+
+    if (isRegister) {
+      final isValid = registerChecks(
+        rawUsername,
+        trimmedUsername,
+        rawPassword,
+        trimmedPassword,
+      );
+      if (!isValid) {
+        return;
+      }
     }
 
     _updateState(() {
@@ -46,9 +54,9 @@ class LoginController {
 
     try {
       if (isRegister) {
-        await _userService.register(username, password);
+        await _userService.register(rawUsername, rawPassword);
       } else {
-        await _userService.login(username, password);
+        await _userService.login(rawUsername, rawPassword);
       }
       onSuccess();
     } catch (e) {
@@ -80,6 +88,35 @@ class LoginController {
         isLoading = false;
       });
     }
+  }
+
+  bool registerChecks(
+    String rawUsername,
+    String trimmedUsername,
+    String rawPassword,
+    String trimmedPassword,
+  ) {
+    if (rawUsername != trimmedUsername) {
+      _updateState(() {
+        errorMessage = ErrorMessages.usernameStartsOrEndsWithSpaces;
+      });
+      return false;
+    }
+
+    if (rawPassword.isNotEmpty && trimmedPassword.isEmpty) {
+      _updateState(() {
+        errorMessage = ErrorMessages.passwordOnlySpaces;
+      });
+      return false;
+    }
+
+    if (trimmedUsername.length < minUsernameLength) {
+      _updateState(() {
+        errorMessage = ErrorMessages.shortUsername;
+      });
+      return false;
+    }
+    return true;
   }
 
   void toggleRegister() {

@@ -1,10 +1,27 @@
 import 'package:client_mobile/models/user_info.dart';
+import 'package:client_mobile/services/chat_service.dart';
 import 'package:client_mobile/services/user_service.dart';
 import 'package:client_mobile/widgets/login_popup.dart';
 import 'package:flutter/material.dart';
 
 class UserPopup extends StatelessWidget {
   const UserPopup({super.key});
+
+  static Future<void> _handleLogout(BuildContext context) async {
+    await UserService().logout();
+    ChatService().clearChatHistory();
+    if (!context.mounted) {
+      return;
+    }
+    Navigator.of(context).pop();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return const LoginPopup();
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,18 +50,7 @@ class UserPopup extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () async {
-            await UserService().logout();
-            if (!context.mounted) {
-              return;
-            }
-            Navigator.of(context).pop();
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) {
-                return const LoginPopup();
-              },
-            );
+            await _handleLogout(context);
           },
           child: const Text('Déconnexion'),
         ),

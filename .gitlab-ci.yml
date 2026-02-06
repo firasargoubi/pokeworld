@@ -13,8 +13,8 @@ cache:
             - master
             - merge_requests
         changes:
-            - client_mobile/**
-            - common/**
+            - client_mobile/**/*
+            - common/**/*
     cache:
         key: '${CI_COMMIT_REF_SLUG}-client-mobile'
         paths:

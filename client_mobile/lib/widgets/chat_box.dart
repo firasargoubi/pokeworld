@@ -27,6 +27,8 @@ class _ChatBoxState extends State<ChatBox> {
   void initState() {
     super.initState();
 
+    _chatService.startListeningToMotion();
+
     _sub = _chatService.generalMessagesStream.listen((messages) {
       setState(() {
         _messages = messages;
@@ -68,6 +70,7 @@ class _ChatBoxState extends State<ChatBox> {
     _emojiSub?.cancel();
     _scrollController.dispose();
     _messageController.dispose();
+    _chatService.stopListeningToMotion();
     super.dispose();
   }
 
