@@ -75,4 +75,10 @@ $font-size: 20px;
 .error {
     color: #ff6666;
     font-size: $font-size;
+    word-break: break-word;
+    white-space: normal;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    padding: 4px 0;
+    text-align: center;
 }

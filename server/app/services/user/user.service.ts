@@ -70,12 +70,19 @@ export class UserService {
 
     async login(loginUserDto: LoginUserDto): Promise<UserResponseDto> {
         const passwordHash = this.hashPassword(loginUserDto.password);
-        const user = await this.userModel
-            .findOneAndUpdate({ username: loginUserDto.username, passwordHash, isLoggedIn: false }, { $set: { isLoggedIn: true } }, { new: true })
-            .exec();
+        const user = await this.userModel.findOne({ username: loginUserDto.username, passwordHash }).exec();
+
         if (!user) {
-            throw new UnauthorizedException('Invalid credentials or user already connected');
+            throw new NotFoundException('User not found');
         }
+
+        if (user.isLoggedIn) {
+            throw new ConflictException('User is already connected');
+        }
+
+        user.isLoggedIn = true;
+        await user.save();
+
         return this.toUserResponse(user);
     }
 

@@ -23,6 +23,7 @@ export class ChatService {
 
     constructor() {
         this.userService.user$.subscribe((user) => {
+            if (this.user?.userId !== user?.userId) this.generalMessagesSignal.update(() => []);
             this.user = user;
         });
         this.socketService.on(ChatEvent.GeneralMessage, (chatMessage: ChatMessage) => {

@@ -216,7 +216,7 @@ describe('UserService', () => {
             expect(result.isLoggedIn).toBe(true);
         });
 
-        it('should throw UnauthorizedException for invalid password', async () => {
+        it('should throw NotFoundException for invalid password', async () => {
             await service.createUser({ username: 'testUser', password: 'password123' });
 
             const loginUserDto: LoginUserDto = {
@@ -224,20 +224,20 @@ describe('UserService', () => {
                 password: 'wrongPassword',
             };
 
-            await expect(service.login(loginUserDto)).rejects.toThrow(UnauthorizedException);
-            await expect(service.login(loginUserDto)).rejects.toThrow('Invalid credentials or user already connected');
+            await expect(service.login(loginUserDto)).rejects.toThrow(NotFoundException);
+            await expect(service.login(loginUserDto)).rejects.toThrow('User not found');
         });
 
-        it('should throw UnauthorizedException for non-existent user', async () => {
+        it('should throw NotFoundException for non-existent user', async () => {
             const loginUserDto: LoginUserDto = {
                 username: 'nonExistent',
                 password: 'password123',
             };
 
-            await expect(service.login(loginUserDto)).rejects.toThrow(UnauthorizedException);
+            await expect(service.login(loginUserDto)).rejects.toThrow(NotFoundException);
         });
 
-        it('should throw UnauthorizedException if user already logged in', async () => {
+        it('should throw ConflictException if user already logged in', async () => {
             await service.createUser({ username: 'testUser', password: 'password123' });
 
             const loginUserDto: LoginUserDto = {
@@ -245,7 +245,7 @@ describe('UserService', () => {
                 password: 'password123',
             };
 
-            await expect(service.login(loginUserDto)).rejects.toThrow(UnauthorizedException);
+            await expect(service.login(loginUserDto)).rejects.toThrow(ConflictException);
         });
     });
 
