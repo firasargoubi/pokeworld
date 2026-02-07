@@ -89,7 +89,8 @@ class ChatService {
 
   void sendGeneralMessage(String message) {
     final timestamp = DateTime.now();
-    final username = UserService().currentUser.value?.username ?? 'Unknown';
+    final username = UserService().currentUser.value?.username;
+    if (username == null) return;
     var chatMessage = {
       'sender': username,
       'content': message,
