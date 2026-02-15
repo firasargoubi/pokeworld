@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:sensors_plus/sensors_plus.dart';
@@ -44,8 +45,13 @@ class MotionDetectionService {
 
   void startListening() {
     if (_isListening) return;
-    _isListening = true;
 
+    // Skip on desktop platforms (Windows, macOS, Linux)
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      return;
+    }
+
+    _isListening = true;
     _sub = userAccelerometerEvents.listen(_detectDirectionalShake);
   }
 
