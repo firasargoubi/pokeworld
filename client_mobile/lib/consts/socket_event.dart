@@ -11,3 +11,11 @@ enum UserEvent {
   const UserEvent(this.value);
   final String value;
 }
+
+enum MatchEvent {
+  joinMatch('joinMatch'),
+  message('message');
+
+  const MatchEvent(this.value);
+  final String value;
+}

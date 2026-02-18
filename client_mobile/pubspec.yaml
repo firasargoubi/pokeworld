@@ -60,6 +60,7 @@ flutter:
     assets:
         - .env.dev
         - .env.prod
+        - assets/images/menu/
         - assets/images/menu/backgrounds/
         - assets/images/menu/logos/
         - assets/images/menu/containers/home-containers/
@@ -67,9 +68,12 @@ flutter:
         - assets/images/menu/pokemons/chibi/
         - assets/images/menu/buttons/poke-button/
         - assets/images/menu/containers/chat/
+        - assets/images/menu/containers/game/
+        - assets/images/menu/containers/join/
         - assets/images/menu/icons/chat/
         - assets/images/menu/buttons/setting/
         - assets/images/menu/icons/settings/
+        - assets/images/menu/headers/
 
     # The following line ensures that the Material Icons font is
     # included with your application, so that you can use the icons in

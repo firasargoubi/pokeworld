@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:client_mobile/consts/menu_card_data.dart';
+import 'package:client_mobile/consts/ui.dart';
 import 'package:client_mobile/models/menu_config.dart';
 import 'package:client_mobile/services/chat_service.dart';
 import 'package:client_mobile/widgets/chat.dart';
@@ -94,7 +95,7 @@ class _HomePageState extends State<HomePage> {
               final screenWidth = constraints.maxWidth;
               final screenHeight = constraints.maxHeight;
 
-              late final double designAspectRatio = 2200 / 1200;
+              late final double designAspectRatio = HOME_PAGE_ASPECT_RATIO;
               late final double baseWidth;
               late final double baseHeight;
 
