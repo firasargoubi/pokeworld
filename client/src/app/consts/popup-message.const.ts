@@ -19,6 +19,7 @@ export enum PopupMessage {
     InvalidCredentials = "Le nom d'utilisateur ou le mot de passe est invalide",
     UsernameTaken = "Le nom d'utilisateur est déjà utilisé",
     AccountConnected = 'Le compte est déjà connecté sur une autre plateforme',
+    ChangeConfirmed = 'Le mot de passe a été changé !',
 }
 
 export const KEYWORDS_TO_REPLACE = ['debug'];

@@ -17,6 +17,34 @@
             />
         </div>
 
+        @if(isCreating) {
+        <div class="form-row">
+            <div class="left-label-small">Adresse courriel</div>
+            <input
+                id="email-input"
+                type="email"
+                [formControl]="emailForm"
+                placeholder="Entrez votre courriel"
+                autocomplete="off"
+                (click)="this.audioService.playEffect(this.clickValue)"
+            />
+        </div>
+        <div class="form-row">
+            <div class="left-label-small">Choisissez un avatar</div>
+            <div class="avatar-list">
+                @for(avatar of avatarList; track $index) {
+                <img
+                    [src]="avatar"
+                    [class.selected]="selectedAvatar === avatar"
+                    (click)="selectAvatar(avatar)"
+                    class="avatar-option"
+                    [alt]="'Avatar ' + ($index + 1)"
+                />
+                }
+            </div>
+        </div>
+        }
+
         <div class="form-row">
             <div class="left-label-small">Mot de passe</div>
             <input class="input-password" type="password" [(ngModel)]="password" (click)="this.audioService.playEffect(this.clickValue)" />

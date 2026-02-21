@@ -1,5 +1,8 @@
 export interface UserInfo {
-    username: string;
     userId: string;
-    passwordHash: string;
+    username: string;
+    email: string;
+    profilePicture: string;
+    balance: number;
+    createdAt: Date;
 }

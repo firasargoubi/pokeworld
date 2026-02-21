@@ -2,7 +2,7 @@
     <div class="user-inner">
         <div class="user-info">
             <div class="avatar-box">
-                <img [src]="avatarImage" alt="Avatar" class="avatar-image" />
+                <img [src]="currentUser?.profilePicture || avatarImage" alt="Avatar" class="avatar-image" />
             </div>
 
             <div class="info-row">
@@ -10,12 +10,23 @@
                 <span class="value">{{ currentUser ? currentUser.username : 'None' }}</span>
             </div>
             <div class="info-row">
-                <span class="label">ID:</span>
-                <span class="value">{{ currentUser ? currentUser.userId : 'None' }}</span>
+                <span class="label">Courriel:</span>
+                <span class="value">{{ currentUser ? currentUser.email : 'None' }}</span>
             </div>
         </div>
         <div class="buttons">
             <button (click)="logout()" class="logout-button">Se déconnecter</button>
+            <button (click)="deleteAccount()" class="logout-button" style="background: #ff6666; color: #fff">Supprimer le compte</button>
+            <button (click)="toggleEditPassword()" class="logout-button" style="background: #4fc3f7; color: #fff">Modifier le mot de passe</button>
         </div>
+        @if(editMode) {
+        <div class="edit-password-row">
+            <input type="password" [(ngModel)]="oldPassword" placeholder="Ancien mot de passe" class="input-password pixel-placeholder" />
+            <input type="password" [(ngModel)]="newPassword" placeholder="Nouveau mot de passe" class="input-password pixel-placeholder" />
+            <button (click)="editPassword()" class="logout-button" style="background: #4fc3f7; color: #fff; margin-left: 8px">Valider</button>
+        </div>
+        @if(passwordError) {
+        <div class="error">{{ passwordError }}</div>
+        } }
     </div>
 </div>

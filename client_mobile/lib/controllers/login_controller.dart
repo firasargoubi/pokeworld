@@ -13,6 +13,7 @@ class LoginController {
   String? errorMessage;
 
   final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   Function(void Function())? _setState;
@@ -24,21 +25,24 @@ class LoginController {
   Future<void> handleSubmit({required Function() onSuccess}) async {
     final rawUsername = usernameController.text.toUpperCase();
     final trimmedUsername = rawUsername.trim();
+    final rawEmail = emailController.text;
+    final trimmedEmail = rawEmail.trim();
     final rawPassword = passwordController.text;
     final trimmedPassword = rawPassword.trim();
 
-    if (rawUsername.isEmpty || rawPassword.isEmpty) {
+    if (rawUsername.isEmpty || rawPassword.isEmpty || rawEmail.isEmpty) {
       _updateState(() {
         errorMessage = ErrorMessages.emptyFields;
       });
       return;
     }
 
-
     if (isRegister) {
       final isValid = registerChecks(
         rawUsername,
         trimmedUsername,
+        rawEmail,
+        trimmedEmail,
         rawPassword,
         trimmedPassword,
       );
@@ -54,7 +58,7 @@ class LoginController {
 
     try {
       if (isRegister) {
-        await _userService.register(rawUsername, rawPassword);
+        await _userService.register(rawUsername, rawEmail, rawPassword);
       } else {
         await _userService.login(rawUsername, rawPassword);
       }
@@ -93,6 +97,8 @@ class LoginController {
   bool registerChecks(
     String rawUsername,
     String trimmedUsername,
+    String rawEmail,
+    String trimmedEmail,
     String rawPassword,
     String trimmedPassword,
   ) {
@@ -106,6 +112,14 @@ class LoginController {
     if (rawPassword.isNotEmpty && trimmedPassword.isEmpty) {
       _updateState(() {
         errorMessage = ErrorMessages.passwordOnlySpaces;
+      });
+      return false;
+    }
+
+    if (rawEmail != trimmedEmail ||
+        !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(trimmedEmail)) {
+      _updateState(() {
+        errorMessage = ErrorMessages.invalidEmail;
       });
       return false;
     }

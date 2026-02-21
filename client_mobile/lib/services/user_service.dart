@@ -8,6 +8,7 @@ import 'package:client_mobile/consts/socket_event.dart';
 import 'package:client_mobile/models/user_info.dart';
 import 'package:client_mobile/services/socket_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -55,9 +56,25 @@ class UserService {
     }
   }
 
-  Future<UserInfo> register(String username, String password) async {
+  Future<UserInfo> register(
+    String username,
+    String email,
+    String password,
+  ) async {
     final String uri = '$baseUrl/${userEndpoints['UserRegister']}';
-    final postBody = {'username': username, 'password': password};
+
+    final byteData = await rootBundle.load(
+      'assets/images/menu/pokemons/chibi/eevee.png',
+    );
+    final bytes = byteData.buffer.asUint8List();
+    String img64 = 'data:image/png;base64,${base64Encode(bytes)}';
+
+    final postBody = {
+      'username': username,
+      'email': email,
+      'password': password,
+      'profilePicture': img64,
+    };
     final bodyJson = jsonEncode(postBody);
     final response = await http.post(
       Uri.parse(uri),

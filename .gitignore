@@ -6,6 +6,7 @@
 .vscode/
 package-lock.json
 .DS_Store
+client/build
 
 # Code Coverage Folder
 coverage/

@@ -106,8 +106,8 @@ describe('UserService', () => {
 
     describe('getAllUsers', () => {
         it('should return all users without filters', async () => {
-            await service.createUser({ username: 'user1', password: 'pass1' });
-            await service.createUser({ username: 'user2', password: 'pass2' });
+            await service.createUser({ username: 'user1', password: 'pass1', email: 'user1@example.com', profilePicture: '' });
+            await service.createUser({ username: 'user2', password: 'pass2', email: 'user2@example.com', profilePicture: '' });
 
             const users = await service.getAllUsers();
 
@@ -118,8 +118,8 @@ describe('UserService', () => {
         });
 
         it('should return filtered users by isLoggedIn', async () => {
-            await service.createUser({ username: 'user1', password: 'pass1' });
-            const user2 = await service.createUser({ username: 'user2', password: 'pass2' });
+            await service.createUser({ username: 'user1', password: 'pass1', email: 'user1@example.com', profilePicture: '' });
+            const user2 = await service.createUser({ username: 'user2', password: 'pass2', email: 'user2@example.com', profilePicture: '' });
 
             await service.logout(user2.userId);
 
@@ -138,15 +138,15 @@ describe('UserService', () => {
 
     describe('checkUsernameExists', () => {
         it('should return true if username exists', async () => {
-            await service.createUser({ username: 'testUser', password: 'password123' });
+            await service.createUser({ username: 'testUser', password: 'password123', email: 'testUser@example.com', profilePicture: '' });
 
-            const exists = await service.checkUsernameExists('testUser');
+            const exists = await service.checkUserExists({ username: 'testUser', deleted: false });
 
             expect(exists).toBe(true);
         });
 
         it('should return false if username does not exist', async () => {
-            const exists = await service.checkUsernameExists('nonExistent');
+            const exists = await service.checkUserExists({ username: 'nonExistent', deleted: false });
 
             expect(exists).toBe(false);
         });
@@ -157,6 +157,8 @@ describe('UserService', () => {
             const createUserDto: CreateUserDto = {
                 username: 'newUser',
                 password: 'password123',
+                email: 'newUser@example.com',
+                profilePicture: '',
             };
 
             const result = await service.createUser(createUserDto);
@@ -172,6 +174,8 @@ describe('UserService', () => {
             const createUserDto: CreateUserDto = {
                 username: 'existingUser',
                 password: 'password123',
+                email: 'existingUser@example.com',
+                profilePicture: '',
             };
 
             await service.createUser(createUserDto);
@@ -184,6 +188,8 @@ describe('UserService', () => {
             const createUserDto: CreateUserDto = {
                 username: 'testUser',
                 password: 'password123',
+                email: 'testUser@example.com',
+                profilePicture: '',
             };
 
             await service.createUser(createUserDto);
@@ -199,6 +205,8 @@ describe('UserService', () => {
             const createUserDto: CreateUserDto = {
                 username: 'testUser',
                 password: 'password123',
+                email: 'testUser@example.com',
+                profilePicture: '',
             };
 
             const createdUser = await service.createUser(createUserDto);
@@ -211,13 +219,16 @@ describe('UserService', () => {
 
             const result = await service.login(loginUserDto);
 
+            service.associateSocket(result.userId, 'socket123');
+
             expect(result).toBeDefined();
             expect(result.username).toBe('testUser');
             expect(result.isLoggedIn).toBe(true);
+            expect(service.getSocketId(result.userId)).toBe('socket123');
         });
 
         it('should throw NotFoundException for invalid password', async () => {
-            await service.createUser({ username: 'testUser', password: 'password123' });
+            await service.createUser({ username: 'testUser', password: 'password123', email: 'testUser@example.com', profilePicture: '' });
 
             const loginUserDto: LoginUserDto = {
                 username: 'testUser',
@@ -238,7 +249,15 @@ describe('UserService', () => {
         });
 
         it('should throw ConflictException if user already logged in', async () => {
-            await service.createUser({ username: 'testUser', password: 'password123' });
+            const user = await service.createUser({
+                username: 'testUser',
+                password: 'password123',
+                email: 'testUser@example.com',
+                profilePicture: '',
+            });
+
+            // Simulate user already connected by associating socket
+            service.associateSocket(user.userId, 'socket123');
 
             const loginUserDto: LoginUserDto = {
                 username: 'testUser',
@@ -251,7 +270,12 @@ describe('UserService', () => {
 
     describe('logout', () => {
         it('should logout user successfully', async () => {
-            const user = await service.createUser({ username: 'testUser', password: 'password123' });
+            const user = await service.createUser({
+                username: 'testUser',
+                password: 'password123',
+                email: 'testUser@example.com',
+                profilePicture: '',
+            });
             service.associateSocket(user.userId, 'socket123');
 
             await service.logout(user.userId);
@@ -267,14 +291,24 @@ describe('UserService', () => {
         });
 
         it('should throw UnauthorizedException if user already logged out', async () => {
-            const user = await service.createUser({ username: 'testUser', password: 'password123' });
+            const user = await service.createUser({
+                username: 'testUser',
+                password: 'password123',
+                email: 'testUser@example.com',
+                profilePicture: '',
+            });
             await service.logout(user.userId);
 
             await expect(service.logout(user.userId)).rejects.toThrow(UnauthorizedException);
         });
 
         it('should logout without error if socket not associated', async () => {
-            const user = await service.createUser({ username: 'testUser', password: 'password123' });
+            const user = await service.createUser({
+                username: 'testUser',
+                password: 'password123',
+                email: 'testUser@example.com',
+                profilePicture: '',
+            });
 
             await expect(service.logout(user.userId)).resolves.not.toThrow();
         });
@@ -282,12 +316,17 @@ describe('UserService', () => {
 
     describe('deleteUser', () => {
         it('should delete user successfully', async () => {
-            const user = await service.createUser({ username: 'testUser', password: 'password123' });
+            const user = await service.createUser({
+                username: 'testUser',
+                password: 'password123',
+                email: 'testUser@example.com',
+                profilePicture: '',
+            });
 
             await service.deleteUser(user.userId);
 
             const userCount = await userModel.countDocuments({ userId: user.userId }).exec();
-            expect(userCount).toBe(0);
+            expect(userCount).toBe(1);
         });
 
         it('should throw NotFoundException if user not found', async () => {
@@ -296,12 +335,17 @@ describe('UserService', () => {
         });
 
         it('should allow deleting user even if logged in', async () => {
-            const user = await service.createUser({ username: 'testUser', password: 'password123' });
+            const user = await service.createUser({
+                username: 'testUser',
+                password: 'password123',
+                email: 'testUser@example.com',
+                profilePicture: '',
+            });
 
             await expect(service.deleteUser(user.userId)).resolves.not.toThrow();
 
             const userCount = await userModel.countDocuments({ userId: user.userId }).exec();
-            expect(userCount).toBe(0);
+            expect(userCount).toBe(1);
         });
     });
 });

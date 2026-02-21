@@ -1,3 +1,8 @@
+.chat-avatar {
+    object-fit: contain;
+    vertical-align: middle;
+    margin-right: 0.5em;
+}
 $chat-base-size: calc(var(--chat-base-size) * 1);
 
 $border-width: calc(var(--chat-base-size) * 4);

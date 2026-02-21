@@ -1,6 +1,7 @@
 import { Match } from '@app/classes/match/match';
-import { ITEM_NAME } from '@common/consts/item-data.const';
+import { User } from '@app/model/schema/user.schema';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
+import { ITEM_NAME } from '@common/consts/item-data.const';
 import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { PlayerCombatData } from '@common/interfaces/match-data';
@@ -11,10 +12,11 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ChatService {
-    message(match: Match, playerId: string, message: string) {
+    message(match: Match, playerId: string, message: string, user: User | null) {
         if (message.length <= MAX_MESSAGE_LENGTH) {
             const chatMessage: ChatMessage = {
                 content: message,
+                profilePicture: user ? user.profilePicture : null,
                 sender: match.getPlayer(playerId).name,
                 timestamp: new Date(),
             };

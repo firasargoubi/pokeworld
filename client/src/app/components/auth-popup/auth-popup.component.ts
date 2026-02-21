@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AVATAR_LIST } from '@app/consts/avatar-list.const';
 import { DEFAULT_CHARACTER_VISUAL_DATA } from '@app/consts/player-data.const';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { CharacterVisualData } from '@app/interfaces/character-visual-data';
@@ -26,17 +27,53 @@ export class AuthPopupComponent {
     ]);
     visualData: CharacterVisualData = structuredClone(DEFAULT_CHARACTER_VISUAL_DATA);
     password = '';
+    emailForm: FormControl = new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^([a-zA-Z0-9_\-.+]+)@([a-zA-Z0-9\-.]+)\.([a-zA-Z]{2,})$/),
+    ]);
     isCreating = false;
     errorMessage = '';
     readonly clickValue = SoundEffect.Click;
+
+    avatarList: string[] = structuredClone(AVATAR_LIST);
+    selectedAvatar: string = this.avatarList[0];
+    avatarUrl: string = '';
 
     audioService: AudioService = inject(AudioService);
     private userService: UserService = inject(UserService);
     private popupService: PopupService = inject(PopupService);
 
-    submit() {
+    @HostListener('document:keydown.enter', ['$event'])
+    onEnterKey(event: KeyboardEvent) {
+        event.preventDefault();
+        this.primaryAction();
+    }
+
+    async getAvatarDataUrl(imagePath: string): Promise<string> {
+        if (!imagePath) return '';
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.src = imagePath;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                } else {
+                    resolve('');
+                }
+            };
+            img.onerror = () => resolve('');
+        });
+    }
+
+    async submit() {
         this.errorMessage = '';
-        if (!this.password.trim() || !this.usernameForm.value.trim()) {
+        if (!this.password.trim() || !this.usernameForm.value.trim() || (this.isCreating && !this.emailForm.value.trim())) {
             this.errorMessage = PopupMessage.EmptyFields;
             return;
         } else if (this.usernameForm.value.trim().length !== this.usernameForm.value.length) {
@@ -45,8 +82,12 @@ export class AuthPopupComponent {
         } else if (!this.usernameForm.valid) {
             this.errorMessage = PopupMessage.UsernameLength;
             return;
+        } else if (this.isCreating && !this.emailForm.valid) {
+            this.errorMessage = 'Adresse courriel invalide';
+            return;
         }
         if (this.isCreating) {
+            this.avatarUrl = await this.getAvatarDataUrl(this.selectedAvatar);
             this.register();
         } else {
             this.login();
@@ -54,19 +95,26 @@ export class AuthPopupComponent {
     }
 
     register() {
-        this.userService.createAccount(this.usernameForm.value.toUpperCase().trim(), this.password).subscribe({
-            next: (user) => {
-                this.userService.setUser(user);
-                this.popupService.showPopup({
-                    message: PopupMessage.SuccessfulAccountCreation,
-                    hasCloseButton: true,
-                    isConfirmation: false,
-                });
-            },
-            error: (error: HttpErrorResponse) => {
-                this.handleNotFoundError(error, true);
-            },
-        });
+        this.userService
+            .createAccount(this.usernameForm.value.toUpperCase().trim(), this.password, this.avatarUrl, this.emailForm.value.trim())
+            .subscribe({
+                next: (user) => {
+                    this.userService.setUser(user);
+                    this.popupService.showPopup({
+                        message: PopupMessage.SuccessfulAccountCreation,
+                        hasCloseButton: true,
+                        isConfirmation: false,
+                    });
+                },
+                error: (error: HttpErrorResponse) => {
+                    this.handleNotFoundError(error, true);
+                },
+            });
+    }
+
+    selectAvatar(avatar: string) {
+        this.selectedAvatar = avatar;
+        this.audioService.playEffect(this.clickValue);
     }
 
     login() {

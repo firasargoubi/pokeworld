@@ -11,17 +11,7 @@
                         <img src="./assets/images/menu/stat-bar/shadow.png" id="avatar-shadow" />
                     </div>
                     <span id="name-form">
-                        <input
-                            id="name-input"
-                            type="text"
-                            [formControl]="nameForm"
-                            maxlength="{{ visualData.nameMaxLength }}"
-                            placeholder="Entrez votre nom"
-                            autofocus
-                            autocomplete="off"
-                            style="text-transform: uppercase"
-                            (click)="this.audioService.playEffect(this.clickValue)"
-                        />
+                        <div id="name-input" readonly style="text-transform: uppercase">{{ username }}</div>
                         <p id="name-input-border">----------------</p>
                     </span>
                 </div>
@@ -110,7 +100,7 @@
         </main>
     </div>
     <footer id="page-footer">
-        <div class="main-button-container" [class.disabled]="!nameForm.valid || !visualData.isAvatarSelected" (click)="joinLobby()">
+        <div class="main-button-container" [class.disabled]="!username || !visualData.isAvatarSelected" (click)="joinLobby()">
             <div class="button-edge"></div>
             <div class="button-body"><p>START GAME</p></div>
             <div class="button-edge"></div>

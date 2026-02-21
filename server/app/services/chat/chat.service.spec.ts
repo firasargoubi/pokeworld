@@ -1,4 +1,5 @@
 import { Match } from '@app/classes/match/match';
+import { User } from '@app/model/schema/user.schema';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ITEM_NAME } from '@common/consts/item-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -17,6 +18,7 @@ describe('ChatService', () => {
     let mockMatch: SinonStubbedInstance<Match>;
     let addLogToMatchStub: SinonStub;
 
+    let defaultUser: User;
     beforeEach(async () => {
         sandbox = createSandbox();
 
@@ -24,6 +26,17 @@ describe('ChatService', () => {
         mockMatch.data = structuredClone(MOCK_MATCH_DATAS[0]);
         mockMatch.data.chatData = [];
         mockMatch.data.logData = [];
+
+        defaultUser = {
+            profilePicture: 'defaultPic',
+            username: 'defaultUser',
+            email: 'default@example.com',
+            userId: 'defaultId',
+            passwordHash: 'defaultHash',
+            balance: 0,
+            isLoggedIn: true,
+            deleted: false,
+        };
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [ChatService],
@@ -46,17 +59,18 @@ describe('ChatService', () => {
         const messageContent = 'Test message';
         mockMatch.getPlayer.returns(MOCK_PLAYER_DATAS[0]);
 
-        service.message(mockMatch, MOCK_PLAYER_DATAS[0].id, messageContent);
+        service.message(mockMatch, MOCK_PLAYER_DATAS[0].id, messageContent, defaultUser);
 
         expect(mockMatch.data.chatData.length).toBe(1);
         expect(mockMatch.data.chatData[0].content).toEqual(messageContent);
+        expect(mockMatch.data.chatData[0].profilePicture).toEqual(defaultUser.profilePicture);
         expect(mockMatch.sendUpdate.calledOnce).toBe(true);
     });
 
     it('should reject message exceeding max length', () => {
         const longMessage = 'A'.repeat(MAX_MESSAGE_LENGTH + 1);
 
-        service.message(mockMatch, MOCK_PLAYER_DATAS[0].id, longMessage);
+        service.message(mockMatch, MOCK_PLAYER_DATAS[0].id, longMessage, defaultUser);
 
         expect(mockMatch.data.chatData.length).toBe(0);
         expect(mockMatch.sendUpdate.called).toBe(false);

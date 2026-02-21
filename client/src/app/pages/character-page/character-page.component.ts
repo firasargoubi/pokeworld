@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { HeaderComponent } from '@app/components/header/header.component';
@@ -13,10 +13,12 @@ import { AudioService } from '@app/services/audio/audio.service';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { UserService } from '@app/services/user/user.service';
 import { AVATAR_DATA, MAX_SELECTABLE_AVATAR_INDEX, MIN_SELECTABLE_AVATAR_INDEX } from '@common/consts/avatar-data.const';
-import { BONUS_STAT, DEFAULT_STAT, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/player-data.const';
+import { BONUS_STAT, DEFAULT_STAT } from '@common/consts/player-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Avatar, DiceType, PlayerData } from '@common/interfaces/player-data';
+import { UserInfo } from '@common/interfaces/user';
 
 @Component({
     selector: 'app-character-page',
@@ -25,16 +27,20 @@ import { Avatar, DiceType, PlayerData } from '@common/interfaces/player-data';
     styleUrl: './character-page.component.scss',
 })
 export class CharacterPageComponent {
-    nameForm: FormControl = new FormControl('', [Validators.required, Validators.minLength(MIN_NAME_LENGTH), Validators.maxLength(MAX_NAME_LENGTH)]);
+    username: string = '';
     visualData: CharacterVisualData = structuredClone(DEFAULT_CHARACTER_VISUAL_DATA);
     readonly audioService: AudioService = inject(AudioService);
     readonly clickValue = SoundEffect.Click;
     private matchService: MatchService = inject(MatchService);
     private popupService: PopupService = inject(PopupService);
     private lobbyService: LobbyService = inject(LobbyService);
+    private userService: UserService = inject(UserService);
     private router: Router = inject(Router);
 
     constructor() {
+        this.userService.user$.subscribe((user: UserInfo | null) => {
+            this.username = user?.username || '';
+        });
         if (this.matchService.isInMatch()) {
             this.updateAvatarList();
             this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.updateAvatarList.bind(this));
@@ -111,7 +117,7 @@ export class CharacterPageComponent {
 
     private getPlayerData(): PlayerData {
         const playerData = this.matchService.selfPlayer;
-        playerData.name = this.nameForm.value.toUpperCase().trim();
+        playerData.name = this.username.toUpperCase().trim();
         playerData.health = this.visualData.isHpSelected ? BONUS_STAT : DEFAULT_STAT;
         playerData.speed = this.visualData.isHpSelected ? DEFAULT_STAT : BONUS_STAT;
         playerData.attackDice = this.visualData.isAttackSelected ? DiceType.D6 : DiceType.D4;
@@ -121,9 +127,6 @@ export class CharacterPageComponent {
 
     private getWarnings() {
         const warningList = [];
-        if (!this.nameForm.valid) {
-            warningList.push('- Le nom doit contenir entre 3 et 15 caractères');
-        }
         if (this.matchService.selfPlayer.avatar === Avatar.Default) {
             warningList.push('- Veuillez choisir un avatar');
         }
