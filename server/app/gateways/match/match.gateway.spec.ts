@@ -148,7 +148,16 @@ describe('MatchGateway', () => {
     });
 
     it('should associate user on user associate event', () => {
-        const mockUser = { userId: 'user123', username: 'testUser', passwordHash: 'testHash' };
+        const mockUser = {
+            userId: 'user123',
+            username: 'testUser',
+            passwordHash: 'testHash',
+            email: 'abc@abc.abc',
+            profilePicture: '',
+            isLoggedIn: true,
+            balance: 0,
+            createdAt: new Date(),
+        };
         gateway.onUserAssociate(mockSocket, mockUser);
         expect(mockUserService.associateSocket.calledWith(mockUser.userId, mockSocket.id)).toBeTruthy();
     });

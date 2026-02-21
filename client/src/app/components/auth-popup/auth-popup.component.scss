@@ -1,3 +1,44 @@
+.avatar-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 8px 0;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.avatar-option {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border: none;
+    outline: 3px solid transparent;
+    outline-offset: 2px;
+    cursor: pointer;
+    background: transparent;
+    image-rendering: pixelated;
+    transition: outline 0.1s;
+    margin: 6px;
+    box-sizing: content-box;
+    position: relative;
+}
+.avatar-option.selected {
+    outline: 3px solid #4fc3f7;
+    background: transparent;
+}
+.avatar-option.selected::after {
+    content: '';
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 14px;
+    height: 14px;
+    background: radial-gradient(circle at 60% 60%, #4fc3f7 70%, #2196f3 100%, transparent 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 8px 2px #4fc3f7;
+    pointer-events: none;
+    z-index: 2;
+}
 $input-border-color: rgba(255, 255, 255, 0.82);
 $input-bg-normal: hsla(231, 12%, 45%, 0.7);
 $input-bg-active: hsla(231, 12%, 45%, 0.6);

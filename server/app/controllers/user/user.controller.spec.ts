@@ -1,10 +1,10 @@
+import { CreateUserDto } from '@app/model/dto/user/create-user.dto';
+import { LoginUserDto } from '@app/model/dto/user/login-user.dto';
+import { UserResponseDto } from '@app/model/dto/user/response-user.dto';
 import { UserService } from '@app/services/user/user.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { UserController } from './user.controller';
-import { CreateUserDto } from '@app/model/dto/user/create-user.dto';
-import { LoginUserDto } from '@app/model/dto/user/login-user.dto';
-import { UserResponseDto } from '@app/model/dto/user/response-user.dto';
 
 describe('UserController', () => {
     let controller: UserController;
@@ -13,6 +13,9 @@ describe('UserController', () => {
         userId: 'user123',
         username: 'testUser',
         isLoggedIn: false,
+        email: 'user@test.com',
+        profilePicture: '',
+        balance: 0,
     };
 
     beforeEach(async () => {
@@ -55,22 +58,22 @@ describe('UserController', () => {
     describe('checkUsername', () => {
         it('should return true if username exists', async () => {
             const username = 'testUser';
-            userService.checkUsernameExists.resolves(true);
+            userService.checkUserExists.resolves(true);
 
             const res = await controller.checkUsername(username);
 
             expect(res).toEqual({ exists: true });
-            expect(userService.checkUsernameExists.calledWith(username)).toBeTruthy();
+            expect(userService.checkUserExists.calledWith({ username })).toBeTruthy();
         });
 
         it('should return false if username does not exist', async () => {
             const username = 'nonExistentUser';
-            userService.checkUsernameExists.resolves(false);
+            userService.checkUserExists.resolves(false);
 
             const res = await controller.checkUsername(username);
 
             expect(res).toEqual({ exists: false });
-            expect(userService.checkUsernameExists.calledWith(username)).toBeTruthy();
+            expect(userService.checkUserExists.calledWith({ username })).toBeTruthy();
         });
     });
 
@@ -79,6 +82,8 @@ describe('UserController', () => {
             const createUserDto: CreateUserDto = {
                 username: 'newUser',
                 password: 'password123',
+                email: 'abc@abc.abc',
+                profilePicture: '',
             };
             userService.createUser.resolves(fakeUserResponse);
 

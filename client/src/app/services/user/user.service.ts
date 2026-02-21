@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { SocketService } from '@app/services/socket/socket.service';
 import { ApiEndpoint } from '@common/interfaces/endpoint.enum';
+import { UserEvent } from '@common/interfaces/socket-event.enum';
 import { UserInfo } from '@common/interfaces/user';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { SocketService } from '@app/services/socket/socket.service';
-import { UserEvent } from '@common/interfaces/socket-event.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -26,13 +26,21 @@ export class UserService {
         return this.http.post<UserInfo>(`${this.baseUrl}/${ApiEndpoint.User}/login`, { username, password });
     }
 
-    createAccount(username: string, password: string): Observable<UserInfo> {
-        return this.http.post<UserInfo>(`${this.baseUrl}/${ApiEndpoint.User}/register`, { username, password });
+    createAccount(username: string, password: string, profilePicture: string, email: string): Observable<UserInfo> {
+        return this.http.post<UserInfo>(`${this.baseUrl}/${ApiEndpoint.User}/register`, { username, password, profilePicture, email });
     }
 
     logout(): Observable<void> {
         const userId = this.currentUserSubject.value?.userId;
         return this.http.post<void>(`${this.baseUrl}/${ApiEndpoint.User}/logout/${userId}`, {});
+    }
+
+    edit(userId: string, oldPassword: string, password: string): Observable<UserInfo> {
+        return this.http.put<UserInfo>(`${this.baseUrl}/${ApiEndpoint.User}/edit`, { userId, oldPassword, password });
+    }
+
+    delete(userId: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${ApiEndpoint.User}/${userId}`);
     }
 
     setUser(user: UserInfo | null): void {

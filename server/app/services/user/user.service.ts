@@ -1,4 +1,5 @@
 import { CreateUserDto } from '@app/model/dto/user/create-user.dto';
+import { EditUserDto } from '@app/model/dto/user/edit-user.dto';
 import { LoginUserDto } from '@app/model/dto/user/login-user.dto';
 import { UserResponseDto } from '@app/model/dto/user/response-user.dto';
 import { User, UserDocument } from '@app/model/schema/user.schema';
@@ -37,19 +38,25 @@ export class UserService {
         return undefined;
     }
 
+    async getUserById(userId: string): Promise<User | null> {
+        const user = await this.userModel.findOne({ userId }).exec();
+        return user ? user : null;
+    }
+
     async getAllUsers(filters?: Record<string, unknown>): Promise<UserResponseDto[]> {
         const query = filters || {};
         const users = await this.userModel.find(query).select('-passwordHash').exec();
         return users.map((user) => this.toUserResponse(user));
     }
 
-    async checkUsernameExists(username: string): Promise<boolean> {
-        const user = await this.userModel.findOne({ username }).exec();
+    async checkUserExists(filters?: Record<string, unknown>): Promise<boolean> {
+        const query = filters || {};
+        const user = await this.userModel.findOne(query).exec();
         return !!user;
     }
 
     async createUser(createUserDto: CreateUserDto): Promise<UserResponseDto> {
-        const exists = await this.checkUsernameExists(createUserDto.username);
+        const exists = await this.checkUserExists({ username: createUserDto.username, deleted: false });
         if (exists) {
             throw new ConflictException('Username already exists');
         }
@@ -58,7 +65,9 @@ export class UserService {
         const userId = uuidv4();
 
         const newUser = new this.userModel({
+            email: createUserDto.email,
             username: createUserDto.username,
+            profilePicture: createUserDto.profilePicture,
             passwordHash,
             userId,
             isLoggedIn: true,
@@ -70,13 +79,13 @@ export class UserService {
 
     async login(loginUserDto: LoginUserDto): Promise<UserResponseDto> {
         const passwordHash = this.hashPassword(loginUserDto.password);
-        const user = await this.userModel.findOne({ username: loginUserDto.username, passwordHash }).exec();
+        const user = await this.userModel.findOne({ username: loginUserDto.username, passwordHash, deleted: false }).exec();
 
         if (!user) {
             throw new NotFoundException('User not found');
         }
 
-        if (user.isLoggedIn) {
+        if (this.userSocketMap.has(user.userId)) {
             throw new ConflictException('User is already connected');
         }
 
@@ -97,11 +106,30 @@ export class UserService {
     }
 
     async deleteUser(userId: string): Promise<void> {
-        const result = await this.userModel.deleteOne({ userId }).exec();
-
-        if (result.deletedCount === 0) {
+        const user = await this.userModel.findOne({ userId }).exec();
+        if (!user) {
             throw new NotFoundException('User not found');
         }
+        user.username = '[supprimé]';
+        user.email = 'None';
+        user.passwordHash = 'None';
+        user.deleted = true;
+        await user.save();
+        if (this.userSocketMap.has(userId)) {
+            this.userSocketMap.delete(userId);
+        }
+    }
+
+    async editUser(editUserDto: EditUserDto): Promise<UserResponseDto> {
+        const passwordHash = this.hashPassword(editUserDto.password);
+        const oldPasswordHash = this.hashPassword(editUserDto.oldPassword);
+        const user = await this.userModel.findOne({ userId: editUserDto.userId, passwordHash: oldPasswordHash, isLoggedIn: true }).exec();
+        if (!user) {
+            throw new UnauthorizedException('Wrong password');
+        }
+        user.passwordHash = passwordHash;
+        await user.save();
+        return this.toUserResponse(user);
     }
 
     private hashPassword(password: string): string {
@@ -112,6 +140,9 @@ export class UserService {
         return {
             userId: user.userId,
             username: user.username,
+            email: user.email,
+            profilePicture: user.profilePicture,
+            balance: user.balance,
             isLoggedIn: user.isLoggedIn,
         };
     }

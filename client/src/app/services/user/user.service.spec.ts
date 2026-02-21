@@ -1,11 +1,11 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { ApiEndpoint } from '@common/interfaces/endpoint.enum';
-import { UserInfo } from '@common/interfaces/user';
-import { UserEvent } from '@common/interfaces/socket-event.enum';
-import { environment } from 'src/environments/environment';
 import { SocketService } from '@app/services/socket/socket.service';
+import { ApiEndpoint } from '@common/interfaces/endpoint.enum';
+import { UserEvent } from '@common/interfaces/socket-event.enum';
+import { UserInfo } from '@common/interfaces/user';
+import { environment } from 'src/environments/environment';
 import { UserService } from './user.service';
 
 describe('UserService', () => {
@@ -13,7 +13,7 @@ describe('UserService', () => {
     let service: UserService;
     let baseUrl: string;
     let socketServiceSpy: jasmine.SpyObj<SocketService>;
-    const mockUser: UserInfo = { username: 'testuser', userId: '1234', passwordHash: 'hashedpassword' };
+    const mockUser: UserInfo = { username: 'testuser', userId: '1234', email: '', profilePicture: 'defaultPic', balance: 100, createdAt: new Date() };
 
     beforeEach(() => {
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['emit']);
@@ -64,7 +64,7 @@ describe('UserService', () => {
     });
 
     it('should create account', () => {
-        service.createAccount('newuser', 'password').subscribe({
+        service.createAccount('newuser', 'password', 'profile', 'email').subscribe({
             next: (user) => {
                 expect(user).toEqual(mockUser);
             },
@@ -72,7 +72,7 @@ describe('UserService', () => {
         });
         const req = httpMock.expectOne(`${baseUrl}/${ApiEndpoint.User}/register`);
         expect(req.request.method).toBe('POST');
-        expect(req.request.body).toEqual({ username: 'newuser', password: 'password' });
+        expect(req.request.body).toEqual({ username: 'newuser', password: 'password', profilePicture: 'profile', email: 'email' });
         req.flush(mockUser);
     });
 

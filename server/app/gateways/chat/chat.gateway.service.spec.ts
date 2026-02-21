@@ -1,6 +1,7 @@
 import { Match } from '@app/classes/match/match';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
+import { UserService } from '@app/services/user/user.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
@@ -12,6 +13,7 @@ describe('LobbyGateway', () => {
     let mockServer: SinonStubbedInstance<Server>;
     let mockChatService: SinonStubbedInstance<ChatService>;
     let mockMatchService: SinonStubbedInstance<MatchService>;
+    let mockUserService: SinonStubbedInstance<UserService>;
     let emitStub: SinonStub;
     let mockMatch: SinonStubbedInstance<Match>;
 
@@ -19,6 +21,7 @@ describe('LobbyGateway', () => {
         mockSocket = createStubInstance<Socket>(Socket);
         mockChatService = createStubInstance<ChatService>(ChatService);
         mockMatchService = createStubInstance<MatchService>(MatchService);
+        mockUserService = createStubInstance<UserService>(UserService);
         mockServer = createStubInstance<Server>(Server);
         emitStub = stub();
         mockMatch = createStubInstance<Match>(Match);
@@ -29,6 +32,7 @@ describe('LobbyGateway', () => {
                 ChatGateway,
                 { provide: MatchService, useValue: mockMatchService },
                 { provide: ChatService, useValue: mockChatService },
+                { provide: UserService, useValue: mockUserService },
                 { provide: Server, useValue: mockServer },
             ],
         }).compile();

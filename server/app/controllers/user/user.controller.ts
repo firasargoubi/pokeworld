@@ -1,8 +1,9 @@
 import { CreateUserDto } from '@app/model/dto/user/create-user.dto';
+import { EditUserDto } from '@app/model/dto/user/edit-user.dto';
 import { LoginUserDto } from '@app/model/dto/user/login-user.dto';
 import { UserResponseDto } from '@app/model/dto/user/response-user.dto';
 import { UserService } from '@app/services/user/user.service';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('user')
@@ -23,7 +24,7 @@ export class UserController {
     @ApiParam({ name: 'username', description: 'Username to check' })
     @ApiResponse({ status: 200, description: 'Returns true if username exists' })
     async checkUsername(@Param('username') username: string): Promise<{ exists: boolean }> {
-        const exists = await this.userService.checkUsernameExists(username);
+        const exists = await this.userService.checkUserExists({ username });
         return { exists };
     }
 
@@ -54,6 +55,15 @@ export class UserController {
     @ApiResponse({ status: 409, description: 'User is not currently connected' })
     async logout(@Param('userId') userId: string): Promise<void> {
         return this.userService.logout(userId);
+    }
+
+    @Put('edit')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Edit account info' })
+    @ApiResponse({ status: 200, description: 'Edit successful', type: UserResponseDto })
+    @ApiResponse({ status: 409, description: 'Wrong password' })
+    async edit(@Body() editUserDto: EditUserDto): Promise<UserResponseDto> {
+        return this.userService.editUser(editUserDto);
     }
 
     @Delete(':userId')

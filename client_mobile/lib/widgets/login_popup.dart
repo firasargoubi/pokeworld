@@ -53,6 +53,17 @@ class _LoginPopupState extends State<LoginPopup> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(_controller.isRegister ? "Créer un compte" : "Se connecter"),
+            if (_controller.isRegister)
+              TextField(
+                controller: _controller.emailController,
+                enabled: !_controller.isLoading,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: "Email",
+                  hintText: "Entrez votre adresse email",
+                  prefixIcon: Icon(Icons.email),
+                ),
+              ),
             TextField(
               controller: _controller.usernameController,
               enabled: !_controller.isLoading,

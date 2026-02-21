@@ -38,7 +38,12 @@ export class ChatService {
 
     sendGeneralMessage(message: string) {
         const username = this.user ? this.user.username : `User-${this.socketService.selfId}`;
-        const chatMessage: ChatMessage = { sender: username, content: message, timestamp: new Date() };
+        const chatMessage: ChatMessage = {
+            sender: username,
+            content: message,
+            timestamp: new Date(),
+            profilePicture: this.user ? this.user.profilePicture : null,
+        };
         this.socketService.emit(ChatEvent.GeneralMessage, chatMessage);
     }
 }

@@ -14,20 +14,14 @@ $font-size: 15px;
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 200px;
+    height: 300px;
     position: relative;
 }
 
 .user-inner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    width: 80%;
     text-align: center;
 }
 
@@ -106,6 +100,24 @@ $font-size: 15px;
     background: hsl(203, 100%, 38%);
 }
 
-.logout-button:active {
-    background: hsl(203, 100%, 42%);
+.edit-password-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.edit-password-row .input-password {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+}
+
+.input-password::placeholder {
+    font-family: 'pixel';
+    font-size: $font-size;
 }
