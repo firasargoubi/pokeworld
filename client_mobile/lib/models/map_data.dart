@@ -29,6 +29,22 @@ class MapData {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'tiles': tiles
+          .map((row) => row.map((tile) => tile.name).toList())
+          .toList(),
+      'items': items.map((type, positions) {
+        return MapEntry(
+          type.name,
+          positions.map((pos) => pos.toJson()).toList(),
+        );
+      }),
+      'size': size.value,
+      'gameMode': gameMode.value,
+    };
+  }
+
   static List<List<TileType>> _parseTiles(dynamic raw) {
     final rows = (raw as List).cast<List>();
     return rows

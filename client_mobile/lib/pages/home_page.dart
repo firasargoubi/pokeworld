@@ -5,6 +5,7 @@ import 'package:client_mobile/consts/menu_card_data.dart';
 import 'package:client_mobile/consts/ui.dart';
 import 'package:client_mobile/models/menu_config.dart';
 import 'package:client_mobile/services/chat_service.dart';
+import 'package:client_mobile/services/user_service.dart';
 import 'package:client_mobile/widgets/chat.dart';
 import 'package:client_mobile/widgets/login_popup.dart';
 import 'package:client_mobile/widgets/menu_card.dart';
@@ -28,12 +29,9 @@ class _HomePageState extends State<HomePage> {
 
   static const String _bgAsset = 'assets/images/menu/backgrounds/main-menu.png';
   static const String _logoAsset = 'assets/images/menu/logos/main-logo.png';
-  static const String _settingsIconAsset =
-      'assets/images/menu/icons/settings/settings.svg';
-  static const String _settingsBtnAsset =
-      'assets/images/menu/buttons/setting/grayButton.png';
-  static const String _settingsBtnActiveAsset =
-      'assets/images/menu/buttons/setting/grayButtonActive.png';
+  static const String _settingsIconAsset = 'assets/images/menu/icons/settings/settings.svg';
+  static const String _settingsBtnAsset = 'assets/images/menu/buttons/setting/grayButton.png';
+  static const String _settingsBtnActiveAsset = 'assets/images/menu/buttons/setting/grayButtonActive.png';
 
   @override
   void initState() {
@@ -43,7 +41,8 @@ class _HomePageState extends State<HomePage> {
 
   void _maybeShowLoginPopup() {
     if (!mounted) return;
-    if (!_didShowLoginPopup) {
+    final isLoggedIn = UserService().currentUser.value != null;
+    if (!isLoggedIn && !_didShowLoginPopup) {
       _didShowLoginPopup = true;
       _showLoginPopup();
     }
@@ -55,22 +54,14 @@ class _HomePageState extends State<HomePage> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return PopScope(
-          canPop: false,
-          onPopInvokedWithResult: (didPop, result) {},
-          child: const LoginPopup(),
-        );
+        return PopScope(canPop: false, onPopInvokedWithResult: (didPop, result) {}, child: const LoginPopup());
       },
     );
   }
 
   void _showUserPopup() {
     if (!mounted) return;
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) => const UserPopup(),
-    );
+    showDialog(context: context, barrierDismissible: true, builder: (context) => const UserPopup());
   }
 
   void _setSettingsPressed(bool pressed) {
@@ -115,12 +106,7 @@ class _HomePageState extends State<HomePage> {
                   height: baseHeight,
                   child: Stack(
                     children: [
-                      Column(
-                        children: [
-                          _buildTopSection(baseSize),
-                          _buildMiddleSection(baseSize),
-                        ],
-                      ),
+                      Column(children: [_buildTopSection(baseSize), _buildMiddleSection(baseSize)]),
                       _buildBottomLeftChat(baseWidth, baseSize),
                     ],
                   ),
@@ -137,11 +123,7 @@ class _HomePageState extends State<HomePage> {
     return Positioned.fill(
       child: ImageFiltered(
         imageFilter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: Image.asset(
-          _bgAsset,
-          fit: BoxFit.cover,
-          filterQuality: FilterQuality.none,
-        ),
+        child: Image.asset(_bgAsset, fit: BoxFit.cover, filterQuality: FilterQuality.none),
       ),
     );
   }
@@ -151,13 +133,7 @@ class _HomePageState extends State<HomePage> {
       flex: 2,
       child: SizedBox(
         width: double.infinity,
-        child: Row(
-          children: [
-            _buildSettingsButton(baseSize),
-            _buildLogoAndTeam(baseSize),
-            _buildMembersList(baseSize),
-          ],
-        ),
+        child: Row(children: [_buildSettingsButton(baseSize), _buildLogoAndTeam(baseSize), _buildMembersList(baseSize)]),
       ),
     );
   }
@@ -170,10 +146,7 @@ class _HomePageState extends State<HomePage> {
         child: Align(
           alignment: Alignment.topCenter,
           child: Padding(
-            padding: EdgeInsets.only(
-              top: baseSize * 0.05,
-              left: baseSize * 0.02,
-            ),
+            padding: EdgeInsets.only(top: baseSize * 0.05, left: baseSize * 0.02),
             child: GestureDetector(
               onTap: _showUserPopup,
               onTapDown: (_) => _setSettingsPressed(true),
@@ -184,11 +157,7 @@ class _HomePageState extends State<HomePage> {
                 height: baseSize * 0.12,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage(
-                      _isSettingsPressed
-                          ? _settingsBtnActiveAsset
-                          : _settingsBtnAsset,
-                    ),
+                    image: AssetImage(_isSettingsPressed ? _settingsBtnActiveAsset : _settingsBtnAsset),
                     fit: BoxFit.cover,
                     filterQuality: FilterQuality.none,
                     alignment: Alignment.center,
@@ -199,10 +168,7 @@ class _HomePageState extends State<HomePage> {
                     _settingsIconAsset,
                     width: baseSize * 0.06,
                     height: baseSize * 0.06,
-                    colorFilter: const ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
-                    ),
+                    colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                   ),
                 ),
               ),
@@ -225,12 +191,7 @@ class _HomePageState extends State<HomePage> {
               left: baseSize * 0.05,
               child: Transform.rotate(
                 angle: -0.1,
-                child: Image.asset(
-                  _logoAsset,
-                  filterQuality: FilterQuality.high,
-                  fit: BoxFit.contain,
-                  width: baseSize * 0.7,
-                ),
+                child: Image.asset(_logoAsset, filterQuality: FilterQuality.high, fit: BoxFit.contain, width: baseSize * 0.7),
               ),
             ),
             Positioned(
@@ -244,13 +205,7 @@ class _HomePageState extends State<HomePage> {
                     fontFamily: 'Pixel',
                     color: Colors.white,
                     fontSize: baseSize * 0.06,
-                    shadows: [
-                      Shadow(
-                        offset: Offset(baseSize * 0.005, 0),
-                        color: const Color(0xFF787878),
-                        blurRadius: 0,
-                      ),
-                    ],
+                    shadows: [Shadow(offset: Offset(baseSize * 0.005, 0), color: const Color(0xFF787878), blurRadius: 0)],
                   ),
                 ),
               ),
@@ -270,10 +225,7 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.all(baseSize * 0.02),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(
-              MEMBERS_NAMES.length,
-              (index) => _buildMemberRow(baseSize, index),
-            ),
+            children: List.generate(MEMBERS_NAMES.length, (index) => _buildMemberRow(baseSize, index)),
           ),
         ),
       ),
@@ -294,13 +246,7 @@ class _HomePageState extends State<HomePage> {
               color: Colors.white,
               fontSize: baseSize * 0.04,
               height: 0.8,
-              shadows: [
-                Shadow(
-                  offset: Offset(baseSize * 0.003, 0),
-                  color: const Color(0xFF787878),
-                  blurRadius: 0,
-                ),
-              ],
+              shadows: [Shadow(offset: Offset(baseSize * 0.003, 0), color: const Color(0xFF787878), blurRadius: 0)],
             ),
           ),
         ),
@@ -310,9 +256,7 @@ class _HomePageState extends State<HomePage> {
           height: baseSize * 0.04,
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage(
-                'assets/images/menu/pokemons/chibi/${MEMBERS_CHIBIS[index]}.png',
-              ),
+              image: AssetImage('assets/images/menu/pokemons/chibi/${MEMBERS_CHIBIS[index]}.png'),
               fit: BoxFit.contain,
               filterQuality: FilterQuality.none,
               alignment: Alignment.center,
@@ -336,19 +280,9 @@ class _HomePageState extends State<HomePage> {
             return Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                MenuCard(
-                  size: size,
-                  color: MenuCardColor.blue,
-                  title: 'Rejoindre \nPartie',
-                  onTap: () => _push(const JoinPage()),
-                ),
+                MenuCard(size: size, color: MenuCardColor.blue, title: 'Rejoindre \nPartie', onTap: () => _push(const JoinPage())),
                 SizedBox(width: gap),
-                MenuCard(
-                  size: size,
-                  color: MenuCardColor.orange,
-                  title: 'Créer \nPartie',
-                  onTap: () => _push(const CreatePage()),
-                ),
+                MenuCard(size: size, color: MenuCardColor.orange, title: 'Créer \nPartie', onTap: () => _push(const CreatePage())),
               ],
             );
           },

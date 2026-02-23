@@ -8,10 +8,16 @@ import 'package:client_mobile/models/map_data.dart';
 import 'package:flutter/material.dart';
 
 class GameCard extends StatelessWidget {
-  const GameCard({super.key, required this.isCreateCard, required this.game});
+  const GameCard({
+    super.key,
+    required this.isCreateCard,
+    required this.game,
+    required this.onTap,
+  });
 
   final bool isCreateCard;
   final GameData game;
+  final VoidCallback onTap;
 
   static const String pixelFont = 'Pixel';
   static const Color shadowColor = Color(0xFF787878);
@@ -217,24 +223,27 @@ class GameCard extends StatelessWidget {
                     flex: 1,
                     child: Align(
                       alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: EdgeInsets.only(left: cardWidth * 0.03),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            SizedBox(
-                              width: cardWidth * 0.35,
-                              child: Image.asset(
-                                config.buttonImage,
-                                fit: BoxFit.contain,
-                                filterQuality: FilterQuality.none,
+                      child: GestureDetector(
+                        onTap: onTap,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: cardWidth * 0.03),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              SizedBox(
+                                width: cardWidth * 0.35,
+                                child: Image.asset(
+                                  config.buttonImage,
+                                  fit: BoxFit.contain,
+                                  filterQuality: FilterQuality.none,
+                                ),
                               ),
-                            ),
-                            Text(
-                              cardButtonText,
-                              style: buttonTextStyle(cardWidth),
-                            ),
-                          ],
+                              Text(
+                                cardButtonText,
+                                style: buttonTextStyle(cardWidth),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

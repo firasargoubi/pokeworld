@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:client_mobile/consts/ui.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/services/game_save.dart';
 import 'package:client_mobile/widgets/game_cards_shell.dart';
@@ -15,7 +16,7 @@ class CreatePage extends StatefulWidget {
 }
 
 class _CreatePageState extends State<CreatePage> {
-  static const double designAspectRatio = 2000 / 1400;
+  static const double designAspectRatio = JOIN_CREATE_PAGE_ASPECT_RATIO;
 
   static const String headerText = 'Créer Partie';
 
@@ -26,6 +27,11 @@ class _CreatePageState extends State<CreatePage> {
   static const Color stripeColor2 = Color(0xFFe6da9b);
 
   late final Future<List<GameData>> gamesFuture = GameSaveService.getAllGames();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,42 +61,25 @@ class _CreatePageState extends State<CreatePage> {
           SizedBox(
             height: baseSize * 0.1,
             width: double.infinity,
-            child: AppHeader(
-              index: 1,
-              text: headerText,
-              onTap: () => Navigator.pop(context),
-            ),
+            child: AppHeader(index: 1, text: headerText, onTap: () => Navigator.pop(context)),
           ),
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: outerBorderColor,
-                  width: outerBorderWidth,
-                ),
+                border: Border.all(color: outerBorderColor, width: outerBorderWidth),
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: innerBorderColor,
-                    width: innerBorderWidth,
-                  ),
+                  border: Border.all(color: innerBorderColor, width: innerBorderWidth),
                 ),
                 child: CustomPaint(
-                  painter: StripePainter(
-                    stripeSize: baseSize * 0.02,
-                    color1: stripeColor1,
-                    color2: stripeColor2,
-                  ),
+                  painter: StripePainter(stripeSize: baseSize * 0.02, color1: stripeColor1, color2: stripeColor2),
                   child: ClipRect(
                     child: FutureBuilder<List<GameData>>(
                       future: gamesFuture,
                       builder: (context, snapshot) {
                         final games = snapshot.data ?? const <GameData>[];
-                        return GameCardsPageShell(
-                          games: games,
-                          isCreateCard: true,
-                        );
+                        return GestureDetector(child: GameCardsPageShell(games: games, isCreateCard: true));
                       },
                     ),
                   ),

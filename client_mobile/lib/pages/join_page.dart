@@ -18,7 +18,7 @@ class JoinPage extends StatefulWidget {
 }
 
 class _JoinPageState extends State<JoinPage> {
-  static const double designAspectRatio = JOIN_CREAT_PAGE_ASPECT_RATIO;
+  static const double designAspectRatio = JOIN_CREATE_PAGE_ASPECT_RATIO;
 
   static const String headerText = 'Joindre Partie';
   static const String floatingButtonText = 'REJOINDRE';
@@ -41,6 +41,11 @@ class _JoinPageState extends State<JoinPage> {
   void dispose() {
     codeController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -73,42 +78,25 @@ class _JoinPageState extends State<JoinPage> {
               SizedBox(
                 height: baseSize * 0.1,
                 width: double.infinity,
-                child: AppHeader(
-                  index: 1,
-                  text: headerText,
-                  onTap: () => Navigator.pop(context),
-                ),
+                child: AppHeader(index: 1, text: headerText, onTap: () => Navigator.pop(context)),
               ),
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(
-                      color: outerBorderColor,
-                      width: outerBorderWidth,
-                    ),
+                    border: Border.all(color: outerBorderColor, width: outerBorderWidth),
                   ),
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(
-                        color: innerBorderColor,
-                        width: innerBorderWidth,
-                      ),
+                      border: Border.all(color: innerBorderColor, width: innerBorderWidth),
                     ),
                     child: CustomPaint(
-                      painter: StripePainter(
-                        stripeSize: baseSize * 0.02,
-                        color1: stripeColor1,
-                        color2: stripeColor2,
-                      ),
+                      painter: StripePainter(stripeSize: baseSize * 0.02, color1: stripeColor1, color2: stripeColor2),
                       child: ClipRect(
                         child: FutureBuilder<List<GameData>>(
                           future: gamesFuture,
                           builder: (context, snapshot) {
                             final games = snapshot.data ?? const <GameData>[];
-                            return GameCardsPageShell(
-                              games: games,
-                              isCreateCard: false,
-                            );
+                            return GameCardsPageShell(games: games, isCreateCard: false);
                           },
                         ),
                       ),
@@ -127,11 +115,7 @@ class _JoinPageState extends State<JoinPage> {
           ),
           if (showOverlay)
             Positioned.fill(
-              child: JoinCodePopup(
-                baseSize: baseSize,
-                controller: codeController,
-                onClose: _closeOverlay,
-              ),
+              child: JoinCodePopup(baseSize: baseSize, controller: codeController, onClose: _closeOverlay),
             ),
         ],
       ),

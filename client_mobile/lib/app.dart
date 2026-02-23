@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'pages/home_page.dart';
+import 'services/navigation_service.dart';
 
 class PokeWorldApp extends StatelessWidget {
   const PokeWorldApp({super.key});
@@ -8,6 +9,7 @@ class PokeWorldApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: NavigationService.navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'PokeWorld',
       theme: ThemeData(

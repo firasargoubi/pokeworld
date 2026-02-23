@@ -74,6 +74,9 @@ flutter:
         - assets/images/menu/buttons/setting/
         - assets/images/menu/icons/settings/
         - assets/images/menu/headers/
+        - assets/images/game/avatars/
+        - assets/images/menu/containers/stats/
+        - assets/images/menu/headers/
 
     # The following line ensures that the Material Icons font is
     # included with your application, so that you can use the icons in

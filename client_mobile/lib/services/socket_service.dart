@@ -29,7 +29,12 @@ class SocketService {
     socket.disconnect();
   }
 
-  void emit(String event, dynamic data) {
-    socket.emit(event, data);
+  void emit(String event, dynamic data, [void Function(dynamic)? ack]) {
+    if (ack == null) {
+      socket.emit(event, data);
+    } else {
+      // Use Socket.IO ack (no Future returned); pass callback directly
+      socket.emitWithAck(event, data, ack: (response) => ack(response));
+    }
   }
 }
