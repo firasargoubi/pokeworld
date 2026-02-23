@@ -1,7 +1,9 @@
 import { Match } from '@app/classes/match/match';
+import { Channel as ChannelDoc, ChannelDocument } from '@app/model/schema/channel.schema';
 import { User } from '@app/model/schema/user.schema';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ITEM_NAME } from '@common/consts/item-data.const';
+import { Channel } from '@common/interfaces/channel';
 import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { PlayerCombatData } from '@common/interfaces/match-data';
@@ -9,9 +11,47 @@ import { Message } from '@common/interfaces/message.enum';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class ChatService {
+    constructor(@InjectModel(ChannelDoc.name) private channelModel: Model<ChannelDocument>) {}
+
+    async createChannel(channelName: string, userName: string): Promise<Channel | null> {
+        if (!channelName) return null;
+
+        const isNameTaken = await this.channelModel.exists({ name: channelName });
+        if (isNameTaken) return null;
+
+        const newChannel = new this.channelModel({ name: channelName, membersUsernames: [userName] });
+        const savedChannel = await newChannel.save();
+        return { name: savedChannel.name, membersUsernames: savedChannel.membersUsernames };
+    }
+
+    async joinChannel(channelName: string, userName: string): Promise<void> {
+        await this.channelModel.updateOne({ name: channelName, membersUsernames: { $ne: userName } }, { $push: { membersUsernames: userName } });
+    }
+
+    async leaveChannel(channelName: string, userName: string): Promise<void> {
+        const channel = await this.channelModel.findOneAndUpdate({ name: channelName }, { $pull: { membersUsernames: userName } }, { new: true });
+        if (!channel) return;
+
+        const hasNoMembers = channel.membersUsernames.length === 0;
+        if (hasNoMembers) {
+            await this.channelModel.deleteOne({ name: channelName });
+        }
+    }
+
+    async deleteChannel(channelName: string): Promise<void> {
+        await this.channelModel.deleteOne({ name: channelName });
+    }
+
+    async getChannels(): Promise<Channel[]> {
+        const channels = await this.channelModel.find().lean().exec();
+        return channels.map((channel) => ({ name: channel.name, membersUsernames: channel.membersUsernames }));
+    }
+
     message(match: Match, playerId: string, message: string, user: User | null) {
         if (message.length <= MAX_MESSAGE_LENGTH) {
             const chatMessage: ChatMessage = {

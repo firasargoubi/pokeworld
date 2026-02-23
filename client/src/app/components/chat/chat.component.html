@@ -1,49 +1,97 @@
-<div class="chat-container" [class.hidden]="!this.isComponentVisible" [class.hide-labels]="hideLabels" [style.--scale-factor]="scaleFactor">
+﻿<div class="chat-container" [class.hidden]="!this.isComponentVisible" [class.hide-labels]="hideLabels" [style.--scale-factor]="scaleFactor">
     <div class="chat-toggle-button" (click)="switchVisibility()"></div>
     <div class="horizontal-border" (click)="switchVisibility()"><p>></p></div>
     <div class="chat-body">
         <div class="chat-interactions-container">
             <div class="categories-container">
-                <div class="category-button messages-button" [class.active]="isGeneralChatActive() || !isInGame" (click)="switchTab(false, true)">
+                <div
+                    class="category-button general-messages-button"
+                    [class.active]="chatService.chatState().activeTab === chatTab.Channels"
+                    (click)="switchTab(chatTab.Channels)"
+                >
+                    <div class="icon"></div>
+                    <p>Canaux</p>
+                </div>
+                <div
+                    class="category-button general-messages-button"
+                    [class.active]="chatService.chatState().activeTab === chatTab.General"
+                    (click)="switchTab(chatTab.General)"
+                >
                     <div class="icon"></div>
                     <p>Général</p>
                 </div>
                 @if (isInGame) {
                 <div
                     class="category-button messages-button"
-                    [class.active]="!isGeneralChatActive() && isChatActive()"
-                    (click)="switchTab(true, false)"
+                    [class.active]="chatService.chatState().activeTab === chatTab.Match"
+                    (click)="switchTab(chatTab.Match)"
                 >
                     <div class="icon"></div>
                     <p>Messagerie</p>
                 </div>
                 <div
                     class="category-button journal-button"
-                    [class.active]="!isGeneralChatActive() && !isChatActive()"
-                    (click)="switchTab(false, false)"
+                    [class.active]="chatService.chatState().activeTab === chatTab.Journal"
+                    (click)="switchTab(chatTab.Journal)"
                 >
                     <div class="icon"></div>
                     <p>Journal</p>
                 </div>
                 }
             </div>
-            @if(isInGame){
-            <div class="filter-button" [class.filter-active]="isFilterEnabled()" (click)="toggleFilter()">
+            @if(isInGame && chatService.chatState().activeTab === chatTab.Journal){
+            <div class="filter-button" [class.filter-active]="chatService.isFilterEnabled()" (click)="toggleFilter()">
                 <div class="icon"></div>
             </div>
             }
         </div>
+        @if (chatService.chatState().activeTab === chatTab.Channels) {
+        <div class="channel-header">
+            @if (chatService.chatState().isInChannelList) {
+            <div class="search-bar simple-medium-stylized-padding">
+                <input
+                    type="text"
+                    placeholder="Rechercher/Créer un canal"
+                    class="message-input"
+                    [(ngModel)]="searchBarValue"
+                    [maxLength]="this.maxInputLength"
+                    (click)="this.audioService.playEffect(this.clickValue)"
+                />
+            </div>
+            <div class="add-button simple-medium-stylized-padding button" (click)="createChannel()">
+                <div class="add-icon"></div>
+            </div>
+            } @else {
+            <button (click)="showChannelList()"><-</button>
+            <span class="channel-name">{{ chatService.activeChannelName() }}</span>
+            <div class="buttons-container flex-row">
+                <div class="channel-leave-button button simple-small-stylized-padding" (click)="leaveChannel()"></div>
+                <div class="channel-delete-button button simple-small-stylized-padding" (click)="deleteChannel()"></div>
+            </div>
+            }
+        </div>
+        }
         <div class="chat-messages-container" #chatContainer>
-            @if (isChatActive() && isInGame) { @for (message of chatMessages; track $index) {
-            <p class="messages">
-                <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
-                @if(message.profilePicture){
-                <img [src]="message.profilePicture" alt="avatar" class="chat-avatar" />
+            @switch (chatService.chatState().activeTab) { @case (chatTab.Channels) { @if (chatService.chatState().isInChannelList) {
+            <div class="channel-list">
+                @for (channel of filteredChannels; track channel.name) {
+                <div class="channel-item stylized-padding" (click)="openChannel(channel.name)">
+                    <div class="channel-info flex-row">
+                        <div class="channel-icon"></div>
+                        <p class="channel-name">{{ channel.name }}</p>
+                    </div>
+                    <div class="buttons-container flex-row">
+                        @if (!chatService.isInChannel(channel.name)) {
+                        <div class="channel-join-button button simple-small-stylized-padding" (click)="joinChannel(channel.name, $event)"></div>
+                        } @else {
+                        <div class="channel-leave-button button simple-small-stylized-padding" (click)="leaveChannel(channel.name, $event)"></div>
+                        }
+                        <div class="channel-delete-button button simple-small-stylized-padding" (click)="deleteChannel(channel.name, $event)"></div>
+                    </div>
+                </div>
                 }
-                <span class="message-content sender">{{ message.sender }}: </span>
-                <span class="message-content message">{{ message.content }}</span>
-            </p>
-            } } @else if (isGeneralChatActive() || !isInGame) { @for (message of generalMessages$ | async; track $index) {
+            </div>
+            } @else { @for (message of chatService.activeChannelMessages(); track message.timestamp) {
             <p class="messages">
                 <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
                 @if(message.profilePicture){
@@ -51,12 +99,26 @@
                 } <span class="message-content sender">{{ message.sender }}: </span>
                 <span class="message-content message">{{ message.content }}</span>
             </p>
-            }} @else { @for (message of logs; track $index) {
+            } } } @case (chatTab.General) { @for (message of chatService.generalMessages$ | async; track $index) {
+            <p class="messages">
+                <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
+                @if(message.profilePicture){
+                <img [src]="message.profilePicture" alt="avatar" class="chat-avatar" />
+                } <span class="message-content sender">{{ message.sender }}: </span>
+                <span class="message-content message">{{ message.content }}</span>
+            </p>
+            } } @case (chatTab.Match) { @for (message of chatMessages; track $index) {
+            <p class="messages">
+                <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
+                <span class="message-content sender">{{ message.sender }}: </span>
+                <span class="message-content message">{{ message.content }}</span>
+            </p>
+            } } @case (chatTab.Journal) { @for (message of logs; track $index) {
             <p class="messages">
                 <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
                 <span class="message-content message">{{ message.content }}</span>
             </p>
-            } }
+            } } }
         </div>
         <div class="chat-input-container">
             <input
@@ -64,8 +126,8 @@
                 placeholder="> Entrez message [Enter]"
                 class="message-input"
                 (keydown)="sendMessage($event)"
-                [maxLength]="this.maxInputLength"
-                (click)="this.audioService.playEffect(this.clickValue)"
+                [maxLength]="maxInputLength"
+                (click)="audioService.playEffect(clickValue)"
             />
         </div>
     </div>

@@ -36,6 +36,12 @@ export enum CombatEvent {
 export enum ChatEvent {
     Message = 'message',
     GeneralMessage = 'generalMessage',
+    CreateChannel = 'createChannel',
+    JoinChannel = 'joinChannel',
+    LeaveChannel = 'leaveChannel',
+    DeleteChannel = 'deleteChannel',
+    ChannelMessage = 'channelMessage',
+    ChannelUpdate = 'channelUpdate',
 }
 
 export enum UserEvent {
