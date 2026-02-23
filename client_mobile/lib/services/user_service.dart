@@ -23,24 +23,29 @@ class UserService {
   final SocketService _socketService = SocketService();
 
   UserService._internal() {
-    final serverUrl = dotenv.env['SERVER_URL'];
-    if (serverUrl == null || serverUrl.isEmpty) {
-      throw StateError(ErrorMessages.serverUrlNotDefined);
+    String? serverUrl;
+    try {
+      serverUrl = dotenv.env['SERVER_URL'];
+    } catch (_) {
+      serverUrl = null;
     }
-    baseUrl = '$serverUrl/api';
+    baseUrl = (serverUrl == null || serverUrl.isEmpty) ? '' : '$serverUrl/api';
   }
 
   final ValueNotifier<UserInfo?> currentUser = ValueNotifier<UserInfo?>(null);
 
+  void _ensureConfigured() {
+    if (baseUrl.isEmpty) {
+      throw StateError(ErrorMessages.serverUrlNotDefined);
+    }
+  }
+
   Future<UserInfo> login(String username, String password) async {
+    _ensureConfigured();
     final String uri = '$baseUrl/${userEndpoints['UserLogin']}';
     final postBody = {'username': username, 'password': password};
     final bodyJson = jsonEncode(postBody);
-    final response = await http.post(
-      Uri.parse(uri),
-      headers: {"Content-Type": "application/json"},
-      body: bodyJson,
-    );
+    final response = await http.post(Uri.parse(uri), headers: {"Content-Type": "application/json"}, body: bodyJson);
     if (response.statusCode == HttpStatusCode.ok.code) {
       Map<String, dynamic> responseMap = jsonDecode(response.body);
       UserInfo user = UserInfo.fromJson(responseMap);
@@ -56,33 +61,17 @@ class UserService {
     }
   }
 
-  Future<UserInfo> register(
-    String username,
-    String email,
-    String password,
-  ) async {
+  Future<UserInfo> register(String username, String email, String password) async {
     final String uri = '$baseUrl/${userEndpoints['UserRegister']}';
 
-    final byteData = await rootBundle.load(
-      'assets/images/menu/pokemons/chibi/eevee.png',
-    );
+    final byteData = await rootBundle.load('assets/images/menu/pokemons/chibi/eevee.png');
     final bytes = byteData.buffer.asUint8List();
     String img64 = 'data:image/png;base64,${base64Encode(bytes)}';
 
-    final postBody = {
-      'username': username,
-      'email': email,
-      'password': password,
-      'profilePicture': img64,
-    };
+    final postBody = {'username': username, 'email': email, 'password': password, 'profilePicture': img64};
     final bodyJson = jsonEncode(postBody);
-    final response = await http.post(
-      Uri.parse(uri),
-      headers: {"Content-Type": "application/json"},
-      body: bodyJson,
-    );
-    if (response.statusCode == HttpStatusCode.ok.code ||
-        response.statusCode == HttpStatusCode.created.code) {
+    final response = await http.post(Uri.parse(uri), headers: {"Content-Type": "application/json"}, body: bodyJson);
+    if (response.statusCode == HttpStatusCode.ok.code || response.statusCode == HttpStatusCode.created.code) {
       Map<String, dynamic> responseMap = jsonDecode(response.body);
       UserInfo user = UserInfo.fromJson(responseMap);
       currentUser.value = user;
@@ -96,16 +85,12 @@ class UserService {
   }
 
   Future<void> logout() async {
+    _ensureConfigured();
     final userId = currentUser.value?.userId;
     if (userId == null) return;
     final String uri = '$baseUrl/${userEndpoints['UserLogout']}/$userId';
-    final response = await http.post(
-      Uri.parse(uri),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({}),
-    );
-    if (response.statusCode != HttpStatusCode.ok.code &&
-        response.statusCode != HttpStatusCode.noContent.code) {
+    final response = await http.post(Uri.parse(uri), headers: {"Content-Type": "application/json"}, body: jsonEncode({}));
+    if (response.statusCode != HttpStatusCode.ok.code && response.statusCode != HttpStatusCode.noContent.code) {
       throw Exception('Failed to logout: ${response.body}');
     }
     currentUser.value = null;

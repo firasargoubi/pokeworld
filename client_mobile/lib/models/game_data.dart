@@ -32,4 +32,16 @@ class GameData {
       thumbnail: json['thumbnail'] as String,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'name': name,
+      'description': description,
+      'lastEdited': lastEdited.toIso8601String(),
+      'isVisible': isVisible,
+      'mapData': mapData.toJson(),
+      'thumbnail': thumbnail,
+    };
+  }
 }

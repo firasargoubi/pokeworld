@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:client_mobile/models/game_data.dart';
+import 'package:client_mobile/services/match_service.dart';
 import 'package:client_mobile/widgets/game_card.dart';
 import 'package:flutter/material.dart';
 
@@ -30,6 +31,7 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
 
   int? openIndex;
   late List<LayerLink> links = _makeLinks(widget.games.length);
+  late final MatchService matchService = MatchService();
 
   static List<LayerLink> _makeLinks(int length) {
     return List.generate(length, (_) => LayerLink());
@@ -122,6 +124,9 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
                           key: ValueKey(game.id),
                           isCreateCard: widget.isCreateCard,
                           game: game,
+                          onTap: () {
+                            matchService.createMatch(game);
+                          },
                         ),
                         Align(
                           alignment: Alignment.topCenter,

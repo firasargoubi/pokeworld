@@ -30,7 +30,7 @@ class LoginController {
     final rawPassword = passwordController.text;
     final trimmedPassword = rawPassword.trim();
 
-    if (rawUsername.isEmpty || rawPassword.isEmpty || rawEmail.isEmpty) {
+    if (rawUsername.isEmpty || rawPassword.isEmpty || (isRegister && rawEmail.isEmpty)) {
       _updateState(() {
         errorMessage = ErrorMessages.emptyFields;
       });
@@ -38,14 +38,7 @@ class LoginController {
     }
 
     if (isRegister) {
-      final isValid = registerChecks(
-        rawUsername,
-        trimmedUsername,
-        rawEmail,
-        trimmedEmail,
-        rawPassword,
-        trimmedPassword,
-      );
+      final isValid = registerChecks(rawUsername, trimmedUsername, rawEmail, trimmedEmail, rawPassword, trimmedPassword);
       if (!isValid) {
         return;
       }
@@ -82,9 +75,7 @@ class LoginController {
         }
       } else {
         final errorText = e.toString();
-        message = isRegister
-            ? "${ErrorMessages.registrationFailed}$errorText"
-            : '${ErrorMessages.loginFailed}$errorText';
+        message = isRegister ? "${ErrorMessages.registrationFailed}$errorText" : '${ErrorMessages.loginFailed}$errorText';
       }
 
       _updateState(() {
@@ -94,14 +85,7 @@ class LoginController {
     }
   }
 
-  bool registerChecks(
-    String rawUsername,
-    String trimmedUsername,
-    String rawEmail,
-    String trimmedEmail,
-    String rawPassword,
-    String trimmedPassword,
-  ) {
+  bool registerChecks(String rawUsername, String trimmedUsername, String rawEmail, String trimmedEmail, String rawPassword, String trimmedPassword) {
     if (rawUsername != trimmedUsername) {
       _updateState(() {
         errorMessage = ErrorMessages.usernameStartsOrEndsWithSpaces;
@@ -116,8 +100,7 @@ class LoginController {
       return false;
     }
 
-    if (rawEmail != trimmedEmail ||
-        !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(trimmedEmail)) {
+    if (rawEmail != trimmedEmail || !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(trimmedEmail)) {
       _updateState(() {
         errorMessage = ErrorMessages.invalidEmail;
       });
