@@ -8,6 +8,7 @@ $chat-base-size: calc(var(--chat-base-size) * 1);
 $border-width: calc(var(--chat-base-size) * 4);
 $pixel-size: calc(var(--chat-base-size) * 0.06);
 $stripe-size: calc(var(--chat-base-size) * 0.5);
+$button-cutout-size: calc(var(--chat-base-size) * 0.4);
 
 $color-text-shadow: rgba(65, 65, 65, 0.6);
 $color-scrollbar: rgba(65, 65, 65, 0.6);
@@ -19,7 +20,11 @@ $color-blue-1: #68a0d8;
 $color-blue-2: #80b8e0;
 
 $color-button-bg: #c0d0e0;
+$color-channel-item: #4d3a01;
+$color-channel-item-border: #302400;
 $color-active: #ffbd00;
+
+$color-channel-search-bar-background: rgba(94, 71, 1, 0.5);
 
 $color-timestamp: $color-blue-1;
 $color-sender: #ffa70f;
@@ -34,19 +39,27 @@ $color-category-shadow: rgba(109, 78, 1, 0.527);
 $color-stripes-1: #e0f0f0;
 $color-stripes-2: #f8f8f8;
 
-$img-chat-border-left: '../../../assets/images/menu/containers/chat/chat-border.png';
-$img-chat-border-center: '../../../assets/images/menu/containers/chat/chat-edge.png';
-$img-chat-border-right: '../../../assets/images/menu/containers/chat/chat-border-2.png';
+$img-base: '../../../assets/images/menu';
 
-$img-chat-edge-left: '../../../assets/images/menu/containers/chat/chat-edge-3.png';
-$img-chat-edge-right: '../../../assets/images/menu/containers/chat/chat-edge-2.png';
+$img-chat-border-left: '#{$img-base}/containers/chat/chat-border.png';
+$img-chat-border-center: '#{$img-base}/containers/chat/chat-edge.png';
+$img-chat-border-right: '#{$img-base}/containers/chat/chat-border-2.png';
 
-$img-chat-body: '../../../assets/images/menu/containers/chat/chat-body.png';
+$img-chat-edge-left: '#{$img-base}/containers/chat/chat-edge-3.png';
+$img-chat-edge-right: '#{$img-base}/containers/chat/chat-edge-2.png';
 
-$img-icon-toggle: '../../../assets/images/menu//icons/mail.png';
-$img-icon-messages: '../../../assets/images/menu/icons/chat/messages.svg';
-$img-icon-journal: '../../../assets/images/menu/icons/chat/journal.svg';
-$img-icon-filter: '../../../assets/images/menu/icons/chat/filter.svg';
+$img-chat-body: '#{$img-base}/containers/chat/chat-body.png';
+
+$img-icon-toggle: '#{$img-base}/icons/mail.png';
+$img-icon-messages: '#{$img-base}/icons/chat/messages.svg';
+$img-icon-general-messages: '#{$img-base}/icons/chat/canaux.svg';
+$img-icon-channels: '#{$img-base}/icons/chat/canal.svg';
+$img-icon-add: '#{$img-base}/icons/chat/add.svg';
+$img-icon-journal: '#{$img-base}/icons/chat/journal.svg';
+$img-icon-filter: '#{$img-base}/icons/chat/filter.svg';
+$img-icon-bin: '#{$img-base}/buttons/admin-button/bin.png';
+$img-icon-join: '#{$img-base}/icons/chat/join.svg';
+$img-icon-leave: '#{$img-base}/icons/chat/leave.svg';
 
 $bg-stripes: repeating-linear-gradient(
     0deg,
@@ -59,8 +72,93 @@ $bg-stripes: repeating-linear-gradient(
 $chat-font-size: calc(2.4 * var(--chat-base-size));
 $shadow-message: calc(0.1 * $chat-font-size) 0 0 $color-message-shadow;
 
+// --- Mixins ---
+
+// Full-corner clip with a single size (used by simple-*-stylized-padding)
+@mixin pixel-clip($size) {
+    clip-path: polygon(
+        0 #{$size},
+        #{$size} #{$size},
+        #{$size} 0,
+        calc(100% - #{$size}) 0,
+        calc(100% - #{$size}) #{$size},
+        100% #{$size},
+        100% calc(100% - #{$size}),
+        calc(100% - #{$size}) calc(100% - #{$size}),
+        calc(100% - #{$size}) 100%,
+        #{$size} 100%,
+        #{$size} calc(100% - #{$size}),
+        0 calc(100% - #{$size})
+    );
+}
+
+// Top-only corners with two sizes (used by category-button, filter-button)
+@mixin pixel-clip-top($inner, $outer) {
+    clip-path: polygon(
+        0 #{$outer},
+        #{$inner} #{$outer},
+        #{$inner} #{$inner},
+        #{$outer} #{$inner},
+        #{$outer} 0,
+        calc(100% - #{$outer}) 0,
+        calc(100% - #{$outer}) #{$inner},
+        calc(100% - #{$inner}) #{$inner},
+        calc(100% - #{$inner}) #{$outer},
+        100% #{$outer},
+        100% 100%,
+        0 100%
+    );
+}
+
+// Full corners with two sizes (used by stylized-padding)
+@mixin pixel-clip-full($inner, $outer) {
+    clip-path: polygon(
+        0 #{$outer},
+        #{$inner} #{$outer},
+        #{$inner} #{$inner},
+        #{$outer} #{$inner},
+        #{$outer} 0,
+        calc(100% - #{$outer}) 0,
+        calc(100% - #{$outer}) #{$inner},
+        calc(100% - #{$inner}) #{$inner},
+        calc(100% - #{$inner}) #{$outer},
+        100% #{$outer},
+        100% calc(100% - #{$outer}),
+        calc(100% - #{$inner}) calc(100% - #{$outer}),
+        calc(100% - #{$inner}) calc(100% - #{$inner}),
+        calc(100% - #{$outer}) calc(100% - #{$inner}),
+        calc(100% - #{$outer}) 100%,
+        #{$outer} 100%,
+        #{$outer} calc(100% - #{$inner}),
+        #{$inner} calc(100% - #{$inner}),
+        #{$inner} calc(100% - #{$outer}),
+        0 calc(100% - #{$outer})
+    );
+}
+
+// Inset box-shadow with hover + active inversion
+@mixin pixel-button-shadow($size, $dark, $light) {
+    box-shadow:
+        inset calc(-1 * #{$size}) calc(-1 * #{$size}) $dark,
+        inset #{$size} #{$size} $light;
+    &:hover {
+        opacity: 0.75;
+    }
+    &:active {
+        box-shadow:
+            inset calc(-1 * #{$size}) calc(-1 * #{$size}) $light,
+            inset #{$size} #{$size} $dark;
+    }
+}
+
 * {
     font-family: 'pixel';
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    gap: calc($pixel-size * 10);
 }
 
 .chat-container {
@@ -244,20 +342,141 @@ $shadow-message: calc(0.1 * $chat-font-size) 0 0 $color-message-shadow;
 
     transition: all 0.1s;
 
-    clip-path: polygon(
-        0 calc($pixel-size * 10),
-        calc($pixel-size * 5) calc($pixel-size * 10),
-        calc($pixel-size * 5) calc($pixel-size * 5),
-        calc($pixel-size * 10) calc($pixel-size * 5),
-        calc($pixel-size * 10) 0,
-        calc(100% - calc($pixel-size * 10)) 0,
-        calc(100% - calc($pixel-size * 10)) calc($pixel-size * 5),
-        calc(100% - calc($pixel-size * 5)) calc($pixel-size * 5),
-        calc(100% - calc($pixel-size * 5)) calc($pixel-size * 10),
-        100% calc($pixel-size * 10),
-        100% 100%,
-        0 100%
-    );
+    @include pixel-clip-top(calc($pixel-size * 5), calc($pixel-size * 10));
+}
+
+.channel-list {
+    display: flex;
+    flex-direction: column;
+    gap: calc($chat-base-size * 0.5);
+    padding: calc($chat-base-size * 1);
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.stylized-padding {
+    @include pixel-clip-full(calc($pixel-size * 5), calc($pixel-size * 10));
+}
+
+.channel-item {
+    width: 100%;
+
+    height: calc($chat-base-size * 6);
+    min-height: calc($chat-base-size * 6);
+
+    cursor: pointer;
+    background-color: $color-channel-item;
+    border: calc($pixel-size * 10) solid $color-channel-item-border;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: calc($chat-base-size * 1);
+    padding: 2% calc($pixel-size * 15);
+
+    transition: all 0.1s;
+    box-sizing: border-box;
+}
+
+.channel-name {
+    display: flex;
+    align-items: center;
+    font-size: calc($chat-base-size * 2.2);
+    text-shadow: calc($chat-base-size * 0.25) 0 0 $color-text-default;
+    user-select: none;
+}
+
+.channel-header {
+    height: calc($chat-base-size * 6);
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc($pixel-size * 10);
+    background-color: $color-channel-item;
+    padding: 2% calc($pixel-size * 15);
+}
+
+$stylized-medium-padding-size: calc($pixel-size * 8);
+.simple-medium-stylized-padding {
+    @include pixel-clip($stylized-medium-padding-size);
+}
+
+.search-bar {
+    width: 100%;
+    padding-left: 1%;
+    background-color: $color-blue-1;
+    border: calc($pixel-size * 10) solid $color-channel-search-bar-background;
+    @include pixel-button-shadow($stylized-medium-padding-size, darkgrey, lightgrey);
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-button {
+    height: 100%;
+    aspect-ratio: 2/1;
+    padding: 2% calc($stylized-medium-padding-size * 2);
+    background-color: green;
+    margin-left: auto;
+    @include pixel-button-shadow($stylized-medium-padding-size, darkgreen, lightgreen);
+}
+
+$stylized-small-padding-size: calc($pixel-size * 5);
+.simple-small-stylized-padding {
+    @include pixel-clip($stylized-small-padding-size);
+}
+
+%channel-action-button {
+    width: calc($chat-base-size * 3);
+    aspect-ratio: 1 / 1;
+    background-size: 70%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.channel-join-button {
+    @extend %channel-action-button;
+    background-color: rgb(47, 47, 255);
+    background-image: url($img-icon-join);
+    @include pixel-button-shadow($stylized-small-padding-size, darkblue, lightskyblue);
+}
+
+.channel-leave-button {
+    @extend %channel-action-button;
+    background-color: rgb(47, 47, 255);
+    background-image: url($img-icon-leave);
+    background-size: 50%;
+    @include pixel-button-shadow($stylized-small-padding-size, darkblue, lightskyblue);
+}
+
+.channel-delete-button {
+    @extend %channel-action-button;
+    background-color: red;
+    background-image: url($img-icon-bin);
+    @include pixel-button-shadow($stylized-small-padding-size, darkred, lightcoral);
+}
+
+.add-icon {
+    width: 40%;
+    aspect-ratio: 1 / 1;
+    background-image: url($img-icon-add);
+    filter: invert(1);
+}
+
+.channel-icon {
+    width: calc($chat-base-size * 3);
+    aspect-ratio: 1 / 1;
+    background-image: url($img-icon-channels);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: invert(1);
 }
 
 .category-button:hover {
@@ -291,6 +510,10 @@ $shadow-message: calc(0.1 * $chat-font-size) 0 0 $color-message-shadow;
 
 .messages-button .icon {
     background-image: url($img-icon-messages);
+}
+
+.general-messages-button .icon {
+    background-image: url($img-icon-general-messages);
 }
 
 .journal-button .icon {
@@ -432,14 +655,15 @@ $shadow-message: calc(0.1 * $chat-font-size) 0 0 $color-message-shadow;
 
 .message-input {
     width: 100%;
-    height: 100%;
+    min-height: 100%;
 
     background: transparent;
     border: none;
     outline: none;
+    padding: 1%;
 
     color: white;
-    font-size: calc(3.5 * $chat-base-size);
+    font-size: $chat-font-size;
     text-shadow: calc(0.25 * $chat-base-size) 0 0 $color-text-shadow;
 }
 

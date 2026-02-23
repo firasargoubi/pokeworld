@@ -1,6 +1,7 @@
 import { User } from '@app/model/schema/user.schema';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
+import { Channel, ChannelMessage, ChannelUser } from '@common/interfaces/channel';
 import { UserService } from '@app/services/user/user.service';
 import { ChatMessage } from '@common/interfaces/chat-message';
 import { ChatEvent } from '@common/interfaces/socket-event.enum';
@@ -28,6 +29,7 @@ export class ChatGateway {
             this.chatService.message(match, socket.id, message, user);
         }
     }
+
     @SubscribeMessage(ChatEvent.GeneralMessage)
     generalMessage(socket: Socket, chatMessage: ChatMessage) {
         const chatMessageToSend: ChatMessage = {
@@ -37,5 +39,52 @@ export class ChatGateway {
             timestamp: new Date(),
         };
         this.server.emit(ChatEvent.GeneralMessage, chatMessageToSend);
+    }
+
+    @SubscribeMessage(ChatEvent.CreateChannel)
+    async createChannel(socket: Socket, channelUser: ChannelUser): Promise<Channel> {
+        const channelName = channelUser.channelName;
+        const userName = channelUser.userName;
+        const channel = await this.chatService.createChannel(channelName, userName);
+        if (!channel) {
+            return null;
+        }
+        socket.join(channel.name);
+        this.server.emit(ChatEvent.ChannelUpdate, await this.chatService.getChannels());
+        return channel;
+    }
+
+    @SubscribeMessage(ChatEvent.JoinChannel)
+    async joinChannel(socket: Socket, channelUser: ChannelUser): Promise<void> {
+        const channelName = channelUser.channelName;
+        const userName = channelUser.userName;
+        await this.chatService.joinChannel(channelName, userName);
+        socket.join(channelName);
+        this.server.emit(ChatEvent.ChannelUpdate, await this.chatService.getChannels());
+    }
+
+    @SubscribeMessage(ChatEvent.LeaveChannel)
+    async leaveChannel(socket: Socket, channelUser: ChannelUser): Promise<void> {
+        const channelName = channelUser.channelName;
+        const userName = channelUser.userName;
+        await this.chatService.leaveChannel(channelName, userName);
+        socket.leave(channelName);
+        this.server.emit(ChatEvent.ChannelUpdate, await this.chatService.getChannels());
+    }
+
+    @SubscribeMessage(ChatEvent.DeleteChannel)
+    async deleteChannel(socket: Socket, channelName: string): Promise<void> {
+        await this.chatService.deleteChannel(channelName);
+        socket.leave(channelName);
+        this.server.emit(ChatEvent.ChannelUpdate, await this.chatService.getChannels());
+    }
+
+    @SubscribeMessage(ChatEvent.ChannelMessage)
+    channelMessage(socket: Socket, data: ChannelMessage): void {
+        this.server.to(data.channelName).emit(ChatEvent.ChannelMessage, data);
+    }
+
+    async handleConnection(socket: Socket): Promise<void> {
+        socket.emit(ChatEvent.ChannelUpdate, await this.chatService.getChannels());
     }
 }

@@ -8,6 +8,7 @@ import { CombatGateway } from './gateways/combat/combat.gateway';
 import { LobbyGateway } from './gateways/lobby/lobby.gateway';
 import { MatchGateway } from './gateways/match/match.gateway';
 import { PlayGateway } from './gateways/play/play.gateway';
+import { Channel, channelSchema } from './model/schema/channel.schema';
 import { Game, gameSchema } from './model/schema/game.schema';
 import { User, userSchema } from './model/schema/user.schema';
 import { BotService } from './services/bot/bot.service';
@@ -35,6 +36,7 @@ import { UserService } from './services/user/user.service';
         MongooseModule.forFeature([
             { name: Game.name, schema: gameSchema },
             { name: User.name, schema: userSchema },
+            { name: Channel.name, schema: channelSchema },
         ]),
     ],
     controllers: [GameController, UserController],

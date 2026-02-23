@@ -1,4 +1,5 @@
 import { Match } from '@app/classes/match/match';
+import { Channel } from '@app/model/schema/channel.schema';
 import { User } from '@app/model/schema/user.schema';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ITEM_NAME } from '@common/consts/item-data.const';
@@ -8,6 +9,7 @@ import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
+import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createSandbox, createStubInstance, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
 import { ChatService } from './chat.service';
@@ -39,7 +41,7 @@ describe('ChatService', () => {
         };
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [ChatService],
+            providers: [{ provide: getModelToken(Channel.name), useValue: {} }, ChatService],
         }).compile();
 
         service = module.get<ChatService>(ChatService);

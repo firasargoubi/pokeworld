@@ -1,6 +1,7 @@
 import { ElementRef, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { ChatTab } from '@app/interfaces/chat-tab.enum';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { ChatService } from '@app/services/chat/chat.service';
@@ -29,13 +30,16 @@ describe('ChatComponent', () => {
     ];
 
     beforeEach(async () => {
-        chatServiceSpy = jasmine.createSpyObj('ChatService', ['sendMessage', 'sendGeneralMessage'], {
+        chatServiceSpy = jasmine.createSpyObj('ChatService', ['sendMessage', 'sendGeneralMessage', 'switchTab', 'channels'], {
+            chatState: signal({ activeTab: ChatTab.Channels, isInChannelList: true, activeChannelName: undefined }),
             isChatActive: signal(true),
             isGeneralChatActive: signal(false),
             isFilterEnabled: signal(false),
             isComponentVisible: signal(true),
             generalMessages$: of([]),
+            channelMessages$: of({}),
         });
+        chatServiceSpy.channels.and.returnValue([]);
 
         matchServiceSpy = jasmine.createSpyObj('MatchService', [], {
             data: {
@@ -75,26 +79,31 @@ describe('ChatComponent', () => {
     });
 
     it('should switch between chat and logs tabs', () => {
-        component.switchTab(false, false);
-        expect(component.isChatActive()).toBeFalse();
+        component.switchTab(ChatTab.Channels);
+        expect(chatServiceSpy.switchTab).toHaveBeenCalledWith(ChatTab.Channels);
 
-        component.switchTab(true, false);
-        expect(component.isChatActive()).toBeTrue();
+        component.switchTab(ChatTab.General);
+        expect(chatServiceSpy.switchTab).toHaveBeenCalledWith(ChatTab.General);
 
-        component.switchTab(false, true);
-        expect(component.isGeneralChatActive()).toBeTrue();
+        component.switchTab(ChatTab.Journal);
+        expect(chatServiceSpy.switchTab).toHaveBeenCalledWith(ChatTab.Journal);
+
+        component.switchTab(ChatTab.Match);
+        expect(chatServiceSpy.switchTab).toHaveBeenCalledWith(ChatTab.Match);
     });
 
     it('should toggle filter', () => {
         component.toggleFilter();
-
-        expect(component.isFilterEnabled()).toBeTrue();
+        expect(chatServiceSpy.isFilterEnabled()).toBeTrue();
         expect(component.logs.length).toBe(1);
     });
 
     it('should send message on Enter key', async () => {
         const input = document.createElement('input');
         input.value = 'Test message';
+
+        // ensure we're on Match tab so component calls sendMessage
+        chatServiceSpy.chatState.set({ activeTab: ChatTab.Match, isInChannelList: true, activeChannelName: undefined });
 
         const event = new KeyboardEvent('keydown', { key: 'Enter' });
         Object.defineProperty(event, 'target', { value: input });
@@ -137,13 +146,13 @@ describe('ChatComponent', () => {
         expect(component.logs.length).toBe(2);
         expect(scrollToBottomSpy).toHaveBeenCalled();
 
-        component.isFilterEnabled.set(true);
+        chatServiceSpy.isFilterEnabled.set(true);
         component['updateChatData']();
         expect(component.logs.length).toBe(1);
     });
 
     it('should filter logs based on player name when filter is enabled', () => {
-        component.isFilterEnabled.set(true);
+        chatServiceSpy.isFilterEnabled.set(true);
 
         component['filterLogs']();
 

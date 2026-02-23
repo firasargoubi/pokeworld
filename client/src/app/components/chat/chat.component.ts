@@ -1,13 +1,13 @@
-import { CommonModule } from '@angular/common';
-import { AfterViewChecked, Component, ElementRef, inject, Input, OnInit, ViewChild, WritableSignal } from '@angular/core';
+﻿import { CommonModule } from '@angular/common';
+import { AfterViewChecked, Component, ElementRef, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ChatTab } from '@app/interfaces/chat-tab.enum';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
-import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-chat',
@@ -23,29 +23,31 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     @ViewChild('chatContainer') private chatContainerRef: ElementRef;
 
     isComponentVisible: boolean = false;
-    isChatActive: WritableSignal<boolean>;
-    isGeneralChatActive: WritableSignal<boolean>;
-    isFilterEnabled: WritableSignal<boolean>;
     maxInputLength = MAX_MESSAGE_LENGTH;
     chatMessages: ChatMessage[] = [];
     logs: ChatLog[] = [];
-    generalMessages$: Observable<ChatMessage[]>;
+    searchBarValue: string = '';
+    readonly chatTab = ChatTab;
     readonly clickValue = SoundEffect.Click;
     readonly audioService: AudioService = inject(AudioService);
+    readonly chatService: ChatService = inject(ChatService);
     private shouldScrollToBottom = false;
     private readonly matchService: MatchService = inject(MatchService);
-    private readonly chatService: ChatService = inject(ChatService);
 
-    ngOnInit() {
-        this.isChatActive = this.chatService.isChatActive;
-        this.isGeneralChatActive = this.chatService.isGeneralChatActive;
-        this.isFilterEnabled = this.chatService.isFilterEnabled;
+    get filteredChannels() {
+        const filter = this.searchBarValue.trim().toLowerCase();
+        return this.chatService.channels().filter((c) => c.name.toLowerCase().startsWith(filter));
+    }
+
+    ngOnInit(): void {
         this.isComponentVisible = this.chatService.isComponentVisible();
-        this.generalMessages$ = this.chatService.generalMessages$;
-        this.generalMessages$.subscribe(() => {
+        this.updateChatData();
+        this.chatService.generalMessages$.subscribe(() => {
             this.shouldScrollToBottom = true;
         });
-        this.updateChatData();
+        this.chatService.channelMessages$.subscribe(() => {
+            this.shouldScrollToBottom = true;
+        });
         this.matchService.matchUpdate.subscribe(() => {
             this.updateChatData();
         });
@@ -58,59 +60,105 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         }
     }
 
-    switchTab(isChat: boolean, isGeneral: boolean) {
+    switchTab(tab: ChatTab): void {
         this.audioService.playEffect(SoundEffect.Click);
-        this.chatService.isChatActive.set(isChat);
-        this.chatService.isGeneralChatActive.set(isGeneral);
+        this.chatService.switchTab(tab);
         this.shouldScrollToBottom = true;
     }
 
-    toggleFilter() {
+    openChannel(channelName: string): void {
+        this.audioService.playEffect(SoundEffect.Click);
+        if (!this.chatService.isInChannel(channelName)) {
+            return;
+        }
+        this.chatService.openChannel(channelName);
+        this.shouldScrollToBottom = true;
+    }
+
+    showChannelList(): void {
+        this.audioService.playEffect(SoundEffect.Click);
+        this.chatService.showChannelList();
+    }
+
+    joinChannel(channelName: string, event?: MouseEvent): void {
+        event?.stopPropagation();
+        this.audioService.playEffect(SoundEffect.Click);
+        this.chatService.joinChannel(channelName);
+    }
+
+    leaveChannel(channelName?: string, event?: MouseEvent): void {
+        const name = channelName ?? this.chatService.activeChannelName();
+        if (!name) return;
+        event?.stopPropagation();
+        this.audioService.playEffect(SoundEffect.Click);
+        this.chatService.leaveChannel(name);
+    }
+
+    deleteChannel(channelName?: string, event?: MouseEvent): void {
+        const name = channelName ?? this.chatService.activeChannelName();
+        if (!name) return;
+        event?.stopPropagation();
+        this.audioService.playEffect(SoundEffect.Click);
+        this.chatService.deleteChannel(name);
+    }
+    createChannel(): void {
+        const name = this.searchBarValue.trim();
+        if (name) {
+            this.chatService.createChannel(name);
+            this.searchBarValue = '';
+        }
+    }
+
+    toggleFilter(): void {
         this.audioService.playEffect(SoundEffect.Click);
         this.chatService.isFilterEnabled.update((value: boolean) => !value);
         this.filterLogs();
         this.shouldScrollToBottom = true;
     }
 
-    sendMessage(event: KeyboardEvent) {
+    sendMessage(event: KeyboardEvent): void {
         if (event.key !== 'Enter') {
-            if (this.isGeneralChatActive()) {
-                return;
-            }
-            this.isChatActive.set(true);
+            if (this.chatService.chatState().activeTab !== ChatTab.Journal) return;
+            this.switchTab(ChatTab.Match);
             return;
         }
 
         const input = event.target as HTMLInputElement;
         const message = input.value.trim();
+        if (!message) return;
 
-        if (message) {
-            input.value = '';
-            const toGeneral = this.isGeneralChatActive() || !this.isInGame;
-            if (toGeneral) {
+        input.value = '';
+        const state = this.chatService.chatState();
+
+        switch (state.activeTab) {
+            case ChatTab.General:
                 this.chatService.sendGeneralMessage(message);
-            } else {
+                break;
+            case ChatTab.Match:
                 this.chatService.sendMessage(message);
-            }
-            this.shouldScrollToBottom = true;
+                break;
+            case ChatTab.Channels:
+                if (state.activeChannelName) this.chatService.sendChannelMessage(state.activeChannelName, message);
+                break;
         }
+        this.shouldScrollToBottom = true;
     }
 
-    switchVisibility() {
+    switchVisibility(): void {
         this.audioService.playEffect(SoundEffect.Click);
         this.isComponentVisible = !this.isComponentVisible;
         this.chatService.isComponentVisible.set(this.isComponentVisible);
     }
 
-    private updateChatData() {
+    private updateChatData(): void {
         this.chatMessages = this.matchService.data.chatData;
         this.filterLogs();
         this.shouldScrollToBottom = true;
     }
 
-    private filterLogs() {
+    private filterLogs(): void {
         const playerName = this.matchService.selfPlayer.name;
-        if (this.isFilterEnabled()) {
+        if (this.chatService.isFilterEnabled()) {
             this.logs = this.matchService.data.logData.filter(
                 (log) => log.content.includes(playerName) || log.concernedPlayersNamesList.includes(playerName),
             );

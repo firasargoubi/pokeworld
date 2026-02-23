@@ -8,6 +8,7 @@ import { PopupMessage } from '@app/consts/popup-message.const';
 import { CharacterVisualData } from '@app/interfaces/character-visual-data';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
+import { ChatService } from '@app/services/chat/chat.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { UserService } from '@app/services/user/user.service';
 import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/player-data.const';
@@ -42,6 +43,7 @@ export class AuthPopupComponent {
     audioService: AudioService = inject(AudioService);
     private userService: UserService = inject(UserService);
     private popupService: PopupService = inject(PopupService);
+    private chatService: ChatService = inject(ChatService);
 
     @HostListener('document:keydown.enter', ['$event'])
     onEnterKey(event: KeyboardEvent) {
@@ -126,6 +128,7 @@ export class AuthPopupComponent {
                     hasCloseButton: true,
                     isConfirmation: false,
                 });
+                this.chatService.joinAllChannels();
             },
             error: (error: HttpErrorResponse) => {
                 this.handleNotFoundError(error, false);

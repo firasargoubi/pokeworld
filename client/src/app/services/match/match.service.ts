@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { NavigationStart, Router, Event as RouterEvent } from '@angular/router';
 import { DEFAULT_GAME_DATA } from '@app/consts/game-data.const';
 import { PopupMessage } from '@app/consts/popup-message.const';
+import { ChatTab } from '@app/interfaces/chat-tab.enum';
 import { PopupColor } from '@app/interfaces/popup';
 import { ChatService } from '@app/services/chat/chat.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
@@ -161,7 +162,7 @@ export class MatchService {
         this.gameDataService.setGameData(structuredClone(DEFAULT_GAME_DATA));
         this.mapService.setPlayers([]);
         this.mapService.clearOverlays();
-        this.chatService.isChatActive.set(true);
+        this.chatService.switchTab(ChatTab.Channels);
         this.chatService.isFilterEnabled.set(false);
         this.matchUpdate.next(this.data);
     }
