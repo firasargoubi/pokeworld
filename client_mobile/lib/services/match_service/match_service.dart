@@ -3,17 +3,17 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../consts/match_data_const.dart';
-import '../consts/player_data_const.dart';
-import '../consts/socket_event.dart';
-import '../models/game_data.dart';
-import '../models/match_data.dart';
-import '../models/message_from_server.dart';
-import '../models/player_data.dart';
-import '../pages/character_page/character_page.dart';
-import '../pages/home_page.dart';
-import 'navigation_service.dart';
-import 'socket_service.dart';
+import '../../consts/match_data_const.dart';
+import '../../consts/player_data_const.dart';
+import '../../consts/socket_event.dart';
+import '../../models/game_data.dart';
+import '../../models/match_data.dart';
+import '../../models/message_from_server.dart';
+import '../../models/player_data.dart';
+import '../../pages/character_page/character_page.dart';
+import '../../pages/home_page.dart';
+import '../navigation_service.dart';
+import '../socket_service.dart';
 
 class MatchService {
   static final MatchService _instance = MatchService._internal();
@@ -32,9 +32,25 @@ class MatchService {
 
   MatchData? get matchData => _matchData;
   Stream<MatchData> get matchUpdates => _matchUpdateController.stream;
+
   String? get selfId => _socketService.socket.id;
   PlayerData? get selfPlayer => _selfPlayer;
   int? get selfIndex => _selfIndex;
+
+  String? get hostPlayerId {
+    final matchData = _matchData;
+    if (matchData == null) return null;
+
+    final hostIndex = matchData.lobbyData.hostPlayerIndex;
+    if (hostIndex < 0 || hostIndex >= matchData.players.length) return null;
+
+    return matchData.players[hostIndex].id;
+  }
+
+  bool isPlayerHost(String? playerId) {
+    if (playerId == null || playerId.isEmpty) return false;
+    return hostPlayerId == playerId;
+  }
 
   void initListeners() {
     if (_listenersInitialized) return;
@@ -52,11 +68,22 @@ class MatchService {
     });
 
     _socketService.socket.on(MatchEvent.update.value, (payload) {
-      if (kDebugMode) {
-        print('Received update event from server');
-      }
       final matchData = MatchData.fromJson((payload as Map).cast<String, dynamic>());
       onUpdate(matchData);
+    });
+
+    _socketService.socket.on(MatchEvent.disconnect.value, (payload) {
+      if (kDebugMode) {
+        print('Disconnected from match');
+      }
+      onDisconnect();
+    });
+
+    _socketService.socket.on(MatchEvent.removedFromMatch.value, (payload) {
+      if (kDebugMode) {
+        print('Removed from match');
+      }
+      onRemovedFromMatch();
     });
   }
 
@@ -76,7 +103,6 @@ class MatchService {
     final matchData = MatchData.fromJson((payload as Map).cast<String, dynamic>());
     onUpdate(matchData);
 
-    // Navigate to character page after successful join/create
     NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const CharacterPage()));
   }
 
@@ -102,9 +128,21 @@ class MatchService {
     _matchUpdateController.add(matchData);
   }
 
+  void onDisconnect() {
+    if (isInMatch()) {
+      resetMatchData();
+      NavigationService.navigatorKey.currentState?.pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const HomePage()), (route) => false);
+    }
+  }
+
+  void onRemovedFromMatch() {
+    resetMatchData();
+    NavigationService.navigatorKey.currentState?.pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const HomePage()), (route) => false);
+  }
+
   void leaveMatch() {
     if (isInMatch()) {
-      _socketService.emit(MatchEvent.leaveMatch.value, null);
+      _socketService.emit(MatchEvent.leaveMatch.value);
       resetMatchData();
     }
 

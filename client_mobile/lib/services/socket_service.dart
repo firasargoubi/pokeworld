@@ -14,13 +14,7 @@ class SocketService {
     if (serverUrl == null) {
       return;
     }
-    socket = io.io(
-      serverUrl,
-      io.OptionBuilder()
-          .setTransports(['websocket'])
-          .disableAutoConnect()
-          .build(),
-    );
+    socket = io.io(serverUrl, io.OptionBuilder().setTransports(['websocket']).disableAutoConnect().build());
 
     socket.connect();
   }
@@ -29,7 +23,7 @@ class SocketService {
     socket.disconnect();
   }
 
-  void emit(String event, dynamic data, [void Function(dynamic)? ack]) {
+  void emit(String event, [dynamic data, void Function(dynamic)? ack]) {
     if (ack == null) {
       socket.emit(event, data);
     } else {

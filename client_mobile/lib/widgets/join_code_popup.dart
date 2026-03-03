@@ -1,40 +1,27 @@
 import 'dart:ui';
 
-import 'package:client_mobile/services/match_service.dart';
+import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class JoinCodePopup extends StatelessWidget {
-  const JoinCodePopup({
-    super.key,
-    required this.baseSize,
-    required this.controller,
-    required this.onClose,
-  });
+  const JoinCodePopup({super.key, required this.baseSize, required this.controller, required this.onClose});
 
   final double baseSize;
   final TextEditingController controller;
   final VoidCallback onClose;
 
-  static const String containerAsset =
-      'assets/images/menu/containers/join/blue-container.png';
+  static const String containerAsset = 'assets/images/menu/containers/join/blue-container.png';
   static const String fontFamily = 'Pixel';
   static const Color shadowColor = Color(0xFF787878);
 
   static const String titleText = "Entrez votre code d'accès";
   static const String hintText = 'Appuyer sur Entrer pour valider';
 
-  List<Shadow> _textShadow(double offsetX) => [
-    Shadow(offset: Offset(offsetX, 0), color: shadowColor, blurRadius: 0),
-  ];
+  List<Shadow> _textShadow(double offsetX) => [Shadow(offset: Offset(offsetX, 0), color: shadowColor, blurRadius: 0)];
 
-  TextStyle _labelStyle(double fontSize, double shadowOffsetX) => TextStyle(
-    fontFamily: fontFamily,
-    color: Colors.white,
-    fontSize: fontSize,
-    height: 0.9,
-    shadows: _textShadow(shadowOffsetX),
-  );
+  TextStyle _labelStyle(double fontSize, double shadowOffsetX) =>
+      TextStyle(fontFamily: fontFamily, color: Colors.white, fontSize: fontSize, height: 0.9, shadows: _textShadow(shadowOffsetX));
 
   @override
   Widget build(BuildContext context) {
@@ -63,30 +50,19 @@ class JoinCodePopup extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.asset(
-                      containerAsset,
-                      fit: BoxFit.fill,
-                      filterQuality: FilterQuality.none,
-                    ),
+                    Image.asset(containerAsset, fit: BoxFit.fill, filterQuality: FilterQuality.none),
                     Padding(
                       padding: EdgeInsets.all(padding),
                       child: Column(
                         children: [
                           Expanded(
                             flex: 1,
-                            child: Center(
-                              child: Text(titleText, style: titleStyle),
-                            ),
+                            child: Center(child: Text(titleText, style: titleStyle)),
                           ),
-                          _OverlayCodeInput(
-                            baseSize: baseSize,
-                            controller: controller,
-                          ),
+                          _OverlayCodeInput(baseSize: baseSize, controller: controller),
                           Expanded(
                             flex: 1,
-                            child: Center(
-                              child: Text(hintText, style: titleStyle),
-                            ),
+                            child: Center(child: Text(hintText, style: titleStyle)),
                           ),
                         ],
                       ),
@@ -114,9 +90,7 @@ class _OverlayCodeInput extends StatelessWidget {
   static const String measureText = '0000';
   static const String underlineText = '____';
 
-  List<Shadow> _textShadow(double offsetX) => [
-    Shadow(offset: Offset(offsetX, 0), color: shadowColor, blurRadius: 0),
-  ];
+  List<Shadow> _textShadow(double offsetX) => [Shadow(offset: Offset(offsetX, 0), color: shadowColor, blurRadius: 0)];
 
   @override
   Widget build(BuildContext context) {
@@ -167,16 +141,8 @@ class _OverlayCodeInput extends StatelessWidget {
                       MatchService().joinMatch(value);
                     }
                   },
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(4),
-                  ],
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    counterText: '',
-                    isCollapsed: true,
-                    contentPadding: EdgeInsets.zero,
-                  ),
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(4)],
+                  decoration: const InputDecoration(border: InputBorder.none, counterText: '', isCollapsed: true, contentPadding: EdgeInsets.zero),
                   style: textStyle,
                 ),
               ),
@@ -201,7 +167,6 @@ class RightOnlyClipper extends CustomClipper<Rect> {
 
   @override
   bool shouldReclip(covariant RightOnlyClipper oldClipper) {
-    return oldClipper.cardWidth != cardWidth ||
-        oldClipper.panelWidth != panelWidth;
+    return oldClipper.cardWidth != cardWidth || oldClipper.panelWidth != panelWidth;
   }
 }

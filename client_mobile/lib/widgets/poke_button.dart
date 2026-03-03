@@ -7,14 +7,15 @@ class PokeButton extends StatefulWidget {
     super.key,
     this.onTap,
     required this.text,
-    this.horizontalPaddingFactor = 0.06,
+    this.textLeftGapFactor = 0.20,
+    this.bodyLeftPaddingFactor = 0.1,
   });
 
   final VoidCallback? onTap;
   final String text;
 
-  /// Horizontal padding as a fraction of the available width.
-  final double horizontalPaddingFactor;
+  final double textLeftGapFactor;
+  final double bodyLeftPaddingFactor;
 
   @override
   State<PokeButton> createState() => _PokeButtonState();
@@ -23,7 +24,6 @@ class PokeButton extends StatefulWidget {
 class _PokeButtonState extends State<PokeButton> {
   bool _isPressed = false;
 
-  // ---- Constants ----
   static const double _FallbackHeight = 48.0;
   static const double _EdgeAspectRatio = 10 / 32;
 
@@ -64,26 +64,42 @@ class _PokeButtonState extends State<PokeButton> {
 
         final double middleSectionHeight = buttonHeight * 0.55;
 
-        final double horizontalPadding = max(
+        final double bodyLeftPad = max(
           0.0,
-          constraints.maxWidth * widget.horizontalPaddingFactor,
+          constraints.maxWidth * widget.bodyLeftPaddingFactor,
         );
 
-        final double textLeftPadding = middleSectionHeight * 1.2;
+        final double textLeftGap = max(
+          0.0,
+          constraints.maxWidth * widget.textLeftGapFactor,
+        );
+
+        final textStyle = TextStyle(
+          fontFamily: _FontFamily,
+          color: Colors.white,
+          fontSize: middleSectionHeight * 0.55,
+          height: 1.0,
+          shadows: [
+            Shadow(
+              offset: Offset(middleSectionHeight * 0.06, 0),
+              color: _ShadowColor,
+              blurRadius: 0,
+            ),
+          ],
+        );
 
         return SizedBox.expand(
           child: Stack(
             clipBehavior: Clip.none,
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                padding: EdgeInsets.only(left: bodyLeftPad),
                 child: Center(
                   child: SizedBox(
                     height: middleSectionHeight,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Left edge (mirrored)
                         AspectRatio(
                           aspectRatio: _EdgeAspectRatio,
                           child: Transform(
@@ -96,8 +112,6 @@ class _PokeButtonState extends State<PokeButton> {
                             ),
                           ),
                         ),
-
-                        // Center container + text
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
@@ -107,37 +121,23 @@ class _PokeButtonState extends State<PokeButton> {
                                 filterQuality: FilterQuality.none,
                               ),
                             ),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
+                            child: Center(
                               child: Padding(
-                                padding: EdgeInsets.only(left: textLeftPadding),
+                                padding: EdgeInsets.only(
+                                  left: textLeftGap,
+                                  right: middleSectionHeight * 0.25,
+                                ),
                                 child: Text(
                                   widget.text,
+                                  textAlign: TextAlign.center,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontFamily: _FontFamily,
-                                    color: Colors.white,
-                                    fontSize: middleSectionHeight * 0.55,
-                                    height: 1.0,
-                                    shadows: [
-                                      Shadow(
-                                        offset: Offset(
-                                          middleSectionHeight * 0.06,
-                                          0,
-                                        ),
-                                        color: _ShadowColor,
-                                        blurRadius: 0,
-                                      ),
-                                    ],
-                                  ),
+                                  style: textStyle,
                                 ),
                               ),
                             ),
                           ),
                         ),
-
-                        // Right edge
                         AspectRatio(
                           aspectRatio: _EdgeAspectRatio,
                           child: Image.asset(
@@ -151,8 +151,6 @@ class _PokeButtonState extends State<PokeButton> {
                   ),
                 ),
               ),
-
-              // Ball overlay
               Positioned(
                 top: 0,
                 left: 0,

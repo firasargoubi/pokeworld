@@ -1,16 +1,12 @@
 import 'dart:math';
 
 import 'package:client_mobile/models/game_data.dart';
-import 'package:client_mobile/services/match_service.dart';
+import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/widgets/game_card.dart';
 import 'package:flutter/material.dart';
 
 class GameCardsPageShell extends StatefulWidget {
-  const GameCardsPageShell({
-    super.key,
-    required this.games,
-    required this.isCreateCard,
-  });
+  const GameCardsPageShell({super.key, required this.games, required this.isCreateCard});
 
   final List<GameData> games;
   final bool isCreateCard;
@@ -25,8 +21,7 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
   static const double cardWidthFactor = 0.40;
   static const double gapFactor = 0.03;
 
-  static const String descriptionAsset =
-      'assets/images/menu/containers/game/description.png';
+  static const String descriptionAsset = 'assets/images/menu/containers/game/description.png';
   static const String pixelFont = 'Pixel';
 
   int? openIndex;
@@ -69,24 +64,13 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
         final rows = (widget.games.length / columns).ceil();
         final totalGridHeight = rows * cardHeight + (rows - 1) * gap;
 
-        final horizontalPadding = max(
-          0,
-          (availableWidth - (columns * cardWidth) - (columns - 1) * gap) / 2,
-        );
+        final horizontalPadding = max(0, (availableWidth - (columns * cardWidth) - (columns - 1) * gap) / 2);
 
         final fitsVertically = totalGridHeight <= availableHeight;
 
         final gridPadding = widget.isCreateCard
-            ? EdgeInsets.symmetric(
-                horizontal: horizontalPadding.toDouble(),
-                vertical: fitsVertically ? 0 : gap,
-              )
-            : EdgeInsets.fromLTRB(
-                horizontalPadding.toDouble(),
-                gap * 2,
-                horizontalPadding.toDouble(),
-                gap * 6,
-              );
+            ? EdgeInsets.symmetric(horizontal: horizontalPadding.toDouble(), vertical: fitsVertically ? 0 : gap)
+            : EdgeInsets.fromLTRB(horizontalPadding.toDouble(), gap * 2, horizontalPadding.toDouble(), gap * 6);
 
         return GestureDetector(
           behavior: HitTestBehavior.translucent,
@@ -102,9 +86,7 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
                 itemCount: widget.games.length,
                 clipBehavior: Clip.none,
                 shrinkWrap: fitsVertically,
-                physics: fitsVertically
-                    ? const NeverScrollableScrollPhysics()
-                    : const BouncingScrollPhysics(),
+                physics: fitsVertically ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
                 padding: gridPadding,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: columns,
@@ -137,9 +119,7 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
                               behavior: HitTestBehavior.opaque,
                               onTap: () {
                                 setState(() {
-                                  openIndex = (openIndex == index)
-                                      ? null
-                                      : index;
+                                  openIndex = (openIndex == index) ? null : index;
                                 });
                               },
                               child: Container(),
@@ -166,19 +146,14 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
                           width: cardWidth + descriptionPanelWidth,
                           height: cardHeight,
                           child: ClipRect(
-                            clipper: RightOnlyClipper(
-                              cardWidth: cardWidth,
-                              panelWidth: descriptionPanelWidth,
-                            ),
+                            clipper: RightOnlyClipper(cardWidth: cardWidth, panelWidth: descriptionPanelWidth),
                             child: Stack(
                               clipBehavior: Clip.none,
                               children: [
                                 AnimatedPositioned(
                                   duration: const Duration(milliseconds: 180),
                                   curve: Curves.easeOut,
-                                  left: isOpen
-                                      ? cardWidth
-                                      : cardWidth - descriptionPanelWidth,
+                                  left: isOpen ? cardWidth : cardWidth - descriptionPanelWidth,
                                   bottom: 0,
                                   width: descriptionPanelWidth,
                                   height: cardHeight * 0.978,
@@ -186,11 +161,7 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
                                     clipBehavior: Clip.none,
                                     children: [
                                       Positioned.fill(
-                                        child: Image.asset(
-                                          descriptionAsset,
-                                          fit: BoxFit.fill,
-                                          filterQuality: FilterQuality.none,
-                                        ),
+                                        child: Image.asset(descriptionAsset, fit: BoxFit.fill, filterQuality: FilterQuality.none),
                                       ),
                                       Positioned(
                                         left: descriptionPanelWidth * 0.25,
@@ -203,11 +174,9 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
                                             widget.games[index].description,
                                             style: TextStyle(
                                               color: Colors.black,
-                                              fontSize:
-                                                  descriptionPanelWidth * 0.12,
+                                              fontSize: descriptionPanelWidth * 0.12,
                                               fontFamily: pixelFont,
-                                              height:
-                                                  descriptionPanelWidth * 0.005,
+                                              height: descriptionPanelWidth * 0.005,
                                             ),
                                             textAlign: TextAlign.left,
                                           ),
@@ -246,7 +215,6 @@ class RightOnlyClipper extends CustomClipper<Rect> {
 
   @override
   bool shouldReclip(covariant RightOnlyClipper oldClipper) {
-    return oldClipper.cardWidth != cardWidth ||
-        oldClipper.panelWidth != panelWidth;
+    return oldClipper.cardWidth != cardWidth || oldClipper.panelWidth != panelWidth;
   }
 }

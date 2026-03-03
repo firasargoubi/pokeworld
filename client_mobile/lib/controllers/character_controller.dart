@@ -1,8 +1,8 @@
 import 'package:client_mobile/consts/player_data_const.dart';
 import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/models/player_data.dart';
-import 'package:client_mobile/services/lobby_service.dart';
-import 'package:client_mobile/services/match_service.dart';
+import 'package:client_mobile/services/lobby_service/lobby_service.dart';
+import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/user_service.dart';
 
 class CharacterController {
