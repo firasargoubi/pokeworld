@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:client_mobile/controllers/character_controller.dart';
 import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/models/match_data.dart';
-import 'package:client_mobile/services/match_service.dart';
+import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/widgets/header.dart';
 import 'package:client_mobile/widgets/stripe_painter.dart';
 import 'package:flutter/foundation.dart';

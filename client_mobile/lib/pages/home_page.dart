@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:client_mobile/consts/menu_card_data.dart';
 import 'package:client_mobile/consts/ui.dart';
 import 'package:client_mobile/models/menu_config.dart';
+import 'package:client_mobile/pages/join_page.dart';
 import 'package:client_mobile/services/chat_service.dart';
 import 'package:client_mobile/services/user_service.dart';
 import 'package:client_mobile/widgets/chat.dart';
@@ -14,7 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import './create_page.dart';
-import './join_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -299,7 +299,7 @@ class _HomePageState extends State<HomePage> {
         alignment: Alignment.bottomLeft,
         width: baseSize * 0.8,
         height: baseSize * 0.6,
-        child: GridLayoutWidget(baseSize: baseSize * 0.15),
+        child: Chat(baseSize: baseSize * 0.15),
       ),
     );
   }

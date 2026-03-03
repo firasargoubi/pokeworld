@@ -1,4 +1,5 @@
 import 'package:client_mobile/consts/game_data_const.dart';
+import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 
 const int defaultSelfIndex = -1;
@@ -34,3 +35,5 @@ MatchData buildDefaultMatchData() {
     logData: [],
   );
 }
+
+const Map<MapSize, int> MAP_SIZE_PLAYER_COUNT = {MapSize.small: 2, MapSize.medium: 4, MapSize.large: 6};

@@ -9,7 +9,7 @@ import '../services/chat_service.dart';
 import '../services/user_service.dart';
 import '../utils/time_utils.dart';
 
-class GridLayoutWidget extends StatefulWidget {
+class Chat extends StatefulWidget {
   final double baseSize;
 
   final double compactWidth;
@@ -18,20 +18,20 @@ class GridLayoutWidget extends StatefulWidget {
   final Duration animDuration;
   final Curve animCurve;
 
-  const GridLayoutWidget({
+  const Chat({
     super.key,
     required this.baseSize,
-    this.compactWidth = 0,
-    this.compactHeight = 0,
+    this.compactWidth = 0.2,
+    this.compactHeight = 0.2,
     this.animDuration = const Duration(milliseconds: 220),
     this.animCurve = Curves.easeInOut,
   });
 
   @override
-  State<GridLayoutWidget> createState() => _GridLayoutWidgetState();
+  State<Chat> createState() => _ChatState();
 }
 
-class _GridLayoutWidgetState extends State<GridLayoutWidget> {
+class _ChatState extends State<Chat> {
   bool _isCompact = true;
 
   final TextEditingController _messageController = TextEditingController();
@@ -373,8 +373,10 @@ class _GridLayoutWidgetState extends State<GridLayoutWidget> {
           constraints.maxHeight - 2 * cornerSize,
         );
 
-        final compactInnerW = widget.compactWidth.clamp(0.0, normalInnerW);
-        final compactMiddleH = widget.compactHeight.clamp(0.0, normalMiddleH);
+        final compactInnerW =
+            widget.compactWidth.clamp(0.0, normalInnerW) * baseSize;
+        final compactMiddleH =
+            widget.compactHeight.clamp(0.0, normalMiddleH) * baseSize;
 
         return TweenAnimationBuilder<double>(
           duration: widget.animDuration,

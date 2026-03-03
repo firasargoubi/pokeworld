@@ -15,9 +15,13 @@ enum UserEvent {
 enum MatchEvent {
   createMatch('createMatch'),
   joinMatch('joinMatch'),
-  message('message'),
   leaveMatch('leaveMatch'),
-  update('update');
+
+  update('update'),
+  message('message'),
+  popup('popup'),
+  removedFromMatch('removedFromMatch'),
+  disconnect('disconnect');
 
   const MatchEvent(this.value);
   final String value;
@@ -25,7 +29,11 @@ enum MatchEvent {
 
 enum LobbyEvent {
   changeAvatar('changeAvatar'),
-  joinLobby('joinLobby');
+  joinLobby('joinLobby'),
+  changeLockStatus('changeLockStatus'),
+  startMatch('startMatch'),
+  addBot('addBot'),
+  kickPlayer('kickPlayer');
 
   const LobbyEvent(this.value);
   final String value;
