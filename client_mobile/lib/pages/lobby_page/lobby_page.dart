@@ -3,12 +3,15 @@ import 'dart:math';
 
 import 'package:client_mobile/consts/match_data_const.dart';
 import 'package:client_mobile/consts/player_data_const.dart';
+import 'package:client_mobile/consts/popup_message_const.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
+import 'package:client_mobile/models/popup_message.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/widgets/add_bot_popup/add_bot_popup.dart';
+import 'package:client_mobile/services/popup_service.dart';
 import 'package:client_mobile/widgets/chat.dart';
 import 'package:client_mobile/widgets/header.dart';
 import 'package:client_mobile/widgets/player_card/player_card.dart';
@@ -28,6 +31,7 @@ class LobbyPage extends StatefulWidget {
 }
 
 class _LobbyPageState extends State<LobbyPage> {
+  final PopupService _popupService = PopupService();
   String code = MatchService().matchData?.code ?? 'ABCD1234';
   bool isAdmin = MatchService().isPlayerHost(MatchService().selfId);
   bool isLocked = MatchService().matchData?.lobbyData.isLocked ?? false;
@@ -141,7 +145,19 @@ class _LobbyPageState extends State<LobbyPage> {
           SizedBox(
             height: b * 0.1,
             width: double.infinity,
-            child: AppHeader(index: 1, text: HEADER_TEXT, onTap: _leaveLobby),
+            child: AppHeader(
+              index: 1, 
+              text: HEADER_TEXT, 
+              onTap: () {
+                _popupService.showPopup(
+                  PopupMessage(
+                    message: PopupMessageConst.quit.message,
+                    isConfirmation: true,
+                    action: _leaveLobby,
+                  ),
+                );
+              }
+            ),
           ),
           Expanded(
             child: RepaintBoundary(

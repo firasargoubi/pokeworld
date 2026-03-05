@@ -1,5 +1,8 @@
 import 'package:client_mobile/consts/auth_errors.dart';
 import 'package:client_mobile/consts/error_messages.dart';
+import 'package:client_mobile/consts/popup_message_const.dart';
+import 'package:client_mobile/models/popup_message.dart';
+import 'package:client_mobile/services/popup_service.dart';
 import 'package:client_mobile/services/user_service.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +10,7 @@ import '../consts/chat_const.dart';
 
 class LoginController {
   final UserService _userService = UserService();
+  final PopupService _popupService = PopupService();
 
   bool isRegister = false;
   bool isLoading = false;
@@ -52,8 +56,14 @@ class LoginController {
     try {
       if (isRegister) {
         await _userService.register(rawUsername, rawEmail, rawPassword);
+        _popupService.showPopup(
+          PopupMessage(message: PopupMessageConst.successfulAccountCreation.message, hasCloseButton: true, isConfirmation: false),
+        );
       } else {
         await _userService.login(rawUsername, rawPassword);
+        _popupService.showPopup(
+          PopupMessage(message: PopupMessageConst.successfulConnection.message, hasCloseButton: true, isConfirmation: false),
+        );
       }
       onSuccess();
     } catch (e) {

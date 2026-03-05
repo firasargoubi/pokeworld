@@ -1,13 +1,15 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:client_mobile/consts/popup_message_const.dart';
 import 'package:client_mobile/controllers/character_controller.dart';
 import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/models/match_data.dart';
+import 'package:client_mobile/models/popup_message.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
+import 'package:client_mobile/services/popup_service.dart';
 import 'package:client_mobile/widgets/header.dart';
 import 'package:client_mobile/widgets/stripe_painter.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'character_page_const.dart';
@@ -24,6 +26,7 @@ class _CharacterPageState extends State<CharacterPage> {
   Avatar? selectedAvatar;
   List<Avatar> lockedAvatars = [];
   final MatchService _matchService = MatchService();
+  final PopupService _popupService = PopupService();
   final CharacterController _controller = CharacterController();
   StreamSubscription<MatchData>? _matchUpdateSubscription;
 
@@ -86,10 +89,13 @@ class _CharacterPageState extends State<CharacterPage> {
       isAttD6Active: isAttD6Active,
       selectedAvatar: selectedAvatar,
       onWarnings: (warnings) {
-        if (kDebugMode) {
-          print('Warnings: ${warnings.join(", ")}');
-        }
-        // TODO: Show popup with warnings
+        _popupService.showPopup(
+          PopupMessage(
+            message: warnings.join('\n'),
+            hasCloseButton: true,
+            isConfirmation: false,
+          ),
+        );
       },
     );
   }
@@ -139,7 +145,13 @@ class _CharacterPageState extends State<CharacterPage> {
               index: 1,
               text: HEADER_TEXT,
               onTap: () {
-                MatchService().leaveMatch();
+                _popupService.showPopup(
+                  PopupMessage(
+                    message: PopupMessageConst.quit.message,
+                    isConfirmation: true,
+                    action: () => MatchService().leaveMatch(),
+                  ),
+                );
               },
             ),
           ),

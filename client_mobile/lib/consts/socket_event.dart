@@ -16,7 +16,6 @@ enum MatchEvent {
   createMatch('createMatch'),
   joinMatch('joinMatch'),
   leaveMatch('leaveMatch'),
-
   update('update'),
   message('message'),
   popup('popup'),

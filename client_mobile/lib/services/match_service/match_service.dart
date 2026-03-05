@@ -1,18 +1,23 @@
 import 'dart:async';
 
+import 'package:client_mobile/pages/join_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../consts/match_data_const.dart';
 import '../../consts/player_data_const.dart';
+import '../../consts/popup_message_const.dart';
+import '../../consts/message_enum.dart';
 import '../../consts/socket_event.dart';
 import '../../models/game_data.dart';
 import '../../models/match_data.dart';
 import '../../models/message_from_server.dart';
 import '../../models/player_data.dart';
+import '../../models/popup_message.dart';
 import '../../pages/character_page/character_page.dart';
 import '../../pages/home_page.dart';
 import '../navigation_service.dart';
+import '../popup_service.dart';
 import '../socket_service.dart';
 
 class MatchService {
@@ -24,6 +29,7 @@ class MatchService {
   }
 
   late final SocketService _socketService;
+  final PopupService _popupService = PopupService();
   bool _listenersInitialized = false;
   MatchData? _matchData = buildDefaultMatchData();
   PlayerData? _selfPlayer = defaultPlayerData;
@@ -61,10 +67,8 @@ class MatchService {
         message: (payload as Map)['message'] as String,
         hasCloseButton: ((payload)['hasCloseButton'] as bool?) ?? false,
       );
-      if (kDebugMode) {
-        print('Match message: ${message.message}');
-        print('Has close button: ${message.hasCloseButton}');
-      }
+
+      onMessage(message);
     });
 
     _socketService.socket.on(MatchEvent.update.value, (payload) {
@@ -73,17 +77,12 @@ class MatchService {
     });
 
     _socketService.socket.on(MatchEvent.disconnect.value, (payload) {
-      if (kDebugMode) {
-        print('Disconnected from match');
-      }
       onDisconnect();
     });
 
     _socketService.socket.on(MatchEvent.removedFromMatch.value, (payload) {
-      if (kDebugMode) {
-        print('Removed from match');
-      }
-      onRemovedFromMatch();
+      final reason = payload as String;
+      onRemovedFromMatch(reason);
     });
   }
 
@@ -106,6 +105,48 @@ class MatchService {
     NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const CharacterPage()));
   }
 
+  void onDisconnect() {
+    if (isInMatch()) {
+      _popupService.keepMessages();
+      _popupService.showPopup(
+        PopupMessage(message: PopupMessageConst.connectionError.message, hasCloseButton: true, isConfirmation: false),
+      );
+      resetMatchData();
+      NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const HomePage()));
+    }
+  }
+
+  void onMessage(MessageFromServer message) {
+    _popupService.showPopup(
+      PopupMessage(
+        message: message.message,
+        hasCloseButton: message.hasCloseButton,
+        isConfirmation: false,
+        popupColor: warningMessages.contains(message.message) ? PopupColor.orange : PopupColor.blue,
+      ),
+    );
+  }
+
+  void onRemovedFromMatch(String reason) {
+    if(isInMatch()){
+      _popupService.keepMessages();
+      if(reason == Message.lockedFromLobby.message){
+        NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const JoinPage()));
+        _popupService.showPopup(
+          PopupMessage(message: reason, hasCloseButton: true, isConfirmation: true, action: () {
+            NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const HomePage()));
+          }),
+        );
+      } else {
+        NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const HomePage()));
+        _popupService.showPopup(
+          PopupMessage(message: reason, hasCloseButton: false, isConfirmation: false),
+        );
+      }
+      resetMatchData();
+    }
+  }
+
   void onUpdate(MatchData matchData) {
     _matchData = matchData;
     final id = selfId;
@@ -126,18 +167,6 @@ class MatchService {
       print('MatchData: $matchData');
     }
     _matchUpdateController.add(matchData);
-  }
-
-  void onDisconnect() {
-    if (isInMatch()) {
-      resetMatchData();
-      NavigationService.navigatorKey.currentState?.pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const HomePage()), (route) => false);
-    }
-  }
-
-  void onRemovedFromMatch() {
-    resetMatchData();
-    NavigationService.navigatorKey.currentState?.pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const HomePage()), (route) => false);
   }
 
   void leaveMatch() {
