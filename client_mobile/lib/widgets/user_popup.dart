@@ -1,5 +1,8 @@
+import 'package:client_mobile/consts/popup_message_const.dart';
+import 'package:client_mobile/models/popup_message.dart';
 import 'package:client_mobile/models/user_info.dart';
 import 'package:client_mobile/services/chat_service.dart';
+import 'package:client_mobile/services/popup_service.dart';
 import 'package:client_mobile/services/user_service.dart';
 import 'package:client_mobile/widgets/login_popup.dart';
 import 'package:flutter/material.dart';
@@ -18,11 +21,7 @@ class UserPopup extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return PopScope(
-          canPop: false,
-          onPopInvokedWithResult: (didPop, result) {},
-          child: const LoginPopup(),
-        );
+        return PopScope(canPop: false, onPopInvokedWithResult: (didPop, result) {}, child: const LoginPopup());
       },
     );
   }
@@ -41,11 +40,7 @@ class UserPopup extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: 4),
-                Text(
-                  username,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16),
-                ),
+                Text(username, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16)),
               ],
             ),
           );
@@ -53,8 +48,17 @@ class UserPopup extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () async {
-            await _handleLogout(context);
+          onPressed: () {
+            PopupService().showPopup(
+              PopupMessage(
+                message: PopupMessageConst.logoutConfirmation.message,
+                hasCloseButton: true,
+                isConfirmation: true,
+                action: () {
+                  _handleLogout(context);
+                },
+              ),
+            );
           },
           child: const Text('Déconnexion'),
         ),
