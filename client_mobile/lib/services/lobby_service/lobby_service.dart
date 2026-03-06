@@ -3,8 +3,10 @@ import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/pages/lobby_page/lobby_page.dart';
+import 'package:client_mobile/pages/play_page/play_page.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/navigation_service.dart';
+import 'package:client_mobile/services/play_service/play_service.dart';
 import 'package:client_mobile/services/socket_service.dart';
 import 'package:flutter/material.dart';
 
@@ -75,6 +77,14 @@ class LobbyService {
       if (nav == null) return;
 
       final route = MaterialPageRoute(builder: (_) => const LobbyPage());
+      nav.pushAndRemoveUntil(route, (r) => false);
+    }
+    if (oldMatchData.state == MatchState.lobby && newMatchData.state == MatchState.turnStart) {
+      final nav = NavigationService.navigatorKey.currentState;
+      if (nav == null) return;
+
+      PlayService().onMatchUpdate(oldMatchData, newMatchData);
+      final route = MaterialPageRoute(builder: (_) => const PlayPage());
       nav.pushAndRemoveUntil(route, (r) => false);
     }
   }

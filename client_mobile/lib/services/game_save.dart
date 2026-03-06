@@ -16,9 +16,7 @@ class GameSaveService {
       throw Exception(errorMissingServerUrl);
     }
 
-    final uri = Uri.parse(
-      '$baseUrl${GAME_SAVE_ENDPOINT[GameSaveEndpointKey.getAllGames]}',
-    );
+    final uri = Uri.parse('$baseUrl${GAME_SAVE_ENDPOINT[GameSaveEndpointKey.getAllGames]}');
     final response = await http.get(uri);
 
     if (response.statusCode != 200) {
@@ -30,9 +28,6 @@ class GameSaveService {
       throw Exception(errorInvalidResponseFormat);
     }
 
-    return decoded
-        .whereType<Map>()
-        .map((e) => GameData.fromJson(e.cast<String, dynamic>()))
-        .toList();
+    return decoded.whereType<Map>().map((e) => GameData.fromJson(e.cast<String, dynamic>())).toList();
   }
 }

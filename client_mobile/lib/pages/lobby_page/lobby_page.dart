@@ -259,7 +259,12 @@ class _LobbyPageState extends State<LobbyPage> {
                               bottom: b * 0.015,
                               width: b * 0.32,
                               height: b * 0.13,
-                              child: PokeButton(text: LAUNCH_TEXT, onTap: () {}),
+                              child: PokeButton(
+                                text: LAUNCH_TEXT,
+                                onTap: () {
+                                  LobbyService().startMatch();
+                                },
+                              ),
                             ),
                         ],
                       ),

@@ -1,2 +1,4 @@
 const JOIN_CREATE_PAGE_ASPECT_RATIO = 2000 / 1400;
 const HOME_PAGE_ASPECT_RATIO = 2000 / 1200;
+
+const DEFAULT_IMAGE_ASSET = 'assets/images/default.png';

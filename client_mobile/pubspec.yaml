@@ -75,9 +75,30 @@ flutter:
         - assets/images/menu/icons/settings/
         - assets/images/menu/headers/
         - assets/images/game/avatars/
+        - assets/images/game/avatars/shiny/
+        - assets/images/game/avatars/evolved/
+        - assets/images/game/avatars/evolved-shiny/
+        - assets/images/game/avatars-faces/
+        - assets/images/game/avatars-faces/shiny/
+        - assets/images/game/avatars-faces/evolved/
+        - assets/images/game/avatars-faces/evolved-shiny/
         - assets/images/menu/containers/stats/
         - assets/images/menu/containers/lobby/
         - assets/images/menu/icons/lobby/
+        - assets/images/menu/headers/
+        - assets/images/menu/containers/play/
+        - assets/images/menu/buttons/play/
+        - assets/images/menu/icons/play/
+        - assets/images/game/tiles/bridge/
+        - assets/images/game/tiles/broken-bridge/
+        - assets/images/game/tiles/bush/
+        - assets/images/game/tiles/grass/
+        - assets/images/game/tiles/path/
+        - assets/images/game/tiles/underlay/
+        - assets/images/game/tiles/water/
+        - assets/images/game/tiles/
+        - assets/images/game/items/
+        - assets/images/
 
     # The following line ensures that the Material Icons font is
     # included with your application, so that you can use the icons in
