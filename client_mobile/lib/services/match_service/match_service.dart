@@ -182,10 +182,27 @@ class MatchService {
     return (_selfIndex ?? defaultSelfIndex) >= 0;
   }
 
+  bool isActivePlayer() {
+    return _selfIndex == _matchData?.playData.activePlayerIndex;
+  }
+
   void resetMatchData() {
     _selfIndex = defaultSelfIndex;
     _matchData = buildDefaultMatchData();
     _selfPlayer = defaultPlayerData;
     _matchUpdateController.add(_matchData!);
+  }
+
+  bool isState(MatchState state) {
+    return _matchData?.state == state;
+  }
+
+  PlayerData? playerById(String id) {
+    final players = _matchData?.players;
+    if (players == null) return null;
+    for (final p in players) {
+      if (p.id == id) return p;
+    }
+    return null;
   }
 }

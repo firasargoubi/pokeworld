@@ -10,5 +10,6 @@
     "eslint.workingDirectories": ["./client", "./server"],
     "eslint.probe": ["javascript", "typescript", "html", "vue", "markdown"],
     "eslint.validate": ["javascript", "typescript", "html", "vue", "markdown"],
-    "dart.lineLength": 150
+    "dart.lineLength": 150,
+    "cSpell.words": ["Pressable"]
 }

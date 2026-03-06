@@ -37,3 +37,15 @@ enum LobbyEvent {
   const LobbyEvent(this.value);
   final String value;
 }
+
+enum PlayEvent {
+  EndTurn('endTurn'),
+  Move('move'),
+  Action('action'),
+  DebugMove('debugMove'),
+  ChangeDebugMode('changeDebugMode'),
+  DropItem('dropItem');
+
+  const PlayEvent(this.value);
+  final String value;
+}
