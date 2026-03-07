@@ -8,11 +8,13 @@ import { VisibilityEvent } from '@app/interfaces/visibility-event';
 import { AudioService } from '@app/services/audio/audio.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { of, throwError } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
 import { AdminPageComponent } from './admin-page.component';
 @Component({
     selector: 'app-game-card',
@@ -35,10 +37,13 @@ describe('AdminPageComponent', () => {
     let routerSpy: jasmine.SpyObj<Router>;
     let chatServiceSpy: jasmine.SpyObj<ChatService>;
     let mockAudioService: jasmine.SpyObj<AudioService>;
+    let i18nServiceSpy: jasmine.SpyObj<I18nService>;
 
     beforeEach(async () => {
         gameSaveServiceSpy = jasmine.createSpyObj<GameSaveService>('GameSaveService', ['getAllGames', 'getGame', 'toggleVisibility', 'deleteGame']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
+        i18nServiceSpy = jasmine.createSpyObj('I18nService', ['translate']);
+        i18nServiceSpy.translate.and.callFake((message: string) => message);
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage', 'playBackgroundMusic']);
         chatServiceSpy = jasmine.createSpyObj('ChatService', ['sendMessage', 'sendGeneralMessage']);
         gameSaveServiceSpy.getAllGames.and.returnValue(of([]));
@@ -49,13 +54,14 @@ describe('AdminPageComponent', () => {
         routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
 
         await TestBed.configureTestingModule({
-            imports: [AdminPageComponent],
+            imports: [AdminPageComponent, TranslateModule.forRoot()],
             providers: [
                 { provide: GameSaveService, useValue: gameSaveServiceSpy },
                 { provide: PopupService, useValue: popupServiceSpy },
                 { provide: Router, useValue: routerSpy },
                 { provide: AudioService, useValue: mockAudioService },
                 { provide: ChatService, useValue: chatServiceSpy },
+                { provide: I18nService, useValue: i18nServiceSpy },
             ],
         }).compileComponents();
 

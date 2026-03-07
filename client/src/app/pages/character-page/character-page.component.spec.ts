@@ -1,10 +1,11 @@
-import { HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
+import { PopupMessage } from '@app/consts/popup-message.const';
 import { AudioService } from '@app/services/audio/audio.service';
+import { UserService } from '@app/services/user/user.service';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -12,6 +13,8 @@ import { Avatar } from '@common/interfaces/player-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { CharacterPageComponent } from './character-page.component';
+import { TranslateModule } from '@ngx-translate/core';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-chat',
@@ -28,6 +31,7 @@ describe('CharacterPageComponent', () => {
     let mockLobbyService: jasmine.SpyObj<LobbyService>;
     let mockRouter: jasmine.SpyObj<Router>;
     let mockAudioService: jasmine.SpyObj<AudioService>;
+    let mockUserService: jasmine.SpyObj<UserService>;
 
     beforeEach(async () => {
         mockMatchService = jasmine.createSpyObj('MatchService', ['isInMatch', 'leaveMatch', 'selfPlayer', 'selfIndex', 'matchUpdate'], {
@@ -39,15 +43,19 @@ describe('CharacterPageComponent', () => {
         mockPopupService = jasmine.createSpyObj('PopupService', ['showPopup']);
         mockLobbyService = jasmine.createSpyObj('LobbyService', ['joinLobby', 'changeAvatar']);
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+        mockUserService = jasmine.createSpyObj('UserService', [], {
+            user$: of({ username: 'test-user' }),
+        });
 
         await TestBed.configureTestingModule({
-            imports: [ReactiveFormsModule, HttpClientModule, CharacterPageComponent],
+            imports: [ReactiveFormsModule, CharacterPageComponent, TranslateModule.forRoot()],
             providers: [
                 { provide: MatchService, useValue: mockMatchService },
                 { provide: PopupService, useValue: mockPopupService },
                 { provide: LobbyService, useValue: mockLobbyService },
                 { provide: Router, useValue: mockRouter },
                 { provide: AudioService, useValue: mockAudioService },
+                { provide: UserService, useValue: mockUserService },
             ],
         }).compileComponents();
 
@@ -101,7 +109,7 @@ describe('CharacterPageComponent', () => {
         mockPopupService.showPopup.and.callFake((popupMessage) => {
             const capturedPopupMessage = popupMessage;
 
-            expect(capturedPopupMessage.message).toBe('Voulez-vous vraiment quitter ?');
+            expect(capturedPopupMessage.message).toBe(PopupMessage.Quit);
             expect(capturedPopupMessage.hasCloseButton).toBeTrue();
             expect(capturedPopupMessage.isConfirmation).toBeTrue();
             expect(capturedPopupMessage.action).toBeDefined();

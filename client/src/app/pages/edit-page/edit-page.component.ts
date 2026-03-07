@@ -16,19 +16,20 @@ import { EditorService } from '@app/services/editor/editor.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
-import { ITEM_DESCRIPTION } from '@common/consts/item-data.const';
+import { ITEM_DESCRIPTION } from '@app/consts/item-data.const';
 import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-edit-page',
     templateUrl: './edit-page.component.html',
     styleUrls: ['./edit-page.component.scss'],
-    imports: [HeaderComponent, MapComponent, FormsModule, ItemComponent, ChatComponent],
+    imports: [HeaderComponent, MapComponent, FormsModule, ItemComponent, ChatComponent, TranslateModule],
 })
 export class EditPageComponent {
     gameDataService: GameDataService = inject(GameDataService);

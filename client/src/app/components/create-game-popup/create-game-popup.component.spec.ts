@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AudioService } from '@app/services/audio/audio.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameMode, MapSize } from '@common/interfaces/map-data';
+import { TranslateModule } from '@ngx-translate/core';
 import { CreateGamePopupComponent } from './create-game-popup.component';
 
 describe('CreateGamePopupComponent', () => {
@@ -16,7 +17,7 @@ describe('CreateGamePopupComponent', () => {
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage']);
 
         await TestBed.configureTestingModule({
-            imports: [CreateGamePopupComponent],
+            imports: [CreateGamePopupComponent, TranslateModule.forRoot()],
             providers: [
                 { provide: Router, useValue: routerSpy },
                 { provide: AudioService, useValue: mockAudioService },

@@ -23,12 +23,13 @@ import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchState } from '@common/interfaces/match-data';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-play-page',
     templateUrl: './play-page.component.html',
     styleUrls: ['./play-page.component.scss'],
-    imports: [MapComponent, CommonModule, ChatComponent, ItemComponent, ItemDropPopupComponent, PlayerInfoPopupComponent],
+    imports: [MapComponent, CommonModule, ChatComponent, ItemComponent, ItemDropPopupComponent, PlayerInfoPopupComponent, TranslateModule],
 })
 export class PlayPageComponent {
     showPlayerInfoPopup: boolean = false;
@@ -122,8 +123,8 @@ export class PlayPageComponent {
         const lastLog = this.matchService.data.logData[this.matchService.data.logData.length - 1];
 
         if (
-            lastLog?.content.includes(this.matchService.selfPlayer.name) &&
-            lastLog.content.includes('ramassé') &&
+            lastLog?.messageParams?.playerName === this.matchService.selfPlayer.name &&
+            lastLog.content.includes('itemPickup') &&
             this.lastLogSize !== this.matchService.data.logData.length
         ) {
             this.lastLogSize = this.matchService.data.logData.length;

@@ -1,11 +1,13 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { ITEM_IMAGES } from '@app/consts/images.const';
-import { ITEM_DESCRIPTION } from '@common/consts/item-data.const';
+import { ITEM_DESCRIPTION } from '@app/consts/item-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-item',
     standalone: true,
+    imports: [TranslateModule],
     templateUrl: './item.component.html',
     styleUrls: ['./item.component.scss'],
 })

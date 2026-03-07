@@ -4,13 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { PopupService } from '@app/services/popup/popup.service';
 import { UserService } from '@app/services/user/user.service';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { UserInfo } from '@common/interfaces/user';
+import { TranslateModule } from '@ngx-translate/core';
+
 @Component({
     selector: 'app-user-popup',
     templateUrl: './user-popup.component.html',
     styleUrls: ['./user-popup.component.scss'],
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslateModule],
 })
 export class UserPopupComponent {
     @Input() avatarImage: string = './assets/images/menu/pokemons/chibi/pikachu.png';
@@ -21,6 +24,7 @@ export class UserPopupComponent {
     newPassword: string = '';
     passwordError: string = '';
     private popupService: PopupService = inject(PopupService);
+    private readonly preferencesService: PreferencesService = inject(PreferencesService);
 
     constructor() {
         this.userService.user$.subscribe((user: UserInfo | null) => (this.currentUser = user));
@@ -37,7 +41,7 @@ export class UserPopupComponent {
 
     deleteAccount(): void {
         this.popupService.showPopup({
-            message: 'Voulez-vous vraiment supprimer votre compte ?',
+            message: PopupMessage.DeleteAccountConfirmation,
             hasCloseButton: true,
             isConfirmation: true,
             action: () => this.confirmDelete(),
@@ -53,7 +57,7 @@ export class UserPopupComponent {
     editPassword(): void {
         this.passwordError = '';
         if (!this.currentUser || !this.oldPassword.trim() || !this.newPassword.trim()) {
-            this.passwordError = 'Les deux champs sont requis';
+            this.passwordError = 'components.userPopup.passwordFieldsRequired';
             return;
         }
         this.userService.edit(this.currentUser.userId, this.oldPassword.trim(), this.newPassword.trim()).subscribe({
@@ -69,14 +73,17 @@ export class UserPopupComponent {
                 });
             },
             error: (err) => {
-                this.passwordError = err?.error?.message || 'Erreur lors du changement de mot de passe';
+                this.passwordError = err?.error?.message || 'components.userPopup.passwordChangeError';
             },
         });
     }
 
     private confirmLogout(): void {
         this.userService.logout().subscribe({
-            next: () => this.userService.setUser(null),
+            next: () => {
+                this.preferencesService.resetPreferences();
+                this.userService.setUser(null);
+            },
         });
     }
 

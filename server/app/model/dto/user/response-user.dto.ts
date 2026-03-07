@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { UserPreferences } from '@common/interfaces/preferences';
 
 export class UserResponseDto {
     @ApiProperty()
@@ -18,4 +19,7 @@ export class UserResponseDto {
 
     @ApiProperty()
     isLoggedIn: boolean;
+
+    @ApiProperty()
+    preferences: UserPreferences;
 }

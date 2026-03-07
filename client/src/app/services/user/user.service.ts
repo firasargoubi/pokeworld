@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { SocketService } from '@app/services/socket/socket.service';
 import { ApiEndpoint } from '@common/interfaces/endpoint.enum';
+import { UserPreferences } from '@common/interfaces/preferences';
 import { UserEvent } from '@common/interfaces/socket-event.enum';
 import { UserInfo } from '@common/interfaces/user';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -26,8 +27,12 @@ export class UserService {
         return this.http.post<UserInfo>(`${this.baseUrl}/${ApiEndpoint.User}/login`, { username, password });
     }
 
-    createAccount(username: string, password: string, profilePicture: string, email: string): Observable<UserInfo> {
-        return this.http.post<UserInfo>(`${this.baseUrl}/${ApiEndpoint.User}/register`, { username, password, profilePicture, email });
+    createAccount(username: string, password: string, profilePicture: string, email: string, preferences?: UserPreferences): Observable<UserInfo> {
+        return this.http.post<UserInfo>(`${this.baseUrl}/${ApiEndpoint.User}/register`, { username, password, profilePicture, email, preferences });
+    }
+
+    updatePreferences(userId: string, preferences: Partial<UserPreferences>): Observable<UserPreferences> {
+        return this.http.patch<UserPreferences>(`${this.baseUrl}/${ApiEndpoint.User}/${userId}/preferences`, preferences);
     }
 
     logout(): Observable<void> {

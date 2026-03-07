@@ -109,7 +109,7 @@ describe('StatService', () => {
         service.playerStats = structuredClone(MOCK_PLAYER_STAT_DATA);
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         let playerVictories = [5, 9, 1];
-        service.playerStats.forEach((player, i) => (player.VICTOIRES = playerVictories[i]));
+        service.playerStats.forEach((player, i) => (player.victories = playerVictories[i]));
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         playerVictories = [9, 5, 1];
         service.sortPlayerStatsBy(PlayerStatType.Victories, Order.Ascending);

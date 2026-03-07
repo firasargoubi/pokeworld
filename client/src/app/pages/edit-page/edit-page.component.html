@@ -9,13 +9,13 @@
     (mousemove)="onMouseMove($event)"
     (mouseover)="onMouseOver($event)"
 >
-    <app-header [onClick]="backButton.bind(this)" [stepNumber]="'3'" [title]="'Modifier un jeu'"></app-header>
+    <app-header [onClick]="backButton.bind(this)" [stepNumber]="'3'" [title]="'pages.edit.title'"></app-header>
 
     <main>
         <div class="editor-left">
-            <div class="left-label">Nom</div>
+            <div class="left-label">{{ 'pages.edit.name' | translate }}</div>
             <input class="input-name" type="text" autocomplete="false" maxlength="20" [(ngModel)]="gameDataService.gameData.name" (click)="this.audioService.playEffect(this.clickValue)" />
-            <div class="left-label-small">Description</div>
+            <div class="left-label-small">{{ 'pages.edit.description' | translate }}</div>
             <textarea
                 class="input-description"
                 autocomplete="false"
@@ -24,10 +24,10 @@
                 [(ngModel)]="gameDataService.gameData.description"
                 (click)="this.audioService.playEffect(this.clickValue)"
             ></textarea>
-            <div class="left-label-medium">Taille : {{ gameDataService.getMapSizeString() }}</div>
-            <div class="left-label-medium">Mode : {{ gameDataService.getGameModeString() }}</div>
-            <button (click)="saveButton()" class="save-button">Sauvegarder</button>
-            <button (click)="resetButton()" class="reset-button">Réinitialiser</button>
+            <div class="left-label-medium">{{ 'pages.edit.size' | translate }} : {{ gameDataService.getMapSizeString() }}</div>
+            <div class="left-label-medium">{{ 'pages.edit.mode' | translate }} : {{ gameDataService.getGameModeString() }}</div>
+            <button (click)="saveButton()" class="save-button">{{ 'pages.edit.save' | translate }}</button>
+            <button (click)="resetButton()" class="reset-button">{{ 'pages.edit.reset' | translate }}</button>
         </div>
         <div class="editor-center">
             <app-map [isEditor]="true"></app-map>
@@ -40,7 +40,7 @@
                         <div class="tool">
                             <div class="tool-image" [style.backgroundImage]="'url(' + tileData.image + ')'"></div>
                         </div>
-                        <div class="tool-description" [innerHTML]="tileData.description"></div>
+                        <div class="tool-description" [innerHTML]="tileData.description | translate"></div>
                     </div>
                     }
                 </div>

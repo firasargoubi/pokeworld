@@ -11,12 +11,13 @@ import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-create-page',
     templateUrl: './create-page.component.html',
     styleUrls: ['./create-page.component.scss'],
-    imports: [GameCardComponent, HeaderComponent, ChatComponent],
+    imports: [GameCardComponent, HeaderComponent, ChatComponent, TranslateModule],
 })
 export class CreatePageComponent implements OnInit {
     games: GameData[] = [];

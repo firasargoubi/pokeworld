@@ -7,6 +7,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 import { UserService } from './user.service';
+import { AppLanguage, AppTheme, DEFAULT_PREFERENCES } from '@common/interfaces/preferences';
 
 describe('UserService', () => {
     let service: UserService;
@@ -167,6 +168,7 @@ describe('UserService', () => {
             expect(result.username).toBe('newUser');
             expect(result.userId).toBeDefined();
             expect(result.isLoggedIn).toBe(true);
+            expect(result.preferences).toEqual(DEFAULT_PREFERENCES);
             expect(result).not.toHaveProperty('passwordHash');
         });
 
@@ -224,6 +226,7 @@ describe('UserService', () => {
             expect(result).toBeDefined();
             expect(result.username).toBe('testUser');
             expect(result.isLoggedIn).toBe(true);
+            expect(result.preferences).toBeDefined();
             expect(service.getSocketId(result.userId)).toBe('socket123');
         });
 
@@ -346,6 +349,36 @@ describe('UserService', () => {
 
             const userCount = await userModel.countDocuments({ userId: user.userId }).exec();
             expect(userCount).toBe(1);
+        });
+    });
+
+    describe('updatePreferences', () => {
+        it('should update language and preserve existing theme', async () => {
+            const user = await service.createUser({
+                username: 'prefUser',
+                password: 'password123',
+                email: 'pref@user.com',
+                profilePicture: '',
+                preferences: {
+                    theme: AppTheme.Dark,
+                    language: AppLanguage.French,
+                },
+            });
+
+            const updated = await service.updatePreferences(user.userId, { language: AppLanguage.English });
+
+            expect(updated).toEqual({
+                theme: AppTheme.Dark,
+                language: AppLanguage.English,
+            });
+
+            const userInDb = await userModel.findOne({ userId: user.userId }).exec();
+            expect(userInDb.preferences.theme).toBe(AppTheme.Dark);
+            expect(userInDb.preferences.language).toBe(AppLanguage.English);
+        });
+
+        it('should throw NotFoundException when user does not exist', async () => {
+            await expect(service.updatePreferences('missing-user', { theme: AppTheme.Dark })).rejects.toThrow(NotFoundException);
         });
     });
 });

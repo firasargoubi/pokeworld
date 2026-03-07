@@ -3,6 +3,7 @@ import { NavigationStart, Router } from '@angular/router';
 import { Popup, PopupColor } from '@app/interfaces/popup';
 import { ChatService } from '@app/services/chat/chat.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { SocketService } from '@app/services/socket/socket.service';
@@ -26,6 +27,7 @@ describe('MatchService', () => {
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let routerSpy: jasmine.SpyObj<Router>;
     let chatServiceSpy: jasmine.SpyObj<ChatService>;
+    let i18nServiceSpy: jasmine.SpyObj<I18nService>;
 
     beforeEach(() => {
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['emit', 'on'], { selfId: 'selfId' });
@@ -35,6 +37,8 @@ describe('MatchService', () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate'], { events: { subscribe: () => ({}) } });
         chatServiceSpy = jasmine.createSpyObj('ChatService', ['sendMessage', 'sendGeneralMessage', 'isChatActive', 'isFilterEnabled', 'switchTab']);
         chatServiceSpy.isFilterEnabled = jasmine.createSpyObj('signal', ['get', 'set']);
+        i18nServiceSpy = jasmine.createSpyObj('I18nService', ['translate']);
+        i18nServiceSpy.translate.and.callFake((message: string) => message);
 
         TestBed.configureTestingModule({
             providers: [
@@ -45,6 +49,7 @@ describe('MatchService', () => {
                 { provide: PopupService, useValue: popupServiceSpy },
                 { provide: Router, useValue: routerSpy },
                 { provide: ChatService, useValue: chatServiceSpy },
+                { provide: I18nService, useValue: i18nServiceSpy },
             ],
         });
 

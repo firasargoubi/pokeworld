@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EMPTY_IMAGE } from '@app/consts/images.const';
+import { TranslateModule } from '@ngx-translate/core';
 import { PlayerCardComponent } from './player-card.component';
 
 describe('PlayerCardComponent', () => {
@@ -8,7 +9,7 @@ describe('PlayerCardComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [PlayerCardComponent],
+            imports: [PlayerCardComponent, TranslateModule.forRoot()],
         }).compileComponents();
 
         fixture = TestBed.createComponent(PlayerCardComponent);

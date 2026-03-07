@@ -2,6 +2,7 @@ import { MatchService } from '@app/services/match/match.service';
 import { UserService } from '@app/services/user/user.service';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData } from '@common/interfaces/match-data';
+import { MessageFromServer } from '@common/interfaces/message-from-server';
 import { UserInfo } from '@common/interfaces/user';
 import { MatchEvent, UserEvent } from '@common/interfaces/socket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -65,12 +66,15 @@ export class MatchGateway {
         this.server.to(matchCode).emit(MatchEvent.Update, matchData);
     }
 
-    emitMessage(matchCode: string, message: string, hasCloseButton: boolean = false) {
+    emitMessage(matchCode: string, message: string, hasCloseButton: boolean = false, messageParams?: Record<string, string | number | boolean>) {
         const socket = this.server.sockets.sockets.get(matchCode);
-        const messageFromServer = {
+        const messageFromServer: MessageFromServer = {
             message,
             hasCloseButton,
         };
+        if (messageParams) {
+            messageFromServer.messageParams = messageParams;
+        }
         if (socket) {
             socket.emit(MatchEvent.Message, messageFromServer);
         } else {

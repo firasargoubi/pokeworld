@@ -11,6 +11,7 @@ import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { COMBAT_PAGE_EFFECTS } from '@app/services/audio/audio.const';
 import { AudioService } from '@app/services/audio/audio.service';
 import { CombatService } from '@app/services/combat/combat.service';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -18,12 +19,13 @@ import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatAction, MatchData, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-combat-page',
     templateUrl: './combat-page.component.html',
     styleUrls: ['./combat-page.component.scss'],
-    imports: [CommonModule, ChatComponent],
+    imports: [CommonModule, ChatComponent, TranslateModule],
 })
 export class CombatPageComponent implements OnDestroy {
     visualData: CombatVisualData = structuredClone(DEFAULT_COMBAT_VISUAL_DATA);
@@ -36,6 +38,7 @@ export class CombatPageComponent implements OnDestroy {
     private playService: PlayService = inject(PlayService);
     private router: Router = inject(Router);
     private popupService: PopupService = inject(PopupService);
+    private i18nService: I18nService = inject(I18nService);
 
     constructor() {
         if (this.matchService.isInMatch()) {
@@ -107,7 +110,7 @@ export class CombatPageComponent implements OnDestroy {
         if (winnerName) {
             this.popupService.keepMessages();
             this.popupService.showPopup({
-                message: `${winnerName} a gagné le combat`,
+                message: `${winnerName} ${this.i18nService.translate('pages.combat.winnerSuffix')}`,
                 hasCloseButton: false,
                 isConfirmation: false,
                 popupColor: PopupColor.Blue,
@@ -115,7 +118,7 @@ export class CombatPageComponent implements OnDestroy {
         } else {
             this.popupService.keepMessages();
             this.popupService.showPopup({
-                message: 'Aucun gagnant',
+                message: 'popup.noWinner',
                 hasCloseButton: false,
                 isConfirmation: false,
                 popupColor: PopupColor.Blue,

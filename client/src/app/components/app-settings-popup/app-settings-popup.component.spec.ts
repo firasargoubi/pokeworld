@@ -1,12 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
-import { AudioSettingsComponent } from './audio-settings.component';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
+import { AppLanguage, AppTheme } from '@common/interfaces/preferences';
+import { TranslateModule } from '@ngx-translate/core';
+import { AppSettingsPopupComponent } from './app-settings-popup.component';
 
-describe('AudioSettingsComponent', () => {
-    let component: AudioSettingsComponent;
-    let fixture: ComponentFixture<AudioSettingsComponent>;
+describe('AppSettingsPopupComponent', () => {
+    let component: AppSettingsPopupComponent;
+    let fixture: ComponentFixture<AppSettingsPopupComponent>;
     let mockAudioService: jasmine.SpyObj<AudioService>;
+    let mockPreferencesService: jasmine.SpyObj<PreferencesService>;
 
     const defaultMusicVolume = 0.5;
 
@@ -18,16 +22,23 @@ describe('AudioSettingsComponent', () => {
             'getBackgroundMusicVolume',
             'getEffectsVolume',
         ]);
+        mockPreferencesService = jasmine.createSpyObj('PreferencesService', ['setTheme', 'setLanguage'], {
+            currentTheme: AppTheme.Default,
+            currentLanguage: AppLanguage.French,
+        });
 
         mockAudioService.getBackgroundMusicVolume.and.returnValue(defaultMusicVolume);
         mockAudioService.getEffectsVolume.and.returnValue(defaultMusicVolume);
 
         await TestBed.configureTestingModule({
-            imports: [AudioSettingsComponent],
-            providers: [{ provide: AudioService, useValue: mockAudioService }],
+            imports: [AppSettingsPopupComponent, TranslateModule.forRoot()],
+            providers: [
+                { provide: AudioService, useValue: mockAudioService },
+                { provide: PreferencesService, useValue: mockPreferencesService },
+            ],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(AudioSettingsComponent);
+        fixture = TestBed.createComponent(AppSettingsPopupComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -108,5 +119,17 @@ describe('AudioSettingsComponent', () => {
         component.playClickSound();
 
         expect(mockAudioService.playEffect).toHaveBeenCalledWith(SoundEffect.Click);
+    });
+
+    it('should set theme preference', () => {
+        component.selectTheme(AppTheme.Dark);
+
+        expect(mockPreferencesService.setTheme).toHaveBeenCalledWith(AppTheme.Dark);
+    });
+
+    it('should set language preference', () => {
+        component.selectLanguage(AppLanguage.English);
+
+        expect(mockPreferencesService.setLanguage).toHaveBeenCalledWith(AppLanguage.English);
     });
 });

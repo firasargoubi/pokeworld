@@ -7,13 +7,22 @@ import { UserEvent } from '@common/interfaces/socket-event.enum';
 import { UserInfo } from '@common/interfaces/user';
 import { environment } from 'src/environments/environment';
 import { UserService } from './user.service';
+import { AppLanguage, DEFAULT_PREFERENCES } from '@common/interfaces/preferences';
 
 describe('UserService', () => {
     let httpMock: HttpTestingController;
     let service: UserService;
     let baseUrl: string;
     let socketServiceSpy: jasmine.SpyObj<SocketService>;
-    const mockUser: UserInfo = { username: 'testuser', userId: '1234', email: '', profilePicture: 'defaultPic', balance: 100, createdAt: new Date() };
+    const mockUser: UserInfo = {
+        username: 'testuser',
+        userId: '1234',
+        email: '',
+        profilePicture: 'defaultPic',
+        balance: 100,
+        createdAt: new Date(),
+        preferences: DEFAULT_PREFERENCES,
+    };
 
     beforeEach(() => {
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['emit']);
@@ -64,7 +73,7 @@ describe('UserService', () => {
     });
 
     it('should create account', () => {
-        service.createAccount('newuser', 'password', 'profile', 'email').subscribe({
+        service.createAccount('newuser', 'password', 'profile', 'email', DEFAULT_PREFERENCES).subscribe({
             next: (user) => {
                 expect(user).toEqual(mockUser);
             },
@@ -72,8 +81,30 @@ describe('UserService', () => {
         });
         const req = httpMock.expectOne(`${baseUrl}/${ApiEndpoint.User}/register`);
         expect(req.request.method).toBe('POST');
-        expect(req.request.body).toEqual({ username: 'newuser', password: 'password', profilePicture: 'profile', email: 'email' });
+        expect(req.request.body).toEqual({
+            username: 'newuser',
+            password: 'password',
+            profilePicture: 'profile',
+            email: 'email',
+            preferences: DEFAULT_PREFERENCES,
+        });
         req.flush(mockUser);
+    });
+
+    it('should update preferences', () => {
+        const updatedPreferences = { ...DEFAULT_PREFERENCES, language: AppLanguage.English };
+
+        service.updatePreferences(mockUser.userId, { language: updatedPreferences.language }).subscribe({
+            next: (preferences) => {
+                expect(preferences).toEqual(updatedPreferences);
+            },
+            error: fail,
+        });
+
+        const req = httpMock.expectOne(`${baseUrl}/${ApiEndpoint.User}/${mockUser.userId}/preferences`);
+        expect(req.request.method).toBe('PATCH');
+        expect(req.request.body).toEqual({ language: AppLanguage.English });
+        req.flush(updatedPreferences);
     });
 
     it('should logout user', () => {

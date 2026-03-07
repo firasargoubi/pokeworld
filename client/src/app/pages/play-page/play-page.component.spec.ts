@@ -17,6 +17,7 @@ import { TileDescriptionService } from '@app/services/tile-description/tile-desc
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
+import { TranslateModule } from '@ngx-translate/core';
 import { PlayPageComponent } from './play-page.component';
 
 @Component({
@@ -58,7 +59,6 @@ describe('PlayPageComponent', () => {
     let mockRouter: jasmine.SpyObj<Router>;
     let mockTimer: jasmine.SpyObj<Timer>;
     let mockAudioService: jasmine.SpyObj<AudioService>;
-
     beforeEach(() => {
         mockTimer = jasmine.createSpyObj('Timer', ['isStarted']);
         mockTileDescriptionService = jasmine.createSpyObj('TileDescriptionService', ['displayTileDescription', 'hideTileDescription'], {
@@ -83,7 +83,7 @@ describe('PlayPageComponent', () => {
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage']);
 
         TestBed.configureTestingModule({
-            imports: [PlayPageComponent, MapComponent],
+            imports: [PlayPageComponent, MapComponent, TranslateModule.forRoot()],
             providers: [
                 { provide: TileDescriptionService, useValue: mockTileDescriptionService },
                 { provide: MatchService, useValue: mockMatchService },
@@ -209,7 +209,8 @@ describe('PlayPageComponent', () => {
     it('should play item sound when player picks up an item', () => {
         const playerName = 'TestPlayer';
         mockMatchService.selfPlayer.name = playerName;
-        mockMatchService.data.logData = [{ content: `${playerName} a ramassé un objet`, timestamp: new Date(), concernedPlayersNamesList: [] }];
+        mockMatchService.data.logData = [{ content: 'server.logs.itemPickup', timestamp: new Date(), concernedPlayersNamesList: [] }];
+        mockMatchService.data.logData[0].messageParams = { playerName };
         component['lastLogSize'] = 0;
         component['onMatchUpdate']();
         expect(mockAudioService.playEffect).toHaveBeenCalledWith(SoundEffect.Item);

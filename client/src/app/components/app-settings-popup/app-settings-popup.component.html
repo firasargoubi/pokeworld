@@ -1,8 +1,22 @@
 <div class="settings-body">
-    <div class="settings-title">Paramètres Audio</div>
+    <div class="settings-title">{{ 'components.appSettings.title' | translate }}</div>
+    
+    <div class="section-title">{{ 'components.appSettings.language' | translate }}</div>
+        <div class="option-row">
+            <button class="option-button" [class.active]="currentLanguage === appLanguage.French" (click)="selectLanguage(appLanguage.French)">{{ 'components.appSettings.languageFr' | translate }}</button>
+            <button class="option-button" [class.active]="currentLanguage === appLanguage.English" (click)="selectLanguage(appLanguage.English)">{{ 'components.appSettings.languageEn' | translate }}</button>
+    </div>
+    
+    <div class="section-title">{{ 'components.appSettings.theme' | translate }}</div>
+        <div class="option-row">
+            <button class="option-button" [class.active]="currentTheme === appTheme.Default" (click)="selectTheme(appTheme.Default)">{{ 'components.appSettings.themeDefault' | translate }}</button>
+            <button class="option-button" [class.active]="currentTheme === appTheme.Dark" (click)="selectTheme(appTheme.Dark)">{{ 'components.appSettings.themeDark' | translate }}</button>
+    </div>
+    
+    <div class="section-title">{{ 'components.appSettings.audio' | translate }}</div>
     <div class="settings-container">
         <div class="setting-line">
-            <label for="volMusic">Musique</label>
+            <label for="volMusic">{{ 'components.appSettings.music' | translate }}</label>
             <input
                 #music
                 id="volMusic"
@@ -26,7 +40,7 @@
         </div>
 
         <div class="setting-line">
-            <label for="volEffects">Effets</label>
+            <label for="volEffects">{{ 'components.appSettings.effects' | translate }}</label>
             <input
                 #effects
                 id="volEffects"

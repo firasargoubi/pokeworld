@@ -1,6 +1,6 @@
 <div id="stat-page-container">
     <div id="stat-page-header">
-        <app-header [onClick]="this.navigateToMenu.bind(this)" [stepNumber]="'1'" [title]="'FIN DE PARTIE'"></app-header>
+        <app-header [onClick]="this.navigateToMenu.bind(this)" [stepNumber]="'1'" [title]="'pages.stat.title'"></app-header>
     </div>
     <div id="stat-page-body">
         <div class="top-container">
@@ -10,7 +10,7 @@
                     <div class="stats-container">
                         <div class="stat-column player-column">
                             <div class="stat-title">
-                                <div class="title">&nbsp;STATS JOUEURS&nbsp;</div>
+                                <div class="title">&nbsp;{{ 'pages.stat.playersStats' | translate }}&nbsp;</div>
                             </div>
                             <div class="stat-container">
                                 @for(player of playerStatList(); track player.id){
@@ -22,7 +22,7 @@
                         @for(statType of playerStatTypes; track statType){
                         <div class="stat-column">
                             <div class="stat-title" (click)="updateSorting(statType)">
-                                <div class="title">{{ statType }}</div>
+                                <div class="title">{{ statTypeLabels[statType] | translate }}</div>
                                 <div
                                     class="sort-icon"
                                     [class.ascending]="this.sortingStat() === statType && this.sortingOrder() === 'ascending'"
@@ -50,30 +50,30 @@
                     <div class="section-body">
                         <div class="infos-container">
                             <div class="match-stats">
-                                <div class="header"><div class="title">&nbsp;STATS PARTIE :&nbsp;</div></div>
+                                <div class="header"><div class="title">&nbsp;{{ 'pages.stat.matchStats' | translate }}&nbsp;</div></div>
                                 <div class="stat-row">
-                                    <div class="label">DURÉE :</div>
+                                    <div class="label">{{ 'pages.stat.duration' | translate }}</div>
                                     <div class="value">{{ statService.globalStats.gameDuration | date: 'mm:ss' }}</div>
                                 </div>
                                 <div class="stat-row">
-                                    <div class="label">TOURS :</div>
+                                    <div class="label">{{ 'pages.stat.turns' | translate }}</div>
                                     <div class="value">{{ statService.globalStats.rounds }}</div>
                                 </div>
                                 <div class="stat-row">
-                                    <div class="label">TUILES VISITÉES :</div>
+                                    <div class="label">{{ 'pages.stat.visitedTiles' | translate }}</div>
                                     <div class="value">{{ statService.globalStats.visitedTilesRatio }} %</div>
                                 </div>
                                 <div class="stat-row">
-                                    <div class="label">PORTES MANIPULEES :</div>
+                                    <div class="label">{{ 'pages.stat.manipulatedDoors' | translate }}</div>
                                     <div class="value">{{ statService.globalStats.toggledBridgesRatio }} %</div>
                                 </div>
                                 @if(isModeCTF()){
                                 <div class="stat-row">
-                                    <div class="label">PORTEURS DE DRAPEAU :</div>
+                                    <div class="label">{{ 'pages.stat.flagCarriers' | translate }}</div>
                                     <div class="value">{{ statService.globalStats.flagHoldersCount }}</div>
                                 </div>
                                 }
-                                <div id="quit-button" (click)="navigateToMenu()">< QUITTER</div>
+                                <div id="quit-button" (click)="navigateToMenu()">{{ 'pages.stat.quit' | translate }}</div>
                             </div>
                             <div class="winner-container">
                                 <div class="header">

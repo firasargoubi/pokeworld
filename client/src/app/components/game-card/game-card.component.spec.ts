@@ -5,6 +5,7 @@ import { AudioService } from '@app/services/audio/audio.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { MapSize } from '@common/interfaces/map-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
+import { TranslateModule } from '@ngx-translate/core';
 import { GameCardComponent } from './game-card.component';
 
 describe('GameCardComponent', () => {
@@ -19,7 +20,7 @@ describe('GameCardComponent', () => {
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage']);
 
         await TestBed.configureTestingModule({
-            imports: [GameCardComponent],
+            imports: [GameCardComponent, TranslateModule.forRoot()],
             providers: [
                 { provide: ThumbnailService, useValue: thumbnailServiceSpy },
                 { provide: AudioService, useValue: mockAudioService },

@@ -4,6 +4,7 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
 import { Popup, PopupColor } from '@app/interfaces/popup';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Subject } from 'rxjs';
 import { PopupService } from './popup.service';
@@ -26,14 +27,18 @@ describe('PopupService', () => {
     let service: PopupService;
     let overlayContainer: OverlayContainer;
     let routerEventsSubject: Subject<NavigationEnd>;
+    let i18nServiceSpy: jasmine.SpyObj<I18nService>;
     beforeEach(() => {
         routerEventsSubject = new Subject<NavigationEnd>();
+        i18nServiceSpy = jasmine.createSpyObj('I18nService', ['translate']);
+        i18nServiceSpy.translate.and.callFake((message: string) => message);
 
         TestBed.configureTestingModule({
             imports: [MockWarningConfirmationPopupComponent],
             providers: [
                 PopupService,
                 Overlay,
+                { provide: I18nService, useValue: i18nServiceSpy },
                 {
                     provide: Router,
                     useValue: {

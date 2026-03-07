@@ -5,6 +5,7 @@ import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ITEM_NAME } from '@common/consts/item-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatData, PlayerCombatData } from '@common/interfaces/match-data';
+import { AppLanguage, AppTheme } from '@common/interfaces/preferences';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
@@ -38,6 +39,10 @@ describe('ChatService', () => {
             balance: 0,
             isLoggedIn: true,
             deleted: false,
+            preferences: {
+                language: AppLanguage.French,
+                theme: AppTheme.Default,
+            },
         };
 
         const module: TestingModule = await Test.createTestingModule({
@@ -100,10 +105,10 @@ describe('ChatService', () => {
 
     it('should log debug mode status', () => {
         service.logDebugMode(mockMatch, true);
-        expect(addLogToMatchStub.firstCall.args[1]).toBe('Le mode de debug a été activé');
+        expect(addLogToMatchStub.firstCall.args[1]).toBe('server.messages.debugModeOn');
 
         service.logDebugMode(mockMatch, false);
-        expect(addLogToMatchStub.secondCall.args[1]).toBe('Le mode de debug a été désactivé');
+        expect(addLogToMatchStub.secondCall.args[1]).toBe('server.messages.debugModeOff');
     });
 
     it('should log player turn start', () => {
@@ -111,7 +116,7 @@ describe('ChatService', () => {
 
         service.logPlayerTurnStart(mockMatch, playerName);
 
-        expect(addLogToMatchStub.calledWith(mockMatch, `Début du tour de ${playerName}`)).toBeTruthy();
+        expect(addLogToMatchStub.calledWith(mockMatch, 'server.logs.turnStart', [], { playerName })).toBeTruthy();
     });
 
     it('should log match winner', () => {
@@ -119,7 +124,7 @@ describe('ChatService', () => {
 
         service.logMatchWinner(mockMatch, playerName);
 
-        expect(addLogToMatchStub.calledWith(mockMatch, `${playerName} à gagné la partie`)).toBeTruthy();
+        expect(addLogToMatchStub.calledWith(mockMatch, 'server.logs.matchWinner', [], { playerName })).toBeTruthy();
     });
 
     it('should log end match with one player or a formatted player list', () => {
@@ -129,11 +134,11 @@ describe('ChatService', () => {
             { ...mockMatch.data.players[2], name: 'Player3', isConnected: true },
         ];
         service.logEndMatch(mockMatch);
-        expect(addLogToMatchStub.calledWith(mockMatch, 'Fin de partie avec Player1, Player2 et Player3')).toBeTruthy();
+        expect(addLogToMatchStub.calledWith(mockMatch, 'server.logs.endMatch', [], { playersList: 'Player1, Player2 et Player3' })).toBeTruthy();
 
         mockMatch.data.players = [{ ...mockMatch.data.players[0], name: 'Player1', isConnected: true }];
         service.logEndMatch(mockMatch);
-        expect(addLogToMatchStub.calledWith(mockMatch, 'Fin de partie avec Player1')).toBeTruthy();
+        expect(addLogToMatchStub.calledWith(mockMatch, 'server.logs.endMatch', [], { playersList: 'Player1' })).toBeTruthy();
     });
 
     it('should log combat start', () => {
@@ -142,7 +147,9 @@ describe('ChatService', () => {
 
         service.logCombatStart(mockMatch, attacker, defender);
 
-        expect(addLogToMatchStub.calledWith(mockMatch, `${attacker} a engagé un combat avec ${defender}`)).toBeTruthy();
+        expect(
+            addLogToMatchStub.calledWith(mockMatch, 'server.logs.combatStart', [], { engagingPlayerName: attacker, targetPlayerName: defender }),
+        ).toBeTruthy();
     });
 
     it('should log bridge toggle correctly', () => {
@@ -153,11 +160,13 @@ describe('ChatService', () => {
 
         mockMatch.data.gameData.mapData.tiles[position.x][position.y] = TileType.Bridge;
         service.logBridgeToggled(mockMatch, playerName, position);
-        expect(addLogToMatchStub.firstCall.args[1]).toBe(`${playerName} a réparé un pont`);
+        expect(addLogToMatchStub.firstCall.args[1]).toBe('server.logs.bridgeRepaired');
+        expect(addLogToMatchStub.firstCall.args[3]).toEqual({ playerName });
 
         mockMatch.data.gameData.mapData.tiles[position.x][position.y] = TileType.BrokenBridge;
         service.logBridgeToggled(mockMatch, playerName, position);
-        expect(addLogToMatchStub.secondCall.args[1]).toBe(`${playerName} a cassé un pont`);
+        expect(addLogToMatchStub.secondCall.args[1]).toBe('server.logs.bridgeBroken');
+        expect(addLogToMatchStub.secondCall.args[3]).toEqual({ playerName });
     });
 
     it('should log escape attempt', () => {
@@ -168,10 +177,12 @@ describe('ChatService', () => {
         sandbox.stub(service as any, 'getConcernedPlayers').returns(['Player1', 'Player2']);
 
         service.logEscapeAttempt(mockMatch, true, playerData);
-        expect(addLogToMatchStub.firstCall.args[1]).toContain('Réussie');
+        expect(addLogToMatchStub.firstCall.args[1]).toBe('server.logs.escapeAttempt.success');
+        expect(addLogToMatchStub.firstCall.args[3]).toEqual({ playerName: 'EscapingPlayer' });
 
         service.logEscapeAttempt(mockMatch, false, playerData);
-        expect(addLogToMatchStub.secondCall.args[1]).toContain('Échouée');
+        expect(addLogToMatchStub.secondCall.args[1]).toBe('server.logs.escapeAttempt.fail');
+        expect(addLogToMatchStub.secondCall.args[3]).toEqual({ playerName: 'EscapingPlayer' });
     });
 
     it('should log attack information', () => {
@@ -191,8 +202,13 @@ describe('ChatService', () => {
 
         service.logAttack(mockMatch, attackerData);
 
-        const expectedMessage = 'Attacker attaque (3) avec Dé (+5)';
-        expect(addLogToMatchStub.calledWith(mockMatch, expectedMessage, ['Player1', 'Player2'])).toBeTruthy();
+        expect(
+            addLogToMatchStub.calledWith(mockMatch, 'server.logs.attack', ['Player1', 'Player2'], {
+                playerName: 'Attacker',
+                attack: 3,
+                rolledAttack: 5,
+            }),
+        ).toBeTruthy();
     });
 
     it('should log defense information', () => {
@@ -213,8 +229,13 @@ describe('ChatService', () => {
 
         service.logDefense(mockMatch, defenderData);
 
-        const expectedMessage = 'Defender se défend (2) avec Dé (+3)';
-        expect(addLogToMatchStub.calledWith(mockMatch, expectedMessage, ['Player1', 'Player2'])).toBeTruthy();
+        expect(
+            addLogToMatchStub.calledWith(mockMatch, 'server.logs.defense', ['Player1', 'Player2'], {
+                playerName: 'Defender',
+                defense: 2,
+                rolledDefense: 3,
+            }),
+        ).toBeTruthy();
     });
 
     it('should log attack result', () => {
@@ -223,10 +244,11 @@ describe('ChatService', () => {
         sandbox.stub(service as any, 'getConcernedPlayers').returns(['Player1', 'Player2']);
 
         service.logAttackResult(mockMatch, attackResult);
-        expect(addLogToMatchStub.firstCall.args[1]).toBe("L'attaque inflige 3 dégâts.");
+        expect(addLogToMatchStub.firstCall.args[1]).toBe('server.logs.attackResult.damage');
+        expect(addLogToMatchStub.firstCall.args[3]).toEqual({ attackResult });
 
         service.logAttackResult(mockMatch, 0);
-        expect(addLogToMatchStub.secondCall.args[1]).toBe("L'attaque est bloqué.");
+        expect(addLogToMatchStub.secondCall.args[1]).toBe('server.logs.attackResult.blocked');
     });
 
     it('should log combat end', () => {
@@ -237,10 +259,12 @@ describe('ChatService', () => {
         sandbox.stub(service as any, 'getConcernedPlayers').returns(['Player1', 'Player2']);
 
         service.logCombatEnd(mockMatch, playerData, true);
-        expect(addLogToMatchStub.firstCall.args[1]).toBe('CombatPlayer a gagné le combat');
+        expect(addLogToMatchStub.firstCall.args[1]).toBe('server.logs.combatEnd.victory');
+        expect(addLogToMatchStub.firstCall.args[3]).toEqual({ playerName: 'CombatPlayer' });
 
         service.logCombatEnd(mockMatch, playerData, false);
-        expect(addLogToMatchStub.secondCall.args[1]).toBe("CombatPlayer s'est enfui du combat");
+        expect(addLogToMatchStub.secondCall.args[1]).toBe('server.logs.combatEnd.escape');
+        expect(addLogToMatchStub.secondCall.args[3]).toEqual({ playerName: 'CombatPlayer' });
     });
 
     it('should log player left', () => {
@@ -250,7 +274,7 @@ describe('ChatService', () => {
 
         service.logPlayerLeft(mockMatch, playerId);
 
-        expect(addLogToMatchStub.calledWith(mockMatch, 'LeavingPlayer a abandonné la partie')).toBeTruthy();
+        expect(addLogToMatchStub.calledWith(mockMatch, 'server.logs.playerLeft', [], { playerName: 'LeavingPlayer' })).toBeTruthy();
     });
 
     it('should get player name from combat data', () => {
@@ -285,6 +309,6 @@ describe('ChatService', () => {
 
         service.logItemPickup(mockMatch, playerName, itemType);
 
-        expect(addLogToMatchStub.calledWith(mockMatch, `${playerName} a ramassé ${ITEM_NAME[itemType]}`)).toBeTruthy();
+        expect(addLogToMatchStub.calledWith(mockMatch, 'server.logs.itemPickup', [], { playerName, itemName: ITEM_NAME[itemType] })).toBeTruthy();
     });
 });

@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { BridgeValidationError, ErrorMessage, TileHandler, TilesCount, ValidationResult } from '@app/interfaces/game-validation';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { GameData } from '@common/interfaces/game-data';
 import { GameMode, MapData, MapSize } from '@common/interfaces/map-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
@@ -8,6 +9,7 @@ import { GameValidationService } from './game-validation.service';
 
 describe('GameValidationService', () => {
     let service: GameValidationService;
+    let i18nServiceSpy: jasmine.SpyObj<I18nService>;
     const map = {
         tiles: Array.from({ length: MapSize.Medium }, () => Array(MapSize.Medium).fill(TileType.Grass)),
         gameMode: GameMode.CTF,
@@ -24,8 +26,11 @@ describe('GameValidationService', () => {
     };
 
     beforeEach(() => {
+        i18nServiceSpy = jasmine.createSpyObj('I18nService', ['translate']);
+        i18nServiceSpy.translate.and.callFake((message: string) => message);
+
         TestBed.configureTestingModule({
-            providers: [GameValidationService],
+            providers: [GameValidationService, { provide: I18nService, useValue: i18nServiceSpy }],
         });
         service = TestBed.inject(GameValidationService);
     });
@@ -321,7 +326,7 @@ describe('GameValidationService', () => {
             bridge: { isValid: true, errors: [] },
             mode: { isValid: true, errorMessage: null },
         };
-        expect(service.getValidationErrorMessage(validResult)).toBe('Aucune erreur de validation');
+        expect(service.getValidationErrorMessage(validResult)).toBe('validation.noErrors');
 
         const invalidResult: ValidationResult = {
             name: { isValid: false, errorMessage: ErrorMessage.Empty },
@@ -355,7 +360,7 @@ describe('GameValidationService', () => {
             ` - [${invalidResult.bridge.errors[1].x},${invalidResult.bridge.errors[1].y}]: ${invalidResult.bridge.errors[1].errorMessage}`,
             ` - ${ErrorMessage.Mode}`,
         ];
-        const expectedMessage = 'Carte invalide :\n' + expectedErrors.join('\n');
+        const expectedMessage = 'validation.invalidMap\n' + expectedErrors.join('\n');
 
         expect(service.getValidationErrorMessage(invalidResult)).toBe(expectedMessage);
     });

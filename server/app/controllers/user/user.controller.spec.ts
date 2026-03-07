@@ -1,7 +1,9 @@
 import { CreateUserDto } from '@app/model/dto/user/create-user.dto';
 import { LoginUserDto } from '@app/model/dto/user/login-user.dto';
+import { UpdatePreferencesDto } from '@app/model/dto/user/update-preferences.dto';
 import { UserResponseDto } from '@app/model/dto/user/response-user.dto';
 import { UserService } from '@app/services/user/user.service';
+import { AppLanguage, AppTheme, DEFAULT_PREFERENCES } from '@common/interfaces/preferences';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { UserController } from './user.controller';
@@ -16,6 +18,7 @@ describe('UserController', () => {
         email: 'user@test.com',
         profilePicture: '',
         balance: 0,
+        preferences: DEFAULT_PREFERENCES,
     };
 
     beforeEach(async () => {
@@ -128,6 +131,21 @@ describe('UserController', () => {
             await controller.deleteUser(userId);
 
             expect(userService.deleteUser.calledWith(userId)).toBeTruthy();
+        });
+    });
+
+    describe('updatePreferences', () => {
+        it('should update preferences successfully', async () => {
+            const userId = 'user123';
+            const dto: UpdatePreferencesDto = { language: AppLanguage.English };
+            const updated = { theme: AppTheme.Default, language: AppLanguage.English };
+
+            userService.updatePreferences.resolves(updated);
+
+            const res = await controller.updatePreferences(userId, dto);
+
+            expect(res).toEqual(updated);
+            expect(userService.updatePreferences.calledWith(userId, dto)).toBeTruthy();
         });
     });
 });

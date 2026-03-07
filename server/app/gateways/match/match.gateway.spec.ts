@@ -1,6 +1,7 @@
 import { Match } from '@app/classes/match/match';
 import { MatchService } from '@app/services/match/match.service';
 import { UserService } from '@app/services/user/user.service';
+import { AppLanguage, AppTheme } from '@common/interfaces/preferences';
 import { MatchEvent } from '@common/interfaces/socket-event.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
@@ -157,6 +158,10 @@ describe('MatchGateway', () => {
             isLoggedIn: true,
             balance: 0,
             createdAt: new Date(),
+            preferences: {
+                language: AppLanguage.French,
+                theme: AppTheme.Default,
+            },
         };
         gateway.onUserAssociate(mockSocket, mockUser);
         expect(mockUserService.associateSocket.calledWith(mockUser.userId, mockSocket.id)).toBeTruthy();

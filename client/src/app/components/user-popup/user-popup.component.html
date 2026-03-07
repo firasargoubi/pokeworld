@@ -6,27 +6,27 @@
             </div>
 
             <div class="info-row">
-                <span class="label">Nom:</span>
-                <span class="value">{{ currentUser ? currentUser.username : 'None' }}</span>
+                <span class="label">{{ 'components.userPopup.nameLabel' | translate }}</span>
+                <span class="value">{{ currentUser ? currentUser.username : ('components.userPopup.noneValue' | translate) }}</span>
             </div>
             <div class="info-row">
-                <span class="label">Courriel:</span>
-                <span class="value">{{ currentUser ? currentUser.email : 'None' }}</span>
+                <span class="label">{{ 'components.userPopup.emailLabel' | translate }}</span>
+                <span class="value">{{ currentUser ? currentUser.email : ('components.userPopup.noneValue' | translate) }}</span>
             </div>
         </div>
         <div class="buttons">
-            <button (click)="logout()" class="logout-button">Se déconnecter</button>
-            <button (click)="deleteAccount()" class="logout-button" style="background: #ff6666; color: #fff">Supprimer le compte</button>
-            <button (click)="toggleEditPassword()" class="logout-button" style="background: #4fc3f7; color: #fff">Modifier le mot de passe</button>
+            <button (click)="logout()" class="logout-button">{{ 'components.userPopup.logout' | translate }}</button>
+            <button (click)="deleteAccount()" class="logout-button" style="background: #ff6666; color: #fff">{{ 'components.userPopup.deleteAccount' | translate }}</button>
+            <button (click)="toggleEditPassword()" class="logout-button" style="background: #4fc3f7; color: #fff">{{ 'components.userPopup.editPassword' | translate }}</button>
         </div>
         @if(editMode) {
         <div class="edit-password-row">
-            <input type="password" [(ngModel)]="oldPassword" placeholder="Ancien mot de passe" class="input-password pixel-placeholder" />
-            <input type="password" [(ngModel)]="newPassword" placeholder="Nouveau mot de passe" class="input-password pixel-placeholder" />
-            <button (click)="editPassword()" class="logout-button" style="background: #4fc3f7; color: #fff; margin-left: 8px">Valider</button>
+            <input type="password" [(ngModel)]="oldPassword" [placeholder]="'components.userPopup.oldPassword' | translate" class="input-password pixel-placeholder" />
+            <input type="password" [(ngModel)]="newPassword" [placeholder]="'components.userPopup.newPassword' | translate" class="input-password pixel-placeholder" />
+            <button (click)="editPassword()" class="logout-button" style="background: #4fc3f7; color: #fff; margin-left: 8px">{{ 'components.userPopup.confirm' | translate }}</button>
         </div>
         @if(passwordError) {
-        <div class="error">{{ passwordError }}</div>
+        <div class="error">{{ passwordError | translate }}</div>
         } }
     </div>
 </div>

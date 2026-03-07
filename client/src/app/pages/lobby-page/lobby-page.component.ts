@@ -19,12 +19,13 @@ import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { MAX_PLAYERS } from '@common/consts/player-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { PlayerType } from '@common/interfaces/player-data';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-lobby-page',
     templateUrl: './lobby-page.component.html',
     styleUrls: ['./lobby-page.component.scss'],
-    imports: [CommonModule, HeaderComponent, PlayerCardComponent, PokeballButtonComponent, ChatComponent, CreateBotPopupComponent],
+    imports: [CommonModule, HeaderComponent, PlayerCardComponent, PokeballButtonComponent, ChatComponent, CreateBotPopupComponent, TranslateModule],
     standalone: true,
 })
 export class LobbyPageComponent {

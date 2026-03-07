@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { ItemDropPopupComponent } from './item-drop-popup.component';
 import { PlayService } from '@app/services/play/play.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('ItemDropPopupComponent', () => {
     let component: ItemDropPopupComponent;
@@ -12,6 +13,7 @@ describe('ItemDropPopupComponent', () => {
         playServiceMock = jasmine.createSpyObj('PlayService', ['dropItem']);
 
         TestBed.configureTestingModule({
+            imports: [TranslateModule.forRoot()],
             providers: [{ provide: PlayService, useValue: playServiceMock }],
         });
 

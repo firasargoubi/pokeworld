@@ -8,12 +8,13 @@ import { AudioService } from '@app/services/audio/audio.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MATCH_CODE_LENGTH } from '@common/consts/match-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-join-page',
     templateUrl: './join-page.component.html',
     styleUrls: ['./join-page.component.scss'],
-    imports: [HeaderComponent, FormsModule, ChatComponent],
+    imports: [HeaderComponent, FormsModule, ChatComponent, TranslateModule],
 })
 export class JoinPageComponent implements OnInit {
     matchCode: string = '';

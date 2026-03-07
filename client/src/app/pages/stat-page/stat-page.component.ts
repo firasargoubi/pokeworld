@@ -10,12 +10,13 @@ import { AudioService } from '@app/services/audio/audio.service';
 import { MatchService } from '@app/services/match/match.service';
 import { StatService } from '@app/services/stat/stat.service';
 import { GameMode } from '@common/interfaces/map-data';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-stat-page',
     templateUrl: './stat-page.component.html',
     styleUrls: ['./stat-page.component.scss'],
-    imports: [HeaderComponent, FormsModule, ChatComponent, DatePipe],
+    imports: [HeaderComponent, FormsModule, ChatComponent, DatePipe, TranslateModule],
 })
 export class StatPageComponent {
     sortingOrder: WritableSignal<Order> = signal(Order.Ascending);
@@ -25,6 +26,16 @@ export class StatPageComponent {
         return this.statService.playerStats;
     });
     playerStatTypes: PlayerStatType[] = Object.values(PlayerStatType);
+    statTypeLabels: Record<PlayerStatType, string> = {
+        [PlayerStatType.DiscoveredItemsCount]: 'pages.stat.playerColumns.items',
+        [PlayerStatType.VisitedTilesRatio]: 'pages.stat.playerColumns.tiles',
+        [PlayerStatType.Combats]: 'pages.stat.playerColumns.combats',
+        [PlayerStatType.Victories]: 'pages.stat.playerColumns.victories',
+        [PlayerStatType.Defeats]: 'pages.stat.playerColumns.defeats',
+        [PlayerStatType.Escapes]: 'pages.stat.playerColumns.escapes',
+        [PlayerStatType.HpInflicted]: 'pages.stat.playerColumns.damage',
+        [PlayerStatType.HpLost]: 'pages.stat.playerColumns.hpLost',
+    };
 
     readonly statService: StatService = inject(StatService);
     private readonly matchService: MatchService = inject(MatchService);

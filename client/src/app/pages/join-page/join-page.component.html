@@ -1,6 +1,6 @@
 <div id="join-page-container">
     <div id="join-page-header">
-        <app-header [onClick]="this.navigateToMenu.bind(this)" [stepNumber]="'1'" [title]="'REJOINDRE PARTIE'"></app-header>
+        <app-header [onClick]="this.navigateToMenu.bind(this)" [stepNumber]="'1'" [title]="'pages.join.title'"></app-header>
     </div>
     <div id="join-page-border">
         <div id="join-page-body">
@@ -14,7 +14,7 @@
                     (click)="this.audioService.playEffect(this.clickValue)"
                 />
                 <div id="main-container-body">
-                    <p id="main-message">Entrez votre code d'accès</p>
+                    <p id="main-message">{{ 'pages.join.enterCode' | translate }}</p>
 
                     <div id="visual-input-container">
                         <div class="number">{{ this.matchCode[0] }}</div>
@@ -23,7 +23,7 @@
                         <div class="number">{{ this.matchCode[3] }}</div>
                     </div>
 
-                    <p id="main-message">Appuyer sur Entrer pour valider</p>
+                    <p id="main-message">{{ 'pages.join.pressEnter' | translate }}</p>
                 </div>
             </div>
         </div>

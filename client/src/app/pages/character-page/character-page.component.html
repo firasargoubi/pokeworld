@@ -1,6 +1,6 @@
 <div id="character-page-container">
     <div id="page-header">
-        <app-header [onClick]="this.goToMenu.bind(this)" [stepNumber]="'2'" [title]="'SELECTIONNEZ VOTRE PERSONNAGE'"></app-header>
+        <app-header [onClick]="this.goToMenu.bind(this)" [stepNumber]="'2'" [title]="'pages.character.title'"></app-header>
     </div>
     <div id="character-page-body">
         <main class="character-page-main">
@@ -17,7 +17,7 @@
                 </div>
                 <div id="stats-selection-container">
                     <div id="bonus-selection-container">
-                        <div class="label">SELECTIONNEZ VOTRE BONUS:</div>
+                        <div class="label">{{ 'pages.character.selectBonus' | translate }}</div>
                         <div class="selections-container">
                             <div
                                 class="stat-container stat-container-bonus-1"
@@ -26,7 +26,7 @@
                             >
                                 <img src="./assets/images/menu/icons/heart.png" class="stat-icon" />
                                 <div class="stat-body">
-                                    <div class="stat-label">+2 HP</div>
+                                    <div class="stat-label">{{ 'pages.character.hpBonus' | translate }}</div>
                                     <div class="stat-value">{{ visualData.isHpSelected ? '6/6' : '4/4' }}</div>
                                 </div>
                             </div>
@@ -37,14 +37,14 @@
                             >
                                 <img src="./assets/images/menu/icons/lightning.png" class="stat-icon" />
                                 <div class="stat-body">
-                                    <div class="stat-label">+2 VIT</div>
+                                    <div class="stat-label">{{ 'pages.character.speedBonus' | translate }}</div>
                                     <div class="stat-value">{{ !visualData.isHpSelected ? '6/6' : '4/4' }}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div id="bonus-selection-container" class="dice">
-                        <div class="label">SELECTIONNEZ VOS DÉS:</div>
+                        <div class="label">{{ 'pages.character.selectDice' | translate }}</div>
                         <div class="selections-container">
                             <div class="stat-container stat-container-dice-1" (click)="toggleBonusDice()">
                                 <img
@@ -58,7 +58,7 @@
                                     [ngClass]="{ visible: !visualData.isAttackSelected, hidden: visualData.isAttackSelected }"
                                 />
                                 <div class="stat-body">
-                                    <div class="stat-label stat-label-dice">ATTAQUE</div>
+                                    <div class="stat-label stat-label-dice">{{ 'pages.character.attack' | translate }}</div>
                                     <div class="stat-value">4/4</div>
                                 </div>
                             </div>
@@ -74,7 +74,7 @@
                                     [ngClass]="{ visible: visualData.isAttackSelected, hidden: !visualData.isAttackSelected }"
                                 />
                                 <div class="stat-body">
-                                    <div class="stat-label stat-label-dice">DÉFENSE</div>
+                                    <div class="stat-label stat-label-dice">{{ 'pages.character.defense' | translate }}</div>
                                     <div class="stat-value">4/4</div>
                                 </div>
                             </div>
@@ -102,7 +102,7 @@
     <footer id="page-footer">
         <div class="main-button-container" [class.disabled]="!username || !visualData.isAvatarSelected" (click)="joinLobby()">
             <div class="button-edge"></div>
-            <div class="button-body"><p>START GAME</p></div>
+            <div class="button-body"><p>{{ 'pages.character.startGame' | translate }}</p></div>
             <div class="button-edge"></div>
         </div>
     </footer>

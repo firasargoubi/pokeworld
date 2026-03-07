@@ -168,7 +168,7 @@
                 "jsdoc/check-alignment": "error",
                 "jsdoc/check-indentation": "error",
                 "linebreak-style": "off",
-                "max-classes-per-file": ["error", 2],
+                "max-classes-per-file": ["error", 5],
                 "max-len": [
                     "error",
                     {

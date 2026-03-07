@@ -1,20 +1,20 @@
 <div class="pop-up">
-    <div class="title">Ajouter un robot</div>
+    <div class="title">{{ 'components.botCreation.title' | translate }}</div>
     <div class="options">
         <div class="option" (click)="onProfileSelection(playerType.BotAggressive)">
             <div class="check-box" [ngClass]="{ selected: selectedProfile === playerType.BotAggressive }"></div>
-            <p>Agressif</p>
+            <p>{{ 'components.botCreation.aggressive' | translate }}</p>
         </div>
         <div class="option" (click)="onProfileSelection(playerType.BotDefensive)">
             <div class="check-box" [ngClass]="{ selected: selectedProfile === playerType.BotDefensive }"></div>
-            <p>Défensif</p>
+            <p>{{ 'components.botCreation.defensive' | translate }}</p>
         </div>
     </div>
     <div class="spacer"></div>
     <div class="button-section">
         <div class="button">
             <app-pokeball-button
-                [buttonContent]="'AJOUTER'"
+                [buttonContent]="'components.botCreation.add' | translate"
                 [delay]="0"
                 [onClickAction]="onValiderSelection.bind(this)"
                 [scale]="0.3"

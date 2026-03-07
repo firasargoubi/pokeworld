@@ -2,18 +2,18 @@ import { MapData } from '@common/interfaces/map-data';
 import { Position } from '@common/interfaces/position';
 
 export enum ErrorMessage {
-    Empty = 'Le champ ne peut pas être vide',
-    TooLong = 'La valeur dépasse la longueur maximale autorisée',
-    Bridge = 'Problème de pont en',
-    BridgeAtEdge = 'Le pont ne peut pas être placé au bord de la carte',
-    BridgeNotBetweenWalls = "Le pont doit être placé entre deux tuiles d'eau",
-    MissingRequiredItems = "Pas assez d'éléments requis placés sur la carte",
-    TooManyItems = "Trop d'éléments de ce type placés sur la carte",
-    DuplicatedName = 'Le nom du jeu existe déjà',
-    TerrainCoverage = 'Couverture du terrain insuffisante',
-    TilesAccessibility = 'Tuiles inaccessibles',
-    Items = 'Objets mal placés',
-    Mode = 'Un drapeau doit être placé sur la carte en mode CTF',
+    Empty = 'validation.errors.empty',
+    TooLong = 'validation.errors.tooLong',
+    Bridge = 'validation.errors.bridge',
+    BridgeAtEdge = 'validation.errors.bridgeAtEdge',
+    BridgeNotBetweenWalls = 'validation.errors.bridgeNotBetweenWalls',
+    MissingRequiredItems = 'validation.errors.missingRequiredItems',
+    TooManyItems = 'validation.errors.tooManyItems',
+    DuplicatedName = 'validation.errors.duplicatedName',
+    TerrainCoverage = 'validation.errors.terrainCoverage',
+    TilesAccessibility = 'validation.errors.tilesAccessibility',
+    Items = 'validation.errors.items',
+    Mode = 'validation.errors.mode',
 }
 
 export interface TilesCount {

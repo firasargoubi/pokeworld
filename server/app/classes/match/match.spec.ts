@@ -276,7 +276,9 @@ describe('Match', () => {
         match['playerLeaveStats'](playerId);
 
         expect(match.data.players[0].isConnected).toBe(false);
-        expect(mockMatchService.sendMessage.calledWith(match.data.code, `${match.data.players[0].name} a quitté la partie`)).toBe(true);
+        expect(mockMatchService.sendMessage.calledWith(match.data.code, Message.PlayerLeftMatch, { playerName: match.data.players[0].name })).toBe(
+            true,
+        );
     });
 
     it('player leave match should kick last player', () => {
@@ -299,7 +301,9 @@ describe('Match', () => {
         match['playerLeaveMatch'](match.data.players[0].id);
 
         expect(match.data.players[0].isConnected).toBe(false);
-        expect(mockMatchService.sendMessage.calledWith(match.data.code, `${match.data.players[0].name} a quitté la partie`)).toBe(true);
+        expect(mockMatchService.sendMessage.calledWith(match.data.code, Message.PlayerLeftMatch, { playerName: match.data.players[0].name })).toBe(
+            true,
+        );
     });
 
     it('set bot timeout should set timeout and execute callback', () => {

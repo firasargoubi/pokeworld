@@ -1,28 +1,28 @@
 import { TileType } from '@common/interfaces/tile-type.enum';
 
 export const TILE_DESCRIPTION: Map<TileType, string> = new Map([
-    [TileType.Path, '<b>Chemin</b>Accélère la vitesse des joueurs'],
-    [TileType.Bush, '<b>Buisson</b>Ralenti la vitesse des joueurs'],
-    [TileType.Water, '<b>Eau</b>Bloque le passage des joueurs'],
-    [TileType.Bridge, '<b>Pont</b>Peut être brisé ou réparé'],
-    [TileType.BrokenBridge, '<b>Pont</b>Peut être brisé ou réparé'],
+    [TileType.Path, 'tiles.description.path'],
+    [TileType.Bush, 'tiles.description.bush'],
+    [TileType.Water, 'tiles.description.water'],
+    [TileType.Bridge, 'tiles.description.bridge'],
+    [TileType.BrokenBridge, 'tiles.description.brokenBridge'],
 ]);
 
 export const RIGHT_CLICK_TILE_DESCRIPTION: Map<TileType, string> = new Map([
-    [TileType.Grass, '<b>Gazon</b><br>Coût de déplacement: 1<br>Tuile de terrain'],
-    [TileType.Path, '<b>Chemin</b><br>Coût de déplacement: 0<br>Accélère la vitesse des joueurs'],
-    [TileType.Bush, '<b>Buisson</b><br>Coût de déplacement: 2<br>Ralenti la vitesse des joueurs'],
-    [TileType.Water, '<b>Eau</b><br>Déplacement impossible<br>Bloque le passage des joueurs'],
-    [TileType.Bridge, '<b>Pont</b><br>Coût de déplacement: 1<br>Peut être brisé'],
-    [TileType.BrokenBridge, '<b>Pont brisé</b><br>Déplacement impossible<br>Peut être réparé'],
+    [TileType.Grass, 'tiles.rightClick.grass'],
+    [TileType.Path, 'tiles.rightClick.path'],
+    [TileType.Bush, 'tiles.rightClick.bush'],
+    [TileType.Water, 'tiles.rightClick.water'],
+    [TileType.Bridge, 'tiles.rightClick.bridge'],
+    [TileType.BrokenBridge, 'tiles.rightClick.brokenBridge'],
 ]);
 
 export const TILE_EFFECT: Record<TileType, string> = {
-    [TileType.Grass]: 'Normal',
-    [TileType.Path]: 'Accélère mouvement',
-    [TileType.Bush]: 'Ralenti le mouvement',
-    [TileType.Water]: 'Bloque le passage',
-    [TileType.Bridge]: 'Traversable',
-    [TileType.None]: 'Aucun effet',
-    [TileType.BrokenBridge]: 'Non traversable',
+    [TileType.Grass]: 'tiles.effect.grass',
+    [TileType.Path]: 'tiles.effect.path',
+    [TileType.Bush]: 'tiles.effect.bush',
+    [TileType.Water]: 'tiles.effect.water',
+    [TileType.Bridge]: 'tiles.effect.bridge',
+    [TileType.None]: 'tiles.effect.none',
+    [TileType.BrokenBridge]: 'tiles.effect.brokenBridge',
 };

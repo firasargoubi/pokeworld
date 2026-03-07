@@ -6,6 +6,7 @@ import { ChatTab } from '@app/interfaces/chat-tab.enum';
 import { PopupColor } from '@app/interfaces/popup';
 import { ChatService } from '@app/services/chat/chat.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { SocketService } from '@app/services/socket/socket.service';
@@ -34,6 +35,7 @@ export class MatchService {
     private mapService: MapService = inject(MapService);
     private popupService: PopupService = inject(PopupService);
     private chatService: ChatService = inject(ChatService);
+    private i18nService: I18nService = inject(I18nService);
     private router: Router = inject(Router);
 
     constructor() {
@@ -126,8 +128,9 @@ export class MatchService {
     }
 
     private onMessage(messageFromServer: MessageFromServer) {
+        const translatedMessage = this.i18nService.translate(messageFromServer.message, messageFromServer.messageParams);
         this.popupService.showPopup({
-            message: messageFromServer.message,
+            message: translatedMessage,
             hasCloseButton: messageFromServer.hasCloseButton,
             isConfirmation: false,
             popupColor: WARNING_MESSAGES.includes(messageFromServer.message) ? PopupColor.Orange : PopupColor.Blue,
@@ -136,11 +139,12 @@ export class MatchService {
 
     private onRemovedFromMatch(reason: string) {
         if (this.isInMatch()) {
+            const translatedReason = this.i18nService.translate(reason);
             this.popupService.keepMessages();
             if (reason === Message.LockedFromLobby) {
                 this.router.navigate([PageEndpoint.Join]);
                 this.popupService.showPopup({
-                    message: reason,
+                    message: translatedReason,
                     hasCloseButton: true,
                     isConfirmation: true,
                     action: () => {
@@ -149,7 +153,7 @@ export class MatchService {
                 });
             } else {
                 this.router.navigate([PageEndpoint.Menu]);
-                this.popupService.showPopup({ message: reason, hasCloseButton: false, isConfirmation: false });
+                this.popupService.showPopup({ message: translatedReason, hasCloseButton: false, isConfirmation: false });
             }
             this.resetMatchData();
         }

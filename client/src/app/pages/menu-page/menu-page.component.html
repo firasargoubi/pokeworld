@@ -3,7 +3,7 @@
     <div class="content-container">
         @if(isAudioSettingsVisible) {
         <div class="audio-settings-container" (click)="this.toggleAudioSettings()">
-            <app-audio-settings class="audio-settings" (click)="$event.stopPropagation()"></app-audio-settings>
+            <app-settings-popup class="audio-settings" (click)="$event.stopPropagation()"></app-settings-popup>
         </div>
         } @if(!currentUser) {
         <div class="user-auth-overlay" tabindex="0">
@@ -23,7 +23,7 @@
                     <div class="icon-user"></div>
                 </div>
                 <div class="logo-container">
-                    <p class="team-number">Equipe #110</p>
+                    <p class="team-number">{{ 'pages.menu.teamNumber' | translate }}</p>
                 </div>
             </div>
 
@@ -68,7 +68,7 @@
             <app-menu-button
                 [containerClass]="'blue-container'"
                 [spriteImage]="'./assets/images/menu/pokemons/normal/blastoise.png'"
-                [textContent]="'Rejoindre <br/>Partie'"
+                [textContent]="'pages.menu.join' | translate"
                 [routePath]="pageEndpoint.Join"
                 (click)="this.audioService.playEffect(this.clickValue)"
             >
@@ -77,7 +77,7 @@
             <app-menu-button
                 [containerClass]="'orange-container'"
                 [spriteImage]="'./assets/images/menu/pokemons/normal/charizard.png'"
-                [textContent]="'Créer <br/>Partie'"
+                [textContent]="'pages.menu.create' | translate"
                 [routePath]="pageEndpoint.Create"
                 (click)="this.audioService.playEffect(this.clickValue)"
             >
@@ -86,7 +86,7 @@
             <app-menu-button
                 [containerClass]="'green-container'"
                 [spriteImage]="'./assets/images/menu/pokemons/normal/venusaur.png'"
-                [textContent]="'Modifier <br/>Partie'"
+                [textContent]="'pages.menu.edit' | translate"
                 [routePath]="pageEndpoint.Admin"
                 (click)="this.audioService.playEffect(this.clickValue)"
             >

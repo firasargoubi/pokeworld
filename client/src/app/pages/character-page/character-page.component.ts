@@ -14,15 +14,17 @@ import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { UserService } from '@app/services/user/user.service';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { AVATAR_DATA, MAX_SELECTABLE_AVATAR_INDEX, MIN_SELECTABLE_AVATAR_INDEX } from '@common/consts/avatar-data.const';
 import { BONUS_STAT, DEFAULT_STAT } from '@common/consts/player-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { Avatar, DiceType, PlayerData } from '@common/interfaces/player-data';
 import { UserInfo } from '@common/interfaces/user';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-character-page',
-    imports: [ReactiveFormsModule, HeaderComponent, CommonModule, FormsModule, ChatComponent],
+    imports: [ReactiveFormsModule, HeaderComponent, CommonModule, FormsModule, ChatComponent, TranslateModule],
     templateUrl: './character-page.component.html',
     styleUrl: './character-page.component.scss',
 })
@@ -35,6 +37,7 @@ export class CharacterPageComponent {
     private popupService: PopupService = inject(PopupService);
     private lobbyService: LobbyService = inject(LobbyService);
     private userService: UserService = inject(UserService);
+    private i18nService: I18nService = inject(I18nService);
     private router: Router = inject(Router);
 
     constructor() {
@@ -126,9 +129,9 @@ export class CharacterPageComponent {
     }
 
     private getWarnings() {
-        const warningList = [];
+        const warningList: string[] = [];
         if (this.matchService.selfPlayer.avatar === Avatar.Default) {
-            warningList.push('- Veuillez choisir un avatar');
+            warningList.push(`- ${this.i18nService.translate('pages.character.chooseAvatarWarning')}`);
         }
         return warningList;
     }

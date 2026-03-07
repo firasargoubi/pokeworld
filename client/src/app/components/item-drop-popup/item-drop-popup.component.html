@@ -2,7 +2,7 @@
     <div id="item-popup">
         <div id="item-popup-container">
             <div id="item-popup-header">
-                <div id="item-popup-title">Selectionnez l'item a déposer</div>
+                <div id="item-popup-title">{{ 'components.itemDropPopup.title' | translate }}</div>
             </div>
             <div id="items-container">
                 <div class="item-choice" [ngClass]="{ 'selected-item': this.selectedItem === 0 }" (click)="this.selectedItem = 0">
@@ -19,7 +19,7 @@
             <div id="button-container">
                 <div class="button">
                     <app-pokeball-button
-                        [buttonContent]="'VALIDER'"
+                        [buttonContent]="'components.itemDropPopup.confirm' | translate"
                         [delay]="100"
                         [onClickAction]="validateChoise.bind(this)"
                         [scale]="0.3"

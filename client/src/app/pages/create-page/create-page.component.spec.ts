@@ -13,6 +13,7 @@ import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { of, throwError } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import { ChatComponent } from '@app/components/chat/chat.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-game-card',
@@ -52,6 +53,7 @@ describe('CreatePageComponent', () => {
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage', 'playCombatEffect']);
 
         await TestBed.configureTestingModule({
+            imports: [TranslateModule.forRoot()],
             providers: [
                 { provide: Router, useValue: routerSpy },
                 { provide: GameSaveService, useValue: gameSaveServiceSpy },

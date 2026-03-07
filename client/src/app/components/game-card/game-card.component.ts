@@ -7,12 +7,13 @@ import { VisibilityEvent } from '@app/interfaces/visibility-event';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameData } from '@common/interfaces/game-data';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-game-card',
     templateUrl: './game-card.component.html',
     styleUrls: ['./game-card.component.scss'],
-    imports: [FormsModule, CommonModule],
+    imports: [FormsModule, CommonModule, TranslateModule],
     standalone: true,
 })
 export class GameCardComponent {

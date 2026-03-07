@@ -60,6 +60,10 @@ body {
     font-family: $default-font;
 }
 
+body.app-theme-dark {
+    filter: invert(1);
+}
+
 .cdk-overlay-container {
     background-color: rgba(0, 0, 0, 0.5);
     left: 0;

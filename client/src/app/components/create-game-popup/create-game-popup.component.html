@@ -1,9 +1,9 @@
 <div class="pop-up-container">
     <div class="pop-up">
-        <div class="title">Nouveau jeu</div>
+        <div class="title">{{ 'components.createGame.title' | translate }}</div>
         <div class="options">
             <div class="option-col">
-                <div class="option-title">Taille de la grille :</div>
+                <div class="option-title">{{ 'components.createGame.gridSize' | translate }} :</div>
                 @for (size of possibleSizes; track $index) {
                 <div class="option" (click)="onSizeSelection(size.value)">
                     <div class="check-box" [ngClass]="size.value === mapSize ? 'selected' : ''"></div>
@@ -12,7 +12,7 @@
                 }
             </div>
             <div class="option-col">
-                <div class="option-title">Mode de jeu :</div>
+                <div class="option-title">{{ 'components.createGame.gameMode' | translate }} :</div>
                 @for (mode of possibleModes; track $index) {
                 <div class="option" (click)="onModeSelection(mode.value)">
                     <div class="check-box" [ngClass]="mode.key === gameMode ? 'selected' : ''"></div>
@@ -25,7 +25,7 @@
         <div class="button-section">
             <div class="button">
                 <app-pokeball-button
-                    [buttonContent]="'VALIDER'"
+                    [buttonContent]="'components.createGame.confirm' | translate"
                     [delay]="0"
                     [onClickAction]="onValiderSelection.bind(this)"
                     [scale]="0.3"

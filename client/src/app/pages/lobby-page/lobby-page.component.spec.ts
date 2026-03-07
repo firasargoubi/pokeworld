@@ -9,6 +9,7 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { PlayerType } from '@common/interfaces/player-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { TranslateModule } from '@ngx-translate/core';
 import { LobbyPageComponent } from './lobby-page.component';
 
 @Component({
@@ -43,7 +44,7 @@ describe('LobbyPageComponent', () => {
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage', 'playCombatEffect']);
 
         await TestBed.configureTestingModule({
-            imports: [LobbyPageComponent],
+            imports: [LobbyPageComponent, TranslateModule.forRoot()],
             providers: [
                 { provide: Router, useValue: routerSpy },
                 { provide: PopupService, useValue: popupServiceSpy },
