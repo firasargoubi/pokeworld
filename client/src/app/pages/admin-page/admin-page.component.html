@@ -5,7 +5,7 @@
         </div>
     </div>
     <div id="admin-page-header">
-        <app-header [onClick]="this.navigateToMenu.bind(this)" [stepNumber]="'1'" [title]="'MODIFIER UN JEU'"></app-header>
+        <app-header [onClick]="this.navigateToMenu.bind(this)" [stepNumber]="'1'" [title]="'pages.admin.title'"></app-header>
     </div>
     <div id="admin-page-border">
         <div id="admin-page-body" [ngStyle]="{ 'overflow-y': isCreationMode ? 'hidden' : 'auto' }">
@@ -26,7 +26,7 @@
     </div>
     <div id="poke-button">
         <app-pokeball-button
-            [buttonContent]="'NOUVEAU JEU'"
+            [buttonContent]="'pages.admin.newGame' | translate"
             [delay]="100"
             [onClickAction]="onCreateGame.bind(this)"
             [scale]="0.4"

@@ -1,5 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
-import { enableProdMode } from '@angular/core';
+import { enableProdMode, importProvidersFrom } from '@angular/core';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader, provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { Routes, provideRouter, withHashLocation } from '@angular/router';
@@ -36,5 +38,22 @@ const routes: Routes = [
 ];
 
 bootstrapApplication(AppComponent, {
-    providers: [provideHttpClient(), provideRouter(routes, withHashLocation()), provideAnimations()],
+    providers: [
+        provideHttpClient(),
+        ...provideTranslateHttpLoader({
+            prefix: './assets/i18n/',
+            suffix: '.json',
+        }),
+        provideRouter(routes, withHashLocation()),
+        provideAnimations(),
+        importProvidersFrom(
+            TranslateModule.forRoot({
+                defaultLanguage: 'fr',
+                loader: {
+                    provide: TranslateLoader,
+                    useClass: TranslateHttpLoader,
+                },
+            }),
+        ),
+    ],
 });

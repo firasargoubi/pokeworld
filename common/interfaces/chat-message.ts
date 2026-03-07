@@ -7,4 +7,5 @@ export interface ChatMessage {
 
 export interface ChatLog extends ChatMessage {
     concernedPlayersNamesList: string[];
+    messageParams?: Record<string, string | number | boolean>;
 }

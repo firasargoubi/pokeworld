@@ -1,7 +1,7 @@
 <div id="combat-page">
     <div id="combat-container" [ngClass]="{ 'not-current-turn': !visualData.isSelfTurn || matchService.data.state !== 'combatWait' }">
         <div id="timer">
-            @if(this.matchService.data.playData.isDebugMode){ <span class="debug-info">DEBUG</span> }
+            @if(this.matchService.data.playData.isDebugMode){ <span class="debug-info">{{ 'pages.play.debug' | translate }}</span> }
             {{ combatService.timer.currentTimeRounded + 1 }}/{{ combatService.timer.maxTime }}
             <div class="timer-container">
                 <div
@@ -43,9 +43,9 @@
                         </p>
                     </div>
                     @if (['successAttack', 'failAttack'].includes(matchService.data.combatData.lastCombatAction)) { @if (visualData.isSelfTurn) {
-                    <p class="dice-bonus">Dé attaque: +{{ matchService.data.combatData.lastRolledAttack }}</p>
+                    <p class="dice-bonus">{{ 'pages.combat.diceAttack' | translate }}: +{{ matchService.data.combatData.lastRolledAttack }}</p>
                     } @else {
-                    <p class="dice-bonus">Dé défense: +{{ matchService.data.combatData.lastRolledDefense }}</p>
+                    <p class="dice-bonus">{{ 'pages.combat.diceDefense' | translate }}: +{{ matchService.data.combatData.lastRolledDefense }}</p>
                     } }
                 </div>
             </div>
@@ -111,9 +111,9 @@
                     </p>
                 </div>
                 @if (['successAttack', 'failAttack'].includes(matchService.data.combatData.lastCombatAction)) { @if (!visualData.isSelfTurn) {
-                <p class="dice-bonus">Dé attaque: +{{ matchService.data.combatData.lastRolledAttack }}</p>
+                <p class="dice-bonus">{{ 'pages.combat.diceAttack' | translate }}: +{{ matchService.data.combatData.lastRolledAttack }}</p>
                 } @else {
-                <p class="dice-bonus">Dé défense: +{{ matchService.data.combatData.lastRolledDefense }}</p>
+                <p class="dice-bonus">{{ 'pages.combat.diceDefense' | translate }}: +{{ matchService.data.combatData.lastRolledDefense }}</p>
                 } }
             </div>
         </div>
@@ -127,11 +127,11 @@
                 <div class="container-body">
                     <div class="action-button" (click)="attackButton()">
                         <img class="container-selection" src="./assets/images/menu/containers/combat-container/container-selection.png" />
-                        <p>Attaquer</p>
+                        <p>{{ 'pages.combat.attack' | translate }}</p>
                     </div>
                     <div class="action-button" [ngClass]="{ disabled: visualData.selfPlayer.currentEscapes === 0 }" (click)="escapeButon()">
                         <img class="container-selection" src="./assets/images/menu/containers/combat-container/container-selection.png" />
-                        <p>Fuire {{ visualData.selfPlayer.currentEscapes }}/{{ visualData.selfPlayer.maxEscapes }}</p>
+                        <p>{{ 'pages.combat.escape' | translate }} {{ visualData.selfPlayer.currentEscapes }}/{{ visualData.selfPlayer.maxEscapes }}</p>
                     </div>
                 </div>
                 <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
@@ -141,7 +141,7 @@
                 <div class="container-body">
                     <div class="stat-container">
                         <span class="stat-label"
-                            >Attaque @if (matchService.data.players[visualData.selfPlayer.playerIndex].attackDice === 4) { (D4) } @else { (D6) }
+                            >{{ 'pages.combat.attackStat' | translate }} @if (matchService.data.players[visualData.selfPlayer.playerIndex].attackDice === 4) { (D4) } @else { (D6) }
                         </span>
                         <span class="stat-value" [ngClass]="{ buff: visualData.selfPlayer.attack > 4, nerf: visualData.selfPlayer.attack < 4 }"
                             >{{ visualData.selfPlayer.attack }}<span>/4</span></span
@@ -149,7 +149,7 @@
                     </div>
                     <div class="stat-container">
                         <span class="stat-label"
-                            >Défense @if (matchService.data.players[visualData.selfPlayer.playerIndex].defenseDice === 4) { (D4) } @else { (D6)
+                            >{{ 'pages.combat.defenseStat' | translate }} @if (matchService.data.players[visualData.selfPlayer.playerIndex].defenseDice === 4) { (D4) } @else { (D6)
                             }</span
                         >
                         <span class="stat-value" [ngClass]="{ buff: visualData.selfPlayer.defense > 4, nerf: visualData.selfPlayer.defense < 4 }"
@@ -157,7 +157,7 @@
                         >
                     </div>
                     <div class="stat-container">
-                        <span class="stat-label">Vitesse</span>
+                        <span class="stat-label">{{ 'pages.combat.speed' | translate }}</span>
                         <span class="stat-value"
                             >{{ matchService.data.players[visualData.selfPlayer.playerIndex].speed }}/{{
                                 matchService.data.players[visualData.selfPlayer.playerIndex].speed

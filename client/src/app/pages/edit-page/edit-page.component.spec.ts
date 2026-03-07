@@ -21,6 +21,7 @@ import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { EditPageComponent } from './edit-page.component';
 import { ChatComponent } from '@app/components/chat/chat.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-map',
@@ -87,7 +88,7 @@ describe('EditPageComponent', () => {
         editorServiceSpy.getRemainingItemCount.and.returnValue(0);
 
         await TestBed.configureTestingModule({
-            imports: [EditPageComponent, FormsModule, HeaderComponent],
+            imports: [EditPageComponent, FormsModule, HeaderComponent, TranslateModule.forRoot()],
             providers: [
                 { provide: Router, useValue: routerSpy },
                 { provide: PopupService, useValue: popupServiceSpy },

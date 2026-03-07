@@ -1,10 +1,10 @@
 export enum PlayerStatType {
-    DiscoveredItemsCount = 'ITEMS',
-    VisitedTilesRatio = '% TUILES',
-    Combats = 'COMBATS',
-    Victories = 'VICTOIRES',
-    Defeats = 'DÉFAITES',
-    Escapes = 'ÉVASIONS',
-    HpInflicted = 'DÉGATS',
-    HpLost = 'PV PERDUS',
+    DiscoveredItemsCount = 'discoveredItemsCount',
+    VisitedTilesRatio = 'visitedTilesRatio',
+    Combats = 'combats',
+    Victories = 'victories',
+    Defeats = 'defeats',
+    Escapes = 'escapes',
+    HpInflicted = 'hpInflicted',
+    HpLost = 'hpLost',
 }

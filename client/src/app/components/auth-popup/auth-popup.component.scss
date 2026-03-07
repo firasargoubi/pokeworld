@@ -123,3 +123,30 @@ $font-size: 20px;
     padding: 4px 0;
     text-align: center;
 }
+
+.language-selector {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
+
+.lang-button {
+    padding: 4px 12px;
+    font-family: 'pixel';
+    font-size: 12px;
+    cursor: pointer;
+    background: $input-bg-normal;
+    border: 2px solid transparent;
+    color: white;
+    transition: border-color 0.15s;
+
+    &:hover {
+        border-color: $input-border-color;
+    }
+
+    &.active {
+        background: hsl(203, 100%, 38%);
+        border-color: $input-border-color;
+    }
+}

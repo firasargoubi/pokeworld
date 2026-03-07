@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MenuButtonComponent } from '@app/components/menu-button/menu-button.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('MenuButtonComponent', () => {
     let component: MenuButtonComponent;
@@ -12,7 +13,7 @@ describe('MenuButtonComponent', () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
         await TestBed.configureTestingModule({
-            imports: [MenuButtonComponent],
+            imports: [MenuButtonComponent, TranslateModule.forRoot()],
             providers: [{ provide: Router, useValue: routerSpy }],
         }).compileComponents();
 

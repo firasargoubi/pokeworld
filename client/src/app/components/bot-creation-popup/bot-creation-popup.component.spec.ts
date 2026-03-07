@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { AudioService } from '@app/services/audio/audio.service';
 import { PlayerType } from '@common/interfaces/player-data';
+import { TranslateModule } from '@ngx-translate/core';
 import { CreateBotPopupComponent } from './bot-creation-popup.component';
 
 describe('CreateBotPopupComponent', () => {
@@ -14,7 +15,7 @@ describe('CreateBotPopupComponent', () => {
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage']);
 
         await TestBed.configureTestingModule({
-            imports: [CreateBotPopupComponent, NgClass, PokeballButtonComponent],
+            imports: [CreateBotPopupComponent, NgClass, PokeballButtonComponent, TranslateModule.forRoot()],
             providers: [{ provide: AudioService, useValue: mockAudioService }],
         }).compileComponents();
 

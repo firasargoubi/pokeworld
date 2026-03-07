@@ -5,12 +5,13 @@ import { PokeballButtonComponent } from '@app/components/pokeball-button/pokebal
 import { PlayService } from '@app/services/play/play.service';
 import { MAX_ITEMS } from '@common/consts/player-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-item-drop-popup',
     templateUrl: './item-drop-popup.component.html',
     styleUrls: ['./item-drop-popup.component.scss'],
-    imports: [ItemComponent, PokeballButtonComponent, CommonModule],
+    imports: [ItemComponent, PokeballButtonComponent, CommonModule, TranslateModule],
 })
 export class ItemDropPopupComponent {
     @Input() inventoryItems: ItemType[] = [];

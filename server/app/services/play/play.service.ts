@@ -92,7 +92,7 @@ export class PlayService {
             match.setTimeout(this.endMatch.bind(this, match), MATCH_END_DURATION);
         } else {
             const playerName = match.data.players[match.data.playData.activePlayerIndex].name;
-            match.sendMessage(`Début du tour de ${playerName}`);
+            match.sendMessage(Message.TurnStart, { playerName });
             this.trackingService.updateRounds(match);
             this.chatService.logPlayerTurnStart(match, playerName);
             match.setTimeout(this.startTurnWait.bind(this, match), TURN_START_DURATION);
@@ -150,7 +150,7 @@ export class PlayService {
         const winner = match.data.players.find((p) => p.combatsWon >= MINIMUM_COMBATS_TO_WIN);
         if (winner) {
             match.data.state = MatchState.MatchEnd;
-            match.sendMessage(`${winner.name} à gagné la partie`);
+            match.sendMessage(Message.MatchWinner, { playerName: winner.name });
             this.trackingService.updateWinner(match, winner);
             this.chatService.logMatchWinner(match, winner.name);
         }
@@ -175,7 +175,7 @@ export class PlayService {
                 this.trackingService.updateWinner(match, flagHolder);
                 const winningTeam = flagHolder.team;
                 match.data.state = MatchState.MatchEnd;
-                match.sendMessage(`L'équipe ${winningTeam} remporte la partie !`);
+                match.sendMessage(Message.TeamWin, { team: winningTeam });
             }
         }
         return hasWon;

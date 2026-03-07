@@ -1,15 +1,27 @@
 <div class="editor-left auth-popup">
     <div class="auth-inner">
-        <div class="left-label">{{ isCreating ? 'Créer un compte' : 'Connexion' }}</div>
+        <div class="left-label">{{ isCreating ? ('components.authPopup.createAccountTitle' | translate) : ('components.authPopup.loginTitle' | translate) }}</div>
+        <div class="language-selector">
+            <button
+                class="lang-button"
+                [class.active]="selectedLanguage === appLanguage.French"
+                (click)="selectLanguage(appLanguage.French)"
+            >{{ 'components.authPopup.languageFr' | translate }}</button>
+            <button
+                class="lang-button"
+                [class.active]="selectedLanguage === appLanguage.English"
+                (click)="selectLanguage(appLanguage.English)"
+            >{{ 'components.authPopup.languageEn' | translate }}</button>
+        </div>
 
         <div class="form-row">
-            <div class="left-label-small">Nom d'utilisateur</div>
+            <div class="left-label-small">{{ 'components.authPopup.username' | translate }}</div>
             <input
                 id="username-input"
                 type="text"
                 [formControl]="usernameForm"
                 maxlength="{{ visualData.nameMaxLength }}"
-                placeholder="Entrez votre nom"
+                [placeholder]="'components.authPopup.usernamePlaceholder' | translate"
                 autofocus
                 autocomplete="off"
                 style="text-transform: uppercase"
@@ -19,18 +31,18 @@
 
         @if(isCreating) {
         <div class="form-row">
-            <div class="left-label-small">Adresse courriel</div>
+            <div class="left-label-small">{{ 'components.authPopup.email' | translate }}</div>
             <input
                 id="email-input"
                 type="email"
                 [formControl]="emailForm"
-                placeholder="Entrez votre courriel"
+                [placeholder]="'components.authPopup.emailPlaceholder' | translate"
                 autocomplete="off"
                 (click)="this.audioService.playEffect(this.clickValue)"
             />
         </div>
         <div class="form-row">
-            <div class="left-label-small">Choisissez un avatar</div>
+            <div class="left-label-small">{{ 'components.authPopup.avatar' | translate }}</div>
             <div class="avatar-list">
                 @for(avatar of avatarList; track $index) {
                 <img
@@ -46,16 +58,16 @@
         }
 
         <div class="form-row">
-            <div class="left-label-small">Mot de passe</div>
+            <div class="left-label-small">{{ 'components.authPopup.password' | translate }}</div>
             <input class="input-password" type="password" [(ngModel)]="password" (click)="this.audioService.playEffect(this.clickValue)" />
         </div>
         @if(errorMessage) {
-        <div class="error">{{ errorMessage }}</div>
+        <div class="error">{{ errorMessage | translate }}</div>
         }
 
         <div class="buttons">
-            <button (click)="primaryAction()" class="save-button">{{ isCreating ? 'Créer un compte' : 'Se connecter' }}</button>
-            <button (click)="toggleAction()" class="change-button">{{ isCreating ? 'Se connecter' : 'Créer un compte' }}</button>
+            <button (click)="primaryAction()" class="save-button">{{ isCreating ? ('components.authPopup.createAccountButton' | translate) : ('components.authPopup.loginButton' | translate) }}</button>
+            <button (click)="toggleAction()" class="change-button">{{ isCreating ? ('components.authPopup.loginButton' | translate) : ('components.authPopup.createAccountButton' | translate) }}</button>
         </div>
     </div>
 </div>

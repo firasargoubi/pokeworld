@@ -1,9 +1,10 @@
 import { TestBed } from '@angular/core/testing';
+import { RIGHT_CLICK_ITEM_DESCRIPTION } from '@app/consts/item-data.const';
+import { RIGHT_CLICK_TILE_DESCRIPTION } from '@app/consts/tile-data.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { Position } from '@common/interfaces/position';
-import { RIGHT_CLICK_ITEM_DESCRIPTION } from '@common/consts/item-data.const';
-import { RIGHT_CLICK_TILE_DESCRIPTION } from '@app/consts/tile-data.const';
 import { MatchService } from '@app/services/match/match.service';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchData } from '@common/interfaces/match-data';
 import { PlayerData } from '@common/interfaces/player-data';
@@ -16,6 +17,7 @@ describe('TileDescriptionService', () => {
     let service: TileDescriptionService;
     let mockGameDataService: jasmine.SpyObj<GameDataService>;
     let mockMatchService: jasmine.SpyObj<MatchService>;
+    let i18nServiceSpy: jasmine.SpyObj<I18nService>;
 
     let mockPosition: Position = { x: 3, y: 4 };
     let mockPlayer: PlayerData;
@@ -27,12 +29,15 @@ describe('TileDescriptionService', () => {
         mockMatchData = { ...structuredClone(MOCK_MATCH_DATAS[0]), players: [mockPlayer] };
         mockGameDataService = jasmine.createSpyObj('GameDataService', ['getTileFromPosition', 'getItem'], { gameData: mockMatchData.gameData });
         mockMatchService = jasmine.createSpyObj('MatchService', ['isActivePlayer', 'canUseDebugMove'], { data: mockMatchData });
+        i18nServiceSpy = jasmine.createSpyObj('I18nService', ['translate']);
+        i18nServiceSpy.translate.and.callFake((message: string) => message);
 
         TestBed.configureTestingModule({
             providers: [
                 TileDescriptionService,
                 { provide: GameDataService, useValue: mockGameDataService },
                 { provide: MatchService, useValue: mockMatchService },
+                { provide: I18nService, useValue: i18nServiceSpy },
             ],
         });
         service = TestBed.inject(TileDescriptionService);

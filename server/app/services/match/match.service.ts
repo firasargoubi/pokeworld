@@ -47,8 +47,8 @@ export class MatchService {
         this.botService.onMatchUpdate(match);
     }
 
-    sendMessage(matchCode: string, message: string) {
-        this.matchGateway.emitMessage(matchCode, message);
+    sendMessage(matchCode: string, message: string, messageParams?: Record<string, string | number | boolean>) {
+        this.matchGateway.emitMessage(matchCode, message, false, messageParams);
     }
 
     playerRemovedFromMatch(playerId: string, reason: string) {

@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { RIGHT_CLICK_TILE_DESCRIPTION } from '@app/consts/tile-data.const';
+import { RIGHT_CLICK_ITEM_DESCRIPTION } from '@app/consts/item-data.const';
 import { GameDataService } from '@app/services/game-data/game-data.service';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { MatchService } from '@app/services/match/match.service';
-import { RIGHT_CLICK_ITEM_DESCRIPTION } from '@common/consts/item-data.const';
 import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { PlayerData } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
@@ -17,6 +18,7 @@ export class TileDescriptionService {
 
     private matchService: MatchService = inject(MatchService);
     private gameDataService: GameDataService = inject(GameDataService);
+    private i18nService: I18nService = inject(I18nService);
 
     displayTileDescription(event: MouseEvent): number | null {
         if (!this.matchService.canUseDebugMove()) {
@@ -78,11 +80,11 @@ export class TileDescriptionService {
 
     private getDescription(position: Position): string {
         const tileType = this.gameDataService.getTileFromPosition(position);
-        let description = RIGHT_CLICK_TILE_DESCRIPTION.get(tileType) as string;
+        let description = this.i18nService.translate(RIGHT_CLICK_TILE_DESCRIPTION.get(tileType) as string);
 
         const itemOnTile = this.gameDataService.getItem(position);
         if (itemOnTile) {
-            description = `${RIGHT_CLICK_ITEM_DESCRIPTION.get(itemOnTile)}<br><br>${description}`;
+            description = `${this.i18nService.translate(RIGHT_CLICK_ITEM_DESCRIPTION.get(itemOnTile) as string)}<br><br>${description}`;
         }
 
         return description;

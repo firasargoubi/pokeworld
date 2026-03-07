@@ -7,12 +7,13 @@ import { AudioService } from '@app/services/audio/audio.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameMode, MapSize } from '@common/interfaces/map-data';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-create-game-popup',
     templateUrl: './create-game-popup.component.html',
     styleUrls: ['./create-game-popup.component.scss'],
-    imports: [PokeballButtonComponent, NgClass],
+    imports: [PokeballButtonComponent, NgClass, TranslateModule],
 })
 export class CreateGamePopupComponent {
     gameMode: GameMode = GameMode.FFA;

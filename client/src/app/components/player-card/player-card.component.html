@@ -14,16 +14,16 @@
         }
     </div>
     <div class="player-card" (click)="displayKickButton && !player.isConnected ? onAddBot() : null">
-        <div class="add-instruction">+ Ajouter</div>
+        <div class="add-instruction">{{ 'components.playerCard.add' | translate }}</div>
         <span class="player-name">
             {{ player.name }}
             @if (player.playerType === 'botAggressive') {
             <span class="bot-icon-aggresive"></span>
-            <span class="bot-type aggresive">Agressif</span>
+            <span class="bot-type aggresive">{{ 'components.playerCard.aggressive' | translate }}</span>
 
             } @if (player.playerType === 'botDefensive') {
             <span class="bot-icon-defensive"></span>
-            <span class="bot-type">Défensif</span>
+            <span class="bot-type">{{ 'components.playerCard.defensive' | translate }}</span>
 
             }
             <div class="crown"></div>

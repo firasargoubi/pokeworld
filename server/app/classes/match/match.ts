@@ -21,14 +21,14 @@ export class Match {
         this.matchService.sendUpdate(this);
     }
 
-    sendMessage(message: string) {
+    sendMessage(message: string, messageParams?: Record<string, string | number | boolean>) {
         this.sendUpdate();
-        this.matchService.sendMessage(this.data.code, message);
+        this.matchService.sendMessage(this.data.code, message, messageParams);
     }
 
-    sendMessageToHost(message: string) {
+    sendMessageToHost(message: string, messageParams?: Record<string, string | number | boolean>) {
         this.sendUpdate();
-        this.matchService.sendMessage(this.data.players[this.data.lobbyData.hostPlayerIndex].id, message);
+        this.matchService.sendMessage(this.data.players[this.data.lobbyData.hostPlayerIndex].id, message, messageParams);
     }
 
     setTimeout(callback: () => void, duration: number) {
@@ -157,7 +157,7 @@ export class Match {
     private playerLeaveStats(playerId: string) {
         const player = this.data.players.find((p) => p.id === playerId);
         player.isConnected = false;
-        this.sendMessage(`${player.name} a quitté la partie`);
+        this.sendMessage(Message.PlayerLeftMatch, { playerName: player.name });
     }
 
     private playerLeaveMatch(playerId: string) {
@@ -172,7 +172,7 @@ export class Match {
             }
             player.spawnPoint = structuredClone(OUTSIDE_OF_MAP);
             this.matchService.respawnPlayer(this, player);
-            this.sendMessage(`${player.name} a quitté la partie`);
+            this.sendMessage(Message.PlayerLeftMatch, { playerName: player.name });
         }
     }
 }

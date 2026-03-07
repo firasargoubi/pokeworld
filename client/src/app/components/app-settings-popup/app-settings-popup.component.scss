@@ -178,3 +178,41 @@ $thumb-size: calc($scale * 3.2);
 .volume-icon.high-volume {
     background-image: url('../../../assets/images/menu/icons/volume/volume-3.png');
 }
+
+.section-title {
+    width: 100%;
+    font-size: calc($scale * 3);
+    letter-spacing: calc($scale * 0.3);
+    text-shadow: calc($scale * 0.25) 0 0 rgba(0, 0, 0, 0.2);
+    user-select: none;
+    text-align: center;
+    margin-top: calc($scale * 2);
+}
+
+.option-row {
+    display: flex;
+    gap: calc($scale * 2);
+    justify-content: center;
+    margin: calc($scale * 1) 0;
+}
+
+.option-button {
+    padding: calc($scale * 1.5) calc($scale * 3);
+    font-family: 'pixel';
+    font-size: calc($scale * 2.5);
+    cursor: pointer;
+    background: hsla(231, 12%, 45%, 0.7);
+    color: white;
+    border: 2px solid transparent;
+    text-transform: uppercase;
+    transition: border-color 0.15s, background 0.15s;
+
+    &:hover {
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    &.active {
+        background: hsl(203, 100%, 38%);
+        border-color: rgba(255, 255, 255, 0.82);
+    }
+}

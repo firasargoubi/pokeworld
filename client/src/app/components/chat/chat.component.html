@@ -10,7 +10,7 @@
                     (click)="switchTab(chatTab.Channels)"
                 >
                     <div class="icon"></div>
-                    <p>Canaux</p>
+                    <p>{{ 'components.chat.channels' | translate }}</p>
                 </div>
                 <div
                     class="category-button general-messages-button"
@@ -18,7 +18,7 @@
                     (click)="switchTab(chatTab.General)"
                 >
                     <div class="icon"></div>
-                    <p>Général</p>
+                    <p>{{ 'components.chat.general' | translate }}</p>
                 </div>
                 @if (isInGame) {
                 <div
@@ -27,7 +27,7 @@
                     (click)="switchTab(chatTab.Match)"
                 >
                     <div class="icon"></div>
-                    <p>Messagerie</p>
+                    <p>{{ 'components.chat.messages' | translate }}</p>
                 </div>
                 <div
                     class="category-button journal-button"
@@ -35,7 +35,7 @@
                     (click)="switchTab(chatTab.Journal)"
                 >
                     <div class="icon"></div>
-                    <p>Journal</p>
+                    <p>{{ 'components.chat.journal' | translate }}</p>
                 </div>
                 }
             </div>
@@ -51,7 +51,7 @@
             <div class="search-bar simple-medium-stylized-padding">
                 <input
                     type="text"
-                    placeholder="Rechercher/Créer un canal"
+                    [placeholder]="'components.chat.searchPlaceholder' | translate"
                     class="message-input"
                     [(ngModel)]="searchBarValue"
                     [maxLength]="this.maxInputLength"
@@ -116,14 +116,14 @@
             } } @case (chatTab.Journal) { @for (message of logs; track $index) {
             <p class="messages">
                 <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
-                <span class="message-content message">{{ message.content }}</span>
+                <span class="message-content message">{{ message.content | translate: message.messageParams }}</span>
             </p>
             } } }
         </div>
         <div class="chat-input-container">
             <input
                 type="text"
-                placeholder="> Entrez message [Enter]"
+                [placeholder]="'components.chat.inputPlaceholder' | translate"
                 class="message-input"
                 (keydown)="sendMessage($event)"
                 [maxLength]="maxInputLength"

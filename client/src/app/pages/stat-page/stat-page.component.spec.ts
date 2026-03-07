@@ -13,6 +13,7 @@ import { MatchData } from '@common/interfaces/match-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { MOCK_GLOBAL_STAT_DATA, MOCK_PLAYER_STAT_DATA, MOCK_WINNER_VISUAL_DATA } from '@common/test-consts/mock-stat-data';
+import { TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { StatPageComponent } from './stat-page.component';
 
@@ -46,7 +47,7 @@ describe('StatPageComponent', () => {
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage', 'playCombatEffect']);
 
         await TestBed.configureTestingModule({
-            imports: [FormsModule, HeaderComponent, ChatComponent],
+            imports: [FormsModule, HeaderComponent, ChatComponent, TranslateModule.forRoot()],
             providers: [
                 { provide: MatchService, useValue: matchServiceSpy },
                 { provide: StatService, useValue: statServiceSpy },

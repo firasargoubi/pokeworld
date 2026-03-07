@@ -11,16 +11,18 @@ import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { VisibilityEvent } from '@app/interfaces/visibility-event';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
 import { ChatComponent } from '@app/components/chat/chat.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
     styleUrls: ['./admin-page.component.scss'],
-    imports: [GameCardComponent, PokeballButtonComponent, CreateGamePopupComponent, CommonModule, HeaderComponent, ChatComponent],
+    imports: [GameCardComponent, PokeballButtonComponent, CreateGamePopupComponent, CommonModule, HeaderComponent, ChatComponent, TranslateModule],
 })
 export class AdminPageComponent implements OnInit {
     games: GameData[] = [];
@@ -28,6 +30,7 @@ export class AdminPageComponent implements OnInit {
     private readonly audioService: AudioService = inject(AudioService);
     private readonly router: Router = inject(Router);
     private readonly gameSaveService: GameSaveService = inject(GameSaveService);
+    private readonly i18nService: I18nService = inject(I18nService);
     private readonly popupService: PopupService = inject(PopupService);
 
     @HostListener('document:keydown.escape')
@@ -68,7 +71,7 @@ export class AdminPageComponent implements OnInit {
 
     deleteGame(id: string, name: string) {
         this.popupService.showPopup({
-            message: `${PopupMessage.DeleteGame} \n\t - ${name}`,
+            message: `${this.i18nService.translate(PopupMessage.DeleteGame)}\n\t - ${name}`,
             hasCloseButton: true,
             isConfirmation: true,
             action: () => this.confirmDeleteGame(id),

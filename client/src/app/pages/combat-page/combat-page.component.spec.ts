@@ -14,6 +14,7 @@ import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatAction, MatchData, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
 import { MOCK_MATCH_DATAS, MOCK_PLAYER_COMBAT_DATAS } from '@common/test-consts/mock-matches';
+import { TranslateModule } from '@ngx-translate/core';
 import { CombatPageComponent } from './combat-page.component';
 
 @Component({
@@ -51,7 +52,7 @@ describe('CombatPageComponent', () => {
         mockCombatService.timer = mockTimer;
 
         await TestBed.configureTestingModule({
-            imports: [CombatPageComponent],
+            imports: [CombatPageComponent, TranslateModule.forRoot()],
             providers: [
                 { provide: MatchService, useValue: mockMatchService },
                 { provide: CombatService, useValue: mockCombatService },
@@ -180,7 +181,7 @@ describe('CombatPageComponent', () => {
 
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith({
-            message: 'Enemy Player a gagné le combat',
+            message: 'Enemy Player pages.combat.winnerSuffix',
             hasCloseButton: false,
             isConfirmation: false,
             popupColor: PopupColor.Blue,
@@ -202,7 +203,7 @@ describe('CombatPageComponent', () => {
         component['displayPopupMessage']();
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith({
-            message: 'Self Player a gagné le combat',
+            message: 'Self Player pages.combat.winnerSuffix',
             hasCloseButton: false,
             isConfirmation: false,
             popupColor: PopupColor.Blue,
@@ -223,7 +224,7 @@ describe('CombatPageComponent', () => {
         component['displayPopupMessage']();
         expect(popupServiceSpy.keepMessages).toHaveBeenCalled();
         expect(popupServiceSpy.showPopup).toHaveBeenCalledWith({
-            message: 'Aucun gagnant',
+            message: 'popup.noWinner',
             hasCloseButton: false,
             isConfirmation: false,
             popupColor: PopupColor.Blue,

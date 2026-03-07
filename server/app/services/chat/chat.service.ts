@@ -66,8 +66,10 @@ export class ChatService {
     }
 
     logItemPickup(match: Match, name: string, itemType: ItemType) {
-        const message = `${name} a ramassé ${ITEM_NAME[itemType]}`;
-        this.addLogToMatch(match, message);
+        this.addLogToMatch(match, 'server.logs.itemPickup', [], {
+            playerName: name,
+            itemName: ITEM_NAME[itemType],
+        });
     }
 
     logDebugMode(match: Match, isDebugMode: boolean) {
@@ -76,11 +78,11 @@ export class ChatService {
     }
 
     logPlayerTurnStart(match: Match, playerName: string) {
-        this.addLogToMatch(match, `Début du tour de ${playerName}`);
+        this.addLogToMatch(match, 'server.logs.turnStart', [], { playerName });
     }
 
     logMatchWinner(match: Match, playerName: string) {
-        this.addLogToMatch(match, `${playerName} à gagné la partie`);
+        this.addLogToMatch(match, 'server.logs.matchWinner', [], { playerName });
     }
 
     logEndMatch(match: Match) {
@@ -89,63 +91,75 @@ export class ChatService {
             activePlayersNames.length === 1
                 ? activePlayersNames[0]
                 : activePlayersNames.slice(0, -1).join(', ') + ' et ' + activePlayersNames[activePlayersNames.length - 1];
-        this.addLogToMatch(match, `Fin de partie avec ${formattedPlayersList}`);
+        this.addLogToMatch(match, 'server.logs.endMatch', [], { playersList: formattedPlayersList });
     }
 
     logCombatStart(match: Match, engagingPlayerName: string, targetPlayerName: string) {
-        this.addLogToMatch(match, engagingPlayerName + ' a engagé un combat avec ' + targetPlayerName);
+        this.addLogToMatch(match, 'server.logs.combatStart', [], {
+            engagingPlayerName,
+            targetPlayerName,
+        });
     }
 
     logBridgeToggled(match: Match, playerName: string, position: Position) {
-        const bridgeState = match.data.gameData.mapData.tiles[position.x][position.y] === TileType.Bridge ? 'réparé' : 'cassé';
-        this.addLogToMatch(match, playerName + ' a ' + bridgeState + ' un pont');
+        const isRepaired = match.data.gameData.mapData.tiles[position.x][position.y] === TileType.Bridge;
+        const message = isRepaired ? 'server.logs.bridgeRepaired' : 'server.logs.bridgeBroken';
+        this.addLogToMatch(match, message, [], { playerName });
     }
 
     logEscapeAttempt(match: Match, isSuccessful: boolean, escapingPlayer: PlayerCombatData) {
-        const message = 'Tentative de fuite de ' + this.getPlayerName(match, escapingPlayer) + ' : ' + (isSuccessful ? 'Réussie' : 'Échouée');
-        this.addLogToMatch(match, message, this.getConcernedPlayers(match));
+        const message = isSuccessful ? 'server.logs.escapeAttempt.success' : 'server.logs.escapeAttempt.fail';
+        this.addLogToMatch(match, message, this.getConcernedPlayers(match), {
+            playerName: this.getPlayerName(match, escapingPlayer),
+        });
     }
 
     logAttack(match: Match, attackingPlayerData: PlayerCombatData) {
-        const message = `${this.getPlayerName(match, attackingPlayerData)} attaque (${attackingPlayerData.attack}) avec Dé (+${
-            match.data.combatData.lastRolledAttack
-        })`;
-        this.addLogToMatch(match, message, this.getConcernedPlayers(match));
+        this.addLogToMatch(match, 'server.logs.attack', this.getConcernedPlayers(match), {
+            playerName: this.getPlayerName(match, attackingPlayerData),
+            attack: attackingPlayerData.attack,
+            rolledAttack: match.data.combatData.lastRolledAttack,
+        });
     }
 
     logDefense(match: Match, defendingPlayerData: PlayerCombatData) {
-        const message = `${this.getPlayerName(match, defendingPlayerData)} se défend (${defendingPlayerData.defense}) avec Dé (+${
-            match.data.combatData.lastRolledDefense
-        })`;
-        this.addLogToMatch(match, message, this.getConcernedPlayers(match));
+        this.addLogToMatch(match, 'server.logs.defense', this.getConcernedPlayers(match), {
+            playerName: this.getPlayerName(match, defendingPlayerData),
+            defense: defendingPlayerData.defense,
+            rolledDefense: match.data.combatData.lastRolledDefense,
+        });
     }
 
     logAttackResult(match: Match, attackResult: number) {
-        const attackResultText = attackResult > 0 ? `inflige ${attackResult} dégâts` : 'est bloqué';
-        const message = `L'attaque ${attackResultText}.`;
-        this.addLogToMatch(match, message, this.getConcernedPlayers(match));
+        if (attackResult > 0) {
+            this.addLogToMatch(match, 'server.logs.attackResult.damage', this.getConcernedPlayers(match), { attackResult });
+        } else {
+            this.addLogToMatch(match, 'server.logs.attackResult.blocked', this.getConcernedPlayers(match));
+        }
     }
 
     logCombatEnd(match: Match, concernedPlayers: PlayerCombatData, isDead: boolean) {
         const activePlayerName = this.getPlayerName(match, concernedPlayers);
-        const message = isDead ? `${activePlayerName} a gagné le combat` : `${activePlayerName} s'est enfui du combat`;
-        this.addLogToMatch(match, message);
+        const message = isDead ? 'server.logs.combatEnd.victory' : 'server.logs.combatEnd.escape';
+        this.addLogToMatch(match, message, [], { playerName: activePlayerName });
     }
 
     logPlayerLeft(match: Match, playerId: string) {
         const leavingPlayer = match.data.players.find((player) => player.id === playerId);
         if (leavingPlayer) {
-            const message = `${leavingPlayer.name} a abandonné la partie`;
-            this.addLogToMatch(match, message);
+            this.addLogToMatch(match, 'server.logs.playerLeft', [], { playerName: leavingPlayer.name });
         }
     }
 
-    private addLogToMatch(match: Match, message: string, concernedPlayers: string[] = []) {
+    private addLogToMatch(match: Match, message: string, concernedPlayers: string[] = [], messageParams?: Record<string, string | number | boolean>) {
         const log: ChatLog = {
             content: message,
             timestamp: new Date(),
             concernedPlayersNamesList: concernedPlayers,
         };
+        if (messageParams) {
+            log.messageParams = messageParams;
+        }
         match.data.logData.push(log);
         match.sendUpdate();
     }

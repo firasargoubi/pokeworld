@@ -11,14 +11,17 @@ import { AudioService } from '@app/services/audio/audio.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { UserService } from '@app/services/user/user.service';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
+import { AppLanguage, AppTheme } from '@common/interfaces/preferences';
 import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/player-data.const';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-auth-popup',
     templateUrl: './auth-popup.component.html',
     styleUrls: ['./auth-popup.component.scss'],
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule],
 })
 export class AuthPopupComponent {
     usernameForm: FormControl = new FormControl('', [
@@ -36,6 +39,8 @@ export class AuthPopupComponent {
     errorMessage = '';
     readonly clickValue = SoundEffect.Click;
 
+    appLanguage = AppLanguage;
+
     avatarList: string[] = structuredClone(AVATAR_LIST);
     selectedAvatar: string = this.avatarList[0];
     avatarUrl: string = '';
@@ -44,9 +49,14 @@ export class AuthPopupComponent {
     private userService: UserService = inject(UserService);
     private popupService: PopupService = inject(PopupService);
     private chatService: ChatService = inject(ChatService);
+    private preferencesService: PreferencesService = inject(PreferencesService);
+
+    get selectedLanguage(): AppLanguage {
+        return this.preferencesService.currentLanguage;
+    }
 
     @HostListener('document:keydown.enter', ['$event'])
-    onEnterKey(event: KeyboardEvent) {
+    onEnterKey(event: Event) {
         event.preventDefault();
         this.primaryAction();
     }
@@ -85,7 +95,7 @@ export class AuthPopupComponent {
             this.errorMessage = PopupMessage.UsernameLength;
             return;
         } else if (this.isCreating && !this.emailForm.valid) {
-            this.errorMessage = 'Adresse courriel invalide';
+            this.errorMessage = 'components.authPopup.invalidEmail';
             return;
         }
         if (this.isCreating) {
@@ -98,10 +108,14 @@ export class AuthPopupComponent {
 
     register() {
         this.userService
-            .createAccount(this.usernameForm.value.toUpperCase().trim(), this.password, this.avatarUrl, this.emailForm.value.trim())
+            .createAccount(this.usernameForm.value.toUpperCase().trim(), this.password, this.avatarUrl, this.emailForm.value.trim(), {
+                language: this.selectedLanguage,
+                theme: AppTheme.Default,
+            })
             .subscribe({
                 next: (user) => {
                     this.userService.setUser(user);
+                    this.preferencesService.syncAfterLogin(user.userId, user.preferences);
                     this.popupService.showPopup({
                         message: PopupMessage.SuccessfulAccountCreation,
                         hasCloseButton: true,
@@ -123,6 +137,7 @@ export class AuthPopupComponent {
         this.userService.login(this.usernameForm.value.toUpperCase().trim(), this.password).subscribe({
             next: (user) => {
                 this.userService.setUser(user);
+                this.preferencesService.syncAfterLogin(user.userId, user.preferences);
                 this.popupService.showPopup({
                     message: PopupMessage.SuccessfulConnection,
                     hasCloseButton: true,
@@ -149,6 +164,11 @@ export class AuthPopupComponent {
     toggleMode() {
         this.isCreating = !this.isCreating;
         this.errorMessage = '';
+    }
+
+    selectLanguage(language: AppLanguage): void {
+        this.audioService.playEffect(this.clickValue);
+        this.preferencesService.setLanguageBeforeAuth(language);
     }
 
     private handleNotFoundError(error: HttpErrorResponse, isRegister: boolean) {

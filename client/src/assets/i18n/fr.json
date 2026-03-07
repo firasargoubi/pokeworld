@@ -1,0 +1,330 @@
+{
+    "popup": {
+        "deleteGame": "Êtes-vous sûr de vouloir supprimer le jeu :",
+        "quit": "Voulez-vous vraiment quitter ?",
+        "quitEditPage": "Voulez-vous vraiment quitter la page? Les modifications non sauvegardées seront perdues.",
+        "successfulSave": "Jeu sauvegardé avec succès",
+        "cancelModification": "Voulez-vous vraiment annuler les modifications?",
+        "gameDoesNotExist": "Le jeu n'existe pas !",
+        "errorFetchingGame": "Erreur lors de la récupération du jeu !",
+        "errorLoadingGames": "Erreur lors du chargement des jeux !",
+        "surrender": "Voulez-vous vraiment abandonner ?",
+        "connectionError": "Erreur de connection avec le serveur",
+        "nameAlreadyExists": "Le nom est déjà utilisé. Veuillez en choisir un autre.",
+        "successfulConnection": "Connecté avec succès !",
+        "successfulAccountCreation": "Compte créé avec succès !",
+        "logoutConfirmation": "Êtes-vous sûr de vouloir vous déconnecter ?",
+        "emptyFields": "Veuillez remplir tous les champs",
+        "usernameSpaces": "Le nom d’utilisateur ne doit pas commencer ni finir par des espaces",
+        "usernameLength": "Le nom doit contenir entre 3 et 15 caractères",
+        "invalidCredentials": "Le nom d'utilisateur ou le mot de passe est invalide",
+        "usernameTaken": "Le nom d'utilisateur est déjà utilisé",
+        "accountConnected": "Le compte est déjà connecté sur une autre plateforme",
+        "changeConfirmed": "Le mot de passe a été changé !",
+        "deleteAccountConfirmation": "Voulez-vous vraiment supprimer votre compte ?",
+        "noWinner": "Aucun gagnant"
+    },
+    "server": {
+        "messages": {
+            "adminQuit": "L'administrateur a quitté la partie",
+            "kick": "Vous avez été exclu par l'administrateur",
+            "roomFull": "La partie est pleine",
+            "alreadyInMatch": "Vous êtes déjà dans une partie",
+            "invalidMatchCode": "La partie n'existe pas",
+            "roomLocked": "La partie est verrouillée",
+            "lockedFromLobby": "Le jeu s'est verrouillé pendant que vous choisissiez votre personnage, souhaitez-vous revenir au menu principal ?",
+            "lastPlayerRemaining": "La partie est terminée car tous les autres joueurs ont quitté",
+            "debugModeOn": "Le mode de debug a été activé",
+            "debugModeOff": "Le mode de debug a été désactivé",
+            "notEnoughPlayers": "La partie doit avoir au moins 2 joueurs pour débuter",
+            "notLocked": "La partie doit être verouillée pour débuter",
+            "notEvenPlayers": "Le mode CTF nécessite un nombre pair de joueurs",
+            "deletedGame": "Le jeu a été supprimé",
+            "invisibleGame": "Le jeu n'est plus visible",
+            "turnStart": "Début du tour de {{playerName}}",
+            "matchWinner": "{{playerName}} a gagné la partie",
+            "teamWin": "L'équipe {{team}} remporte la partie !",
+            "playerLeftMatch": "{{playerName}} a quitté la partie"
+        },
+        "logs": {
+            "itemPickup": "{{playerName}} a ramassé {{itemName}}",
+            "turnStart": "Début du tour de {{playerName}}",
+            "matchWinner": "{{playerName}} a gagné la partie",
+            "endMatch": "Fin de partie avec {{playersList}}",
+            "combatStart": "{{engagingPlayerName}} a engagé un combat avec {{targetPlayerName}}",
+            "bridgeRepaired": "{{playerName}} a réparé un pont",
+            "bridgeBroken": "{{playerName}} a cassé un pont",
+            "escapeAttempt": {
+                "success": "Tentative de fuite de {{playerName}} : Réussie",
+                "fail": "Tentative de fuite de {{playerName}} : Échouée"
+            },
+            "attack": "{{playerName}} attaque ({{attack}}) avec Dé (+{{rolledAttack}})",
+            "defense": "{{playerName}} se défend ({{defense}}) avec Dé (+{{rolledDefense}})",
+            "attackResult": {
+                "damage": "L'attaque inflige {{attackResult}} dégâts.",
+                "blocked": "L'attaque est bloquée."
+            },
+            "combatEnd": {
+                "victory": "{{playerName}} a gagné le combat",
+                "escape": "{{playerName}} s'est enfui du combat"
+            },
+            "playerLeft": "{{playerName}} a abandonné la partie"
+        }
+    },
+    "items": {
+        "rightClick": {
+            "item1": "<b>Shiny Charm</b><br>+1 ATT / +1 DEF<br>Rend le porteur shiny",
+            "item2": "<b>Evo Gem</b><br>+2 ATT / +2 DEF<br>Fait évoluer le pokemon",
+            "item3": "<b>Bush Boost</b><br>+3 ATT depuis un buisson<br>Bonus d'attaque quand le joueur est caché dans les buissons",
+            "item4": "<b>Healing Berry</b><br>+1 PV/tour si PV≤ 50%<br>Soigne le joueur quand sa santé est faible.",
+            "item5": "<b>PokeBall</b><br>+30% chances de fuite<br>+1 fuite par combat",
+            "item6": "<b>Invisibility Mantle</b><br>Rend le porteur invisible aux yeux des autres",
+            "random": "<b>Item Aléatoire</b><br>Se transforme aléatoirement en l'un des six objets",
+            "spawn": "<b>Point de départ</b><br>Endroit où les joueurs réaparaissent lorsqu'ils sont éliminés",
+            "flag": "<b>Drapeau</b><br>Rapportez le à votre point de départ pour gagner la partie"
+        },
+        "description": {
+            "item1": "<b>Shiny Charm:</b> +1 ATT / +1 DEF<br>Ajoute un point d'attaque et de défense au joueur qui le ramasse.",
+            "item2": "<b>Evo Gem:</b> +2 ATT / +2 DEF<br>Ajoute deux points d'attaque et de défense au joueur.",
+            "item3": "<b>Bush Boost:</b> +3 ATT en buisson<br>Donne un bonus d'attaque supplémentaire quand le joueur est caché dans les buissons.",
+            "item4": "<b>Healing Berry:</b> +1 PV/tour si PV ≤ 50%<br>Régénère 1 point de vie par tour quand la santé du joueur est faible.",
+            "item5": "<b>PokeBall:</b> +30% évasion, +1 nb esquive<br>Augmente les chances d'esquiver et permet d'esquiver une attaque supplémentaire.",
+            "item6": "<b>Invisibility Mantle:</b> Joueur invisible temporairement<br>Rend le joueur invisible aux yeux des autres pendant un court moment.",
+            "random": "<b>Item Aléatoire:</b> Effet surprise<br>Donne aléatoirement l'un des six objets lors de la collecte.",
+            "spawn": "<b>Point de départ:</b> Zone de spawn<br>Endroit où les joueurs apparaissent en début de partie ou après avoir été éliminés.",
+            "flag": "<b>Drapeau:</b> Objectif Capture the Flag<br>L'objectif principal à capturer dans le mode de jeu CTF."
+        }
+    },
+    "validation": {
+        "invalidMap": "Carte invalide :",
+        "noErrors": "Aucune erreur de validation",
+        "errors": {
+            "empty": "Le champ ne peut pas être vide",
+            "tooLong": "La valeur dépasse la longueur maximale autorisée",
+            "bridge": "Problème de pont en",
+            "bridgeAtEdge": "Le pont ne peut pas être placé au bord de la carte",
+            "bridgeNotBetweenWalls": "Le pont doit être placé entre deux tuiles d'eau",
+            "missingRequiredItems": "Pas assez d'éléments requis placés sur la carte",
+            "tooManyItems": "Trop d'éléments de ce type placés sur la carte",
+            "duplicatedName": "Le nom du jeu existe déjà",
+            "terrainCoverage": "Couverture du terrain insuffisante",
+            "tilesAccessibility": "Tuiles inaccessibles",
+            "items": "Objets mal placés",
+            "mode": "Un drapeau doit être placé sur la carte en mode CTF"
+        }
+    },
+    "tiles": {
+        "description": {
+            "path": "<b>Chemin</b>Accélère la vitesse des joueurs",
+            "bush": "<b>Buisson</b>Ralenti la vitesse des joueurs",
+            "water": "<b>Eau</b>Bloque le passage des joueurs",
+            "bridge": "<b>Pont</b>Peut être brisé ou réparé",
+            "brokenBridge": "<b>Pont brisé</b>Peut être réparé"
+        },
+        "rightClick": {
+            "grass": "<b>Gazon</b><br>Coût de déplacement: 1<br>Tuile de terrain",
+            "path": "<b>Chemin</b><br>Coût de déplacement: 0<br>Accélère la vitesse des joueurs",
+            "bush": "<b>Buisson</b><br>Coût de déplacement: 2<br>Ralenti la vitesse des joueurs",
+            "water": "<b>Eau</b><br>Déplacement impossible<br>Bloque le passage des joueurs",
+            "bridge": "<b>Pont</b><br>Coût de déplacement: 1<br>Peut être brisé",
+            "brokenBridge": "<b>Pont brisé</b><br>Déplacement impossible<br>Peut être réparé"
+        },
+        "effect": {
+            "grass": "Normal",
+            "path": "Accélère mouvement",
+            "bush": "Ralenti le mouvement",
+            "water": "Bloque le passage",
+            "bridge": "Traversable",
+            "none": "Aucun effet",
+            "brokenBridge": "Non traversable"
+        }
+    },
+    "pages": {
+        "menu": {
+            "join": "Rejoindre <br/>Partie",
+            "create": "Créer <br/>Partie",
+            "edit": "Modifier <br/>Jeux",
+            "teamNumber": "Équipe #110"
+        },
+        "join": {
+            "title": "REJOINDRE PARTIE",
+            "enterCode": "Entrez votre code d'accès",
+            "pressEnter": "Appuyer sur Entrer pour valider"
+        },
+        "create": {
+            "title": "CRÉER PARTIE"
+        },
+        "lobby": {
+            "title": "Page d'attente",
+            "accessCode": "Votre code d'accès",
+            "start": "LANCER"
+        },
+        "edit": {
+            "title": "Modifier un jeu",
+            "name": "Nom",
+            "description": "Description",
+            "size": "Taille",
+            "mode": "Mode",
+            "save": "Sauvegarder",
+            "reset": "Réinitialiser"
+        },
+        "admin": {
+            "title": "MODIFIER UN JEU",
+            "newGame": "NOUVEAU JEU"
+        },
+        "character": {
+            "title": "SELECTIONNEZ VOTRE PERSONNAGE",
+            "selectBonus": "SELECTIONNEZ VOTRE BONUS:",
+            "selectDice": "SELECTIONNEZ VOS DÉS:",
+            "hpBonus": "+2 PV",
+            "speedBonus": "+2 VIT",
+            "attack": "ATTAQUE",
+            "defense": "DÉFENSE",
+            "startGame": "COMMENCER",
+            "chooseAvatarWarning": "Veuillez choisir un avatar"
+        },
+        "play": {
+            "mapSize": "Taille carte",
+            "gameMode": "Mode de jeu",
+            "debug": "DEBUG",
+            "playerCount": "Nombre de joueurs",
+            "surrender": "< Abandonner",
+            "movement": "Mouvement",
+            "action": "Action",
+            "endTurn": "Terminer le tour",
+            "itemPickupKeyword": "ramassé"
+        },
+        "combat": {
+            "attack": "Attaquer",
+            "escape": "Fuir",
+            "attackStat": "Attaque",
+            "defenseStat": "Défense",
+            "diceAttack": "Dé attaque",
+            "diceDefense": "Dé défense",
+            "speed": "Vitesse",
+            "winnerSuffix": "a gagné le combat"
+        },
+        "stat": {
+            "title": "FIN DE PARTIE",
+            "playersStats": "STATS JOUEURS",
+            "matchStats": "STATS PARTIE :",
+            "duration": "DURÉE :",
+            "turns": "TOURS :",
+            "visitedTiles": "TUILES VISITÉES :",
+            "manipulatedDoors": "PORTES MANIPULEES :",
+            "flagCarriers": "PORTEURS DE DRAPEAU :",
+            "quit": "< QUITTER",
+            "playerColumns": {
+                "items": "ITEMS",
+                "tiles": "% TUILES",
+                "combats": "COMBATS",
+                "victories": "VICTOIRES",
+                "defeats": "DÉFAITES",
+                "escapes": "ÉVASIONS",
+                "damage": "DÉGATS",
+                "hpLost": "PV PERDUS"
+            }
+        }
+    },
+    "components": {
+        "appSettings": {
+            "title": "Paramètres",
+            "language": "Langue",
+            "languageFr": "FR",
+            "languageEn": "EN",
+            "theme": "Thème visuel",
+            "themeDefault": "Par défaut",
+            "themeDark": "Sombre",
+            "audio": "Audio",
+            "music": "Musique",
+            "effects": "Effets"
+        },
+        "authPopup": {
+            "loginTitle": "Connexion",
+            "createAccountTitle": "Créer un compte",
+            "languageFr": "FR",
+            "languageEn": "EN",
+            "username": "Nom d'utilisateur",
+            "usernamePlaceholder": "Entrez votre nom",
+            "email": "Adresse courriel",
+            "emailPlaceholder": "Entrez votre courriel",
+            "avatar": "Choisissez un avatar",
+            "password": "Mot de passe",
+            "loginButton": "Se connecter",
+            "createAccountButton": "Créer un compte",
+            "invalidEmail": "Adresse courriel invalide"
+        },
+        "botCreation": {
+            "title": "Ajouter un robot",
+            "aggressive": "Agressif",
+            "defensive": "Défensif",
+            "add": "AJOUTER"
+        },
+        "chat": {
+            "channels": "Canaux",
+            "general": "Général",
+            "messages": "Messagerie",
+            "journal": "Journal",
+            "searchPlaceholder": "Rechercher/Créer un canal",
+            "inputPlaceholder": "> Entrez message [Enter]"
+        },
+        "createGame": {
+            "title": "Nouveau jeu",
+            "gridSize": "Taille de la grille",
+            "gameMode": "Mode de jeu",
+            "confirm": "VALIDER"
+        },
+        "gameCard": {
+            "play": "JOUER"
+        },
+        "header": {
+            "back": "Retour"
+        },
+        "item": {
+            "default": "Item"
+        },
+        "itemDropPopup": {
+            "title": "Selectionnez l'item a déposer",
+            "confirm": "VALIDER"
+        },
+        "map": {
+            "default": "Carte"
+        },
+        "menuButton": {
+            "default": "Bouton"
+        },
+        "playerCard": {
+            "add": "+ Ajouter",
+            "aggressive": "Agressif",
+            "defensive": "Défensif"
+        },
+        "playerInfoPopup": {
+            "close": "X",
+            "healthPoints": "Points de vie",
+            "movementPoints": "Points de mouvement",
+            "attack": "Attaque",
+            "defense": "Défense"
+        },
+        "pokeballButton": {
+            "default": "BOUTON"
+        },
+        "userPopup": {
+            "nameLabel": "Nom:",
+            "emailLabel": "Courriel:",
+            "noneValue": "Aucun",
+            "logout": "Se déconnecter",
+            "deleteAccount": "Supprimer le compte",
+            "editPassword": "Modifier le mot de passe",
+            "oldPassword": "Ancien mot de passe",
+            "newPassword": "Nouveau mot de passe",
+            "confirm": "Valider",
+            "passwordFieldsRequired": "Les deux champs sont requis",
+            "passwordChangeError": "Erreur lors du changement de mot de passe"
+        },
+        "warningConfirmation": {
+            "close": "Fermer",
+            "confirm": "Confirmer",
+            "cancel": "Annuler"
+        }
+    }
+}

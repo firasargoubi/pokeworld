@@ -27,4 +27,10 @@ export const COMBAT_LOG_PATTERNS = {
     victory: 'gagné le combat',
 };
 
+export const COMBAT_LOG_KEYS = {
+    attack: 'server.logs.attackResult.damage',
+    flee: 'server.logs.combatEnd.escape',
+    victory: 'server.logs.combatEnd.victory',
+};
+
 export const AUDIO_LOCAL_STORAGE_KEY = 'audio_settings';

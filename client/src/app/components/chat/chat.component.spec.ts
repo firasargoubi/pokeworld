@@ -5,8 +5,10 @@ import { ChatTab } from '@app/interfaces/chat-tab.enum';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { ChatService } from '@app/services/chat/chat.service';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { MatchService } from '@app/services/match/match.service';
 import { ChatLog } from '@common/interfaces/chat-message';
+import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { ChatComponent } from './chat.component';
 
@@ -15,6 +17,7 @@ describe('ChatComponent', () => {
     let fixture: ComponentFixture<ChatComponent>;
     let chatServiceSpy: jasmine.SpyObj<ChatService>;
     let matchServiceSpy: jasmine.SpyObj<MatchService>;
+    let i18nServiceSpy: jasmine.SpyObj<I18nService>;
     let scrollToBottomSpy: jasmine.Spy;
     let mockAudioService: jasmine.SpyObj<AudioService>;
 
@@ -55,13 +58,16 @@ describe('ChatComponent', () => {
             },
         });
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage']);
+        i18nServiceSpy = jasmine.createSpyObj('I18nService', ['translate']);
+        i18nServiceSpy.translate.and.callFake((message: string) => message);
 
         await TestBed.configureTestingModule({
-            imports: [ChatComponent, FormsModule],
+            imports: [ChatComponent, FormsModule, TranslateModule.forRoot()],
             providers: [
                 { provide: ChatService, useValue: chatServiceSpy },
                 { provide: MatchService, useValue: matchServiceSpy },
                 { provide: AudioService, useValue: mockAudioService },
+                { provide: I18nService, useValue: i18nServiceSpy },
             ],
         }).compileComponents();
 

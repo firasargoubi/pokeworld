@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
     BridgeValidationError,
     ErrorMessage,
@@ -17,12 +17,15 @@ import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode, MapData } from '@common/interfaces/map-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { BRIDGE_TYPES, MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH, MIN_TERRAIN_RATIO } from './game-validation.const';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameValidationService {
+    private readonly i18nService: I18nService = inject(I18nService);
+
     validateGame(game: GameData): ValidationResult | null {
         const validationResult = this.validateMap(game.mapData);
 
@@ -43,24 +46,28 @@ export class GameValidationService {
             }
 
             if (key === 'terrainCoverage') {
-                errors.push(` - ${ErrorMessage.TerrainCoverage} (${value.coveragePercentage}%)`);
+                errors.push(` - ${this.i18nService.translate(ErrorMessage.TerrainCoverage)} (${value.coveragePercentage}%)`);
             } else if (key === 'tilesAccessibility') {
-                errors.push(` - ${ErrorMessage.TilesAccessibility}`);
+                errors.push(` - ${this.i18nService.translate(ErrorMessage.TilesAccessibility)}`);
             } else if (key === 'items') {
-                errors.push(` - ${ErrorMessage.Items} (${value.misplacedItems.length})`);
+                errors.push(` - ${this.i18nService.translate(ErrorMessage.Items)} (${value.misplacedItems.length})`);
             } else if (key === 'bridge') {
                 value.errors.forEach((error: BridgeValidationError) => {
-                    errors.push(` - [${error.x},${error.y}]: ${error.errorMessage}`);
+                    errors.push(` - [${error.x},${error.y}]: ${this.i18nService.translate(error.errorMessage)}`);
                 });
             } else if (key === 'mode') {
-                errors.push(` - ${ErrorMessage.Mode}`);
+                errors.push(` - ${this.i18nService.translate(ErrorMessage.Mode)}`);
             } else {
                 const errorMessage: ValidationStatus = value;
-                errors.push(` - ${key}: ${errorMessage.errorMessage}`);
+                const localized = errorMessage.errorMessage ? this.i18nService.translate(errorMessage.errorMessage) : '';
+                errors.push(` - ${key}: ${localized}`);
             }
         }
 
-        return errors.length ? 'Carte invalide :\n' + errors.join('\n') : 'Aucune erreur de validation';
+        const invalidMapMessage = this.i18nService.translate('validation.invalidMap');
+        const noErrorsMessage = this.i18nService.translate('validation.noErrors');
+
+        return errors.length ? `${invalidMapMessage}\n${errors.join('\n')}` : noErrorsMessage;
     }
 
     private validateName(gameName: string): ValidationStatus {

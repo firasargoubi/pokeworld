@@ -5,6 +5,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
 import { KEYWORDS_TO_REPLACE } from '@app/consts/popup-message.const';
 import { Popup } from '@app/interfaces/popup';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { filter } from 'rxjs/operators';
 import { POPUP_DELAY } from './popup.service.const';
 
@@ -18,6 +19,7 @@ export class PopupService {
     private overlay: Overlay = inject(Overlay);
     private overlayContainer: OverlayContainer = inject(OverlayContainer);
     private router: Router = inject(Router);
+    private i18nService: I18nService = inject(I18nService);
 
     constructor() {
         this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
@@ -38,7 +40,7 @@ export class PopupService {
                 return containedKeyword.some((keyword) => message.toLowerCase().includes(keyword.toLowerCase()));
             });
         }
-        this.messages.push(popupMessage);
+        this.messages.push({ ...popupMessage, message: this.i18nService.translate(popupMessage.message) });
         this.displayPopup();
     }
 

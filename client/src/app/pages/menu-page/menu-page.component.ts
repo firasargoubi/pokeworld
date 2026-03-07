@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { AudioSettingsComponent } from '@app/components/audio-settings/audio-settings.component';
+import { AppSettingsPopupComponent } from '@app/components/app-settings-popup/app-settings-popup.component';
 import { AuthPopupComponent } from '@app/components/auth-popup/auth-popup.component';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { MenuButtonComponent } from '@app/components/menu-button/menu-button.component';
@@ -11,12 +11,22 @@ import { AudioService } from '@app/services/audio/audio.service';
 import { UserService } from '@app/services/user/user.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { UserInfo } from '@common/interfaces/user';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-menu-page',
     templateUrl: './menu-page.component.html',
     styleUrls: ['./menu-page.component.scss'],
-    imports: [CommonModule, MenuButtonComponent, RouterModule, AudioSettingsComponent, AuthPopupComponent, UserPopupComponent, ChatComponent],
+    imports: [
+        CommonModule,
+        MenuButtonComponent,
+        RouterModule,
+        AppSettingsPopupComponent,
+        AuthPopupComponent,
+        UserPopupComponent,
+        ChatComponent,
+        TranslateModule,
+    ],
 })
 export class MenuPageComponent {
     pageEndpoint = PageEndpoint;

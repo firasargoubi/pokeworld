@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AudioSettings, BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { MatchData } from '@common/interfaces/match-data';
-import { AUDIO_CONFIG, AUDIO_LOCAL_STORAGE_KEY, COMBAT_LOG_PATTERNS, SOUND_EFFECTS_MAP } from './audio.const';
+import { AUDIO_CONFIG, AUDIO_LOCAL_STORAGE_KEY, COMBAT_LOG_KEYS, COMBAT_LOG_PATTERNS, SOUND_EFFECTS_MAP } from './audio.const';
 
 @Injectable({
     providedIn: 'root',
@@ -74,12 +74,16 @@ export class AudioService {
         const lastLog = currentLogs[currentLogs.length - 1];
 
         const logText = lastLog.content.toLowerCase();
+        const logKey = lastLog.content;
+        const isAttack = logKey === COMBAT_LOG_KEYS.attack || logText.includes(COMBAT_LOG_PATTERNS.attack);
+        const isFlee = logKey === COMBAT_LOG_KEYS.flee || logText.includes(COMBAT_LOG_PATTERNS.flee);
+        const isVictory = logKey === COMBAT_LOG_KEYS.victory || logText.includes(COMBAT_LOG_PATTERNS.victory);
 
-        if (logText.includes(COMBAT_LOG_PATTERNS.attack)) {
+        if (isAttack) {
             this.playEffect(SoundEffect.Attack);
-        } else if (logText.includes(COMBAT_LOG_PATTERNS.flee)) {
+        } else if (isFlee) {
             this.playEffect(SoundEffect.Flee);
-        } else if (logText.includes(COMBAT_LOG_PATTERNS.victory)) {
+        } else if (isVictory) {
             if (this.backgroundMusic) {
                 this.backgroundMusic.volume = 0;
             }

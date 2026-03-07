@@ -1,3 +1,5 @@
+import { UserPreferences } from './preferences';
+
 export interface UserInfo {
     userId: string;
     username: string;
@@ -5,4 +7,5 @@ export interface UserInfo {
     profilePicture: string;
     balance: number;
     createdAt: Date;
+    preferences: UserPreferences;
 }

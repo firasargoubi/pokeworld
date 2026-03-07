@@ -3,7 +3,7 @@ import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { EMPTY_IMAGE, ITEM_IMAGES, TILE_IMAGES } from './images.const';
-import { ITEM_DESCRIPTION } from '@common/consts/item-data.const';
+import { ITEM_DESCRIPTION } from './item-data.const';
 import { TILE_DESCRIPTION } from './tile-data.const';
 
 export const DEFAULT_EDITOR_TILES: EditorTile[] = [

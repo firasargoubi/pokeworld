@@ -5,16 +5,18 @@ import { ChatTab } from '@app/interfaces/chat-tab.enum';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { ChatService } from '@app/services/chat/chat.service';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-chat',
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.scss'],
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslateModule],
 })
 export class ChatComponent implements OnInit, AfterViewChecked {
     @Input() hideLabels: boolean = false;
@@ -33,6 +35,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     readonly chatService: ChatService = inject(ChatService);
     private shouldScrollToBottom = false;
     private readonly matchService: MatchService = inject(MatchService);
+    private readonly i18nService: I18nService = inject(I18nService);
 
     get filteredChannels() {
         const filter = this.searchBarValue.trim().toLowerCase();
@@ -160,13 +163,17 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         const playerName = this.matchService.selfPlayer.name;
         if (this.chatService.isFilterEnabled()) {
             this.logs = this.matchService.data.logData.filter(
-                (log) => log.content.includes(playerName) || log.concernedPlayersNamesList.includes(playerName),
+                (log) => this.resolveLogContent(log).includes(playerName) || log.concernedPlayersNamesList.includes(playerName),
             );
         } else {
             this.logs = this.matchService.data.logData.filter(
                 (log) => log.concernedPlayersNamesList.length === 0 || log.concernedPlayersNamesList.includes(playerName),
             );
         }
+    }
+
+    private resolveLogContent(log: ChatLog): string {
+        return this.i18nService.translate(log.content, log.messageParams);
     }
 
     private scrollToBottom(): void {

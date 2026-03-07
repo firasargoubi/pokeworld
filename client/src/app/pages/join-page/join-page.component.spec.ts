@@ -8,6 +8,7 @@ import { MatchService } from '@app/services/match/match.service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { Component } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-chat',
@@ -29,7 +30,7 @@ describe('JoinPageComponent', () => {
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage', 'playCombatEffect']);
 
         await TestBed.configureTestingModule({
-            imports: [FormsModule, HeaderComponent],
+            imports: [FormsModule, HeaderComponent, TranslateModule.forRoot()],
             providers: [
                 { provide: Router, useValue: routerSpy },
                 { provide: MatchService, useValue: matchServiceSpy },

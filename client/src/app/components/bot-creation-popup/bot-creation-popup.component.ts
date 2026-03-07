@@ -4,12 +4,13 @@ import { PokeballButtonComponent } from '@app/components/pokeball-button/pokebal
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { PlayerType } from '@common/interfaces/player-data';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-create-bot-popup',
     templateUrl: './bot-creation-popup.component.html',
     styleUrls: ['./bot-creation-popup.component.scss'],
-    imports: [PokeballButtonComponent, NgClass],
+    imports: [PokeballButtonComponent, NgClass, TranslateModule],
     standalone: true,
 })
 export class CreateBotPopupComponent {

@@ -85,15 +85,15 @@
             </div>
             <div class="main-right">
                 <div class="map-info-card">
-                    <div>Taille de la carte : {{ matchService.data.gameData.mapData.size }} x {{ matchService.data.gameData.mapData.size }}</div>
+                    <div>{{ 'pages.play.mapSize' | translate }} : {{ matchService.data.gameData.mapData.size }} x {{ matchService.data.gameData.mapData.size }}</div>
                     <div>
-                        Mode de jeu : {{ matchService.data.gameData.mapData.gameMode }}
+                        {{ 'pages.play.gameMode' | translate }} : {{ matchService.data.gameData.mapData.gameMode }}
                         @if (matchService.data.playData.isDebugMode) {
-                        <span class="debug-text">DEBUG</span>
+                        <span class="debug-text">{{ 'pages.play.debug' | translate }}</span>
                         }
                     </div>
-                    <div>Nombre de joueurs : {{ visualData.currentPlayerCount }} / {{ matchService.data.players.length }}</div>
-                    <div (click)="surrenderButton()" class="surrender-button">< Abandonner</div>
+                    <div>{{ 'pages.play.playerCount' | translate }} : {{ visualData.currentPlayerCount }} / {{ matchService.data.players.length }}</div>
+                    <div (click)="surrenderButton()" class="surrender-button">{{ 'pages.play.surrender' | translate }}</div>
                 </div>
                 <div class="self-info-card">
                     <div class="self-info-container">
@@ -104,7 +104,7 @@
                     <div class="movement-container">
                         <div class="movement-text">
                             <div class="movement-text-left">
-                                <p>Mouvement</p>
+                                <p>{{ 'pages.play.movement' | translate }}</p>
                                 <div class="movement-icon"></div>
                             </div>
                             <div class="movement-text-right">{{ visualData.movementLeft }} / {{ matchService.selfPlayer.speed }}</div>
@@ -123,8 +123,8 @@
                         </div>
                     </div>
                 </div>
-                <div (click)="actionButton()" class="action-button" [class.active]="visualData.canUseAction">Action</div>
-                <div (click)="endTurnButton()" class="endturn-button" [class.active]="visualData.canEndTurn">Terminer le tour</div>
+                <div (click)="actionButton()" class="action-button" [class.active]="visualData.canUseAction">{{ 'pages.play.action' | translate }}</div>
+                <div (click)="endTurnButton()" class="endturn-button" [class.active]="visualData.canEndTurn">{{ 'pages.play.endTurn' | translate }}</div>
             </div>
         </div>
     </main>

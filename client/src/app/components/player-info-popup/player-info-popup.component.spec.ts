@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AudioService } from '@app/services/audio/audio.service';
 import { MatchService } from '@app/services/match/match.service';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { TranslateModule } from '@ngx-translate/core';
 import { PlayerInfoPopupComponent } from './player-info-popup.component';
 
 describe('PlayerInfoPopupComponent', () => {
@@ -18,7 +19,7 @@ describe('PlayerInfoPopupComponent', () => {
         });
 
         await TestBed.configureTestingModule({
-            imports: [CommonModule, PlayerInfoPopupComponent],
+            imports: [CommonModule, PlayerInfoPopupComponent, TranslateModule.forRoot()],
             providers: [
                 { provide: MatchService, useValue: mockMatchService },
                 { provide: AudioService, useValue: mockAudioService },
