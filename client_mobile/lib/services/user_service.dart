@@ -61,10 +61,11 @@ class UserService {
     }
   }
 
-  Future<UserInfo> register(String username, String email, String password) async {
+  Future<UserInfo> register(String username, String email, String password, String avatarPath) async {
+    _ensureConfigured();
     final String uri = '$baseUrl/${userEndpoints['UserRegister']}';
 
-    final byteData = await rootBundle.load('assets/images/menu/pokemons/chibi/eevee.png');
+    final byteData = await rootBundle.load(avatarPath);
     final bytes = byteData.buffer.asUint8List();
     String img64 = 'data:image/png;base64,${base64Encode(bytes)}';
 
@@ -91,7 +92,32 @@ class UserService {
     final String uri = '$baseUrl/${userEndpoints['UserLogout']}/$userId';
     final response = await http.post(Uri.parse(uri), headers: {"Content-Type": "application/json"}, body: jsonEncode({}));
     if (response.statusCode != HttpStatusCode.ok.code && response.statusCode != HttpStatusCode.noContent.code) {
-      throw Exception('Failed to logout: ${response.body}');
+      throw Exception('${ErrorMessages.logoutFailed}${response.body}');
+    }
+    currentUser.value = null;
+  }
+
+  Future<UserInfo> edit(String userId, String oldPassword, String password) async {
+    _ensureConfigured();
+    final String uri = '$baseUrl/${userEndpoints['UserEdit']}';
+    final bodyJson = jsonEncode({'userId': userId, 'oldPassword': oldPassword, 'password': password});
+    final response = await http.put(Uri.parse(uri), headers: {'Content-Type': 'application/json'}, body: bodyJson);
+    if (response.statusCode == HttpStatusCode.ok.code) {
+      final Map<String, dynamic> responseMap = jsonDecode(response.body);
+      final UserInfo user = UserInfo.fromJson(responseMap);
+      currentUser.value = user;
+      _socketService.emit(UserEvent.associate.value, user);
+      return user;
+    }
+    throw Exception('Failed to edit user: ${response.body}');
+  }
+
+  Future<void> delete(String userId) async {
+    _ensureConfigured();
+    final String uri = '$baseUrl/${userEndpoints['UserDelete']}/$userId';
+    final response = await http.delete(Uri.parse(uri), headers: {'Content-Type': 'application/json'});
+    if (response.statusCode != HttpStatusCode.ok.code && response.statusCode != HttpStatusCode.noContent.code) {
+      throw Exception('${ErrorMessages.deleteAccountFailed}${response.body}');
     }
     currentUser.value = null;
   }

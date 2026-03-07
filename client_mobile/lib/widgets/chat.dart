@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../services/chat_service.dart';
 import '../services/user_service.dart';
+import '../utils/profile_image_provider.dart';
 import '../utils/time_utils.dart';
 
 class Chat extends StatefulWidget {
@@ -103,22 +104,14 @@ class _ChatState extends State<Chat> {
               Container(
                 width: baseSize * 1.5,
                 height: baseSize * 0.5,
-                padding: EdgeInsets.only(
-                  left: baseSize * 0.1,
-                  top: baseSize * 0.05,
-                ),
+                padding: EdgeInsets.only(left: baseSize * 0.1, top: baseSize * 0.05),
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage(
-                      'assets/images/menu/containers/chat/canal.png',
-                    ),
+                    image: AssetImage('assets/images/menu/containers/chat/canal.png'),
                     fit: BoxFit.fitWidth,
                     alignment: Alignment.topCenter,
                     filterQuality: FilterQuality.none,
-                    colorFilter: ColorFilter.mode(
-                      Color.fromARGB(255, 255, 200, 0),
-                      BlendMode.srcIn,
-                    ),
+                    colorFilter: ColorFilter.mode(Color.fromARGB(255, 255, 200, 0), BlendMode.srcIn),
                   ),
                 ),
                 child: Row(
@@ -133,22 +126,14 @@ class _ChatState extends State<Chat> {
                         child: SvgPicture.asset(
                           'assets/images/menu/icons/chat/messages.svg',
                           fit: BoxFit.contain,
-                          colorFilter: const ColorFilter.mode(
-                            Colors.white,
-                            BlendMode.srcIn,
-                          ),
+                          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                         ),
                       ),
                     ),
                     SizedBox(width: baseSize * 0.07),
                     Text(
                       'Géneral',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Pixel',
-                        fontSize: baseSize * 0.3,
-                        height: baseSize * 0.008,
-                      ),
+                      style: TextStyle(color: Colors.white, fontFamily: 'Pixel', fontSize: baseSize * 0.3, height: baseSize * 0.008),
                     ),
                   ],
                 ),
@@ -157,22 +142,14 @@ class _ChatState extends State<Chat> {
               Container(
                 width: baseSize * 1.5,
                 height: baseSize * 0.4,
-                padding: EdgeInsets.only(
-                  left: baseSize * 0.1,
-                  top: baseSize * 0.05,
-                ),
+                padding: EdgeInsets.only(left: baseSize * 0.1, top: baseSize * 0.05),
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage(
-                      'assets/images/menu/containers/chat/canal.png',
-                    ),
+                    image: AssetImage('assets/images/menu/containers/chat/canal.png'),
                     fit: BoxFit.fitWidth,
                     alignment: Alignment.topCenter,
                     filterQuality: FilterQuality.none,
-                    colorFilter: ColorFilter.mode(
-                      Color(0xFFc0d0e0),
-                      BlendMode.srcIn,
-                    ),
+                    colorFilter: ColorFilter.mode(Color(0xFFc0d0e0), BlendMode.srcIn),
                   ),
                 ),
                 child: Row(
@@ -187,22 +164,14 @@ class _ChatState extends State<Chat> {
                         child: SvgPicture.asset(
                           'assets/images/menu/icons/chat/messages.svg',
                           fit: BoxFit.contain,
-                          colorFilter: const ColorFilter.mode(
-                            Colors.white,
-                            BlendMode.srcIn,
-                          ),
+                          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                         ),
                       ),
                     ),
                     SizedBox(width: baseSize * 0.07),
                     Text(
                       'Partie',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Pixel',
-                        fontSize: baseSize * 0.3,
-                        height: baseSize * 0.008,
-                      ),
+                      style: TextStyle(color: Colors.white, fontFamily: 'Pixel', fontSize: baseSize * 0.3, height: baseSize * 0.008),
                     ),
                   ],
                 ),
@@ -216,70 +185,59 @@ class _ChatState extends State<Chat> {
             itemCount: messages.length,
             itemBuilder: (context, index) {
               final msg = messages[index];
-              final isSelfSent =
-                  msg.sender == UserService().currentUser.value?.username;
+              final isSelfSent = msg.sender == UserService().currentUser.value?.username;
+              final avatarImage = msg.profilePicture.isNotEmpty ? avatarImageProviderFromProfilePicture(msg.profilePicture) : null;
 
               return Padding(
                 padding: EdgeInsets.all(baseSize * 0.02),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Container(
-                    padding: EdgeInsets.all(baseSize * 0.00),
-                    child: RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: '[${formatTime(msg.timestamp.toLocal())}] ',
-                            style: TextStyle(
-                              fontFamily: 'Pixel',
-                              fontSize: baseSize * 0.25,
-                              height: baseSize * 0.007,
-                              color: const Color(0xFF68a0d8),
-                              shadows: [
-                                Shadow(
-                                  offset: Offset(baseSize * 0.015, 0),
-                                  color: const Color(0xFF787878),
-                                  blurRadius: 0,
-                                ),
-                              ],
+                  child: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: '[${formatTime(msg.timestamp.toLocal())}] ',
+                          style: TextStyle(
+                            fontFamily: 'Pixel',
+                            fontSize: baseSize * 0.25,
+                            height: baseSize * 0.007,
+                            color: const Color(0xFF68a0d8),
+                            shadows: [Shadow(offset: Offset(baseSize * 0.015, 0), color: const Color(0xFF787878), blurRadius: 0)],
+                          ),
+                        ),
+                        if (avatarImage != null)
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.baseline,
+                            baseline: TextBaseline.alphabetic,
+                            child: Transform.translate(
+                              offset: Offset(0, -baseSize * 0.02),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: baseSize * 0.04),
+                                child: CircleAvatar(radius: baseSize * 0.1, backgroundImage: avatarImage),
+                              ),
                             ),
                           ),
-                          TextSpan(
-                            text: '${msg.sender}: ',
-                            style: TextStyle(
-                              fontFamily: 'Pixel',
-                              fontSize: baseSize * 0.25,
-                              height: baseSize * 0.007,
-                              color: isSelfSent
-                                  ? const Color.fromARGB(255, 170, 0, 255)
-                                  : const Color(0xFFffa70f),
-                              shadows: [
-                                Shadow(
-                                  offset: Offset(baseSize * 0.015, 0),
-                                  color: const Color(0xFF787878),
-                                  blurRadius: 0,
-                                ),
-                              ],
-                            ),
+                        TextSpan(
+                          text: '${msg.sender}: ',
+                          style: TextStyle(
+                            fontFamily: 'Pixel',
+                            fontSize: baseSize * 0.25,
+                            height: baseSize * 0.007,
+                            color: isSelfSent ? const Color.fromARGB(255, 170, 0, 255) : const Color(0xFFffa70f),
+                            shadows: [Shadow(offset: Offset(baseSize * 0.015, 0), color: const Color(0xFF787878), blurRadius: 0)],
                           ),
-                          TextSpan(
-                            text: msg.content,
-                            style: TextStyle(
-                              fontFamily: 'Pixel',
-                              fontSize: baseSize * 0.25,
-                              height: baseSize * 0.007,
-                              color: const Color.fromARGB(255, 55, 55, 55),
-                              shadows: [
-                                Shadow(
-                                  offset: Offset(baseSize * 0.015, 0),
-                                  color: const Color(0xFF787878),
-                                  blurRadius: 0,
-                                ),
-                              ],
-                            ),
+                        ),
+                        TextSpan(
+                          text: msg.content,
+                          style: TextStyle(
+                            fontFamily: 'Pixel',
+                            fontSize: baseSize * 0.25,
+                            height: baseSize * 0.007,
+                            color: const Color.fromARGB(255, 55, 55, 55),
+                            shadows: [Shadow(offset: Offset(baseSize * 0.015, 0), color: const Color(0xFF787878), blurRadius: 0)],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -301,13 +259,7 @@ class _ChatState extends State<Chat> {
                     fontFamily: 'Pixel',
                     fontSize: baseSize * 0.3,
                     color: const Color.fromARGB(255, 55, 55, 55),
-                    shadows: [
-                      Shadow(
-                        offset: Offset(baseSize * 0.015, 0),
-                        color: const Color.fromARGB(255, 66, 66, 66),
-                        blurRadius: 0,
-                      ),
-                    ],
+                    shadows: [Shadow(offset: Offset(baseSize * 0.015, 0), color: const Color.fromARGB(255, 66, 66, 66), blurRadius: 0)],
                   ),
                   decoration: const InputDecoration(
                     hintText: 'Entrez votre message...',
@@ -337,13 +289,7 @@ class _ChatState extends State<Chat> {
                         fontFamily: 'Pixel',
                         fontSize: baseSize * 0.45,
                         height: baseSize * 0.005,
-                        shadows: [
-                          Shadow(
-                            offset: Offset(baseSize * 0.02, 0),
-                            color: const Color.fromARGB(255, 66, 66, 66),
-                            blurRadius: 0,
-                          ),
-                        ],
+                        shadows: [Shadow(offset: Offset(baseSize * 0.02, 0), color: const Color.fromARGB(255, 66, 66, 66), blurRadius: 0)],
                       ),
                     ),
                   ),
@@ -364,19 +310,11 @@ class _ChatState extends State<Chat> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final normalInnerW = math.max(
-          0.0,
-          constraints.maxWidth - 2 * cornerSize,
-        );
-        final normalMiddleH = math.max(
-          0.0,
-          constraints.maxHeight - 2 * cornerSize,
-        );
+        final normalInnerW = math.max(0.0, constraints.maxWidth - 2 * cornerSize);
+        final normalMiddleH = math.max(0.0, constraints.maxHeight - 2 * cornerSize);
 
-        final compactInnerW =
-            widget.compactWidth.clamp(0.0, normalInnerW) * baseSize;
-        final compactMiddleH =
-            widget.compactHeight.clamp(0.0, normalMiddleH) * baseSize;
+        final compactInnerW = widget.compactWidth.clamp(0.0, normalInnerW) * baseSize;
+        final compactMiddleH = widget.compactHeight.clamp(0.0, normalMiddleH) * baseSize;
 
         return TweenAnimationBuilder<double>(
           duration: widget.animDuration,
@@ -413,9 +351,7 @@ class _ChatState extends State<Chat> {
                                   height: cornerSize,
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage(
-                                        'assets/images/menu/containers/chat/chat-border.png',
-                                      ),
+                                      image: AssetImage('assets/images/menu/containers/chat/chat-border.png'),
                                       fit: BoxFit.cover,
                                       filterQuality: FilterQuality.none,
                                     ),
@@ -429,9 +365,7 @@ class _ChatState extends State<Chat> {
                                       Container(
                                         decoration: const BoxDecoration(
                                           image: DecorationImage(
-                                            image: AssetImage(
-                                              'assets/images/menu/containers/chat/chat-edge.png',
-                                            ),
+                                            image: AssetImage('assets/images/menu/containers/chat/chat-edge.png'),
                                             fit: BoxFit.fill,
                                             filterQuality: FilterQuality.none,
                                           ),
@@ -452,18 +386,7 @@ class _ChatState extends State<Chat> {
                                                 fontFamily: 'Pixel',
                                                 fontSize: baseSize * 0.45,
                                                 height: baseSize * 0.005,
-                                                shadows: [
-                                                  Shadow(
-                                                    offset: Offset(
-                                                      baseSize * -0.02,
-                                                      0,
-                                                    ),
-                                                    color: const Color(
-                                                      0xFF9F9F9F,
-                                                    ),
-                                                    blurRadius: 0,
-                                                  ),
-                                                ],
+                                                shadows: [Shadow(offset: Offset(baseSize * -0.02, 0), color: const Color(0xFF9F9F9F), blurRadius: 0)],
                                               ),
                                             ),
                                           ),
@@ -477,9 +400,7 @@ class _ChatState extends State<Chat> {
                                   height: cornerSize,
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage(
-                                        'assets/images/menu/containers/chat/chat-border-2.png',
-                                      ),
+                                      image: AssetImage('assets/images/menu/containers/chat/chat-border-2.png'),
                                       fit: BoxFit.cover,
                                       filterQuality: FilterQuality.none,
                                     ),
@@ -502,9 +423,7 @@ class _ChatState extends State<Chat> {
                                         child: Container(
                                           decoration: const BoxDecoration(
                                             image: DecorationImage(
-                                              image: AssetImage(
-                                                'assets/images/menu/containers/chat/chat-edge-2.png',
-                                              ),
+                                              image: AssetImage('assets/images/menu/containers/chat/chat-edge-2.png'),
                                               fit: BoxFit.fill,
                                               filterQuality: FilterQuality.none,
                                             ),
@@ -520,9 +439,7 @@ class _ChatState extends State<Chat> {
                                       child: Container(
                                         decoration: const BoxDecoration(
                                           image: DecorationImage(
-                                            image: AssetImage(
-                                              'assets/images/menu/containers/chat/chat-edge-2.png',
-                                            ),
+                                            image: AssetImage('assets/images/menu/containers/chat/chat-edge-2.png'),
                                             fit: BoxFit.fill,
                                             filterQuality: FilterQuality.none,
                                           ),
@@ -544,20 +461,10 @@ class _ChatState extends State<Chat> {
                                         switchInCurve: widget.animCurve,
                                         switchOutCurve: widget.animCurve,
                                         child: _isCompact
-                                            ? const SizedBox.expand(
-                                                key: ValueKey(
-                                                  'collapsed_center',
-                                                ),
-                                              )
+                                            ? const SizedBox.expand(key: ValueKey('collapsed_center'))
                                             : Container(
-                                                key: const ValueKey(
-                                                  'expanded_center',
-                                                ),
-                                                child:
-                                                    _buildExpandedChildrenOnly(
-                                                      cornerSize,
-                                                      baseSize,
-                                                    ),
+                                                key: const ValueKey('expanded_center'),
+                                                child: _buildExpandedChildrenOnly(cornerSize, baseSize),
                                               ),
                                       ),
                                     ),
@@ -575,9 +482,7 @@ class _ChatState extends State<Chat> {
                                   height: cornerSize,
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage(
-                                        'assets/images/menu/containers/chat/chat-border-2.png',
-                                      ),
+                                      image: AssetImage('assets/images/menu/containers/chat/chat-border-2.png'),
                                       fit: BoxFit.cover,
                                       filterQuality: FilterQuality.none,
                                     ),
@@ -592,9 +497,7 @@ class _ChatState extends State<Chat> {
                                   child: Container(
                                     decoration: const BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage(
-                                          'assets/images/menu/containers/chat/chat-edge.png',
-                                        ),
+                                        image: AssetImage('assets/images/menu/containers/chat/chat-edge.png'),
                                         fit: BoxFit.fill,
                                         filterQuality: FilterQuality.none,
                                       ),
@@ -609,9 +512,7 @@ class _ChatState extends State<Chat> {
                                   height: cornerSize,
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage(
-                                        'assets/images/menu/containers/chat/chat-border.png',
-                                      ),
+                                      image: AssetImage('assets/images/menu/containers/chat/chat-border.png'),
                                       fit: BoxFit.cover,
                                       filterQuality: FilterQuality.none,
                                     ),

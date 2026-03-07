@@ -8,9 +8,9 @@ import 'package:client_mobile/pages/join_page.dart';
 import 'package:client_mobile/services/chat_service.dart';
 import 'package:client_mobile/services/user_service.dart';
 import 'package:client_mobile/widgets/chat.dart';
-import 'package:client_mobile/widgets/login_popup.dart';
+import 'package:client_mobile/widgets/login_popup/login_popup.dart';
 import 'package:client_mobile/widgets/menu_card.dart';
-import 'package:client_mobile/widgets/user_popup.dart';
+import 'package:client_mobile/widgets/user_popup/user_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 

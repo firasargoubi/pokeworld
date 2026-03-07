@@ -1,0 +1,13 @@
+const String USER_POPUP_TITLE = 'Utilisateur';
+const String USER_POPUP_UNKNOWN_USER = 'Utilisateur inconnu';
+const String USER_POPUP_UNKNOWN_EMAIL = 'Courriel inconnu';
+const String USER_POPUP_OLD_PASSWORD_LABEL = 'Ancien mot de passe';
+const String USER_POPUP_NEW_PASSWORD_LABEL = 'Nouveau mot de passe';
+const String USER_POPUP_CANCEL = 'Annuler';
+const String USER_POPUP_EDIT_PASSWORD = 'Modifier mot de passe';
+const String USER_POPUP_CONFIRM = 'Valider';
+const String USER_POPUP_LOGOUT = 'Déconnexion';
+const String USER_POPUP_DELETE_ACCOUNT = 'Supprimer le compte';
+const String USER_POPUP_CLOSE = 'Fermer';
+const String USER_POPUP_DELETE_ACCOUNT_CONFIRMATION = 'Voulez-vous vraiment supprimer votre compte ?';
+const String USER_POPUP_REQUIRED_FIELDS_ERROR = 'Les deux champs sont requis';
