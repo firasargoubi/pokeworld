@@ -1,0 +1,11 @@
+const String LOGIN_POPUP_CREATE_ACCOUNT_TITLE = 'Créer un compte';
+const String LOGIN_POPUP_SIGN_IN_TITLE = 'Se connecter';
+const String LOGIN_POPUP_EMAIL_LABEL = 'Email';
+const String LOGIN_POPUP_EMAIL_HINT = 'Entrez votre adresse email';
+const String LOGIN_POPUP_CHOOSE_AVATAR_LABEL = 'Choisissez un avatar';
+const String LOGIN_POPUP_USERNAME_LABEL = "Nom d'utilisateur";
+const String LOGIN_POPUP_USERNAME_HINT = "Entrez votre nom d'utilisateur";
+const String LOGIN_POPUP_PASSWORD_LABEL = 'Mot de passe';
+const String LOGIN_POPUP_PASSWORD_HINT = 'Entrez votre mot de passe';
+const String LOGIN_POPUP_REGISTER_BUTTON = "S'inscrire";
+const String LOGIN_POPUP_ALREADY_HAVE_ACCOUNT = "J'ai déjà un compte";

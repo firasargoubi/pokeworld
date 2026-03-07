@@ -1,4 +1,5 @@
 import 'package:client_mobile/consts/auth_errors.dart';
+import 'package:client_mobile/consts/avatar_list.dart';
 import 'package:client_mobile/consts/error_messages.dart';
 import 'package:client_mobile/consts/popup_message_const.dart';
 import 'package:client_mobile/models/popup_message.dart';
@@ -15,6 +16,7 @@ class LoginController {
   bool isRegister = false;
   bool isLoading = false;
   String? errorMessage;
+  String selectedAvatar = USER_PROFILE_PICTURES.first;
 
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -55,15 +57,13 @@ class LoginController {
 
     try {
       if (isRegister) {
-        await _userService.register(rawUsername, rawEmail, rawPassword);
+        await _userService.register(rawUsername, rawEmail, rawPassword, selectedAvatar);
         _popupService.showPopup(
           PopupMessage(message: PopupMessageConst.successfulAccountCreation.message, hasCloseButton: true, isConfirmation: false),
         );
       } else {
         await _userService.login(rawUsername, rawPassword);
-        _popupService.showPopup(
-          PopupMessage(message: PopupMessageConst.successfulConnection.message, hasCloseButton: true, isConfirmation: false),
-        );
+        _popupService.showPopup(PopupMessage(message: PopupMessageConst.successfulConnection.message, hasCloseButton: true, isConfirmation: false));
       }
       onSuccess();
     } catch (e) {
@@ -129,6 +129,13 @@ class LoginController {
   void toggleRegister() {
     _updateState(() {
       isRegister = !isRegister;
+      errorMessage = null;
+    });
+  }
+
+  void selectAvatar(String avatarPath) {
+    _updateState(() {
+      selectedAvatar = avatarPath;
     });
   }
 
@@ -142,6 +149,7 @@ class LoginController {
 
   void dispose() {
     usernameController.dispose();
+    emailController.dispose();
     passwordController.dispose();
   }
 }

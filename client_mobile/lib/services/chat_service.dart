@@ -10,19 +10,15 @@ class ChatMessage {
   final String sender;
   final String content;
   final DateTime timestamp;
+  final String profilePicture;
 
-  ChatMessage({
-    required this.sender,
-    required this.content,
-    required this.timestamp,
-  });
+  ChatMessage({required this.sender, required this.content, required this.timestamp, required this.profilePicture});
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) => ChatMessage(
     sender: (json['sender'] ?? '').toString(),
     content: (json['content'] ?? '').toString(),
-    timestamp:
-        DateTime.tryParse((json['timestamp'] ?? '').toString()) ??
-        DateTime.now(),
+    timestamp: DateTime.tryParse((json['timestamp'] ?? '').toString()) ?? DateTime.now(),
+    profilePicture: (json['profilePicture'] ?? '').toString(),
   );
 }
 
@@ -39,10 +35,8 @@ class ChatService {
   bool _listenersInitialized = false;
   StreamSubscription<ShakeEvent>? _motionSubscription;
 
-  final _generalMessagesController =
-      StreamController<List<ChatMessage>>.broadcast();
-  Stream<List<ChatMessage>> get generalMessagesStream =>
-      _generalMessagesController.stream;
+  final _generalMessagesController = StreamController<List<ChatMessage>>.broadcast();
+  Stream<List<ChatMessage>> get generalMessagesStream => _generalMessagesController.stream;
 
   final List<ChatMessage> _storedMessages = [];
   List<ChatMessage> get allMessages => List.unmodifiable(_storedMessages);
@@ -89,20 +83,18 @@ class ChatService {
 
   void sendGeneralMessage(String message) {
     final timestamp = DateTime.now();
-    final username = UserService().currentUser.value?.username;
+    final currentUser = UserService().currentUser.value;
+    final username = currentUser?.username;
     if (username == null) return;
     var chatMessage = {
       'sender': username,
       'content': message,
       'timestamp': timestamp.toIso8601String(),
+      'profilePicture': currentUser?.profilePicture ?? '',
     };
     _socketService.emit(ChatEvent.generalMessage.value, chatMessage);
 
-    final newMessage = ChatMessage(
-      sender: username,
-      content: message,
-      timestamp: timestamp,
-    );
+    final newMessage = ChatMessage(sender: username, content: message, timestamp: timestamp, profilePicture: currentUser?.profilePicture ?? '');
     _lastSentMessage = newMessage;
   }
 
