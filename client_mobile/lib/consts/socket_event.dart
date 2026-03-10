@@ -1,4 +1,5 @@
 enum ChatEvent {
+  Message('message'),
   generalMessage('generalMessage');
 
   const ChatEvent(this.value);

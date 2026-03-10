@@ -1,3 +1,4 @@
+import 'package:client_mobile/models/chat_message.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/player_data.dart';
@@ -12,8 +13,8 @@ class MatchData {
   final CombatData combatData;
   final TrackingData trackingData;
   final List<PlayerData> players;
-  final List<dynamic> chatData;
-  final List<dynamic> logData;
+  final List<ChatMessage> chatData;
+  final List<ChatLog> logData;
 
   MatchData({
     required this.code,
@@ -32,33 +33,19 @@ class MatchData {
     return MatchData(
       code: json['code'] as String,
       state: MatchState.fromValue(json['state'] as String),
-      gameData: GameData.fromJson(
-        (json['gameData'] as Map).cast<String, dynamic>(),
-      ),
-      lobbyData: LobbyData.fromJson(
-        (json['lobbyData'] as Map).cast<String, dynamic>(),
-      ),
-      playData: PlayData.fromJson(
-        (json['playData'] as Map).cast<String, dynamic>(),
-      ),
-      combatData: CombatData.fromJson(
-        (json['combatData'] as Map).cast<String, dynamic>(),
-      ),
-      trackingData: TrackingData.fromJson(
-        (json['trackingData'] as Map).cast<String, dynamic>(),
-      ),
-      players: ((json['players'] as List?) ?? const [])
-          .cast<Map>()
-          .map((e) => PlayerData.fromJson(e.cast<String, dynamic>()))
-          .toList(),
-      chatData: ((json['chatData'] as List?) ?? const []).cast<dynamic>(),
-      logData: ((json['logData'] as List?) ?? const []).cast<dynamic>(),
+      gameData: GameData.fromJson((json['gameData'] as Map).cast<String, dynamic>()),
+      lobbyData: LobbyData.fromJson((json['lobbyData'] as Map).cast<String, dynamic>()),
+      playData: PlayData.fromJson((json['playData'] as Map).cast<String, dynamic>()),
+      combatData: CombatData.fromJson((json['combatData'] as Map).cast<String, dynamic>()),
+      trackingData: TrackingData.fromJson((json['trackingData'] as Map).cast<String, dynamic>()),
+      players: ((json['players'] as List?) ?? const []).cast<Map>().map((e) => PlayerData.fromJson(e.cast<String, dynamic>())).toList(),
+      chatData: ((json['chatData'] as List?) ?? const []).cast<Map>().map((e) => ChatMessage.fromJson(e.cast<String, dynamic>())).toList(),
+      logData: ((json['logData'] as List?) ?? const []).cast<Map>().map((e) => ChatLog.fromJson(e.cast<String, dynamic>())).toList(),
     );
   }
 
   @override
-  String toString() =>
-      'MatchData(code: $code, state: ${state.value}, players: ${players.length})';
+  String toString() => 'MatchData(code: $code, state: ${state.value}, players: ${players.length})';
 }
 
 class LobbyData {
@@ -68,10 +55,7 @@ class LobbyData {
   LobbyData({required this.isLocked, required this.hostPlayerIndex});
 
   factory LobbyData.fromJson(Map<String, dynamic> json) {
-    return LobbyData(
-      isLocked: json['isLocked'] as bool,
-      hostPlayerIndex: (json['hostPlayerIndex'] as num).toInt(),
-    );
+    return LobbyData(isLocked: json['isLocked'] as bool, hostPlayerIndex: (json['hostPlayerIndex'] as num).toInt());
   }
 }
 
@@ -82,13 +66,7 @@ class PlayData {
   final bool hasAction;
   final int movementLeft;
 
-  PlayData({
-    required this.timeLeft,
-    required this.isDebugMode,
-    required this.activePlayerIndex,
-    required this.hasAction,
-    required this.movementLeft,
-  });
+  PlayData({required this.timeLeft, required this.isDebugMode, required this.activePlayerIndex, required this.hasAction, required this.movementLeft});
 
   factory PlayData.fromJson(Map<String, dynamic> json) {
     return PlayData(
@@ -120,9 +98,7 @@ class CombatData {
 
   factory CombatData.fromJson(Map<String, dynamic> json) {
     return CombatData(
-      lastCombatAction: CombatAction.fromValue(
-        json['lastCombatAction'] as String,
-      ),
+      lastCombatAction: CombatAction.fromValue(json['lastCombatAction'] as String),
       turnDuration: (json['turnDuration'] as num).toInt(),
       isSecondPlayerTurn: json['isSecondPlayerTurn'] as bool,
       playersCombatData: ((json['playersCombatData'] as List?) ?? const [])
@@ -193,10 +169,7 @@ class TrackingData {
 
   factory TrackingData.fromJson(Map<String, dynamic> json) {
     List<Position> parsePositions(dynamic raw) {
-      return ((raw as List?) ?? const [])
-          .cast<Map>()
-          .map((e) => Position.fromJson(e.cast<String, dynamic>()))
-          .toList();
+      return ((raw as List?) ?? const []).cast<Map>().map((e) => Position.fromJson(e.cast<String, dynamic>())).toList();
     }
 
     return TrackingData(
@@ -223,10 +196,7 @@ enum CombatAction {
   const CombatAction(this.value);
 
   static CombatAction fromValue(String v) {
-    return CombatAction.values.firstWhere(
-      (e) => e.value == v,
-      orElse: () => CombatAction.none,
-    );
+    return CombatAction.values.firstWhere((e) => e.value == v, orElse: () => CombatAction.none);
   }
 }
 
@@ -246,9 +216,6 @@ enum MatchState {
   const MatchState(this.value);
 
   static MatchState fromValue(String v) {
-    return MatchState.values.firstWhere(
-      (e) => e.value == v,
-      orElse: () => MatchState.lobby,
-    );
+    return MatchState.values.firstWhere((e) => e.value == v, orElse: () => MatchState.lobby);
   }
 }

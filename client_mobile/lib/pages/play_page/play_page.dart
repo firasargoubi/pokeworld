@@ -107,6 +107,7 @@ class _PlayPageState extends State<PlayPage> {
     final innerBorderWidth = baseSize * 0.02;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Column(
         children: [
           Expanded(

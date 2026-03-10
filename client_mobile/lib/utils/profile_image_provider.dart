@@ -4,24 +4,34 @@ import 'package:flutter/material.dart';
 
 const String _defaultProfileImagePath = 'assets/images/menu/pokemons/chibi/pikachu.png';
 
-ImageProvider avatarImageProviderFromProfilePicture(String? profilePicture, {ImageProvider? fallback}) {
-  if (profilePicture == null || profilePicture.isEmpty) {
-    return fallback ?? const AssetImage(_defaultProfileImagePath);
-  }
+final Map<String, ImageProvider> _providerCache = {};
 
-  if (profilePicture.startsWith('data:image')) {
+ImageProvider profilePictureImageProvider(String? profilePicture, {ImageProvider? fallback}) {
+  final key = profilePicture ?? '';
+
+  final cached = _providerCache[key];
+  if (cached != null) return cached;
+
+  ImageProvider provider;
+
+  if (profilePicture == null || profilePicture.isEmpty) {
+    provider = fallback ?? const AssetImage(_defaultProfileImagePath);
+  } else if (profilePicture.startsWith('data:image')) {
     final commaIndex = profilePicture.indexOf(',');
     if (commaIndex == -1 || commaIndex >= profilePicture.length - 1) {
-      return fallback ?? const AssetImage(_defaultProfileImagePath);
+      provider = fallback ?? const AssetImage(_defaultProfileImagePath);
+    } else {
+      try {
+        final bytes = base64Decode(profilePicture.substring(commaIndex + 1));
+        provider = MemoryImage(bytes);
+      } catch (_) {
+        provider = fallback ?? const AssetImage(_defaultProfileImagePath);
+      }
     }
-
-    try {
-      final bytes = base64Decode(profilePicture.substring(commaIndex + 1));
-      return MemoryImage(bytes);
-    } catch (_) {
-      return fallback ?? const AssetImage(_defaultProfileImagePath);
-    }
+  } else {
+    provider = NetworkImage(profilePicture);
   }
 
-  return NetworkImage(profilePicture);
+  _providerCache[key] = provider;
+  return provider;
 }

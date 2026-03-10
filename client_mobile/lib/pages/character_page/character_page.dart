@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:client_mobile/consts/popup_message_const.dart';
 import 'package:client_mobile/controllers/character_controller.dart';
 import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/popup_message.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/popup_service.dart';
+import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/header.dart';
 import 'package:client_mobile/widgets/stripe_painter.dart';
 import 'package:flutter/material.dart';
@@ -89,13 +89,7 @@ class _CharacterPageState extends State<CharacterPage> {
       isAttD6Active: isAttD6Active,
       selectedAvatar: selectedAvatar,
       onWarnings: (warnings) {
-        _popupService.showPopup(
-          PopupMessage(
-            message: warnings.join('\n'),
-            hasCloseButton: true,
-            isConfirmation: false,
-          ),
-        );
+        _popupService.showPopup(PopupMessage(message: warnings.join('\n'), hasCloseButton: true, isConfirmation: false));
       },
     );
   }
@@ -136,200 +130,215 @@ class _CharacterPageState extends State<CharacterPage> {
     final defenseIconAsset = isAttD6Active ? D4_ICON_ASSET : D6_ICON_ASSET;
 
     return Scaffold(
-      body: Column(
+      resizeToAvoidBottomInset: false,
+      body: Stack(
         children: [
-          SizedBox(
-            height: baseSize * 0.1,
-            width: double.infinity,
-            child: AppHeader(
-              index: 1,
-              text: HEADER_TEXT,
-              onTap: () {
-                _popupService.showPopup(
-                  PopupMessage(
-                    message: PopupMessageConst.quit.message,
-                    isConfirmation: true,
-                    action: () => MatchService().leaveMatch(),
-                  ),
-                );
-              },
-            ),
-          ),
-          Expanded(
-            child: SizedBox(
-              width: double.infinity,
-              child: Row(
-                children: [
-                  // ================= LEFT SIDE =================
-                  Expanded(
-                    child: Column(
-                      children: [
-                        // Top left panel (avatar + username)
-                        SizedBox(
-                          height: baseSize * 0.2,
-                          width: double.infinity,
-                          child: BorderedBox(
-                            outerWidth: outerBorderWidth,
-                            innerWidth: innerBorderWidth,
-                            outerBorderColor: OUTER_BORDER_COLOR,
-                            innerBorderColor: INNER_BORDER_COLOR,
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                final height = constraints.maxHeight;
+          Column(
+            children: [
+              SizedBox(
+                height: baseSize * 0.1,
+                width: double.infinity,
+                child: AppHeader(
+                  index: 1,
+                  text: HEADER_TEXT,
+                  onTap: () {
+                    MatchService().leaveMatch();
+                  },
+                ),
+              ),
+              Expanded(
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Row(
+                    children: [
+                      // ================= LEFT SIDE =================
+                      Expanded(
+                        child: Column(
+                          children: [
+                            // Top left panel (avatar + username)
+                            SizedBox(
+                              height: baseSize * 0.2,
+                              width: double.infinity,
+                              child: BorderedBox(
+                                outerWidth: outerBorderWidth,
+                                innerWidth: innerBorderWidth,
+                                outerBorderColor: OUTER_BORDER_COLOR,
+                                innerBorderColor: INNER_BORDER_COLOR,
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    final height = constraints.maxHeight;
 
-                                final gap = height * 0.12;
-                                final fontSize = height * 0.4;
+                                    final gap = height * 0.12;
+                                    final fontSize = height * 0.4;
 
-                                final style = pixelTextStyle(
-                                  fontFamily: PIXEL_FONT,
-                                  shadowColor: SHADOW_COLOR,
-                                  fontSize: fontSize,
-                                  height: 0.9,
-                                  letterSpacing: fontSize * 0.15,
-                                  shadowOffsetX: fontSize * 0.10,
-                                );
+                                    final style = pixelTextStyle(
+                                      fontFamily: PIXEL_FONT,
+                                      shadowColor: SHADOW_COLOR,
+                                      fontSize: fontSize,
+                                      height: 0.9,
+                                      letterSpacing: fontSize * 0.15,
+                                      shadowOffsetX: fontSize * 0.10,
+                                    );
 
-                                return Container(
-                                  color: PSEUDO_PANEL_COLOR,
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        width: height,
-                                        height: height,
-                                        child: Container(
-                                          color: PSEUDO_AVATAR_PLACEHOLDER_COLOR,
-                                          child: selectedAvatarData == null
-                                              ? null
-                                              : Padding(
-                                                  padding: EdgeInsets.all(height * 0.08),
-                                                  child: Image.asset(
-                                                    selectedAvatarData.image,
-                                                    fit: BoxFit.contain,
-                                                    filterQuality: FilterQuality.none,
-                                                  ),
-                                                ),
-                                        ),
-                                      ),
-                                      SizedBox(width: gap),
-                                      Expanded(
-                                        child: Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Padding(
-                                            padding: EdgeInsets.only(left: gap),
-                                            child: Stack(
-                                              clipBehavior: Clip.none,
-                                              children: [
-                                                Text(
-                                                  '_' * _controller.getUsername().length,
-                                                  style: style.copyWith(height: 3),
-                                                  maxLines: 1,
-                                                  softWrap: false,
-                                                  overflow: TextOverflow.clip,
-                                                ),
-                                                Text(
-                                                  _controller.getUsername(),
-                                                  style: style.copyWith(height: 2.5),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ],
+                                    return Container(
+                                      color: PSEUDO_PANEL_COLOR,
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            width: height,
+                                            height: height,
+                                            child: Container(
+                                              color: PSEUDO_AVATAR_PLACEHOLDER_COLOR,
+                                              child: selectedAvatarData == null
+                                                  ? null
+                                                  : Padding(
+                                                      padding: EdgeInsets.all(height * 0.08),
+                                                      child: Image.asset(
+                                                        selectedAvatarData.image,
+                                                        fit: BoxFit.contain,
+                                                        filterQuality: FilterQuality.none,
+                                                      ),
+                                                    ),
                                             ),
                                           ),
-                                        ),
+                                          SizedBox(width: gap),
+                                          Expanded(
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Padding(
+                                                padding: EdgeInsets.only(left: gap),
+                                                child: Stack(
+                                                  clipBehavior: Clip.none,
+                                                  children: [
+                                                    Text(
+                                                      '_' * _controller.getUsername().length,
+                                                      style: style.copyWith(height: 3),
+                                                      maxLines: 1,
+                                                      softWrap: false,
+                                                      overflow: TextOverflow.clip,
+                                                    ),
+                                                    Text(
+                                                      _controller.getUsername(),
+                                                      style: style.copyWith(height: 2.5),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-
-                        // Bottom left panel (stats)
-                        Expanded(
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: BorderedBox(
-                              outerWidth: outerBorderWidth,
-                              innerWidth: innerBorderWidth,
-                              outerBorderColor: OUTER_BORDER_COLOR,
-                              innerBorderColor: INNER_BORDER_COLOR,
-                              showOuterTop: false,
-                              child: CustomPaint(
-                                painter: StripePainter(stripeSize: baseSize * 0.02, color1: LEFT_STRIPE_COLOR_1, color2: LEFT_STRIPE_COLOR_2),
-                                child: CharacterStatsPanel(
-                                  baseSize: baseSize,
-                                  hpOpacity: hpOpacity,
-                                  vitOpacity: vitOpacity,
-                                  hpBottomText: hpBottomText,
-                                  vitBottomText: vitBottomText,
-                                  attackIconAsset: attackIconAsset,
-                                  defenseIconAsset: defenseIconAsset,
-                                  onToggleHpVit: toggleHpVitBonus,
-                                  onToggleAtkDef: toggleAttackDefenseDie,
+                                    );
+                                  },
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
 
-                  // ================= RIGHT SIDE =================
-                  SizedBox(
-                    width: baseSize * 0.5,
-                    child: BorderedBox(
-                      outerWidth: outerBorderWidth,
-                      innerWidth: innerBorderWidth,
-                      outerBorderColor: OUTER_BORDER_COLOR,
-                      innerBorderColor: INNER_BORDER_COLOR,
-                      showOuterLeft: false,
-                      child: CustomPaint(
-                        painter: StripePainter(stripeSize: baseSize * 0.02, color1: RIGHT_STRIPE_COLOR_1, color2: RIGHT_STRIPE_COLOR_2),
-                        child: CharacterAvatarGrid(
-                          baseSize: baseSize,
-                          avatarDatas: avatarDatas,
-                          selectedAvatar: selectedAvatar,
-                          isAvatarLocked: isAvatarLocked,
-                          onSelectAvatar: selectAvatar,
-                          selectFrameAsset: SELECT_FRAME_ASSET,
-                          disabledAvatarOpacity: DISABLED_AVATAR_OPACITY,
-                          grayScaleFilter: grayScaleColorFilter(),
+                            // Bottom left panel (stats)
+                            Expanded(
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: BorderedBox(
+                                  outerWidth: outerBorderWidth,
+                                  innerWidth: innerBorderWidth,
+                                  outerBorderColor: OUTER_BORDER_COLOR,
+                                  innerBorderColor: INNER_BORDER_COLOR,
+                                  showOuterTop: false,
+                                  child: CustomPaint(
+                                    painter: StripePainter(stripeSize: baseSize * 0.02, color1: LEFT_STRIPE_COLOR_1, color2: LEFT_STRIPE_COLOR_2),
+                                    child: CharacterStatsPanel(
+                                      baseSize: baseSize,
+                                      hpOpacity: hpOpacity,
+                                      vitOpacity: vitOpacity,
+                                      hpBottomText: hpBottomText,
+                                      vitBottomText: vitBottomText,
+                                      attackIconAsset: attackIconAsset,
+                                      defenseIconAsset: defenseIconAsset,
+                                      onToggleHpVit: toggleHpVitBonus,
+                                      onToggleAtkDef: toggleAttackDefenseDie,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
 
-          // ================= BOTTOM BUTTON =================
-          SizedBox(
-            height: baseSize * 0.10,
-            width: double.infinity,
-            child: GestureDetector(
-              onTap: joinLobby,
-              child: Container(
-                color: OUTER_BORDER_COLOR,
-                alignment: Alignment.center,
-                child: Text(
-                  START_GAME_TEXT,
-                  style: pixelTextStyle(
-                    fontFamily: PIXEL_FONT,
-                    shadowColor: SHADOW_COLOR,
-                    fontSize: baseSize * 0.04,
-                    height: 1.0,
-                    letterSpacing: baseSize * 0.006,
-                    shadowOffsetX: baseSize * 0.004,
+                      // ================= RIGHT SIDE =================
+                      SizedBox(
+                        width: baseSize * 0.5,
+                        child: BorderedBox(
+                          outerWidth: outerBorderWidth,
+                          innerWidth: innerBorderWidth,
+                          outerBorderColor: OUTER_BORDER_COLOR,
+                          innerBorderColor: INNER_BORDER_COLOR,
+                          showOuterLeft: false,
+                          child: CustomPaint(
+                            painter: StripePainter(stripeSize: baseSize * 0.02, color1: RIGHT_STRIPE_COLOR_1, color2: RIGHT_STRIPE_COLOR_2),
+                            child: CharacterAvatarGrid(
+                              baseSize: baseSize,
+                              avatarDatas: avatarDatas,
+                              selectedAvatar: selectedAvatar,
+                              isAvatarLocked: isAvatarLocked,
+                              onSelectAvatar: selectAvatar,
+                              selectFrameAsset: SELECT_FRAME_ASSET,
+                              disabledAvatarOpacity: DISABLED_AVATAR_OPACITY,
+                              grayScaleFilter: grayScaleColorFilter(),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
+
+              // ================= BOTTOM BUTTON =================
+              SizedBox(
+                height: baseSize * 0.15,
+                width: double.infinity,
+                child: GestureDetector(
+                  onTap: joinLobby,
+                  child: Container(
+                    color: OUTER_BORDER_COLOR,
+                    alignment: Alignment.center,
+                    child: Text(
+                      START_GAME_TEXT,
+                      style: pixelTextStyle(
+                        fontFamily: PIXEL_FONT,
+                        shadowColor: SHADOW_COLOR,
+                        fontSize: baseSize * 0.04,
+                        height: 1.0,
+                        letterSpacing: baseSize * 0.006,
+                        shadowOffsetX: baseSize * 0.004,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
+          _buildBottomLeftChat(baseWidth, baseSize),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBottomLeftChat(double baseWidth, double baseSize) {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom * 0.97;
+
+    return Positioned(
+      bottom: baseWidth * 0.015 + keyboardHeight,
+      left: baseWidth * 0.035,
+      child: Container(
+        alignment: Alignment.bottomLeft,
+        width: baseSize * 0.8,
+        height: baseSize * 0.5,
+        child: Chat(baseSize: baseSize * 0.1),
       ),
     );
   }

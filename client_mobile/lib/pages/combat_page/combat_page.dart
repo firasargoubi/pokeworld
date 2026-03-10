@@ -5,7 +5,7 @@ import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/services/combat_service/combat_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
-import 'package:client_mobile/widgets/chat.dart';
+import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/stripe_painter.dart';
 import 'package:flutter/material.dart';
 
@@ -348,9 +348,9 @@ class _CombatPageState extends State<CombatPage> {
                   return Positioned(
                     bottom: max(naturalBottom, keyboardHeight),
                     left: (constraints.maxWidth - arenaSize.width) / 2,
-                    width: arenaSize.width * 0.38,
-                    height: baseSize * 0.35,
-                    child: Opacity(opacity: 0.95, child: Chat(baseSize: baseSize * 0.08)),
+                    width: arenaSize.width * 0.45,
+                    height: baseSize * 0.4,
+                    child: Opacity(opacity: 0.95, child: Chat(baseSize: baseSize * 0.1, showMatchChannel: true)),
                   );
                 },
               ),

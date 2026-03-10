@@ -11,6 +11,9 @@ class StripePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.clipRect(Offset.zero & size);
+
     final backgroundPaint = Paint()..color = color1;
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), backgroundPaint);
 
@@ -24,6 +27,8 @@ class StripePainter extends CustomPainter {
       y += currentStripeSize;
       isColor1 = !isColor1;
     }
+
+    canvas.restore();
   }
 
   @override
