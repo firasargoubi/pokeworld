@@ -2,6 +2,8 @@ import 'package:client_mobile/consts/socket_event.dart';
 import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
+import 'package:client_mobile/pages/combat_page/combat_page.dart';
+import 'package:client_mobile/pages/play_page/play_page.dart';
 import 'package:client_mobile/pages/stat_page/stat_page.dart';
 import 'package:client_mobile/services/map_service/map_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
@@ -157,13 +159,31 @@ class PlayService {
     }
   }
 
-  void checkForRedirection() {
-    if (MatchService().isState(MatchState.statistics)) {
-      final route = MaterialPageRoute(builder: (_) => const StatPage());
-      final nav = NavigationService.navigatorKey.currentState;
-      if (nav == null) return;
-      nav.pushAndRemoveUntil(route, (r) => false);
+  void checkForRedirection(MatchData oldMatchData, MatchData newMatchData) {
+    final isSelfInCombat = newMatchData.combatData.playersCombatData.any((p) => p.playerIndex == MatchService().selfIndex);
+
+    final wasInCombatState =
+        oldMatchData.state == MatchState.combatWait || oldMatchData.state == MatchState.combatAnimation || oldMatchData.state == MatchState.combatEnd;
+
+    final isMatchInCombatState =
+        newMatchData.state == MatchState.combatWait || newMatchData.state == MatchState.combatAnimation || newMatchData.state == MatchState.combatEnd;
+
+    if (isSelfInCombat && isMatchInCombatState && !wasInCombatState) {
+      _navigateAndReplace((_) => const CombatPage());
+    } else if (wasInCombatState && (newMatchData.state == MatchState.turnWait || newMatchData.state == MatchState.turnStart)) {
+      _navigateAndReplace((_) => const PlayPage());
+    } else if (newMatchData.state == MatchState.matchEnd && !wasInCombatState) {
+      _navigateAndReplace((_) => const PlayPage());
+    } else if (newMatchData.state == MatchState.statistics) {
+      _navigateAndReplace((_) => const StatPage());
     }
+  }
+
+  void _navigateAndReplace(WidgetBuilder builder) {
+    final nav = NavigationService.navigatorKey.currentState;
+    if (nav == null) return;
+    final route = MaterialPageRoute(builder: builder);
+    nav.pushAndRemoveUntil(route, (r) => false);
   }
 
   Future<void> onMatchUpdate(MatchData oldMatchData, MatchData newMatchData) async {
@@ -171,6 +191,6 @@ class PlayService {
     isPerformingAction = false;
     updateOverlays();
     updateMovement(oldMatchData, newMatchData);
-    checkForRedirection();
+    checkForRedirection(oldMatchData, newMatchData);
   }
 }

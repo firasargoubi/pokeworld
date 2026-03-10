@@ -49,3 +49,11 @@ enum PlayEvent {
   const PlayEvent(this.value);
   final String value;
 }
+
+enum CombatEvent {
+  Attack('attack'),
+  Escape('escape');
+
+  const CombatEvent(this.value);
+  final String value;
+}

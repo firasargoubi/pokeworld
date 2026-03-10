@@ -30,6 +30,8 @@ class _PlayTimerWidgetState extends State<PlayTimerWidget> with SingleTickerProv
   StreamSubscription? _matchSubscription;
   MatchState? _previousState;
 
+  static double? _savedProgress;
+
   @override
   void initState() {
     super.initState();
@@ -40,6 +42,10 @@ class _PlayTimerWidgetState extends State<PlayTimerWidget> with SingleTickerProv
     );
 
     _previousState = MatchService().matchData?.state;
+
+    if (_previousState == MatchState.turnWait) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _resumeOrStart());
+    }
 
     _matchSubscription = MatchService().matchUpdates.listen((updatedMatchData) {
       final state = updatedMatchData.state;
@@ -73,23 +79,38 @@ class _PlayTimerWidgetState extends State<PlayTimerWidget> with SingleTickerProv
 
   void _start() {
     if (widget.durationSeconds <= 0) return;
+    _savedProgress = null;
     _controller
       ..duration = Duration(seconds: widget.durationSeconds)
       ..reset()
       ..forward();
   }
 
-  void _pause() => _controller.stop();
+  void _pause() {
+    _savedProgress = _controller.value;
+    _controller.stop();
+  }
 
   void _resume() {
     if (_controller.isCompleted) return;
-
     if (_controller.value == 0.0) {
       _start();
       return;
     }
-
     _controller.forward();
+  }
+
+  void _resumeOrStart() {
+    if (widget.durationSeconds <= 0) return;
+    _controller.duration = Duration(seconds: widget.durationSeconds);
+    final saved = _savedProgress;
+    if (saved != null && saved > 0.0 && saved < 1.0) {
+      _savedProgress = null;
+      _controller.value = saved;
+      _controller.forward();
+    } else {
+      _start();
+    }
   }
 
   @override
