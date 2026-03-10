@@ -5,9 +5,8 @@ import 'package:client_mobile/consts/menu_card_data.dart';
 import 'package:client_mobile/consts/ui.dart';
 import 'package:client_mobile/models/menu_config.dart';
 import 'package:client_mobile/pages/join_page.dart';
-import 'package:client_mobile/services/chat_service.dart';
 import 'package:client_mobile/services/user_service.dart';
-import 'package:client_mobile/widgets/chat.dart';
+import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/login_popup/login_popup.dart';
 import 'package:client_mobile/widgets/menu_card.dart';
 import 'package:client_mobile/widgets/user_popup/user_popup.dart';
@@ -69,15 +68,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _push(Widget page) async {
-    ChatService().stopListeningToMotion();
     await Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
     if (!mounted) return;
-    ChatService().startListeningToMotion();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           _buildBlurredBackground(),
@@ -107,7 +105,7 @@ class _HomePageState extends State<HomePage> {
                   child: Stack(
                     children: [
                       Column(children: [_buildTopSection(baseSize), _buildMiddleSection(baseSize)]),
-                      _buildBottomLeftChat(baseWidth, baseSize),
+                      _buildBottomLeftChat(baseWidth, baseSize, screenHeight, baseHeight),
                     ],
                   ),
                 ),
@@ -291,15 +289,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildBottomLeftChat(double baseWidth, double baseSize) {
+  Widget _buildBottomLeftChat(double baseWidth, double baseSize, double screenHeight, double baseHeight) {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final stackBottomOffset = max(0.0, (screenHeight - baseHeight) / 2);
+    final keyboardInStack = max(0.0, keyboardHeight - stackBottomOffset) + baseSize * 0.02;
+    final naturalBottom = baseWidth * 0.02;
+
     return Positioned(
-      bottom: baseWidth * 0.01,
+      bottom: max(naturalBottom, keyboardInStack),
       left: baseWidth * 0.01,
       child: Container(
         alignment: Alignment.bottomLeft,
         width: baseSize * 0.8,
-        height: baseSize * 0.6,
-        child: Chat(baseSize: baseSize * 0.15),
+        height: baseSize * 0.5,
+        child: Chat(baseSize: baseSize * 0.1),
       ),
     );
   }

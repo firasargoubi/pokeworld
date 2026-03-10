@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:client_mobile/consts/ui.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/services/game_save.dart';
+import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/game_cards_shell.dart';
 import 'package:client_mobile/widgets/header.dart';
 import 'package:client_mobile/widgets/stripe_painter.dart';
@@ -56,38 +57,59 @@ class _CreatePageState extends State<CreatePage> {
     final innerBorderWidth = baseSize * 0.02;
 
     return Scaffold(
-      body: Column(
+      resizeToAvoidBottomInset: false,
+      body: Stack(
         children: [
-          SizedBox(
-            height: baseSize * 0.1,
-            width: double.infinity,
-            child: AppHeader(index: 1, text: headerText, onTap: () => Navigator.pop(context)),
-          ),
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: outerBorderColor, width: outerBorderWidth),
+          Column(
+            children: [
+              SizedBox(
+                height: baseSize * 0.1,
+                width: double.infinity,
+                child: AppHeader(index: 1, text: headerText, onTap: () => Navigator.pop(context)),
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: innerBorderColor, width: innerBorderWidth),
-                ),
-                child: CustomPaint(
-                  painter: StripePainter(stripeSize: baseSize * 0.02, color1: stripeColor1, color2: stripeColor2),
-                  child: ClipRect(
-                    child: FutureBuilder<List<GameData>>(
-                      future: gamesFuture,
-                      builder: (context, snapshot) {
-                        final games = snapshot.data ?? const <GameData>[];
-                        return GestureDetector(child: GameCardsPageShell(games: games, isCreateCard: true));
-                      },
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: outerBorderColor, width: outerBorderWidth),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: innerBorderColor, width: innerBorderWidth),
+                    ),
+                    child: CustomPaint(
+                      painter: StripePainter(stripeSize: baseSize * 0.02, color1: stripeColor1, color2: stripeColor2),
+                      child: ClipRect(
+                        child: FutureBuilder<List<GameData>>(
+                          future: gamesFuture,
+                          builder: (context, snapshot) {
+                            final games = snapshot.data ?? const <GameData>[];
+                            return GestureDetector(child: GameCardsPageShell(games: games, isCreateCard: true));
+                          },
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
+          _buildBottomLeftChat(baseWidth, baseSize),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBottomLeftChat(double baseWidth, double baseSize) {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom * 0.95;
+
+    return Positioned(
+      bottom: baseWidth * 0.035 + keyboardHeight,
+      left: baseWidth * 0.035,
+      child: Container(
+        alignment: Alignment.bottomLeft,
+        width: baseSize * 0.8,
+        height: baseSize * 0.5,
+        child: Chat(baseSize: baseSize * 0.1),
       ),
     );
   }

@@ -10,9 +10,9 @@ import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/models/popup_message.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
-import 'package:client_mobile/widgets/add_bot_popup/add_bot_popup.dart';
 import 'package:client_mobile/services/popup_service.dart';
-import 'package:client_mobile/widgets/chat.dart';
+import 'package:client_mobile/widgets/add_bot_popup/add_bot_popup.dart';
+import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/header.dart';
 import 'package:client_mobile/widgets/player_card/player_card.dart';
 import 'package:client_mobile/widgets/poke_button.dart';
@@ -250,7 +250,7 @@ class _LobbyPageState extends State<LobbyPage> {
                             height: b * 0.45,
                             child: Align(
                               alignment: Alignment.bottomLeft,
-                              child: Chat(baseSize: b * 0.1),
+                              child: Chat(baseSize: b * 0.1, showMatchChannel: true),
                             ),
                           ),
                           if (isAdmin)

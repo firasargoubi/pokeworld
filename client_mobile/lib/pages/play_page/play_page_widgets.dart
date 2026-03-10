@@ -12,7 +12,7 @@ import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/play_service/play_service.dart';
-import 'package:client_mobile/widgets/chat.dart';
+import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/map/map.dart';
 import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
 import 'package:flutter/material.dart';
@@ -70,137 +70,163 @@ class LeftPanel extends StatelessWidget {
           child: SizedBox(
             width: double.infinity,
             height: constraints.maxHeight,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
               children: [
-                SizedBox(
-                  width: leftWidth,
-                  height: totalHeight,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        top: top,
-                        left: (leftWidth - indicatorSize) / 2,
-                        child: SizedBox(
-                          width: indicatorSize,
-                          height: indicatorSize,
-                          child: Image.asset(SELECTION_ICON_ASSET, fit: BoxFit.contain, filterQuality: FilterQuality.none),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      ...List.generate(players.length, (index) {
-                        final player = players[index];
-
-                        final avatarAsset = AVATAR_DATA[player.avatar]!.image;
-
-                        final playerIcon = player.type == PlayerType.botAggressive
-                            ? AGGRESSIVE_BOT_ICON_ASSET
-                            : player.type == PlayerType.botDefensive
-                            ? DEFENSIVE_BOT_ICON_ASSET
-                            : MatchService().isPlayerHost(player.id)
-                            ? CROWN_ICON_ASSET
-                            : '';
-
-                        final containerAsset = player.team == Team.red
-                            ? RED_CONTAINER_ASSET
-                            : player.team == Team.blue
-                            ? BLUE_CONTAINER_ASSET
-                            : GRAY_CONTAINER_ASSET;
-
-                        final isConnected = player.isConnected;
-                        final opacity = isConnected ? 1.0 : 0.6;
-
-                        final nameStyle = pixelLineStyle(
-                          textSize,
-                        ).copyWith(decoration: isConnected ? TextDecoration.none : TextDecoration.lineThrough);
-
-                        final isFFA = MatchService().matchData?.gameData.mapData.gameMode == GameMode.ffa;
-
-                        return Opacity(
-                          opacity: opacity,
-                          child: Padding(
-                            padding: EdgeInsets.only(bottom: index == players.length - 1 ? 0 : gapY),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: leftWidth,
+                      height: totalHeight,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            top: top,
+                            left: (leftWidth - indicatorSize) / 2,
                             child: SizedBox(
-                              width: double.infinity,
-                              child: AspectRatio(
-                                aspectRatio: PLAYER_ITEM_ASPECT_RATIO,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(image: AssetImage(containerAsset), fit: BoxFit.fill, filterQuality: FilterQuality.none),
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: baseBodySize * 0.02),
-                                    child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        SizedBox(
-                                          width: iconSize,
-                                          height: iconSize,
-                                          child: DecoratedBox(
-                                            decoration: BoxDecoration(image: DecorationImage(image: AssetImage(avatarAsset))),
-                                          ),
+                              width: indicatorSize,
+                              height: indicatorSize,
+                              child: Image.asset(SELECTION_ICON_ASSET, fit: BoxFit.contain, filterQuality: FilterQuality.none),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          ...List.generate(players.length, (index) {
+                            final player = players[index];
+
+                            final avatarAsset = AVATAR_DATA[player.avatar]!.image;
+
+                            final playerIcon = player.type == PlayerType.botAggressive
+                                ? AGGRESSIVE_BOT_ICON_ASSET
+                                : player.type == PlayerType.botDefensive
+                                ? DEFENSIVE_BOT_ICON_ASSET
+                                : MatchService().isPlayerHost(player.id)
+                                ? CROWN_ICON_ASSET
+                                : '';
+
+                            final containerAsset = player.team == Team.red
+                                ? RED_CONTAINER_ASSET
+                                : player.team == Team.blue
+                                ? BLUE_CONTAINER_ASSET
+                                : GRAY_CONTAINER_ASSET;
+
+                            final isConnected = player.isConnected;
+                            final opacity = isConnected ? 1.0 : 0.6;
+
+                            final nameStyle = pixelLineStyle(
+                              textSize,
+                            ).copyWith(decoration: isConnected ? TextDecoration.none : TextDecoration.lineThrough);
+
+                            final isFFA = MatchService().matchData?.gameData.mapData.gameMode == GameMode.ffa;
+
+                            return Opacity(
+                              opacity: opacity,
+                              child: Padding(
+                                padding: EdgeInsets.only(bottom: index == players.length - 1 ? 0 : gapY),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: AspectRatio(
+                                    aspectRatio: PLAYER_ITEM_ASPECT_RATIO,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage(containerAsset),
+                                          fit: BoxFit.fill,
+                                          filterQuality: FilterQuality.none,
                                         ),
-                                        SizedBox(width: baseBodySize * 0.01),
-                                        Text(player.name, style: nameStyle),
-                                        SizedBox(width: baseBodySize * 0.01),
-                                        SizedBox(
-                                          width: textSize,
-                                          height: textSize,
-                                          child: DecoratedBox(
-                                            decoration: BoxDecoration(image: DecorationImage(image: AssetImage(avatarAsset))),
-                                          ),
-                                        ),
-                                        SizedBox(width: baseBodySize * 0.006),
-                                        if (playerIcon.isNotEmpty)
-                                          SizedBox(
-                                            width: textSize,
-                                            height: textSize,
-                                            child: DecoratedBox(
-                                              decoration: BoxDecoration(image: DecorationImage(image: AssetImage(playerIcon))),
+                                      ),
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: baseBodySize * 0.02),
+                                        child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              width: iconSize,
+                                              height: iconSize,
+                                              child: DecoratedBox(
+                                                decoration: BoxDecoration(image: DecorationImage(image: AssetImage(avatarAsset))),
+                                              ),
                                             ),
-                                          ),
-                                        const Spacer(),
-                                        SizedBox(
-                                          width: iconSize,
-                                          height: iconSize,
-                                          child: DecoratedBox(
-                                            decoration: BoxDecoration(
-                                              image: DecorationImage(
-                                                image: AssetImage(
-                                                  PlayService().hasItem(player.id, ItemType.Flag) ? ItemType.Flag.assetPath : DEFAULT_IMAGE_ASSET,
+                                            SizedBox(width: baseBodySize * 0.01),
+                                            Text(player.name, style: nameStyle),
+                                            SizedBox(width: baseBodySize * 0.01),
+                                            SizedBox(
+                                              width: textSize,
+                                              height: textSize,
+                                              child: DecoratedBox(
+                                                decoration: BoxDecoration(image: DecorationImage(image: AssetImage(avatarAsset))),
+                                              ),
+                                            ),
+                                            SizedBox(width: baseBodySize * 0.006),
+                                            if (playerIcon.isNotEmpty)
+                                              SizedBox(
+                                                width: textSize,
+                                                height: textSize,
+                                                child: DecoratedBox(
+                                                  decoration: BoxDecoration(image: DecorationImage(image: AssetImage(playerIcon))),
+                                                ),
+                                              ),
+                                            const Spacer(),
+                                            SizedBox(
+                                              width: iconSize,
+                                              height: iconSize,
+                                              child: DecoratedBox(
+                                                decoration: BoxDecoration(
+                                                  image: DecorationImage(
+                                                    image: AssetImage(
+                                                      PlayService().hasItem(player.id, ItemType.Flag) ? ItemType.Flag.assetPath : DEFAULT_IMAGE_ASSET,
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
+                                            SizedBox(width: baseBodySize * 0.005),
+                                            SizedBox(
+                                              width: iconSize,
+                                              height: iconSize,
+                                              child: DecoratedBox(
+                                                decoration: BoxDecoration(image: DecorationImage(image: AssetImage(SWORD_ICON_ASSET))),
+                                              ),
+                                            ),
+                                            SizedBox(width: baseBodySize * 0.005),
+                                            Text('${player.combatsWon}${isFFA ? "/3" : ""}', style: pixelLineStyle(textSize)),
+                                          ],
                                         ),
-                                        SizedBox(width: baseBodySize * 0.005),
-                                        SizedBox(
-                                          width: iconSize,
-                                          height: iconSize,
-                                          child: DecoratedBox(
-                                            decoration: BoxDecoration(image: DecorationImage(image: AssetImage(SWORD_ICON_ASSET))),
-                                          ),
-                                        ),
-                                        SizedBox(width: baseBodySize * 0.005),
-                                        Text('${player.combatsWon}${isFFA ? "/3" : ""}', style: pixelLineStyle(textSize)),
-                                      ],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ),
-                        );
-                      }),
-                      SizedBox(height: gapY),
-                      Expanded(child: Chat(baseSize: baseBodySize * 0.08)),
-                    ],
-                  ),
+                            );
+                          }),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Builder(
+                  builder: (context) {
+                    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom + baseBodySize * 0.18;
+                    final screenHeight = MediaQuery.of(context).size.height;
+                    final panelBottomFromScreen = max(0.0, screenHeight - constraints.maxHeight);
+                    final keyboardIntrusion = max(0.0, keyboardHeight - panelBottomFromScreen);
+
+                    final minChatHeight = baseBodySize * 0.18;
+                    final naturalHeight = (constraints.maxHeight - totalHeight - gapY).clamp(minChatHeight, constraints.maxHeight);
+                    final chatHeight = (constraints.maxHeight - keyboardIntrusion).clamp(minChatHeight, naturalHeight);
+
+                    return Positioned(
+                      bottom: keyboardIntrusion,
+                      left: leftWidth,
+                      right: 0.0,
+                      height: chatHeight,
+                      child: Chat(baseSize: baseBodySize * 0.1, showMatchChannel: true),
+                    );
+                  },
                 ),
               ],
             ),

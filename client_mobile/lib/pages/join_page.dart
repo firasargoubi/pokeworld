@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:client_mobile/consts/ui.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/services/game_save.dart';
+import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/game_cards_shell.dart';
 import 'package:client_mobile/widgets/header.dart';
 import 'package:client_mobile/widgets/join_code_popup.dart';
@@ -71,6 +72,7 @@ class _JoinPageState extends State<JoinPage> {
     final innerBorderWidth = baseSize * 0.02;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           Column(
@@ -117,7 +119,23 @@ class _JoinPageState extends State<JoinPage> {
             Positioned.fill(
               child: JoinCodePopup(baseSize: baseSize, controller: codeController, onClose: _closeOverlay),
             ),
+          _buildBottomLeftChat(baseWidth, baseSize),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBottomLeftChat(double baseWidth, double baseSize) {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom * 0.95;
+
+    return Positioned(
+      bottom: baseWidth * 0.035 + keyboardHeight,
+      left: baseWidth * 0.035,
+      child: Container(
+        alignment: Alignment.bottomLeft,
+        width: baseSize * 0.8,
+        height: baseSize * 0.5,
+        child: Chat(baseSize: baseSize * 0.1),
       ),
     );
   }

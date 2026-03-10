@@ -1,7 +1,7 @@
 import 'package:client_mobile/consts/popup_message_const.dart';
 import 'package:client_mobile/models/popup_message.dart';
 import 'package:client_mobile/models/user_info.dart';
-import 'package:client_mobile/services/chat_service.dart';
+import 'package:client_mobile/services/chat_service/chat_service.dart';
 import 'package:client_mobile/services/popup_service.dart';
 import 'package:client_mobile/services/user_service.dart';
 import 'package:client_mobile/utils/profile_image_provider.dart';
@@ -98,7 +98,7 @@ class _UserPopupState extends State<UserPopup> {
         builder: (context, user, _) {
           final username = user?.username ?? USER_POPUP_UNKNOWN_USER;
           final email = user?.email ?? USER_POPUP_UNKNOWN_EMAIL;
-          final avatar = avatarImageProviderFromProfilePicture(
+          final avatar = profilePictureImageProvider(
             user?.profilePicture,
             fallback: const AssetImage('assets/images/menu/pokemons/chibi/pikachu.png'),
           );
