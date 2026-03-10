@@ -41,20 +41,13 @@ class PlayerData {
       isConnected: json['isConnected'] as bool,
       name: json['name'] as String,
       avatar: _avatarFromServer(json['avatar'] as String),
-      items: ((json['items'] as List?) ?? const [])
-          .cast<String>()
-          .map((e) => ItemType.values.byName(e))
-          .toList(),
+      items: ((json['items'] as List?) ?? const []).cast<String>().map((e) => ItemType.values.byName(e)).toList(),
       health: (json['health'] as num).toInt(),
       speed: (json['speed'] as num).toInt(),
       attackDice: DiceType.fromValue((json['attackDice'] as num).toInt()),
       defenseDice: DiceType.fromValue((json['defenseDice'] as num).toInt()),
-      spawnPoint: Position.fromJson(
-        (json['spawnPoint'] as Map).cast<String, dynamic>(),
-      ),
-      position: Position.fromJson(
-        (json['position'] as Map).cast<String, dynamic>(),
-      ),
+      spawnPoint: Position.fromJson((json['spawnPoint'] as Map).cast<String, dynamic>()),
+      position: Position.fromJson((json['position'] as Map).cast<String, dynamic>()),
       combatsWon: (json['combatsWon'] as num).toInt(),
       type: PlayerType.fromValue(json['type'] as String),
       team: Team.fromValue(json['team'] as String),
@@ -89,10 +82,16 @@ enum DiceType {
   const DiceType(this.value);
 
   static DiceType fromValue(int v) {
-    return DiceType.values.firstWhere(
-      (e) => e.value == v,
-      orElse: () => DiceType.d4,
-    );
+    return DiceType.values.firstWhere((e) => e.value == v, orElse: () => DiceType.d4);
+  }
+
+  String displayName() {
+    switch (this) {
+      case DiceType.d4:
+        return 'D4';
+      case DiceType.d6:
+        return 'D6';
+    }
   }
 }
 
@@ -105,10 +104,7 @@ enum PlayerType {
   const PlayerType(this.value);
 
   static PlayerType fromValue(String v) {
-    return PlayerType.values.firstWhere(
-      (e) => e.value == v,
-      orElse: () => PlayerType.player,
-    );
+    return PlayerType.values.firstWhere((e) => e.value == v, orElse: () => PlayerType.player);
   }
 }
 
@@ -127,14 +123,8 @@ enum Team {
 
 Avatar _avatarFromServer(String raw) {
   if (raw == 'default') return Avatar.defaultAvatar;
-  var name = raw
-      .replaceAll('-evolved', 'Evolved')
-      .replaceAll('-shiny', 'Shiny')
-      .replaceAll('-', '');
-  return Avatar.values.firstWhere(
-    (e) => e.name == name,
-    orElse: () => Avatar.defaultAvatar,
-  );
+  var name = raw.replaceAll('-evolved', 'Evolved').replaceAll('-shiny', 'Shiny').replaceAll('-', '');
+  return Avatar.values.firstWhere((e) => e.name == name, orElse: () => Avatar.defaultAvatar);
 }
 
 String _avatarToServer(Avatar avatar) {
