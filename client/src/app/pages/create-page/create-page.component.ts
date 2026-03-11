@@ -6,11 +6,13 @@ import { HeaderComponent } from '@app/components/header/header.component';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
+import { GameState } from '@common/interfaces/game-state.enum';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -27,6 +29,7 @@ export class CreatePageComponent implements OnInit {
     private gameSaveService: GameSaveService = inject(GameSaveService);
     private matchService: MatchService = inject(MatchService);
     private popupService: PopupService = inject(PopupService);
+    private readonly gameDataService: GameDataService = inject(GameDataService);
 
     navigateToMenu() {
         this.audioService.playEffect(SoundEffect.Click);
@@ -39,24 +42,43 @@ export class CreatePageComponent implements OnInit {
     }
 
     async createMatch(gameData: GameData) {
-        if (!this.isCreatingMatch) {
-            this.isCreatingMatch = true;
-            const isMatchCreated = await this.matchService.createMatch(gameData);
-            if (!isMatchCreated) {
-                this.loadGames();
-                this.isCreatingMatch = false;
-            }
-        }
+        this.gameSaveService.getGame(gameData._id).subscribe({
+            next: async (updatedGame: GameData) => {
+                gameData = updatedGame;
+                if (!this.isGameAccessible(gameData)) {
+                    this.handleUnauthorizedAccess();
+                    return;
+                }
+                if (!this.isCreatingMatch) {
+                    this.isCreatingMatch = true;
+                    const isMatchCreated = await this.matchService.createMatch(gameData);
+                    if (!isMatchCreated) {
+                        this.loadGames();
+                        this.isCreatingMatch = false;
+                    }
+                }
+            },
+        });
     }
 
     private loadGames() {
         this.gameSaveService.getAllGames().subscribe({
             next: (games) => {
-                this.games = games.filter((game) => game.isVisible);
+                this.games = games.filter((game) => this.isGameAccessible(game));
             },
             error: () => {
                 this.popupService.showPopup({ message: PopupMessage.ConnectionError, hasCloseButton: true, isConfirmation: false });
             },
         });
+    }
+
+    private handleUnauthorizedAccess() {
+        this.popupService.showPopup({ message: PopupMessage.UnauthorizedAccessToGame, hasCloseButton: true, isConfirmation: false });
+        this.loadGames();
+    }
+
+    private isGameAccessible(game: GameData) {
+        const isStateAcessible = [GameState.PUBLIC, GameState.PRIVATE_SHARED].includes(game.gameState);
+        return this.gameDataService.isOwner(game.owner) || isStateAcessible;
     }
 }

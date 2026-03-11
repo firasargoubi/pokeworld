@@ -22,7 +22,8 @@
         "accountConnected": "This account is already connected on another platform",
         "changeConfirmed": "Password changed successfully!",
         "deleteAccountConfirmation": "Do you really want to delete your account?",
-        "noWinner": "No winner"
+        "noWinner": "No winner",
+        "unauthorizedAccessToGame": "This game is no longer accessible due to a change of state"
     },
     "server": {
         "messages": {

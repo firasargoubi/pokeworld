@@ -25,24 +25,15 @@
                         <div class="mode-sub-background"></div>
                     </div>
                     <p class="last-edited">{{ formatDate(game.lastEdited) }}</p>
+                    <div class="owner">
+                        Owner : 
+                        @if (game.owner) {
+                            {{game.owner.userName}}
+                        }
+                    </div>
                 </div>
                 <div class="game-interaction">
                     @if(isAdminView) {
-                    <div class="admin-button-container visibility-button" (click)="onToggleVisibility()">
-                        <div class="button-edge"></div>
-                        <div class="button-body">
-                            <img
-                                [src]="
-                                    game.isVisible
-                                        ? './assets/images/menu/buttons/admin-button/eye.png'
-                                        : './assets/images/menu/buttons/admin-button/closed-eye.png'
-                                "
-                                class="button-icon"
-                            />
-                        </div>
-                        <div class="button-edge"></div>
-                    </div>
-
                     <div class="admin-button-container edit-button" (click)="onEdit()">
                         <div class="button-edge"></div>
                         <div class="button-body">

@@ -24,6 +24,17 @@
                 [(ngModel)]="gameDataService.gameData.description"
                 (click)="this.audioService.playEffect(this.clickValue)"
             ></textarea>
+            @if (gameDataService.isOwner(this.gameDataService.gameData.owner)) {
+            <fieldset class="gamestates-form">
+                @for (state of gameState | keyvalue; track state.key) {
+                <div class="gamestate-option">
+                    <input type="radio" [id]="state.key" [value]="state.value" [(ngModel)]="gameDataService.gameData.gameState"
+                        name="gameStates">
+                    <label [for]="state.key">{{ state.value }}</label>
+                </div>
+                }
+            </fieldset>
+            }
             <div class="left-label-medium">{{ 'pages.edit.size' | translate }} : {{ gameDataService.getMapSizeString() }}</div>
             <div class="left-label-medium">{{ 'pages.edit.mode' | translate }} : {{ gameDataService.getGameModeString() }}</div>
             <button (click)="saveButton()" class="save-button">{{ 'pages.edit.save' | translate }}</button>

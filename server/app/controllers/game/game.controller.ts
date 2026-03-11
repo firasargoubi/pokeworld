@@ -118,25 +118,6 @@ export class GameController {
         response.status(HttpStatus.OK).json(updatedGame);
     }
 
-    @ApiOkResponse({
-        description: 'Toggles the visibility of a game',
-        type: Game,
-    })
-    @ApiBadRequestResponse({
-        description: 'Returns BAD_REQUEST http status when _id is Invalid',
-    })
-    @ApiNotFoundResponse({
-        description: 'Returns NOT_FOUND http status when _id not found',
-    })
-    @ApiInternalServerErrorResponse({
-        description: 'Returns INTERNAL_SERVER_ERROR http status when request fails',
-    })
-    @Patch(`/:id/${ApiEndpoint.Toggle}`)
-    async toggleVisibility(@Param('id') id: string, @Res() response: Response) {
-        const updatedGame = await this.gameService.toggleVisibility(id);
-        response.status(HttpStatus.OK).json(updatedGame);
-    }
-
     @ApiNoContentResponse({
         description: 'Deletes a game',
     })

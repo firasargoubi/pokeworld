@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -20,6 +21,7 @@ import { ITEM_DESCRIPTION } from '@app/consts/item-data.const';
 import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
+import { GameState } from '@common/interfaces/game-state.enum';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
@@ -29,11 +31,12 @@ import { TranslateModule } from '@ngx-translate/core';
     selector: 'app-edit-page',
     templateUrl: './edit-page.component.html',
     styleUrls: ['./edit-page.component.scss'],
-    imports: [HeaderComponent, MapComponent, FormsModule, ItemComponent, ChatComponent, TranslateModule],
+    imports: [HeaderComponent, MapComponent, FormsModule, ItemComponent, ChatComponent, CommonModule, TranslateModule],
 })
 export class EditPageComponent {
     gameDataService: GameDataService = inject(GameDataService);
     editorVisualData: EditorVisualData = structuredClone(DEFAULT_EDITOR_DATA);
+    gameState = GameState;
     readonly audioService: AudioService = inject(AudioService);
     readonly clickValue = SoundEffect.Click;
     private editorService: EditorService = inject(EditorService);

@@ -5,22 +5,26 @@ import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameMode, MapSize } from '@common/interfaces/map-data';
 import { TranslateModule } from '@ngx-translate/core';
 import { CreateGamePopupComponent } from './create-game-popup.component';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 
 describe('CreateGamePopupComponent', () => {
     let component: CreateGamePopupComponent;
     let fixture: ComponentFixture<CreateGamePopupComponent>;
     let routerSpy: jasmine.SpyObj<Router>;
     let mockAudioService: jasmine.SpyObj<AudioService>;
+    let gameDataService: jasmine.SpyObj<GameDataService>;
 
     beforeEach(async () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage']);
+        gameDataService = jasmine.createSpyObj('GameDataService', ['createNewGame']);
 
         await TestBed.configureTestingModule({
             imports: [CreateGamePopupComponent, TranslateModule.forRoot()],
             providers: [
                 { provide: Router, useValue: routerSpy },
                 { provide: AudioService, useValue: mockAudioService },
+                { provide: GameDataService, useValue: gameDataService },
             ],
         }).compileComponents();
 

@@ -1,3 +1,4 @@
+import { GameState } from "@common/interfaces/game-state.enum";
 import { GameData } from "../interfaces/game-data";
 import { ItemType } from "../interfaces/item-type.enum";
 import { GameMode, MapSize } from "../interfaces/map-data";
@@ -7,7 +8,8 @@ export const MOCK_GAME_DATAS: GameData[] = [
     {
         _id: '123',
         name: 'Game 1',
-        isVisible: true,
+        owner: {userId: '', userName : ''},
+        gameState: GameState.PUBLIC,
         description: 'Description 1',
         lastEdited: new Date(),
         mapData: {
@@ -30,7 +32,8 @@ export const MOCK_GAME_DATAS: GameData[] = [
     {
         _id: '456',
         name: 'Game 2',
-        isVisible: true,
+        owner: {userId: '', userName : ''},
+        gameState: GameState.PUBLIC,
         description: 'Description 2',
         lastEdited: new Date(),
         mapData: {
@@ -53,7 +56,8 @@ export const MOCK_GAME_DATAS: GameData[] = [
     {
         _id: '789',
         name: 'Game 3',
-        isVisible: true,
+        owner: {userId: '', userName : ''},
+        gameState: GameState.PUBLIC,
         description: 'Description 3',
         lastEdited: new Date(),
         mapData: {

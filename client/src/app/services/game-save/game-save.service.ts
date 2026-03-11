@@ -24,10 +24,6 @@ export class GameSaveService {
         return this.http.put<GameData>(`${this.baseUrl}/${ApiEndpoint.Games}`, gameData);
     }
 
-    toggleVisibility(gameId: string): Observable<GameData> {
-        return this.http.patch<GameData>(`${this.baseUrl}/${ApiEndpoint.Games}/${gameId}/${ApiEndpoint.Toggle}`, {});
-    }
-
     deleteGame(gameId: string): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/${ApiEndpoint.Games}/${gameId}`);
     }

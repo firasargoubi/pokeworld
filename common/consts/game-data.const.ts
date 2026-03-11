@@ -1,3 +1,4 @@
+import { GameState } from '@common/interfaces/game-state.enum';
 import { GameData } from '../interfaces/game-data';
 import { ItemType } from '../interfaces/item-type.enum';
 import { GameMode, MapSize } from '../interfaces/map-data';
@@ -5,9 +6,10 @@ import { GameMode, MapSize } from '../interfaces/map-data';
 export const DEFAULT_GAME_DATA: GameData = {
     _id: '',
     name: '',
+    owner: {userId : '', userName : ''},
+    gameState: GameState.PUBLIC,
     description: '',
     lastEdited: new Date(),
-    isVisible: false,
     mapData: {
         items: {
             [ItemType.Item1]: [],

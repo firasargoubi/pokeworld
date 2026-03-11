@@ -5,14 +5,16 @@ import { UpdatePreferencesDto } from '@app/model/dto/user/update-preferences.dto
 import { UserResponseDto } from '@app/model/dto/user/response-user.dto';
 import { User, UserDocument } from '@app/model/schema/user.schema';
 import { AppLanguage, AppTheme, DEFAULT_PREFERENCES, UserPreferences } from '@common/interfaces/preferences';
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Inject, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as crypto from 'crypto';
 import { Model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
+import { GameService } from '@app/services/game/game.service';
 
 @Injectable()
 export class UserService {
+    @Inject(GameService) private readonly gameService: GameService;
     private readonly passkey: string;
     private userSocketMap: Map<string, string> = new Map<string, string>();
 
@@ -113,6 +115,15 @@ export class UserService {
         if (!user) {
             throw new NotFoundException('User not found');
         }
+
+        const allGames = await this.gameService.getAllGames();
+        for (const game of allGames) {
+            const isOwner = game.owner?.userId === userId;
+            if (isOwner) {
+                this.gameService.deleteGame(game._id);
+            }
+        }
+
         user.username = '[supprimé]';
         user.email = 'None';
         user.passwordHash = 'None';

@@ -1,6 +1,8 @@
 ﻿<div class="chat-container" [class.hidden]="!this.isComponentVisible" [class.hide-labels]="hideLabels" [style.--scale-factor]="scaleFactor">
     <div class="chat-toggle-button" (click)="switchVisibility()"></div>
-    <div class="horizontal-border" (click)="switchVisibility()"><p>></p></div>
+    <div class="horizontal-border" (click)="switchVisibility()">
+        <p>></p>
+    </div>
     <div class="chat-body">
         <div class="chat-interactions-container">
             <div class="categories-container">
@@ -63,11 +65,11 @@
             </div>
             } @else {
             <button (click)="showChannelList()"><-</button>
-            <span class="channel-name">{{ chatService.activeChannelName() }}</span>
-            <div class="buttons-container flex-row">
-                <div class="channel-leave-button button simple-small-stylized-padding" (click)="leaveChannel()"></div>
-                <div class="channel-delete-button button simple-small-stylized-padding" (click)="deleteChannel()"></div>
-            </div>
+                <span class="channel-name">{{ chatService.activeChannelName() }}</span>
+                <div class="buttons-container flex-row">
+                    <div class="channel-leave-button button simple-small-stylized-padding" (click)="leaveChannel()"></div>
+                    <div class="channel-delete-button button simple-small-stylized-padding" (click)="deleteChannel()"></div>
+                </div>
             }
         </div>
         }

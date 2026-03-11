@@ -63,18 +63,6 @@ export class GameService {
         return updatedGame;
     }
 
-    async toggleVisibility(id: string): Promise<Game> {
-        if (!isValidObjectId(id)) {
-            throw new BadRequestException(`Invalid ID format: ${id}`);
-        }
-        const game = await this.gameModel.findById(id).exec();
-        if (!game) {
-            throw new NotFoundException(`Game with ID ${id} not found.`);
-        }
-        game.isVisible = !game.isVisible;
-        return game.save();
-    }
-
     async deleteGame(id: string): Promise<void> {
         if (!isValidObjectId(id)) {
             throw new BadRequestException(`Invalid ID format: ${id}`);

@@ -125,7 +125,6 @@ export class EditorService {
     }
 
     private async saveGameOnServer(): Promise<boolean> {
-        this.gameDataService.gameData.isVisible = false;
         this.gameDataService.gameData.lastEdited = new Date();
         this.gameDataService.gameData.thumbnail = await this.thumbnailService.getThumbnail(this.gameDataService.gameData.mapData, true);
 

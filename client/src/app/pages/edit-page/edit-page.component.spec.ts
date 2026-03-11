@@ -74,16 +74,20 @@ describe('EditPageComponent', () => {
             'pickItem',
         ]);
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage', 'playBackgroundMusic']);
-        gameDataServiceSpy = jasmine.createSpyObj('GameDataService', ['isMapValid', 'isModified', 'getItem', 'setGameData', 'removeItem'], {
-            itemUpdate: {
-                subscribe: () => undefined,
+        gameDataServiceSpy = jasmine.createSpyObj(
+            'GameDataService',
+            ['isMapValid', 'isModified', 'getItem', 'setGameData', 'removeItem', 'isOwner'],
+            {
+                itemUpdate: {
+                    subscribe: () => undefined,
+                },
+                gameData: structuredClone(MOCK_GAME_DATAS)[0],
+                isOutOfBound: () => false,
+                getTile: () => TileType.Grass,
+                getMapSizeString: () => '',
+                getGameModeString: () => '',
             },
-            gameData: structuredClone(MOCK_GAME_DATAS)[0],
-            isOutOfBound: () => false,
-            getTile: () => TileType.Grass,
-            getMapSizeString: () => '',
-            getGameModeString: () => '',
-        });
+        );
         gameDataServiceSpy.isMapValid.and.returnValue(true);
         editorServiceSpy.getRemainingItemCount.and.returnValue(0);
 

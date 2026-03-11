@@ -296,6 +296,7 @@ $bg-btn-red: linear-gradient(
     height: $big-stripe-size;
     display: grid;
     grid-template-columns: 40% 60%;
+    grid-template-rows: 50% 50%;
     justify-content: space-between;
     width: 100%;
 }
@@ -344,6 +345,15 @@ $bg-btn-red: linear-gradient(
     z-index: 0;
 }
 
+.owner{
+    overflow: visible;
+    margin-top: 1px;
+    padding: 11px;
+    color: black;
+    height: 100%;
+    width: 100%;
+}
+
 .last-edited {
     letter-spacing: 0.2;
     width: 100%;
@@ -364,7 +374,7 @@ $bg-btn-red: linear-gradient(
     gap: min(1vw, 1vh);
     justify-content: center;
     align-items: center;
-    height: 50%;
+    height: 40%;
     width: 100%;
 }
 

@@ -253,18 +253,6 @@ describe('MatchService', () => {
         expect(canCreate).toBe(false);
     });
 
-    it('can create match should return false if match is not visible ', async () => {
-        const playerId = 'player1';
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'hasPlayerId').returns(false);
-        const invisibleGame = mockMatch.data.gameData;
-        invisibleGame.isVisible = false;
-        mockGameService.findGame.returns(Promise.resolve(invisibleGame));
-        const canCreate = await service['canCreateMatch'](playerId, invisibleGame);
-        expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.InvisibleGame, true)).toBe(true);
-        expect(canCreate).toBe(false);
-    });
-
     it('can create match should return true if match is VALID ', async () => {
         const playerId = 'player1';
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
