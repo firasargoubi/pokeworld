@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
-import 'package:client_mobile/widgets/poke_button.dart';
+import 'package:client_mobile/widgets/poke_button/poke_button.dart';
 import 'package:flutter/material.dart';
 
 import 'add_bot_popup_const.dart';
@@ -62,7 +62,7 @@ class _AddBotPopupState extends State<AddBotPopup> {
   }
 
   void submit() {
-    final PlayerType playerType = _isAggressive ? PlayerType.botAggressive : PlayerType.botDefensive;
+    final PlayerType playerType = _isAggressive ? PlayerType.BotAggressive : PlayerType.BotDefensive;
     LobbyService().addBot(playerType);
     widget.onClose();
   }

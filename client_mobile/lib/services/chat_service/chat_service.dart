@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:client_mobile/models/chat_message.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
-import 'package:client_mobile/services/user_service.dart';
+import 'package:client_mobile/services/user_service/user_service.dart';
 
-import '../../consts/socket_event.dart';
-import '../socket_service.dart';
+import '../../models/socket_event.dart';
+import '../socket_service/socket_service.dart';
 
 class ChatService {
   static final ChatService _instance = ChatService._internal();
@@ -39,7 +39,7 @@ class ChatService {
     if (_listenersInitialized) return;
     _listenersInitialized = true;
 
-    _socketService.socket.on(ChatEvent.generalMessage.value, (data) {
+    _socketService.socket.on(ChatEvent.GeneralMessage.value, (data) {
       if (data is Map<String, dynamic>) {
         final chatMsg = ChatMessage.fromJson(Map<String, dynamic>.from(data));
         _generalMessages.add(chatMsg);
@@ -50,7 +50,7 @@ class ChatService {
     MatchService().matchUpdates.listen((matchData) {
       _matchMessages.clear();
       _matchMessages.addAll(matchData.chatData);
-      _matchMessagesController.add(List.unmodifiable(_matchMessages)); // ← ajouter
+      _matchMessagesController.add(List.unmodifiable(_matchMessages));
 
       _matchLogs.clear();
       _matchLogs.addAll(matchData.logData);
@@ -68,7 +68,7 @@ class ChatService {
       timestamp: timestamp,
       profilePicture: UserService().currentUser.value?.profilePicture,
     );
-    _socketService.emit(ChatEvent.generalMessage.value, chatMessage);
+    _socketService.emit(ChatEvent.GeneralMessage.value, chatMessage);
   }
 
   void sendMatchMessage(String message) {

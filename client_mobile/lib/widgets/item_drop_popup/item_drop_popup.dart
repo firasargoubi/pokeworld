@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/play_service/play_service.dart';
-import 'package:client_mobile/widgets/poke_button.dart';
+import 'package:client_mobile/widgets/poke_button/poke_button.dart';
 import 'package:flutter/material.dart';
 
 import 'item_drop_popup_const.dart';

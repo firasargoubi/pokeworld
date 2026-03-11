@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:client_mobile/models/avatar_data.dart';
+import 'package:client_mobile/consts/avatar_data_const.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
@@ -77,8 +77,8 @@ class _PlayerCardState extends State<PlayerCard> {
     userProfilePictureAsset = FALLBACK_AVATAR_ASSET;
 
     final playerType = player?.type;
-    isBot = playerType != null && playerType != PlayerType.player;
-    isAggressiveBot = playerType == PlayerType.botAggressive;
+    isBot = playerType != null && playerType != PlayerType.Player;
+    isAggressiveBot = playerType == PlayerType.BotAggressive;
 
     isSelf = MatchService().selfId == player?.id;
     isAdmin = MatchService().isPlayerHost(player?.id);

@@ -3,20 +3,19 @@ import 'dart:math';
 
 import 'package:client_mobile/consts/match_data_const.dart';
 import 'package:client_mobile/consts/player_data_const.dart';
-import 'package:client_mobile/consts/popup_message_const.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/models/popup_message.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
-import 'package:client_mobile/services/popup_service.dart';
+import 'package:client_mobile/services/popup_service/popup_service.dart';
 import 'package:client_mobile/widgets/add_bot_popup/add_bot_popup.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
-import 'package:client_mobile/widgets/header.dart';
+import 'package:client_mobile/widgets/header/header.dart';
 import 'package:client_mobile/widgets/player_card/player_card.dart';
-import 'package:client_mobile/widgets/poke_button.dart';
-import 'package:client_mobile/widgets/stripe_painter.dart';
+import 'package:client_mobile/widgets/poke_button/poke_button.dart';
+import 'package:client_mobile/widgets/stripe_painter/stripe_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -37,7 +36,7 @@ class _LobbyPageState extends State<LobbyPage> {
   bool isLocked = MatchService().matchData?.lobbyData.isLocked ?? false;
 
   final mapSize = MatchService().matchData?.gameData.mapData.size;
-  late final maxPlayers = MAP_SIZE_PLAYER_COUNT[mapSize] ?? MAP_SIZE_PLAYER_COUNT[MapSize.small]!;
+  late final maxPlayers = MAP_SIZE_PLAYER_COUNT[mapSize] ?? MAP_SIZE_PLAYER_COUNT[MapSize.Small]!;
   late List<PlayerData> players;
 
   StreamSubscription<MatchData>? _sub;
@@ -45,7 +44,7 @@ class _LobbyPageState extends State<LobbyPage> {
   List<PlayerData> _list(MatchData? md) {
     final next = (md?.players ?? const <PlayerData>[]).where((p) => p.isConnected).toList(growable: true);
     while (next.length < maxPlayers) {
-      next.add(defaultPlayerData);
+      next.add(DEFAULT_PLAYER_DATA);
     }
     if (next.length > maxPlayers) next.removeRange(maxPlayers, next.length);
     return next;
@@ -146,17 +145,11 @@ class _LobbyPageState extends State<LobbyPage> {
             height: b * 0.1,
             width: double.infinity,
             child: AppHeader(
-              index: 1, 
-              text: HEADER_TEXT, 
+              index: 1,
+              text: HEADER_TEXT,
               onTap: () {
-                _popupService.showPopup(
-                  PopupMessage(
-                    message: PopupMessageConst.quit.message,
-                    isConfirmation: true,
-                    action: _leaveLobby,
-                  ),
-                );
-              }
+                _popupService.showPopup(PopupMessage(message: PopupMessages.Quit.message, isConfirmation: true, action: _leaveLobby));
+              },
             ),
           ),
           Expanded(

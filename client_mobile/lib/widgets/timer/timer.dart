@@ -43,16 +43,16 @@ class _PlayTimerWidgetState extends State<PlayTimerWidget> with SingleTickerProv
 
     _previousState = MatchService().matchData?.state;
 
-    if (_previousState == MatchState.turnWait) {
+    if (_previousState == MatchState.TurnWait) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _resumeOrStart());
     }
 
     _matchSubscription = MatchService().matchUpdates.listen((updatedMatchData) {
       final state = updatedMatchData.state;
 
-      if (_previousState == MatchState.turnStart && state == MatchState.turnWait) {
+      if (_previousState == MatchState.TurnStart && state == MatchState.TurnWait) {
         _start();
-      } else if (state == MatchState.turnWait) {
+      } else if (state == MatchState.TurnWait) {
         _resume();
       } else {
         _pause();

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:client_mobile/models/avatar_data.dart';
+import 'package:client_mobile/consts/avatar_data_const.dart';
 import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/map_visual_data.dart';
@@ -278,13 +278,13 @@ class MapService extends ChangeNotifier {
 
   OverlayType? getOverlay(Position position) {
     if (overlayTiles.actions.any((p) => p.x == position.x && p.y == position.y)) {
-      return OverlayType.action;
+      return OverlayType.Action;
     }
     if (overlayTiles.hoverMoves.any((p) => p.x == position.x && p.y == position.y)) {
-      return OverlayType.hoverMove;
+      return OverlayType.HoverMove;
     }
     if (overlayTiles.possibleMoves.any((p) => p.x == position.x && p.y == position.y)) {
-      return OverlayType.possibleMove;
+      return OverlayType.PossibleMove;
     }
     return null;
   }

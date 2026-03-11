@@ -1,9 +1,8 @@
-import 'package:client_mobile/consts/popup_message_const.dart';
 import 'package:client_mobile/models/popup_message.dart';
 import 'package:client_mobile/models/user_info.dart';
 import 'package:client_mobile/services/chat_service/chat_service.dart';
-import 'package:client_mobile/services/popup_service.dart';
-import 'package:client_mobile/services/user_service.dart';
+import 'package:client_mobile/services/popup_service/popup_service.dart';
+import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:client_mobile/utils/profile_image_provider.dart';
 import 'package:client_mobile/widgets/login_popup/login_popup.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +80,7 @@ class _UserPopupState extends State<UserPopup> {
         _newPassword = '';
         _passwordError = '';
       });
-      PopupService().showPopup(PopupMessage(message: PopupMessageConst.changeConfirmed.message, hasCloseButton: true, isConfirmation: false));
+      PopupService().showPopup(PopupMessage(message: PopupMessages.ChangeConfirmed.message, hasCloseButton: true, isConfirmation: false));
     } catch (e) {
       setState(() {
         _passwordError = e.toString();
@@ -154,7 +153,7 @@ class _UserPopupState extends State<UserPopup> {
           onPressed: () {
             PopupService().showPopup(
               PopupMessage(
-                message: PopupMessageConst.logoutConfirmation.message,
+                message: PopupMessages.LogoutConfirmation.message,
                 hasCloseButton: true,
                 isConfirmation: true,
                 action: () {

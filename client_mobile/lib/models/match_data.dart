@@ -186,36 +186,36 @@ class TrackingData {
 }
 
 enum CombatAction {
-  none('none'),
-  successAttack('successAttack'),
-  failAttack('failAttack'),
-  successEscape('successEscape'),
-  failEscape('failEscape');
+  None('none'),
+  SuccessAttack('successAttack'),
+  FailAttack('failAttack'),
+  SuccessEscape('successEscape'),
+  FailEscape('failEscape');
 
   final String value;
   const CombatAction(this.value);
 
   static CombatAction fromValue(String v) {
-    return CombatAction.values.firstWhere((e) => e.value == v, orElse: () => CombatAction.none);
+    return CombatAction.values.firstWhere((e) => e.value == v, orElse: () => CombatAction.None);
   }
 }
 
 enum MatchState {
-  lobby('lobby'),
-  turnStart('turnStart'),
-  turnWait('turnWait'),
-  movementAnimation('movementAnimation'),
-  itemDropSelection('itemDropSelection'),
-  combatWait('combatWait'),
-  combatAnimation('combatAnimation'),
-  combatEnd('combatEnd'),
-  matchEnd('matchEnd'),
-  statistics('statistics');
+  Lobby('lobby'),
+  TurnStart('turnStart'),
+  TurnWait('turnWait'),
+  MovementAnimation('movementAnimation'),
+  ItemDropSelection('itemDropSelection'),
+  CombatWait('combatWait'),
+  CombatAnimation('combatAnimation'),
+  CombatEnd('combatEnd'),
+  MatchEnd('matchEnd'),
+  Statistics('statistics');
 
   final String value;
   const MatchState(this.value);
 
   static MatchState fromValue(String v) {
-    return MatchState.values.firstWhere((e) => e.value == v, orElse: () => MatchState.lobby);
+    return MatchState.values.firstWhere((e) => e.value == v, orElse: () => MatchState.Lobby);
   }
 }

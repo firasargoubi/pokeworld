@@ -1,15 +1,15 @@
-import 'package:client_mobile/consts/socket_event.dart';
 import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
+import 'package:client_mobile/models/socket_event.dart';
 import 'package:client_mobile/pages/combat_page/combat_page.dart';
 import 'package:client_mobile/pages/play_page/play_page.dart';
 import 'package:client_mobile/pages/stat_page/stat_page.dart';
 import 'package:client_mobile/services/map_service/map_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/movement/movement_service.dart';
-import 'package:client_mobile/services/navigation_service.dart';
-import 'package:client_mobile/services/socket_service.dart';
+import 'package:client_mobile/services/navigation_service/navigation_service.dart';
+import 'package:client_mobile/services/socket_service/socket_service.dart';
 import 'package:flutter/material.dart';
 
 class PlayService {
@@ -39,11 +39,11 @@ class PlayService {
   }
 
   bool canAct() {
-    return MatchService().isActivePlayer() && MatchService().isState(MatchState.turnWait) && MatchService().matchData!.playData.hasAction;
+    return MatchService().isActivePlayer() && MatchService().isState(MatchState.TurnWait) && MatchService().matchData!.playData.hasAction;
   }
 
   bool canEndTurn() {
-    return MatchService().isActivePlayer() && MatchService().isState(MatchState.turnWait);
+    return MatchService().isActivePlayer() && MatchService().isState(MatchState.TurnWait);
   }
 
   bool hasItem(String id, ItemType item) {
@@ -81,7 +81,7 @@ class PlayService {
   }
 
   void updateOverlays() {
-    if (MatchService().isActivePlayer() && (MatchService().isState(MatchState.turnWait) || MatchService().isState(MatchState.turnStart))) {
+    if (MatchService().isActivePlayer() && (MatchService().isState(MatchState.TurnWait) || MatchService().isState(MatchState.TurnStart))) {
       displayPossibleMoves();
     } else {
       MapService().resetOverlayTiles();
@@ -138,7 +138,7 @@ class PlayService {
   }
 
   void updateMovement(MatchData oldMatchData, MatchData newMatchData) {
-    if (MatchService().isState(MatchState.movementAnimation)) {
+    if (MatchService().isState(MatchState.MovementAnimation)) {
       final int activeIndex = newMatchData.playData.activePlayerIndex;
 
       final Position oldPos = oldMatchData.players[activeIndex].position;
@@ -163,18 +163,18 @@ class PlayService {
     final isSelfInCombat = newMatchData.combatData.playersCombatData.any((p) => p.playerIndex == MatchService().selfIndex);
 
     final wasInCombatState =
-        oldMatchData.state == MatchState.combatWait || oldMatchData.state == MatchState.combatAnimation || oldMatchData.state == MatchState.combatEnd;
+        oldMatchData.state == MatchState.CombatWait || oldMatchData.state == MatchState.CombatAnimation || oldMatchData.state == MatchState.CombatEnd;
 
     final isMatchInCombatState =
-        newMatchData.state == MatchState.combatWait || newMatchData.state == MatchState.combatAnimation || newMatchData.state == MatchState.combatEnd;
+        newMatchData.state == MatchState.CombatWait || newMatchData.state == MatchState.CombatAnimation || newMatchData.state == MatchState.CombatEnd;
 
     if (isSelfInCombat && isMatchInCombatState && !wasInCombatState) {
       _navigateAndReplace((_) => const CombatPage());
-    } else if (wasInCombatState && (newMatchData.state == MatchState.turnWait || newMatchData.state == MatchState.turnStart)) {
+    } else if (wasInCombatState && (newMatchData.state == MatchState.TurnWait || newMatchData.state == MatchState.TurnStart)) {
       _navigateAndReplace((_) => const PlayPage());
-    } else if (newMatchData.state == MatchState.matchEnd && !wasInCombatState) {
+    } else if (newMatchData.state == MatchState.MatchEnd && wasInCombatState) {
       _navigateAndReplace((_) => const PlayPage());
-    } else if (newMatchData.state == MatchState.statistics) {
+    } else if (newMatchData.state == MatchState.Statistics) {
       _navigateAndReplace((_) => const StatPage());
     }
   }

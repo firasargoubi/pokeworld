@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:client_mobile/consts/battle_platfrom.dart';
-import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
@@ -415,6 +414,8 @@ class CombatPlatformsLayer extends StatelessWidget {
     required this.enemyCombatData,
     required this.selfSprite,
     required this.enemySprite,
+    required this.selfSpriteAsset,
+    required this.enemySpriteAsset,
   });
 
   final double baseSize;
@@ -425,6 +426,9 @@ class CombatPlatformsLayer extends StatelessWidget {
 
   final SpriteAnimator selfSprite;
   final SpriteAnimator enemySprite;
+
+  final String selfSpriteAsset;
+  final String enemySpriteAsset;
 
   @override
   Widget build(BuildContext context) {
@@ -437,7 +441,7 @@ class CombatPlatformsLayer extends StatelessWidget {
           containerWidth: baseSize * 0.63,
           containerHeight: baseSize * 0.4,
           platformAsset: TILE_TYPE_TO_ASSET_PATH[selfCombatData.standingTile]!.selfPlatform,
-          spriteAsset: AVATAR_DATA[selfPlayer.avatar]!.backGif,
+          spriteAsset: selfSpriteAsset,
           spriteWidth: baseSize * 0.7,
           spriteHeight: baseSize * 0.7,
           spriteBottom: baseSize * -0.075,
@@ -452,7 +456,7 @@ class CombatPlatformsLayer extends StatelessWidget {
           containerWidth: baseSize * 0.63,
           containerHeight: baseSize * 0.4,
           platformAsset: TILE_TYPE_TO_ASSET_PATH[enemyCombatData.standingTile]!.enemyPlatform,
-          spriteAsset: AVATAR_DATA[enemyPlayer.avatar]!.frontGif,
+          spriteAsset: enemySpriteAsset,
           spriteWidth: baseSize * 0.45,
           spriteHeight: baseSize * 0.45,
           spriteBottom: baseSize * 0.06,

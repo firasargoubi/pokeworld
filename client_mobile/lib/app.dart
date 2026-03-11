@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'models/popup_message.dart';
-import 'pages/home_page.dart';
-import 'services/navigation_service.dart';
-import 'services/popup_service.dart';
-import 'widgets/warning_confirmation_popup.dart';
+import 'pages/home_page/home_page.dart';
+import 'services/navigation_service/navigation_service.dart';
+import 'services/popup_service/popup_service.dart';
+import 'widgets/warning_confirmation_popup/warning_confirmation_popup.dart';
 
 class PokeWorldApp extends StatelessWidget {
   const PokeWorldApp({super.key});

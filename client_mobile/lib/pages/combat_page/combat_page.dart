@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:client_mobile/consts/avatar_data_const.dart';
+import 'package:client_mobile/models/avatar_data.dart';
+import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/services/combat_service/combat_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
-import 'package:client_mobile/widgets/stripe_painter.dart';
+import 'package:client_mobile/widgets/stripe_painter/stripe_painter.dart';
 import 'package:flutter/material.dart';
 
 import 'combat_page_const.dart';
@@ -108,9 +111,23 @@ class _CombatPageState extends State<CombatPage> {
     }
   }
 
+  String computeGif(bool isSelf, Avatar avatar) {
+    if (isSelf) {
+      if (selfPlayer.items.contains(ItemType.Item6)) {
+        return AVATAR_DATA[Avatar.MissingNo]!.backGif;
+      }
+      return AVATAR_DATA[avatar]!.backGif;
+    } else {
+      if (enemyPlayer.items.contains(ItemType.Item6)) {
+        return AVATAR_DATA[Avatar.MissingNo]!.frontGif;
+      }
+      return AVATAR_DATA[avatar]!.frontGif;
+    }
+  }
+
   void _updateDiceText(bool selfWasAttacker, CombatData rawCombat) {
     final action = rawCombat.lastCombatAction;
-    if (action != CombatAction.successAttack && action != CombatAction.failAttack) return;
+    if (action != CombatAction.SuccessAttack && action != CombatAction.FailAttack) return;
 
     final attackRoll = rawCombat.lastRolledAttack;
     final defenseRoll = rawCombat.lastRolledDefense;
@@ -138,20 +155,20 @@ class _CombatPageState extends State<CombatPage> {
       _timerKey = UniqueKey().toString();
     });
 
-    if (newMatchState == MatchState.combatAnimation && _lastAnimatedTurnFlag != turnFlag) {
+    if (newMatchState == MatchState.CombatAnimation && _lastAnimatedTurnFlag != turnFlag) {
       _lastAnimatedTurnFlag = turnFlag;
 
-      if (action == CombatAction.successAttack || action == CombatAction.failAttack) {
+      if (action == CombatAction.SuccessAttack || action == CombatAction.FailAttack) {
         final attacker = selfWasAttacker ? selfSprite : enemySprite;
         final defender = selfWasAttacker ? enemySprite : selfSprite;
 
-        if (action == CombatAction.successAttack) {
+        if (action == CombatAction.SuccessAttack) {
           _playAttack(attacker);
           _playHit(defender);
         } else {
           _playAttack(attacker);
         }
-      } else if (action == CombatAction.successEscape) {
+      } else if (action == CombatAction.SuccessEscape) {
         final escaper = selfWasAttacker ? selfSprite : enemySprite;
         _playEscape(escaper);
       }
@@ -263,6 +280,8 @@ class _CombatPageState extends State<CombatPage> {
                               enemyCombatData: enemyCombatData,
                               selfSprite: selfSprite,
                               enemySprite: enemySprite,
+                              selfSpriteAsset: computeGif(true, selfPlayer.avatar),
+                              enemySpriteAsset: computeGif(false, enemyPlayer.avatar),
                             ),
                             CombatHudLayer(
                               baseSize: baseSize,

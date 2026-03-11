@@ -1,10 +1,10 @@
 import 'package:client_mobile/models/chat_message.dart';
 import 'package:client_mobile/utils/profile_image_provider.dart';
-import 'package:client_mobile/widgets/stripe_painter.dart';
+import 'package:client_mobile/widgets/stripe_painter/stripe_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../services/user_service.dart';
+import '../../services/user_service/user_service.dart';
 import '../../utils/time_utils.dart';
 import 'chat_const.dart';
 
@@ -99,16 +99,16 @@ class ChatHeader extends StatelessWidget {
           ChatChannelButton(
             baseSize: baseSize,
             label: CHAT_GENERAL_LABEL,
-            isSelected: selectedChannel == ChatChannel.general,
-            onTap: () => onChannelChanged(ChatChannel.general),
+            isSelected: selectedChannel == ChatChannel.General,
+            onTap: () => onChannelChanged(ChatChannel.General),
           ),
           SizedBox(width: baseSize * CHAT_CHANNELS_GAP_FACTOR),
           if (showMatchChannel) ...{
             ChatChannelButton(
               baseSize: baseSize,
               label: CHAT_PARTY_LABEL,
-              isSelected: selectedChannel == ChatChannel.match,
-              onTap: () => onChannelChanged(ChatChannel.match),
+              isSelected: selectedChannel == ChatChannel.Match,
+              onTap: () => onChannelChanged(ChatChannel.Match),
             ),
           },
         ],

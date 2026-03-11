@@ -1,4 +1,4 @@
-enum MenuCardColor { blue, orange }
+enum MenuCardColor { Blue, Orange }
 
 class MenuCardConfig {
   final String backgroundImage;

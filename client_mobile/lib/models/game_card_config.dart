@@ -1,4 +1,4 @@
-enum GameCardColor { blue, green, pink }
+enum GameCardColor { Blue, Green, Pink }
 
 class GameCardConfig {
   final String backgroundImage;

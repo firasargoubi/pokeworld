@@ -34,4 +34,4 @@ class OverlayTiles {
   OverlayTiles({required this.possibleMoves, required this.hoverMoves, required this.actions, required this.playerPosition});
 }
 
-enum OverlayType { possibleMove, hoverMove, action }
+enum OverlayType { PossibleMove, HoverMove, Action }
