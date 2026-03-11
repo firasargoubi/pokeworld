@@ -1,5 +1,5 @@
 import 'package:client_mobile/consts/avatar_list.dart';
-import 'package:client_mobile/consts/chat_const.dart';
+import 'package:client_mobile/consts/login_const.dart';
 import 'package:client_mobile/controllers/login_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -85,7 +85,7 @@ class _LoginPopupState extends State<LoginPopup> {
             TextField(
               controller: _controller.usernameController,
               enabled: !_controller.isLoading,
-              inputFormatters: [UsernameInputFormatter(), LengthLimitingTextInputFormatter(maxUsernameLength)],
+              inputFormatters: [UsernameInputFormatter(), LengthLimitingTextInputFormatter(MAX_USERNAME_LENGTH)],
               decoration: InputDecoration(labelText: LOGIN_POPUP_USERNAME_LABEL, hintText: LOGIN_POPUP_USERNAME_HINT, prefixIcon: Icon(Icons.person)),
             ),
             TextField(

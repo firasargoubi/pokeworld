@@ -32,7 +32,7 @@ class Chat extends StatefulWidget {
 
 class _ChatState extends State<Chat> {
   static bool _isCompact = true;
-  static ChatChannel _selectedChannel = ChatChannel.general;
+  static ChatChannel _selectedChannel = ChatChannel.General;
 
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -45,7 +45,7 @@ class _ChatState extends State<Chat> {
   List<ChatMessage> _generalMessages = [];
   List<ChatMessage> _matchMessages = [];
 
-  List<ChatMessage> get _currentMessages => _selectedChannel == ChatChannel.general ? _generalMessages : _matchMessages;
+  List<ChatMessage> get _currentMessages => _selectedChannel == ChatChannel.General ? _generalMessages : _matchMessages;
 
   void _toggleCompact() => setState(() => _isCompact = !_isCompact);
   double _lerp(double start, double end, double t) => start + (end - start) * t;
@@ -59,14 +59,14 @@ class _ChatState extends State<Chat> {
 
     _generalSubscription = _chatService.generalMessagesStream.listen((messages) {
       setState(() => _generalMessages = messages);
-      if (_selectedChannel == ChatChannel.general) {
+      if (_selectedChannel == ChatChannel.General) {
         WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
       }
     });
 
     _matchSubscription = _chatService.matchMessagesStream.listen((messages) {
       setState(() => _matchMessages = messages);
-      if (_selectedChannel == ChatChannel.match) {
+      if (_selectedChannel == ChatChannel.Match) {
         WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
       }
     });
@@ -93,7 +93,7 @@ class _ChatState extends State<Chat> {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
-    if (_selectedChannel == ChatChannel.general) {
+    if (_selectedChannel == ChatChannel.General) {
       _chatService.sendGeneralMessage(text);
     } else {
       _chatService.sendMatchMessage(text);

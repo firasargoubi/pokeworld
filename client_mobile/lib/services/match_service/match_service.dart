@@ -1,24 +1,24 @@
 import 'dart:async';
 
-import 'package:client_mobile/pages/join_page.dart';
+import 'package:client_mobile/models/server_message.dart';
+import 'package:client_mobile/pages/join_page/join_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../consts/match_data_const.dart';
-import '../../consts/player_data_const.dart';
-import '../../consts/popup_message_const.dart';
 import '../../consts/message_enum.dart';
-import '../../consts/socket_event.dart';
+import '../../consts/player_data_const.dart';
 import '../../models/game_data.dart';
 import '../../models/match_data.dart';
 import '../../models/message_from_server.dart';
 import '../../models/player_data.dart';
 import '../../models/popup_message.dart';
+import '../../models/socket_event.dart';
 import '../../pages/character_page/character_page.dart';
-import '../../pages/home_page.dart';
-import '../navigation_service.dart';
-import '../popup_service.dart';
-import '../socket_service.dart';
+import '../../pages/home_page/home_page.dart';
+import '../navigation_service/navigation_service.dart';
+import '../popup_service/popup_service.dart';
+import '../socket_service/socket_service.dart';
 
 class MatchService {
   static final MatchService _instance = MatchService._internal();
@@ -31,9 +31,9 @@ class MatchService {
   late final SocketService _socketService;
   final PopupService _popupService = PopupService();
   bool _listenersInitialized = false;
-  MatchData? _matchData = buildDefaultMatchData();
-  PlayerData? _selfPlayer = defaultPlayerData;
-  int? _selfIndex = defaultSelfIndex;
+  MatchData? _matchData = GET_DEFAULT_MATCH_DATA();
+  PlayerData? _selfPlayer = DEFAULT_PLAYER_DATA;
+  int? _selfIndex = DEFAULT_SELF_INDEX;
   final StreamController<MatchData> _matchUpdateController = StreamController<MatchData>.broadcast();
 
   MatchData? get matchData => _matchData;
@@ -62,7 +62,7 @@ class MatchService {
     if (_listenersInitialized) return;
     _listenersInitialized = true;
 
-    _socketService.socket.on(MatchEvent.message.value, (payload) {
+    _socketService.socket.on(MatchEvent.Message.value, (payload) {
       final message = MessageFromServer(
         message: (payload as Map)['message'] as String,
         hasCloseButton: ((payload)['hasCloseButton'] as bool?) ?? false,
@@ -71,29 +71,29 @@ class MatchService {
       onMessage(message);
     });
 
-    _socketService.socket.on(MatchEvent.update.value, (payload) {
+    _socketService.socket.on(MatchEvent.Update.value, (payload) {
       final matchData = MatchData.fromJson((payload as Map).cast<String, dynamic>());
       onUpdate(matchData);
     });
 
-    _socketService.socket.on(MatchEvent.disconnect.value, (payload) {
+    _socketService.socket.on(MatchEvent.Disconnect.value, (payload) {
       onDisconnect();
     });
 
-    _socketService.socket.on(MatchEvent.removedFromMatch.value, (payload) {
+    _socketService.socket.on(MatchEvent.RemovedFromMatch.value, (payload) {
       final reason = payload as String;
       onRemovedFromMatch(reason);
     });
   }
 
   void joinMatch(String matchCode) {
-    _socketService.emit(MatchEvent.joinMatch.value, matchCode, (payload) {
+    _socketService.emit(MatchEvent.JoinMatch.value, matchCode, (payload) {
       onMatchJoin(payload);
     });
   }
 
   void createMatch(GameData gameData) {
-    _socketService.emit(MatchEvent.createMatch.value, gameData, (payload) {
+    _socketService.emit(MatchEvent.CreateMatch.value, gameData, (payload) {
       onMatchJoin(payload);
     });
   }
@@ -108,9 +108,7 @@ class MatchService {
   void onDisconnect() {
     if (isInMatch()) {
       _popupService.keepMessages();
-      _popupService.showPopup(
-        PopupMessage(message: PopupMessageConst.connectionError.message, hasCloseButton: true, isConfirmation: false),
-      );
+      _popupService.showPopup(PopupMessage(message: PopupMessages.ConnectionError.message, hasCloseButton: true, isConfirmation: false));
       resetMatchData();
       NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const HomePage()));
     }
@@ -122,26 +120,29 @@ class MatchService {
         message: message.message,
         hasCloseButton: message.hasCloseButton,
         isConfirmation: false,
-        popupColor: warningMessages.contains(message.message) ? PopupColor.orange : PopupColor.blue,
+        popupColor: WARNING_MESSAGES.contains(message.message) ? PopupColor.Orange : PopupColor.Blue,
       ),
     );
   }
 
   void onRemovedFromMatch(String reason) {
-    if(isInMatch()){
+    if (isInMatch()) {
       _popupService.keepMessages();
-      if(reason == Message.lockedFromLobby.message){
+      if (reason == Message.LockedFromLobby.message) {
         NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const JoinPage()));
         _popupService.showPopup(
-          PopupMessage(message: reason, hasCloseButton: true, isConfirmation: true, action: () {
-            NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const HomePage()));
-          }),
+          PopupMessage(
+            message: reason,
+            hasCloseButton: true,
+            isConfirmation: true,
+            action: () {
+              NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const HomePage()));
+            },
+          ),
         );
       } else {
         NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const HomePage()));
-        _popupService.showPopup(
-          PopupMessage(message: reason, hasCloseButton: false, isConfirmation: false),
-        );
+        _popupService.showPopup(PopupMessage(message: reason, hasCloseButton: false, isConfirmation: false));
       }
       resetMatchData();
     }
@@ -151,16 +152,16 @@ class MatchService {
     _matchData = matchData;
     final id = selfId;
     if (id == null) {
-      _selfPlayer = defaultPlayerData;
-      _selfIndex = defaultSelfIndex;
+      _selfPlayer = DEFAULT_PLAYER_DATA;
+      _selfIndex = DEFAULT_SELF_INDEX;
     } else {
       final index = matchData.players.indexWhere((p) => p.id == id);
       if (index >= 0) {
         _selfIndex = index;
         _selfPlayer = matchData.players[index];
       } else {
-        _selfIndex = defaultSelfIndex;
-        _selfPlayer = defaultPlayerData;
+        _selfIndex = DEFAULT_SELF_INDEX;
+        _selfPlayer = DEFAULT_PLAYER_DATA;
       }
     }
     if (kDebugMode) {
@@ -171,7 +172,7 @@ class MatchService {
 
   void leaveMatch() {
     if (isInMatch()) {
-      _socketService.emit(MatchEvent.leaveMatch.value);
+      _socketService.emit(MatchEvent.LeaveMatch.value);
       resetMatchData();
     }
 
@@ -179,7 +180,7 @@ class MatchService {
   }
 
   bool isInMatch() {
-    return (_selfIndex ?? defaultSelfIndex) >= 0;
+    return (_selfIndex ?? DEFAULT_SELF_INDEX) >= 0;
   }
 
   bool isActivePlayer() {
@@ -187,9 +188,9 @@ class MatchService {
   }
 
   void resetMatchData() {
-    _selfIndex = defaultSelfIndex;
-    _matchData = buildDefaultMatchData();
-    _selfPlayer = defaultPlayerData;
+    _selfIndex = DEFAULT_SELF_INDEX;
+    _matchData = GET_DEFAULT_MATCH_DATA();
+    _selfPlayer = DEFAULT_PLAYER_DATA;
     _matchUpdateController.add(_matchData!);
   }
 

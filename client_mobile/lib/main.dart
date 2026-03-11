@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'app.dart';
 import 'services/chat_service/chat_service.dart';
-import 'services/socket_service.dart';
+import 'services/socket_service/socket_service.dart';
 
 Future<void> main() async {
   try {

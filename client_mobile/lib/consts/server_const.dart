@@ -1,0 +1,1 @@
+const SERVER_URL_KEY = 'SERVER_URL';

@@ -1,0 +1,2 @@
+const int MAX_USERNAME_LENGTH = 10;
+const int MIN_USERNAME_LENGTH = 3;

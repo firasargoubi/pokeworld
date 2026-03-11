@@ -2,18 +2,19 @@ import 'package:client_mobile/consts/game_data_const.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 
-const int defaultSelfIndex = -1;
-const int turnWaitDuration = 30000;
+const int DEFAULT_SELF_INDEX = -1;
+const int TURN_WAIT_DURATION = 30000;
 
-MatchData buildDefaultMatchData() {
+// ignore: non_constant_identifier_names
+MatchData GET_DEFAULT_MATCH_DATA() {
   return MatchData(
     code: '',
-    state: MatchState.lobby,
-    gameData: buildDefaultGameData(),
+    state: MatchState.Lobby,
+    gameData: GET_DEFAULT_GAME_DATA(),
     lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0),
-    playData: PlayData(timeLeft: turnWaitDuration, activePlayerIndex: 0, isDebugMode: false, hasAction: false, movementLeft: 0),
+    playData: PlayData(timeLeft: TURN_WAIT_DURATION, activePlayerIndex: 0, isDebugMode: false, hasAction: false, movementLeft: 0),
     combatData: CombatData(
-      lastCombatAction: CombatAction.none,
+      lastCombatAction: CombatAction.None,
       turnDuration: 0,
       isSecondPlayerTurn: false,
       playersCombatData: [],
@@ -36,4 +37,4 @@ MatchData buildDefaultMatchData() {
   );
 }
 
-const Map<MapSize, int> MAP_SIZE_PLAYER_COUNT = {MapSize.small: 2, MapSize.medium: 4, MapSize.large: 6};
+const Map<MapSize, int> MAP_SIZE_PLAYER_COUNT = {MapSize.Small: 2, MapSize.Medium: 4, MapSize.Large: 6};

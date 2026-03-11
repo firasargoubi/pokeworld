@@ -1,13 +1,12 @@
 import 'package:client_mobile/consts/auth_errors.dart';
 import 'package:client_mobile/consts/avatar_list.dart';
-import 'package:client_mobile/consts/error_messages.dart';
-import 'package:client_mobile/consts/popup_message_const.dart';
+import 'package:client_mobile/models/error_messages.dart';
 import 'package:client_mobile/models/popup_message.dart';
-import 'package:client_mobile/services/popup_service.dart';
-import 'package:client_mobile/services/user_service.dart';
+import 'package:client_mobile/services/popup_service/popup_service.dart';
+import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:flutter/material.dart';
 
-import '../consts/chat_const.dart';
+import '../consts/login_const.dart';
 
 class LoginController {
   final UserService _userService = UserService();
@@ -38,7 +37,7 @@ class LoginController {
 
     if (rawUsername.isEmpty || rawPassword.isEmpty || (isRegister && rawEmail.isEmpty)) {
       _updateState(() {
-        errorMessage = ErrorMessages.emptyFields;
+        errorMessage = ErrorMessage.EmptyFields.message;
       });
       return;
     }
@@ -58,12 +57,10 @@ class LoginController {
     try {
       if (isRegister) {
         await _userService.register(rawUsername, rawEmail, rawPassword, selectedAvatar);
-        _popupService.showPopup(
-          PopupMessage(message: PopupMessageConst.successfulAccountCreation.message, hasCloseButton: true, isConfirmation: false),
-        );
+        _popupService.showPopup(PopupMessage(message: PopupMessages.SuccessfulAccountCreation.message, hasCloseButton: true, isConfirmation: false));
       } else {
         await _userService.login(rawUsername, rawPassword);
-        _popupService.showPopup(PopupMessage(message: PopupMessageConst.successfulConnection.message, hasCloseButton: true, isConfirmation: false));
+        _popupService.showPopup(PopupMessage(message: PopupMessages.SuccessfulConnection.message, hasCloseButton: true, isConfirmation: false));
       }
       onSuccess();
     } catch (e) {
@@ -71,21 +68,21 @@ class LoginController {
       if (e is AuthException) {
         switch (e.error) {
           case AuthError.usernameExists:
-            message = ErrorMessages.usernameExists;
+            message = ErrorMessage.UsernameExists.message;
             break;
           case AuthError.invalidCredentials:
-            message = ErrorMessages.invalidCredentials;
+            message = ErrorMessage.InvalidCredentials.message;
             break;
           case AuthError.userNotFound:
-            message = ErrorMessages.userNotFound;
+            message = ErrorMessage.UserNotFound.message;
             break;
           case AuthError.alreadyConnected:
-            message = ErrorMessages.alreadyConnected;
+            message = ErrorMessage.AlreadyConnected.message;
             break;
         }
       } else {
         final errorText = e.toString();
-        message = isRegister ? "${ErrorMessages.registrationFailed}$errorText" : '${ErrorMessages.loginFailed}$errorText';
+        message = isRegister ? "${ErrorMessage.RegistrationFailed.message}$errorText" : '${ErrorMessage.LoginFailed.message}$errorText';
       }
 
       _updateState(() {
@@ -98,28 +95,28 @@ class LoginController {
   bool registerChecks(String rawUsername, String trimmedUsername, String rawEmail, String trimmedEmail, String rawPassword, String trimmedPassword) {
     if (rawUsername != trimmedUsername) {
       _updateState(() {
-        errorMessage = ErrorMessages.usernameStartsOrEndsWithSpaces;
+        errorMessage = ErrorMessage.UsernameStartsOrEndsWithSpaces.message;
       });
       return false;
     }
 
     if (rawPassword.isNotEmpty && trimmedPassword.isEmpty) {
       _updateState(() {
-        errorMessage = ErrorMessages.passwordOnlySpaces;
+        errorMessage = ErrorMessage.PasswordOnlySpaces.message;
       });
       return false;
     }
 
     if (rawEmail != trimmedEmail || !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(trimmedEmail)) {
       _updateState(() {
-        errorMessage = ErrorMessages.invalidEmail;
+        errorMessage = ErrorMessage.InvalidEmail.message;
       });
       return false;
     }
 
-    if (trimmedUsername.length < minUsernameLength) {
+    if (trimmedUsername.length < MIN_USERNAME_LENGTH) {
       _updateState(() {
-        errorMessage = ErrorMessages.shortUsername;
+        errorMessage = ErrorMessage.ShortUsername.message;
       });
       return false;
     }

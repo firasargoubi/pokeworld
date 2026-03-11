@@ -25,24 +25,28 @@ class _MapWidgetState extends State<MapWidget> {
   @override
   void initState() {
     super.initState();
-    _mapService.toVisualData(widget.matchData);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _mapService.toVisualData(widget.matchData);
+    });
   }
 
   @override
   void didUpdateWidget(covariant MapWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!identical(oldWidget.matchData, widget.matchData)) {
-      _mapService.toVisualData(widget.matchData);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _mapService.toVisualData(widget.matchData);
+      });
     }
   }
 
   Color _overlayColor(OverlayType? overlay) {
     switch (overlay) {
-      case OverlayType.action:
+      case OverlayType.Action:
         return Colors.red.withValues(alpha: OVERLAY_ACTION_ALPHA);
-      case OverlayType.hoverMove:
+      case OverlayType.HoverMove:
         return Colors.blue.withValues(alpha: OVERLAY_HOVER_MOVE_ALPHA);
-      case OverlayType.possibleMove:
+      case OverlayType.PossibleMove:
         return Colors.white.withValues(alpha: OVERLAY_POSSIBLE_MOVE_ALPHA);
       default:
         return Colors.transparent;

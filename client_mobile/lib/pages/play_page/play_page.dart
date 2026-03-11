@@ -2,11 +2,14 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:client_mobile/consts/player_data_const.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
+import 'package:client_mobile/models/popup_message.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/play_service/play_service.dart';
+import 'package:client_mobile/services/popup_service/popup_service.dart';
 import 'package:client_mobile/widgets/item_drop_popup/item_drop_popup.dart';
 import 'package:client_mobile/widgets/timer/timer.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +41,8 @@ class _PlayPageState extends State<PlayPage> {
   int get movementLeft => isSelfTurn ? MatchService().matchData!.playData.movementLeft : 0;
   int get activePlayerIndex => MatchService().matchData!.playData.activePlayerIndex;
 
+  final PopupService _popupService = PopupService();
+
   @override
   void initState() {
     super.initState();
@@ -48,7 +53,7 @@ class _PlayPageState extends State<PlayPage> {
       if (!mounted) return;
 
       _showItemDropPopup();
-      if (matchData.state == MatchState.itemDropSelection) {
+      if (matchData.state == MatchState.ItemDropSelection) {
         _hideItemDropPopup();
       }
 
@@ -63,7 +68,7 @@ class _PlayPageState extends State<PlayPage> {
   }
 
   void _showItemDropPopup() {
-    if (MatchService().selfPlayer!.items.length >= 3) {
+    if (MatchService().selfPlayer!.items.length > MAX_ITEMS) {
       Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
 
       showDialog(
@@ -168,7 +173,15 @@ class _PlayPageState extends State<PlayPage> {
                                               isSelfTurn: isSelfTurn,
                                               hasAction: hasAction,
                                               canEndTurn: canEndTurn,
-                                              onSurrender: () => MatchService().leaveMatch(),
+                                              onSurrender: () => {
+                                                _popupService.showPopup(
+                                                  PopupMessage(
+                                                    message: PopupMessages.Surrender.message,
+                                                    isConfirmation: true,
+                                                    action: () => MatchService().leaveMatch(),
+                                                  ),
+                                                ),
+                                              },
                                             ),
                                           ),
                                         ],

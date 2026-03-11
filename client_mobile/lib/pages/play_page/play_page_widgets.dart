@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:client_mobile/consts/avatar_data_const.dart';
 import 'package:client_mobile/consts/match_data_const.dart';
 import 'package:client_mobile/consts/ui.dart';
-import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/map_data.dart';
@@ -100,17 +100,17 @@ class LeftPanel extends StatelessWidget {
 
                             final avatarAsset = AVATAR_DATA[player.avatar]!.image;
 
-                            final playerIcon = player.type == PlayerType.botAggressive
+                            final playerIcon = player.type == PlayerType.BotAggressive
                                 ? AGGRESSIVE_BOT_ICON_ASSET
-                                : player.type == PlayerType.botDefensive
+                                : player.type == PlayerType.BotDefensive
                                 ? DEFENSIVE_BOT_ICON_ASSET
                                 : MatchService().isPlayerHost(player.id)
                                 ? CROWN_ICON_ASSET
                                 : '';
 
-                            final containerAsset = player.team == Team.red
+                            final containerAsset = player.team == Team.Red
                                 ? RED_CONTAINER_ASSET
-                                : player.team == Team.blue
+                                : player.team == Team.Blue
                                 ? BLUE_CONTAINER_ASSET
                                 : GRAY_CONTAINER_ASSET;
 
@@ -121,7 +121,7 @@ class LeftPanel extends StatelessWidget {
                               textSize,
                             ).copyWith(decoration: isConnected ? TextDecoration.none : TextDecoration.lineThrough);
 
-                            final isFFA = MatchService().matchData?.gameData.mapData.gameMode == GameMode.ffa;
+                            final isFFA = MatchService().matchData?.gameData.mapData.gameMode == GameMode.FFA;
 
                             return Opacity(
                               opacity: opacity,

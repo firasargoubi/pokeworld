@@ -3,7 +3,7 @@ import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
-import 'package:client_mobile/services/user_service.dart';
+import 'package:client_mobile/services/user_service/user_service.dart';
 
 class CharacterController {
   final MatchService _matchService = MatchService();
@@ -40,10 +40,10 @@ class CharacterController {
       name: username.toUpperCase().trim(),
       avatar: selfPlayer.avatar,
       items: selfPlayer.items,
-      health: isHpBonusActive ? bonusStat : defaultStat,
-      speed: isHpBonusActive ? defaultStat : bonusStat,
-      attackDice: isAttD6Active ? DiceType.d6 : DiceType.d4,
-      defenseDice: isAttD6Active ? DiceType.d4 : DiceType.d6,
+      health: isHpBonusActive ? BONUS_STAT : DEFAULT_STAT,
+      speed: isHpBonusActive ? DEFAULT_STAT : BONUS_STAT,
+      attackDice: isAttD6Active ? DiceType.D6 : DiceType.D4,
+      defenseDice: isAttD6Active ? DiceType.D4 : DiceType.D6,
       spawnPoint: selfPlayer.spawnPoint,
       position: selfPlayer.position,
       combatsWon: selfPlayer.combatsWon,
@@ -55,7 +55,7 @@ class CharacterController {
   List<String> _getWarnings(Avatar? selectedAvatar) {
     final warnings = <String>[];
 
-    if (selectedAvatar == null || selectedAvatar == Avatar.defaultAvatar) {
+    if (selectedAvatar == null || selectedAvatar == Avatar.DefaultAvatar) {
       warnings.add('Veuillez choisir un avatar');
     }
 

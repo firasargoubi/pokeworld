@@ -2,12 +2,7 @@ import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/tile_type.dart';
 
 class MapData {
-  MapData({
-    required this.tiles,
-    required this.items,
-    required this.size,
-    required this.gameMode,
-  });
+  MapData({required this.tiles, required this.items, required this.size, required this.gameMode});
 
   final List<List<TileType>> tiles;
   final Map<ItemType, List<Position>> items;
@@ -18,27 +13,16 @@ class MapData {
     return MapData(
       tiles: _parseTiles(json['tiles']),
       items: _parseItems(json['items']),
-      size: MapSize.values.firstWhere(
-        (e) => e.value == (json['size'] as num).toInt(),
-        orElse: () => MapSize.small,
-      ),
-      gameMode: GameMode.values.firstWhere(
-        (e) => e.value == json['gameMode'] as String,
-        orElse: () => GameMode.ffa,
-      ),
+      size: MapSize.values.firstWhere((e) => e.value == (json['size'] as num).toInt(), orElse: () => MapSize.Small),
+      gameMode: GameMode.values.firstWhere((e) => e.value == json['gameMode'] as String, orElse: () => GameMode.FFA),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'tiles': tiles
-          .map((row) => row.map((tile) => tile.name).toList())
-          .toList(),
+      'tiles': tiles.map((row) => row.map((tile) => tile.name).toList()).toList(),
       'items': items.map((type, positions) {
-        return MapEntry(
-          type.name,
-          positions.map((pos) => pos.toJson()).toList(),
-        );
+        return MapEntry(type.name, positions.map((pos) => pos.toJson()).toList());
       }),
       'size': size.value,
       'gameMode': gameMode.value,
@@ -47,41 +31,31 @@ class MapData {
 
   static List<List<TileType>> _parseTiles(dynamic raw) {
     final rows = (raw as List).cast<List>();
-    return rows
-        .map(
-          (row) => row
-              .cast<String>()
-              .map((name) => TileType.values.byName(name))
-              .toList(),
-        )
-        .toList();
+    return rows.map((row) => row.cast<String>().map((name) => TileType.values.byName(name)).toList()).toList();
   }
 
   static Map<ItemType, List<Position>> _parseItems(dynamic raw) {
     final map = (raw as Map).cast<String, dynamic>();
     return map.map((typeName, positionsRaw) {
       final type = ItemType.values.byName(typeName);
-      final positions = (positionsRaw as List)
-          .cast<Map>()
-          .map((e) => Position.fromJson(e.cast<String, dynamic>()))
-          .toList();
+      final positions = (positionsRaw as List).cast<Map>().map((e) => Position.fromJson(e.cast<String, dynamic>())).toList();
       return MapEntry(type, positions);
     });
   }
 }
 
 enum MapSize {
-  small(10),
-  medium(15),
-  large(20);
+  Small(10),
+  Medium(15),
+  Large(20);
 
   final int value;
   const MapSize(this.value);
 }
 
 enum GameMode {
-  ffa('FFA'),
-  ctf('CTF');
+  FFA('FFA'),
+  CTF('CTF');
 
   final String value;
   const GameMode(this.value);
@@ -94,10 +68,7 @@ class Position {
   final int y;
 
   factory Position.fromJson(Map<String, dynamic> json) {
-    return Position(
-      x: (json['x'] as num).toInt(),
-      y: (json['y'] as num).toInt(),
-    );
+    return Position(x: (json['x'] as num).toInt(), y: (json['y'] as num).toInt());
   }
 
   Map<String, dynamic> toJson() => {'x': x, 'y': y};

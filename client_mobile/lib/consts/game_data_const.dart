@@ -2,7 +2,8 @@ import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/map_data.dart';
 
-GameData buildDefaultGameData() {
+// ignore: non_constant_identifier_names
+GameData GET_DEFAULT_GAME_DATA() {
   return GameData(
     id: '',
     name: '',
@@ -22,8 +23,8 @@ GameData buildDefaultGameData() {
         ItemType.Flag: [],
       },
       tiles: [],
-      size: MapSize.small,
-      gameMode: GameMode.ffa,
+      size: MapSize.Small,
+      gameMode: GameMode.FFA,
     ),
     thumbnail: '',
   );

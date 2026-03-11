@@ -40,7 +40,7 @@ class PlayerData {
       id: json['id'] as String,
       isConnected: json['isConnected'] as bool,
       name: json['name'] as String,
-      avatar: _avatarFromServer(json['avatar'] as String),
+      avatar: Avatar.fromValue(json['avatar'] as String),
       items: ((json['items'] as List?) ?? const []).cast<String>().map((e) => ItemType.values.byName(e)).toList(),
       health: (json['health'] as num).toInt(),
       speed: (json['speed'] as num).toInt(),
@@ -59,7 +59,7 @@ class PlayerData {
       'id': id,
       'isConnected': isConnected,
       'name': name,
-      'avatar': _avatarToServer(avatar),
+      'avatar': avatar.value,
       'items': items.map((e) => e.name).toList(),
       'health': health,
       'speed': speed,
@@ -75,60 +75,48 @@ class PlayerData {
 }
 
 enum DiceType {
-  d4(4),
-  d6(6);
+  D4(4),
+  D6(6);
 
   final int value;
   const DiceType(this.value);
 
   static DiceType fromValue(int v) {
-    return DiceType.values.firstWhere((e) => e.value == v, orElse: () => DiceType.d4);
+    return DiceType.values.firstWhere((e) => e.value == v, orElse: () => DiceType.D4);
   }
 
   String displayName() {
     switch (this) {
-      case DiceType.d4:
+      case DiceType.D4:
         return 'D4';
-      case DiceType.d6:
+      case DiceType.D6:
         return 'D6';
     }
   }
 }
 
 enum PlayerType {
-  player('player'),
-  botAggressive('botAggressive'),
-  botDefensive('botDefensive');
+  Player('player'),
+  BotAggressive('botAggressive'),
+  BotDefensive('botDefensive');
 
   final String value;
   const PlayerType(this.value);
 
   static PlayerType fromValue(String v) {
-    return PlayerType.values.firstWhere((e) => e.value == v, orElse: () => PlayerType.player);
+    return PlayerType.values.firstWhere((e) => e.value == v, orElse: () => PlayerType.Player);
   }
 }
 
 enum Team {
-  red('rouge'),
-  blue('bleu'),
-  none('none');
+  Red('rouge'),
+  Blue('bleu'),
+  None('none');
 
   final String value;
   const Team(this.value);
 
   static Team fromValue(String v) {
-    return Team.values.firstWhere((e) => e.value == v, orElse: () => Team.none);
+    return Team.values.firstWhere((e) => e.value == v, orElse: () => Team.None);
   }
-}
-
-Avatar _avatarFromServer(String raw) {
-  if (raw == 'default') return Avatar.defaultAvatar;
-  var name = raw.replaceAll('-evolved', 'Evolved').replaceAll('-shiny', 'Shiny').replaceAll('-', '');
-  return Avatar.values.firstWhere((e) => e.name == name, orElse: () => Avatar.defaultAvatar);
-}
-
-String _avatarToServer(Avatar avatar) {
-  final name = avatar.name;
-  if (name == 'defaultAvatar') return 'default';
-  return name.replaceAll('Evolved', '-evolved').replaceAll('Shiny', '-shiny');
 }

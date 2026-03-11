@@ -1,4 +1,4 @@
-enum ChatChannel { general, match }
+enum ChatChannel { General, Match }
 
 class ChatMessage {
   final String? sender;

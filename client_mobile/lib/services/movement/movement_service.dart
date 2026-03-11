@@ -43,7 +43,7 @@ class MovementService {
     final player = matchData.players.cast<dynamic>().where((p) => p.position.x == position.x && p.position.y == position.y).toList();
     if (player.isNotEmpty) {
       final found = player.first;
-      if (matchData.gameData.mapData.gameMode == GameMode.ctf) {
+      if (matchData.gameData.mapData.gameMode == GameMode.CTF) {
         final activePlayer = matchData.players[matchData.playData.activePlayerIndex];
         hasEnemyPlayer = found.team != activePlayer.team;
       } else {
