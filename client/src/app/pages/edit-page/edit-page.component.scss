@@ -468,3 +468,17 @@ app-map {
 app-warning-confirmation-popup {
     flex-shrink: 0;
 }
+
+.gamestates-form {
+  display: flex;       
+  flex-direction: row; 
+  gap: 20px;           
+  border: none;        
+  align-items: center; 
+}
+
+.gamestate-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;            
+}

@@ -6,7 +6,10 @@ import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongo
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { GameService } from '@app/services/game/game.service';
 import { UserService } from './user.service';
+import { GameData } from '@common/interfaces/game-data';
 import { AppLanguage, AppTheme, DEFAULT_PREFERENCES } from '@common/interfaces/preferences';
 
 describe('UserService', () => {
@@ -14,10 +17,12 @@ describe('UserService', () => {
     let userModel: Model<UserDocument>;
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
+    let gameService: SinonStubbedInstance<GameService>;
 
     beforeAll(async () => {
         process.env.PASSWORD_PASSKEY = 'test-passkey';
-
+        gameService = createStubInstance(GameService);
+        gameService.getAllGames.resolves([]);
         mongoServer = await MongoMemoryServer.create();
         const module: TestingModule = await Test.createTestingModule({
             imports: [
@@ -28,7 +33,7 @@ describe('UserService', () => {
                 }),
                 MongooseModule.forFeature([{ name: User.name, schema: userSchema }]),
             ],
-            providers: [UserService],
+            providers: [UserService, { provide: GameService, useValue: gameService }],
         }).compile();
 
         service = module.get<UserService>(UserService);
@@ -349,6 +354,25 @@ describe('UserService', () => {
 
             const userCount = await userModel.countDocuments({ userId: user.userId }).exec();
             expect(userCount).toBe(1);
+        });
+
+        it('should delete owned games when deleting user', async () => {
+            const user = await service.createUser({
+                username: 'testUser',
+                password: 'password123',
+                email: 'testUser@example.com',
+                profilePicture: '',
+            });
+            const mockGames = [
+                { _id: 'game1', owner: { userId: user.userId } },
+                { _id: 'game2', owner: { userId: 'randomId' } },
+                { _id: 'game3', owner: { userId: user.userId } },
+            ] as GameData[];
+            gameService.getAllGames.resolves(mockGames);
+            await service.deleteUser(user.userId);
+            expect(gameService.deleteGame.calledWith('game1')).toBe(true);
+            expect(gameService.deleteGame.calledWith('game3')).toBe(true);
+            expect(gameService.deleteGame.calledWith('game2')).toBe(false);
         });
     });
 

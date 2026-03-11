@@ -7,23 +7,27 @@ import { MapSize } from '@common/interfaces/map-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { TranslateModule } from '@ngx-translate/core';
 import { GameCardComponent } from './game-card.component';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 
 describe('GameCardComponent', () => {
     let component: GameCardComponent;
     let fixture: ComponentFixture<GameCardComponent>;
     let thumbnailServiceSpy: jasmine.SpyObj<ThumbnailService>;
     let mockAudioService: jasmine.SpyObj<AudioService>;
+    let gameDataService: jasmine.SpyObj<GameDataService>;
 
     beforeEach(async () => {
         thumbnailServiceSpy = jasmine.createSpyObj('ThumbnailService', ['getThumbnail']);
         thumbnailServiceSpy.getThumbnail.and.returnValue(Promise.resolve('data:image/png;base64,mockthumbnail'));
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage']);
+        gameDataService = jasmine.createSpyObj('GameDataService', ['setGameData']);
 
         await TestBed.configureTestingModule({
             imports: [GameCardComponent, TranslateModule.forRoot()],
             providers: [
                 { provide: ThumbnailService, useValue: thumbnailServiceSpy },
                 { provide: AudioService, useValue: mockAudioService },
+                { provide: GameDataService, useValue: gameDataService },
             ],
         }).compileComponents();
 
@@ -48,13 +52,6 @@ describe('GameCardComponent', () => {
         spyOn(component.delete, 'emit');
         component.onDelete();
         expect(component.delete.emit).toHaveBeenCalledWith(MOCK_GAME_DATAS[0]._id);
-    });
-
-    it('should toggle visibility and emit event when onToggleVisibility is called', () => {
-        spyOn(component.toggleVisibility, 'emit');
-        component.onToggleVisibility();
-        expect(component.toggleVisibility.emit).toHaveBeenCalledWith({ id: MOCK_GAME_DATAS[0]._id, isVisible: MOCK_GAME_DATAS[0].isVisible });
-        expect(component.game.isVisible).toBeFalse();
     });
 
     it('should emit join event when onJoin is called', () => {

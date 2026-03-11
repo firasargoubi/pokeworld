@@ -7,6 +7,7 @@ import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongo
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MapSize, GameMode } from '@common/interfaces/map-data';
+import { GameState } from '@common/interfaces/game-state.enum';
 
 describe('GameService', () => {
     let service: GameService;
@@ -17,8 +18,9 @@ describe('GameService', () => {
     const fakeGame: Game = {
         name: 'Test Game',
         description: 'Test Description',
+        owner: { userId: 'id', userName: 'user' },
+        gameState: GameState.PRIVATE,
         lastEdited: new Date(),
-        isVisible: true,
         mapData: {
             tiles: [[]],
             items: {
@@ -152,23 +154,6 @@ describe('GameService', () => {
         const nonExistentId = (await gameModel.create(fakeGame))._id.toString();
         await gameModel.deleteMany({});
         await expect(service.updateGame(nonExistentId, { name: 'New Name' })).rejects.toThrow(NotFoundException);
-    });
-
-    it('toggleVisibility() should toggle the visibility of a game', async () => {
-        const createdGame = await gameModel.create(fakeGame);
-        await service.toggleVisibility(createdGame._id);
-        const updatedGame = await gameModel.findById(createdGame._id);
-        expect(updatedGame.isVisible).toBe(!createdGame.isVisible);
-    });
-
-    it('toggleVisibility() should throw NotFoundException if game not found', async () => {
-        const nonExistentId = new gameModel()._id.toString();
-        await expect(service.toggleVisibility(nonExistentId)).rejects.toThrow(NotFoundException);
-    });
-
-    it('toggleVisibility() should fail if mongo query failed', async () => {
-        jest.spyOn(gameModel, 'findById').mockResolvedValueOnce(null);
-        await expect(service.toggleVisibility(fakeGame._id)).rejects.toBeTruthy();
     });
 
     it('deleteGame() should delete the game', async () => {

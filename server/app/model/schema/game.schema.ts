@@ -5,6 +5,7 @@ import { TileType } from '@common/interfaces/tile-type.enum';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
+import { GameState } from '@common/interfaces/game-state.enum';
 
 export type GameDocument = Game & Document;
 
@@ -26,6 +27,16 @@ export class MapData {
     gameMode: GameMode;
 }
 
+export class Owner {
+    @ApiProperty()
+    @Prop({ required: true })
+    userId: string;
+
+    @ApiProperty()
+    @Prop({ required: true })
+    userName: string;
+}
+
 @Schema()
 export class Game {
     @ApiProperty()
@@ -37,12 +48,16 @@ export class Game {
     description: string;
 
     @ApiProperty()
-    @Prop({ required: true, default: () => new Date() })
-    lastEdited: Date;
+    @Prop({ required: true, type: Object })
+    owner: Owner;
 
     @ApiProperty()
-    @Prop({ required: true, default: true })
-    isVisible: boolean;
+    @Prop({ required: true, default: GameState.PUBLIC })
+    gameState: GameState;
+
+    @ApiProperty()
+    @Prop({ required: true, default: () => new Date() })
+    lastEdited: Date;
 
     @ApiProperty()
     @Prop({ required: true, type: Object })

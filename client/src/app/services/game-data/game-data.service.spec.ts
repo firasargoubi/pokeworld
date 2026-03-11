@@ -4,12 +4,22 @@ import { GameMode, MapSize } from '@common/interfaces/map-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { GameDataService } from './game-data.service';
+import { UserService } from '@app/services/user/user.service';
+import { TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
 
 describe('GameDataService', () => {
     let service: GameDataService;
 
     beforeEach(() => {
-        service = new GameDataService();
+        const userServiceStub: Partial<UserService> = {
+            user$: of(null),
+        };
+
+        TestBed.configureTestingModule({
+            providers: [GameDataService, { provide: UserService, useValue: userServiceStub }],
+        });
+        service = TestBed.inject(GameDataService);
 
         service.gameData.mapData.tiles = Array.from({ length: service.gameData.mapData.size }, () =>
             Array(service.gameData.mapData.size).fill(TileType.Water),

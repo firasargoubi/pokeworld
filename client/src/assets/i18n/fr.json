@@ -22,7 +22,8 @@
         "accountConnected": "Le compte est déjà connecté sur une autre plateforme",
         "changeConfirmed": "Le mot de passe a été changé !",
         "deleteAccountConfirmation": "Voulez-vous vraiment supprimer votre compte ?",
-        "noWinner": "Aucun gagnant"
+        "noWinner": "Aucun gagnant",
+        "unauthorizedAccessToGame": "Ce jeu n'est plus accessible en raison d'un changement de son etat"
     },
     "server": {
         "messages": {

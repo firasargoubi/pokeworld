@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { DEFAULT_GAME_DATA } from '@app/consts/game-data.const';
 import { GameData } from '@common/interfaces/game-data';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -6,6 +6,8 @@ import { GameMode, MapSize } from '@common/interfaces/map-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { Subject } from 'rxjs';
+import { UserService } from '@app/services/user/user.service';
+import { Owner } from '@common/interfaces/owner';
 
 @Injectable({
     providedIn: 'root',
@@ -14,6 +16,17 @@ export class GameDataService {
     gameData: GameData = structuredClone(DEFAULT_GAME_DATA);
     mapUpdate: Subject<Position | null> = new Subject();
     itemUpdate: Subject<ItemType | null> = new Subject();
+    private readonly userService = inject(UserService);
+
+    isOwner(owner: Owner) {
+        if (!owner) {
+            return true; // temporary before adding owners to games without owners (before change of schema)
+        }
+        let currentUserId;
+        this.userService.user$.subscribe((user) => (currentUserId = user?.userId));
+        const ownerUserId = owner?.userId;
+        return currentUserId === ownerUserId;
+    }
 
     createNewGame(size: MapSize, mode: GameMode) {
         const newGameData = structuredClone(DEFAULT_GAME_DATA);
@@ -21,6 +34,11 @@ export class GameDataService {
         newGameData.mapData.gameMode = mode;
         newGameData.mapData.tiles = Array.from({ length: size }, () => {
             return Array.from({ length: size }, () => TileType.Grass);
+        });
+        this.userService.user$.subscribe((user) => {
+            if (user != null) {
+                newGameData.owner = { userId: user.userId, userName: user.username };
+            }
         });
         this.setGameData(newGameData);
     }

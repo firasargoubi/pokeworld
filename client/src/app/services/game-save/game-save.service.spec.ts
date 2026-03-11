@@ -83,21 +83,6 @@ describe('GameSave', () => {
         req.flush(newGame);
     });
 
-    it('should toggle visibility of a game', () => {
-        const toggledGame = { ...mockGames[0], isVisible: !mockGames[0].isVisible };
-
-        service.toggleVisibility(toggledGame._id).subscribe({
-            next: (response: GameData) => {
-                expect(response.isVisible).toBe(!mockGames[0].isVisible);
-            },
-            error: fail,
-        });
-
-        const req = httpMock.expectOne(`${baseUrl}/games/${toggledGame._id}/toggle`);
-        expect(req.request.method).toBe('PATCH');
-        req.flush(toggledGame);
-    });
-
     it('should delete a game', () => {
         const gameId = mockGames[0]._id;
 

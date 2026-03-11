@@ -21,6 +21,7 @@ export enum PopupMessage {
     AccountConnected = 'popup.accountConnected',
     ChangeConfirmed = 'popup.changeConfirmed',
     DeleteAccountConfirmation = 'popup.deleteAccountConfirmation',
+    UnauthorizedAccessToGame = 'popup.unauthorizedAccessToGame',
 }
 
 export const KEYWORDS_TO_REPLACE = ['debug'];

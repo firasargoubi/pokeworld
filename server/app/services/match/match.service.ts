@@ -147,9 +147,6 @@ export class MatchService {
         } else if (!game) {
             this.matchGateway.emitMessage(playerId, Message.DeletedGame, true);
             canCreateMatch = false;
-        } else if (!game.isVisible) {
-            this.matchGateway.emitMessage(playerId, Message.InvisibleGame, true);
-            canCreateMatch = false;
         }
         return canCreateMatch;
     }

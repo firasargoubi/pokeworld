@@ -3,8 +3,9 @@ import { GameMode, MapSize } from '@common/interfaces/map-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsObject, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
+import { IsEnum, IsObject, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { GAME_DESCRIPTION_MAX_LENGTH, GAME_NAME_MAX_LENGTH } from './game.dto.constants';
+import { GameState } from '@common/interfaces/game-state.enum';
 
 export class MapData {
     @ApiProperty()
@@ -24,6 +25,16 @@ export class MapData {
     gameMode: GameMode;
 }
 
+export class Owner {
+    @ApiProperty()
+    @IsString()
+    userId: string;
+
+    @ApiProperty()
+    @IsString()
+    userName: string;
+}
+
 export class CreateGameDto {
     @ApiProperty({ maxLength: GAME_NAME_MAX_LENGTH })
     @IsString()
@@ -36,12 +47,17 @@ export class CreateGameDto {
     description: string;
 
     @ApiProperty()
-    @IsString()
-    lastEdited: Date;
+    @IsOptional()
+    @IsObject()
+    owner: Owner;
 
     @ApiProperty()
-    @IsBoolean()
-    isVisible: boolean;
+    @IsEnum(GameState)
+    gameState: GameState;
+
+    @ApiProperty()
+    @IsString()
+    lastEdited: Date;
 
     @ApiProperty()
     @IsObject()

@@ -3,7 +3,6 @@ import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CARD_SIZE_TO_COLOR, GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@app/consts/ui.const';
 import { SoundEffect } from '@app/interfaces/sound-service';
-import { VisibilityEvent } from '@app/interfaces/visibility-event';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameData } from '@common/interfaces/game-data';
@@ -22,7 +21,6 @@ export class GameCardComponent {
     @Input() index: number = 0;
     @Output() edit = new EventEmitter<string>();
     @Output() delete = new EventEmitter<string>();
-    @Output() toggleVisibility = new EventEmitter<VisibilityEvent>();
     @Output() join = new EventEmitter<string>();
 
     isHovered: boolean = false;
@@ -39,12 +37,6 @@ export class GameCardComponent {
     onDelete() {
         this.audioService.playEffect(SoundEffect.Click);
         this.delete.emit(this.game._id);
-    }
-
-    onToggleVisibility() {
-        this.audioService.playEffect(SoundEffect.Click);
-        this.toggleVisibility.emit({ id: this.game._id, isVisible: this.game.isVisible });
-        this.game.isVisible = !this.game.isVisible;
     }
 
     onJoin() {

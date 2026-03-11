@@ -107,22 +107,6 @@ describe('GameController', () => {
         await controller.updateGame('valid_id', {} as Game, res);
     });
 
-    it('toggleVisibility() should toggle visibility of a game', async () => {
-        gameService.toggleVisibility.resolves(fakeGame);
-
-        const res = {} as unknown as Response;
-        res.status = (code) => {
-            expect(code).toEqual(HttpStatus.OK);
-            return res;
-        };
-        res.json = (game) => {
-            expect(game).toEqual(fakeGame);
-            return res;
-        };
-
-        await controller.toggleVisibility('valid_id', res);
-    });
-
     it('deleteGame() should delete a game', async () => {
         gameService.deleteGame.resolves();
 

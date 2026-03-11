@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { BridgeValidationError, ErrorMessage, TileHandler, TilesCount, ValidationResult } from '@app/interfaces/game-validation';
 import { I18nService } from '@app/services/i18n/i18n.service';
 import { GameData } from '@common/interfaces/game-data';
+import { GameState } from '@common/interfaces/game-state.enum';
 import { GameMode, MapData, MapSize } from '@common/interfaces/map-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { VALIDATION_TESTS_CASES } from './game-validation.const.spec';
@@ -22,7 +23,8 @@ describe('GameValidationService', () => {
         description: 'ValidGameDescription',
         mapData: map,
         lastEdited: new Date(),
-        isVisible: true,
+        owner: { userId: '', userName: '' },
+        gameState: GameState.PRIVATE,
     };
 
     beforeEach(() => {
