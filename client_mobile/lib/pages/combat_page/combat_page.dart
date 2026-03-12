@@ -8,6 +8,7 @@ import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/services/combat_service/combat_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
+import 'package:client_mobile/services/play_service/play_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/stripe_painter/stripe_painter.dart';
 import 'package:flutter/material.dart';
@@ -56,6 +57,8 @@ class _CombatPageState extends State<CombatPage> {
       _readyForAnimations = true;
     });
 
+    PlayService().startListeningToMotion();
+
     _matchSubscription = MatchService().matchUpdates.listen((_) {
       if (!mounted) return;
 
@@ -86,6 +89,7 @@ class _CombatPageState extends State<CombatPage> {
   @override
   void dispose() {
     _matchSubscription?.cancel();
+    PlayService().stopListeningToMotion();
     super.dispose();
   }
 

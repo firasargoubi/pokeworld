@@ -41,8 +41,6 @@ class _PlayPageState extends State<PlayPage> {
   int get movementLeft => isSelfTurn ? MatchService().matchData!.playData.movementLeft : 0;
   int get activePlayerIndex => MatchService().matchData!.playData.activePlayerIndex;
 
-  final PopupService _popupService = PopupService();
-
   @override
   void initState() {
     super.initState();
@@ -59,11 +57,14 @@ class _PlayPageState extends State<PlayPage> {
 
       setState(() => _matchData = updatedMatchData);
     });
+
+    PlayService().startListeningToMotion();
   }
 
   @override
   void dispose() {
     _matchDataSubscription.cancel();
+    PlayService().stopListeningToMotion();
     super.dispose();
   }
 
@@ -84,6 +85,12 @@ class _PlayPageState extends State<PlayPage> {
 
   void _hideItemDropPopup() {
     Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
+  }
+
+  void _showSurrenderConfirmationPopup() {
+    PopupService().showPopup(
+      PopupMessage(message: PopupMessages.Surrender.message, hasCloseButton: true, isConfirmation: true, action: MatchService().leaveMatch),
+    );
   }
 
   double _computeBaseSize(Size screenSize) {
@@ -173,15 +180,7 @@ class _PlayPageState extends State<PlayPage> {
                                               isSelfTurn: isSelfTurn,
                                               hasAction: hasAction,
                                               canEndTurn: canEndTurn,
-                                              onSurrender: () => {
-                                                _popupService.showPopup(
-                                                  PopupMessage(
-                                                    message: PopupMessages.Surrender.message,
-                                                    isConfirmation: true,
-                                                    action: () => MatchService().leaveMatch(),
-                                                  ),
-                                                ),
-                                              },
+                                              onSurrender: _showSurrenderConfirmationPopup,
                                             ),
                                           ),
                                         ],

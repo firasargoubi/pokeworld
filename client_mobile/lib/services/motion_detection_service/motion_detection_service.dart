@@ -28,8 +28,13 @@ class MotionDetectionService {
   factory MotionDetectionService() => _instance;
   MotionDetectionService._internal();
 
-  StreamSubscription<UserAccelerometerEvent>? _sub;
+  StreamSubscription<AccelerometerEvent>? _sub;
   bool _isListening = false;
+
+  // Low-pass gravity estimate used to derive linear acceleration from raw accelerometer.
+  double _gravityX = 0;
+  double _gravityY = 0;
+  double _gravityZ = 0;
 
   final _shakeController = StreamController<ShakeEvent>.broadcast();
   Stream<ShakeEvent> get onShake => _shakeController.stream;
@@ -37,8 +42,8 @@ class MotionDetectionService {
   static const double shakeThreshold = 3.2;
   static const double directionDominanceRatio = 1.25;
   static const int slopMs = 250;
-  static const int burstResetMs = 1200;
-  static const int minHitsForShake = 2;
+  static const int burstResetMs = 1000;
+  static const int minHitsForShake = 3;
 
   int _lastHitMsH = 0, _hitsH = 0;
   int _lastHitMsV = 0, _hitsV = 0;
@@ -52,7 +57,7 @@ class MotionDetectionService {
     }
 
     _isListening = true;
-    _sub = userAccelerometerEvents.listen(_detectDirectionalShake);
+    _sub = accelerometerEvents.listen(_detectDirectionalShakeFromAccelerometer);
   }
 
   void stopListening() {
@@ -62,12 +67,21 @@ class MotionDetectionService {
     _sub = null;
   }
 
-  void _detectDirectionalShake(UserAccelerometerEvent e) {
-    final nowMs = DateTime.now().millisecondsSinceEpoch;
+  void _detectDirectionalShakeFromAccelerometer(AccelerometerEvent e) {
+    const alpha = 0.8;
+    _gravityX = alpha * _gravityX + (1 - alpha) * e.x;
+    _gravityY = alpha * _gravityY + (1 - alpha) * e.y;
+    _gravityZ = alpha * _gravityZ + (1 - alpha) * e.z;
 
-    final dx = e.x;
-    final dy = e.y;
-    final dz = e.z;
+    final dx = e.x - _gravityX;
+    final dy = e.y - _gravityY;
+    final dz = e.z - _gravityZ;
+
+    _detectDirectionalShake(dx, dy, dz);
+  }
+
+  void _detectDirectionalShake(double dx, double dy, double dz) {
+    final nowMs = DateTime.now().millisecondsSinceEpoch;
 
     final ax = dx.abs();
     final ay = dy.abs();

@@ -40,6 +40,7 @@ const String SURRENDER_TEXT = '< Abandonner';
 const String MAP_SIZE_LABEL = 'Taille de la carte : ';
 const String GAME_MODE_LABEL = 'Mode de jeu : ';
 const String PLAYER_COUNT_LABEL = 'Nombre de joueurs : ';
+const String DEBUG_MODE_LABEL = 'DEBUG';
 
 const double PLAYER_ITEM_ASPECT_RATIO = 163 / 30;
 const double SURRENDER_BUTTON_ASPECT_RATIO = 350 / 70;
