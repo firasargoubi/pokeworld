@@ -130,15 +130,13 @@ class MatchService {
       _popupService.keepMessages();
       if (reason == Message.LockedFromLobby.message) {
         NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const JoinPage()));
-        _popupService.showPopup(
-          PopupMessage(
-            message: reason,
-            hasCloseButton: true,
-            isConfirmation: true,
-            action: () {
-              NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const HomePage()));
-            },
-          ),
+        PopupMessage(
+          message: reason,
+          hasCloseButton: true,
+          isConfirmation: true,
+          action: () {
+            NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const HomePage()));
+          },
         );
       } else {
         NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const HomePage()));
@@ -185,6 +183,13 @@ class MatchService {
 
   bool isActivePlayer() {
     return _selfIndex == _matchData?.playData.activePlayerIndex;
+  }
+
+  bool isHost() {
+    final selfIndex = _selfIndex;
+    final matchData = _matchData;
+    if (selfIndex == null || matchData == null) return false;
+    return selfIndex == matchData.lobbyData.hostPlayerIndex;
   }
 
   void resetMatchData() {

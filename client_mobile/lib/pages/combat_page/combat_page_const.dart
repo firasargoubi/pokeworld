@@ -23,6 +23,8 @@ const String FOOTER_ATTACK_STAT_LABEL = 'Attaque';
 const String FOOTER_DEFENSE_STAT_LABEL = 'Défense';
 const String FOOTER_SPEED_STAT_LABEL = 'Vitesse';
 
+const String DEBUG_MODE_LABEL = 'DEBUG';
+
 const Duration ATTACK_ANIMATION_DURATION = Duration(milliseconds: 180);
 const Duration DEATH_ANIMATION_DURATION = Duration(milliseconds: 4000);
 const Duration ESCAPE_ANIMATION_DURATION = Duration(milliseconds: 2000);

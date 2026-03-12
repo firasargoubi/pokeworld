@@ -76,6 +76,10 @@ class _MapWidgetState extends State<MapWidget> {
     PlayService().handleClick(Position(x: x, y: y));
   }
 
+  void _handleTileLongPress(int x, int y) {
+    PlayService().handleLongPress(Position(x: x, y: y));
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -108,6 +112,7 @@ class _MapWidgetState extends State<MapWidget> {
 
                       return GestureDetector(
                         onTap: () => _handleTileTap(y, x),
+                        onLongPress: () => _handleTileLongPress(y, x),
                         child: Stack(
                           fit: StackFit.expand,
                           children: [

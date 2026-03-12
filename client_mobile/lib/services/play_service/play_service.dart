@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
@@ -7,6 +9,7 @@ import 'package:client_mobile/pages/play_page/play_page.dart';
 import 'package:client_mobile/pages/stat_page/stat_page.dart';
 import 'package:client_mobile/services/map_service/map_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
+import 'package:client_mobile/services/motion_detection_service/motion_detection_service.dart';
 import 'package:client_mobile/services/movement/movement_service.dart';
 import 'package:client_mobile/services/navigation_service/navigation_service.dart';
 import 'package:client_mobile/services/socket_service/socket_service.dart';
@@ -23,6 +26,8 @@ class PlayService {
   final SocketService _socketService = SocketService();
 
   MatchData? _previousMatchData;
+  StreamSubscription<ShakeEvent>? _motionSubscription;
+  int _motionListenerCount = 0;
 
   bool isPerformingAction = false;
   Position? _lastMovementPathPosition;
@@ -62,8 +67,51 @@ class PlayService {
     _socketService.emit(PlayEvent.EndTurn.value, null);
   }
 
+  void startListeningToMotion() {
+    _motionListenerCount++;
+    if (_motionListenerCount > 1) return;
+
+    final motionDetectionService = MotionDetectionService();
+    motionDetectionService.startListening();
+    _motionSubscription = motionDetectionService.onShake.listen((shakeEvent) {
+      if (shakeEvent.direction == ShakeDirection.horizontal) {
+        changeDebugMode();
+      }
+    });
+  }
+
+  void stopListeningToMotion() {
+    if (_motionListenerCount > 0) _motionListenerCount--;
+    if (_motionListenerCount > 0) return;
+
+    _motionSubscription?.cancel();
+    _motionSubscription = null;
+    MotionDetectionService().stopListening();
+  }
+
+  void changeDebugMode() {
+    if (!MatchService().isHost()) return;
+
+    final isDebugMode = MatchService().matchData?.playData.isDebugMode ?? false;
+    _socketService.emit(PlayEvent.ChangeDebugMode.value, !isDebugMode);
+  }
+
   void moveTo(Position targetPosition) {
     _socketService.emit(PlayEvent.Move.value, targetPosition.toJson());
+  }
+
+  bool performDebugMove(Position targetPosition) {
+    final matchData = MatchService().matchData;
+    if (matchData == null) return false;
+
+    final canDebugMove = matchData.playData.isDebugMode && MatchService().isActivePlayer() && MatchService().isState(MatchState.TurnWait);
+    if (!canDebugMove) return false;
+
+    _socketService.emit(PlayEvent.DebugMove.value, targetPosition.toJson());
+    MapService().setHoverMoves([]);
+    _lastMovementPathPosition = null;
+    isPerformingAction = false;
+    return true;
   }
 
   bool performAction(Position targetPosition) {
@@ -97,6 +145,11 @@ class PlayService {
     MapService().setActions([]);
     if (performAction(targetPosition)) return;
     performMovementPath(targetPosition);
+  }
+
+  void handleLongPress(Position targetPosition) {
+    MapService().setActions([]);
+    performDebugMove(targetPosition);
   }
 
   void displayActions() {

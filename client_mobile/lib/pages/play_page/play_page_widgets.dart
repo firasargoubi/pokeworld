@@ -331,7 +331,10 @@ class InfoPanel extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('$MAP_SIZE_LABEL${gameData.mapData.size.value}x${gameData.mapData.size.value}', style: pixelLineStyle(lineFontSize)),
-                Text('$GAME_MODE_LABEL${gameData.mapData.gameMode.value}', style: pixelLineStyle(lineFontSize)),
+                Text(
+                  '$GAME_MODE_LABEL${gameData.mapData.gameMode.value} ${MatchService().matchData!.playData.isDebugMode ? DEBUG_MODE_LABEL : ''}',
+                  style: pixelLineStyle(lineFontSize),
+                ),
                 Text(
                   '$PLAYER_COUNT_LABEL${MatchService().matchData!.players.length} / ${MAP_SIZE_PLAYER_COUNT[gameData.mapData.size]}',
                   style: pixelLineStyle(lineFontSize),
