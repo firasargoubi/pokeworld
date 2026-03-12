@@ -154,7 +154,7 @@ class TrackingData {
   final int rounds;
   final int flagHoldersCount;
   final dynamic matchWinner; // WinnerData (not modeled)
-  final List<dynamic> players; // TrackingPlayerData (not modeled)
+  final List<TrackingPlayerData> players;
 
   TrackingData({
     required this.startTime,
@@ -180,7 +180,55 @@ class TrackingData {
       rounds: (json['rounds'] as num).toInt(),
       flagHoldersCount: (json['flagHoldersCount'] as num).toInt(),
       matchWinner: json['matchWinner'],
-      players: ((json['players'] as List?) ?? const []).cast<dynamic>(),
+      players: ((json['players'] as List?) ?? const []).cast<Map>().map((e) => TrackingPlayerData.fromJson(e.cast<String, dynamic>())).toList(),
+    );
+  }
+}
+
+class TrackingPlayerData {
+  final String id;
+  final String name;
+  final Team? team;
+  final List<Position> coveredGroundTiles;
+  final List<dynamic> pickedUpItems;
+  final int combats;
+  final int victories;
+  final int defeats;
+  final int escapes;
+  final int hpInflicted;
+  final int hpLost;
+
+  TrackingPlayerData({
+    required this.id,
+    required this.name,
+    this.team,
+    required this.coveredGroundTiles,
+    required this.pickedUpItems,
+    required this.combats,
+    required this.victories,
+    required this.defeats,
+    required this.escapes,
+    required this.hpInflicted,
+    required this.hpLost,
+  });
+
+  factory TrackingPlayerData.fromJson(Map<String, dynamic> json) {
+    List<Position> parsePositions(dynamic raw) {
+      return ((raw as List?) ?? const []).cast<Map>().map((e) => Position.fromJson(e.cast<String, dynamic>())).toList();
+    }
+
+    return TrackingPlayerData(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      team: json['team'] != null ? Team.fromValue(json['team'] as String) : null,
+      coveredGroundTiles: parsePositions(json['coveredGroundTiles']),
+      pickedUpItems: ((json['pickedUpItems'] as List?) ?? const []),
+      combats: (json['combats'] as num).toInt(),
+      victories: (json['victories'] as num).toInt(),
+      defeats: (json['defeats'] as num).toInt(),
+      escapes: (json['escapes'] as num).toInt(),
+      hpInflicted: (json['hpInflicted'] as num).toInt(),
+      hpLost: (json['hpLost'] as num).toInt(),
     );
   }
 }

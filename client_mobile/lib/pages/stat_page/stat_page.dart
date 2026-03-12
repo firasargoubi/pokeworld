@@ -1,21 +1,254 @@
+import 'dart:math';
+
+import 'package:client_mobile/models/stat_data.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
+import 'package:client_mobile/services/stat_service/stat_service.dart';
+import 'package:client_mobile/widgets/header/header.dart';
+import 'package:client_mobile/widgets/stat_container/stat_container.dart';
 import 'package:flutter/material.dart';
 
-class StatPage extends StatelessWidget {
+import 'stat_page_const.dart';
+import 'stat_page_widgets.dart';
+
+class StatPage extends StatefulWidget {
   const StatPage({super.key});
 
-  Future<void> _onBack(BuildContext context) async {
-    MatchService().leaveMatch();
+  @override
+  State<StatPage> createState() => _StatPageState();
+}
+
+class _StatPageState extends State<StatPage> {
+  final StatService _statService = StatService();
+  final TextEditingController codeController = TextEditingController();
+
+  PlayerStatType _sortingStat = PlayerStatType.combats;
+  SortOrder _sortingOrder = SortOrder.ascending;
+
+  final selfId = MatchService().selfId;
+
+  List<bool> get isSelfList => _statService.playerStats.map((player) => player.id == selfId).toList();
+
+  WinnerVisualData? get winner => _statService.winnerData;
+
+  @override
+  void initState() {
+    super.initState();
+    _statService.initializeData();
+  }
+
+  @override
+  void dispose() {
+    codeController.dispose();
+    super.dispose();
+  }
+
+  void _updateSorting(PlayerStatType statType) {
+    setState(() {
+      if (statType == _sortingStat) {
+        _sortingOrder = _sortingOrder == SortOrder.ascending ? SortOrder.descending : SortOrder.ascending;
+      } else {
+        _sortingOrder = SortOrder.ascending;
+        _sortingStat = statType;
+      }
+      _statService.sortPlayerStatsBy(_sortingStat, _sortingOrder);
+    });
+  }
+
+  String _formatDuration(int ms) {
+    final total = ms ~/ 1000;
+    final minutes = (total ~/ 60).toString().padLeft(2, '0');
+    final seconds = (total % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
+  String _formatRatio(double ratio) => '${ratio.toStringAsFixed(0)}%';
+
+  (double, double) _computeBaseDimensions(double screenWidth, double screenHeight) {
+    if (screenWidth / screenHeight > STAT_PAGE_DESIGN_ASPECT_RATIO) {
+      final baseHeight = screenHeight;
+      final baseWidth = baseHeight * STAT_PAGE_DESIGN_ASPECT_RATIO;
+      return (baseWidth, baseHeight);
+    }
+
+    final baseWidth = screenWidth;
+    final baseHeight = baseWidth / STAT_PAGE_DESIGN_ASPECT_RATIO;
+    return (baseWidth, baseHeight);
+  }
+
+  Widget _buildStatColumn(String title, List<String> values, List<bool> selfValues, double baseSize, {PlayerStatType? statType}) {
+    final isSorting = statType != null && statType == _sortingStat;
+    final isAscending = _sortingOrder == SortOrder.ascending;
+
+    return StatColumn(
+      title: title,
+      values: values,
+      isSelfList: selfValues,
+      baseSize: baseSize,
+      isSorting: isSorting,
+      isAscending: isAscending,
+      onTap: statType != null ? () => _updateSorting(statType) : null,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final mediaSize = MediaQuery.of(context).size;
+    final screenWidth = mediaSize.width;
+    final screenHeight = mediaSize.height;
+    final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
+
+    final (baseWidth, baseHeight) = _computeBaseDimensions(screenWidth, screenHeight);
+    final baseSize = min(baseWidth, baseHeight);
+
+    final stats = _statService.globalStats;
+    final outerBorderWidth = baseSize * STAT_PAGE_BORDER_WIDTH_FACTOR;
+    final innerBorderWidth = baseSize * STAT_PAGE_BORDER_WIDTH_FACTOR;
+    final padding = baseSize * STAT_PAGE_PADDING_FACTOR;
+    final contentHeight = baseHeight - (baseSize * STAT_PAGE_HEADER_HEIGHT_FACTOR) - (padding * 2);
+    final contentWidth = baseWidth - (padding * 2);
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('StatPage'),
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => _onBack(context)),
+      resizeToAvoidBottomInset: false,
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              SizedBox(
+                height: baseSize * STAT_PAGE_HEADER_HEIGHT_FACTOR,
+                width: double.infinity,
+                child: AppHeader(index: 1, text: STAT_PAGE_HEADER_TEXT, onTap: () => MatchService().leaveMatch()),
+              ),
+              Expanded(
+                child: StatPageFrame(
+                  baseSize: baseSize,
+                  outerBorderWidth: outerBorderWidth,
+                  innerBorderWidth: innerBorderWidth,
+                  contentWidth: contentWidth,
+                  contentHeight: contentHeight,
+                  padding: padding,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        flex: STAT_MAIN_SECTION_FLEX.toInt(),
+                        child: StatContainer(
+                          baseSize: baseSize * STAT_PAGE_BASE_WIDGET_SIZE_FACTOR,
+                          child: Row(
+                            children: [
+                              PlayerNamesColumn(players: _statService.playerStats, baseSize: baseSize),
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: [
+                                      _buildStatColumn(
+                                        STAT_ITEMS_LABEL,
+                                        _statService.playerStats.map((player) => player.discoveredItemsCount.toString()).toList(),
+                                        isSelfList,
+                                        baseSize,
+                                        statType: PlayerStatType.discoveredItemsCount,
+                                      ),
+                                      _buildStatColumn(
+                                        STAT_TILES_LABEL,
+                                        _statService.playerStats.map((player) => '${player.visitedTilesRatio}%').toList(),
+                                        isSelfList,
+                                        baseSize,
+                                        statType: PlayerStatType.visitedTilesRatio,
+                                      ),
+                                      _buildStatColumn(
+                                        STAT_COMBATS_LABEL,
+                                        _statService.playerStats.map((player) => player.combats.toString()).toList(),
+                                        isSelfList,
+                                        baseSize,
+                                        statType: PlayerStatType.combats,
+                                      ),
+                                      _buildStatColumn(
+                                        STAT_VICTORIES_LABEL,
+                                        _statService.playerStats.map((player) => player.victories.toString()).toList(),
+                                        isSelfList,
+                                        baseSize,
+                                        statType: PlayerStatType.victories,
+                                      ),
+                                      _buildStatColumn(
+                                        STAT_DEFEATS_LABEL,
+                                        _statService.playerStats.map((player) => player.defeats.toString()).toList(),
+                                        isSelfList,
+                                        baseSize,
+                                        statType: PlayerStatType.defeats,
+                                      ),
+                                      _buildStatColumn(
+                                        STAT_ESCAPES_LABEL,
+                                        _statService.playerStats.map((player) => player.escapes.toString()).toList(),
+                                        isSelfList,
+                                        baseSize,
+                                        statType: PlayerStatType.escapes,
+                                      ),
+                                      _buildStatColumn(
+                                        STAT_HP_INFLICTED_LABEL,
+                                        _statService.playerStats.map((player) => player.hpInflicted.toString()).toList(),
+                                        isSelfList,
+                                        baseSize,
+                                        statType: PlayerStatType.hpInflicted,
+                                      ),
+                                      _buildStatColumn(
+                                        STAT_HP_LOST_LABEL,
+                                        _statService.playerStats.map((player) => player.hpLost.toString()).toList(),
+                                        isSelfList,
+                                        baseSize,
+                                        statType: PlayerStatType.hpLost,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(flex: STAT_SPACER_SECTION_FLEX.toInt(), child: Container()),
+                      Expanded(
+                        flex: STAT_BOTTOM_SECTION_FLEX.toInt(),
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.only(bottom: keyboardInset),
+                                  child: const Align(alignment: Alignment.bottomLeft),
+                                ),
+                              ),
+                              SizedBox(width: baseSize * STAT_PAGE_PADDING_FACTOR),
+                              Expanded(
+                                child: GameStatsPanel(
+                                  baseSize: baseSize,
+                                  stats: stats,
+                                  winner: winner,
+                                  formatDuration: _formatDuration,
+                                  formatRatio: _formatRatio,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          MatchChatOverlay(
+            screenWidth: screenWidth,
+            screenHeight: screenHeight,
+            baseWidth: baseWidth,
+            baseHeight: baseHeight,
+            padding: padding,
+            contentHeight: contentHeight,
+            baseSize: baseSize,
+            keyboardInset: max(keyboardInset, (screenHeight - baseHeight) / 2 + 2 * padding),
+          ),
+        ],
       ),
-      body: const Center(child: Text('StatPage vide')),
     );
   }
 }
