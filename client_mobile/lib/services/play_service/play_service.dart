@@ -174,7 +174,7 @@ class PlayService {
       _navigateAndReplace((_) => const PlayPage());
     } else if (newMatchData.state == MatchState.MatchEnd && wasInCombatState) {
       _navigateAndReplace((_) => const PlayPage());
-    } else if (newMatchData.state == MatchState.Statistics) {
+    } else if (newMatchData.state == MatchState.Statistics && oldMatchData.state != MatchState.Statistics) {
       _navigateAndReplace((_) => const StatPage());
     }
   }

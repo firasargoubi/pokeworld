@@ -117,6 +117,7 @@ flutter:
         - assets/images/game/avatars-gifs/evolved/
         - assets/images/game/avatars-gifs/shiny/
         - assets/images/game/avatars-gifs/evolved-shiny/
+        - assets/images/menu/icons/stat/
 
     # The following line ensures that the Material Icons font is
     # included with your application, so that you can use the icons in
