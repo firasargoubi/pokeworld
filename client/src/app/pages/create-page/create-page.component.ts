@@ -1,3 +1,4 @@
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
@@ -58,6 +59,9 @@ export class CreatePageComponent implements OnInit {
                     }
                 }
             },
+            error: (error: HttpErrorResponse) => {
+                this.handleNotFoundError(error);
+            },
         });
     }
 
@@ -70,6 +74,15 @@ export class CreatePageComponent implements OnInit {
                 this.popupService.showPopup({ message: PopupMessage.ConnectionError, hasCloseButton: true, isConfirmation: false });
             },
         });
+    }
+
+    private handleNotFoundError(error: HttpErrorResponse) {
+        if (error.status === HttpStatusCode.NotFound) {
+            this.popupService.showPopup({ message: PopupMessage.GameDoesNotExist, hasCloseButton: true, isConfirmation: false });
+            this.loadGames();
+        } else {
+            this.popupService.showPopup({ message: PopupMessage.ErrorFetchingGame, hasCloseButton: true, isConfirmation: false });
+        }
     }
 
     private handleUnauthorizedAccess() {
