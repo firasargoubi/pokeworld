@@ -1,6 +1,8 @@
 import 'package:client_mobile/consts/avatar_list.dart';
 import 'package:client_mobile/consts/login_const.dart';
 import 'package:client_mobile/controllers/login_controller.dart';
+import 'package:client_mobile/models/audio.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -55,6 +57,7 @@ class _LoginPopupState extends State<LoginPopup> {
                 enabled: !_controller.isLoading,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(labelText: LOGIN_POPUP_EMAIL_LABEL, hintText: LOGIN_POPUP_EMAIL_HINT, prefixIcon: Icon(Icons.email)),
+                onTap: () => AudioService().playSoundEffect(SoundEffect.Select.path),
               ),
             if (_controller.isRegister)
               Column(
@@ -68,7 +71,9 @@ class _LoginPopupState extends State<LoginPopup> {
                     children: USER_PROFILE_PICTURES.map((avatarPath) {
                       final isSelected = _controller.selectedAvatar == avatarPath;
                       return GestureDetector(
-                        onTap: _controller.isLoading ? null : () => _controller.selectAvatar(avatarPath),
+                        onTap: _controller.isLoading
+                            ? null
+                            : () => {_controller.selectAvatar(avatarPath), AudioService().playSoundEffect(SoundEffect.Select.path)},
                         child: Container(
                           padding: const EdgeInsets.all(2),
                           decoration: BoxDecoration(
@@ -87,18 +92,21 @@ class _LoginPopupState extends State<LoginPopup> {
               enabled: !_controller.isLoading,
               inputFormatters: [UsernameInputFormatter(), LengthLimitingTextInputFormatter(MAX_USERNAME_LENGTH)],
               decoration: InputDecoration(labelText: LOGIN_POPUP_USERNAME_LABEL, hintText: LOGIN_POPUP_USERNAME_HINT, prefixIcon: Icon(Icons.person)),
+              onTap: () => AudioService().playSoundEffect(SoundEffect.Select.path),
             ),
             TextField(
               controller: _controller.passwordController,
               enabled: !_controller.isLoading,
               obscureText: true,
               decoration: InputDecoration(labelText: LOGIN_POPUP_PASSWORD_LABEL, hintText: LOGIN_POPUP_PASSWORD_HINT, prefixIcon: Icon(Icons.lock)),
+              onTap: () => AudioService().playSoundEffect(SoundEffect.Select.path),
             ),
             if (_controller.errorMessage != null) Text(_controller.errorMessage!, style: TextStyle(color: Colors.red, fontSize: 12)),
             ElevatedButton(
               onPressed: _controller.isLoading
                   ? null
                   : () {
+                      AudioService().playSoundEffect(SoundEffect.Select.path);
                       _controller.handleSubmit(
                         onSuccess: () {
                           if (mounted) {
@@ -112,7 +120,10 @@ class _LoginPopupState extends State<LoginPopup> {
                   : Text(_controller.isRegister ? LOGIN_POPUP_REGISTER_BUTTON : LOGIN_POPUP_SIGN_IN_TITLE),
             ),
             TextButton(
-              onPressed: _controller.toggleRegister,
+              onPressed: () {
+                AudioService().playSoundEffect(SoundEffect.Select.path);
+                _controller.toggleRegister();
+              },
               child: Text(_controller.isRegister ? LOGIN_POPUP_ALREADY_HAVE_ACCOUNT : LOGIN_POPUP_CREATE_ACCOUNT_TITLE),
             ),
           ],

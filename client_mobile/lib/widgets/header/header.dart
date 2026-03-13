@@ -1,3 +1,5 @@
+import 'package:client_mobile/models/audio.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 
 import 'header_const.dart';
@@ -25,6 +27,7 @@ class _AppHeaderState extends State<AppHeader> {
   void _setPressed(bool value) => setState(() => _isPressed = value);
 
   void _handleTapUp(_) {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
     _setPressed(false);
     widget.onTap();
   }

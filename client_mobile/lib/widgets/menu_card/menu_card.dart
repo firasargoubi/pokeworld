@@ -1,5 +1,7 @@
 import 'package:client_mobile/consts/menu_card_data.dart';
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/menu_config.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 
 import 'menu_card_const.dart';
@@ -39,7 +41,7 @@ class _MenuCardState extends State<MenuCard> {
     final currentButtonImage = _isPressed ? widget.buttonImageActive : widget.buttonImage;
 
     return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapDown: (_) => {setState(() => _isPressed = true), AudioService().playSoundEffect(SoundEffect.Select.path)},
       onTapUp: (_) {
         setState(() => _isPressed = false);
         widget.onTap?.call();

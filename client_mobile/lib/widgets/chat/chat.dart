@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/chat_message.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/chat_service/chat_service.dart';
@@ -47,7 +49,11 @@ class _ChatState extends State<Chat> {
 
   List<ChatMessage> get _currentMessages => _selectedChannel == ChatChannel.General ? _generalMessages : _matchMessages;
 
-  void _toggleCompact() => setState(() => _isCompact = !_isCompact);
+  void _toggleCompact() {
+    setState(() => _isCompact = !_isCompact);
+    AudioService().playSoundEffect(SoundEffect.Select.path);
+  }
+
   double _lerp(double start, double end, double t) => start + (end - start) * t;
 
   @override

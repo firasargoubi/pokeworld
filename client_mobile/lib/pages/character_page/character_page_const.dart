@@ -37,6 +37,9 @@ const String LIGHTNING_ICON_ASSET = 'assets/images/menu/containers/stats/lightni
 const String D4_ICON_ASSET = 'assets/images/menu/containers/stats/d4-dice.png';
 const String D6_ICON_ASSET = 'assets/images/menu/containers/stats/d6-dice.png';
 
+const String START_GAME_BUTTON_ASSET = 'assets/images/menu/containers/stats/blue-button.png';
+const String START_GAME_BUTTON_ACTIVE_ASSET = 'assets/images/menu/containers/stats/blue-button-active.png';
+
 // Stat texts
 const String STAT_HP_TOP_TEXT = '+2 HP';
 const String STAT_VIT_TOP_TEXT = '+2 VIT';

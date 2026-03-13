@@ -3,10 +3,12 @@ import 'dart:math';
 
 import 'package:client_mobile/consts/match_data_const.dart';
 import 'package:client_mobile/consts/player_data_const.dart';
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/models/popup_message.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/popup_service/popup_service.dart';
@@ -53,6 +55,10 @@ class _LobbyPageState extends State<LobbyPage> {
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AudioService().playBackgroundMusic(BackgroundMusic.Menu.path);
+    });
 
     final md = MatchService().matchData;
     code = md?.code ?? 'ABCD1234';

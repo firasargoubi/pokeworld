@@ -5,6 +5,7 @@ import 'package:client_mobile/consts/game_card.dart';
 import 'package:client_mobile/models/game_card_config.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/map_data.dart';
+import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
 import 'package:flutter/material.dart';
 
 import 'game_card_const.dart';
@@ -186,19 +187,18 @@ class GameCard extends StatelessWidget {
                     flex: 1,
                     child: Align(
                       alignment: Alignment.topCenter,
-                      child: GestureDetector(
-                        onTap: onTap,
-                        child: Padding(
-                          padding: EdgeInsets.only(left: cardWidth * 0.03),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              SizedBox(
-                                width: cardWidth * 0.35,
-                                child: Image.asset(config.buttonImage, fit: BoxFit.contain, filterQuality: FilterQuality.none),
-                              ),
-                              Text(cardButtonText, style: buttonTextStyle(cardWidth)),
-                            ],
+                      child: Padding(
+                        padding: EdgeInsets.only(left: cardWidth * 0.03),
+                        child: SizedBox(
+                          width: cardWidth * 0.35,
+                          height: cardHeight * 0.12,
+                          child: PressableBackground(
+                            backgroundAsset: config.buttonImage,
+                            activeBackgroundAsset: config.buttonImageActive,
+                            onTap: onTap,
+                            text: cardButtonText,
+                            textStyle: buttonTextStyle(cardWidth),
+                            activeTextStyle: buttonTextStyle(cardWidth),
                           ),
                         ),
                       ),

@@ -1,7 +1,11 @@
 import 'dart:math';
 
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/game_data.dart';
+import 'package:client_mobile/pages/home_page/home_page.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/game_save/game_save.dart';
+import 'package:client_mobile/services/navigation_service/navigation_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/game_cards_shell/game_cards_shell.dart';
 import 'package:client_mobile/widgets/header/header.dart';
@@ -19,6 +23,14 @@ class CreatePage extends StatefulWidget {
 
 class _CreatePageState extends State<CreatePage> {
   late final Future<List<GameData>> gamesFuture = GameSaveService.getAllGames();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AudioService().playBackgroundMusic(BackgroundMusic.Menu.path);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +62,11 @@ class _CreatePageState extends State<CreatePage> {
               SizedBox(
                 height: baseSize * 0.1,
                 width: double.infinity,
-                child: AppHeader(index: 1, text: CREATE_PAGE_HEADER_TEXT, onTap: () => Navigator.pop(context)),
+                child: AppHeader(
+                  index: 1,
+                  text: CREATE_PAGE_HEADER_TEXT,
+                  onTap: () => NavigationService().navigateAndReplace((_) => const HomePage()),
+                ),
               ),
               Expanded(
                 child: Container(

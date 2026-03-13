@@ -1,3 +1,5 @@
+import 'package:client_mobile/models/audio.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 
 class PressableBackground extends StatefulWidget {
@@ -39,7 +41,7 @@ class _PressableBackgroundState extends State<PressableBackground> {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapDown: (_) => {setState(() => _isPressed = true), AudioService().playSoundEffect(SoundEffect.Select.path)},
       onTapCancel: () => setState(() => _isPressed = false),
       onTapUp: (_) {
         setState(() => _isPressed = false);

@@ -1,4 +1,6 @@
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/chat_message.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/utils/profile_image_provider.dart';
 import 'package:client_mobile/widgets/stripe_painter/stripe_painter.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +26,10 @@ class ChatChannelButton extends StatelessWidget {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: onTap,
+      onTap: () {
+        onTap?.call();
+        AudioService().playSoundEffect(SoundEffect.Select.path);
+      },
       child: Container(
         width: baseSize * CHAT_CHANNEL_WIDTH_FACTOR,
         height: height,
@@ -100,7 +105,10 @@ class ChatHeader extends StatelessWidget {
             baseSize: baseSize,
             label: CHAT_GENERAL_LABEL,
             isSelected: selectedChannel == ChatChannel.General,
-            onTap: () => onChannelChanged(ChatChannel.General),
+            onTap: () {
+              onChannelChanged(ChatChannel.General);
+              AudioService().playSoundEffect(SoundEffect.Select.path);
+            },
           ),
           SizedBox(width: baseSize * CHAT_CHANNELS_GAP_FACTOR),
           if (showMatchChannel) ...{
@@ -108,7 +116,10 @@ class ChatHeader extends StatelessWidget {
               baseSize: baseSize,
               label: CHAT_PARTY_LABEL,
               isSelected: selectedChannel == ChatChannel.Match,
-              onTap: () => onChannelChanged(ChatChannel.Match),
+              onTap: () {
+                onChannelChanged(ChatChannel.Match);
+                AudioService().playSoundEffect(SoundEffect.Select.path);
+              },
             ),
           },
         ],
@@ -239,7 +250,10 @@ class ChatInputBar extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: onSend,
+            onTap: () {
+              onSend();
+              AudioService().playSoundEffect(SoundEffect.Select.path);
+            },
             child: Container(
               width: baseSize * CHAT_SEND_BUTTON_WIDTH_FACTOR,
               height: baseSize * CHAT_SEND_BUTTON_HEIGHT_FACTOR,
@@ -341,7 +355,10 @@ class ChatTopEdge extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: onTap,
+      onTap: () {
+        onTap();
+        AudioService().playSoundEffect(SoundEffect.Select.path);
+      },
       child: Row(
         children: [
           Container(

@@ -1,8 +1,11 @@
 import 'dart:math';
 
 import 'package:client_mobile/consts/ui.dart';
+import 'package:client_mobile/models/audio.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:client_mobile/widgets/login_popup/login_popup.dart';
+import 'package:client_mobile/widgets/settings_popup/settings_popup.dart';
 import 'package:client_mobile/widgets/user_popup/user_popup.dart';
 import 'package:flutter/material.dart';
 
@@ -17,12 +20,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool _didShowLoginPopup = false;
-  bool _isSettingsPressed = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowLoginPopup());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      AudioService().playBackgroundMusic(BackgroundMusic.Menu.path);
+      _maybeShowLoginPopup();
+    });
   }
 
   void _maybeShowLoginPopup() {
@@ -50,8 +56,13 @@ class _HomePageState extends State<HomePage> {
     showDialog(context: context, barrierDismissible: true, builder: (context) => const UserPopup());
   }
 
-  void _setSettingsPressed(bool pressed) {
-    setState(() => _isSettingsPressed = pressed);
+  void _showSettingsPopup() {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => SettingsPopup(onClose: () => Navigator.of(context).pop()),
+    );
   }
 
   Future<void> _push(Widget page) async {
@@ -93,12 +104,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Column(
                         children: [
-                          HomePageTopSection(
-                            baseSize: baseSize,
-                            isSettingsPressed: _isSettingsPressed,
-                            onSettingsTap: _showUserPopup,
-                            onSettingsPressedChanged: _setSettingsPressed,
-                          ),
+                          HomePageTopSection(baseSize: baseSize, onSettingsTap: _showSettingsPopup, onAccountTap: _showUserPopup),
                           HomePageMiddleSection(baseSize: baseSize, onPush: _push),
                         ],
                       ),
