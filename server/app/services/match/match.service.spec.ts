@@ -53,6 +53,9 @@ describe('MatchService', () => {
 
     beforeEach(() => {
         mockMatch.data = structuredClone(MOCK_MATCH_DATAS[0]);
+        mockMatch.isState.returns(true);
+        mockMatch.isFull.returns(false);
+        mockMatch.hasAvailableSpawnPoint.returns(true);
         service['matches'] = new Map();
         service['playerToMatchCode'] = new Map();
     });
@@ -248,8 +251,10 @@ describe('MatchService', () => {
         sandbox.stub(service as any, 'hasMatchCode').returns(true);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasPlayerId').returns(false);
+        mockMatch.isFull.returns(true);
+        mockMatch.isState.returns(true);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'isMatchFull').returns(true);
+        sandbox.stub(service as any, 'getMatch').returns(mockMatch);
         const canJoin = service['canJoinMatch'](playerId, mockMatch.data.code);
         expect(canJoin).toBe(false);
         expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.RoomFull)).toBe(true);
@@ -261,13 +266,49 @@ describe('MatchService', () => {
         sandbox.stub(service as any, 'hasMatchCode').returns(true);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasPlayerId').returns(false);
+        mockMatch.isFull.returns(false);
+        mockMatch.isState.returns(true);
+        mockMatch.data.lobbyData.isLocked = true;
+        mockMatch.data.lobbyData.isDropInEnabled = false;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'isMatchFull').returns(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
-        sandbox.stub(service as any, 'isMatchLocked').returns(true);
+        sandbox.stub(service as any, 'getMatch').returns(mockMatch);
         const canJoin = service['canJoinMatch'](playerId, mockMatch.data.code);
         expect(canJoin).toBe(false);
         expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.RoomLocked)).toBe(true);
+    });
+
+    it('can join match should return drop in disabled when match in progress', () => {
+        const playerId = 'player1';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'hasMatchCode').returns(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'hasPlayerId').returns(false);
+        mockMatch.isFull.returns(false);
+        mockMatch.isState.returns(false);
+        mockMatch.data.lobbyData.isDropInEnabled = false;
+        mockMatch.data.lobbyData.isLocked = true;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'getMatch').returns(mockMatch);
+        const canJoin = service['canJoinMatch'](playerId, mockMatch.data.code);
+        expect(canJoin).toBe(false);
+        expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.DropInDisabled, true)).toBe(true);
+    });
+
+    it('can join match should return no available spawn when drop in has no slots', () => {
+        const playerId = 'player1';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'hasMatchCode').returns(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'hasPlayerId').returns(false);
+        mockMatch.isFull.returns(false);
+        mockMatch.isState.returns(false);
+        mockMatch.data.lobbyData.isDropInEnabled = true;
+        mockMatch.hasAvailableSpawnPoint.returns(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'getMatch').returns(mockMatch);
+        const canJoin = service['canJoinMatch'](playerId, mockMatch.data.code);
+        expect(canJoin).toBe(false);
+        expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.NoAvailableSpawn, true)).toBe(true);
     });
 
     it('can create match should return true if player is not in a match', async () => {

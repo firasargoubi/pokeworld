@@ -20,6 +20,20 @@
                         </div>
                         <div class="button-edge"></div>
                     </div>
+                    <div class="button-container dropin" [class.disabled]="!visualData.isSelfHost" (click)="toggleDropInStatus()">
+                        <div class="button-edge"></div>
+                        <div class="button-body">
+                            <span class="dropin-label">{{ 'pages.lobby.dropInLabel' | translate }}</span>
+                            <span class="dropin-value">
+                                {{
+                                    (this.matchService.data.lobbyData.isDropInEnabled
+                                        ? 'pages.lobby.dropInOn'
+                                        : 'pages.lobby.dropInOff') | translate
+                                }}
+                            </span>
+                        </div>
+                        <div class="button-edge"></div>
+                    </div>
 
                     <div class="button-container copy" (click)="this.copyMatchCode()">
                         <div class="button-edge"></div>

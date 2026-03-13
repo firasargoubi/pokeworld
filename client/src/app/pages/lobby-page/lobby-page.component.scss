@@ -242,6 +242,22 @@ $player-card-width: calc($base-size * 70);
     background: $bg-button-green;
 }
 
+.dropin .button-body {
+    flex-direction: column;
+    gap: calc($base-size * 0.5);
+    color: white;
+    font-weight: bold;
+}
+
+.dropin .dropin-label {
+    font-size: calc($base-size * 1.8);
+    letter-spacing: calc($base-size * 0.2);
+}
+
+.dropin .dropin-value {
+    font-size: calc($base-size * 2.2);
+}
+
 .button-container .icon {
     height: 60%;
     aspect-ratio: 1/1;

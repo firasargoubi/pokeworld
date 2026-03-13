@@ -4,6 +4,7 @@ import { DEFAULT_PLAYER_DATA, MAX_PLAYERS } from '@common/consts/player-data.con
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { PlayerData, PlayerType } from '@common/interfaces/player-data';
+import { Position } from '@common/interfaces/position';
 
 export class Match {
     data: MatchData;
@@ -11,6 +12,8 @@ export class Match {
     private matchService: MatchService;
     private timeout: NodeJS.Timeout | null = null;
     private botTimeout: NodeJS.Timeout | null = null;
+    private availableSpawnPoints: Position[] = [];
+    private dropOutVictories: Map<string, number> = new Map();
 
     constructor(matchData: MatchData, matchService: MatchService) {
         this.data = matchData;
@@ -124,6 +127,34 @@ export class Match {
         this.data.players = this.data.players.filter((p) => p.id !== playerId);
     }
 
+    setAvailableSpawnPoints(spawnPoints: Position[]) {
+        this.availableSpawnPoints = spawnPoints.map((spawnPoint) => structuredClone(spawnPoint));
+    }
+
+    hasAvailableSpawnPoint(): boolean {
+        return this.availableSpawnPoints.length > 0;
+    }
+
+    getNextAvailableSpawnPoint(): Position | null {
+        return this.availableSpawnPoints.length ? this.availableSpawnPoints.shift() ?? null : null;
+    }
+
+    releaseSpawnPoint(spawnPoint: Position) {
+        if (spawnPoint.x >= 0 && spawnPoint.y >= 0) {
+            this.availableSpawnPoints.push(structuredClone(spawnPoint));
+        }
+    }
+
+    storePlayerVictories(playerId: string, victories: number) {
+        this.dropOutVictories.set(playerId, victories);
+    }
+
+    getPlayerVictories(playerId: string): number | undefined {
+        const victories = this.dropOutVictories.get(playerId);
+        this.dropOutVictories.delete(playerId);
+        return victories;
+    }
+
     private kickJoiningPlayers() {
         const playerIdsToKick = this.data.players.filter((p) => !p.isConnected).map((p) => p.id);
         playerIdsToKick.forEach((playerId) => {
@@ -162,7 +193,17 @@ export class Match {
 
     private playerLeaveMatch(playerId: string) {
         const player = this.data.players.find((p) => p.id === playerId);
+        if (!player) {
+            return;
+        }
         player.isConnected = false;
+        if (this.data.lobbyData.isDropInEnabled && player.spawnPoint.x >= 0 && player.spawnPoint.y >= 0) {
+            this.releaseSpawnPoint(player.spawnPoint);
+            this.data.gameData.mapData.items.Spawn = this.data.gameData.mapData.items.Spawn.filter(
+                (spawnPoint) => spawnPoint.x !== player.spawnPoint.x || spawnPoint.y !== player.spawnPoint.y,
+            );
+            this.storePlayerVictories(playerId, player.combatsWon);
+        }
         const connectedPlayers = this.data.players.filter((p) => p.isConnected);
         if (connectedPlayers.length === 1) {
             this.kickPlayer(connectedPlayers[0].id, Message.LastPlayerRemaining);

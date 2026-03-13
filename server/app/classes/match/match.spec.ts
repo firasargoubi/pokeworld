@@ -306,6 +306,33 @@ describe('Match', () => {
         );
     });
 
+    it('player leave match should respawn player when drop in disabled', () => {
+        match.data.players = [
+            { ...structuredClone(MOCK_PLAYER_DATAS[0]), id: 'player1', isConnected: true },
+            { ...structuredClone(MOCK_PLAYER_DATAS[1]), id: 'player2', isConnected: true },
+            { ...structuredClone(MOCK_PLAYER_DATAS[2]), id: 'player3', isConnected: true },
+        ];
+        match.data.lobbyData.isDropInEnabled = false;
+        match.data.state = MatchState.TurnWait;
+        mockMatchService.respawnPlayer.resetHistory();
+
+        match['playerLeaveMatch'](match.data.players[0].id);
+
+        expect(mockMatchService.respawnPlayer.called).toBe(true);
+    });
+
+    it('player leave match should start next turn when drop in active player leaves', () => {
+        match.data.lobbyData.isDropInEnabled = true;
+        match.data.state = MatchState.TurnWait;
+        match.data.players.forEach((player) => (player.isConnected = true));
+        match.data.playData.activePlayerIndex = 1;
+        mockMatchService.startNextTurn.resetHistory();
+
+        match['playerLeaveMatch'](match.data.players[1].id);
+
+        expect(mockMatchService.startNextTurn.calledWith(match)).toBe(true);
+    });
+
     it('set bot timeout should set timeout and execute callback', () => {
         const callbackStub = sandbox.stub();
         sandbox.stub(global, 'setTimeout').callsFake((callback: () => void) => {

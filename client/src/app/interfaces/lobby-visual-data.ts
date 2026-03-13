@@ -1,6 +1,7 @@
 export interface LobbyVisualData {
     players: LobbyPlayerVisualData[];
     isSelfHost: boolean;
+    isDropInEnabled: boolean;
 }
 
 export interface LobbyPlayerVisualData {

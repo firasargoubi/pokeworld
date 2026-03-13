@@ -21,6 +21,7 @@ export interface MatchData {
 export interface LobbyData {
     isLocked: boolean;
     hostPlayerIndex: number;
+    isDropInEnabled: boolean;
 }
 
 export interface PlayData {

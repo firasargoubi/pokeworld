@@ -1,5 +1,6 @@
 import { Match } from '@app/classes/match/match';
 import { BotService } from '@app/services/bot/bot.service';
+import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { TrackingService } from '@app/services/tracking/tracking.service';
@@ -7,8 +8,8 @@ import { REGULAR_ITEMS } from '@common/consts/map-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
 import { Message } from '@common/interfaces/message.enum';
-import { Avatar, PlayerType } from '@common/interfaces/player-data';
-import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
+import { Avatar, PlayerData, PlayerType, Team } from '@common/interfaces/player-data';
+import { MOCK_MATCH_DATAS, MOCK_PLAYER_COMBAT_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonSandbox, SinonStubbedInstance, createSandbox, createStubInstance } from 'sinon';
@@ -22,6 +23,7 @@ describe('LobbyService', () => {
     let mockBotService: SinonStubbedInstance<BotService>;
     let mockMatch: SinonStubbedInstance<Match>;
     let mocktrackingService: SinonStubbedInstance<TrackingService>;
+    let mockMapService: SinonStubbedInstance<MapService>;
 
     beforeAll(async () => {
         sandbox = createSandbox();
@@ -30,6 +32,7 @@ describe('LobbyService', () => {
         mockBotService = createStubInstance<BotService>(BotService);
         mockMatch = createStubInstance<Match>(Match);
         mocktrackingService = createStubInstance<TrackingService>(TrackingService);
+        mockMapService = createStubInstance<MapService>(MapService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -38,6 +41,7 @@ describe('LobbyService', () => {
                 { provide: MatchService, useValue: mockMatchService },
                 { provide: BotService, useValue: mockBotService },
                 { provide: TrackingService, useValue: mocktrackingService },
+                { provide: MapService, useValue: mockMapService },
             ],
         }).compile();
 
@@ -47,6 +51,9 @@ describe('LobbyService', () => {
     beforeEach(() => {
         mockMatch = createStubInstance<Match>(Match);
         mockMatch.data = structuredClone(MOCK_MATCH_DATAS[1]);
+        mockMatch.isState.returns(true);
+        mockMapService.getNearestEmptyTile.resetHistory();
+        mockMapService.getNearestEmptyTile.callsFake((_matchData, position) => position);
     });
 
     afterEach(() => {
@@ -85,6 +92,91 @@ describe('LobbyService', () => {
         expect(player.isConnected).toBe(true);
     });
 
+    it('should remove player when drop in disabled mid match', () => {
+        const player = structuredClone(MOCK_PLAYER_DATAS[0]);
+        mockMatch.isState.returns(false);
+        mockMatch.data.lobbyData.isDropInEnabled = false;
+
+        service.joinLobby(mockMatch, player.id, player);
+
+        expect(mockMatchService.playerRemovedFromMatch.calledWith(player.id, Message.DropInDisabled)).toBeTruthy();
+    });
+
+    it('should remove player when no spawn points are available', () => {
+        const player = structuredClone(MOCK_PLAYER_DATAS[0]);
+        mockMatch.isState.returns(false);
+        mockMatch.data.lobbyData.isDropInEnabled = true;
+        mockMatch.getNextAvailableSpawnPoint.returns(null);
+
+        service.joinLobby(mockMatch, player.id, player);
+
+        expect(mockMatchService.playerRemovedFromMatch.calledWith(player.id, Message.NoAvailableSpawn)).toBeTruthy();
+    });
+
+    it('should handle drop in when enabled', () => {
+        const player = structuredClone(MOCK_PLAYER_DATAS[0]);
+        mockMatch.isState.returns(false);
+        mockMatch.data.lobbyData.isDropInEnabled = true;
+        mockMatch.getNextAvailableSpawnPoint.returns({ x: 2, y: 2 });
+        const nearestTile = { x: 3, y: 4 };
+        mockMapService.getNearestEmptyTile.returns(nearestTile);
+
+        service.joinLobby(mockMatch, player.id, player);
+
+        expect(player.spawnPoint).toEqual({ x: 2, y: 2 });
+        expect(player.position).toEqual(nearestTile);
+        expect(player.combatsWon).toBe(0);
+        expect(mockMatch.sendUpdate.calledOnce).toBeTruthy();
+    });
+
+    it('should assign drop in team in ctf mode', () => {
+        const player = structuredClone(MOCK_PLAYER_DATAS[2]);
+        mockMatch.isState.returns(false);
+        mockMatch.data.lobbyData.isDropInEnabled = true;
+        mockMatch.data.gameData.mapData.gameMode = GameMode.CTF;
+        mockMatch.data.players = [
+            { ...structuredClone(MOCK_PLAYER_DATAS[0]), team: Team.Red, isConnected: true },
+            { ...structuredClone(MOCK_PLAYER_DATAS[1]), team: Team.Red, isConnected: true },
+            { ...structuredClone(MOCK_PLAYER_DATAS[2]), team: Team.Blue, isConnected: true },
+        ] as PlayerData[];
+        mockMatch.getNextAvailableSpawnPoint.returns({ x: 4, y: 4 });
+
+        service.joinLobby(mockMatch, player.id, player);
+
+        expect(player.team).toBe(Team.Blue);
+    });
+
+    it('should insert drop in player by speed and update indexes', () => {
+        const player = { ...structuredClone(MOCK_PLAYER_DATAS[3]), id: 'dropPlayer', name: 'dropPlayerName', speed: 5 };
+        const spawn = { x: 9, y: 9 };
+        mockMatch.isState.returns(false);
+        mockMatch.data.lobbyData.isDropInEnabled = true;
+        mockMatch.getNextAvailableSpawnPoint.returns(spawn);
+        mockMatch.data.players = [
+            { ...structuredClone(MOCK_PLAYER_DATAS[0]), id: 'hostPlayer', speed: 7 },
+            { ...structuredClone(MOCK_PLAYER_DATAS[1]), id: 'midPlayer', speed: 4 },
+            { ...structuredClone(MOCK_PLAYER_DATAS[2]), id: 'slowPlayer', speed: 2 },
+        ] as PlayerData[];
+        mockMatch.data.lobbyData.hostPlayerIndex = 0;
+        mockMatch.data.playData.activePlayerIndex = 2;
+        mockMatch.data.combatData.playersCombatData = [
+            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]), playerIndex: 1 },
+            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), playerIndex: 2 },
+        ];
+
+        service.joinLobby(mockMatch, player.id, player);
+
+        expect(mockMatch.data.players.map((p) => p.id)).toEqual(['hostPlayer', 'dropPlayer', 'midPlayer', 'slowPlayer']);
+        expect(player.spawnPoint).toEqual(spawn);
+        expect(player.position).toEqual(spawn);
+        expect(mockMatch.data.lobbyData.hostPlayerIndex).toBe(0);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        expect(mockMatch.data.playData.activePlayerIndex).toBe(3);
+        expect(mockMatch.data.combatData.playersCombatData[0].playerIndex).toBe(2);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        expect(mockMatch.data.combatData.playersCombatData[1].playerIndex).toBe(3);
+    });
+
     it('should change lock status if host', () => {
         const playerId = 'playerId';
         mockMatch.isHost.returns(true);
@@ -92,6 +184,16 @@ describe('LobbyService', () => {
         service.changeLockStatus(mockMatch, playerId, true);
 
         expect(mockMatch.changeLockStatus.calledWith(true)).toBeTruthy();
+    });
+
+    it('should change drop in status if host', () => {
+        const playerId = 'playerId';
+        mockMatch.isHost.returns(true);
+
+        service.changeDropInStatus(mockMatch, playerId, true);
+
+        expect(mockMatch.data.lobbyData.isDropInEnabled).toBe(true);
+        expect(mockMatch.sendUpdate.calledOnce).toBeTruthy();
     });
 
     it('should start match if conditions are met', () => {
@@ -174,6 +276,7 @@ describe('LobbyService', () => {
         expect(mockMatch.data.players[0].position).toEqual(mockMatch.data.players[0].spawnPoint);
         expect(mockMatch.data.players[1].spawnPoint).toBeDefined();
         expect(mockMatch.data.players[1].position).toEqual(mockMatch.data.players[1].spawnPoint);
+        expect(mockMatch.setAvailableSpawnPoints.calledOnce).toBeTruthy();
     });
 
     it('get unique name should return original name if unique or append suffix', () => {

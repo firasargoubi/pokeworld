@@ -1,5 +1,6 @@
 import { Match } from '@app/classes/match/match';
 import { BotService } from '@app/services/bot/bot.service';
+import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { TrackingService } from '@app/services/tracking/tracking.service';
@@ -20,6 +21,7 @@ export class LobbyService {
     @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
     @Inject(forwardRef(() => BotService)) private readonly botService: BotService;
     @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
+    @Inject(MapService) private readonly mapService: MapService;
 
     kickPlayer(match: Match, playerId: string, targetPlayerId: string) {
         const isHost = match.isHost(playerId);
@@ -38,18 +40,30 @@ export class LobbyService {
     }
 
     joinLobby(match: Match, playerId: string, playerData: PlayerData) {
-        match.data.players = match.data.players.filter((p) => p.id !== playerId);
+        const existingIndex = match.data.players.findIndex((p) => p.name === playerData.name);
+        if (match.isState([MatchState.Lobby])) match.data.players = match.data.players.filter((p) => p.id !== playerId);
         playerData.name = this.getUniqueName(match, playerId, playerData.name);
-        match.data.trackingData.players.push({ ...structuredClone(DEFAULT_PLAYER_TRACKING_DATA), id: playerId, name: playerData.name });
         playerData.isConnected = true;
-        match.data.players.push(playerData);
-        match.changeLockStatus(false);
-        match.sendUpdate();
+        if (match.isState([MatchState.Lobby])) {
+            this.registerTrackingPlayer(match, playerId, playerData);
+            match.data.players.push(playerData);
+            match.changeLockStatus(false);
+            match.sendUpdate();
+        } else {
+            this.handleDropIn(match, playerId, playerData, existingIndex);
+        }
     }
 
     changeLockStatus(match: Match, playerId: string, lockStatus: boolean) {
         if (match.isHost(playerId)) {
             match.changeLockStatus(lockStatus);
+            match.sendUpdate();
+        }
+    }
+
+    changeDropInStatus(match: Match, playerId: string, dropInStatus: boolean) {
+        if (match.isHost(playerId)) {
+            match.data.lobbyData.isDropInEnabled = dropInStatus;
             match.sendUpdate();
         }
     }
@@ -134,14 +148,108 @@ export class LobbyService {
     }
 
     private assignSpawnPoints(match: Match) {
-        const spawnPoints = match.data.gameData.mapData.items.Spawn;
-        const shuffledSpawnPoints = spawnPoints.sort(() => Math.random() - RANDOM_THRESHOLD).slice(0, match.data.players.length);
-        match.data.gameData.mapData.items.Spawn = spawnPoints.filter((s) => shuffledSpawnPoints.includes(s));
+        const spawnPoints = structuredClone(match.data.gameData.mapData.items.Spawn);
+        const shuffledSpawnPoints = spawnPoints.sort(() => Math.random() - RANDOM_THRESHOLD);
+        const assignedSpawnPoints = shuffledSpawnPoints.slice(0, match.data.players.length);
+        match.setAvailableSpawnPoints(shuffledSpawnPoints.slice(match.data.players.length));
+        match.data.gameData.mapData.items.Spawn = assignedSpawnPoints;
 
-        shuffledSpawnPoints.forEach((spawnPoint, i) => {
+        assignedSpawnPoints.forEach((spawnPoint, i) => {
             const player = match.data.players[i];
             player.spawnPoint = spawnPoint;
             player.position = spawnPoint;
+        });
+    }
+
+    private handleDropIn(match: Match, playerId: string, playerData: PlayerData, existingIndex: number = -1) {
+        if (!match.data.lobbyData.isDropInEnabled) {
+            this.matchService.playerRemovedFromMatch(playerId, Message.DropInDisabled);
+            return;
+        }
+        const spawnPoint = match.getNextAvailableSpawnPoint();
+        if (!spawnPoint) {
+            this.matchService.playerRemovedFromMatch(playerId, Message.NoAvailableSpawn);
+            return;
+        }
+
+        const isSpawnAlreadyOnMap = match.data.gameData.mapData.items.Spawn.some((pos) => pos.x === spawnPoint.x && pos.y === spawnPoint.y);
+        if (!isSpawnAlreadyOnMap) {
+            match.data.gameData.mapData.items.Spawn.push(structuredClone(spawnPoint));
+        }
+        const storedVictories = match.getPlayerVictories(playerId);
+        if (storedVictories !== undefined) {
+            playerData.combatsWon = storedVictories;
+        }
+        playerData.spawnPoint = structuredClone(spawnPoint);
+        const nearestAvailableTile = this.mapService.getNearestEmptyTile(match.data, playerData.spawnPoint);
+        playerData.position = structuredClone(nearestAvailableTile);
+        this.assignDropInTeam(match, playerData);
+
+        if (existingIndex !== -1) {
+            const existingPlayer = match.data.players[existingIndex];
+            const updatedPlayer: PlayerData = {
+                ...existingPlayer,
+                ...playerData,
+                id: playerId,
+                isConnected: true,
+            };
+            match.data.players[existingIndex] = updatedPlayer;
+            this.registerTrackingPlayer(match, playerId, updatedPlayer);
+            match.sendUpdate();
+            return;
+        }
+        this.registerTrackingPlayer(match, playerId, playerData);
+        const insertionIndex = this.getDropInInsertIndex(match, playerData.speed);
+        match.data.players.splice(insertionIndex, 0, playerData);
+        this.updateIndexesAfterDropIn(match, insertionIndex);
+        match.sendUpdate();
+    }
+
+    private registerTrackingPlayer(match: Match, playerId: string, playerData: PlayerData) {
+        const hasSpawnPoint = playerData.spawnPoint && playerData.spawnPoint.x >= 0 && playerData.spawnPoint.y >= 0;
+        match.data.trackingData.players = match.data.trackingData.players.filter((player) => player.id !== playerId);
+        match.data.trackingData.players.push({
+            ...structuredClone(DEFAULT_PLAYER_TRACKING_DATA),
+            id: playerId,
+            name: playerData.name,
+            team: playerData.team,
+            coveredGroundTiles: hasSpawnPoint ? [playerData.spawnPoint] : structuredClone(DEFAULT_PLAYER_TRACKING_DATA.coveredGroundTiles),
+        });
+    }
+
+    private assignDropInTeam(match: Match, playerData: PlayerData) {
+        if (match.data.gameData.mapData.gameMode !== GameMode.CTF) {
+            playerData.team = Team.None;
+            return;
+        }
+        const connectedPlayers = match.data.players.filter((player) => player.isConnected && player.team !== Team.None);
+        const redCount = connectedPlayers.filter((player) => player.team === Team.Red).length;
+        const blueCount = connectedPlayers.filter((player) => player.team === Team.Blue).length;
+        playerData.team = redCount <= blueCount ? Team.Red : Team.Blue;
+    }
+
+    private getDropInInsertIndex(match: Match, playerSpeed: number): number {
+        for (let i = 0; i < match.data.players.length; i++) {
+            if (playerSpeed > match.data.players[i].speed) {
+                return i;
+            }
+        }
+        return match.data.players.length;
+    }
+
+    private updateIndexesAfterDropIn(match: Match, insertIndex: number) {
+        if (match.data.lobbyData.hostPlayerIndex >= insertIndex) {
+            match.data.lobbyData.hostPlayerIndex++;
+        }
+
+        if (match.data.playData.activePlayerIndex >= insertIndex && match.data.playData.activePlayerIndex !== -1) {
+            match.data.playData.activePlayerIndex++;
+        }
+
+        match.data.combatData.playersCombatData.forEach((playerCombatData) => {
+            if (playerCombatData.playerIndex >= insertIndex) {
+                playerCombatData.playerIndex++;
+            }
         });
     }
 

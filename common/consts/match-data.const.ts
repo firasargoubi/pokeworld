@@ -17,6 +17,7 @@ export const DEFAULT_SELF_INDEX = -1;
 export const DEFAULT_LOBBY_DATA: LobbyData = {
     isLocked: false,
     hostPlayerIndex: 0,
+    isDropInEnabled: false,
 };
 
 export const DEFAULT_PLAY_DATA: PlayData = {

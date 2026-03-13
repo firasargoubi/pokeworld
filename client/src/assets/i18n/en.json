@@ -45,7 +45,9 @@
             "turnStart": "Start of {{playerName}}'s turn",
             "matchWinner": "{{playerName}} won the match",
             "teamWin": "Team {{team}} wins the match!",
-            "playerLeftMatch": "{{playerName}} left the match"
+            "playerLeftMatch": "{{playerName}} left the match",
+            "dropInDisabled": "Le drop-in est désactivé pour cette partie",
+            "NoAvailableSpawn": "Aucun point d'apparition n'est disponible pour le moment"
         },
         "logs": {
             "itemPickup": "{{playerName}} picked up {{itemName}}",
@@ -158,7 +160,10 @@
         "lobby": {
             "title": "Lobby",
             "accessCode": "Your access code",
-            "start": "START"
+            "start": "START",
+            "dropInLabel": "DROP-IN",
+            "dropInOn": "ON",
+            "dropInOff": "OFF"
         },
         "edit": {
             "title": "Edit game",

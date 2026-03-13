@@ -75,6 +75,14 @@ export class LobbyPageComponent {
         this.lobbyService.changeLockStatus(!this.matchService.data.lobbyData.isLocked);
     }
 
+    toggleDropInStatus() {
+        if (!this.visualData.isSelfHost) {
+            return;
+        }
+        this.audioService.playEffect(SoundEffect.Click);
+        this.lobbyService.changeDropInStatus(!this.matchService.data.lobbyData.isDropInEnabled);
+    }
+
     kickPlayer(playerId: string) {
         this.audioService.playEffect(SoundEffect.Click);
         this.lobbyService.kickPlayer(playerId);
@@ -106,6 +114,7 @@ export class LobbyPageComponent {
 
     private updateVisual() {
         this.visualData.isSelfHost = this.matchService.isHost();
+        this.visualData.isDropInEnabled = this.matchService.data.lobbyData.isDropInEnabled;
         this.visualData.players = this.matchService.data.players
             .map((p, i) => ({
                 isConnected: p.isConnected,
