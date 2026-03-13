@@ -14,10 +14,7 @@ import 'package:socket_io_client/socket_io_client.dart' as io;
 
 class _MockSocket extends Mock implements io.Socket {}
 
-MatchData _matchData({
-  MatchState state = MatchState.TurnStart,
-  List<PlayerData> players = const [],
-}) => MatchData(
+MatchData _matchData({MatchState state = MatchState.TurnStart, List<PlayerData> players = const []}) => MatchData(
   code: 'TEST',
   state: state,
   gameData: GameData(
@@ -25,12 +22,8 @@ MatchData _matchData({
     name: 'Game',
     description: '',
     lastEdited: DateTime(2024),
-    isVisible: true,
     mapData: MapData(
-      tiles: List.generate(
-        10,
-        (_) => List.generate(10, (_) => TileType.Grass),
-      ),
+      tiles: List.generate(10, (_) => List.generate(10, (_) => TileType.Grass)),
       items: {},
       size: MapSize.Small,
       gameMode: GameMode.FFA,
@@ -38,13 +31,7 @@ MatchData _matchData({
     thumbnail: '',
   ),
   lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0),
-  playData: PlayData(
-    timeLeft: 60,
-    isDebugMode: false,
-    activePlayerIndex: 0,
-    hasAction: false,
-    movementLeft: 3,
-  ),
+  playData: PlayData(timeLeft: 60, isDebugMode: false, activePlayerIndex: 0, hasAction: false, movementLeft: 3),
   combatData: CombatData(
     lastCombatAction: CombatAction.None,
     turnDuration: 0,
@@ -104,21 +91,14 @@ void main() {
   group('kickPlayer', () {
     test('should emit KickPlayer event with playerId', () {
       LobbyService().kickPlayer('p1');
-      verify(
-        () => mockSocket.emit(LobbyEvent.KickPlayer.value, 'p1'),
-      ).called(1);
+      verify(() => mockSocket.emit(LobbyEvent.KickPlayer.value, 'p1')).called(1);
     });
   });
 
   group('changeAvatar', () {
     test('should emit ChangeAvatar event with avatar value', () {
       LobbyService().changeAvatar(Avatar.Avatar1);
-      verify(
-        () => mockSocket.emit(
-          LobbyEvent.ChangeAvatar.value,
-          Avatar.Avatar1.value,
-        ),
-      ).called(1);
+      verify(() => mockSocket.emit(LobbyEvent.ChangeAvatar.value, Avatar.Avatar1.value)).called(1);
     });
   });
 
@@ -126,112 +106,72 @@ void main() {
     test('should emit JoinLobby event with player json', () {
       final player = _player(id: 'p1');
       LobbyService().joinLobby(player);
-      verify(
-        () => mockSocket.emit(LobbyEvent.JoinLobby.value, player.toJson()),
-      ).called(1);
+      verify(() => mockSocket.emit(LobbyEvent.JoinLobby.value, player.toJson())).called(1);
     });
   });
 
   group('changeLockStatus', () {
     test('should emit ChangeLockStatus event with true', () {
       LobbyService().changeLockStatus(true);
-      verify(
-        () => mockSocket.emit(LobbyEvent.ChangeLockStatus.value, true),
-      ).called(1);
+      verify(() => mockSocket.emit(LobbyEvent.ChangeLockStatus.value, true)).called(1);
     });
 
     test('should emit ChangeLockStatus event with false', () {
       LobbyService().changeLockStatus(false);
-      verify(
-        () => mockSocket.emit(LobbyEvent.ChangeLockStatus.value, false),
-      ).called(1);
+      verify(() => mockSocket.emit(LobbyEvent.ChangeLockStatus.value, false)).called(1);
     });
   });
 
   group('startMatch', () {
     test('should emit StartMatch event', () {
       LobbyService().startMatch();
-      verify(
-        () => mockSocket.emit(LobbyEvent.StartMatch.value, any()),
-      ).called(1);
+      verify(() => mockSocket.emit(LobbyEvent.StartMatch.value, any())).called(1);
     });
   });
 
   group('addBot', () {
     test('should emit AddBot event with bot type value', () {
       LobbyService().addBot(PlayerType.BotAggressive);
-      verify(
-        () => mockSocket.emit(
-          LobbyEvent.AddBot.value,
-          PlayerType.BotAggressive.value,
-        ),
-      ).called(1);
+      verify(() => mockSocket.emit(LobbyEvent.AddBot.value, PlayerType.BotAggressive.value)).called(1);
     });
   });
 
   group('onMatchUpdate', () {
-    test(
-      'should complete without error when nav is null on any transition',
-      () async {
-        await expectLater(
-          LobbyService().onMatchUpdate(_matchData(), _matchData()),
-          completes,
-        );
-      },
-    );
+    test('should complete without error when nav is null on any transition', () async {
+      await expectLater(LobbyService().onMatchUpdate(_matchData(), _matchData()), completes);
+    });
 
-    test(
-      'should complete without error on Lobby to TurnStart transition',
-      () async {
-        await expectLater(
-          LobbyService().onMatchUpdate(
-            _matchData(state: MatchState.Lobby),
-            _matchData(state: MatchState.TurnStart),
-          ),
-          completes,
-        );
-      },
-    );
+    test('should complete without error on Lobby to TurnStart transition', () async {
+      await expectLater(LobbyService().onMatchUpdate(_matchData(state: MatchState.Lobby), _matchData(state: MatchState.TurnStart)), completes);
+    });
 
-    test(
-      'should complete without error when self player connects in Lobby state',
-      () async {
-        await expectLater(
-          LobbyService().onMatchUpdate(
-            _matchData(
-              state: MatchState.Lobby,
-              players: [_player(id: 'self', isConnected: false)],
-            ),
-            _matchData(
-              state: MatchState.Lobby,
-              players: [_player(id: 'self', isConnected: true)],
-            ),
-          ),
-          completes,
-        );
-      },
-    );
-
-    test('should complete without error when state does not change', () async {
+    test('should complete without error when self player connects in Lobby state', () async {
       await expectLater(
         LobbyService().onMatchUpdate(
-          _matchData(state: MatchState.TurnStart),
-          _matchData(state: MatchState.TurnStart),
+          _matchData(
+            state: MatchState.Lobby,
+            players: [_player(id: 'self', isConnected: false)],
+          ),
+          _matchData(
+            state: MatchState.Lobby,
+            players: [_player(id: 'self', isConnected: true)],
+          ),
         ),
         completes,
       );
     });
+
+    test('should complete without error when state does not change', () async {
+      await expectLater(LobbyService().onMatchUpdate(_matchData(state: MatchState.TurnStart), _matchData(state: MatchState.TurnStart)), completes);
+    });
   });
 
   group('initMatchUpdateListener', () {
-    test(
-      'should call onMatchUpdate after two successive match updates',
-      () async {
-        MatchService().onUpdate(_matchData(state: MatchState.Lobby));
-        await Future(() {});
-        MatchService().onUpdate(_matchData(state: MatchState.TurnStart));
-        await Future(() {});
-      },
-    );
+    test('should call onMatchUpdate after two successive match updates', () async {
+      MatchService().onUpdate(_matchData(state: MatchState.Lobby));
+      await Future(() {});
+      MatchService().onUpdate(_matchData(state: MatchState.TurnStart));
+      await Future(() {});
+    });
   });
 }

@@ -9,7 +9,6 @@ GameData GET_DEFAULT_GAME_DATA() {
     name: '',
     description: '',
     lastEdited: DateTime.fromMillisecondsSinceEpoch(0),
-    isVisible: false,
     mapData: MapData(
       items: {
         ItemType.Item1: [],

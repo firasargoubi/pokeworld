@@ -20,7 +20,7 @@ MapData _buildMapData({List<List<TileType>>? tiles}) =>
     MapData(tiles: tiles ?? _buildTiles(), items: {}, size: MapSize.Small, gameMode: GameMode.FFA);
 
 GameData _buildGameData(MapData mapData) =>
-    GameData(id: 'g1', name: 'Game', description: '', lastEdited: DateTime(2024), isVisible: true, mapData: mapData, thumbnail: '');
+    GameData(id: 'g1', name: 'Game', description: '', lastEdited: DateTime(2024), mapData: mapData, thumbnail: '');
 
 CombatData _emptyCombatData() => CombatData(
   lastCombatAction: CombatAction.None,
