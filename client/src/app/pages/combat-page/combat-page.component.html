@@ -122,6 +122,7 @@
         </div>
 
         <div id="combat-footer">
+            @if (isInCombat) {
             <div id="action-container">
                 <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png" />
                 <div class="container-body">
@@ -131,7 +132,9 @@
                     </div>
                     <div class="action-button" [ngClass]="{ disabled: visualData.selfPlayer.currentEscapes === 0 }" (click)="escapeButon()">
                         <img class="container-selection" src="./assets/images/menu/containers/combat-container/container-selection.png" />
-                        <p>{{ 'pages.combat.escape' | translate }} {{ visualData.selfPlayer.currentEscapes }}/{{ visualData.selfPlayer.maxEscapes }}</p>
+                        <p>
+                            {{ 'pages.combat.escape' | translate }} {{ visualData.selfPlayer.currentEscapes }}/{{ visualData.selfPlayer.maxEscapes }}
+                        </p>
                     </div>
                 </div>
                 <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
@@ -141,7 +144,8 @@
                 <div class="container-body">
                     <div class="stat-container">
                         <span class="stat-label"
-                            >{{ 'pages.combat.attackStat' | translate }} @if (matchService.data.players[visualData.selfPlayer.playerIndex].attackDice === 4) { (D4) } @else { (D6) }
+                            >{{ 'pages.combat.attackStat' | translate }} @if (matchService.data.players[visualData.selfPlayer.playerIndex].attackDice
+                            === 4) { (D4) } @else { (D6) }
                         </span>
                         <span class="stat-value" [ngClass]="{ buff: visualData.selfPlayer.attack > 4, nerf: visualData.selfPlayer.attack < 4 }"
                             >{{ visualData.selfPlayer.attack }}<span>/4</span></span
@@ -149,8 +153,8 @@
                     </div>
                     <div class="stat-container">
                         <span class="stat-label"
-                            >{{ 'pages.combat.defenseStat' | translate }} @if (matchService.data.players[visualData.selfPlayer.playerIndex].defenseDice === 4) { (D4) } @else { (D6)
-                            }</span
+                            >{{ 'pages.combat.defenseStat' | translate }} @if
+                            (matchService.data.players[visualData.selfPlayer.playerIndex].defenseDice === 4) { (D4) } @else { (D6) }</span
                         >
                         <span class="stat-value" [ngClass]="{ buff: visualData.selfPlayer.defense > 4, nerf: visualData.selfPlayer.defense < 4 }"
                             >{{ visualData.selfPlayer.defense }}<span>/4</span></span
@@ -167,6 +171,56 @@
                 </div>
                 <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
             </div>
+            } @else {
+            <div id="spectator-full-container">
+                <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png" />
+                <div class="container-body">
+                    <div class="spectator-container">
+                        @for (fighter of spectatorPanels; track fighter.playerIndex; let i = $index) {
+                        <div class="spectator-player">
+                            <div class="spectator-avatar">
+                                <img [src]="fighter.profilePicture" [alt]="fighter.name + ' profile picture'" />
+                            </div>
+                            <div class="spectator-details">
+                                <div class="fighter-header">
+                                    <p class="fighter-name">{{ fighter.name }}</p>
+                                </div>
+                                <div class="spectator-stat-line">
+                                    <span class="stat-label">{{ 'components.playerInfoPopup.healthPoints' | translate }}</span>
+                                    <span class="stat-value">{{ fighter.currentHealth }}/{{ fighter.maxHealth }}</span>
+                                </div>
+                                <div class="spectator-stat-line">
+                                    <span class="stat-label"
+                                        >{{ 'pages.combat.attackStat' | translate }} @if (fighter.attackDice === 4) { (D4) } @else { (D6) }
+                                    </span>
+                                    <span class="stat-value" [ngClass]="{ buff: fighter.attack > 4, nerf: fighter.attack < 4 }"
+                                        >{{ fighter.attack }}<span>/4</span></span
+                                    >
+                                </div>
+                                <div class="spectator-stat-line">
+                                    <span class="stat-label"
+                                        >{{ 'pages.combat.defenseStat' | translate }} @if (fighter.defenseDice === 4) { (D4) } @else { (D6) }
+                                    </span>
+                                    <span class="stat-value" [ngClass]="{ buff: fighter.defense > 4, nerf: fighter.defense < 4 }"
+                                        >{{ fighter.defense }}<span>/4</span></span
+                                    >
+                                </div>
+                                <div class="spectator-stat-line">
+                                    <span class="stat-label">{{ 'pages.combat.speed' | translate }}</span>
+                                    <span class="stat-value">{{ fighter.speed }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        @if (i === 0 && spectatorPanels.length > 1) {
+                        <div class="vs-divider">
+                            <span class="vs-text">VS</span>
+                        </div>
+                        } }
+                    </div>
+                </div>
+                <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
+            </div>
+            }
         </div>
     </div>
 </div>

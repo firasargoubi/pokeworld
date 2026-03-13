@@ -1,8 +1,8 @@
 import { User } from '@app/model/schema/user.schema';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
-import { Channel, ChannelMessage, ChannelUser } from '@common/interfaces/channel';
 import { UserService } from '@app/services/user/user.service';
+import { Channel, ChannelMessage, ChannelUser } from '@common/interfaces/channel';
 import { ChatMessage } from '@common/interfaces/chat-message';
 import { ChatEvent } from '@common/interfaces/socket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';

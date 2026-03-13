@@ -143,6 +143,10 @@ main {
         #{calc($base-size * 2)} 100%;
 }
 
+.profile-picture {
+    height: 100%;
+}
+
 .timer-text {
     position: absolute;
     overflow: visible;

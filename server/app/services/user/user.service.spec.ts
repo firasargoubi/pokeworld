@@ -1,16 +1,18 @@
+/* eslint-disable max-lines */
 import { CreateUserDto } from '@app/model/dto/user/create-user.dto';
+import { EditUserDto } from '@app/model/dto/user/edit-user.dto';
 import { LoginUserDto } from '@app/model/dto/user/login-user.dto';
 import { User, UserDocument, userSchema } from '@app/model/schema/user.schema';
-import { ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { GameService } from '@app/services/game/game.service';
+import { MatchService } from '@app/services/match/match.service';
+import { AppLanguage, AppTheme, DEFAULT_PREFERENCES } from '@common/interfaces/preferences';
+import { BadRequestException, ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
-import { GameService } from '@app/services/game/game.service';
 import { UserService } from './user.service';
-import { GameData } from '@common/interfaces/game-data';
-import { AppLanguage, AppTheme, DEFAULT_PREFERENCES } from '@common/interfaces/preferences';
 
 describe('UserService', () => {
     let service: UserService;
@@ -18,11 +20,16 @@ describe('UserService', () => {
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
     let gameService: SinonStubbedInstance<GameService>;
+    let matchServiceMock: { updateUsernameInMatches: jest.Mock };
 
     beforeAll(async () => {
         process.env.PASSWORD_PASSKEY = 'test-passkey';
         gameService = createStubInstance(GameService);
         gameService.getAllGames.resolves([]);
+        gameService.deleteGamesByOwner.resolves();
+        gameService.updateOwnerUsername.resolves();
+        matchServiceMock = { updateUsernameInMatches: jest.fn() };
+
         mongoServer = await MongoMemoryServer.create();
         const module: TestingModule = await Test.createTestingModule({
             imports: [
@@ -33,7 +40,7 @@ describe('UserService', () => {
                 }),
                 MongooseModule.forFeature([{ name: User.name, schema: userSchema }]),
             ],
-            providers: [UserService, { provide: GameService, useValue: gameService }],
+            providers: [UserService, { provide: GameService, useValue: gameService }, { provide: MatchService, useValue: matchServiceMock }],
         }).compile();
 
         service = module.get<UserService>(UserService);
@@ -43,6 +50,11 @@ describe('UserService', () => {
 
     afterEach(async () => {
         await userModel.deleteMany({});
+        matchServiceMock.updateUsernameInMatches.mockReset();
+        gameService.getAllGames.resetHistory();
+        gameService.deleteGame.resetHistory();
+        gameService.deleteGamesByOwner.resetHistory();
+        gameService.updateOwnerUsername.resetHistory();
     });
 
     afterAll(async () => {
@@ -205,6 +217,33 @@ describe('UserService', () => {
             expect(userInDb.passwordHash).toBeDefined();
             expect(userInDb.passwordHash).not.toBe('password123');
         });
+
+        it('should persist full profile picture when provided', async () => {
+            const createUserDto: CreateUserDto = {
+                username: 'avatarUser',
+                password: 'password123',
+                email: 'avatar@example.com',
+                profilePicture: 'smallAvatar',
+                fullProfilePicture: 'fullAvatar',
+            };
+
+            const result = await service.createUser(createUserDto);
+
+            expect(result.fullProfilePicture).toBe('fullAvatar');
+        });
+
+        it('should fallback to profile picture when full profile picture is missing', async () => {
+            const createUserDto: CreateUserDto = {
+                username: 'fallbackUser',
+                password: 'password123',
+                email: 'fallback@example.com',
+                profilePicture: 'smallAvatar',
+            };
+
+            const result = await service.createUser(createUserDto);
+
+            expect(result.fullProfilePicture).toBe('smallAvatar');
+        });
     });
 
     describe('login', () => {
@@ -273,6 +312,145 @@ describe('UserService', () => {
             };
 
             await expect(service.login(loginUserDto)).rejects.toThrow(ConflictException);
+        });
+    });
+
+    describe('editUser', () => {
+        it('should update password when old password matches', async () => {
+            const user = await service.createUser({
+                username: 'editPasswordUser',
+                password: 'oldPass123',
+                email: 'editPasswordUser@example.com',
+                profilePicture: '',
+            });
+
+            const editDto: EditUserDto = {
+                userId: user.userId,
+                password: 'newSecret456',
+                oldPassword: 'oldPass123',
+            };
+
+            const result = await service.editUser(editDto);
+            expect(result.userId).toBe(user.userId);
+
+            await service.logout(user.userId);
+            await expect(
+                service.login({
+                    username: 'editPasswordUser',
+                    password: 'newSecret456',
+                }),
+            ).resolves.toBeDefined();
+        });
+
+        it('should update username when new username is available', async () => {
+            const user = await service.createUser({
+                username: 'oldUsername',
+                password: 'password123',
+                email: 'oldUsername@example.com',
+                profilePicture: '',
+            });
+
+            const editDto: EditUserDto = {
+                userId: user.userId,
+                username: 'newusername',
+            };
+
+            const result = await service.editUser(editDto);
+            expect(result.username).toBe('NEWUSERNAME');
+            expect(gameService.updateOwnerUsername.calledWith(user.userId, 'NEWUSERNAME')).toBe(true);
+            expect(matchServiceMock.updateUsernameInMatches).toHaveBeenCalledWith(user.userId, 'NEWUSERNAME');
+        });
+
+        it('should not propagate username update to matches when only password changes', async () => {
+            const user = await service.createUser({
+                username: 'editPasswordOnly',
+                password: 'oldPass123',
+                email: 'editpasswordonly@example.com',
+                profilePicture: '',
+            });
+
+            const editDto: EditUserDto = {
+                userId: user.userId,
+                password: 'newSecret456',
+                oldPassword: 'oldPass123',
+            };
+
+            await service.editUser(editDto);
+            expect(matchServiceMock.updateUsernameInMatches).not.toHaveBeenCalled();
+            expect(gameService.updateOwnerUsername.called).toBe(false);
+        });
+
+        it('should throw ConflictException when username already exists', async () => {
+            await service.createUser({
+                username: 'TAKENUSERNAME',
+                password: 'password123',
+                email: 'taken@example.com',
+                profilePicture: '',
+            });
+
+            const user = await service.createUser({
+                username: 'editable',
+                password: 'password123',
+                email: 'editable@example.com',
+                profilePicture: '',
+            });
+
+            const editDto: EditUserDto = {
+                userId: user.userId,
+                username: 'takenusername',
+            };
+
+            await expect(service.editUser(editDto)).rejects.toThrow(ConflictException);
+        });
+
+        it('should throw UnauthorizedException when old password is invalid', async () => {
+            const user = await service.createUser({
+                username: 'wrongPwdUser',
+                password: 'correctPassword',
+                email: 'wrongPwd@example.com',
+                profilePicture: '',
+            });
+
+            const editDto: EditUserDto = {
+                userId: user.userId,
+                password: 'newPassword',
+                oldPassword: 'incorrect',
+            };
+
+            await expect(service.editUser(editDto)).rejects.toThrow(UnauthorizedException);
+        });
+
+        it('should throw BadRequestException when no changes are provided', async () => {
+            const user = await service.createUser({
+                username: 'noChangeUser',
+                password: 'password123',
+                email: 'nochange@example.com',
+                profilePicture: '',
+            });
+
+            const editDto: EditUserDto = {
+                userId: user.userId,
+            };
+
+            await expect(service.editUser(editDto)).rejects.toThrow(BadRequestException);
+        });
+
+        it('should throw UnauthorizedException when user is not logged in', async () => {
+            const user = await service.createUser({
+                username: 'loggedOutUser',
+                password: 'password123',
+                email: 'loggedout@example.com',
+                profilePicture: '',
+            });
+
+            await service.logout(user.userId);
+
+            const editDto: EditUserDto = {
+                userId: user.userId,
+                username: 'SOMETHING',
+            };
+
+            await expect(service.editUser(editDto)).rejects.toThrow(UnauthorizedException);
         });
     });
 
@@ -363,16 +541,8 @@ describe('UserService', () => {
                 email: 'testUser@example.com',
                 profilePicture: '',
             });
-            const mockGames = [
-                { _id: 'game1', owner: { userId: user.userId } },
-                { _id: 'game2', owner: { userId: 'randomId' } },
-                { _id: 'game3', owner: { userId: user.userId } },
-            ] as GameData[];
-            gameService.getAllGames.resolves(mockGames);
             await service.deleteUser(user.userId);
-            expect(gameService.deleteGame.calledWith('game1')).toBe(true);
-            expect(gameService.deleteGame.calledWith('game3')).toBe(true);
-            expect(gameService.deleteGame.calledWith('game2')).toBe(false);
+            expect(gameService.deleteGamesByOwner.calledWith(user.userId)).toBe(true);
         });
     });
 

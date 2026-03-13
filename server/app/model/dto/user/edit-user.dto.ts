@@ -1,15 +1,22 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 
 export class EditUserDto {
     @ApiProperty()
     userId: string;
 
-    @ApiProperty({ description: 'Password', example: 'SecurePass123!' })
+    @ApiPropertyOptional({ description: 'New username', example: 'Trainer_001' })
     @IsString()
-    password: string;
+    @IsOptional()
+    username?: string;
 
-    @ApiProperty({ description: 'Password', example: 'SecurePass123!' })
+    @ApiPropertyOptional({ description: 'New password', example: 'SecurePass123!' })
     @IsString()
-    oldPassword: string;
+    @IsOptional()
+    password?: string;
+
+    @ApiPropertyOptional({ description: 'Old password', example: 'SecurePass123!' })
+    @IsString()
+    @IsOptional()
+    oldPassword?: string;
 }

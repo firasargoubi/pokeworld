@@ -77,14 +77,18 @@ $d6-icon: '../../../assets/images/menu/icons/small-d6.png';
     line-height: calc(0.15 * $map-size);
     height: calc(0.15 * $map-size);
     width: calc(0.56 * $map-size);
-    
+
     font-size: calc(0.08 * $map-size);
     text-shadow:
         calc(0.06 * $map-size * 0.0172) calc(0.06 * $map-size * 0.006) 0 $dark-text-shadow,
         calc(0.06 * $map-size * 0.0344) calc(0.06 * $map-size * 0.012) 0 $dark-text-shadow,
         calc(0.06 * $map-size * 0.0516) calc(0.06 * $map-size * 0.018) 0 $dark-text-shadow,
         calc(0.06 * $map-size * 0.0688) calc(0.06 * $map-size * 0.024) 0 $dark-text-shadow,
-        calc(0.06 * $map-size * 0.0860) calc(0.06 * $map-size * 0.030) 0 $dark-text-shadow;
+        calc(0.06 * $map-size * 0.086) calc(0.06 * $map-size * 0.03) 0 $dark-text-shadow;
+}
+
+.profile-picture {
+    height: 60%;
 }
 
 button.close-button {
@@ -120,14 +124,14 @@ button.close-button:active {
 .movement-text {
     width: calc(0.75 * $map-size);
     height: calc(0.06 * $map-size);
-    
+
     font-size: calc(0.05 * $map-size);
     text-shadow:
         calc(0.03 * $map-size * 0.0172) calc(0.03 * $map-size * 0.006) 0 $dark-text-shadow,
         calc(0.03 * $map-size * 0.0344) calc(0.03 * $map-size * 0.012) 0 $dark-text-shadow,
         calc(0.03 * $map-size * 0.0516) calc(0.03 * $map-size * 0.018) 0 $dark-text-shadow,
         calc(0.03 * $map-size * 0.0688) calc(0.03 * $map-size * 0.024) 0 $dark-text-shadow,
-        calc(0.03 * $map-size * 0.0860) calc(0.03 * $map-size * 0.030) 0 $dark-text-shadow;
+        calc(0.03 * $map-size * 0.086) calc(0.03 * $map-size * 0.03) 0 $dark-text-shadow;
 }
 
 .movement-bar {
@@ -206,7 +210,7 @@ button.close-button:active {
 .items-container {
     width: calc(0.75 * $map-size);
     height: calc(0.195 * $map-size);
-    margin-top: calc(0.060 * $map-size);
+    margin-top: calc(0.06 * $map-size);
     margin-left: calc(0.083 * $map-size);
     overflow: visible;
 }
@@ -259,13 +263,13 @@ button.close-button:active {
     height: calc(0.195 * 0.5 * $map-size);
     line-height: calc(0.195 * 0.5 * $map-size);
     font-size: calc(0.05 * $map-size);
-    width: calc(0.20 * $map-size);
+    width: calc(0.2 * $map-size);
     text-shadow:
         calc(0.03 * $map-size * 0.0172) calc(0.03 * $map-size * 0.006) 0 $dark-text-shadow,
         calc(0.03 * $map-size * 0.0344) calc(0.03 * $map-size * 0.012) 0 $dark-text-shadow,
         calc(0.03 * $map-size * 0.0516) calc(0.03 * $map-size * 0.018) 0 $dark-text-shadow,
         calc(0.03 * $map-size * 0.0688) calc(0.03 * $map-size * 0.024) 0 $dark-text-shadow,
-        calc(0.03 * $map-size * 0.0860) calc(0.03 * $map-size * 0.030) 0 $dark-text-shadow;
+        calc(0.03 * $map-size * 0.086) calc(0.03 * $map-size * 0.03) 0 $dark-text-shadow;
 }
 
 .dice {

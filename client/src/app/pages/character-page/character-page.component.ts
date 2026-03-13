@@ -10,11 +10,11 @@ import { PopupMessage } from '@app/consts/popup-message.const';
 import { CharacterVisualData } from '@app/interfaces/character-visual-data';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { UserService } from '@app/services/user/user.service';
-import { I18nService } from '@app/services/i18n/i18n.service';
 import { AVATAR_DATA, MAX_SELECTABLE_AVATAR_INDEX, MIN_SELECTABLE_AVATAR_INDEX } from '@common/consts/avatar-data.const';
 import { BONUS_STAT, DEFAULT_STAT } from '@common/consts/player-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
@@ -29,7 +29,7 @@ import { TranslateModule } from '@ngx-translate/core';
     styleUrl: './character-page.component.scss',
 })
 export class CharacterPageComponent {
-    username: string = '';
+    user: UserInfo | null = null;
     visualData: CharacterVisualData = structuredClone(DEFAULT_CHARACTER_VISUAL_DATA);
     readonly audioService: AudioService = inject(AudioService);
     readonly clickValue = SoundEffect.Click;
@@ -42,7 +42,7 @@ export class CharacterPageComponent {
 
     constructor() {
         this.userService.user$.subscribe((user: UserInfo | null) => {
-            this.username = user?.username || '';
+            this.user = user;
         });
         if (this.matchService.isInMatch()) {
             this.updateAvatarList();
@@ -120,11 +120,14 @@ export class CharacterPageComponent {
 
     private getPlayerData(): PlayerData {
         const playerData = this.matchService.selfPlayer;
-        playerData.name = this.username.toUpperCase().trim();
+        playerData.name = this.user?.username.toUpperCase().trim() || 'Joueur';
         playerData.health = this.visualData.isHpSelected ? BONUS_STAT : DEFAULT_STAT;
         playerData.speed = this.visualData.isHpSelected ? DEFAULT_STAT : BONUS_STAT;
         playerData.attackDice = this.visualData.isAttackSelected ? DiceType.D6 : DiceType.D4;
         playerData.defenseDice = this.visualData.isAttackSelected ? DiceType.D4 : DiceType.D6;
+        playerData.profilePicture = this.user?.profilePicture || '';
+        playerData.fullProfilePicture = this.user?.fullProfilePicture || '';
+        playerData.userId = this.user?.userId || '';
         return playerData;
     }
 

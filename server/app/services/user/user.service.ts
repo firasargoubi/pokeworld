@@ -1,20 +1,22 @@
 import { CreateUserDto } from '@app/model/dto/user/create-user.dto';
 import { EditUserDto } from '@app/model/dto/user/edit-user.dto';
 import { LoginUserDto } from '@app/model/dto/user/login-user.dto';
-import { UpdatePreferencesDto } from '@app/model/dto/user/update-preferences.dto';
 import { UserResponseDto } from '@app/model/dto/user/response-user.dto';
+import { UpdatePreferencesDto } from '@app/model/dto/user/update-preferences.dto';
 import { User, UserDocument } from '@app/model/schema/user.schema';
+import { GameService } from '@app/services/game/game.service';
+import { MatchService } from '@app/services/match/match.service';
 import { AppLanguage, AppTheme, DEFAULT_PREFERENCES, UserPreferences } from '@common/interfaces/preferences';
-import { Inject, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, forwardRef, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as crypto from 'crypto';
 import { Model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
-import { GameService } from '@app/services/game/game.service';
 
 @Injectable()
 export class UserService {
     @Inject(GameService) private readonly gameService: GameService;
+    @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
     private readonly passkey: string;
     private userSocketMap: Map<string, string> = new Map<string, string>();
 
@@ -72,6 +74,7 @@ export class UserService {
             email: createUserDto.email,
             username: createUserDto.username,
             profilePicture: createUserDto.profilePicture,
+            fullProfilePicture: createUserDto.fullProfilePicture ?? createUserDto.profilePicture,
             passwordHash,
             userId,
             isLoggedIn: true,
@@ -116,13 +119,7 @@ export class UserService {
             throw new NotFoundException('User not found');
         }
 
-        const allGames = await this.gameService.getAllGames();
-        for (const game of allGames) {
-            const isOwner = game.owner?.userId === userId;
-            if (isOwner) {
-                this.gameService.deleteGame(game._id);
-            }
-        }
+        await this.gameService.deleteGamesByOwner(userId);
 
         user.username = '[supprimé]';
         user.email = 'None';
@@ -135,14 +132,50 @@ export class UserService {
     }
 
     async editUser(editUserDto: EditUserDto): Promise<UserResponseDto> {
-        const passwordHash = this.hashPassword(editUserDto.password);
-        const oldPasswordHash = this.hashPassword(editUserDto.oldPassword);
-        const user = await this.userModel.findOne({ userId: editUserDto.userId, passwordHash: oldPasswordHash, isLoggedIn: true }).exec();
+        const user = await this.userModel.findOne({ userId: editUserDto.userId, isLoggedIn: true }).exec();
         if (!user) {
-            throw new UnauthorizedException('Wrong password');
+            throw new UnauthorizedException('User is not connected');
         }
-        user.passwordHash = passwordHash;
+
+        let hasChanges = false;
+        let hasUsernameChanged = false;
+
+        if (editUserDto.password) {
+            if (!editUserDto.oldPassword) throw new UnauthorizedException('Old password is required');
+            const oldPasswordHash = this.hashPassword(editUserDto.oldPassword);
+            if (user.passwordHash !== oldPasswordHash) {
+                throw new UnauthorizedException('Wrong password');
+            }
+            user.passwordHash = this.hashPassword(editUserDto.password);
+            hasChanges = true;
+        }
+
+        if (typeof editUserDto.username === 'string') {
+            const sanitizedUsername = editUserDto.username.trim();
+            if (!sanitizedUsername) {
+                throw new BadRequestException('Username cannot be empty');
+            }
+            const normalizedUsername = sanitizedUsername.toUpperCase();
+            if (normalizedUsername !== user.username) {
+                const usernameTaken = await this.checkUserExists({ username: normalizedUsername, deleted: false });
+                if (usernameTaken) {
+                    throw new ConflictException('Username already exists');
+                }
+                user.username = normalizedUsername;
+                hasChanges = true;
+                hasUsernameChanged = true;
+            }
+        }
+
+        if (!hasChanges) {
+            throw new BadRequestException('No changes provided');
+        }
+
         await user.save();
+        if (hasUsernameChanged) {
+            await this.gameService.updateOwnerUsername(user.userId, user.username);
+            this.matchService?.updateUsernameInMatches(user.userId, user.username);
+        }
         return this.toUserResponse(user);
     }
 
@@ -184,6 +217,7 @@ export class UserService {
             username: user.username,
             email: user.email,
             profilePicture: user.profilePicture,
+            fullProfilePicture: user.fullProfilePicture ?? user.profilePicture,
             balance: user.balance,
             isLoggedIn: user.isLoggedIn,
             preferences,

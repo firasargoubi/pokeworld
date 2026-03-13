@@ -20,7 +20,7 @@
         "invalidCredentials": "Username or password is invalid",
         "usernameTaken": "Username is already taken",
         "accountConnected": "This account is already connected on another platform",
-        "changeConfirmed": "Password changed successfully!",
+        "changeConfirmed": "Change applied successfully!",
         "deleteAccountConfirmation": "Do you really want to delete your account?",
         "noWinner": "No winner",
         "unauthorizedAccessToGame": "This game is no longer accessible due to a change of state"
@@ -251,9 +251,14 @@
             "emailPlaceholder": "Enter your email",
             "avatar": "Choose an avatar",
             "password": "Password",
+            "confirmPassword": "Confirm password",
+            "confirmPasswordPlaceholder": "Re-enter your password",
             "loginButton": "Sign in",
             "createAccountButton": "Create account",
-            "invalidEmail": "Invalid email address"
+            "invalidEmail": "Invalid email address",
+            "passwordMismatch": "Passwords do not match",
+            "confirmAccountCreation": "Do you want to confirm account creation?",
+            "avatarAlt": "Avatar {{index}}"
         },
         "botCreation": {
             "title": "Add a bot",
@@ -319,8 +324,24 @@
             "oldPassword": "Current password",
             "newPassword": "New password",
             "confirm": "Confirm",
-            "passwordFieldsRequired": "Both fields are required",
-            "passwordChangeError": "Error while changing password"
+            "passwordFieldsRequired": "All password fields are required",
+            "passwordMismatch": "Passwords do not match",
+            "passwordUnchanged": "New password must be different from current password",
+            "passwordChangeError": "Error while changing password",
+            "configure": "Configure",
+            "accountSettingsTitle": "Account settings",
+            "close": "Close",
+            "usernameSectionTitle": "Username",
+            "newUsernamePlaceholder": "New name",
+            "updateUsername": "Update name",
+            "passwordSectionTitle": "Password",
+            "confirmPasswordPlaceholder": "Confirm password",
+            "updatePassword": "Update password",
+            "usernameRequired": "Name is required",
+            "usernameUnchanged": "No changes detected",
+            "confirmUsernameChange": "Do you want to confirm the username change?",
+            "usernameUpdateError": "Error while changing the name",
+            "avatarAlt": "Full avatar image"
         },
         "warningConfirmation": {
             "close": "Close",

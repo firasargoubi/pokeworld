@@ -1,32 +1,92 @@
 <div class="user-popup">
-    <div class="user-inner">
-        <div class="user-info">
-            <div class="avatar-box">
-                <img [src]="currentUser?.profilePicture || avatarImage" alt="Avatar" class="avatar-image" />
+    <div class="user-card" [class.show-back]="showBack" [class.animations-enabled]="animationsEnabled">
+        <div class="card-face card-front">
+            <div class="front-content">
+                <div class="info-email">
+                    <span class="label">{{ 'components.userPopup.emailLabel' | translate }}</span>
+                    <span class="value">{{ currentUser?.email || ('components.userPopup.noneValue' | translate) }}</span>
+                </div>
+                <div class="info-name">
+                    <span class="label">{{ 'components.userPopup.nameLabel' | translate }}</span>
+                    <span class="value">{{ currentUser?.username || ('components.userPopup.noneValue' | translate) }}</span>
+                </div>
+                <div class="avatar-frame">
+                    <img [src]="avatarToDisplay" [attr.alt]="'components.userPopup.avatarAlt' | translate" class="full-avatar" />
+                </div>
+                <div class="button-row">
+                    <button class="primary-button" (click)="toggleCard()" [disabled]="!currentUser">
+                        {{ 'components.userPopup.configure' | translate }}
+                    </button>
+                </div>
             </div>
+        </div>
 
-            <div class="info-row">
-                <span class="label">{{ 'components.userPopup.nameLabel' | translate }}</span>
-                <span class="value">{{ currentUser ? currentUser.username : ('components.userPopup.noneValue' | translate) }}</span>
+        <div class="card-face card-back">
+            <div class="back-content">
+                <div class="back-header">
+                    <p class="back-title">{{ 'components.userPopup.accountSettingsTitle' | translate }}</p>
+                    <button class="text-button" (click)="toggleCard()">
+                        {{ 'components.userPopup.close' | translate }}
+                    </button>
+                </div>
+
+                <div class="form-section">
+                    <p class="section-title">{{ 'components.userPopup.usernameSectionTitle' | translate }}</p>
+                    <input
+                        type="text"
+                        [ngModel]="newUsername"
+                        (ngModelChange)="newUsername = ($event || '').toUpperCase()"
+                        class="text-input pixel-placeholder"
+                        [placeholder]="'components.userPopup.newUsernamePlaceholder' | translate"
+                        style="text-transform: uppercase"
+                    />
+                    @if(usernameError) {
+                    <div class="error">{{ usernameError }}</div>
+                    }
+                    <button class="primary-button" (click)="updateUsername()" [disabled]="isUpdatingUsername">
+                        {{ 'components.userPopup.updateUsername' | translate }}
+                    </button>
+                </div>
+
+                <div class="form-section">
+                    <p class="section-title">{{ 'components.userPopup.passwordSectionTitle' | translate }}</p>
+                    <div class="input-row">
+                        <input
+                            type="password"
+                            [(ngModel)]="oldPassword"
+                            class="text-input pixel-placeholder"
+                            [placeholder]="'components.userPopup.oldPassword' | translate"
+                        />
+                        <input
+                            type="password"
+                            [(ngModel)]="newPassword"
+                            class="text-input pixel-placeholder"
+                            [placeholder]="'components.userPopup.newPassword' | translate"
+                        />
+                        <input
+                            type="password"
+                            [(ngModel)]="confirmNewPassword"
+                            class="text-input pixel-placeholder"
+                            [placeholder]="'components.userPopup.confirmPasswordPlaceholder' | translate"
+                        />
+                    </div>
+                    @if(passwordError) {
+                    <div class="error">{{ passwordError }}</div>
+                    }
+                    <button class="primary-button" (click)="editPassword()" [disabled]="isUpdatingPassword">
+                        {{ 'components.userPopup.updatePassword' | translate }}
+                    </button>
+                </div>
+
+                <div class="actions-row">
+                    <button class="secondary-button" (click)="logout()">
+                        {{ 'components.userPopup.logout' | translate }}
+                    </button>
+                    <button class="danger-button" (click)="deleteAccount()">
+                        {{ 'components.userPopup.deleteAccount' | translate }}
+                    </button>
+                </div>
             </div>
-            <div class="info-row">
-                <span class="label">{{ 'components.userPopup.emailLabel' | translate }}</span>
-                <span class="value">{{ currentUser ? currentUser.email : ('components.userPopup.noneValue' | translate) }}</span>
-            </div>
         </div>
-        <div class="buttons">
-            <button (click)="logout()" class="logout-button">{{ 'components.userPopup.logout' | translate }}</button>
-            <button (click)="deleteAccount()" class="logout-button" style="background: #ff6666; color: #fff">{{ 'components.userPopup.deleteAccount' | translate }}</button>
-            <button (click)="toggleEditPassword()" class="logout-button" style="background: #4fc3f7; color: #fff">{{ 'components.userPopup.editPassword' | translate }}</button>
-        </div>
-        @if(editMode) {
-        <div class="edit-password-row">
-            <input type="password" [(ngModel)]="oldPassword" [placeholder]="'components.userPopup.oldPassword' | translate" class="input-password pixel-placeholder" />
-            <input type="password" [(ngModel)]="newPassword" [placeholder]="'components.userPopup.newPassword' | translate" class="input-password pixel-placeholder" />
-            <button (click)="editPassword()" class="logout-button" style="background: #4fc3f7; color: #fff; margin-left: 8px">{{ 'components.userPopup.confirm' | translate }}</button>
-        </div>
-        @if(passwordError) {
-        <div class="error">{{ passwordError | translate }}</div>
-        } }
     </div>
 </div>

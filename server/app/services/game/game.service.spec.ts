@@ -1,13 +1,13 @@
+import { Game, GameDocument, gameSchema } from '@app/model/schema/game.schema';
+import { GameService } from '@app/services/game/game.service';
+import { GameState } from '@common/interfaces/game-state.enum';
+import { ItemType } from '@common/interfaces/item-type.enum';
+import { GameMode, MapSize } from '@common/interfaces/map-data';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
-import { GameService } from '@app/services/game/game.service';
-import { Game, GameDocument, gameSchema } from '@app/model/schema/game.schema';
-import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { ItemType } from '@common/interfaces/item-type.enum';
-import { MapSize, GameMode } from '@common/interfaces/map-data';
-import { GameState } from '@common/interfaces/game-state.enum';
 
 describe('GameService', () => {
     let service: GameService;
@@ -170,6 +170,32 @@ describe('GameService', () => {
     it('deleteGame() should fail if mongo query failed', async () => {
         jest.spyOn(gameModel, 'findByIdAndDelete').mockResolvedValueOnce(null);
         await expect(service.deleteGame(fakeGame._id)).rejects.toBeTruthy();
+    });
+
+    it('deleteGamesByOwner() should remove every game owned by the user', async () => {
+        await gameModel.create({ ...fakeGame, name: 'Owner Game 1', owner: { userId: 'owner-1', userName: 'OWNER-1' } });
+        await gameModel.create({ ...fakeGame, name: 'Owner Game 2', owner: { userId: 'owner-1', userName: 'OWNER-1' } });
+        await gameModel.create({ ...fakeGame, name: 'Other Owner Game', owner: { userId: 'owner-2', userName: 'OWNER-2' } });
+
+        await service.deleteGamesByOwner('owner-1');
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        expect(await gameModel.countDocuments({ 'owner.userId': 'owner-1' })).toEqual(0);
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        expect(await gameModel.countDocuments({ 'owner.userId': 'owner-2' })).toEqual(1);
+    });
+
+    it('updateOwnerUsername() should update owner username on every owned game', async () => {
+        await gameModel.create({ ...fakeGame, name: 'Owner Game 1', owner: { userId: 'owner-1', userName: 'OLD' } });
+        await gameModel.create({ ...fakeGame, name: 'Owner Game 2', owner: { userId: 'owner-1', userName: 'OLD' } });
+        await gameModel.create({ ...fakeGame, name: 'Other Owner Game', owner: { userId: 'owner-2', userName: 'OTHER' } });
+
+        await service.updateOwnerUsername('owner-1', 'NEW-NAME');
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        const updatedGames = await gameModel.find({ 'owner.userId': 'owner-1' }).exec();
+        expect(updatedGames.every((game) => game.owner.userName === 'NEW-NAME')).toBe(true);
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        const unaffectedGame = await gameModel.findOne({ 'owner.userId': 'owner-2' }).exec();
+        expect(unaffectedGame.owner.userName).toBe('OTHER');
     });
 
     it('isNameUnique() should return true if name is unique', async () => {

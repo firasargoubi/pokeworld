@@ -10,12 +10,14 @@ import { CombatService } from '@app/services/combat/combat.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { UserService } from '@app/services/user/user.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatAction, MatchData, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
 import { MOCK_MATCH_DATAS, MOCK_PLAYER_COMBAT_DATAS } from '@common/test-consts/mock-matches';
 import { TranslateModule } from '@ngx-translate/core';
 import { CombatPageComponent } from './combat-page.component';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-chat',
@@ -36,6 +38,7 @@ describe('CombatPageComponent', () => {
     let mockTimer: jasmine.SpyObj<Timer>;
     let mockAudioService: jasmine.SpyObj<AudioService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
+    let mockUserService: Partial<UserService>;
 
     beforeEach(async () => {
         mockMatchService = jasmine.createSpyObj('MatchService', ['isInMatch', 'isState'], {
@@ -48,6 +51,7 @@ describe('CombatPageComponent', () => {
         mockTimer = jasmine.createSpyObj('Timer', ['maxTime']);
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage', 'playCombatEffect']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'keepMessages']);
+        mockUserService = { user$: of(null) };
 
         mockCombatService.timer = mockTimer;
 
@@ -60,6 +64,7 @@ describe('CombatPageComponent', () => {
                 { provide: Router, useValue: mockRouter },
                 { provide: AudioService, useValue: mockAudioService },
                 { provide: PopupService, useValue: popupServiceSpy },
+                { provide: UserService, useValue: mockUserService },
             ],
         }).compileComponents();
 
@@ -129,6 +134,23 @@ describe('CombatPageComponent', () => {
         const updatePlayersCombatDataSpy = spyOn(component as any, 'updatePlayersCombatData').and.callThrough();
         component['updatePlayersCombatData']();
         expect(updatePlayersCombatDataSpy).toHaveBeenCalled();
+    });
+
+    it('should populate spectator panels with current combatants', () => {
+        mockMatchService.selfIndex = 3;
+        component['updatePlayersCombatData']();
+        expect(component.spectatorPanels.length).toEqual(mockMatchService.data.combatData.playersCombatData.length);
+        expect(component.spectatorPanels[0].name).toEqual(mockMatchService.data.players[component.spectatorPanels[0].playerIndex].name);
+    });
+
+    it('should fallback to avatar art when a profile picture is missing', () => {
+        mockMatchService.data.players[0].profilePicture = undefined;
+        mockMatchService.data.players[1].profilePicture = undefined;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        component['updateSpectatorPanels']();
+        expect(component.spectatorPanels[0].profilePicture).toEqual(
+            AVATAR_DATA[mockMatchService.data.players[component.spectatorPanels[0].playerIndex].avatar].imageCentered,
+        );
     });
 
     it('should set enemyImage to missingNo when enemy player has Item6', () => {

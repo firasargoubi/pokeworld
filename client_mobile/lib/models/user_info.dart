@@ -4,6 +4,7 @@ class UserInfo {
     required this.userId,
     required this.email,
     required this.profilePicture,
+    required this.fullProfilePicture,
     required this.balance,
     required this.createdAt,
   });
@@ -12,6 +13,7 @@ class UserInfo {
   String userId;
   String email;
   String profilePicture;
+  String fullProfilePicture;
   num balance;
   DateTime? createdAt;
 
@@ -21,6 +23,7 @@ class UserInfo {
       userId: json['userId'].toString(),
       email: (json['email'] ?? '').toString(),
       profilePicture: (json['profilePicture'] ?? '').toString(),
+      fullProfilePicture: (json['fullProfilePicture'] ?? '').toString(),
       balance: (json['balance'] ?? 0) as num,
       createdAt: json['createdAt'] == null ? null : DateTime.tryParse(json['createdAt'].toString()),
     );
@@ -32,6 +35,7 @@ class UserInfo {
       'username': username,
       'email': email,
       'profilePicture': profilePicture,
+      'fullProfilePicture': fullProfilePicture,
       'balance': balance,
       'createdAt': createdAt?.toIso8601String(),
     };

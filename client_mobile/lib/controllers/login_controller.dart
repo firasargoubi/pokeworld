@@ -16,6 +16,13 @@ class LoginController {
   bool isLoading = false;
   String? errorMessage;
   String selectedAvatar = USER_PROFILE_PICTURES.first;
+  String get selectedFullAvatar {
+    final index = USER_PROFILE_PICTURES.indexOf(selectedAvatar);
+    if (index != -1 && index < USER_FULL_PROFILE_PICTURES.length) {
+      return USER_FULL_PROFILE_PICTURES[index];
+    }
+    return selectedAvatar;
+  }
 
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -56,7 +63,7 @@ class LoginController {
 
     try {
       if (isRegister) {
-        await _userService.register(rawUsername, rawEmail, rawPassword, selectedAvatar);
+        await _userService.register(rawUsername, rawEmail, rawPassword, selectedAvatar, selectedFullAvatar);
         _popupService.showPopup(PopupMessage(message: PopupMessages.SuccessfulAccountCreation.message, hasCloseButton: true, isConfirmation: false));
       } else {
         await _userService.login(rawUsername, rawPassword);

@@ -12,4 +12,5 @@ export interface LobbyPlayerVisualData {
     health: number;
     id: string;
     playerType: string;
+    profilePicture?: string;
 }

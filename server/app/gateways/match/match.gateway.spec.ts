@@ -155,6 +155,7 @@ describe('MatchGateway', () => {
             passwordHash: 'testHash',
             email: 'abc@abc.abc',
             profilePicture: '',
+            fullProfilePicture: '',
             isLoggedIn: true,
             balance: 0,
             createdAt: new Date(),

@@ -25,6 +25,7 @@
                 autofocus
                 autocomplete="off"
                 style="text-transform: uppercase"
+                (input)="onUsernameInput()"
                 (click)="this.audioService.playEffect(this.clickValue)"
             />
         </div>
@@ -50,7 +51,7 @@
                     [class.selected]="selectedAvatar === avatar"
                     (click)="selectAvatar(avatar)"
                     class="avatar-option"
-                    [alt]="'Avatar ' + ($index + 1)"
+                    [attr.alt]="'components.authPopup.avatarAlt' | translate: { index: $index + 1 }"
                 />
                 }
             </div>
@@ -61,6 +62,18 @@
             <div class="left-label-small">{{ 'components.authPopup.password' | translate }}</div>
             <input class="input-password" type="password" [(ngModel)]="password" (click)="this.audioService.playEffect(this.clickValue)" />
         </div>
+        @if(isCreating) {
+        <div class="form-row">
+            <div class="left-label-small">{{ 'components.authPopup.confirmPassword' | translate }}</div>
+            <input
+                class="input-password"
+                type="password"
+                [(ngModel)]="confirmPassword"
+                [placeholder]="'components.authPopup.confirmPasswordPlaceholder' | translate"
+                (click)="this.audioService.playEffect(this.clickValue)"
+            />
+        </div>
+        }
         @if(errorMessage) {
         <div class="error">{{ errorMessage | translate }}</div>
         }

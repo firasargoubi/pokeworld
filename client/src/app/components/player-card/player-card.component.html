@@ -17,7 +17,9 @@
         <div class="add-instruction">{{ 'components.playerCard.add' | translate }}</div>
         <span class="player-name">
             {{ player.name }}
-            @if (player.playerType === 'botAggressive') {
+            @if( player.profilePicture) {
+            <img src="{{ player.profilePicture }}" class="profile-picture" />
+            } @if (player.playerType === 'botAggressive') {
             <span class="bot-icon-aggresive"></span>
             <span class="bot-type aggresive">{{ 'components.playerCard.aggressive' | translate }}</span>
 

@@ -11,7 +11,7 @@
                         <img src="./assets/images/menu/stat-bar/shadow.png" id="avatar-shadow" />
                     </div>
                     <span id="name-form">
-                        <div id="name-input" readonly style="text-transform: uppercase">{{ username }}</div>
+                        <div id="name-input" readonly style="text-transform: uppercase">{{ user?.username }}</div>
                         <p id="name-input-border">----------------</p>
                     </span>
                 </div>
@@ -100,7 +100,7 @@
         </main>
     </div>
     <footer id="page-footer">
-        <div class="main-button-container" [class.disabled]="!username || !visualData.isAvatarSelected" (click)="joinLobby()">
+        <div class="main-button-container" [class.disabled]="!user?.username || !visualData.isAvatarSelected" (click)="joinLobby()">
             <div class="button-edge"></div>
             <div class="button-body"><p>{{ 'pages.character.startGame' | translate }}</p></div>
             <div class="button-edge"></div>

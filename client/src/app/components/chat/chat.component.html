@@ -112,6 +112,9 @@
             } } @case (chatTab.Match) { @for (message of chatMessages; track $index) {
             <p class="messages">
                 <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
+                @if(message.profilePicture){
+                <img [src]="message.profilePicture" alt="avatar" class="chat-avatar" />
+                }
                 <span class="message-content sender">{{ message.sender }}: </span>
                 <span class="message-content message">{{ message.content }}</span>
             </p>

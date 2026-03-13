@@ -17,6 +17,7 @@ describe('UserController', () => {
         isLoggedIn: false,
         email: 'user@test.com',
         profilePicture: '',
+        fullProfilePicture: '',
         balance: 0,
         preferences: DEFAULT_PREFERENCES,
     };

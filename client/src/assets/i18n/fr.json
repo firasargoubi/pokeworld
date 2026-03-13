@@ -20,7 +20,7 @@
         "invalidCredentials": "Le nom d'utilisateur ou le mot de passe est invalide",
         "usernameTaken": "Le nom d'utilisateur est déjà utilisé",
         "accountConnected": "Le compte est déjà connecté sur une autre plateforme",
-        "changeConfirmed": "Le mot de passe a été changé !",
+        "changeConfirmed": "Le changement a été appliqué !",
         "deleteAccountConfirmation": "Voulez-vous vraiment supprimer votre compte ?",
         "noWinner": "Aucun gagnant",
         "unauthorizedAccessToGame": "Ce jeu n'est plus accessible en raison d'un changement de son etat"
@@ -251,9 +251,14 @@
             "emailPlaceholder": "Entrez votre courriel",
             "avatar": "Choisissez un avatar",
             "password": "Mot de passe",
+            "confirmPassword": "Confirmer",
+            "confirmPasswordPlaceholder": "Répétez le mot de passe",
             "loginButton": "Se connecter",
             "createAccountButton": "Créer un compte",
-            "invalidEmail": "Adresse courriel invalide"
+            "invalidEmail": "Adresse courriel invalide",
+            "passwordMismatch": "Les mots de passe ne correspondent pas",
+            "confirmAccountCreation": "Voulez-vous confirmer la création du compte ?",
+            "avatarAlt": "Avatar {{index}}"
         },
         "botCreation": {
             "title": "Ajouter un robot",
@@ -319,8 +324,24 @@
             "oldPassword": "Ancien mot de passe",
             "newPassword": "Nouveau mot de passe",
             "confirm": "Valider",
-            "passwordFieldsRequired": "Les deux champs sont requis",
-            "passwordChangeError": "Erreur lors du changement de mot de passe"
+            "passwordFieldsRequired": "Tous les champs de mot de passe sont requis",
+            "passwordMismatch": "Les mots de passe ne correspondent pas",
+            "passwordUnchanged": "Le nouveau mot de passe doit être différent de l'ancien",
+            "passwordChangeError": "Erreur lors du changement de mot de passe",
+            "configure": "Configurer",
+            "accountSettingsTitle": "Paramètres du compte",
+            "close": "Fermer",
+            "usernameSectionTitle": "Nom d'utilisateur",
+            "newUsernamePlaceholder": "Nouveau nom",
+            "updateUsername": "Mettre à jour le nom",
+            "passwordSectionTitle": "Mot de passe",
+            "confirmPasswordPlaceholder": "Confirmer mot de passe",
+            "updatePassword": "Mettre à jour le mot de passe",
+            "usernameRequired": "Le nom est requis",
+            "usernameUnchanged": "Aucun changement détecté",
+            "confirmUsernameChange": "Voulez-vous confirmer le changement du nom ?",
+            "usernameUpdateError": "Erreur lors du changement de nom",
+            "avatarAlt": "Avatar complet"
         },
         "warningConfirmation": {
             "close": "Fermer",

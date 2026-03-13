@@ -74,6 +74,9 @@ export interface PlayerData {
     combatsWon: number;
     type: PlayerType;
     team: Team;
+    userId?: string;
+    profilePicture?: string;
+    fullProfilePicture?: string;
 }
 
 export enum Team {

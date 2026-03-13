@@ -215,8 +215,11 @@ export class CombatService {
         const playerCombatData = {
             ...structuredClone(DEFAULT_PLAYER_COMBAT_DATA),
             playerIndex: match.getPlayerIndex(playerId),
+            name: player.name,
             currentHealth: player.health,
             standingTile: match.data.gameData.mapData.tiles[player.position.x][player.position.y],
+            profilePicture: player.profilePicture,
+            fullProfilePicture: player.fullProfilePicture,
         };
         return this.applyCombatBuffs(match, playerCombatData);
     }

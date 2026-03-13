@@ -61,15 +61,25 @@ class UserService {
     }
   }
 
-  Future<UserInfo> register(String username, String email, String password, String avatarPath) async {
+  Future<UserInfo> register(String username, String email, String password, String avatarPath, String fullAvatarPath) async {
     _ensureConfigured();
     final String uri = '$baseUrl/${UserEndpoint.UserRegister.path}';
 
-    final byteData = await rootBundle.load(avatarPath);
-    final bytes = byteData.buffer.asUint8List();
-    String img64 = 'data:image/png;base64,${base64Encode(bytes)}';
+    final avatarByteData = await rootBundle.load(avatarPath);
+    final avatarBytes = avatarByteData.buffer.asUint8List();
+    String avatarImg64 = 'data:image/png;base64,${base64Encode(avatarBytes)}';
 
-    final postBody = {'username': username, 'email': email, 'password': password, 'profilePicture': img64};
+    final fullAvatarByteData = await rootBundle.load(fullAvatarPath);
+    final fullAvatarBytes = fullAvatarByteData.buffer.asUint8List();
+    String fullAvataImg64 = 'data:image/png;base64,${base64Encode(fullAvatarBytes)}';
+
+    final postBody = {
+      'username': username,
+      'email': email,
+      'password': password,
+      'profilePicture': avatarImg64,
+      'fullProfilePicture': fullAvataImg64,
+    };
     final bodyJson = jsonEncode(postBody);
     final response = await http.post(Uri.parse(uri), headers: {"Content-Type": "application/json"}, body: bodyJson);
     if (response.statusCode == HttpStatusCode.Ok.code || response.statusCode == HttpStatusCode.Created.code) {

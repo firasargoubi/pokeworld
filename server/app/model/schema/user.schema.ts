@@ -29,6 +29,9 @@ export class User {
     profilePicture: string;
 
     @Prop()
+    fullProfilePicture: string;
+
+    @Prop()
     balance: number;
 
     @Prop({ required: true, default: false })

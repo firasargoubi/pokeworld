@@ -116,6 +116,7 @@ export class LobbyPageComponent {
                 health: p.health,
                 id: p.id,
                 playerType: p.type,
+                profilePicture: p.profilePicture,
             }))
             .filter((p) => p.isConnected);
         const playersVisualData = this.visualData.players;
