@@ -3,13 +3,16 @@ import 'dart:math';
 
 import 'package:client_mobile/consts/avatar_data_const.dart';
 import 'package:client_mobile/controllers/character_controller.dart';
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/popup_message.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/popup_service/popup_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/header/header.dart';
+import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
 import 'package:client_mobile/widgets/stripe_painter/stripe_painter.dart';
 import 'package:flutter/material.dart';
 
@@ -39,6 +42,9 @@ class _CharacterPageState extends State<CharacterPage> {
     super.initState();
     _updateAvatarList();
     _matchUpdateSubscription = _matchService.matchUpdates.listen(_onMatchUpdate);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AudioService().playBackgroundMusic(BackgroundMusic.Menu.path);
+    });
   }
 
   @override
@@ -69,6 +75,7 @@ class _CharacterPageState extends State<CharacterPage> {
   bool isAvatarLocked(Avatar avatar) => lockedAvatars.contains(avatar);
 
   void selectAvatar(Avatar avatar) {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
     if (isAvatarLocked(avatar)) return;
     if (selectedAvatar == avatar) return;
 
@@ -77,14 +84,17 @@ class _CharacterPageState extends State<CharacterPage> {
   }
 
   void toggleHpVitBonus() {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
     setState(() => isHpBonusActive = !isHpBonusActive);
   }
 
   void toggleAttackDefenseDie() {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
     setState(() => isAttD6Active = !isAttD6Active);
   }
 
   void joinLobby() {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
     _controller.joinLobby(
       isHpBonusActive: isHpBonusActive,
       isAttD6Active: isAttD6Active,
@@ -304,19 +314,23 @@ class _CharacterPageState extends State<CharacterPage> {
               SizedBox(
                 height: baseSize * 0.15,
                 width: double.infinity,
-                child: GestureDetector(
-                  onTap: joinLobby,
-                  child: Container(
-                    color: OUTER_BORDER_COLOR,
-                    alignment: Alignment.center,
-                    child: Text(
-                      START_GAME_TEXT,
-                      style: pixelTextStyle(
+                child: Container(
+                  color: OUTER_BORDER_COLOR,
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    width: baseSize * 0.3,
+                    height: baseSize * 0.1,
+                    child: PressableBackground(
+                      backgroundAsset: START_GAME_BUTTON_ASSET,
+                      activeBackgroundAsset: START_GAME_BUTTON_ACTIVE_ASSET,
+                      onTap: joinLobby,
+                      text: START_GAME_TEXT,
+                      textStyle: pixelTextStyle(
                         fontFamily: PIXEL_FONT,
                         shadowColor: SHADOW_COLOR,
                         fontSize: baseSize * 0.04,
                         height: 1.0,
-                        letterSpacing: baseSize * 0.006,
+                        letterSpacing: baseSize * 0.003,
                         shadowOffsetX: baseSize * 0.004,
                       ),
                     ),

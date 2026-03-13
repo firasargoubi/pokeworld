@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/stat_data.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/stat_service/stat_service.dart';
 import 'package:client_mobile/widgets/header/header.dart';
@@ -33,6 +35,11 @@ class _StatPageState extends State<StatPage> {
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AudioService().playBackgroundMusic(BackgroundMusic.Menu.path);
+    });
+
     _statService.initializeData();
   }
 
@@ -43,6 +50,7 @@ class _StatPageState extends State<StatPage> {
   }
 
   void _updateSorting(PlayerStatType statType) {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
     setState(() {
       if (statType == _sortingStat) {
         _sortingOrder = _sortingOrder == SortOrder.ascending ? SortOrder.descending : SortOrder.ascending;

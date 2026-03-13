@@ -4,13 +4,16 @@ const Map<GameCardColor, GameCardConfig> GAME_CARD_CONFIGS = {
   GameCardColor.Blue: GameCardConfig(
     backgroundImage: 'assets/images/menu/containers/game/blue.png',
     buttonImage: 'assets/images/menu/containers/game/blue-button.png',
+    buttonImageActive: 'assets/images/menu/containers/game/blue-button-active.png',
   ),
   GameCardColor.Green: GameCardConfig(
     backgroundImage: 'assets/images/menu/containers/game/green.png',
     buttonImage: 'assets/images/menu/containers/game/green-button.png',
+    buttonImageActive: 'assets/images/menu/containers/game/green-button-active.png',
   ),
   GameCardColor.Pink: GameCardConfig(
     backgroundImage: 'assets/images/menu/containers/game/pink.png',
     buttonImage: 'assets/images/menu/containers/game/pink-button.png',
+    buttonImageActive: 'assets/images/menu/containers/game/pink-button-active.png',
   ),
 };

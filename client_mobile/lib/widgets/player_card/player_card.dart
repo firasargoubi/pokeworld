@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:client_mobile/consts/avatar_data_const.dart';
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/player_data.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:flutter/material.dart';
@@ -37,11 +39,13 @@ class _PlayerCardState extends State<PlayerCard> {
   bool _isActionPressed = false;
 
   void _setActionPressed(bool pressed) {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
     if (_isActionPressed == pressed) return;
     setState(() => _isActionPressed = pressed);
   }
 
   void _setInactivePressed(bool pressed) {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
     if (_isInactivePressed == pressed || !isViewerHost) return;
     setState(() => _isInactivePressed = pressed);
     if (!pressed) {

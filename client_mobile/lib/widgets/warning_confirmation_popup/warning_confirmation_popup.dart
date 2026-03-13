@@ -1,4 +1,6 @@
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/popup_message.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 
 import 'warning_confirmation_popup_const.dart';
@@ -53,19 +55,19 @@ class WarningConfirmationPopup extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         TextButton(
-                          onPressed: () => onClosed(true),
+                          onPressed: () => {onClosed(true), AudioService().playSoundEffect(SoundEffect.Select.path)},
                           child: Text(WARNING_CONFIRMATION_POPUP_CONFIRM_TEXT, style: _buttonTextStyle),
                         ),
                         const SizedBox(width: WARNING_CONFIRMATION_POPUP_BUTTON_SPACING),
                         TextButton(
-                          onPressed: () => onClosed(false),
+                          onPressed: () => {onClosed(false), AudioService().playSoundEffect(SoundEffect.Select.path)},
                           child: Text(WARNING_CONFIRMATION_POPUP_CANCEL_TEXT, style: _buttonTextStyle),
                         ),
                       ],
                     )
                   else if (hasCloseButton)
                     TextButton(
-                      onPressed: () => onClosed(false),
+                      onPressed: () => {onClosed(false), AudioService().playSoundEffect(SoundEffect.Select.path)},
                       child: Text(WARNING_CONFIRMATION_POPUP_CLOSE_TEXT, style: _buttonTextStyle),
                     ),
                 ],

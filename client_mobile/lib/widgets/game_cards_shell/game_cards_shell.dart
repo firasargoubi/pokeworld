@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/game_data.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/widgets/game_card/game_card.dart';
 import 'package:flutter/material.dart';
@@ -70,6 +72,7 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
           behavior: HitTestBehavior.translucent,
           onTap: () {
             if (openIndex != null) {
+              AudioService().playSoundEffect(SoundEffect.Select.path);
               setState(() => openIndex = null);
             }
           },
@@ -113,6 +116,7 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
                               behavior: HitTestBehavior.opaque,
                               onTap: () {
                                 setState(() {
+                                  AudioService().playSoundEffect(SoundEffect.Select.path);
                                   openIndex = openIndex == index ? null : index;
                                 });
                               },

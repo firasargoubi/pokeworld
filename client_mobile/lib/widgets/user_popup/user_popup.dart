@@ -1,5 +1,7 @@
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/popup_message.dart';
 import 'package:client_mobile/models/user_info.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/chat_service/chat_service.dart';
 import 'package:client_mobile/services/popup_service/popup_service.dart';
 import 'package:client_mobile/services/user_service/user_service.dart';
@@ -23,6 +25,7 @@ class _UserPopupState extends State<UserPopup> {
   String _passwordError = '';
 
   void _showLoginDialog() {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
     Navigator.of(context).pop();
     showDialog(
       context: context,
@@ -34,6 +37,8 @@ class _UserPopupState extends State<UserPopup> {
   }
 
   Future<void> _handleLogout() async {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
+
     try {
       await UserService().logout();
       ChatService().clearChatHistory();
@@ -47,6 +52,7 @@ class _UserPopupState extends State<UserPopup> {
   }
 
   Future<void> _handleDeleteAccount() async {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
     final userId = UserService().currentUser.value?.userId;
     if (userId == null) {
       return;
@@ -64,6 +70,7 @@ class _UserPopupState extends State<UserPopup> {
   }
 
   Future<void> _handleEditPassword() async {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
     final currentUser = UserService().currentUser.value;
     if (currentUser == null || _oldPassword.trim().isEmpty || _newPassword.trim().isEmpty) {
       setState(() {
@@ -139,6 +146,7 @@ class _UserPopupState extends State<UserPopup> {
       actions: [
         TextButton(
           onPressed: () {
+            AudioService().playSoundEffect(SoundEffect.Select.path);
             setState(() {
               _editMode = !_editMode;
               _oldPassword = '';
@@ -151,6 +159,7 @@ class _UserPopupState extends State<UserPopup> {
         if (_editMode) TextButton(onPressed: () => _handleEditPassword(), child: const Text(USER_POPUP_CONFIRM)),
         TextButton(
           onPressed: () {
+            AudioService().playSoundEffect(SoundEffect.Select.path);
             PopupService().showPopup(
               PopupMessage(
                 message: PopupMessages.LogoutConfirmation.message,
@@ -166,6 +175,7 @@ class _UserPopupState extends State<UserPopup> {
         ),
         TextButton(
           onPressed: () {
+            AudioService().playSoundEffect(SoundEffect.Select.path);
             PopupService().showPopup(
               PopupMessage(
                 message: USER_POPUP_DELETE_ACCOUNT_CONFIRMATION,
@@ -181,6 +191,7 @@ class _UserPopupState extends State<UserPopup> {
         ),
         TextButton(
           onPressed: () {
+            AudioService().playSoundEffect(SoundEffect.Select.path);
             Navigator.of(context).pop();
           },
           child: const Text(USER_POPUP_CLOSE),

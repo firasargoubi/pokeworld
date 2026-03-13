@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:client_mobile/models/audio.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 
 import 'poke_button_const.dart';
@@ -106,7 +108,7 @@ class _PokeButtonState extends State<PokeButton> {
     if (widget.onTap != null) {
       content = GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTapDown: (_) => _setPressed(true),
+        onTapDown: (_) => {_setPressed(true), AudioService().playSoundEffect(SoundEffect.Select.path)},
         onTapUp: (_) => _setPressed(false),
         onTapCancel: () => _setPressed(false),
         onTap: widget.onTap,

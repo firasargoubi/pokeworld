@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:client_mobile/consts/avatar_data_const.dart';
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/combat_service/combat_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/play_service/play_service.dart';
@@ -55,6 +57,7 @@ class _CombatPageState extends State<CombatPage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _readyForAnimations = true;
+      AudioService().playBackgroundMusic(BackgroundMusic.Combat.path);
     });
 
     PlayService().startListeningToMotion();
@@ -201,6 +204,7 @@ class _CombatPageState extends State<CombatPage> {
   }
 
   void _playHit(SpriteAnimator sprite) {
+    AudioService().playSoundEffect(SoundEffect.Attack.path);
     final isSelf = sprite == selfSprite;
     sprite.translate(
       dx: (isSelf ? SELF_HIT_FACTOR_X : ENEMY_HIT_FACTOR_X) * _baseSize,
@@ -212,11 +216,13 @@ class _CombatPageState extends State<CombatPage> {
   }
 
   void _playDeath(SpriteAnimator sprite) {
+    AudioService().playSoundEffect(SoundEffect.Death.path);
     sprite.translate(dx: 0, dy: DEATH_FACTOR_Y * _baseSize, duration: DEATH_ANIMATION_DURATION, onChanged: _rebuild);
     sprite.setFilter(color: DEATH_TINT_COLOR, resetAfter: DEATH_ANIMATION_DURATION, opacity: 0.1, onChanged: _rebuild);
   }
 
   void _playEscape(SpriteAnimator sprite) {
+    AudioService().playSoundEffect(SoundEffect.Flee.path);
     final isSelf = sprite == selfSprite;
     sprite.translate(
       dx: (isSelf ? SELF_ESCAPE_FACTOR_X : ENEMY_ESCAPE_FACTOR_X) * _baseSize,

@@ -7,6 +7,7 @@ import 'package:client_mobile/pages/create_page/create_page.dart';
 import 'package:client_mobile/pages/join_page/join_page.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/menu_card/menu_card.dart';
+import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -27,18 +28,11 @@ class HomePageBlurredBackground extends StatelessWidget {
 }
 
 class HomePageTopSection extends StatelessWidget {
-  const HomePageTopSection({
-    super.key,
-    required this.baseSize,
-    required this.isSettingsPressed,
-    required this.onSettingsTap,
-    required this.onSettingsPressedChanged,
-  });
+  const HomePageTopSection({super.key, required this.baseSize, required this.onSettingsTap, required this.onAccountTap});
 
   final double baseSize;
-  final bool isSettingsPressed;
   final VoidCallback onSettingsTap;
-  final ValueChanged<bool> onSettingsPressedChanged;
+  final VoidCallback onAccountTap;
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +42,25 @@ class HomePageTopSection extends StatelessWidget {
         width: double.infinity,
         child: Row(
           children: [
-            _HomePageSettingsButton(
-              baseSize: baseSize,
-              isPressed: isSettingsPressed,
-              onTap: onSettingsTap,
-              onPressedChanged: onSettingsPressedChanged,
+            Expanded(
+              flex: 10,
+              child: SizedBox(
+                height: double.infinity,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: baseSize * 0.02, top: baseSize * 0.05),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        _HomePageTopButton(baseSize: baseSize, iconAsset: HOME_PAGE_ACCOUNT_ICON_ASSET, onTap: onAccountTap),
+                        SizedBox(height: baseSize * 0),
+                        _HomePageTopButton(baseSize: baseSize, iconAsset: HOME_PAGE_SETTINGS_ICON_ASSET, onTap: onSettingsTap),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
             HomePageLogoAndTeam(baseSize: baseSize),
             HomePageMembersList(baseSize: baseSize),
@@ -63,13 +71,12 @@ class HomePageTopSection extends StatelessWidget {
   }
 }
 
-class _HomePageSettingsButton extends StatelessWidget {
-  const _HomePageSettingsButton({required this.baseSize, required this.isPressed, required this.onTap, required this.onPressedChanged});
+class _HomePageTopButton extends StatelessWidget {
+  const _HomePageTopButton({required this.baseSize, required this.iconAsset, required this.onTap});
 
   final double baseSize;
-  final bool isPressed;
+  final String iconAsset;
   final VoidCallback onTap;
-  final ValueChanged<bool> onPressedChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -80,26 +87,17 @@ class _HomePageSettingsButton extends StatelessWidget {
         child: Align(
           alignment: Alignment.topCenter,
           child: Padding(
-            padding: EdgeInsets.only(top: baseSize * 0.05, left: baseSize * 0.02),
-            child: GestureDetector(
-              onTap: onTap,
-              onTapDown: (_) => onPressedChanged(true),
-              onTapUp: (_) => onPressedChanged(false),
-              onTapCancel: () => onPressedChanged(false),
-              child: Container(
-                width: baseSize * 0.12,
-                height: baseSize * 0.12,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(isPressed ? HOME_PAGE_SETTINGS_BUTTON_ACTIVE_ASSET : HOME_PAGE_SETTINGS_BUTTON_ASSET),
-                    fit: BoxFit.cover,
-                    filterQuality: FilterQuality.none,
-                    alignment: Alignment.center,
-                  ),
-                ),
+            padding: EdgeInsets.only(left: baseSize * 0.0),
+            child: SizedBox(
+              width: baseSize * 0.12,
+              height: baseSize * 0.15,
+              child: PressableBackground(
+                backgroundAsset: HOME_PAGE_SETTINGS_BUTTON_ASSET,
+                activeBackgroundAsset: HOME_PAGE_SETTINGS_BUTTON_ACTIVE_ASSET,
+                onTap: onTap,
                 child: Center(
                   child: SvgPicture.asset(
-                    HOME_PAGE_SETTINGS_ICON_ASSET,
+                    iconAsset,
                     width: baseSize * 0.06,
                     height: baseSize * 0.06,
                     colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
