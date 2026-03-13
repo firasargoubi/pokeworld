@@ -243,7 +243,7 @@ $player-card-gap: calc($base-size * 0.8);
 .main-left .player-arrow-container {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: $player-card-gap;
 }
 
@@ -330,6 +330,11 @@ $player-card-gap: calc($base-size * 0.8);
 
 .play-page .player-arrow.active-red {
     background-image: url($img-arrow-red);
+}
+
+.play-page .player-arrow.is-hidden {
+    visibility: hidden;
+    opacity: 0;
 }
 
 .main-left .player-card-left {

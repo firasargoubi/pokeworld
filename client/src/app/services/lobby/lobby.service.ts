@@ -36,6 +36,10 @@ export class LobbyService {
         this.socketService.emit(LobbyEvent.ChangeLockStatus, lockStatus);
     }
 
+    changeDropInStatus(isEnabled: boolean) {
+        this.socketService.emit(LobbyEvent.ChangeDropInStatus, isEnabled);
+    }
+
     startMatch() {
         this.socketService.emit(LobbyEvent.StartMatch);
     }
@@ -49,6 +53,8 @@ export class LobbyService {
         const oldState = oldMatchData.state;
         if (this.matchService.isState([MatchState.Lobby]) && !oldIsConnected && this.matchService.selfPlayer.isConnected) {
             this.router.navigate([PageEndpoint.Lobby]);
+        } else if (!this.matchService.isState([MatchState.Lobby]) && !oldIsConnected && this.matchService.selfPlayer.isConnected) {
+            this.router.navigate([PageEndpoint.Play]);
         } else if (oldState === MatchState.Lobby && this.matchService.isState([MatchState.TurnStart])) {
             this.router.navigate([PageEndpoint.Play]);
         }

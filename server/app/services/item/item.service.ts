@@ -18,12 +18,7 @@ export class ItemService {
 
     dropItems(match: Match, playerId: string, items: ItemType[]) {
         const player = match.getPlayer(playerId);
-        for (const item of items) {
-            const position = this.mapService.getNearestItemDropSpot(match.data, player.position);
-            match.data.gameData.mapData.items[item].push(position);
-            player.items = player.items.filter((i) => i !== item);
-        }
-        this.computeItems(player);
+        this.dropItemsFromData(match, player, items);
     }
 
     checkAndPickupItem(match: Match, playerData: PlayerData) {
@@ -56,6 +51,15 @@ export class ItemService {
             return;
         }
 
+        this.computeItems(player);
+    }
+
+    private dropItemsFromData(match: Match, player: PlayerData, items: ItemType[]) {
+        for (const item of items) {
+            const position = this.mapService.getNearestItemDropSpot(match.data, player.position);
+            match.data.gameData.mapData.items[item].push(position);
+            player.items = player.items.filter((i) => i !== item);
+        }
         this.computeItems(player);
     }
 

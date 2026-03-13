@@ -78,6 +78,12 @@ describe('LobbyGateway', () => {
         expect(mockLobbyService.changeLockStatus.calledWith(mockMatch, mockSocket.id, lockStatus)).toBeTruthy();
     });
 
+    it('should call change drop in status on event', () => {
+        const dropInStatus = true;
+        gateway.changeDropInStatus(mockSocket, dropInStatus);
+        expect(mockLobbyService.changeDropInStatus.calledWith(mockMatch, mockSocket.id, dropInStatus)).toBeTruthy();
+    });
+
     it('should call start match on change start match event', () => {
         gateway.startMatch(mockSocket);
         expect(mockLobbyService.startMatch.calledWith(mockMatch, mockSocket.id)).toBeTruthy();

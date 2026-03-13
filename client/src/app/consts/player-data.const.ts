@@ -15,4 +15,5 @@ export const DEFAULT_CHARACTER_VISUAL_DATA: CharacterVisualData = {
 export const DEFAULT_LOBBY_VISUAL_DATA: LobbyVisualData = {
     players: [],
     isSelfHost: false,
+    isDropInEnabled: false,
 };

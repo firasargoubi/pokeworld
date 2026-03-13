@@ -6,6 +6,7 @@ export const DEFAULT_PLAY_VISUAL_DATA: PlayVisualData = {
     canEndTurn: false,
     currentPlayerCount: 0,
     players: [],
+    activePlayerArrowIndex: -1,
     selfAvatarUrl: '',
     thumbnailUrl: structuredClone(EMPTY_IMAGE),
     movementLeft: 0,

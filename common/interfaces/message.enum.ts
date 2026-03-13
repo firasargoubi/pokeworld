@@ -18,4 +18,6 @@ export enum Message {
     MatchWinner = 'server.messages.matchWinner',
     TeamWin = 'server.messages.teamWin',
     PlayerLeftMatch = 'server.messages.playerLeftMatch',
+    DropInDisabled = 'server.messages.dropInDisabled',
+    NoAvailableSpawn = 'server.messages.NoAvailableSpawn',
 }

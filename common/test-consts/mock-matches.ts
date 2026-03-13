@@ -11,6 +11,7 @@ export const MOCK_MATCH_CODES = ['1111', '2222', '3333'];
 export const MOCK_LOBBY_DATA: LobbyData = {
     isLocked: false,
     hostPlayerIndex: 0,
+    isDropInEnabled: false,
 };
 
 export const MOCK_PLAY_DATA: PlayData = {

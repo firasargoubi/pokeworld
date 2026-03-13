@@ -3,6 +3,7 @@ export interface PlayVisualData {
     canEndTurn: boolean;
     currentPlayerCount: number;
     players: PlayerVisualData[];
+    activePlayerArrowIndex: number;
     selfAvatarUrl: string;
     movementLeft: number;
     thumbnailUrl: string;
@@ -19,5 +20,6 @@ export interface PlayerVisualData {
     botType: string;
     team: string;
     hasFlag: boolean;
+    matchIndex: number;
     profilePicture?: string;
 }

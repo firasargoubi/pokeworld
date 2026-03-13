@@ -20,9 +20,11 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { TileDescriptionService } from '@app/services/tile-description/tile-description.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
+import { MAX_PLAYERS } from '@common/consts/player-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchState } from '@common/interfaces/match-data';
+import { PlayerData } from '@common/interfaces/player-data';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -35,6 +37,7 @@ export class PlayPageComponent {
     showPlayerInfoPopup: boolean = false;
     descriptionPlayerIndex: number = 0;
     visualData: PlayVisualData = structuredClone(DEFAULT_PLAY_VISUAL_DATA);
+    maxPlayerSlots: number = 0;
     tileDescriptionService: TileDescriptionService = inject(TileDescriptionService);
     matchService: MatchService = inject(MatchService);
     playService: PlayService = inject(PlayService);
@@ -144,22 +147,32 @@ export class PlayPageComponent {
     }
 
     private updateVisual() {
+        let visiblePlayers: { player: PlayerData; index: number }[];
+        if (this.matchService.data.lobbyData.isDropInEnabled) {
+            visiblePlayers = this.matchService.data.players.map((player, index) => ({ player, index })).filter(({ player }) => player.isConnected);
+        } else {
+            visiblePlayers = this.matchService.data.players.map((player, index) => ({ player, index }));
+        }
+        const activePlayerArrowIndex = visiblePlayers.findIndex(({ index }) => index === this.matchService.data.playData.activePlayerIndex);
+        this.maxPlayerSlots = MAX_PLAYERS[this.matchService.data.gameData.mapData.size];
         this.visualData = {
             canUseAction: this.matchService.canUseAction(),
             canEndTurn: this.matchService.canEndTurn(),
-            currentPlayerCount: this.matchService.data.players.filter((p) => p.isConnected).length,
-            players: this.matchService.data.players.map((p, i) => ({
-                id: p.id,
-                name: p.name,
-                avatarUrl: AVATAR_DATA[p.avatar].imageCentered,
-                combatsWon: p.combatsWon,
-                isHost: i === this.matchService.data.lobbyData.hostPlayerIndex,
-                botType: p.type,
-                isConnected: p.isConnected,
-                team: p.team,
-                hasFlag: p.items.includes(ItemType.Flag),
-                profilePicture: p.profilePicture,
+            currentPlayerCount: visiblePlayers.length,
+            players: visiblePlayers.map(({ player, index }) => ({
+                id: player.id,
+                name: player.name,
+                avatarUrl: AVATAR_DATA[player.avatar].imageCentered,
+                combatsWon: player.combatsWon,
+                isHost: index === this.matchService.data.lobbyData.hostPlayerIndex,
+                botType: player.type,
+                isConnected: player.isConnected,
+                team: player.team,
+                hasFlag: player.items.includes(ItemType.Flag),
+                matchIndex: index,
+                profilePicture: player.profilePicture,
             })),
+            activePlayerArrowIndex,
             selfAvatarUrl: AVATAR_DATA[this.matchService.selfPlayer.avatar].imageCentered,
             movementLeft: this.matchService.getMovementLeft(),
             thumbnailUrl: this.visualData.thumbnailUrl,

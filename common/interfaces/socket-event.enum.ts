@@ -15,6 +15,7 @@ export enum LobbyEvent {
     ChangeAvatar = 'changeAvatar',
     JoinLobby = 'joinLobby',
     ChangeLockStatus = 'changeLockStatus',
+    ChangeDropInStatus = 'changeDropInStatus',
     StartMatch = 'startMatch',
     AddBot = 'addBot',
 }

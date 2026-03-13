@@ -34,7 +34,7 @@ describe('LobbyPageComponent', () => {
 
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
-        lobbyServiceSpy = jasmine.createSpyObj('LobbyService', ['startMatch', 'kickPlayer', 'changeLockStatus', 'addBot']);
+        lobbyServiceSpy = jasmine.createSpyObj('LobbyService', ['startMatch', 'kickPlayer', 'changeLockStatus', 'changeDropInStatus', 'addBot']);
         matchServiceSpy = jasmine.createSpyObj('MatchService', ['isInMatch', 'isState', 'isHost', 'leaveMatch'], {
             matchUpdate: { pipe: () => ({ subscribe: () => ({}) }) },
             data: mockMatchData,
@@ -97,6 +97,11 @@ describe('LobbyPageComponent', () => {
     it('should toggle lock room change lock status', () => {
         component.toggleLockRoom();
         expect(lobbyServiceSpy.changeLockStatus).toHaveBeenCalled();
+    });
+
+    it('should toggle drop in status when host clicks button', () => {
+        component.toggleDropInStatus();
+        expect(lobbyServiceSpy.changeDropInStatus).toHaveBeenCalled();
     });
 
     it('should call showPopup when leaveLobbyButton is called', () => {

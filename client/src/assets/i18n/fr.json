@@ -45,7 +45,9 @@
             "turnStart": "Début du tour de {{playerName}}",
             "matchWinner": "{{playerName}} a gagné la partie",
             "teamWin": "L'équipe {{team}} remporte la partie !",
-            "playerLeftMatch": "{{playerName}} a quitté la partie"
+            "playerLeftMatch": "{{playerName}} a quitté la partie",
+            "dropInDisabled": "Le drop-in est désactivé pour cette partie",
+            "NoAvailableSpawn": "Aucun point d'apparition n'est disponible pour le moment"
         },
         "logs": {
             "itemPickup": "{{playerName}} a ramassé {{itemName}}",
@@ -158,7 +160,10 @@
         "lobby": {
             "title": "Page d'attente",
             "accessCode": "Votre code d'accès",
-            "start": "LANCER"
+            "start": "LANCER",
+            "dropInLabel": "DROP-IN",
+            "dropInOn": "ACTIF",
+            "dropInOff": "INACTIF"
         },
         "edit": {
             "title": "Modifier un jeu",

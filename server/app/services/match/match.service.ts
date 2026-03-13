@@ -9,7 +9,7 @@ import { PlayService } from '@app/services/play/play.service';
 import { DEFAULT_MATCH_DATA, MATCH_CODE_LENGTH, MATCH_CODE_RANGE } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
 import { GameData } from '@common/interfaces/game-data';
-import { MatchData } from '@common/interfaces/match-data';
+import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -156,12 +156,23 @@ export class MatchService {
         } else if (this.hasPlayerId(playerId)) {
             this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch, true);
             canJoinMatch = false;
-        } else if (this.isMatchFull(matchCode)) {
-            this.matchGateway.emitMessage(playerId, Message.RoomFull, true);
-            canJoinMatch = false;
-        } else if (this.isMatchLocked(matchCode)) {
-            this.matchGateway.emitMessage(playerId, Message.RoomLocked, true);
-            canJoinMatch = false;
+        } else {
+            const match = this.getMatch(matchCode);
+            const isInLobby = match.isState([MatchState.Lobby]);
+            const isDropIn = match.data.lobbyData.isDropInEnabled && !isInLobby;
+            if (match.isFull()) {
+                this.matchGateway.emitMessage(playerId, Message.RoomFull, true);
+                canJoinMatch = false;
+            } else if (!isInLobby && !isDropIn) {
+                this.matchGateway.emitMessage(playerId, Message.DropInDisabled, true);
+                canJoinMatch = false;
+            } else if (!isDropIn && match.data.lobbyData.isLocked) {
+                this.matchGateway.emitMessage(playerId, Message.RoomLocked, true);
+                canJoinMatch = false;
+            } else if (isDropIn && !match.hasAvailableSpawnPoint()) {
+                this.matchGateway.emitMessage(playerId, Message.NoAvailableSpawn, true);
+                canJoinMatch = false;
+            }
         }
         return canJoinMatch;
     }

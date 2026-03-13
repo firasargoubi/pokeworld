@@ -45,6 +45,14 @@ export class LobbyGateway {
         }
     }
 
+    @SubscribeMessage(LobbyEvent.ChangeDropInStatus)
+    changeDropInStatus(socket: Socket, dropInStatus: boolean) {
+        const match = this.matchService.getMatchFromPlayerId(socket.id);
+        if (match) {
+            this.lobbyService.changeDropInStatus(match, socket.id, dropInStatus);
+        }
+    }
+
     @SubscribeMessage(LobbyEvent.StartMatch)
     startMatch(socket: Socket) {
         const match = this.matchService.getMatchFromPlayerId(socket.id);

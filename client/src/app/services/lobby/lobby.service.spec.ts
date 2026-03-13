@@ -57,6 +57,11 @@ describe('LobbyService', () => {
         expect(mockSocketService.emit).toHaveBeenCalledWith(LobbyEvent.ChangeLockStatus, true);
     });
 
+    it('changeDropInStatus should emit ChangeDropInStatus event with status', () => {
+        service.changeDropInStatus(true);
+        expect(mockSocketService.emit).toHaveBeenCalledWith(LobbyEvent.ChangeDropInStatus, true);
+    });
+
     it('startMatch should emit StartMatch event', () => {
         service.startMatch();
         expect(mockSocketService.emit).toHaveBeenCalledWith(LobbyEvent.StartMatch);
@@ -78,10 +83,21 @@ describe('LobbyService', () => {
         expect(mockRouter.navigate).toHaveBeenCalledWith([PageEndpoint.Lobby]);
     });
 
-    it('on match update should navigate to lobby', () => {
-        mockMatchService.isState.and.returnValue(true);
+    it('on match update should navigate to play when leaving lobby', () => {
+        mockMatchService.isState.and.callFake((states: MatchState[]) => states.includes(MatchState.Lobby) || states.includes(MatchState.TurnStart));
         const oldMatchData = structuredClone(MOCK_MATCH_DATAS[0]);
         oldMatchData.state = MatchState.Lobby;
+        service['onMatchUpdate'](oldMatchData);
+        expect(mockRouter.navigate).toHaveBeenCalledWith([PageEndpoint.Play]);
+    });
+
+    it('on match update should navigate to play on drop in', () => {
+        mockMatchService.isState.and.returnValue(false);
+        Object.defineProperty(mockSocketService, 'selfId', { value: 'selfId' });
+        const oldMatchData = structuredClone(MOCK_MATCH_DATAS[0]);
+        oldMatchData.players[0].isConnected = false;
+        oldMatchData.players[0].id = 'selfId';
+        mockMatchService.selfPlayer.isConnected = true;
         service['onMatchUpdate'](oldMatchData);
         expect(mockRouter.navigate).toHaveBeenCalledWith([PageEndpoint.Play]);
     });

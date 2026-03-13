@@ -124,11 +124,14 @@ describe('StatService', () => {
         const mockTileRatio = 42.3;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'getTileRatio').and.returnValue(mockTileRatio);
+        matchService.data.players[0].isConnected = false;
 
         const playerStats = service['getPlayerStats']();
+        const expectedPlayers = mockTrackingData.players.filter((_, index) => index !== 0);
 
+        expect(playerStats.length).toBe(expectedPlayers.length);
         playerStats.forEach((player, index) => {
-            const mockPlayer = mockTrackingData.players[index];
+            const mockPlayer = expectedPlayers[index];
             expect(player.id).toBe(mockPlayer.id);
             expect(player.name).toBe(mockPlayer.name);
             expect(player[PlayerStatType.DiscoveredItemsCount]).toBe(mockPlayer.pickedUpItems.length);
@@ -141,8 +144,8 @@ describe('StatService', () => {
             expect(player[PlayerStatType.HpLost]).toBe(mockPlayer.hpLost);
         });
 
-        expect(service['getTileRatio']).toHaveBeenCalledTimes(mockTrackingData.players.length);
-        mockTrackingData.players.forEach((player) => {
+        expect(service['getTileRatio']).toHaveBeenCalledTimes(expectedPlayers.length);
+        expectedPlayers.forEach((player) => {
             expect(service['getTileRatio']).toHaveBeenCalledWith(player.coveredGroundTiles);
         });
     });
