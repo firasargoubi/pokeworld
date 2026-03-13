@@ -135,9 +135,8 @@ export class PlayPageComponent {
     }
 
     private checkForRedirect() {
-        const isSelfInCombat = this.matchService.data.combatData.playersCombatData.some((p) => p.playerIndex === this.matchService.selfIndex);
         const isMatchInCombatState = this.matchService.isState([MatchState.CombatWait, MatchState.CombatAnimation, MatchState.CombatEnd]);
-        if (isSelfInCombat && isMatchInCombatState) {
+        if (isMatchInCombatState) {
             this.router.navigate([PageEndpoint.Combat]);
         } else if (this.matchService.isState([MatchState.Statistics])) {
             this.router.navigate([PageEndpoint.Stat]);
@@ -159,6 +158,7 @@ export class PlayPageComponent {
                 isConnected: p.isConnected,
                 team: p.team,
                 hasFlag: p.items.includes(ItemType.Flag),
+                profilePicture: p.profilePicture,
             })),
             selfAvatarUrl: AVATAR_DATA[this.matchService.selfPlayer.avatar].imageCentered,
             movementLeft: this.matchService.getMovementLeft(),

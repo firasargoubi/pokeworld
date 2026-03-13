@@ -20,7 +20,7 @@ export const DEFAULT_PLAYER_DATA: PlayerData = {
 };
 
 export const MIN_NAME_LENGTH = 3;
-export const MAX_NAME_LENGTH = 16;
+export const MAX_NAME_LENGTH = 10;
 export const DEFAULT_STAT = 4;
 export const BONUS_STAT = 6;
 export const DEFAULT_ESCAPE_POINTS = 2;

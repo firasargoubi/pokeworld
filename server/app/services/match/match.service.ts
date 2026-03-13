@@ -115,6 +115,34 @@ export class MatchService {
         this.playService.startNextTurn(match);
     }
 
+    updateUsernameInMatches(userId: string, newUsername: string) {
+        this.matches.forEach((match) => {
+            let hasChanges = false;
+
+            match.data.players.forEach((player, playerIndex) => {
+                if (player.userId === userId && player.name !== newUsername) {
+                    player.name = newUsername;
+                    hasChanges = true;
+
+                    const trackingPlayer = match.data.trackingData.players.find((tracking) => tracking.id === player.id);
+                    if (trackingPlayer) {
+                        trackingPlayer.name = newUsername;
+                    }
+
+                    match.data.combatData.playersCombatData
+                        .filter((combatPlayer) => combatPlayer.playerIndex === playerIndex)
+                        .forEach((combatPlayer) => {
+                            combatPlayer.name = newUsername;
+                        });
+                }
+            });
+
+            if (hasChanges) {
+                this.sendUpdate(match);
+            }
+        });
+    }
+
     private disconnectPlayer(playerId: string) {
         this.playerToMatchCode.delete(playerId);
         this.matchGateway.disconnectPlayer(playerId);

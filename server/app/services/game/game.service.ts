@@ -73,6 +73,25 @@ export class GameService {
         }
     }
 
+    async deleteGamesByOwner(userId: string): Promise<void> {
+        if (!userId) {
+            throw new BadRequestException('Owner userId is required to delete games.');
+        }
+        // eslint-disable-next-line @typescript-eslint/naming-convention -- Problem with camel case and mongoose schema
+        await this.gameModel.deleteMany({ 'owner.userId': userId }).exec();
+    }
+
+    async updateOwnerUsername(userId: string, newUsername: string): Promise<void> {
+        if (!userId) {
+            throw new BadRequestException('Owner userId is required to update username.');
+        }
+        if (!newUsername) {
+            throw new BadRequestException('Owner username is required to update username.');
+        }
+        // eslint-disable-next-line @typescript-eslint/naming-convention -- Problem with camel case and mongoose schema
+        await this.gameModel.updateMany({ 'owner.userId': userId }, { $set: { 'owner.userName': newUsername } }).exec();
+    }
+
     async isNameUnique(name: string, exceptId?: string): Promise<boolean> {
         if (!name) {
             throw new BadRequestException('Name is required.');

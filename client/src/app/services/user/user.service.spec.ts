@@ -3,11 +3,11 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { SocketService } from '@app/services/socket/socket.service';
 import { ApiEndpoint } from '@common/interfaces/endpoint.enum';
+import { AppLanguage, DEFAULT_PREFERENCES } from '@common/interfaces/preferences';
 import { UserEvent } from '@common/interfaces/socket-event.enum';
 import { UserInfo } from '@common/interfaces/user';
 import { environment } from 'src/environments/environment';
 import { UserService } from './user.service';
-import { AppLanguage, DEFAULT_PREFERENCES } from '@common/interfaces/preferences';
 
 describe('UserService', () => {
     let httpMock: HttpTestingController;
@@ -16,10 +16,16 @@ describe('UserService', () => {
     let socketServiceSpy: jasmine.SpyObj<SocketService>;
     const mockUser: UserInfo = {
         username: 'testuser',
+
         userId: '1234',
+
         email: '',
+
         profilePicture: 'defaultPic',
+
+        fullProfilePicture: 'fullPic',
         balance: 100,
+
         createdAt: new Date(),
         preferences: DEFAULT_PREFERENCES,
     };
@@ -73,21 +79,47 @@ describe('UserService', () => {
     });
 
     it('should create account', () => {
-        service.createAccount('newuser', 'password', 'profile', 'email', DEFAULT_PREFERENCES).subscribe({
-            next: (user) => {
-                expect(user).toEqual(mockUser);
-            },
-            error: fail,
-        });
+        service
+            .createAccount(
+                {
+                    username: 'newuser',
+                    password: 'password',
+                    profilePicture: 'profile',
+                    fullProfilePicture: 'fullProfile',
+                    email: 'email',
+                },
+                DEFAULT_PREFERENCES,
+            )
+            .subscribe({
+                next: (user) => {
+                    expect(user).toEqual(mockUser);
+                },
+                error: fail,
+            });
         const req = httpMock.expectOne(`${baseUrl}/${ApiEndpoint.User}/register`);
         expect(req.request.method).toBe('POST');
         expect(req.request.body).toEqual({
             username: 'newuser',
             password: 'password',
             profilePicture: 'profile',
+            fullProfilePicture: 'fullProfile',
             email: 'email',
             preferences: DEFAULT_PREFERENCES,
         });
+        req.flush(mockUser);
+    });
+
+    it('should edit account with provided fields', () => {
+        service.edit('1234', { password: 'newPass', oldPassword: 'oldPass', username: 'NEWNAME' }).subscribe({
+            next: (user) => {
+                expect(user).toEqual(mockUser);
+            },
+            error: fail,
+        });
+
+        const req = httpMock.expectOne(`${baseUrl}/${ApiEndpoint.User}/edit`);
+        expect(req.request.method).toBe('PUT');
+        expect(req.request.body).toEqual({ userId: '1234', oldPassword: 'oldPass', password: 'newPass', username: 'NEWNAME' });
         req.flush(mockUser);
     });
 

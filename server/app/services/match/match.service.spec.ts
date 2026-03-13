@@ -184,6 +184,44 @@ describe('MatchService', () => {
         expect(mockPlayService.startNextTurn.calledWith(mockMatch)).toBe(true);
     });
 
+    it('update username in matches should update player and emit update', () => {
+        const matchData = structuredClone(MOCK_MATCH_DATAS[0]);
+        matchData.players = [
+            { ...structuredClone(MOCK_PLAYER_DATAS[0]), id: 'socket-1', userId: 'user-1', name: 'OLD_NAME' },
+            { ...structuredClone(MOCK_PLAYER_DATAS[1]), id: 'socket-2', userId: 'user-2', name: 'OTHER_NAME' },
+        ];
+        matchData.trackingData.players = [
+            { ...matchData.trackingData.players[0], id: 'socket-1', name: 'OLD_NAME' },
+            { ...matchData.trackingData.players[1], id: 'socket-2', name: 'OTHER_NAME' },
+        ];
+        matchData.combatData.playersCombatData = [
+            { ...matchData.combatData.playersCombatData[0], playerIndex: 0, name: 'OLD_NAME' },
+            { ...matchData.combatData.playersCombatData[1], playerIndex: 1, name: 'OTHER_NAME' },
+        ];
+
+        const match = { data: matchData } as Match;
+        service['matches'] = new Map([[matchData.code, match]]);
+        mockMatchGateway.emitUpdate.resetHistory();
+
+        service.updateUsernameInMatches('user-1', 'NEW_NAME');
+
+        expect(match.data.players[0].name).toBe('NEW_NAME');
+        expect(match.data.trackingData.players[0].name).toBe('NEW_NAME');
+        expect(match.data.combatData.playersCombatData[0].name).toBe('NEW_NAME');
+        expect(mockMatchGateway.emitUpdate.calledWith(matchData.code, matchData)).toBe(true);
+    });
+
+    it('update username in matches should not emit update when user is not present', () => {
+        const matchData = structuredClone(MOCK_MATCH_DATAS[0]);
+        const match = { data: matchData } as Match;
+        service['matches'] = new Map([[matchData.code, match]]);
+        mockMatchGateway.emitUpdate.resetHistory();
+
+        service.updateUsernameInMatches('missing-user', 'NEW_NAME');
+
+        expect(mockMatchGateway.emitUpdate.called).toBe(false);
+    });
+
     it('can join match should return invalid match code', () => {
         const playerId = 'player1';
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method

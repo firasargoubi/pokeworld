@@ -15,10 +15,13 @@ import { I18nService } from '@app/services/i18n/i18n.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { UserService } from '@app/services/user/user.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { ItemType } from '@common/interfaces/item-type.enum';
-import { CombatAction, MatchData, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
+import { CombatAction, MatchData, MatchState, PlayerCombatData, SpectatorPanelData } from '@common/interfaces/match-data';
+import { PlayerType } from '@common/interfaces/player-data';
+import { UserInfo } from '@common/interfaces/user';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -31,17 +34,24 @@ export class CombatPageComponent implements OnDestroy {
     visualData: CombatVisualData = structuredClone(DEFAULT_COMBAT_VISUAL_DATA);
     matchService: MatchService = inject(MatchService);
     combatService: CombatService = inject(CombatService);
+    isInCombat: boolean = false;
+    currentUser: UserInfo | null = null;
+    spectatorPanels: SpectatorPanelData[] = [];
 
     readonly audioService: AudioService = inject(AudioService);
     readonly clickValue = SoundEffect.Click;
 
+    private readonly botAggressiveImage = './assets/images/menu/icons/bot-aggressive.png';
+    private readonly botDefensiveImage = './assets/images/menu/icons/bot-defensive.png';
     private playService: PlayService = inject(PlayService);
+    private userService: UserService = inject(UserService);
     private router: Router = inject(Router);
     private popupService: PopupService = inject(PopupService);
     private i18nService: I18nService = inject(I18nService);
 
     constructor() {
         if (this.matchService.isInMatch()) {
+            this.userService.user$.subscribe((user: UserInfo | null) => (this.currentUser = user));
             this.onMatchUpdate(this.matchService.data);
             this.updateImages();
             this.computeItems();
@@ -82,6 +92,8 @@ export class CombatPageComponent implements OnDestroy {
         this.visualData.enemyPlatform = BATTLE_PLATFORM_IMAGES[this.visualData.enemyPlayer.standingTile].enemyPlatform;
         this.visualData.selfImage = AVATAR_DATA[this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar].backGif;
         this.visualData.enemyImage = AVATAR_DATA[this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar].frontGif;
+        this.visualData.selfProfilePicture = this.matchService.data.players[this.visualData.selfPlayer.playerIndex].profilePicture;
+        this.visualData.enemyProfilePicture = this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].profilePicture;
     }
 
     private onMatchUpdate(oldMatchData: MatchData) {
@@ -137,6 +149,10 @@ export class CombatPageComponent implements OnDestroy {
             this.visualData.enemyPlayer = this.matchService.data.combatData.playersCombatData[0];
             this.visualData.isSelfTurn = this.matchService.data.combatData.isSecondPlayerTurn;
         }
+        if (this.matchService.data.combatData.playersCombatData.find((p) => p.name === this.currentUser?.username)) {
+            this.isInCombat = true;
+        }
+        this.updateSpectatorPanels();
     }
 
     private checkHealingAnimation(oldMatchData: MatchData) {
@@ -171,5 +187,47 @@ export class CombatPageComponent implements OnDestroy {
         if (this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].items.includes(ItemType.Item6)) {
             this.visualData.enemyImage = AVATAR_DATA.missingNo.backGif;
         }
+    }
+
+    private updateSpectatorPanels() {
+        const combatants = this.matchService.data.combatData.playersCombatData ?? [];
+        if (!combatants.length) {
+            this.spectatorPanels = [];
+            return;
+        }
+
+        const allPanels = combatants
+            .map((combatant) => {
+                const player = this.matchService.data.players[combatant.playerIndex];
+                if (!player) {
+                    return null;
+                }
+
+                let profilePicture = combatant.fullProfilePicture ?? AVATAR_DATA[player.avatar].imageCentered;
+                if (player.type === PlayerType.BotAggressive) {
+                    profilePicture = this.botAggressiveImage;
+                } else if (player.type === PlayerType.BotDefensive) {
+                    profilePicture = this.botDefensiveImage;
+                }
+
+                return {
+                    playerIndex: combatant.playerIndex,
+                    name: player.name,
+                    profilePicture,
+                    playerType: player.type,
+                    attack: combatant.attack,
+                    attackDice: player.attackDice,
+                    defense: combatant.defense,
+                    defenseDice: player.defenseDice,
+                    speed: player.speed,
+                    currentHealth: combatant.currentHealth,
+                    maxHealth: player.health,
+                };
+            })
+            .filter((panel): panel is SpectatorPanelData => panel !== null);
+
+        const selfPanel = allPanels.find((p) => p.playerIndex === this.visualData.selfPlayer.playerIndex);
+        const enemyPanel = allPanels.find((p) => p.playerIndex === this.visualData.enemyPlayer.playerIndex);
+        this.spectatorPanels = [selfPanel, enemyPanel].filter((p): p is SpectatorPanelData => p != null);
     }
 }

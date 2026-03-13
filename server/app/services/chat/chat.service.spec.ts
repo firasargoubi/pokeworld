@@ -32,6 +32,7 @@ describe('ChatService', () => {
 
         defaultUser = {
             profilePicture: 'defaultPic',
+            fullProfilePicture: 'defaultFullPic',
             username: 'defaultUser',
             email: 'default@example.com',
             userId: 'defaultId',

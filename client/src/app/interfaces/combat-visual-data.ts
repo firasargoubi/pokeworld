@@ -10,4 +10,6 @@ export interface CombatVisualData {
     enemyPlatform: string;
     isSelfHealing: boolean;
     isEnemyHealing: boolean;
+    selfProfilePicture?: string;
+    enemyProfilePicture?: string;
 }

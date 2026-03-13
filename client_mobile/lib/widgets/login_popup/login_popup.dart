@@ -73,9 +73,9 @@ class _LoginPopupState extends State<LoginPopup> {
                           padding: const EdgeInsets.all(2),
                           decoration: BoxDecoration(
                             border: Border.all(color: isSelected ? Colors.blue : Colors.transparent, width: 2),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(4),
                           ),
-                          child: CircleAvatar(radius: 18, backgroundImage: AssetImage(avatarPath)),
+                          child: Image.asset(avatarPath, width: 40, height: 40, fit: BoxFit.contain),
                         ),
                       );
                     }).toList(),

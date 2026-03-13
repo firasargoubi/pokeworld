@@ -1,5 +1,5 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { AppLanguage, AppTheme } from '@common/interfaces/preferences';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { LoginUserDto } from './login-user.dto';
@@ -29,4 +29,9 @@ export class CreateUserDto extends PartialType(LoginUserDto) {
     @ValidateNested()
     @Type(() => UserPreferencesDto)
     preferences?: UserPreferencesDto;
+
+    @ApiPropertyOptional({ description: 'Full profile picture', example: 'Avatar_full_1' })
+    @IsString()
+    @IsOptional()
+    fullProfilePicture?: string;
 }

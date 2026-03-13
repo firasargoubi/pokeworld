@@ -15,6 +15,9 @@ export class UserResponseDto {
     profilePicture: string;
 
     @ApiProperty()
+    fullProfilePicture: string;
+
+    @ApiProperty()
     balance: number;
 
     @ApiProperty()

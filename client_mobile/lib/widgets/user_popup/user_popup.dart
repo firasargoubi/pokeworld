@@ -98,8 +98,8 @@ class _UserPopupState extends State<UserPopup> {
           final username = user?.username ?? USER_POPUP_UNKNOWN_USER;
           final email = user?.email ?? USER_POPUP_UNKNOWN_EMAIL;
           final avatar = profilePictureImageProvider(
-            user?.profilePicture,
-            fallback: const AssetImage('assets/images/menu/pokemons/chibi/pikachu.png'),
+            user?.fullProfilePicture,
+            fallback: const AssetImage('assets/images/menu/fullAvatars/fullAvatar0.png'),
           );
           return SizedBox(
             width: 240,
@@ -107,7 +107,7 @@ class _UserPopupState extends State<UserPopup> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: 4),
-                CircleAvatar(radius: 30, backgroundImage: avatar),
+                Image(image: avatar, height: 120, fit: BoxFit.contain),
                 const SizedBox(height: 8),
                 Text(username, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16)),
                 const SizedBox(height: 6),

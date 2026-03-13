@@ -1,6 +1,6 @@
 import { ChatLog, ChatMessage } from './chat-message';
 import { GameData } from './game-data';
-import { PlayerData } from './player-data';
+import { PlayerData, PlayerType } from './player-data';
 import { Position } from './position';
 import { TileType } from './tile-type.enum';
 import { TrackingPlayerData, WinnerData } from './track-data';
@@ -42,6 +42,7 @@ export interface CombatData {
 
 export interface PlayerCombatData {
     playerIndex: number;
+    name?: string;
     currentHealth: number;
     currentEscapes: number;
     maxEscapes: number;
@@ -49,6 +50,8 @@ export interface PlayerCombatData {
     attack: number;
     defense: number;
     standingTile: TileType;
+    profilePicture?: string;
+    fullProfilePicture?: string;
 }
 
 export interface TrackingData {
@@ -60,6 +63,19 @@ export interface TrackingData {
     flagHoldersCount: number;
     matchWinner: WinnerData;
     players: TrackingPlayerData[];
+}
+export interface SpectatorPanelData {
+    playerIndex: number;
+    name: string;
+    profilePicture: string;
+    playerType: PlayerType;
+    attack: number;
+    attackDice: number;
+    defense: number;
+    defenseDice: number;
+    speed: number;
+    currentHealth: number;
+    maxHealth: number;
 }
 
 export enum CombatAction {

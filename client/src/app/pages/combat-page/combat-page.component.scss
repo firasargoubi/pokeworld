@@ -469,6 +469,45 @@ $bg-stripes: repeating-linear-gradient(
     justify-content: center;
 }
 
+#spectator-full-container {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+#spectator-full-container .container-body {
+    padding: 2% 3%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.spectator-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    gap: calc($base-size * 1);
+    align-items: stretch;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+
+.vs-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    padding: 0 calc($base-size * 2);
+}
+
+.vs-text {
+    font-size: calc($base-size * 8);
+    font-weight: bold;
+    user-select: none;
+}
+
 .stat-container {
     display: flex;
     justify-content: space-between;
@@ -494,6 +533,92 @@ $bg-stripes: repeating-linear-gradient(
     text-align: left;
     width: 36%;
     overflow: visible;
+}
+
+.spectator-player {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    gap: calc($base-size * 2);
+    align-items: center;
+    overflow: hidden;
+}
+
+.spectator-player:not(:last-child) {
+    padding-right: calc($base-size * 1);
+}
+
+.spectator-avatar {
+    flex: 0 0 calc($base-size * 20);
+    height: 80%;
+    width: 80%;
+    display: flex;
+    //align-items: center;
+    //justify-content: center;
+}
+
+.full-avatar img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.spectator-details {
+    display: flex;
+    flex-direction: column;
+    gap: calc($base-size * 0.2);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.fighter-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.fighter-name {
+    font-size: calc($base-size * 3.8);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fighter-health {
+    font-size: calc($base-size * 3.2);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fighter-health-label {
+    margin-right: calc($base-size * 0.5);
+}
+
+.spectator-stat-line {
+    display: flex;
+    //justify-content: space-between;
+    gap: calc($base-size * 0.2);
+    font-size: calc($base-size * 3.2);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.spectator-stat-line .stat-label {
+    width: 29%;
+    //flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spectator-stat-line .stat-value {
+    //flex: 0 0 auto;
+    text-align: right;
 }
 
 .chat-container {

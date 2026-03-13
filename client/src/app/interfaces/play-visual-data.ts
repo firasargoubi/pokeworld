@@ -19,4 +19,5 @@ export interface PlayerVisualData {
     botType: string;
     team: string;
     hasFlag: boolean;
+    profilePicture?: string;
 }
