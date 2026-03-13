@@ -6,7 +6,6 @@ class GameData {
     required this.name,
     required this.description,
     required this.lastEdited,
-    required this.isVisible,
     required this.mapData,
     required this.thumbnail,
   });
@@ -15,7 +14,6 @@ class GameData {
   final String name;
   final String description;
   final DateTime lastEdited;
-  final bool isVisible;
   final MapData mapData;
   final String thumbnail;
 
@@ -25,10 +23,7 @@ class GameData {
       name: json['name'] as String,
       description: json['description'] as String,
       lastEdited: DateTime.parse(json['lastEdited'] as String),
-      isVisible: json['isVisible'] as bool,
-      mapData: MapData.fromJson(
-        (json['mapData'] as Map).cast<String, dynamic>(),
-      ),
+      mapData: MapData.fromJson((json['mapData'] as Map).cast<String, dynamic>()),
       thumbnail: json['thumbnail'] as String,
     );
   }
@@ -39,7 +34,6 @@ class GameData {
       'name': name,
       'description': description,
       'lastEdited': lastEdited.toIso8601String(),
-      'isVisible': isVisible,
       'mapData': mapData.toJson(),
       'thumbnail': thumbnail,
     };

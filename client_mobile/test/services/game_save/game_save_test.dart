@@ -15,13 +15,7 @@ void main() {
     'name': 'Test Game',
     'description': '',
     'lastEdited': '2024-01-01T00:00:00.000',
-    'isVisible': true,
-    'mapData': {
-      'tiles': List.generate(10, (_) => List.generate(10, (_) => 'Grass')),
-      'items': {},
-      'size': 10,
-      'gameMode': 'FFA',
-    },
+    'mapData': {'tiles': List.generate(10, (_) => List.generate(10, (_) => 'Grass')), 'items': {}, 'size': 10, 'gameMode': 'FFA'},
     'thumbnail': '',
   };
 
@@ -34,46 +28,27 @@ void main() {
     });
 
     test('should return list of GameData on 200 response', () async {
-      final client = MockClient(
-        (_) async => http.Response(jsonEncode([gameJson()]), 200),
-      );
-      final result = await http.runWithClient(
-        () => GameSaveService.getAllGames(),
-        () => client,
-      );
+      final client = MockClient((_) async => http.Response(jsonEncode([gameJson()]), 200));
+      final result = await http.runWithClient(() => GameSaveService.getAllGames(), () => client);
       expect(result, hasLength(1));
       expect(result.first, isA<GameData>());
       expect(result.first.name, equals('Test Game'));
     });
 
-    test(
-      'should return empty list when response body is empty array',
-      () async {
-        final client = MockClient((_) async => http.Response('[]', 200));
-        final result = await http.runWithClient(
-          () => GameSaveService.getAllGames(),
-          () => client,
-        );
-        expect(result, isEmpty);
-      },
-    );
+    test('should return empty list when response body is empty array', () async {
+      final client = MockClient((_) async => http.Response('[]', 200));
+      final result = await http.runWithClient(() => GameSaveService.getAllGames(), () => client);
+      expect(result, isEmpty);
+    });
 
     test('should throw when status code is not 200', () {
       final client = MockClient((_) async => http.Response('error', 404));
-      expect(
-        http.runWithClient(() => GameSaveService.getAllGames(), () => client),
-        throwsException,
-      );
+      expect(http.runWithClient(() => GameSaveService.getAllGames(), () => client), throwsException);
     });
 
     test('should throw when response body is not a JSON list', () {
-      final client = MockClient(
-        (_) async => http.Response(jsonEncode({'key': 'value'}), 200),
-      );
-      expect(
-        http.runWithClient(() => GameSaveService.getAllGames(), () => client),
-        throwsException,
-      );
+      final client = MockClient((_) async => http.Response(jsonEncode({'key': 'value'}), 200));
+      expect(http.runWithClient(() => GameSaveService.getAllGames(), () => client), throwsException);
     });
   });
 }

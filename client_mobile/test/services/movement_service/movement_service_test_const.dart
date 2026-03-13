@@ -7,10 +7,7 @@ import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/models/tile_type.dart';
 
 // 3x3 grid: all Grass except (0,0)=Path and (1,1)=Water
-List<List<TileType>> buildTiles({
-  int size = 3,
-  TileType fill = TileType.Grass,
-}) => List.generate(size, (_) => List.generate(size, (_) => fill));
+List<List<TileType>> buildTiles({int size = 3, TileType fill = TileType.Grass}) => List.generate(size, (_) => List.generate(size, (_) => fill));
 
 MapData buildMapData({
   List<List<TileType>>? tiles,
@@ -20,19 +17,14 @@ MapData buildMapData({
 }) {
   final s = size.value;
   return MapData(
-    tiles:
-        tiles ??
-        List.generate(s, (_) => List.generate(s, (_) => TileType.Grass)),
+    tiles: tiles ?? List.generate(s, (_) => List.generate(s, (_) => TileType.Grass)),
     items: items ?? {},
     size: size,
     gameMode: gameMode,
   );
 }
 
-PlayerData buildPlayer({
-  Position position = const Position(x: 0, y: 0),
-  Team team = Team.None,
-}) => PlayerData(
+PlayerData buildPlayer({Position position = const Position(x: 0, y: 0), Team team = Team.None}) => PlayerData(
   id: 'p1',
   isConnected: true,
   name: 'Player',
@@ -69,15 +61,8 @@ TrackingData emptyTrackingData() => TrackingData(
   players: [],
 );
 
-GameData buildGameData(MapData mapData) => GameData(
-  id: 'g1',
-  name: 'Game',
-  description: '',
-  lastEdited: DateTime(2024),
-  isVisible: true,
-  mapData: mapData,
-  thumbnail: '',
-);
+GameData buildGameData(MapData mapData) =>
+    GameData(id: 'g1', name: 'Game', description: '', lastEdited: DateTime(2024), mapData: mapData, thumbnail: '');
 
 MatchData buildMatchData({
   required MapData mapData,
@@ -90,13 +75,7 @@ MatchData buildMatchData({
   state: MatchState.TurnStart,
   gameData: buildGameData(mapData),
   lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0),
-  playData: PlayData(
-    timeLeft: 60,
-    isDebugMode: false,
-    activePlayerIndex: activePlayerIndex,
-    hasAction: hasAction,
-    movementLeft: movementLeft,
-  ),
+  playData: PlayData(timeLeft: 60, isDebugMode: false, activePlayerIndex: activePlayerIndex, hasAction: hasAction, movementLeft: movementLeft),
   combatData: emptyCombatData(),
   trackingData: emptyTrackingData(),
   players: players,

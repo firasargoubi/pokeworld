@@ -26,7 +26,6 @@ MatchData buildMatchData({List<ChatMessage> messages = const [], List<ChatLog> l
     name: 'Game',
     description: '',
     lastEdited: DateTime(2024),
-    isVisible: true,
     mapData: MapData(
       tiles: List.generate(10, (_) => List.generate(10, (_) => TileType.Grass)),
       items: {},
