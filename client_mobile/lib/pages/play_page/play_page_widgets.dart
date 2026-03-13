@@ -10,6 +10,7 @@ import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/play_service/play_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
@@ -330,13 +331,13 @@ class InfoPanel extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('$MAP_SIZE_LABEL${gameData.mapData.size.value}x${gameData.mapData.size.value}', style: pixelLineStyle(lineFontSize)),
                 Text(
-                  '$GAME_MODE_LABEL${gameData.mapData.gameMode.value} ${MatchService().matchData!.playData.isDebugMode ? DEBUG_MODE_LABEL : ''}',
+                  '${I18nService().translate(MAP_SIZE_LABEL_KEY)}${gameData.mapData.size.value}x${gameData.mapData.size.value}',
                   style: pixelLineStyle(lineFontSize),
                 ),
+                Text('${I18nService().translate(GAME_MODE_LABEL_KEY)}${gameData.mapData.gameMode.value}', style: pixelLineStyle(lineFontSize)),
                 Text(
-                  '$PLAYER_COUNT_LABEL${MatchService().matchData!.players.length} / ${MAP_SIZE_PLAYER_COUNT[gameData.mapData.size]}',
+                  '${I18nService().translate(PLAYER_COUNT_LABEL_KEY)}${MatchService().matchData!.players.length} / ${MAP_SIZE_PLAYER_COUNT[gameData.mapData.size]}',
                   style: pixelLineStyle(lineFontSize),
                 ),
                 const Spacer(),
@@ -350,7 +351,7 @@ class InfoPanel extends StatelessWidget {
                         backgroundAsset: SURRENDER_BUTTON_ASSET,
                         activeBackgroundAsset: SURRENDER_BUTTON_ACTIVE_ASSET,
                         onTap: onSurrender,
-                        text: SURRENDER_TEXT,
+                        text: I18nService().translate(SURRENDER_KEY),
                         textStyle: pixelLineStyle(buttonFontSize),
                         activeTextStyle: pixelLineStyle(buttonFontSize).copyWith(color: Colors.white),
                       ),
@@ -453,7 +454,7 @@ class MovementSection extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: baseBodySize * 0.02),
             child: Row(
               children: [
-                Text(MOVEMENT_LABEL_TEXT, style: pixelLineStyle(labelFontSize)),
+                Text(I18nService().translate(MOVEMENT_LABEL_KEY), style: pixelLineStyle(labelFontSize)),
                 const Spacer(),
                 Text('$movementLeft/$maxSpeed', style: pixelLineStyle(labelFontSize)),
               ],
@@ -592,7 +593,7 @@ class BottomButtons extends StatelessWidget {
         imageButton(
           asset: actionAsset,
           activeAsset: actionActiveAsset,
-          text: ACTION_TEXT,
+          text: I18nService().translate(ACTION_KEY),
           onTap: () {
             if (isSelfTurn && hasAction) {
               PlayService().displayActions();
@@ -603,7 +604,7 @@ class BottomButtons extends StatelessWidget {
         imageButton(
           asset: endTurnAsset,
           activeAsset: endTurnActiveAsset,
-          text: END_TURN_TEXT,
+          text: I18nService().translate(END_TURN_KEY),
           onTap: () {
             if (isSelfTurn) {
               PlayService().endTurn();

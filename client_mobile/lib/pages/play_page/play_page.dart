@@ -8,6 +8,7 @@ import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/models/popup_message.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/play_service/play_service.dart';
@@ -42,6 +43,8 @@ class _PlayPageState extends State<PlayPage> {
   bool get canEndTurn => PlayService().canEndTurn();
   int get movementLeft => isSelfTurn ? MatchService().matchData!.playData.movementLeft : 0;
   int get activePlayerIndex => MatchService().matchData!.playData.activePlayerIndex;
+
+  final PopupService _popupService = PopupService();
 
   @override
   void initState() {
@@ -94,9 +97,12 @@ class _PlayPageState extends State<PlayPage> {
   }
 
   void _showSurrenderConfirmationPopup() {
-    PopupService().showPopup(
-      PopupMessage(message: PopupMessages.Surrender.message, hasCloseButton: true, isConfirmation: true, action: MatchService().leaveMatch),
-    );
+    _popupService.showPopup(
+      PopupMessage(
+        message: I18nService().translate(PopupMessages.Surrender.messageKey),
+        isConfirmation: true,
+        action: () => MatchService().leaveMatch(),
+      ),    );
   }
 
   double _computeBaseSize(Size screenSize) {

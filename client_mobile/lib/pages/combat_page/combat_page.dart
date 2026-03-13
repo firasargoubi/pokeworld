@@ -9,6 +9,7 @@ import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/combat_service/combat_service.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/play_service/play_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
@@ -133,6 +134,7 @@ class _CombatPageState extends State<CombatPage> {
   }
 
   void _updateDiceText(bool selfWasAttacker, CombatData rawCombat) {
+    final i18n = I18nService();
     final action = rawCombat.lastCombatAction;
     if (action != CombatAction.SuccessAttack && action != CombatAction.FailAttack) return;
 
@@ -140,11 +142,11 @@ class _CombatPageState extends State<CombatPage> {
     final defenseRoll = rawCombat.lastRolledDefense;
 
     if (selfWasAttacker) {
-      selfRolledDiceText = 'Dé attaque: +$attackRoll';
-      enemyRolledDiceText = 'Dé défense: +$defenseRoll';
+      selfRolledDiceText = i18n.translate(COMBAT_ATTACK_ROLL_LABEL_KEY, params: {'value': attackRoll});
+      enemyRolledDiceText = i18n.translate(COMBAT_DEFENSE_ROLL_LABEL_KEY, params: {'value': defenseRoll});
     } else {
-      selfRolledDiceText = 'Dé défense: +$defenseRoll';
-      enemyRolledDiceText = 'Dé attaque: +$attackRoll';
+      selfRolledDiceText = i18n.translate(COMBAT_DEFENSE_ROLL_LABEL_KEY, params: {'value': defenseRoll});
+      enemyRolledDiceText = i18n.translate(COMBAT_ATTACK_ROLL_LABEL_KEY, params: {'value': attackRoll});
     }
   }
 
@@ -235,6 +237,7 @@ class _CombatPageState extends State<CombatPage> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = I18nService();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: LayoutBuilder(
@@ -321,7 +324,7 @@ class _CombatPageState extends State<CombatPage> {
                                   baseSize: baseSize,
                                   onAttack: CombatService().attack,
                                   onRun: CombatService().escape,
-                                  runText: '$FOOTER_RUN_TEXT ${selfCombatData.currentEscapes}/${selfCombatData.maxEscapes}',
+                                  runText: '${i18n.translate(FOOTER_RUN_KEY)} ${selfCombatData.currentEscapes}/${selfCombatData.maxEscapes}',
                                   attackTextStyle: pixelStyle(baseSize * 0.05),
                                   isSelfTurn: isSelfTurn,
                                   currentEscapes: selfCombatData.currentEscapes,
@@ -338,21 +341,21 @@ class _CombatPageState extends State<CombatPage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       StatRow(
-                                        label: '$FOOTER_ATTACK_STAT_LABEL (${selfPlayer.attackDice.displayName()})',
+                                        label: '${i18n.translate(FOOTER_ATTACK_STAT_LABEL_KEY)} (${selfPlayer.attackDice.displayName()})',
                                         value: '${selfCombatData.attack}/4',
                                         style: footerStyle,
                                         fontSize: footerStatFont,
                                       ),
                                       SizedBox(height: baseSize * 0.01),
                                       StatRow(
-                                        label: '$FOOTER_DEFENSE_STAT_LABEL (${selfPlayer.defenseDice.displayName()})',
+                                        label: '${i18n.translate(FOOTER_DEFENSE_STAT_LABEL_KEY)} (${selfPlayer.defenseDice.displayName()})',
                                         value: '${selfCombatData.defense}/4',
                                         style: footerStyle,
                                         fontSize: footerStatFont,
                                       ),
                                       SizedBox(height: baseSize * 0.01),
                                       StatRow(
-                                        label: FOOTER_SPEED_STAT_LABEL,
+                                        label: i18n.translate(FOOTER_SPEED_STAT_LABEL_KEY),
                                         value: '${selfPlayer.speed}/${selfPlayer.speed}',
                                         style: footerStyle,
                                         fontSize: footerStatFont,

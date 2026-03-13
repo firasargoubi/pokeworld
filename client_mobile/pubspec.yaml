@@ -62,6 +62,7 @@ flutter:
     assets:
         - .env.dev
         - .env.prod
+        - assets/i18n/
         - assets/images/menu/
         - assets/images/menu/backgrounds/
         - assets/images/menu/logos/

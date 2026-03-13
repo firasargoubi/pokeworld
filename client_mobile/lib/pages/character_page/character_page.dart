@@ -8,6 +8,7 @@ import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/popup_message.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/popup_service/popup_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
@@ -100,13 +101,15 @@ class _CharacterPageState extends State<CharacterPage> {
       isAttD6Active: isAttD6Active,
       selectedAvatar: selectedAvatar,
       onWarnings: (warnings) {
-        _popupService.showPopup(PopupMessage(message: warnings.join('\n'), hasCloseButton: true, isConfirmation: false));
+        final translatedWarnings = warnings.map((warning) => I18nService().translate(warning)).join('\n');
+        _popupService.showPopup(PopupMessage(message: translatedWarnings, hasCloseButton: true, isConfirmation: false));
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final i18n = I18nService();
     final mediaSize = MediaQuery.of(context).size;
     final screenWidth = mediaSize.width;
     final screenHeight = mediaSize.height;
@@ -132,8 +135,8 @@ class _CharacterPageState extends State<CharacterPage> {
     final hpOpacity = isHpBonusActive ? 1.0 : INACTIVE_STAT_OPACITY;
     final vitOpacity = isHpBonusActive ? INACTIVE_STAT_OPACITY : 1.0;
 
-    final hpBottomText = isHpBonusActive ? STAT_HP_BOTTOM_BOOSTED_TEXT : STAT_HP_BOTTOM_BASE_TEXT;
-    final vitBottomText = isHpBonusActive ? STAT_VIT_BOTTOM_BASE_TEXT : STAT_VIT_BOTTOM_BOOSTED_TEXT;
+    final hpBottomText = i18n.translate(isHpBonusActive ? STAT_HP_BOTTOM_BOOSTED_KEY : STAT_HP_BOTTOM_BASE_KEY);
+    final vitBottomText = i18n.translate(isHpBonusActive ? STAT_VIT_BOTTOM_BASE_KEY : STAT_VIT_BOTTOM_BOOSTED_KEY);
 
     final selectedAvatarData = selectedAvatar == null ? null : AVATAR_DATA[selectedAvatar!];
 
@@ -151,10 +154,14 @@ class _CharacterPageState extends State<CharacterPage> {
                 width: double.infinity,
                 child: AppHeader(
                   index: 1,
-                  text: HEADER_TEXT,
+                  text: i18n.translate(HEADER_KEY),
                   onTap: () {
                     _popupService.showPopup(
-                      PopupMessage(message: PopupMessages.Quit.message, isConfirmation: true, action: () => MatchService().leaveMatch()),
+                      PopupMessage(
+                        message: I18nService().translate(PopupMessages.Quit.messageKey),
+                        isConfirmation: true,
+                        action: () => MatchService().leaveMatch(),
+                      ),
                     );
                   },
                 ),
@@ -324,7 +331,7 @@ class _CharacterPageState extends State<CharacterPage> {
                       backgroundAsset: START_GAME_BUTTON_ASSET,
                       activeBackgroundAsset: START_GAME_BUTTON_ACTIVE_ASSET,
                       onTap: joinLobby,
-                      text: START_GAME_TEXT,
+                      text: i18n.translate(START_GAME_KEY),
                       textStyle: pixelTextStyle(
                         fontFamily: PIXEL_FONT,
                         shadowColor: SHADOW_COLOR,

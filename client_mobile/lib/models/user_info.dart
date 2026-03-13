@@ -1,3 +1,5 @@
+import 'package:client_mobile/models/user_preferences.dart';
+
 class UserInfo {
   UserInfo({
     required this.username,
@@ -7,6 +9,7 @@ class UserInfo {
     required this.fullProfilePicture,
     required this.balance,
     required this.createdAt,
+    required this.preferences,
   });
 
   String username;
@@ -16,6 +19,7 @@ class UserInfo {
   String fullProfilePicture;
   num balance;
   DateTime? createdAt;
+  UserPreferences preferences;
 
   factory UserInfo.fromJson(Map<String, dynamic> json) {
     return UserInfo(
@@ -26,6 +30,7 @@ class UserInfo {
       fullProfilePicture: (json['fullProfilePicture'] ?? '').toString(),
       balance: (json['balance'] ?? 0) as num,
       createdAt: json['createdAt'] == null ? null : DateTime.tryParse(json['createdAt'].toString()),
+      preferences: UserPreferences.fromJson(json['preferences'] as Map<String, dynamic>?),
     );
   }
 
@@ -38,6 +43,7 @@ class UserInfo {
       'fullProfilePicture': fullProfilePicture,
       'balance': balance,
       'createdAt': createdAt?.toIso8601String(),
+      'preferences': preferences.toJson(),
     };
   }
 }

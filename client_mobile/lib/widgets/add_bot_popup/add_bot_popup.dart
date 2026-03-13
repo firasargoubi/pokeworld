@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:client_mobile/models/player_data.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/widgets/poke_button/poke_button.dart';
 import 'package:flutter/material.dart';
@@ -77,6 +78,8 @@ class _AddBotPopupState extends State<AddBotPopup> {
 
     final titleStyle = _pixelTextStyle(baseSize * 0.05);
 
+    final i18n = I18nService();
+
     return Stack(
       children: [
         Positioned.fill(
@@ -106,7 +109,7 @@ class _AddBotPopupState extends State<AddBotPopup> {
                       children: [
                         Expanded(
                           flex: 3,
-                          child: Center(child: Text(TITLE_TEXT, style: titleStyle)),
+                          child: Center(child: Text(i18n.translate(TITLE_KEY), style: titleStyle)),
                         ),
                         Expanded(
                           flex: 3,
@@ -127,7 +130,7 @@ class _AddBotPopupState extends State<AddBotPopup> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     ModeOption(
-                                      text: AGGRESSIVE_TEXT,
+                                      text: i18n.translate(AGGRESSIVE_KEY),
                                       selected: _isAggressive,
                                       checkboxSize: checkboxSize,
                                       checkboxInnerPadding: checkboxInnerPadding,
@@ -137,7 +140,7 @@ class _AddBotPopupState extends State<AddBotPopup> {
                                     ),
                                     SizedBox(width: optionsGap),
                                     ModeOption(
-                                      text: DEFENSIVE_TEXT,
+                                      text: i18n.translate(DEFENSIVE_KEY),
                                       selected: !_isAggressive,
                                       checkboxSize: checkboxSize,
                                       checkboxInnerPadding: checkboxInnerPadding,
@@ -157,7 +160,7 @@ class _AddBotPopupState extends State<AddBotPopup> {
                             child: SizedBox(
                               width: baseSize * 0.35,
                               height: baseSize * 0.20,
-                              child: PokeButton(text: ADD_BUTTON_TEXT, onTap: submit),
+                              child: PokeButton(text: i18n.translate(ADD_BUTTON_KEY), onTap: submit),
                             ),
                           ),
                         ),

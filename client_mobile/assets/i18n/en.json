@@ -1,0 +1,373 @@
+{
+    "popup": {
+        "deleteGame": "Are you sure you want to delete the game:",
+        "quit": "Do you really want to quit?",
+        "quitEditPage": "Do you really want to leave the page? Unsaved changes will be lost.",
+        "successfulSave": "Game saved successfully",
+        "cancelModification": "Do you really want to cancel changes?",
+        "gameDoesNotExist": "The game does not exist!",
+        "errorFetchingGame": "Error while fetching the game!",
+        "errorLoadingGames": "Error while loading games!",
+        "surrender": "Do you really want to surrender?",
+        "connectionError": "Connection error with the server",
+        "nameAlreadyExists": "The name is already used. Please choose another one.",
+        "successfulConnection": "Connected successfully!",
+        "successfulAccountCreation": "Account created successfully!",
+        "logoutConfirmation": "Are you sure you want to log out?",
+        "emptyFields": "Please fill in all fields",
+        "usernameSpaces": "Username must not start or end with spaces",
+        "usernameLength": "Username must contain between 3 and 15 characters",
+        "invalidCredentials": "Username or password is invalid",
+        "usernameTaken": "Username is already taken",
+        "accountConnected": "This account is already connected on another platform",
+        "changeConfirmed": "Change applied successfully!",
+        "deleteAccountConfirmation": "Do you really want to delete your account?",
+        "noWinner": "No winner",
+        "unauthorizedAccessToGame": "This game is no longer accessible due to a change of state",
+        "passwordSpaces": "Password must not contain only spaces",
+        "invalidEmail": "Please enter a valid email address",
+        "userNotFound": "Username does not exist",
+        "registrationFailed": "Registration failed: ",
+        "loginFailed": "Login failed: ",
+        "logoutFailed": "Logout failed: ",
+        "deleteAccountFailed": "Account deletion failed: ",
+        "changeFailed": "Failed to apply the change"
+    },
+    "server": {
+        "messages": {
+            "adminQuit": "The administrator left the match",
+            "kick": "You have been kicked by the administrator",
+            "roomFull": "The match is full",
+            "alreadyInMatch": "You are already in a match",
+            "invalidMatchCode": "The match does not exist",
+            "roomLocked": "The match is locked",
+            "lockedFromLobby": "The match locked while you were choosing your character, do you want to return to the main menu?",
+            "lastPlayerRemaining": "The match ended because all other players left",
+            "debugModeOn": "Debug mode has been enabled",
+            "debugModeOff": "Debug mode has been disabled",
+            "notEnoughPlayers": "The match needs at least 2 players to start",
+            "notLocked": "The match must be locked before starting",
+            "notEvenPlayers": "CTF mode requires an even number of players",
+            "deletedGame": "The game was deleted",
+            "invisibleGame": "The game is no longer visible",
+            "turnStart": "Start of {{playerName}}'s turn",
+            "matchWinner": "{{playerName}} won the match",
+            "teamWin": "Team {{team}} wins the match!",
+            "playerLeftMatch": "{{playerName}} left the match"
+        },
+        "logs": {
+            "itemPickup": "{{playerName}} picked up {{itemName}}",
+            "turnStart": "Start of {{playerName}}'s turn",
+            "matchWinner": "{{playerName}} won the match",
+            "endMatch": "Match ended with {{playersList}}",
+            "combatStart": "{{engagingPlayerName}} engaged in combat with {{targetPlayerName}}",
+            "bridgeRepaired": "{{playerName}} repaired a bridge",
+            "bridgeBroken": "{{playerName}} broke a bridge",
+            "escapeAttempt": {
+                "success": "Escape attempt by {{playerName}}: Success",
+                "fail": "Escape attempt by {{playerName}}: Failed"
+            },
+            "attack": "{{playerName}} attacks ({{attack}}) with Dice (+{{rolledAttack}})",
+            "defense": "{{playerName}} defends ({{defense}}) with Dice (+{{rolledDefense}})",
+            "attackResult": {
+                "damage": "The attack deals {{attackResult}} damage.",
+                "blocked": "The attack is blocked."
+            },
+            "combatEnd": {
+                "victory": "{{playerName}} won the fight",
+                "escape": "{{playerName}} escaped from combat"
+            },
+            "playerLeft": "{{playerName}} left the match"
+        }
+    },
+    "items": {
+        "rightClick": {
+            "item1": "<b>Shiny Charm</b><br>+1 ATK / +1 DEF<br>Makes the holder shiny",
+            "item2": "<b>Evo Gem</b><br>+2 ATK / +2 DEF<br>Evolves the pokemon",
+            "item3": "<b>Bush Boost</b><br>+3 ATK from bush<br>Attack bonus when the player is hidden in bushes",
+            "item4": "<b>Healing Berry</b><br>+1 HP/turn if HP ≤ 50%<br>Heals the player when health is low.",
+            "item5": "<b>PokeBall</b><br>+30% escape chance<br>+1 extra escape per combat",
+            "item6": "<b>Invisibility Mantle</b><br>Makes the holder invisible to others",
+            "random": "<b>Random Item</b><br>Transforms randomly into one of the six items",
+            "spawn": "<b>Spawn Point</b><br>Where players respawn when eliminated",
+            "flag": "<b>Flag</b><br>Bring it back to your spawn point to win"
+        },
+        "description": {
+            "item1": "<b>Shiny Charm:</b> +1 ATK / +1 DEF<br>Adds one attack and one defense point to the player.",
+            "item2": "<b>Evo Gem:</b> +2 ATK / +2 DEF<br>Adds two attack and two defense points to the player.",
+            "item3": "<b>Bush Boost:</b> +3 ATK in bush<br>Gives extra attack bonus while hidden in bushes.",
+            "item4": "<b>Healing Berry:</b> +1 HP/turn if HP ≤ 50%<br>Regenerates 1 HP per turn when health is low.",
+            "item5": "<b>PokeBall:</b> +30% escape, +1 extra dodge<br>Increases escape chance and grants one additional dodge.",
+            "item6": "<b>Invisibility Mantle:</b> Temporarily invisible player<br>Makes the player invisible to others for a short period.",
+            "random": "<b>Random Item:</b> Surprise effect<br>Randomly grants one of the six items when collected.",
+            "spawn": "<b>Spawn Point:</b> Spawn area<br>Where players appear at match start or after elimination.",
+            "flag": "<b>Flag:</b> Capture the Flag objective<br>Main objective to capture in CTF mode."
+        }
+    },
+    "validation": {
+        "invalidMap": "Invalid map:",
+        "noErrors": "No validation errors",
+        "errors": {
+            "empty": "Field cannot be empty",
+            "tooLong": "Value exceeds maximum allowed length",
+            "bridge": "Bridge issue at",
+            "bridgeAtEdge": "Bridge cannot be placed on map edge",
+            "bridgeNotBetweenWalls": "Bridge must be placed between two water tiles",
+            "missingRequiredItems": "Not enough required items placed on the map",
+            "tooManyItems": "Too many items of this type placed on the map",
+            "duplicatedName": "Game name already exists",
+            "terrainCoverage": "Insufficient terrain coverage",
+            "tilesAccessibility": "Inaccessible tiles",
+            "items": "Misplaced items",
+            "mode": "A flag must be placed in CTF mode"
+        }
+    },
+    "tiles": {
+        "description": {
+            "path": "<b>Path</b>Increases movement speed",
+            "bush": "<b>Bush</b>Slows movement speed",
+            "water": "<b>Water</b>Blocks movement",
+            "bridge": "<b>Bridge</b>Can be broken or repaired",
+            "brokenBridge": "<b>Broken bridge</b>Can be repaired"
+        },
+        "rightClick": {
+            "grass": "<b>Grass</b><br>Movement cost: 1<br>Terrain tile",
+            "path": "<b>Path</b><br>Movement cost: 0<br>Increases movement speed",
+            "bush": "<b>Bush</b><br>Movement cost: 2<br>Slows movement speed",
+            "water": "<b>Water</b><br>No movement<br>Blocks movement",
+            "bridge": "<b>Bridge</b><br>Movement cost: 1<br>Can be broken",
+            "brokenBridge": "<b>Broken bridge</b><br>No movement<br>Can be repaired"
+        },
+        "effect": {
+            "grass": "Normal",
+            "path": "Boosts movement",
+            "bush": "Slows movement",
+            "water": "Blocks movement",
+            "bridge": "Traversable",
+            "none": "No effect",
+            "brokenBridge": "Not traversable"
+        }
+    },
+    "pages": {
+        "menu": {
+            "join": "Join <br/>Match",
+            "create": "Create <br/>Match",
+            "edit": "Edit <br/>Games",
+            "teamNumber": "Team #110"
+        },
+        "join": {
+            "title": "JOIN MATCH",
+            "enterCode": "Enter your access code",
+            "pressEnter": "Press Enter to confirm",
+            "joinButton": "JOIN"
+        },
+        "create": {
+            "title": "CREATE MATCH"
+        },
+        "lobby": {
+            "title": "Lobby",
+            "accessCode": "Your access code",
+            "start": "START"
+        },
+        "edit": {
+            "title": "Edit game",
+            "name": "Name",
+            "description": "Description",
+            "size": "Size",
+            "mode": "Mode",
+            "save": "Save",
+            "reset": "Reset"
+        },
+        "admin": {
+            "title": "EDIT GAME",
+            "newGame": "NEW GAME"
+        },
+        "character": {
+            "title": "SELECT YOUR CHARACTER",
+            "selectBonus": "SELECT YOUR BONUS:",
+            "selectDice": "SELECT YOUR DICE:",
+            "hpBonus": "+2 HP",
+            "speedBonus": "+2 SPD",
+            "attack": "ATTACK",
+            "defense": "DEFENSE",
+            "startGame": "START",
+            "chooseAvatarWarning": "Please choose an avatar"
+        },
+        "play": {
+            "mapSize": "Map size : ",
+            "gameMode": "Game mode : ",
+            "debug": "DEBUG",
+            "playerCount": "Player count : ",
+            "surrender": "< Surrender",
+            "movement": "Movement",
+            "action": "Action",
+            "endTurn": "End turn",
+            "itemPickupKeyword": "picked up"
+        },
+        "combat": {
+            "attack": "Attack",
+            "escape": "Escape",
+            "attackStat": "Attack",
+            "defenseStat": "Defense",
+            "diceAttack": "Attack dice: +{{value}}",
+            "diceDefense": "Defense dice: +{{value}}",
+            "speed": "Speed",
+            "winnerSuffix": "won the fight"
+        },
+        "stat": {
+            "title": "END OF MATCH",
+            "playersStats": "PLAYER STATS",
+            "matchStats": "MATCH STATS:",
+            "duration": "DURATION:",
+            "turns": "TURNS:",
+            "visitedTiles": "VISITED TILES:",
+            "manipulatedDoors": "MANIPULATED DOORS:",
+            "flagCarriers": "FLAG CARRIERS:",
+            "quit": "< QUIT",
+            "playerColumns": {
+                "items": "ITEMS",
+                "tiles": "% TILES",
+                "combats": "COMBATS",
+                "victories": "VICTORIES",
+                "defeats": "DEFEATS",
+                "escapes": "ESCAPES",
+                "damage": "DAMAGE",
+                "hpLost": "HP LOST"
+            }
+        }
+    },
+    "components": {
+        "appSettings": {
+            "title": "Settings",
+            "language": "Language",
+            "languageFr": "FR",
+            "languageEn": "EN",
+            "theme": "Visual theme",
+            "themeDefault": "Default",
+            "themeDark": "Dark",
+            "audio": "Audio",
+            "music": "Music",
+            "effects": "Effects",
+            "close": "Close"
+        },
+        "authPopup": {
+            "loginTitle": "Login",
+            "createAccountTitle": "Create account",
+            "languageFr": "FR",
+            "languageEn": "EN",
+            "username": "Username",
+            "usernamePlaceholder": "Enter your username",
+            "email": "Email address",
+            "emailPlaceholder": "Enter your email",
+            "avatar": "Choose an avatar",
+            "password": "Password",
+            "confirmPassword": "Confirm password",
+            "confirmPasswordPlaceholder": "Re-enter your password",
+            "loginButton": "Sign in",
+            "createAccountButton": "Create account",
+            "invalidEmail": "Invalid email address",
+            "passwordMismatch": "Passwords do not match",
+            "confirmAccountCreation": "Do you want to confirm account creation?",
+            "avatarAlt": "Avatar {{index}}"
+        },
+        "botCreation": {
+            "title": "Add a bot",
+            "aggressive": "Aggressive",
+            "defensive": "Defensive",
+            "add": "ADD"
+        },
+        "chat": {
+            "channels": "Channels",
+            "general": "General",
+            "messages": "Messages",
+            "journal": "Journal",
+            "searchPlaceholder": "Search/Create a channel",
+            "inputPlaceholder": "> Enter message [Enter]"
+        },
+        "createGame": {
+            "title": "New game",
+            "gridSize": "Grid size",
+            "gameMode": "Game mode",
+            "confirm": "CONFIRM"
+        },
+        "gameCard": {
+            "play": "PLAY",
+            "join": "JOIN"
+        },
+        "header": {
+            "back": "Back"
+        },
+        "item": {
+            "default": "Item"
+        },
+        "itemDropPopup": {
+            "title": "Select item to drop",
+            "confirm": "CONFIRM"
+        },
+        "map": {
+            "default": "Map"
+        },
+        "menuButton": {
+            "default": "Button"
+        },
+        "playerCard": {
+            "add": "+ Add",
+            "aggressive": "Aggressive",
+            "defensive": "Defensive"
+        },
+        "playerInfoPopup": {
+            "close": "X",
+            "healthPoints": "Health points",
+            "movementPoints": "Movement points",
+            "attack": "Attack",
+            "defense": "Defense"
+        },
+        "pokeballButton": {
+            "default": "BUTTON"
+        },
+        "userPopup": {
+            "userTitle": "User",
+            "nameLabel": "Name:",
+            "emailLabel": "Email:",
+            "noneValue": "None",
+            "logout": "Log out",
+            "deleteAccount": "Delete account",
+            "editPassword": "Change password",
+            "oldPassword": "Current password",
+            "newPassword": "New password",
+            "confirm": "Confirm",
+            "passwordFieldsRequired": "All password fields are required",
+            "passwordMismatch": "Passwords do not match",
+            "passwordUnchanged": "New password must be different from current password",
+            "passwordChangeError": "Error while changing password",
+            "configure": "Configure",
+            "accountSettingsTitle": "Account settings",
+            "close": "Close",
+            "usernameSectionTitle": "Username",
+            "newUsernamePlaceholder": "New name",
+            "updateUsername": "Update name",
+            "passwordSectionTitle": "Password",
+            "confirmPasswordPlaceholder": "Confirm password",
+            "updatePassword": "Update password",
+            "usernameRequired": "Name is required",
+            "usernameUnchanged": "No changes detected",
+            "confirmUsernameChange": "Do you want to confirm the username change?",
+            "usernameUpdateError": "Error while changing the name",
+            "avatarAlt": "Full avatar image",
+            "unknownUser": "Unknown user",
+            "unknownEmail": "Unknown email",
+            "cancel": "Cancel",
+            "deleteAccountConfirmation": "Do you really want to delete your account?",
+            "requiredFieldsError": "All required fields must be filled",
+            "languageFr": "FR",
+            "languageEn": "EN",
+            "themeDefault": "Default",
+            "themeDark": "Dark"
+        },
+        "warningConfirmation": {
+            "close": "Close",
+            "confirm": "Confirm",
+            "cancel": "Cancel"
+        }
+    }
+}

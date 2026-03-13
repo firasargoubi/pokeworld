@@ -16,9 +16,9 @@ const String CHAT_CHANNEL_ASSET = 'assets/images/menu/containers/chat/canal.png'
 const String CHAT_MESSAGES_ICON_ASSET = 'assets/images/menu/icons/chat/messages.svg';
 const String CHAT_MAIL_ICON_ASSET = 'assets/images/menu/icons/chat/mail.png';
 
-const String CHAT_GENERAL_LABEL = 'Géneral';
-const String CHAT_PARTY_LABEL = 'Partie';
-const String CHAT_INPUT_HINT = 'Entrez votre message...';
+const String CHAT_GENERAL_LABEL_KEY = 'components.chat.general';
+const String CHAT_PARTY_LABEL_KEY = 'components.chat.messages';
+const String CHAT_INPUT_HINT_KEY = 'components.chat.inputPlaceholder';
 const String CHAT_SEND_LABEL = '>';
 
 const Color CHAT_SELECTED_CHANNEL_COLOR = Color.fromARGB(255, 255, 200, 0);

@@ -8,6 +8,7 @@ import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/models/popup_message.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
@@ -144,6 +145,8 @@ class _LobbyPageState extends State<LobbyPage> {
     final labelStyle = _label(b);
     final codeStyle = _code(b);
 
+    final i18n = I18nService();
+
     return Scaffold(
       body: Column(
         children: [
@@ -152,9 +155,11 @@ class _LobbyPageState extends State<LobbyPage> {
             width: double.infinity,
             child: AppHeader(
               index: 1,
-              text: HEADER_TEXT,
+              text: I18nService().translate(HEADER_KEY),
               onTap: () {
-                _popupService.showPopup(PopupMessage(message: PopupMessages.Quit.message, isConfirmation: true, action: _leaveLobby));
+                _popupService.showPopup(
+                  PopupMessage(message: I18nService().translate(PopupMessages.Quit.messageKey), isConfirmation: true, action: _leaveLobby),
+                );
               },
             ),
           ),
@@ -259,7 +264,7 @@ class _LobbyPageState extends State<LobbyPage> {
                               width: b * 0.32,
                               height: b * 0.13,
                               child: PokeButton(
-                                text: LAUNCH_TEXT,
+                                text: i18n.translate(LAUNCH_KEY),
                                 onTap: () {
                                   LobbyService().startMatch();
                                 },

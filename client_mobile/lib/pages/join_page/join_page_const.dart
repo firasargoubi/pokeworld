@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 const double JOIN_PAGE_DESIGN_ASPECT_RATIO = JOIN_CREATE_PAGE_ASPECT_RATIO;
 
-const String JOIN_PAGE_HEADER_TEXT = 'Joindre Partie';
-const String JOIN_PAGE_FLOATING_BUTTON_TEXT = 'REJOINDRE';
+const String JOIN_PAGE_HEADER_TEXT = 'pages.join.title';
+const String JOIN_PAGE_FLOATING_BUTTON_TEXT = 'pages.join.joinButton';
 
 const Color JOIN_PAGE_OUTER_BORDER_COLOR = Color(0xFF636776);
 const Color JOIN_PAGE_INNER_BORDER_COLOR = Color(0xFFe9f6f7);

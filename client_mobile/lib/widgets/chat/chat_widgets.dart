@@ -1,5 +1,6 @@
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/chat_message.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/utils/profile_image_provider.dart';
 import 'package:client_mobile/widgets/stripe_painter/stripe_painter.dart';
@@ -92,6 +93,7 @@ class ChatHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = I18nService();
     return Container(
       height: baseSize * CHAT_HEADER_HEIGHT_FACTOR,
       width: double.infinity,
@@ -103,7 +105,7 @@ class ChatHeader extends StatelessWidget {
         children: [
           ChatChannelButton(
             baseSize: baseSize,
-            label: CHAT_GENERAL_LABEL,
+            label: i18n.translate(CHAT_GENERAL_LABEL_KEY),
             isSelected: selectedChannel == ChatChannel.General,
             onTap: () {
               onChannelChanged(ChatChannel.General);
@@ -114,7 +116,7 @@ class ChatHeader extends StatelessWidget {
           if (showMatchChannel) ...{
             ChatChannelButton(
               baseSize: baseSize,
-              label: CHAT_PARTY_LABEL,
+              label: i18n.translate(CHAT_PARTY_LABEL_KEY),
               isSelected: selectedChannel == ChatChannel.Match,
               onTap: () {
                 onChannelChanged(ChatChannel.Match);
@@ -235,7 +237,7 @@ class ChatInputBar extends StatelessWidget {
                 ],
               ),
               decoration: InputDecoration(
-                hintText: CHAT_INPUT_HINT,
+                hintText: I18nService().translate(CHAT_INPUT_HINT_KEY),
                 hintStyle: TextStyle(
                   fontFamily: CHAT_FONT_FAMILY,
                   color: CHAT_HINT_COLOR,

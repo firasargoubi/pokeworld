@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/widgets/poke_button/poke_button.dart';
 import 'package:flutter/material.dart';
 
@@ -94,6 +95,7 @@ class _SettingsPopupState extends State<SettingsPopup> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = I18nService();
     final baseSize = _computeBaseSize(MediaQuery.of(context).size);
 
     final dialogHeight = baseSize * 0.55;
@@ -135,13 +137,13 @@ class _SettingsPopupState extends State<SettingsPopup> {
                       children: [
                         Expanded(
                           flex: 2,
-                          child: Center(child: Text(TITLE_TEXT, style: titleStyle)),
+                          child: Center(child: Text(i18n.translate(TITLE_TEXT), style: titleStyle)),
                         ),
                         Expanded(
                           flex: 3,
                           child: Center(
                             child: VolumeSlider(
-                              label: MUSIC_LABEL,
+                              label: i18n.translate(MUSIC_LABEL),
                               value: _musicVolume,
                               onChanged: _onMusicVolumeChange,
                               labelStyle: labelStyle,
@@ -154,7 +156,7 @@ class _SettingsPopupState extends State<SettingsPopup> {
                           flex: 3,
                           child: Center(
                             child: VolumeSlider(
-                              label: EFFECTS_LABEL,
+                              label: i18n.translate(EFFECTS_LABEL),
                               value: _effectsVolume,
                               onChanged: _onEffectsVolumeChange,
                               labelStyle: labelStyle,
@@ -169,7 +171,7 @@ class _SettingsPopupState extends State<SettingsPopup> {
                             child: SizedBox(
                               width: baseSize * 0.35,
                               height: baseSize * 0.18,
-                              child: PokeButton(text: CLOSE_BUTTON_TEXT, onTap: widget.onClose),
+                              child: PokeButton(text: i18n.translate(CLOSE_BUTTON_TEXT), onTap: widget.onClose),
                             ),
                           ),
                         ),

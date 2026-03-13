@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:client_mobile/consts/battle_platfrom.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
 import 'package:flutter/material.dart';
@@ -378,7 +379,7 @@ class CombatButtons extends StatelessWidget {
               backgroundAsset: BUTTON_ASSET,
               activeBackgroundAsset: BUTTON_ACTIVE_ASSET,
               onTap: isSelfTurn ? onAttack : () {},
-              text: FOOTER_ATTACK_TEXT,
+              text: I18nService().translate(FOOTER_ATTACK_KEY),
               textStyle: attackTextStyle,
               activeTextStyle: attackTextStyle,
             ),
@@ -585,7 +586,7 @@ class _CombatTimerState extends State<CombatTimer> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(MatchService().matchData!.playData.isDebugMode ? '$DEBUG_MODE_LABEL ' : '', style: pixelStyle(widget.baseSize * 0.05)),
+            Text(MatchService().matchData!.playData.isDebugMode ? '${I18nService().translate(DEBUG_MODE_LABEL_KEY)} ' : '', style: pixelStyle(widget.baseSize * 0.05)),
             Text('$currentTime/${widget.maxTime}', style: pixelStyle(widget.baseSize * 0.05)),
             SizedBox(width: widget.baseSize * 0.02),
             Image.asset(TIMER_ASSET, width: widget.baseSize * 0.05, height: widget.baseSize * 0.05, fit: BoxFit.contain),

@@ -5,6 +5,7 @@ import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/pages/home_page/home_page.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/game_save/game_save.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/navigation_service/navigation_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/game_cards_shell/game_cards_shell.dart';
@@ -49,6 +50,7 @@ class _JoinPageState extends State<JoinPage> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = I18nService();
     final mediaSize = MediaQuery.of(context).size;
     final screenWidth = mediaSize.width;
     final screenHeight = mediaSize.height;
@@ -77,7 +79,7 @@ class _JoinPageState extends State<JoinPage> {
               SizedBox(
                 height: baseSize * 0.1,
                 width: double.infinity,
-                child: AppHeader(index: 1, text: JOIN_PAGE_HEADER_TEXT, onTap: () => NavigationService().navigateAndReplace((_) => const HomePage())),
+                child: AppHeader(index: 1, text: i18n.translate(JOIN_PAGE_HEADER_TEXT), onTap: () => NavigationService().navigateAndReplace((_) => const HomePage())),
               ),
               Expanded(
                 child: Container(
@@ -110,7 +112,7 @@ class _JoinPageState extends State<JoinPage> {
             bottom: baseSize * 0.06,
             width: baseSize * 0.42,
             height: baseSize * 0.15,
-            child: PokeButton(text: JOIN_PAGE_FLOATING_BUTTON_TEXT, onTap: _openOverlay),
+            child: PokeButton(text: i18n.translate(JOIN_PAGE_FLOATING_BUTTON_TEXT), onTap: _openOverlay),
           ),
           if (showOverlay)
             Positioned.fill(

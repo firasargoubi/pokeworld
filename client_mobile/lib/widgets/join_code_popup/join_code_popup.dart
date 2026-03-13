@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,6 +21,7 @@ class JoinCodePopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = I18nService();
     final dialogHeight = baseSize * 0.60;
     final dialogWidth = dialogHeight * 16 / 9;
     final padding = baseSize * 0.065;
@@ -52,12 +54,12 @@ class JoinCodePopup extends StatelessWidget {
                         children: [
                           Expanded(
                             flex: 1,
-                            child: Center(child: Text(JOIN_CODE_POPUP_TITLE_TEXT, style: titleStyle)),
+                            child: Center(child: Text(i18n.translate(JOIN_CODE_POPUP_TITLE_TEXT), style: titleStyle)),
                           ),
                           _OverlayCodeInput(baseSize: baseSize, controller: controller),
                           Expanded(
                             flex: 1,
-                            child: Center(child: Text(JOIN_CODE_POPUP_HINT_TEXT, style: titleStyle)),
+                            child: Center(child: Text(i18n.translate(JOIN_CODE_POPUP_HINT_TEXT), style: titleStyle)),
                           ),
                         ],
                       ),

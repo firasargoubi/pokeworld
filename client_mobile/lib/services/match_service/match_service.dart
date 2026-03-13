@@ -16,6 +16,7 @@ import '../../models/popup_message.dart';
 import '../../models/socket_event.dart';
 import '../../pages/character_page/character_page.dart';
 import '../../pages/home_page/home_page.dart';
+import '../i18n_service/i18n_service.dart';
 import '../navigation_service/navigation_service.dart';
 import '../popup_service/popup_service.dart';
 import '../socket_service/socket_service.dart';
@@ -63,9 +64,12 @@ class MatchService {
     _listenersInitialized = true;
 
     _socketService.socket.on(MatchEvent.Message.value, (payload) {
+      final data = (payload as Map).cast<String, dynamic>();
+
       final message = MessageFromServer(
-        message: (payload as Map)['message'] as String,
-        hasCloseButton: ((payload)['hasCloseButton'] as bool?) ?? false,
+        message: data['message'] as String,
+        hasCloseButton: (data['hasCloseButton'] as bool?) ?? false,
+        messageParams: (data['messageParams'] as Map?)?.cast<String, Object?>() ?? const {},
       );
 
       onMessage(message);
@@ -108,16 +112,19 @@ class MatchService {
   void onDisconnect() {
     if (isInMatch()) {
       _popupService.keepMessages();
-      _popupService.showPopup(PopupMessage(message: PopupMessages.ConnectionError.message, hasCloseButton: true, isConfirmation: false));
+      _popupService.showPopup(
+        PopupMessage(message: I18nService().translate(PopupMessages.ConnectionError.messageKey), hasCloseButton: true, isConfirmation: false),
+      );
       resetMatchData();
       NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const HomePage()));
     }
   }
 
   void onMessage(MessageFromServer message) {
+    final translatedMessage = I18nService().translate(message.message, params: message.messageParams);
     _popupService.showPopup(
       PopupMessage(
-        message: message.message,
+        message: translatedMessage,
         hasCloseButton: message.hasCloseButton,
         isConfirmation: false,
         popupColor: WARNING_MESSAGES.contains(message.message) ? PopupColor.Orange : PopupColor.Blue,
@@ -128,19 +135,22 @@ class MatchService {
   void onRemovedFromMatch(String reason) {
     if (isInMatch()) {
       _popupService.keepMessages();
+      final translatedReason = I18nService().translate(reason);
       if (reason == Message.LockedFromLobby.message) {
         NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const JoinPage()));
-        PopupMessage(
-          message: reason,
-          hasCloseButton: true,
-          isConfirmation: true,
-          action: () {
-            NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const HomePage()));
-          },
+        _popupService.showPopup(
+          PopupMessage(
+            message: translatedReason,
+            hasCloseButton: true,
+            isConfirmation: true,
+            action: () {
+              NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const HomePage()));
+            },
+          ),
         );
       } else {
         NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const HomePage()));
-        _popupService.showPopup(PopupMessage(message: reason, hasCloseButton: false, isConfirmation: false));
+        _popupService.showPopup(PopupMessage(message: translatedReason, hasCloseButton: false, isConfirmation: false));
       }
       resetMatchData();
     }

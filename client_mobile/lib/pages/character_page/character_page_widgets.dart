@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:client_mobile/models/avatar_data.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:flutter/material.dart';
 
 import 'character_page_const.dart';
@@ -107,6 +108,7 @@ class CharacterStatsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = I18nService();
     return LayoutBuilder(
       builder: (context, constraints) {
         final gap = baseSize * 0.05;
@@ -196,7 +198,7 @@ class CharacterStatsPanel extends StatelessWidget {
         }
 
         final hpBox = labeledStatBox(
-          topText: STAT_HP_TOP_TEXT,
+          topText: i18n.translate(STAT_HP_TOP_KEY),
           bottomText: hpBottomText,
           backgroundImage: STAT_PINK_ASSET,
           icon: HEART_ICON_ASSET,
@@ -205,7 +207,7 @@ class CharacterStatsPanel extends StatelessWidget {
         );
 
         final vitBox = labeledStatBox(
-          topText: STAT_VIT_TOP_TEXT,
+          topText: i18n.translate(STAT_VIT_TOP_KEY),
           bottomText: vitBottomText,
           backgroundImage: STAT_GREEN_ASSET,
           icon: LIGHTNING_ICON_ASSET,
@@ -214,16 +216,16 @@ class CharacterStatsPanel extends StatelessWidget {
         );
 
         final atkBox = labeledStatBox(
-          topText: STAT_ATK_TOP_TEXT,
-          bottomText: STAT_ATK_BOTTOM_TEXT,
+          topText: i18n.translate(STAT_ATK_TOP_KEY),
+          bottomText: i18n.translate(STAT_ATK_BOTTOM_KEY),
           backgroundImage: STAT_BLUE_ASSET,
           icon: attackIconAsset,
           onTap: onToggleAtkDef,
         );
 
         final defBox = labeledStatBox(
-          topText: STAT_DEF_TOP_TEXT,
-          bottomText: STAT_DEF_BOTTOM_TEXT,
+          topText: i18n.translate(STAT_DEF_TOP_KEY),
+          bottomText: i18n.translate(STAT_DEF_BOTTOM_KEY),
           backgroundImage: STAT_ORANGE_ASSET,
           icon: defenseIconAsset,
           onTap: onToggleAtkDef,

@@ -5,24 +5,24 @@ const double STAT_PAGE_DESIGN_ASPECT_RATIO = 17 / 9;
 const String PIXEL_FONT = 'Pixel';
 const Color PIXEL_SHADOW_COLOR = Color(0xFFB3B3B3);
 
-const String STAT_PAGE_HEADER_TEXT = 'FIN PARTIE';
-const String STAT_PLAYERS_TITLE = 'STATS JOUEURS';
-const String STAT_GAME_TITLE = 'STATS PARTIE';
+const String STAT_PAGE_HEADER_KEY = 'pages.stat.title';
+const String STAT_PLAYERS_TITLE_KEY = 'pages.stat.playersStats';
+const String STAT_GAME_TITLE_KEY = 'pages.stat.matchStats';
 
-const String STAT_ITEMS_LABEL = 'Items';
-const String STAT_TILES_LABEL = 'Tuiles %';
-const String STAT_COMBATS_LABEL = 'Combats';
-const String STAT_VICTORIES_LABEL = 'Victoires';
-const String STAT_DEFEATS_LABEL = 'Défaites';
-const String STAT_ESCAPES_LABEL = 'Fuites';
-const String STAT_HP_INFLICTED_LABEL = 'HP infligés';
-const String STAT_HP_LOST_LABEL = 'HP perdus';
+const String STAT_ITEMS_LABEL_KEY = 'pages.stat.playerColumns.items';
+const String STAT_TILES_LABEL_KEY = 'pages.stat.playerColumns.tiles';
+const String STAT_COMBATS_LABEL_KEY = 'pages.stat.playerColumns.combats';
+const String STAT_VICTORIES_LABEL_KEY = 'pages.stat.playerColumns.victories';
+const String STAT_DEFEATS_LABEL_KEY = 'pages.stat.playerColumns.defeats';
+const String STAT_ESCAPES_LABEL_KEY = 'pages.stat.playerColumns.escapes';
+const String STAT_HP_INFLICTED_LABEL_KEY = 'pages.stat.playerColumns.damage';
+const String STAT_HP_LOST_LABEL_KEY = 'pages.stat.playerColumns.hpLost';
 
-const String STAT_DURATION_LABEL = 'Durée:';
-const String STAT_ROUNDS_LABEL = 'Tours:';
-const String STAT_VISITED_TILES_LABEL = 'Tuiles visitées:';
-const String STAT_TOGGLED_BRIDGES_LABEL = 'Porte manipulée:';
-const String STAT_FLAG_HOLDERS_LABEL = 'Porteurs de drapeau:';
+const String STAT_DURATION_LABEL_KEY = 'pages.stat.duration';
+const String STAT_ROUNDS_LABEL_KEY = 'pages.stat.turns';
+const String STAT_VISITED_TILES_LABEL_KEY = 'pages.stat.visitedTiles';
+const String STAT_TOGGLED_BRIDGES_LABEL_KEY = 'pages.stat.manipulatedDoors';
+const String STAT_FLAG_HOLDERS_LABEL_KEY = 'pages.stat.flagCarriers';
 
 const Color STAT_PAGE_OUTER_BORDER_COLOR = Color(0xFF636776);
 const Color STAT_PAGE_INNER_BORDER_COLOR = Color(0xFFe9f6f7);
