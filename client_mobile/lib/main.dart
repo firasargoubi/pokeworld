@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'app.dart';
 import 'services/chat_service/chat_service.dart';
+import 'services/preferences_service/preferences_service.dart';
 import 'services/socket_service/socket_service.dart';
 
 Future<void> main() async {
@@ -17,6 +18,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AudioService().init();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+  await PreferencesService().initialize();
+
   SocketService().connect();
   ChatService().initListeners();
   runApp(const PokeWorldApp());

@@ -71,7 +71,7 @@
                 "victory": "{{playerName}} won the fight",
                 "escape": "{{playerName}} escaped from combat"
             },
-            "playerLeftLog": "{{playerName}} left the match"
+            "playerLeft": "{{playerName}} left the match"
         }
     },
     "items": {

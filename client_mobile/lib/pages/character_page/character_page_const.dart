@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 const double DESIGN_ASPECT_RATIO = 2000 / 1400;
 
 // Text
-const String HEADER_TEXT = 'Choisir Personnage';
-const String START_GAME_TEXT = 'START GAME';
+const String HEADER_KEY = 'pages.character.title';
+const String START_GAME_KEY = 'pages.character.startGame';
 
 // Colors
 const Color OUTER_BORDER_COLOR = Color(0xFF636776);
@@ -41,17 +41,18 @@ const String START_GAME_BUTTON_ASSET = 'assets/images/menu/containers/stats/blue
 const String START_GAME_BUTTON_ACTIVE_ASSET = 'assets/images/menu/containers/stats/blue-button-active.png';
 
 // Stat texts
-const String STAT_HP_TOP_TEXT = '+2 HP';
-const String STAT_VIT_TOP_TEXT = '+2 VIT';
-const String STAT_ATK_TOP_TEXT = 'ATTAQUE';
-const String STAT_ATK_BOTTOM_TEXT = '4/4';
-const String STAT_DEF_TOP_TEXT = 'DEFENSE';
-const String STAT_DEF_BOTTOM_TEXT = '4/4';
+const String STAT_HP_TOP_KEY = 'pages.character.hpBonus';
+const String STAT_VIT_TOP_KEY = 'pages.character.speedBonus';
+const String STAT_ATK_TOP_KEY = 'pages.character.attack';
+const String STAT_ATK_BOTTOM_KEY = '4/4';
+const String STAT_DEF_TOP_KEY = 'pages.character.defense';
+const String STAT_DEF_BOTTOM_KEY = '4/4';
+const String CHOOSE_AVATAR_WARNING_KEY = 'pages.character.chooseAvatarWarning';
 
-const String STAT_HP_BOTTOM_BASE_TEXT = '4/4';
-const String STAT_HP_BOTTOM_BOOSTED_TEXT = '6/6';
-const String STAT_VIT_BOTTOM_BASE_TEXT = '4/4';
-const String STAT_VIT_BOTTOM_BOOSTED_TEXT = '6/6';
+const String STAT_HP_BOTTOM_BASE_KEY = '4/4';
+const String STAT_HP_BOTTOM_BOOSTED_KEY = '6/6';
+const String STAT_VIT_BOTTOM_BASE_KEY = '4/4';
+const String STAT_VIT_BOTTOM_BOOSTED_KEY = '6/6';
 
 // Opacity
 const double DISABLED_AVATAR_OPACITY = 0.45;

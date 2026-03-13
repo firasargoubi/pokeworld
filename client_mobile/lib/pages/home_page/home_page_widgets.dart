@@ -5,6 +5,7 @@ import 'package:client_mobile/consts/menu_card_data.dart';
 import 'package:client_mobile/models/menu_config.dart';
 import 'package:client_mobile/pages/create_page/create_page.dart';
 import 'package:client_mobile/pages/join_page/join_page.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/menu_card/menu_card.dart';
 import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
@@ -119,6 +120,8 @@ class HomePageLogoAndTeam extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = I18nService();
+
     return Expanded(
       flex: 60,
       child: SizedBox(
@@ -139,7 +142,7 @@ class HomePageLogoAndTeam extends StatelessWidget {
               child: Transform.rotate(
                 angle: -0.3,
                 child: Text(
-                  HOME_PAGE_TEAM_TEXT,
+                  i18n.translate(HOME_PAGE_TEAM_TEXT),
                   style: TextStyle(
                     fontFamily: HOME_PAGE_PIXEL_FONT,
                     color: HOME_PAGE_TEXT_COLOR,
@@ -230,6 +233,8 @@ class HomePageMiddleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = I18nService();
+
     return Expanded(
       flex: 3,
       child: SizedBox(
@@ -242,9 +247,14 @@ class HomePageMiddleSection extends StatelessWidget {
             return Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                MenuCard(size: size, color: MenuCardColor.Blue, title: HOME_PAGE_JOIN_TEXT, onTap: () => onPush(const JoinPage())),
+                MenuCard(size: size, color: MenuCardColor.Blue, title: i18n.translate(HOME_PAGE_JOIN_TEXT), onTap: () => onPush(const JoinPage())),
                 SizedBox(width: gap),
-                MenuCard(size: size, color: MenuCardColor.Orange, title: HOME_PAGE_CREATE_TEXT, onTap: () => onPush(const CreatePage())),
+                MenuCard(
+                  size: size,
+                  color: MenuCardColor.Orange,
+                  title: i18n.translate(HOME_PAGE_CREATE_TEXT),
+                  onTap: () => onPush(const CreatePage()),
+                ),
               ],
             );
           },

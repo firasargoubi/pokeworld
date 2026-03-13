@@ -1,6 +1,7 @@
 import 'package:client_mobile/consts/player_data_const.dart';
 import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/models/player_data.dart';
+import 'package:client_mobile/pages/character_page/character_page_const.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/user_service/user_service.dart';
@@ -56,7 +57,7 @@ class CharacterController {
     final warnings = <String>[];
 
     if (selectedAvatar == null || selectedAvatar == Avatar.DefaultAvatar) {
-      warnings.add('Veuillez choisir un avatar');
+      warnings.add(CHOOSE_AVATAR_WARNING_KEY);
     }
 
     return warnings;

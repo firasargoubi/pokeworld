@@ -1,5 +1,6 @@
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/popup_message.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 
@@ -35,6 +36,7 @@ class WarningConfirmationPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = I18nService();
     return Material(
       color: Colors.transparent,
       child: Center(
@@ -56,19 +58,19 @@ class WarningConfirmationPopup extends StatelessWidget {
                       children: <Widget>[
                         TextButton(
                           onPressed: () => {onClosed(true), AudioService().playSoundEffect(SoundEffect.Select.path)},
-                          child: Text(WARNING_CONFIRMATION_POPUP_CONFIRM_TEXT, style: _buttonTextStyle),
+                          child: Text(i18n.translate(WARNING_CONFIRMATION_POPUP_CONFIRM_KEY), style: _buttonTextStyle),
                         ),
                         const SizedBox(width: WARNING_CONFIRMATION_POPUP_BUTTON_SPACING),
                         TextButton(
                           onPressed: () => {onClosed(false), AudioService().playSoundEffect(SoundEffect.Select.path)},
-                          child: Text(WARNING_CONFIRMATION_POPUP_CANCEL_TEXT, style: _buttonTextStyle),
+                          child: Text(i18n.translate(WARNING_CONFIRMATION_POPUP_CANCEL_KEY), style: _buttonTextStyle),
                         ),
                       ],
                     )
                   else if (hasCloseButton)
                     TextButton(
                       onPressed: () => {onClosed(false), AudioService().playSoundEffect(SoundEffect.Select.path)},
-                      child: Text(WARNING_CONFIRMATION_POPUP_CLOSE_TEXT, style: _buttonTextStyle),
+                      child: Text(i18n.translate(WARNING_CONFIRMATION_POPUP_CLOSE_KEY), style: _buttonTextStyle),
                     ),
                 ],
               ),

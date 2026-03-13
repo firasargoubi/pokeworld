@@ -1,6 +1,7 @@
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/models/stat_data.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/stat_container/stat_container.dart';
@@ -248,7 +249,7 @@ class PlayerNamesColumn extends StatelessWidget {
       height: double.infinity,
       child: Column(
         children: [
-          StatSectionHeader(title: STAT_PLAYERS_TITLE, baseSize: baseSize),
+          StatSectionHeader(title: I18nService().translate(STAT_PLAYERS_TITLE_KEY), baseSize: baseSize),
           SizedBox(width: double.infinity, height: baseSize * STAT_COLUMN_SPACING_FACTOR),
           StatColumnBody(
             baseSize: baseSize,
@@ -313,7 +314,7 @@ class GameStatsPanel extends StatelessWidget {
               child: Column(
                 children: [
                   StatSectionHeader(
-                    title: STAT_GAME_TITLE,
+                    title: I18nService().translate(STAT_GAME_TITLE_KEY),
                     baseSize: baseSize,
                     alignment: Alignment.centerLeft,
                     horizontalPaddingFactor: STAT_GAME_HEADER_HORIZONTAL_PADDING_FACTOR,
@@ -324,11 +325,28 @@ class GameStatsPanel extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          StatLine(label: STAT_DURATION_LABEL, value: formatDuration(stats.gameDuration), baseSize: baseSize),
-                          StatLine(label: STAT_ROUNDS_LABEL, value: stats.rounds.toString(), baseSize: baseSize),
-                          StatLine(label: STAT_VISITED_TILES_LABEL, value: formatRatio(stats.visitedTilesRatio), baseSize: baseSize),
-                          StatLine(label: STAT_TOGGLED_BRIDGES_LABEL, value: formatRatio(stats.toggledBridgesRatio), baseSize: baseSize),
-                          if (showFlagHolders) StatLine(label: STAT_FLAG_HOLDERS_LABEL, value: stats.flagHoldersCount.toString(), baseSize: baseSize),
+                          StatLine(
+                            label: I18nService().translate(STAT_DURATION_LABEL_KEY),
+                            value: formatDuration(stats.gameDuration),
+                            baseSize: baseSize,
+                          ),
+                          StatLine(label: I18nService().translate(STAT_ROUNDS_LABEL_KEY), value: stats.rounds.toString(), baseSize: baseSize),
+                          StatLine(
+                            label: I18nService().translate(STAT_VISITED_TILES_LABEL_KEY),
+                            value: formatRatio(stats.visitedTilesRatio),
+                            baseSize: baseSize,
+                          ),
+                          StatLine(
+                            label: I18nService().translate(STAT_TOGGLED_BRIDGES_LABEL_KEY),
+                            value: formatRatio(stats.toggledBridgesRatio),
+                            baseSize: baseSize,
+                          ),
+                          if (showFlagHolders)
+                            StatLine(
+                              label: I18nService().translate(STAT_FLAG_HOLDERS_LABEL_KEY),
+                              value: stats.flagHoldersCount.toString(),
+                              baseSize: baseSize,
+                            ),
                         ],
                       ),
                     ),

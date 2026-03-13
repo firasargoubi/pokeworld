@@ -4,6 +4,7 @@ import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/tile_type.dart';
 import 'package:client_mobile/models/user_info.dart';
+import 'package:client_mobile/models/user_preferences.dart';
 
 Map<String, dynamic> buildMessageJson({String sender = 'Alice', String content = 'Hello'}) => {
   'sender': sender,
@@ -15,8 +16,16 @@ ChatMessage buildChatMessage({String content = 'Hello'}) => ChatMessage(content:
 
 ChatLog buildChatLog() => ChatLog(content: 'Player joined', timestamp: DateTime(2024), concernedPlayersNamesList: ['Alice']);
 
-UserInfo buildUserInfo() =>
-    UserInfo(username: 'testuser', userId: 'u1', email: 'test@test.com', profilePicture: '', fullProfilePicture: '', balance: 0, createdAt: null);
+UserInfo buildUserInfo() => UserInfo(
+  username: 'testuser',
+  userId: 'u1',
+  email: 'test@test.com',
+  profilePicture: '',
+  fullProfilePicture: '',
+  balance: 0,
+  createdAt: null,
+  preferences: UserPreferences.defaults,
+);
 
 MatchData buildMatchData({List<ChatMessage> messages = const [], List<ChatLog> logs = const []}) => MatchData(
   code: 'TEST',

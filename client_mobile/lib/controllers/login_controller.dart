@@ -2,7 +2,10 @@ import 'package:client_mobile/consts/auth_errors.dart';
 import 'package:client_mobile/consts/avatar_list.dart';
 import 'package:client_mobile/models/error_messages.dart';
 import 'package:client_mobile/models/popup_message.dart';
+import 'package:client_mobile/models/user_preferences.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/popup_service/popup_service.dart';
+import 'package:client_mobile/services/preferences_service/preferences_service.dart';
 import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:flutter/material.dart';
 
@@ -10,12 +13,15 @@ import '../consts/login_const.dart';
 
 class LoginController {
   final UserService _userService = UserService();
+  final PreferencesService _preferencesService = PreferencesService();
   final PopupService _popupService = PopupService();
 
   bool isRegister = false;
   bool isLoading = false;
   String? errorMessage;
   String selectedAvatar = USER_PROFILE_PICTURES.first;
+
+  AppLanguage get currentLanguage => _preferencesService.currentLanguage.value;
   String get selectedFullAvatar {
     final index = USER_PROFILE_PICTURES.indexOf(selectedAvatar);
     if (index != -1 && index < USER_FULL_PROFILE_PICTURES.length) {
@@ -29,6 +35,11 @@ class LoginController {
   final TextEditingController passwordController = TextEditingController();
 
   Function(void Function())? _setState;
+
+  String _translateError(String messageOrKey) {
+    final translated = I18nService().translate(messageOrKey);
+    return translated == messageOrKey ? messageOrKey : translated;
+  }
 
   void init(Function(void Function()) setState) {
     _setState = setState;
@@ -44,7 +55,7 @@ class LoginController {
 
     if (rawUsername.isEmpty || rawPassword.isEmpty || (isRegister && rawEmail.isEmpty)) {
       _updateState(() {
-        errorMessage = ErrorMessage.EmptyFields.message;
+        errorMessage = _translateError(ErrorMessage.EmptyFields.message);
       });
       return;
     }
@@ -63,11 +74,29 @@ class LoginController {
 
     try {
       if (isRegister) {
-        await _userService.register(rawUsername, rawEmail, rawPassword, selectedAvatar, selectedFullAvatar);
-        _popupService.showPopup(PopupMessage(message: PopupMessages.SuccessfulAccountCreation.message, hasCloseButton: true, isConfirmation: false));
+        await _userService.register(
+          rawUsername,
+          rawEmail,
+          rawPassword,
+          selectedAvatar,
+          selectedFullAvatar,
+          preferences: UserPreferences(language: _preferencesService.currentLanguage.value, theme: _preferencesService.currentTheme.value),
+        );
+        _popupService.showPopup(
+          PopupMessage(
+            message: I18nService().translate(PopupMessages.SuccessfulAccountCreation.messageKey),
+            hasCloseButton: true,
+            isConfirmation: false,
+          ),
+        );
       } else {
         await _userService.login(rawUsername, rawPassword);
-        _popupService.showPopup(PopupMessage(message: PopupMessages.SuccessfulConnection.message, hasCloseButton: true, isConfirmation: false));
+        _preferencesService.syncPreferencesFromUser();
+        final i18n = I18nService();
+        await i18n.use(_preferencesService.currentLanguage.value);
+        _popupService.showPopup(
+          PopupMessage(message: i18n.translate(PopupMessages.SuccessfulConnection.messageKey), hasCloseButton: true, isConfirmation: false),
+        );
       }
       onSuccess();
     } catch (e) {
@@ -75,21 +104,22 @@ class LoginController {
       if (e is AuthException) {
         switch (e.error) {
           case AuthError.usernameExists:
-            message = ErrorMessage.UsernameExists.message;
+            message = _translateError(ErrorMessage.UsernameExists.message);
             break;
           case AuthError.invalidCredentials:
-            message = ErrorMessage.InvalidCredentials.message;
+            message = _translateError(ErrorMessage.InvalidCredentials.message);
             break;
           case AuthError.userNotFound:
-            message = ErrorMessage.UserNotFound.message;
+            message = _translateError(ErrorMessage.UserNotFound.message);
             break;
           case AuthError.alreadyConnected:
-            message = ErrorMessage.AlreadyConnected.message;
+            message = _translateError(ErrorMessage.AlreadyConnected.message);
             break;
         }
       } else {
         final errorText = e.toString();
-        message = isRegister ? "${ErrorMessage.RegistrationFailed.message}$errorText" : '${ErrorMessage.LoginFailed.message}$errorText';
+        final errorPrefix = _translateError(isRegister ? ErrorMessage.RegistrationFailed.message : ErrorMessage.LoginFailed.message);
+        message = '$errorPrefix $errorText';
       }
 
       _updateState(() {
@@ -102,28 +132,28 @@ class LoginController {
   bool registerChecks(String rawUsername, String trimmedUsername, String rawEmail, String trimmedEmail, String rawPassword, String trimmedPassword) {
     if (rawUsername != trimmedUsername) {
       _updateState(() {
-        errorMessage = ErrorMessage.UsernameStartsOrEndsWithSpaces.message;
+        errorMessage = _translateError(ErrorMessage.UsernameStartsOrEndsWithSpaces.message);
       });
       return false;
     }
 
     if (rawPassword.isNotEmpty && trimmedPassword.isEmpty) {
       _updateState(() {
-        errorMessage = ErrorMessage.PasswordOnlySpaces.message;
+        errorMessage = _translateError(ErrorMessage.PasswordOnlySpaces.message);
       });
       return false;
     }
 
     if (rawEmail != trimmedEmail || !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(trimmedEmail)) {
       _updateState(() {
-        errorMessage = ErrorMessage.InvalidEmail.message;
+        errorMessage = _translateError(ErrorMessage.InvalidEmail.message);
       });
       return false;
     }
 
     if (trimmedUsername.length < MIN_USERNAME_LENGTH) {
       _updateState(() {
-        errorMessage = ErrorMessage.ShortUsername.message;
+        errorMessage = _translateError(ErrorMessage.ShortUsername.message);
       });
       return false;
     }
@@ -141,6 +171,19 @@ class LoginController {
     _updateState(() {
       selectedAvatar = avatarPath;
     });
+  }
+
+  Future<void> selectLanguage(AppLanguage language) async {
+    try {
+      await _preferencesService.setLanguage(language);
+      _updateState(() {
+        errorMessage = null;
+      });
+    } catch (_) {
+      _updateState(() {
+        errorMessage = _translateError(ErrorMessage.RegistrationFailed.message);
+      });
+    }
   }
 
   void _updateState(void Function() callback) {

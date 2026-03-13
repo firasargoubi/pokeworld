@@ -16,14 +16,17 @@ const String PIXEL_FONT = 'Pixel';
 
 const Color FOOTER_COLOR = Color(0xFF283030);
 
-const String FOOTER_ATTACK_TEXT = 'Attaquer';
-const String FOOTER_RUN_TEXT = 'Fuire';
+const String FOOTER_ATTACK_KEY = 'pages.combat.attack';
+const String FOOTER_RUN_KEY = 'pages.combat.escape';
 
-const String FOOTER_ATTACK_STAT_LABEL = 'Attaque';
-const String FOOTER_DEFENSE_STAT_LABEL = 'Défense';
-const String FOOTER_SPEED_STAT_LABEL = 'Vitesse';
+const String FOOTER_ATTACK_STAT_LABEL_KEY = 'pages.combat.attackStat';
+const String FOOTER_DEFENSE_STAT_LABEL_KEY = 'pages.combat.defenseStat';
+const String FOOTER_SPEED_STAT_LABEL_KEY = 'pages.combat.speed';
 
-const String DEBUG_MODE_LABEL = 'DEBUG';
+const String COMBAT_ATTACK_ROLL_LABEL_KEY = 'pages.combat.diceAttack';
+const String COMBAT_DEFENSE_ROLL_LABEL_KEY = 'pages.combat.diceDefense';
+
+const String DEBUG_MODE_LABEL_KEY = 'DEBUG';
 
 const Duration ATTACK_ANIMATION_DURATION = Duration(milliseconds: 180);
 const Duration DEATH_ANIMATION_DURATION = Duration(milliseconds: 4000);

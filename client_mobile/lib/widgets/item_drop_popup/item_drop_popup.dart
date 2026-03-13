@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/item_type.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/play_service/play_service.dart';
@@ -69,6 +70,8 @@ class _ItemDropPopupState extends State<ItemDropPopup> {
 
     final titleStyle = _pixelTextStyle(baseSize * 0.05);
 
+    final i18n = I18nService();
+
     return Stack(
       children: [
         Positioned.fill(
@@ -97,7 +100,7 @@ class _ItemDropPopupState extends State<ItemDropPopup> {
                       children: [
                         Expanded(
                           flex: 2,
-                          child: Center(child: Text(TITLE_TEXT, style: titleStyle)),
+                          child: Center(child: Text(i18n.translate(TITLE_KEY), style: titleStyle)),
                         ),
                         Expanded(
                           flex: 4,
@@ -150,7 +153,7 @@ class _ItemDropPopupState extends State<ItemDropPopup> {
                             child: SizedBox(
                               width: baseSize * 0.4,
                               height: baseSize * 0.20,
-                              child: PokeButton(text: ADD_BUTTON_TEXT, onTap: () => PlayService().dropItem(items[selectedIndex])),
+                              child: PokeButton(text: i18n.translate(CONFIRM_BUTTON_KEY), onTap: () => PlayService().dropItem(items[selectedIndex])),
                             ),
                           ),
                         ),

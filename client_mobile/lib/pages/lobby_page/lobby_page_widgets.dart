@@ -1,3 +1,4 @@
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
 import 'package:flutter/material.dart';
 
@@ -39,7 +40,7 @@ class LobbyCodePanel extends StatelessWidget {
               flex: 5,
               child: Align(
                 alignment: Alignment.bottomCenter,
-                child: Text(CODE_LABEL_TEXT, style: labelStyle),
+                child: Text(I18nService().translate(CODE_LABEL_KEY), style: labelStyle),
               ),
             ),
             Expanded(

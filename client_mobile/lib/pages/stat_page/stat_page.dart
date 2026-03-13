@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/stat_data.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/stat_service/stat_service.dart';
@@ -124,7 +125,7 @@ class _StatPageState extends State<StatPage> {
               SizedBox(
                 height: baseSize * STAT_PAGE_HEADER_HEIGHT_FACTOR,
                 width: double.infinity,
-                child: AppHeader(index: 1, text: STAT_PAGE_HEADER_TEXT, onTap: () => MatchService().leaveMatch()),
+                child: AppHeader(index: 1, text: I18nService().translate(STAT_PAGE_HEADER_KEY), onTap: () => MatchService().leaveMatch()),
               ),
               Expanded(
                 child: StatPageFrame(
@@ -149,56 +150,56 @@ class _StatPageState extends State<StatPage> {
                                   child: Row(
                                     children: [
                                       _buildStatColumn(
-                                        STAT_ITEMS_LABEL,
+                                        I18nService().translate(STAT_ITEMS_LABEL_KEY),
                                         _statService.playerStats.map((player) => player.discoveredItemsCount.toString()).toList(),
                                         isSelfList,
                                         baseSize,
                                         statType: PlayerStatType.discoveredItemsCount,
                                       ),
                                       _buildStatColumn(
-                                        STAT_TILES_LABEL,
+                                        I18nService().translate(STAT_TILES_LABEL_KEY),
                                         _statService.playerStats.map((player) => '${player.visitedTilesRatio}%').toList(),
                                         isSelfList,
                                         baseSize,
                                         statType: PlayerStatType.visitedTilesRatio,
                                       ),
                                       _buildStatColumn(
-                                        STAT_COMBATS_LABEL,
+                                        I18nService().translate(STAT_COMBATS_LABEL_KEY),
                                         _statService.playerStats.map((player) => player.combats.toString()).toList(),
                                         isSelfList,
                                         baseSize,
                                         statType: PlayerStatType.combats,
                                       ),
                                       _buildStatColumn(
-                                        STAT_VICTORIES_LABEL,
+                                        I18nService().translate(STAT_VICTORIES_LABEL_KEY),
                                         _statService.playerStats.map((player) => player.victories.toString()).toList(),
                                         isSelfList,
                                         baseSize,
                                         statType: PlayerStatType.victories,
                                       ),
                                       _buildStatColumn(
-                                        STAT_DEFEATS_LABEL,
+                                        I18nService().translate(STAT_DEFEATS_LABEL_KEY),
                                         _statService.playerStats.map((player) => player.defeats.toString()).toList(),
                                         isSelfList,
                                         baseSize,
                                         statType: PlayerStatType.defeats,
                                       ),
                                       _buildStatColumn(
-                                        STAT_ESCAPES_LABEL,
+                                        I18nService().translate(STAT_ESCAPES_LABEL_KEY),
                                         _statService.playerStats.map((player) => player.escapes.toString()).toList(),
                                         isSelfList,
                                         baseSize,
                                         statType: PlayerStatType.escapes,
                                       ),
                                       _buildStatColumn(
-                                        STAT_HP_INFLICTED_LABEL,
+                                        I18nService().translate(STAT_HP_INFLICTED_LABEL_KEY),
                                         _statService.playerStats.map((player) => player.hpInflicted.toString()).toList(),
                                         isSelfList,
                                         baseSize,
                                         statType: PlayerStatType.hpInflicted,
                                       ),
                                       _buildStatColumn(
-                                        STAT_HP_LOST_LABEL,
+                                        I18nService().translate(STAT_HP_LOST_LABEL_KEY),
                                         _statService.playerStats.map((player) => player.hpLost.toString()).toList(),
                                         isSelfList,
                                         baseSize,

@@ -32,15 +32,14 @@ const String SWORD_ICON_ASSET = 'assets/images/menu/icons/play/sword.png';
 const String AGGRESSIVE_BOT_ICON_ASSET = 'assets/images/menu/icons/play/bot-aggressive.png';
 const String DEFENSIVE_BOT_ICON_ASSET = 'assets/images/menu/icons/play/bot-defensive.png';
 
-const String MOVEMENT_LABEL_TEXT = 'Mouvement';
-const String ACTION_TEXT = 'Action';
-const String END_TURN_TEXT = 'Fin du tour';
-const String SURRENDER_TEXT = '< Abandonner';
+const String MOVEMENT_LABEL_KEY = 'pages.play.movement';
+const String ACTION_KEY = 'pages.play.action';
+const String END_TURN_KEY = 'pages.play.endTurn';
+const String SURRENDER_KEY = 'pages.play.surrender';
 
-const String MAP_SIZE_LABEL = 'Taille de la carte : ';
-const String GAME_MODE_LABEL = 'Mode de jeu : ';
-const String PLAYER_COUNT_LABEL = 'Nombre de joueurs : ';
-const String DEBUG_MODE_LABEL = 'DEBUG';
+const String MAP_SIZE_LABEL_KEY = 'pages.play.mapSize';
+const String GAME_MODE_LABEL_KEY = 'pages.play.gameMode';
+const String PLAYER_COUNT_LABEL_KEY = 'pages.play.playerCount';
 
 const double PLAYER_ITEM_ASPECT_RATIO = 163 / 30;
 const double SURRENDER_BUTTON_ASPECT_RATIO = 350 / 70;

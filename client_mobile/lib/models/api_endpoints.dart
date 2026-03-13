@@ -1,9 +1,9 @@
 enum UserEndpoint {
+  User('user'),
   UserLogin('user/login'),
   UserRegister('user/register'),
   UserLogout('user/logout'),
-  UserEdit('user/edit'),
-  UserDelete('user');
+  UserEdit('user/edit');
 
   final String path;
   const UserEndpoint(this.path);

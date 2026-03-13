@@ -1,19 +1,19 @@
 enum Message {
-  AdminQuit("L'administrateur a quitté la partie"),
-  Kick("Vous avez été exclu par l'administrateur"),
-  RoomFull("La partie est pleine"),
-  AlreadyInMatch("Vous êtes déjà dans une partie"),
-  InvalidMatchCode("La partie n'existe pas"),
-  RoomLocked("La partie est verrouillée"),
-  LockedFromLobby("Le jeu s'est verrouillé pendant que vous choisissiez votre personnage, souhaitez-vous revenir au menu principal ?"),
-  LastPlayerRemaining("La partie est terminée car tous les autres joueurs ont quitté"),
-  DebugModeOn("Le mode de debug a été activé"),
-  DebugModeOff("Le mode de debug a été désactivé"),
-  NotEnoughPlayers("La partie doit avoir au moins 2 joueurs pour débuter"),
-  NotLocked("La partie doit être verouillée pour débuter"),
-  NotEvenPlayers("Le mode CTF nécessite un nombre pair de joueurs"),
-  DeleteGame("Le jeu a été supprimé"),
-  InvisibleGame("Le jeu n'est plus visible");
+  AdminQuit('server.messages.adminQuit'),
+  Kick('server.messages.kick'),
+  RoomFull('server.messages.roomFull'),
+  AlreadyInMatch('server.messages.alreadyInMatch'),
+  InvalidMatchCode('server.messages.invalidMatchCode'),
+  RoomLocked('server.messages.roomLocked'),
+  LockedFromLobby('server.messages.lockedFromLobby'),
+  LastPlayerRemaining('server.messages.lastPlayerRemaining'),
+  DebugModeOn('server.messages.debugModeOn'),
+  DebugModeOff('server.messages.debugModeOff'),
+  NotEnoughPlayers('server.messages.notEnoughPlayers'),
+  NotLocked('server.messages.notLocked'),
+  NotEvenPlayers('server.messages.notEvenPlayers'),
+  DeleteGame('server.messages.deletedGame'),
+  InvisibleGame('server.messages.invisibleGame');
 
   const Message(this.message);
 

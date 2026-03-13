@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:client_mobile/consts/avatar_data_const.dart';
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/player_data.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
@@ -90,7 +91,7 @@ class _PlayerCardState extends State<PlayerCard> {
     isViewerHost = matchData?.lobbyData.hostPlayerIndex == MatchService().selfIndex;
 
     isInactive = !(player?.isConnected ?? false);
-    inactiveLabel = isViewerHost ? INACTIVE_LABEL_TEXT : '';
+    inactiveLabel = isViewerHost ? I18nService().translate(INACTIVE_LABEL_KEY) : '';
   }
 
   static ColorFilter brightnessFilter(double brightness) {

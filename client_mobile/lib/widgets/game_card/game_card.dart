@@ -5,6 +5,7 @@ import 'package:client_mobile/consts/game_card.dart';
 import 'package:client_mobile/models/game_card_config.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/map_data.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
 import 'package:flutter/material.dart';
 
@@ -68,7 +69,9 @@ class GameCard extends StatelessWidget {
         ? GAME_CARD_CONFIGS[GameCardColor.Green]!
         : GAME_CARD_CONFIGS[GameCardColor.Pink]!;
 
-    final cardButtonText = isCreateCard ? GAME_CARD_CREATE_BUTTON_TEXT : GAME_CARD_JOIN_BUTTON_TEXT;
+    final i18n = I18nService();
+    final buttonKey = isCreateCard ? GAME_CARD_CREATE_BUTTON_KEY : GAME_CARD_JOIN_BUTTON_KEY;
+    final cardButtonText = i18n.translate(buttonKey);
 
     final nameText = game.name;
     final sizeText = '${game.mapData.size.value}x${game.mapData.size.value}';

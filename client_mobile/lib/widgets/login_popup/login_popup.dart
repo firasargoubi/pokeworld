@@ -1,6 +1,9 @@
 import 'package:client_mobile/consts/avatar_list.dart';
 import 'package:client_mobile/consts/login_const.dart';
 import 'package:client_mobile/controllers/login_controller.dart';
+import 'package:client_mobile/models/user_preferences.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
+import 'package:client_mobile/widgets/binary_toggle/binary_toggle.dart';
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +43,8 @@ class _LoginPopupState extends State<LoginPopup> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = I18nService();
+
     return Dialog(
       child: Container(
         padding: const EdgeInsets.all(16.0),
@@ -50,20 +55,44 @@ class _LoginPopupState extends State<LoginPopup> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(_controller.isRegister ? LOGIN_POPUP_CREATE_ACCOUNT_TITLE : LOGIN_POPUP_SIGN_IN_TITLE),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    i18n.translate(_controller.isRegister ? LOGIN_POPUP_CREATE_ACCOUNT_TITLE : LOGIN_POPUP_SIGN_IN_TITLE),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                BinaryToggle(
+                  leftSelected: _controller.currentLanguage == AppLanguage.French,
+                  enabled: !_controller.isLoading,
+                  leftLabel: i18n.translate(LOGIN_POPUP_LANGUAGE_FRENCH),
+                  rightLabel: i18n.translate(LOGIN_POPUP_LANGUAGE_ENGLISH),
+                  onChanged: (isFrench) {
+                    _controller.selectLanguage(isFrench ? AppLanguage.French : AppLanguage.English);
+                  },
+                ),
+              ],
+            ),
             if (_controller.isRegister)
               TextField(
                 controller: _controller.emailController,
                 enabled: !_controller.isLoading,
                 keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(labelText: LOGIN_POPUP_EMAIL_LABEL, hintText: LOGIN_POPUP_EMAIL_HINT, prefixIcon: Icon(Icons.email)),
+                decoration: InputDecoration(
+                  labelText: i18n.translate(LOGIN_POPUP_EMAIL_LABEL),
+                  hintText: i18n.translate(LOGIN_POPUP_EMAIL_HINT),
+                  prefixIcon: const Icon(Icons.email),
+                ),
                 onTap: () => AudioService().playSoundEffect(SoundEffect.Select.path),
               ),
             if (_controller.isRegister)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(LOGIN_POPUP_CHOOSE_AVATAR_LABEL),
+                  Text(i18n.translate(LOGIN_POPUP_CHOOSE_AVATAR_LABEL)),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -91,14 +120,22 @@ class _LoginPopupState extends State<LoginPopup> {
               controller: _controller.usernameController,
               enabled: !_controller.isLoading,
               inputFormatters: [UsernameInputFormatter(), LengthLimitingTextInputFormatter(MAX_USERNAME_LENGTH)],
-              decoration: InputDecoration(labelText: LOGIN_POPUP_USERNAME_LABEL, hintText: LOGIN_POPUP_USERNAME_HINT, prefixIcon: Icon(Icons.person)),
+              decoration: InputDecoration(
+                labelText: i18n.translate(LOGIN_POPUP_USERNAME_LABEL),
+                hintText: i18n.translate(LOGIN_POPUP_USERNAME_HINT),
+                prefixIcon: Icon(Icons.person)
+              ),
               onTap: () => AudioService().playSoundEffect(SoundEffect.Select.path),
             ),
             TextField(
               controller: _controller.passwordController,
               enabled: !_controller.isLoading,
               obscureText: true,
-              decoration: InputDecoration(labelText: LOGIN_POPUP_PASSWORD_LABEL, hintText: LOGIN_POPUP_PASSWORD_HINT, prefixIcon: Icon(Icons.lock)),
+              decoration: InputDecoration(
+                labelText: i18n.translate(LOGIN_POPUP_PASSWORD_LABEL),
+                hintText: i18n.translate(LOGIN_POPUP_PASSWORD_HINT),
+                prefixIcon: const Icon(Icons.lock),
+              ),
               onTap: () => AudioService().playSoundEffect(SoundEffect.Select.path),
             ),
             if (_controller.errorMessage != null) Text(_controller.errorMessage!, style: TextStyle(color: Colors.red, fontSize: 12)),
@@ -116,15 +153,15 @@ class _LoginPopupState extends State<LoginPopup> {
                       );
                     },
               child: _controller.isLoading
-                  ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                  : Text(_controller.isRegister ? LOGIN_POPUP_REGISTER_BUTTON : LOGIN_POPUP_SIGN_IN_TITLE),
+                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                  : Text(i18n.translate(_controller.isRegister ? LOGIN_POPUP_REGISTER_BUTTON : LOGIN_POPUP_SIGN_IN_TITLE)),
             ),
             TextButton(
               onPressed: () {
                 AudioService().playSoundEffect(SoundEffect.Select.path);
                 _controller.toggleRegister();
               },
-              child: Text(_controller.isRegister ? LOGIN_POPUP_ALREADY_HAVE_ACCOUNT : LOGIN_POPUP_CREATE_ACCOUNT_TITLE),
+              child: Text(i18n.translate(_controller.isRegister ? LOGIN_POPUP_ALREADY_HAVE_ACCOUNT : LOGIN_POPUP_CREATE_ACCOUNT_TITLE)),
             ),
           ],
         ),

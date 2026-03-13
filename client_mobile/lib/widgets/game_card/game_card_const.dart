@@ -9,8 +9,8 @@ const String GAME_CARD_LIVE_ICON_ASSET = 'assets/images/menu/containers/game/ico
 const String GAME_CARD_FFA_ICON_ASSET = 'assets/images/menu/containers/game/FFA-icon.png';
 const String GAME_CARD_CTF_ICON_ASSET = 'assets/images/menu/containers/game/CTF-icon.png';
 
-const String GAME_CARD_JOIN_BUTTON_TEXT = 'JOINDRE';
-const String GAME_CARD_CREATE_BUTTON_TEXT = 'CRÉER';
+const String GAME_CARD_JOIN_BUTTON_KEY = 'components.gameCard.join';
+const String GAME_CARD_CREATE_BUTTON_KEY = 'components.gameCard.play';
 
 const bool GAME_CARD_DEFAULT_IS_WAITING = true;
 const String GAME_CARD_DEFAULT_COUNT_PLAYERS = '1/4';

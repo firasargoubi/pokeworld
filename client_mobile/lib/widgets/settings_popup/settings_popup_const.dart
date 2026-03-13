@@ -7,10 +7,10 @@ const String CONTAINER_ASSET = 'assets/images/menu/containers/lobby/gray.png';
 const String FONT_FAMILY = 'Pixel';
 const Color SHADOW_COLOR = Color.fromARGB(255, 100, 100, 100);
 
-const String TITLE_TEXT = 'Paramètres';
-const String MUSIC_LABEL = 'MUSIQUE';
-const String EFFECTS_LABEL = 'EFFETS';
-const String CLOSE_BUTTON_TEXT = 'FERMER';
+const String TITLE_TEXT = 'components.appSettings.title';
+const String MUSIC_LABEL = 'components.appSettings.music';
+const String EFFECTS_LABEL = 'components.appSettings.effects';
+const String CLOSE_BUTTON_TEXT = 'components.appSettings.close';
 
 const double OVERLAY_ALPHA = 0.5;
 const double BLUR_SIGMA = 2.0;
