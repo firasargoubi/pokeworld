@@ -18,6 +18,7 @@ import {
     PATH_ATTACK_MODIFICATION,
     PATH_DEFENSE_MODIFICATION,
 } from '@common/consts/combat-data.const';
+import { AVATAR_ELEMENT_TYPE_MAP, ELEMENT_TYPE_ADVANTAGE_BONUS, ELEMENT_TYPE_ADVANTAGES } from '@common/consts/elemental-type';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatAction, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
 import { PlayerData, PlayerType } from '@common/interfaces/player-data';
@@ -46,7 +47,10 @@ export class CombatService {
 
     startCombat(match: Match, playerId: string, targetPlayerId: string) {
         match.data.combatData.lastCombatAction = CombatAction.None;
-        match.data.combatData.playersCombatData = [this.computePlayerData(match, playerId), this.computePlayerData(match, targetPlayerId)];
+        match.data.combatData.playersCombatData = [
+            this.computePlayerData(match, playerId, targetPlayerId),
+            this.computePlayerData(match, targetPlayerId, playerId),
+        ];
         match.data.combatData.isSecondPlayerTurn = match.getPlayer(playerId).speed < match.getPlayer(targetPlayerId).speed;
         this.startCombatWait(match);
     }
@@ -210,9 +214,9 @@ export class CombatService {
         return result;
     }
 
-    private computePlayerData(match: Match, playerId: string): PlayerCombatData {
+    private computePlayerData(match: Match, playerId: string, enemyId: string): PlayerCombatData {
         const player = match.getPlayer(playerId);
-        const playerCombatData = {
+        let playerCombatData: PlayerCombatData = {
             ...structuredClone(DEFAULT_PLAYER_COMBAT_DATA),
             playerIndex: match.getPlayerIndex(playerId),
             name: player.name,
@@ -221,7 +225,10 @@ export class CombatService {
             profilePicture: player.profilePicture,
             fullProfilePicture: player.fullProfilePicture,
         };
-        return this.applyCombatBuffs(match, playerCombatData);
+
+        playerCombatData = this.applyCombatBuffs(match, playerCombatData);
+        playerCombatData = this.applyElementalBuffs(match, playerCombatData, playerId, enemyId);
+        return playerCombatData;
     }
 
     private applyCombatBuffs(match: Match, playerCombatData: PlayerCombatData): PlayerCombatData {
@@ -242,6 +249,22 @@ export class CombatService {
             }
         });
 
+        return playerCombatData;
+    }
+
+    private applyElementalBuffs(match: Match, playerCombatData: PlayerCombatData, playerId: string, targetPlayerId: string): PlayerCombatData {
+        if (!match.data.playData.isElementalMode) {
+            return playerCombatData;
+        }
+        const player = match.getPlayer(playerId);
+        const targetPlayer = match.getPlayer(targetPlayerId);
+
+        const playerType = AVATAR_ELEMENT_TYPE_MAP[player.avatar];
+        const targetPlayerType = AVATAR_ELEMENT_TYPE_MAP[targetPlayer.avatar];
+
+        if (ELEMENT_TYPE_ADVANTAGES[playerType].includes(targetPlayerType)) {
+            playerCombatData.attack += ELEMENT_TYPE_ADVANTAGE_BONUS;
+        }
         return playerCombatData;
     }
 }

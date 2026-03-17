@@ -22,6 +22,7 @@ export class AppSettingsPopupComponent {
 
     private lastMusicVolume = this.audioService.getBackgroundMusicVolume();
     private lastEffectsVolume = this.audioService.getEffectsVolume();
+    private lastAvatarsVolume = this.audioService.getAvatarsVolume();
 
     get currentTheme(): AppTheme {
         return this.preferencesService.currentTheme;
@@ -31,12 +32,14 @@ export class AppSettingsPopupComponent {
         return this.preferencesService.currentLanguage;
     }
 
-    onVolumeChange(music: number, effects: number): void {
+    onVolumeChange(music: number, effects: number, avatars: number): void {
         const factor = 100;
         this.lastMusicVolume = music / factor;
         this.lastEffectsVolume = effects / factor;
+        this.lastAvatarsVolume = avatars / factor;
         this.audioService.setBackgroundMusicVolume(this.lastMusicVolume);
         this.audioService.setEffectsVolume(this.lastEffectsVolume);
+        this.audioService.setAvatarsVolume(this.lastAvatarsVolume);
     }
 
     onMuteMusic(): void {
@@ -48,6 +51,11 @@ export class AppSettingsPopupComponent {
     onMuteEffects(): void {
         const fx = this.audioService.getEffectsVolume() === 0 ? this.lastEffectsVolume : 0;
         this.audioService.setEffectsVolume(fx);
+    }
+
+    onMuteAvatars(): void {
+        const av = this.audioService.getAvatarsVolume() === 0 ? this.lastAvatarsVolume : 0;
+        this.audioService.setAvatarsVolume(av);
     }
 
     playClickSound(): void {

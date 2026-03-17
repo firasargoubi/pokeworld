@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { CreateBotPopupComponent } from '@app/components/bot-creation-popup/bot-creation-popup.component';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { MatchSettingsPopupComponent } from '@app/components/match-settings-popup/match-settings-popup.component';
 import { PlayerCardComponent } from '@app/components/player-card/player-card.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { DEFAULT_LOBBY_VISUAL_DATA } from '@app/consts/player-data.const';
@@ -18,6 +19,7 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { MAX_PLAYERS } from '@common/consts/player-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { MatchSettings } from '@common/interfaces/match-data';
 import { PlayerType } from '@common/interfaces/player-data';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -25,13 +27,23 @@ import { TranslateModule } from '@ngx-translate/core';
     selector: 'app-lobby-page',
     templateUrl: './lobby-page.component.html',
     styleUrls: ['./lobby-page.component.scss'],
-    imports: [CommonModule, HeaderComponent, PlayerCardComponent, PokeballButtonComponent, ChatComponent, CreateBotPopupComponent, TranslateModule],
+    imports: [
+        CommonModule,
+        HeaderComponent,
+        PlayerCardComponent,
+        PokeballButtonComponent,
+        ChatComponent,
+        CreateBotPopupComponent,
+        TranslateModule,
+        MatchSettingsPopupComponent,
+    ],
     standalone: true,
 })
 export class LobbyPageComponent {
     visualData: LobbyVisualData = structuredClone(DEFAULT_LOBBY_VISUAL_DATA);
     matchService: MatchService = inject(MatchService);
     showBotPopup: boolean = false;
+    isMatchSettingsPopupVisible: boolean = false;
     private lobbyService: LobbyService = inject(LobbyService);
     private popupService: PopupService = inject(PopupService);
     private router: Router = inject(Router);
@@ -75,14 +87,6 @@ export class LobbyPageComponent {
         this.lobbyService.changeLockStatus(!this.matchService.data.lobbyData.isLocked);
     }
 
-    toggleDropInStatus() {
-        if (!this.visualData.isSelfHost) {
-            return;
-        }
-        this.audioService.playEffect(SoundEffect.Click);
-        this.lobbyService.changeDropInStatus(!this.matchService.data.lobbyData.isDropInEnabled);
-    }
-
     kickPlayer(playerId: string) {
         this.audioService.playEffect(SoundEffect.Click);
         this.lobbyService.kickPlayer(playerId);
@@ -98,9 +102,19 @@ export class LobbyPageComponent {
         this.showBotPopup = true;
     }
 
+    showMatchSettingsPopup() {
+        this.audioService.playEffect(SoundEffect.Click);
+        this.isMatchSettingsPopupVisible = true;
+    }
+
     handleBotTypeSelected(botType: PlayerType) {
         this.lobbyService.addBot(botType);
         this.showBotPopup = false;
+    }
+
+    handleSettingsSelected(matchSettings: MatchSettings) {
+        this.lobbyService.changeMatchSettings(matchSettings);
+        this.isMatchSettingsPopupVisible = false;
     }
 
     private copyToClipboard(text: string) {

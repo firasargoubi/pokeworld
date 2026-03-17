@@ -96,3 +96,15 @@ export interface AvatarModifiers {
     isEvolved: boolean;
     isMissingNo: boolean;
 }
+
+export enum ElementalType {
+    Grass = 'grass',
+    Water = 'water',
+    Fire = 'fire',
+    Electric = 'electric',
+    Normal = 'normal',
+    Fairy = 'fairy',
+    Ground = 'ground',
+    Dragon = 'dragon',
+    Psychic = 'psychic',
+}

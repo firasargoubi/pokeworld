@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
-import { MatchState } from '@common/interfaces/match-data';
+import { MatchSettings, MatchState } from '@common/interfaces/match-data';
 import { Avatar, PlayerType } from '@common/interfaces/player-data';
 import { LobbyEvent } from '@common/interfaces/socket-event.enum';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
@@ -57,9 +57,14 @@ describe('LobbyService', () => {
         expect(mockSocketService.emit).toHaveBeenCalledWith(LobbyEvent.ChangeLockStatus, true);
     });
 
-    it('changeDropInStatus should emit ChangeDropInStatus event with status', () => {
-        service.changeDropInStatus(true);
-        expect(mockSocketService.emit).toHaveBeenCalledWith(LobbyEvent.ChangeDropInStatus, true);
+    it('changeMatchSettings should emit ChangeMatchSettings event with matchSettings', () => {
+        const mockMatchSettings: MatchSettings = {
+            isElementalMode: true,
+            isDropInEnabled: true,
+            isRapidElimination: false,
+        };
+        service.changeMatchSettings(mockMatchSettings);
+        expect(mockSocketService.emit).toHaveBeenCalledWith(LobbyEvent.ChangeMatchSettings, mockMatchSettings);
     });
 
     it('startMatch should emit StartMatch event', () => {

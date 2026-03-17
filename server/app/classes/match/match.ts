@@ -1,7 +1,7 @@
 import { MatchService } from '@app/services/match/match.service';
 import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { DEFAULT_PLAYER_DATA, MAX_PLAYERS } from '@common/consts/player-data.const';
-import { MatchData, MatchState } from '@common/interfaces/match-data';
+import { MatchData, MatchSettings, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
@@ -65,6 +65,11 @@ export class Match {
         } else {
             this.data.lobbyData.isLocked = false;
         }
+    }
+
+    changeSettings(matchSettings: MatchSettings) {
+        this.data.playData.isElementalMode = matchSettings.isElementalMode;
+        this.data.lobbyData.isDropInEnabled = matchSettings.isDropInEnabled;
     }
 
     leave(playerId: string): void {

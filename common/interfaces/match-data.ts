@@ -30,6 +30,7 @@ export interface PlayData {
     activePlayerIndex: number;
     hasAction: boolean;
     movementLeft: number;
+    isElementalMode: boolean;
 }
 
 export interface CombatData {
@@ -77,6 +78,12 @@ export interface SpectatorPanelData {
     speed: number;
     currentHealth: number;
     maxHealth: number;
+}
+
+export interface MatchSettings {
+    isElementalMode: boolean;
+    isDropInEnabled: boolean;
+    isRapidElimination: boolean;
 }
 
 export enum CombatAction {

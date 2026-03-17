@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AudioSettings, BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { MatchData } from '@common/interfaces/match-data';
-import { AUDIO_CONFIG, AUDIO_LOCAL_STORAGE_KEY, COMBAT_LOG_KEYS, COMBAT_LOG_PATTERNS, SOUND_EFFECTS_MAP } from './audio.const';
+import { Avatar } from '@common/interfaces/player-data';
+import { AUDIO_CONFIG, AUDIO_LOCAL_STORAGE_KEY, AVATAR_SOUNDS, COMBAT_LOG_KEYS, COMBAT_LOG_PATTERNS, SOUND_EFFECTS_MAP } from './audio.const';
 
 @Injectable({
     providedIn: 'root',
@@ -9,10 +10,12 @@ import { AUDIO_CONFIG, AUDIO_LOCAL_STORAGE_KEY, COMBAT_LOG_KEYS, COMBAT_LOG_PATT
 export class AudioService {
     private backgroundMusic: HTMLAudioElement | null = null;
     private effects: Map<SoundEffect, HTMLAudioElement> = new Map();
+    private avatarsSounds: Map<Avatar, HTMLAudioElement> = new Map();
     private currentTrack: BackgroundMusic | null = null;
     private previousLogSize = 0;
     private backgroundMusicVolume = AUDIO_CONFIG.backgroundMusicVolume;
     private effectsVolume = AUDIO_CONFIG.effectsVolume;
+    private avatarsVolume = AUDIO_CONFIG.avatarsVolume;
 
     constructor() {
         this.loadSavedVolumes();
@@ -26,6 +29,19 @@ export class AudioService {
                 const audio = new Audio(`assets/audio/effects/${path}`);
                 audio.load();
                 this.effects.set(effect, audio);
+            }
+        });
+    }
+
+    preloadAvatarSounds(avatars: Avatar[]): void {
+        avatars.forEach((avatar) => {
+            if (!this.avatarsSounds.has(avatar)) {
+                const soundFile = AVATAR_SOUNDS[avatar];
+                if (soundFile) {
+                    const audio = new Audio(`assets/audio/avatars/${soundFile}`);
+                    audio.load();
+                    this.avatarsSounds.set(avatar, audio);
+                }
             }
         });
     }
@@ -93,6 +109,32 @@ export class AudioService {
         this.previousLogSize = currentLogs.length;
     }
 
+    playAvatarsSounds(avatars: Avatar[]): void {
+        let index = 0;
+        const playNext = () => {
+            if (index < avatars.length) {
+                const avatar = avatars[index];
+                const soundFile = AVATAR_SOUNDS[avatar];
+                if (soundFile) {
+                    const audio = this.avatarsSounds.get(avatar);
+                    if (audio) {
+                        audio.volume = this.avatarsVolume;
+                        audio.play();
+                        audio.onended = () => {
+                            index++;
+                            setTimeout(playNext, AUDIO_CONFIG.avatarSoundInterval);
+                        };
+                    }
+                } else {
+                    index++;
+                    setTimeout(playNext, AUDIO_CONFIG.avatarSoundInterval);
+                }
+            }
+        };
+
+        playNext();
+    }
+
     setBackgroundMusicVolume(volume: number = this.backgroundMusicVolume): void {
         this.backgroundMusicVolume = this.validateVolume(volume, AUDIO_CONFIG.backgroundMusicVolume);
         this.saveSettings();
@@ -109,6 +151,11 @@ export class AudioService {
         });
     }
 
+    setAvatarsVolume(volume: number = this.avatarsVolume): void {
+        this.avatarsVolume = this.validateVolume(volume, AUDIO_CONFIG.avatarsVolume);
+        this.saveSettings();
+    }
+
     getBackgroundMusicVolume(): number {
         return this.backgroundMusicVolume;
     }
@@ -117,10 +164,15 @@ export class AudioService {
         return this.effectsVolume;
     }
 
+    getAvatarsVolume(): number {
+        return this.avatarsVolume;
+    }
+
     private saveSettings(): void {
         const settings: AudioSettings = {
             backgroundMusicVolume: this.backgroundMusicVolume,
             effectsVolume: this.effectsVolume,
+            avatarsVolume: this.avatarsVolume,
         };
         localStorage.setItem(AUDIO_LOCAL_STORAGE_KEY, JSON.stringify(settings));
     }
@@ -138,9 +190,11 @@ export class AudioService {
                 const settings: AudioSettings = JSON.parse(storedSettings);
                 this.backgroundMusicVolume = this.validateVolume(settings.backgroundMusicVolume, AUDIO_CONFIG.backgroundMusicVolume);
                 this.effectsVolume = this.validateVolume(settings.effectsVolume, AUDIO_CONFIG.effectsVolume);
+                this.avatarsVolume = this.validateVolume(settings.avatarsVolume, AUDIO_CONFIG.avatarsVolume);
             } catch (error) {
                 this.backgroundMusicVolume = AUDIO_CONFIG.backgroundMusicVolume;
                 this.effectsVolume = AUDIO_CONFIG.effectsVolume;
+                this.avatarsVolume = AUDIO_CONFIG.avatarsVolume;
             }
         }
     }

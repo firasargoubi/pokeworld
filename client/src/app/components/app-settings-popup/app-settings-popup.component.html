@@ -1,18 +1,26 @@
 <div class="settings-body">
     <div class="settings-title">{{ 'components.appSettings.title' | translate }}</div>
-    
+
     <div class="section-title">{{ 'components.appSettings.language' | translate }}</div>
-        <div class="option-row">
-            <button class="option-button" [class.active]="currentLanguage === appLanguage.French" (click)="selectLanguage(appLanguage.French)">{{ 'components.appSettings.languageFr' | translate }}</button>
-            <button class="option-button" [class.active]="currentLanguage === appLanguage.English" (click)="selectLanguage(appLanguage.English)">{{ 'components.appSettings.languageEn' | translate }}</button>
+    <div class="option-row">
+        <button class="option-button" [class.active]="currentLanguage === appLanguage.French" (click)="selectLanguage(appLanguage.French)">
+            {{ 'components.appSettings.languageFr' | translate }}
+        </button>
+        <button class="option-button" [class.active]="currentLanguage === appLanguage.English" (click)="selectLanguage(appLanguage.English)">
+            {{ 'components.appSettings.languageEn' | translate }}
+        </button>
     </div>
-    
+
     <div class="section-title">{{ 'components.appSettings.theme' | translate }}</div>
-        <div class="option-row">
-            <button class="option-button" [class.active]="currentTheme === appTheme.Default" (click)="selectTheme(appTheme.Default)">{{ 'components.appSettings.themeDefault' | translate }}</button>
-            <button class="option-button" [class.active]="currentTheme === appTheme.Dark" (click)="selectTheme(appTheme.Dark)">{{ 'components.appSettings.themeDark' | translate }}</button>
+    <div class="option-row">
+        <button class="option-button" [class.active]="currentTheme === appTheme.Default" (click)="selectTheme(appTheme.Default)">
+            {{ 'components.appSettings.themeDefault' | translate }}
+        </button>
+        <button class="option-button" [class.active]="currentTheme === appTheme.Dark" (click)="selectTheme(appTheme.Dark)">
+            {{ 'components.appSettings.themeDark' | translate }}
+        </button>
     </div>
-    
+
     <div class="section-title">{{ 'components.appSettings.audio' | translate }}</div>
     <div class="settings-container">
         <div class="setting-line">
@@ -25,7 +33,7 @@
                 max="100"
                 [value]="audioService.getBackgroundMusicVolume() * 100"
                 [style.--fill]="audioService.getBackgroundMusicVolume() * 100 + '%'"
-                (input)="onVolumeChange(music.valueAsNumber, effects.valueAsNumber)"
+                (input)="onVolumeChange(music.valueAsNumber, effects.valueAsNumber, avatars.valueAsNumber)"
                 (click)="playClickSound()"
             />
             <div class="mute-button" (mousedown)="onMuteMusic()">
@@ -49,7 +57,7 @@
                 max="100"
                 [value]="audioService.getEffectsVolume() * 100"
                 [style.--fill]="audioService.getEffectsVolume() * 100 + '%'"
-                (input)="onVolumeChange(music.valueAsNumber, effects.valueAsNumber)"
+                (input)="onVolumeChange(music.valueAsNumber, effects.valueAsNumber, avatars.valueAsNumber)"
                 (click)="playClickSound()"
             />
             <div class="mute-button" (mousedown)="onMuteEffects()">
@@ -59,6 +67,30 @@
                     [class.low-volume]="audioService.getEffectsVolume() > 0 && audioService.getEffectsVolume() <= 0.5"
                     [class.medium-volume]="audioService.getEffectsVolume() > 0.5 && audioService.getEffectsVolume() <= 0.8"
                     [class.high-volume]="audioService.getEffectsVolume() > 0.8"
+                ></div>
+            </div>
+        </div>
+
+        <div class="setting-line">
+            <label for="volAvatars">{{ 'components.appSettings.avatars' | translate }}</label>
+            <input
+                #avatars
+                id="volAvatars"
+                type="range"
+                min="0"
+                max="100"
+                [value]="audioService.getAvatarsVolume() * 100"
+                [style.--fill]="audioService.getAvatarsVolume() * 100 + '%'"
+                (input)="onVolumeChange(music.valueAsNumber, effects.valueAsNumber, avatars.valueAsNumber)"
+                (click)="playClickSound()"
+            />
+            <div class="mute-button" (mousedown)="onMuteAvatars()">
+                <div
+                    class="volume-icon"
+                    [class.muted]="audioService.getAvatarsVolume() === 0"
+                    [class.low-volume]="audioService.getAvatarsVolume() > 0 && audioService.getAvatarsVolume() <= 0.5"
+                    [class.medium-volume]="audioService.getAvatarsVolume() > 0.5 && audioService.getAvatarsVolume() <= 0.8"
+                    [class.high-volume]="audioService.getAvatarsVolume() > 0.8"
                 ></div>
             </div>
         </div>

@@ -15,9 +15,9 @@ export enum LobbyEvent {
     ChangeAvatar = 'changeAvatar',
     JoinLobby = 'joinLobby',
     ChangeLockStatus = 'changeLockStatus',
-    ChangeDropInStatus = 'changeDropInStatus',
     StartMatch = 'startMatch',
     AddBot = 'addBot',
+    ChangeMatchSettings = 'changeMatchSettings',
 }
 
 export enum PlayEvent {
@@ -46,5 +46,5 @@ export enum ChatEvent {
 }
 
 export enum UserEvent {
-    Associate = 'associate'
+    Associate = 'associate',
 }
