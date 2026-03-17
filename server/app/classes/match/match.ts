@@ -3,7 +3,7 @@ import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { DEFAULT_PLAYER_DATA, MAX_PLAYERS } from '@common/consts/player-data.const';
 import { MatchData, MatchSettings, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
-import { PlayerData, PlayerType } from '@common/interfaces/player-data';
+import { Avatar, PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { Position } from '@common/interfaces/position';
 
 export class Match {
@@ -150,13 +150,13 @@ export class Match {
         }
     }
 
-    storePlayerVictories(playerId: string, victories: number) {
-        this.dropOutVictories.set(playerId, victories);
+    storePlayerVictories(playerUserId: string, victories: number) {
+        this.dropOutVictories.set(playerUserId, victories);
     }
 
-    getPlayerVictories(playerId: string): number | undefined {
-        const victories = this.dropOutVictories.get(playerId);
-        this.dropOutVictories.delete(playerId);
+    getPlayerVictories(playerUserId: string): number | undefined {
+        const victories = this.dropOutVictories.get(playerUserId);
+        this.dropOutVictories.delete(playerUserId);
         return victories;
     }
 
@@ -202,12 +202,16 @@ export class Match {
             return;
         }
         player.isConnected = false;
+        player.avatar = Avatar.Default;
+        player.id = player.userId ?? player.id;
         if (this.data.lobbyData.isDropInEnabled && player.spawnPoint.x >= 0 && player.spawnPoint.y >= 0) {
             this.releaseSpawnPoint(player.spawnPoint);
             this.data.gameData.mapData.items.Spawn = this.data.gameData.mapData.items.Spawn.filter(
                 (spawnPoint) => spawnPoint.x !== player.spawnPoint.x || spawnPoint.y !== player.spawnPoint.y,
             );
-            this.storePlayerVictories(playerId, player.combatsWon);
+            if (player.userId) {
+                this.storePlayerVictories(player.userId, player.combatsWon);
+            }
         }
         const connectedPlayers = this.data.players.filter((p) => p.isConnected);
         if (connectedPlayers.length === 1) {

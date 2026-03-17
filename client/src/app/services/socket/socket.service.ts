@@ -41,4 +41,8 @@ export class SocketService {
     on<T>(event: string, callback: (...args: T[]) => void) {
         this.socket.on(event, callback);
     }
+
+    off<T>(event: string, callback?: (...args: T[]) => void) {
+        this.socket.off(event, callback);
+    }
 }

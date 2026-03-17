@@ -65,7 +65,7 @@ export class StatPageComponent {
     }
 
     isSelfPlayer(playerId: string) {
-        return this.matchService.selfPlayer.id === playerId;
+        return (this.matchService.selfPlayer.userId ?? this.matchService.selfPlayer.id) === playerId;
     }
 
     isModeCTF(): boolean {

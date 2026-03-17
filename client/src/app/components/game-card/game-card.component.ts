@@ -5,8 +5,10 @@ import { CARD_SIZE_TO_COLOR, GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@a
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
+import { MAX_PLAYERS } from '@common/consts/player-data.const';
 import { GameData } from '@common/interfaces/game-data';
-import { TranslateModule } from '@ngx-translate/core';
+import { MatchData, MatchState } from '@common/interfaces/match-data';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-game-card',
@@ -17,6 +19,7 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class GameCardComponent {
     @Input() game: GameData;
+    @Input() matchData?: MatchData;
     @Input() isAdminView: boolean = false;
     @Input() index: number = 0;
     @Output() edit = new EventEmitter<string>();
@@ -28,6 +31,29 @@ export class GameCardComponent {
     cardColor: string = 'blue-card';
     private audioService: AudioService = inject(AudioService);
     private gameDataService: GameDataService = inject(GameDataService);
+    private translate: TranslateService = inject(TranslateService);
+
+    get matchStateIconClass(): string {
+        let className = 'state-icon ';
+        if (this.matchData?.state === MatchState.Lobby) {
+            className += 'lobby';
+        } else {
+            className += 'in-game';
+        }
+        return className;
+    }
+
+    get gameMatchInfo(): string {
+        if (this.matchData) {
+            const maxPlayers = MAX_PLAYERS[this.game.mapData.size];
+            const nbPlayers = this.matchData.players.filter((player) => player.isConnected).length;
+            const formattedMatchInfo = `${nbPlayers}/${maxPlayers} ${this.translate.instant('components.gameCard.players')}\n${this.translate.instant(
+                'components.gameCard.code',
+            )}: ${this.matchData.code}`;
+            return formattedMatchInfo;
+        }
+        return this.formatDate(this.game.lastEdited);
+    }
 
     onEdit() {
         this.audioService.playEffect(SoundEffect.Click);

@@ -89,9 +89,13 @@ describe('LobbyService', () => {
     });
 
     it('on match update should navigate to play when leaving lobby', () => {
-        mockMatchService.isState.and.callFake((states: MatchState[]) => states.includes(MatchState.Lobby) || states.includes(MatchState.TurnStart));
+        mockMatchService.isState.and.callFake((states: MatchState[]) => states.includes(MatchState.TurnStart));
+        Object.defineProperty(mockSocketService, 'selfId', { value: 'selfId' });
         const oldMatchData = structuredClone(MOCK_MATCH_DATAS[0]);
         oldMatchData.state = MatchState.Lobby;
+        oldMatchData.players[0].id = 'selfId';
+        oldMatchData.players[0].isConnected = true;
+        mockMatchService.selfPlayer.isConnected = true;
         service['onMatchUpdate'](oldMatchData);
         expect(mockRouter.navigate).toHaveBeenCalledWith([PageEndpoint.Play]);
     });

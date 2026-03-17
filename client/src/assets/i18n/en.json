@@ -152,7 +152,8 @@
         "join": {
             "title": "JOIN MATCH",
             "enterCode": "Enter your access code",
-            "pressEnter": "Press Enter to confirm"
+            "pressEnter": "Press Enter to confirm",
+            "joinButton": "JOIN"
         },
         "create": {
             "title": "CREATE MATCH"
@@ -298,7 +299,9 @@
             "confirm": "CONFIRM"
         },
         "gameCard": {
-            "play": "PLAY"
+            "play": "PLAY",
+            "players": "players",
+            "code": "Code"
         },
         "header": {
             "back": "Back"

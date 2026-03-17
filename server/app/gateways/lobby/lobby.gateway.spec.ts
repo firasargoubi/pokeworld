@@ -1,6 +1,7 @@
 import { Match } from '@app/classes/match/match';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
+import { UserService } from '@app/services/user/user.service';
 import { Avatar, PlayerType } from '@common/interfaces/player-data';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -14,6 +15,7 @@ describe('LobbyGateway', () => {
     let mockServer: SinonStubbedInstance<Server>;
     let mockLobbyService: SinonStubbedInstance<LobbyService>;
     let mockMatchService: SinonStubbedInstance<MatchService>;
+    let mockUserService: SinonStubbedInstance<UserService>;
     let emitStub: SinonStub;
     let mockMatch: SinonStubbedInstance<Match>;
 
@@ -21,16 +23,19 @@ describe('LobbyGateway', () => {
         mockSocket = createStubInstance<Socket>(Socket);
         mockLobbyService = createStubInstance<LobbyService>(LobbyService);
         mockMatchService = createStubInstance<MatchService>(MatchService);
+        mockUserService = createStubInstance<UserService>(UserService);
         mockServer = createStubInstance<Server>(Server);
         emitStub = stub();
         mockMatch = createStubInstance<Match>(Match);
         mockMatchService.getMatchFromPlayerId.returns(mockMatch);
+        mockUserService.getUserId.returns('user-1');
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 LobbyGateway,
                 { provide: MatchService, useValue: mockMatchService },
                 { provide: LobbyService, useValue: mockLobbyService },
+                { provide: UserService, useValue: mockUserService },
                 { provide: Server, useValue: mockServer },
             ],
         }).compile();
@@ -69,6 +74,7 @@ describe('LobbyGateway', () => {
     it('should call join lobby on join lobby event', () => {
         const playerData = structuredClone(MOCK_PLAYER_DATAS[0]);
         gateway.joinLobby(mockSocket, playerData);
+        expect(playerData.userId).toBe('user-1');
         expect(mockLobbyService.joinLobby.calledWith(mockMatch, mockSocket.id, playerData)).toBeTruthy();
     });
 

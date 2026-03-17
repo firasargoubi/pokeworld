@@ -54,6 +54,11 @@ $color-btn-pink-dark: #a85a4f;
 $color-btn-red-mid: #d43a3a;
 $color-btn-red-dark: #a01818;
 
+$img-base: '../../../assets/images/menu/icons';
+
+$img-lobby-icon: '#{$img-base}/wait-icon.png';
+$img-in-game-icon: '#{$img-base}/icon-live.png';
+
 $clip-path: polygon(
     $corner-square-size 0%,
     calc(100% - #{$corner-square-size}) 0%,
@@ -243,6 +248,28 @@ $bg-btn-red: linear-gradient(
     z-index: 1;
     font-size: calc(var(--base-size) * 3.5);
     text-shadow: calc($base-size * 0.35) 0 0 $color-shadow-text-strong;
+}
+
+.state-icon {
+    position: absolute;
+    aspect-ratio: 1/1;
+    min-height: 20%;
+    bottom: 3%;
+    left: 2%;
+    overflow: visible;
+    z-index: 1;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+
+}
+
+.lobby {
+    background-image: url($img-lobby-icon);
+}
+
+.in-game {
+    background-image: url($img-in-game-icon);
 }
 
 .thumbnail-separator {

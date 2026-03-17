@@ -19,15 +19,13 @@ export class TrackingService {
             match.data.trackingData.coveredGroundTiles.push(player.position);
         });
         match.data.trackingData.startTime = Date.now();
-        match.data.trackingData.players = match.data.players
-            .filter((player) => player.isConnected)
-            .map((player) => ({
-                ...structuredClone(DEFAULT_PLAYER_TRACKING_DATA),
-                id: player.id,
-                name: player.name,
-                team: player.team,
-                coveredGroundTiles: [player.spawnPoint],
-            }));
+        match.data.trackingData.players = match.data.players.map((player) => ({
+            ...structuredClone(DEFAULT_PLAYER_TRACKING_DATA),
+            id: this.getTrackingId(player),
+            name: player.name,
+            team: player.team,
+            coveredGroundTiles: [player.spawnPoint],
+        }));
     }
 
     stopTrackingMatch(match: Match) {
@@ -64,7 +62,7 @@ export class TrackingService {
     updateWinner(match: Match, winner: PlayerData) {
         const standingTile = match.data.gameData.mapData.tiles[winner.position.x][winner.position.y];
         const name = match.data.gameData.mapData.gameMode === GameMode.FFA ? winner.name : winner.team;
-        match.data.trackingData.matchWinner = { id: winner.id, avatar: winner.avatar, name, tile: standingTile };
+        match.data.trackingData.matchWinner = { id: this.getTrackingId(winner), avatar: winner.avatar, name, tile: standingTile };
     }
 
     updateItems(match: Match, item: ItemType, playerId: string) {
@@ -98,7 +96,12 @@ export class TrackingService {
     }
 
     private getPlayerStat(match: Match, playerId: string): TrackingPlayerData {
-        return match.data.trackingData.players.find((player) => player.id === playerId);
+        const trackedPlayerId = match.getPlayer(playerId)?.userId ?? playerId;
+        return match.data.trackingData.players.find((player) => player.id === trackedPlayerId);
+    }
+
+    private getTrackingId(player: PlayerData): string {
+        return player.userId ?? player.id;
     }
 
     private addPosIfNew(targetPosition: Position, visitedPositions: Position[]) {

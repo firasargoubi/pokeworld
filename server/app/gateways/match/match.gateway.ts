@@ -3,7 +3,7 @@ import { UserService } from '@app/services/user/user.service';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData } from '@common/interfaces/match-data';
 import { MessageFromServer } from '@common/interfaces/message-from-server';
-import { MatchEvent, UserEvent } from '@common/interfaces/socket-event.enum';
+import { JoinPageEvent, MatchEvent, UserEvent } from '@common/interfaces/socket-event.enum';
 import { UserInfo } from '@common/interfaces/user';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -35,7 +35,25 @@ export class MatchGateway {
     onUserAssociate(socket: Socket, user: UserInfo) {
         if (user) {
             this.userService.associateSocket(user.userId, socket.id);
+        } else {
+            this.userService.disassociateSocketBySocketId(socket.id);
         }
+    }
+
+    @SubscribeMessage(JoinPageEvent.JoinRoom)
+    handleJoinRoom(socket: Socket) {
+        socket.join(JoinPageEvent.Room);
+        socket.emit(JoinPageEvent.UpdateMatchList, this.matchService.getAvailableMatches());
+    }
+
+    @SubscribeMessage(JoinPageEvent.LeaveRoom)
+    handleLeaveRoom(socket: Socket) {
+        socket.leave(JoinPageEvent.Room);
+    }
+
+    broadcastMatchListUpdate() {
+        const availableMatches = this.matchService.getAvailableMatches();
+        this.server.to(JoinPageEvent.Room).emit(JoinPageEvent.UpdateMatchList, availableMatches);
     }
 
     handleDisconnect(socket: Socket) {

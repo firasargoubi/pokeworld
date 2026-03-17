@@ -40,18 +40,12 @@ export class LobbyService {
     }
 
     joinLobby(match: Match, playerId: string, playerData: PlayerData) {
-        const existingIndex = match.data.players.findIndex((p) => p.name === playerData.name);
-        if (match.isState([MatchState.Lobby])) match.data.players = match.data.players.filter((p) => p.id !== playerId);
-        playerData.name = this.getUniqueName(match, playerId, playerData.name);
-        playerData.isConnected = true;
         if (match.isState([MatchState.Lobby])) {
-            this.registerTrackingPlayer(match, playerId, playerData);
-            match.data.players.push(playerData);
-            match.changeLockStatus(false);
-            match.sendUpdate();
-        } else {
-            this.handleDropIn(match, playerId, playerData, existingIndex);
+            this.joinLobbyState(match, playerId, playerData);
+            return;
         }
+
+        this.joinDropInState(match, playerId, playerData);
     }
 
     changeLockStatus(match: Match, playerId: string, lockStatus: boolean) {
@@ -112,6 +106,65 @@ export class LobbyService {
             suffix++;
         }
         return newName;
+    }
+
+    private joinLobbyState(match: Match, playerId: string, playerData: PlayerData) {
+        const placeholderIndex = this.findPlaceholderIndex(match, playerId);
+        playerData.name = this.getUniqueName(match, playerId, playerData.name);
+        playerData.isConnected = true;
+
+        if (placeholderIndex !== -1) {
+            const existingPlayer = match.data.players[placeholderIndex];
+            const updatedPlayer: PlayerData = {
+                ...existingPlayer,
+                ...playerData,
+                id: playerId,
+                isConnected: true,
+            };
+            this.registerTrackingPlayer(match, playerId, updatedPlayer);
+            match.data.players[placeholderIndex] = updatedPlayer;
+        } else {
+            this.registerTrackingPlayer(match, playerId, playerData);
+            match.data.players.push(playerData);
+        }
+
+        match.changeLockStatus(false);
+        match.sendUpdate();
+    }
+
+    private joinDropInState(match: Match, playerId: string, playerData: PlayerData) {
+        match.data.players = match.data.players.filter((p) => !(p.id === playerId && !p.name));
+        const reconnectUserId = playerData.userId?.trim();
+        const disconnectedPlayerIndex = reconnectUserId ? this.findDisconnectedPlayerIndexByUserId(match, reconnectUserId) : -1;
+
+        if (disconnectedPlayerIndex === -1) {
+            playerData.name = this.getUniqueName(match, playerId, playerData.name);
+        } else {
+            this.remapReconnectingPlayerSocket(match, disconnectedPlayerIndex, playerId);
+        }
+
+        playerData.isConnected = true;
+        this.handleDropIn(match, playerId, playerData, disconnectedPlayerIndex);
+    }
+
+    private findPlaceholderIndex(match: Match, playerId: string): number {
+        return match.data.players.findIndex((player) => player.id === playerId && !player.name);
+    }
+
+    private findDisconnectedPlayerIndexByUserId(match: Match, userId: string): number {
+        if (!userId) {
+            return -1;
+        }
+        return match.data.players.findIndex((player) => player.userId === userId && !player.isConnected);
+    }
+
+    private remapReconnectingPlayerSocket(match: Match, disconnectedPlayerIndex: number, newPlayerId: string) {
+        const oldPlayerId = match.data.players[disconnectedPlayerIndex].id;
+        this.matchService.remapPlayerSocketId(oldPlayerId, newPlayerId, match.data.code);
+        const trackingPlayer = match.data.trackingData.players.find((player) => player.id === oldPlayerId);
+        if (trackingPlayer) {
+            trackingPlayer.id = newPlayerId;
+        }
     }
 
     private startMatchFirstTurn(match: Match) {
@@ -176,9 +229,11 @@ export class LobbyService {
         if (!isSpawnAlreadyOnMap) {
             match.data.gameData.mapData.items.Spawn.push(structuredClone(spawnPoint));
         }
-        const storedVictories = match.getPlayerVictories(playerId);
+        const storedVictories = playerData.userId ? match.getPlayerVictories(playerData.userId) : undefined;
         if (storedVictories !== undefined) {
             playerData.combatsWon = storedVictories;
+        } else if (existingIndex === -1) {
+            playerData.combatsWon = 0;
         }
         playerData.spawnPoint = structuredClone(spawnPoint);
         const nearestAvailableTile = this.mapService.getNearestEmptyTile(match.data, playerData.spawnPoint);
@@ -187,16 +242,19 @@ export class LobbyService {
 
         if (existingIndex !== -1) {
             const existingPlayer = match.data.players[existingIndex];
-            const updatedPlayer: PlayerData = {
-                ...existingPlayer,
-                ...playerData,
-                id: playerId,
-                isConnected: true,
-            };
-            match.data.players[existingIndex] = updatedPlayer;
-            this.registerTrackingPlayer(match, playerId, updatedPlayer);
-            match.sendUpdate();
-            return;
+            if (existingPlayer && playerData.userId && existingPlayer.userId === playerData.userId) {
+                const updatedPlayer: PlayerData = {
+                    ...existingPlayer,
+                    ...playerData,
+                    id: playerId,
+                    isConnected: true,
+                };
+                updatedPlayer.combatsWon = storedVictories ?? existingPlayer.combatsWon;
+                match.data.players[existingIndex] = updatedPlayer;
+                this.registerTrackingPlayer(match, playerId, updatedPlayer);
+                match.sendUpdate();
+                return;
+            }
         }
         this.registerTrackingPlayer(match, playerId, playerData);
         const insertionIndex = this.getDropInInsertIndex(match, playerData.speed);
@@ -206,11 +264,28 @@ export class LobbyService {
     }
 
     private registerTrackingPlayer(match: Match, playerId: string, playerData: PlayerData) {
+        const trackingPlayerId = playerData.userId ?? playerId;
+        const trackingPlayer = match.data.trackingData.players.find((player) => player.id === trackingPlayerId);
+
         const hasSpawnPoint = playerData.spawnPoint && playerData.spawnPoint.x >= 0 && playerData.spawnPoint.y >= 0;
-        match.data.trackingData.players = match.data.trackingData.players.filter((player) => player.id !== playerId);
+        if (trackingPlayer) {
+            trackingPlayer.id = trackingPlayerId;
+            trackingPlayer.team = playerData.team;
+
+            const hasPosition =
+                playerData.position &&
+                playerData.position.x >= 0 &&
+                playerData.position.y >= 0 &&
+                !trackingPlayer.coveredGroundTiles.some((position) => position.x === playerData.position.x && position.y === playerData.position.y);
+            if (hasPosition) {
+                trackingPlayer.coveredGroundTiles.push(structuredClone(playerData.position));
+            }
+            return;
+        }
+
         match.data.trackingData.players.push({
             ...structuredClone(DEFAULT_PLAYER_TRACKING_DATA),
-            id: playerId,
+            id: trackingPlayerId,
             name: playerData.name,
             team: playerData.team,
             coveredGroundTiles: hasSpawnPoint ? [playerData.spawnPoint] : structuredClone(DEFAULT_PLAYER_TRACKING_DATA.coveredGroundTiles),

@@ -55,17 +55,16 @@ describe('TrackingService', () => {
         expect(matchData.trackingData.startTime).toBeLessThanOrEqual(Date.now());
     });
 
-    it('should initialize tracking data with only connected players', () => {
+    it('should initialize tracking data with all connected and disconnected players', () => {
         matchData.players[0].isConnected = false;
         matchData.players[1].isConnected = false;
         const nLobbyPlayers = matchData.players.length;
-        const nDiconnected = 2;
 
         service.startTrackingMatch(match);
 
-        expect(matchData.trackingData.players.length).toBe(nLobbyPlayers - nDiconnected);
-        expect(matchData.trackingData.players[0].id).toBe(matchData.players[nDiconnected].id);
-        expect(matchData.trackingData.players[1].id).toBe(matchData.players[nDiconnected + 1].id);
+        expect(matchData.trackingData.players.length).toBe(nLobbyPlayers);
+        expect(matchData.trackingData.players[0].id).toBe(matchData.players[0].id);
+        expect(matchData.trackingData.players[1].id).toBe(matchData.players[1].id);
     });
 
     it('should initialize player tracking data with default values for all connected players', () => {

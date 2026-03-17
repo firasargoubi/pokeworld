@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { BotService } from '@app/services/bot/bot.service';
@@ -6,6 +7,7 @@ import { CombatService } from '@app/services/combat/combat.service';
 import { GameService } from '@app/services/game/game.service';
 import { PlayService } from '@app/services/play/play.service';
 import { MATCH_CODE_LENGTH } from '@common/consts/match-data.const';
+import { MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { PlayerType } from '@common/interfaces/player-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
@@ -194,8 +196,8 @@ describe('MatchService', () => {
             { ...structuredClone(MOCK_PLAYER_DATAS[1]), id: 'socket-2', userId: 'user-2', name: 'OTHER_NAME' },
         ];
         matchData.trackingData.players = [
-            { ...matchData.trackingData.players[0], id: 'socket-1', name: 'OLD_NAME' },
-            { ...matchData.trackingData.players[1], id: 'socket-2', name: 'OTHER_NAME' },
+            { ...matchData.trackingData.players[0], id: 'user-1', name: 'OLD_NAME' },
+            { ...matchData.trackingData.players[1], id: 'user-2', name: 'OTHER_NAME' },
         ];
         matchData.combatData.playersCombatData = [
             { ...matchData.combatData.playersCombatData[0], playerIndex: 0, name: 'OLD_NAME' },
@@ -411,5 +413,69 @@ describe('MatchService', () => {
 
         expect(matchCode).toBeDefined();
         expect(matchCode.length).toBe(MATCH_CODE_LENGTH);
+    });
+
+    it('getAvailableMatches should return list of available matches', () => {
+        const matchData1 = structuredClone(MOCK_MATCH_DATAS[0]);
+        const match1 = createStubInstance(Match);
+        match1.data = matchData1;
+        match1.data.code = '1111';
+        match1.isFull.returns(false);
+        match1.data.lobbyData.isLocked = false;
+        match1.data.state = MatchState.Lobby;
+
+        const matchData2 = structuredClone(MOCK_MATCH_DATAS[1]);
+        const match2 = createStubInstance(Match);
+        match2.data = matchData2;
+        match2.data.code = '2222';
+        match2.isFull.returns(false);
+        match2.data.lobbyData.isLocked = true;
+        match2.data.state = MatchState.TurnWait;
+        match2.data.lobbyData.isDropInEnabled = true;
+
+        const matchData3 = structuredClone(MOCK_MATCH_DATAS[0]);
+        const match3 = createStubInstance(Match);
+        match3.data = matchData3;
+        match3.data.code = '3333';
+        match3.isFull.returns(false);
+        match3.data.lobbyData.isLocked = true;
+        match3.data.state = MatchState.Lobby;
+
+        const matchData4 = structuredClone(MOCK_MATCH_DATAS[0]);
+        const match4 = createStubInstance(Match);
+        match4.data = matchData4;
+        match4.data.code = '4444';
+        match4.isFull.returns(true);
+        match4.data.lobbyData.isLocked = false;
+        match4.data.state = MatchState.Lobby;
+
+        const matchData5 = structuredClone(MOCK_MATCH_DATAS[0]);
+        const match5 = createStubInstance(Match);
+        match5.data = matchData5;
+        match5.data.code = '5555';
+        match5.isFull.returns(false);
+        match5.data.lobbyData.isLocked = true;
+        match5.data.state = MatchState.TurnWait;
+        match5.data.lobbyData.isDropInEnabled = false;
+
+        const matchData6 = structuredClone(MOCK_MATCH_DATAS[0]);
+        const match6 = createStubInstance(Match);
+        match6.data = matchData6;
+        match6.data.code = '6666';
+        match6.isFull.returns(true);
+        match6.data.lobbyData.isLocked = true;
+        match6.data.state = MatchState.TurnWait;
+        match6.data.lobbyData.isDropInEnabled = true;
+
+        service['matches'].set(matchData1.code, match1);
+        service['matches'].set(matchData2.code, match2);
+        service['matches'].set(matchData3.code, match3);
+        service['matches'].set(matchData4.code, match4);
+        service['matches'].set(matchData5.code, match5);
+        service['matches'].set(matchData6.code, match6);
+
+        const availableMatches = service.getAvailableMatches();
+
+        expect(availableMatches).toEqual([matchData1, matchData2]);
     });
 });
