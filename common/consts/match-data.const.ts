@@ -26,6 +26,7 @@ export const DEFAULT_PLAY_DATA: PlayData = {
     isDebugMode: false,
     hasAction: false,
     movementLeft: 0,
+    isElementalMode: false,
 };
 
 export const DEFAULT_MATCH_DATA: MatchData = {

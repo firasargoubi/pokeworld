@@ -187,7 +187,18 @@
             "attack": "ATTAQUE",
             "defense": "DÉFENSE",
             "startGame": "COMMENCER",
-            "chooseAvatarWarning": "Veuillez choisir un avatar"
+            "chooseAvatarWarning": "Veuillez choisir un avatar",
+            "elementalType": {
+                "dragon": "DRAGON",
+                "electric": "ÉLEC",
+                "fairy": "FÉE",
+                "fire": "FEU",
+                "grass": "PLANTE",
+                "ground": "SOL",
+                "normal": "NORMAL",
+                "psychic": "PSY",
+                "water": "EAU"
+            }
         },
         "play": {
             "mapSize": "Taille carte",
@@ -243,6 +254,7 @@
             "themeDark": "Sombre",
             "audio": "Audio",
             "music": "Musique",
+            "avatars": "Avatars",
             "effects": "Effets"
         },
         "authPopup": {
@@ -352,6 +364,13 @@
             "close": "Fermer",
             "confirm": "Confirmer",
             "cancel": "Annuler"
+        },
+        "matchSettings": {
+            "title": "Paramètres de partie",
+            "dropInDropOut": "Drop in, drop out",
+            "elementalMode": "Mode élémentaire",
+            "rapidElimination": "Élimination rapide",
+            "validate": "Valider"
         }
     }
 }

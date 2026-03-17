@@ -7,6 +7,7 @@ import { PopupColor } from '@app/interfaces/popup';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { CombatService } from '@app/services/combat/combat.service';
+import { I18nService } from '@app/services/i18n/i18n.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { PopupService } from '@app/services/popup/popup.service';
@@ -16,8 +17,8 @@ import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatAction, MatchData, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
 import { MOCK_MATCH_DATAS, MOCK_PLAYER_COMBAT_DATAS } from '@common/test-consts/mock-matches';
 import { TranslateModule } from '@ngx-translate/core';
-import { CombatPageComponent } from './combat-page.component';
 import { of } from 'rxjs';
+import { CombatPageComponent } from './combat-page.component';
 
 @Component({
     selector: 'app-chat',
@@ -31,26 +32,48 @@ class MockChatComponent {
 describe('CombatPageComponent', () => {
     let component: CombatPageComponent;
     let fixture: ComponentFixture<CombatPageComponent>;
-    let mockMatchService: jasmine.SpyObj<MatchService>;
+    let mockMatchService: jasmine.SpyObj<MatchService> & {
+        data: MatchData;
+        matchUpdate: { pipe: () => { subscribe: () => object } };
+        selfIndex?: number;
+    };
     let mockCombatService: jasmine.SpyObj<CombatService>;
     let mockPlayService: jasmine.SpyObj<PlayService>;
     let mockRouter: jasmine.SpyObj<Router>;
     let mockTimer: jasmine.SpyObj<Timer>;
     let mockAudioService: jasmine.SpyObj<AudioService>;
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
+    let mockI18nService: jasmine.SpyObj<I18nService>;
     let mockUserService: Partial<UserService>;
 
     beforeEach(async () => {
         mockMatchService = jasmine.createSpyObj('MatchService', ['isInMatch', 'isState'], {
             matchUpdate: { pipe: () => ({ subscribe: () => ({}) }) },
             data: structuredClone(MOCK_MATCH_DATAS[0]),
-        });
+            selfIndex: 0,
+        }) as jasmine.SpyObj<MatchService> & {
+            data: MatchData;
+            matchUpdate: { pipe: () => { subscribe: () => object } };
+            selfIndex?: number;
+        };
+        mockMatchService.isInMatch.and.returnValue(true);
+        mockMatchService.isState.and.returnValue(false);
+
         mockCombatService = jasmine.createSpyObj('CombatService', ['attack', 'escape', 'hasPlayerHealed']);
         mockPlayService = jasmine.createSpyObj('PlayService', ['changeDebugMode']);
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         mockTimer = jasmine.createSpyObj('Timer', ['maxTime']);
-        mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage', 'playCombatEffect']);
+        mockAudioService = jasmine.createSpyObj('AudioService', [
+            'playEffect',
+            'playBackgroundMusic',
+            'preloadEffectsForPage',
+            'playCombatEffect',
+            'preloadAvatarSounds',
+            'playAvatarsSounds',
+        ]);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'keepMessages']);
+        mockI18nService = jasmine.createSpyObj('I18nService', ['translate']);
+        mockI18nService.translate.and.callFake((key: string) => key);
         mockUserService = { user$: of(null) };
 
         mockCombatService.timer = mockTimer;
@@ -64,6 +87,7 @@ describe('CombatPageComponent', () => {
                 { provide: Router, useValue: mockRouter },
                 { provide: AudioService, useValue: mockAudioService },
                 { provide: PopupService, useValue: popupServiceSpy },
+                { provide: I18nService, useValue: mockI18nService },
                 { provide: UserService, useValue: mockUserService },
             ],
         }).compileComponents();
@@ -89,6 +113,8 @@ describe('CombatPageComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
         expect(component).toBeTruthy();
+        expect(mockAudioService.preloadAvatarSounds).toHaveBeenCalled();
+        expect(mockAudioService.playAvatarsSounds).toHaveBeenCalled();
     });
 
     it('should toggle debug mode d key press', () => {
@@ -99,11 +125,13 @@ describe('CombatPageComponent', () => {
 
     it('attack button should call attack', () => {
         component.attackButton();
+        expect(mockAudioService.playEffect).toHaveBeenCalledWith(SoundEffect.Click);
         expect(mockCombatService.attack).toHaveBeenCalled();
     });
 
     it('escape button should call escape', () => {
         component.escapeButon();
+        expect(mockAudioService.playEffect).toHaveBeenCalledWith(SoundEffect.Click);
         expect(mockCombatService.escape).toHaveBeenCalled();
     });
 
@@ -130,6 +158,7 @@ describe('CombatPageComponent', () => {
     });
 
     it('update players combat data should update second player', () => {
+        mockMatchService.selfIndex = 1;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         const updatePlayersCombatDataSpy = spyOn(component as any, 'updatePlayersCombatData').and.callThrough();
         component['updatePlayersCombatData']();
@@ -139,7 +168,7 @@ describe('CombatPageComponent', () => {
     it('should populate spectator panels with current combatants', () => {
         mockMatchService.selfIndex = 3;
         component['updatePlayersCombatData']();
-        expect(component.spectatorPanels.length).toEqual(mockMatchService.data.combatData.playersCombatData.length);
+        expect(component.spectatorPanels.length).toEqual(2);
         expect(component.spectatorPanels[0].name).toEqual(mockMatchService.data.players[component.spectatorPanels[0].playerIndex].name);
     });
 
@@ -288,6 +317,7 @@ describe('CombatPageComponent', () => {
 
         expect(mockMatchService.isState).toHaveBeenCalledWith([MatchState.TurnWait, MatchState.TurnStart, MatchState.MatchEnd]);
         expect(displayPopupSpy).toHaveBeenCalled();
+        expect(mockRouter.navigate).toHaveBeenCalled();
     });
 
     it('should not redirect when match state is still in combat', () => {

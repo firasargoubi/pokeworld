@@ -7,6 +7,7 @@ import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
+import { MatchSettings } from '@common/interfaces/match-data';
 import { PlayerType } from '@common/interfaces/player-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { TranslateModule } from '@ngx-translate/core';
@@ -34,7 +35,7 @@ describe('LobbyPageComponent', () => {
 
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
-        lobbyServiceSpy = jasmine.createSpyObj('LobbyService', ['startMatch', 'kickPlayer', 'changeLockStatus', 'changeDropInStatus', 'addBot']);
+        lobbyServiceSpy = jasmine.createSpyObj('LobbyService', ['startMatch', 'kickPlayer', 'changeLockStatus', 'addBot', 'changeMatchSettings']);
         matchServiceSpy = jasmine.createSpyObj('MatchService', ['isInMatch', 'isState', 'isHost', 'leaveMatch'], {
             matchUpdate: { pipe: () => ({ subscribe: () => ({}) }) },
             data: mockMatchData,
@@ -99,9 +100,16 @@ describe('LobbyPageComponent', () => {
         expect(lobbyServiceSpy.changeLockStatus).toHaveBeenCalled();
     });
 
-    it('should toggle drop in status when host clicks button', () => {
-        component.toggleDropInStatus();
-        expect(lobbyServiceSpy.changeDropInStatus).toHaveBeenCalled();
+    it('handleSettingsSelected should call lobbyService.changeMatchSettings and hide popup', () => {
+        const mockMatchSettings: MatchSettings = {
+            isElementalMode: true,
+            isDropInEnabled: false,
+            isRapidElimination: true,
+        };
+        component.isMatchSettingsPopupVisible = true;
+        component.handleSettingsSelected(mockMatchSettings);
+        expect(lobbyServiceSpy.changeMatchSettings).toHaveBeenCalledWith(mockMatchSettings);
+        expect(component.isMatchSettingsPopupVisible).toBeFalse();
     });
 
     it('should call showPopup when leaveLobbyButton is called', () => {

@@ -20,6 +20,7 @@ export const MOCK_PLAY_DATA: PlayData = {
     activePlayerIndex: 0,
     hasAction: true,
     movementLeft: 6,
+    isElementalMode: false,
 };
 
 export const MOCK_PLAYER_COMBAT_DATAS: PlayerCombatData[] = [

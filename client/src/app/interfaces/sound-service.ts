@@ -17,4 +17,5 @@ export enum BackgroundMusic {
 export interface AudioSettings {
     backgroundMusicVolume: number;
     effectsVolume: number;
+    avatarsVolume: number;
 }

@@ -75,9 +75,24 @@ $bg-button-green: linear-gradient(
     #407540 100%
 );
 
+$bg-button-gray: linear-gradient(
+    to bottom,
+    #d0d0d0 0,
+    #d0d0d0 $button-cutout-size,
+    #a0a0a0 $button-cutout-size,
+    #a0a0a0 calc(100% - $button-cutout-size),
+    #606060 calc(100% - $button-cutout-size),
+    #606060 100%
+);
+
 $img-lock: '../../../assets/images/menu/icons/lock.png';
 $img-unlock: '../../../assets/images/menu/icons/unlock.png';
 $img-copy: '../../../assets/images/menu/icons/copy.png';
+$img-settings: '../../../assets/images/menu/icons/settings/settings-cog.png';
+
+$elemental-icon: '../../../assets/images/menu/icons/match-mode/elemental.png';
+$drop-icon: '../../../assets/images/menu/icons/match-mode/drop.png';
+$re-icon: '../../../assets/images/menu/icons/match-mode/skull.png';
 
 $player-card-height: calc($base-size * 10);
 $player-card-width: calc($base-size * 70);
@@ -165,6 +180,7 @@ $player-card-width: calc($base-size * 70);
 }
 
 .access-code {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -172,7 +188,51 @@ $player-card-width: calc($base-size * 70);
     color: $color-access-code;
     overflow: visible;
     width: 100%;
+    height: calc($base-size * 10);
     background-color: $color-access-main;
+    padding: 0 0 0 calc($base-size * 5);
+}
+
+.access-code p {
+    width: auto;
+}
+
+.match-mode-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: calc($base-size * 5);
+    height: 100%;
+}
+
+.mode-icon {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    filter: invert(88%) sepia(24%) saturate(435%) hue-rotate(120deg) brightness(97%) contrast(92%);
+    transition: all 0.3s ease-in-out;
+}
+
+.drop-icon {
+    opacity: 0.2;
+    background-image: url($drop-icon);
+}
+
+.re-icon {
+    opacity: 0.2;
+    background-image: url($re-icon);
+    background-size: auto 80%;
+}
+
+.elemental-icon {
+    opacity: 0.2;
+    background-image: url($elemental-icon);
+}
+
+.match-mode-icon .visible {
+    opacity: 1;
 }
 
 .spacer {
@@ -224,6 +284,10 @@ $player-card-width: calc($base-size * 70);
     background: $bg-button-green;
 }
 
+.settings .button-edge {
+    background: $bg-button-gray;
+}
+
 .button-container .button-edge:last-child {
     margin-left: calc($button-cutout-size * -0.2);
     margin-right: 0;
@@ -242,20 +306,8 @@ $player-card-width: calc($base-size * 70);
     background: $bg-button-green;
 }
 
-.dropin .button-body {
-    flex-direction: column;
-    gap: calc($base-size * 0.5);
-    color: white;
-    font-weight: bold;
-}
-
-.dropin .dropin-label {
-    font-size: calc($base-size * 1.8);
-    letter-spacing: calc($base-size * 0.2);
-}
-
-.dropin .dropin-value {
-    font-size: calc($base-size * 2.2);
+.settings .button-body {
+    background: $bg-button-gray;
 }
 
 .button-container .icon {
@@ -278,6 +330,10 @@ $player-card-width: calc($base-size * 70);
 
 .copy-icon {
     background-image: url($img-copy);
+}
+
+.settings-icon {
+    background-image: url($img-settings);
 }
 
 .disabled {
@@ -344,7 +400,8 @@ $player-card-width: calc($base-size * 70);
     transform: scale(1);
 }
 
-#creation-bot-popup {
+#creation-bot-popup,
+#match-settings-popup {
     position: fixed;
     top: 0;
     left: 0;

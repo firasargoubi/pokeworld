@@ -11,8 +11,8 @@
                         <img src="./assets/images/menu/stat-bar/shadow.png" id="avatar-shadow" />
                     </div>
                     <span id="name-form">
-                        <div id="name-input" readonly style="text-transform: uppercase">{{ user?.username }}</div>
-                        <p id="name-input-border">----------------</p>
+                        <div id="name-input" readonly style="text-transform: uppercase">{{ this.user?.username }}</div>
+                        <p id="name-input-border">{{ '-'.repeat(this.user?.username?.length || 0) }}</p>
                     </span>
                 </div>
                 <div id="stats-selection-container">
@@ -93,6 +93,18 @@
                         title="{{ avatar.name }}"
                     >
                         <img src="{{ avatar.image }}" class="avatar-select" />
+                        <div
+                            class="type-container"
+                            [style.--main-color]="elementalTypeLabelConfig[avatarToElementalTypeMap[avatar.avatar]].mainColor"
+                            [style.--light-color]="elementalTypeLabelConfig[avatarToElementalTypeMap[avatar.avatar]].lightColor"
+                            [style.--dark-color]="elementalTypeLabelConfig[avatarToElementalTypeMap[avatar.avatar]].darkColor"
+                        >
+                            <div class="type-edge"></div>
+                            <div class="type-body">
+                                <p>{{ elementalTypeLabelConfig[avatarToElementalTypeMap[avatar.avatar]].textKey | translate }}</p>
+                            </div>
+                            <div class="type-edge"></div>
+                        </div>
                     </div>
                     }
                 </div>
@@ -100,9 +112,11 @@
         </main>
     </div>
     <footer id="page-footer">
-        <div class="main-button-container" [class.disabled]="!user?.username || !visualData.isAvatarSelected" (click)="joinLobby()">
+        <div class="main-button-container" [class.disabled]="!visualData.isAvatarSelected" (click)="joinLobby()">
             <div class="button-edge"></div>
-            <div class="button-body"><p>{{ 'pages.character.startGame' | translate }}</p></div>
+            <div class="button-body">
+                <p>{{ 'pages.character.startGame' | translate }}</p>
+            </div>
             <div class="button-edge"></div>
         </div>
     </footer>

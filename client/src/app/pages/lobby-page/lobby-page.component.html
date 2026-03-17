@@ -6,7 +6,14 @@
         <div id="lobby-body">
             <div class="access-code-container">
                 <p class="access-title">{{ 'pages.lobby.accessCode' | translate }}</p>
-                <p class="access-code">{{ matchService.data.code }}</p>
+                <div class="access-code">
+                    {{ matchService.data.code }}
+                    <div class="match-mode-icon">
+                        <div class="mode-icon drop-icon" [class.visible]="this.matchService.data.lobbyData.isDropInEnabled"></div>
+                        <div class="mode-icon elemental-icon" [class.visible]="this.matchService.data.playData.isElementalMode"></div>
+                        <div class="mode-icon re-icon"></div>
+                    </div>
+                </div>
                 <div class="spacer"></div>
                 <div class="access-interactions">
                     <div class="button-container lock" [class.disabled]="!visualData.isSelfHost" (click)="toggleLockRoom()">
@@ -20,20 +27,13 @@
                         </div>
                         <div class="button-edge"></div>
                     </div>
-                    <div class="button-container dropin" [class.disabled]="!visualData.isSelfHost" (click)="toggleDropInStatus()">
+                    @if(visualData.isSelfHost) {
+                    <div class="button-container settings" (click)="this.showMatchSettingsPopup()">
                         <div class="button-edge"></div>
-                        <div class="button-body">
-                            <span class="dropin-label">{{ 'pages.lobby.dropInLabel' | translate }}</span>
-                            <span class="dropin-value">
-                                {{
-                                    (this.matchService.data.lobbyData.isDropInEnabled
-                                        ? 'pages.lobby.dropInOn'
-                                        : 'pages.lobby.dropInOff') | translate
-                                }}
-                            </span>
-                        </div>
+                        <div class="button-body"><div class="icon settings-icon"></div></div>
                         <div class="button-edge"></div>
                     </div>
+                    }
 
                     <div class="button-container copy" (click)="this.copyMatchCode()">
                         <div class="button-edge"></div>
@@ -62,12 +62,22 @@
     </div>
     @if (visualData.isSelfHost) {
     <div id="poke-button">
-        <app-pokeball-button [buttonContent]="'pages.lobby.start' | translate" [onClickAction]="this.startMatchButton.bind(this)" [scale]="0.3"></app-pokeball-button>
+        <app-pokeball-button
+            [buttonContent]="'pages.lobby.start' | translate"
+            [onClickAction]="this.startMatchButton.bind(this)"
+            [scale]="0.3"
+        ></app-pokeball-button>
     </div>
     }
     <div id="creation-bot-popup" [class.visible]="showBotPopup" (click)="this.showBotPopup = false">
         <div class="popup-content" (click)="$event.stopPropagation()">
             <app-create-bot-popup (botTypeSelected)="handleBotTypeSelected($event)"></app-create-bot-popup>
+        </div>
+    </div>
+    <div id="match-settings-popup" [class.visible]="isMatchSettingsPopupVisible" (click)="this.isMatchSettingsPopupVisible = false">
+        <div class="popup-content" (click)="$event.stopPropagation()">
+            <app-match-settings-popup [isVisible]="isMatchSettingsPopupVisible" (settingsSelected)="handleSettingsSelected($event)">
+            </app-match-settings-popup>
         </div>
     </div>
 </div>

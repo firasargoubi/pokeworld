@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { DEFAULT_COMBAT_VISUAL_DATA } from '@app/consts/combat-data.const';
+import { ELEMENTAL_TYPE_ICONS } from '@app/consts/elemental-type.const';
 import { BATTLE_PLATFORM_IMAGES } from '@app/consts/images.const';
 import { CombatVisualData } from '@app/interfaces/combat-visual-data';
 import { PopupColor } from '@app/interfaces/popup';
@@ -17,6 +18,7 @@ import { PlayService } from '@app/services/play/play.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { UserService } from '@app/services/user/user.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
+import { AVATAR_ELEMENT_TYPE_MAP, ELEMENT_TYPE_ADVANTAGES } from '@common/consts/elemental-type';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatAction, MatchData, MatchState, PlayerCombatData, SpectatorPanelData } from '@common/interfaces/match-data';
@@ -61,6 +63,7 @@ export class CombatPageComponent implements OnDestroy {
         }
         this.audioService.preloadEffectsForPage(COMBAT_PAGE_EFFECTS);
         this.audioService.playBackgroundMusic(BackgroundMusic.Combat);
+        this.playAvatarsAudio();
     }
 
     @HostListener('document:keydown', ['$event'])
@@ -94,6 +97,19 @@ export class CombatPageComponent implements OnDestroy {
         this.visualData.enemyImage = AVATAR_DATA[this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar].frontGif;
         this.visualData.selfProfilePicture = this.matchService.data.players[this.visualData.selfPlayer.playerIndex].profilePicture;
         this.visualData.enemyProfilePicture = this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].profilePicture;
+        this.computeElementalTypeAdvantages();
+    }
+
+    private computeElementalTypeAdvantages() {
+        if (this.matchService.data.playData.isElementalMode) {
+            const selfElementalType = AVATAR_ELEMENT_TYPE_MAP[this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar];
+            const enemyElementalType = AVATAR_ELEMENT_TYPE_MAP[this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar];
+
+            this.visualData.selfElementalIcon = ELEMENTAL_TYPE_ICONS[selfElementalType];
+            this.visualData.enemyElementalIcon = ELEMENTAL_TYPE_ICONS[enemyElementalType];
+            this.visualData.isSelfElementalAdvantage = ELEMENT_TYPE_ADVANTAGES[selfElementalType].includes(enemyElementalType);
+            this.visualData.isEnemyElementalAdvantage = ELEMENT_TYPE_ADVANTAGES[enemyElementalType].includes(selfElementalType);
+        }
     }
 
     private onMatchUpdate(oldMatchData: MatchData) {
@@ -187,6 +203,13 @@ export class CombatPageComponent implements OnDestroy {
         if (this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].items.includes(ItemType.Item6)) {
             this.visualData.enemyImage = AVATAR_DATA.missingNo.backGif;
         }
+    }
+
+    private playAvatarsAudio() {
+        const selfAvatar = this.matchService.data.players[this.visualData.selfPlayer.playerIndex].avatar;
+        const enemyAvatar = this.matchService.data.players[this.visualData.enemyPlayer.playerIndex].avatar;
+        this.audioService.preloadAvatarSounds([selfAvatar, enemyAvatar]);
+        this.audioService.playAvatarsSounds([selfAvatar, enemyAvatar]);
     }
 
     private updateSpectatorPanels() {

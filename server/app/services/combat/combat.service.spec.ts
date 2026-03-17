@@ -390,7 +390,7 @@ describe('CombatService', () => {
         mockMatch.getPlayerIndex.returns(0);
         mockMatch.data.gameData.mapData.tiles[0][0] = TileType.Grass;
 
-        const result = service['computePlayerData'](mockMatch, 'player1');
+        const result = service['computePlayerData'](mockMatch, 'player1', 'player2');
 
         expect(result.playerIndex).toBe(0);
         expect(result.currentHealth).toBe(MOCK_PLAYER_DATAS[0].health);

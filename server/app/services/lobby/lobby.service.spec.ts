@@ -186,13 +186,13 @@ describe('LobbyService', () => {
         expect(mockMatch.changeLockStatus.calledWith(true)).toBeTruthy();
     });
 
-    it('should change drop in status if host', () => {
+    it('should change match settings if host', () => {
         const playerId = 'playerId';
         mockMatch.isHost.returns(true);
 
-        service.changeDropInStatus(mockMatch, playerId, true);
+        service.changeMatchSettings(mockMatch, playerId, { isElementalMode: true, isDropInEnabled: true, isRapidElimination: false });
 
-        expect(mockMatch.data.lobbyData.isDropInEnabled).toBe(true);
+        expect(mockMatch.changeSettings.calledWith({ isElementalMode: true, isDropInEnabled: true, isRapidElimination: false })).toBeTruthy();
         expect(mockMatch.sendUpdate.calledOnce).toBeTruthy();
     });
 

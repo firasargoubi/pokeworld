@@ -37,6 +37,7 @@ $img-clock: '../../../assets/images/menu/icons/clock-icon.png';
 $img-hp-container: '../../../assets/images/menu/containers/description/battle-player-safari-rotated.png';
 $img-hp-container-enemy: '../../../assets/images/menu/containers/description/battle-player-safari-rotated-mirorded.png';
 $img-hp-bar: '../../../assets/images/menu/stat-bar/hp-bar.png';
+$img-advantage: '../../../assets/images/menu/icons/arrows/advantage-arrow.png';
 
 $img-footer-container-body: '../../../assets/images/menu/containers/combat-container/combat-container-body.png';
 
@@ -283,8 +284,8 @@ $bg-stripes: repeating-linear-gradient(
     position: absolute;
     bottom: $combat-info-height;
     right: calc($base-size * 9);
-    width: calc($base-size * 70);
-    aspect-ratio: 17/5;
+    width: calc($base-size * 78);
+    aspect-ratio: 18/5;
     background-image: url($img-hp-container);
     background-size: 100% 100%;
     background-position: center;
@@ -310,16 +311,48 @@ $bg-stripes: repeating-linear-gradient(
     margin: 2% 0 0 5%;
 }
 
-.hp-container .name {
+.hp-container .name-container {
     position: absolute;
     top: 6%;
     left: 5%;
+    display: flex;
+    align-items: center;
+    gap: calc($base-size * 1);
+}
+
+.hp-container .name {
     font-size: calc($base-size * 5);
+    line-height: 100%;
+}
+
+.hp-container .elemental-icon {
+    display: none;
+    height: calc($base-size * 4);
+    aspect-ratio: 1/1;
+    object-fit: contain;
+}
+
+.hp-container .elemental-icon.active {
+    display: block;
+}
+
+.hp-container .advantage-icon {
+    display: none;
+    height: calc($base-size * 4);
+    aspect-ratio: 1/1;
+    background-image: url($img-advantage);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.hp-container .advantage-icon.active {
+    display: block;
 }
 
 .hp-container .hp-bar {
     position: absolute;
-    bottom: 40%;
+    bottom: 35%;
     right: 4%;
     width: 65%;
     aspect-ratio: 20/1.1;

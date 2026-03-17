@@ -10,7 +10,7 @@ import { MIN_PLAYERS } from '@common/consts/player-data.const';
 import { DEFAULT_PLAYER_TRACKING_DATA } from '@common/consts/track-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
-import { MatchData, MatchState } from '@common/interfaces/match-data';
+import { MatchData, MatchSettings, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { Avatar, PlayerData, PlayerType, Team } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -61,9 +61,9 @@ export class LobbyService {
         }
     }
 
-    changeDropInStatus(match: Match, playerId: string, dropInStatus: boolean) {
+    changeMatchSettings(match: Match, playerId: string, matchSettings: MatchSettings) {
         if (match.isHost(playerId)) {
-            match.data.lobbyData.isDropInEnabled = dropInStatus;
+            match.changeSettings(matchSettings);
             match.sendUpdate();
         }
     }

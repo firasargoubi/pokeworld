@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
-import { MatchData, MatchState } from '@common/interfaces/match-data';
+import { MatchData, MatchSettings, MatchState } from '@common/interfaces/match-data';
 import { Avatar, PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { LobbyEvent } from '@common/interfaces/socket-event.enum';
 
@@ -36,16 +36,16 @@ export class LobbyService {
         this.socketService.emit(LobbyEvent.ChangeLockStatus, lockStatus);
     }
 
-    changeDropInStatus(isEnabled: boolean) {
-        this.socketService.emit(LobbyEvent.ChangeDropInStatus, isEnabled);
-    }
-
     startMatch() {
         this.socketService.emit(LobbyEvent.StartMatch);
     }
 
     addBot(botType: PlayerType) {
         this.socketService.emit(LobbyEvent.AddBot, botType);
+    }
+
+    changeMatchSettings(matchSettings: MatchSettings) {
+        this.socketService.emit(LobbyEvent.ChangeMatchSettings, matchSettings);
     }
 
     private onMatchUpdate(oldMatchData: MatchData) {

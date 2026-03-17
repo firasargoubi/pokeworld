@@ -1,13 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { MatchData } from '@common/interfaces/match-data';
-import { AUDIO_CONFIG, AUDIO_LOCAL_STORAGE_KEY, COMBAT_LOG_PATTERNS, SOUND_EFFECTS_MAP } from './audio.const';
+import { Avatar } from '@common/interfaces/player-data';
+import { AUDIO_CONFIG, AUDIO_LOCAL_STORAGE_KEY, AVATAR_SOUNDS, COMBAT_LOG_PATTERNS, SOUND_EFFECTS_MAP } from './audio.const';
 import { AudioService } from './audio.service';
 
 describe('AudioService', () => {
     let service: AudioService;
     let audioElementSpy: jasmine.SpyObj<HTMLAudioElement>;
     let effectAudioSpy: jasmine.SpyObj<HTMLAudioElement>;
+    let avatarAudioSpy: jasmine.SpyObj<HTMLAudioElement>;
     let getItemSpy: jasmine.Spy<(key: string) => string | null>;
     let setItemSpy: jasmine.Spy<(key: string, value: string) => void>;
 
@@ -30,6 +32,10 @@ describe('AudioService', () => {
         effectAudioSpy.currentTime = 0;
         effectAudioSpy.play = jasmine.createSpy('play').and.returnValue(Promise.resolve());
 
+        avatarAudioSpy = jasmine.createSpyObj('HTMLAudioElement', ['play', 'load']);
+        avatarAudioSpy.volume = 0;
+        avatarAudioSpy.play = jasmine.createSpy('play').and.returnValue(Promise.resolve());
+
         spyOn(window, 'Audio').and.returnValue(audioElementSpy);
         getItemSpy = spyOn(window.localStorage, 'getItem').and.returnValue(null);
         setItemSpy = spyOn(window.localStorage, 'setItem').and.stub();
@@ -39,6 +45,7 @@ describe('AudioService', () => {
 
         service['backgroundMusic'] = null;
         service['effects'] = new Map<SoundEffect, HTMLAudioElement>();
+        service['avatarsSounds'] = new Map<Avatar, HTMLAudioElement>();
         service['currentTrack'] = null;
         service['previousLogSize'] = 0;
 
@@ -55,8 +62,12 @@ describe('AudioService', () => {
         expect(service['backgroundMusic']).toBeNull();
         expect(service['effects']).toBeDefined();
         expect(service['effects'].size).toBe(0);
+        expect(service['avatarsSounds'].size).toBe(0);
         expect(service['currentTrack']).toBeNull();
         expect(service['previousLogSize']).toBe(0);
+        expect(service.getBackgroundMusicVolume()).toBe(AUDIO_CONFIG.backgroundMusicVolume);
+        expect(service.getEffectsVolume()).toBe(AUDIO_CONFIG.effectsVolume);
+        expect(service.getAvatarsVolume()).toBe(AUDIO_CONFIG.avatarsVolume);
     });
 
     it('should preload click effect in constructor', () => {
@@ -70,10 +81,12 @@ describe('AudioService', () => {
         const delta = 0.1;
         const storedMusicVolume = AUDIO_CONFIG.backgroundMusicVolume + delta;
         const storedEffectsVolume = AUDIO_CONFIG.effectsVolume - delta;
+        const storedAvatarsVolume = AUDIO_CONFIG.avatarsVolume - delta;
 
         const storedSettings = JSON.stringify({
             backgroundMusicVolume: storedMusicVolume,
             effectsVolume: storedEffectsVolume,
+            avatarsVolume: storedAvatarsVolume,
         });
 
         getItemSpy.and.returnValue(storedSettings);
@@ -85,6 +98,7 @@ describe('AudioService', () => {
         expect(getItemSpy).toHaveBeenCalledWith(AUDIO_LOCAL_STORAGE_KEY);
         expect(freshService.getBackgroundMusicVolume()).toBe(storedMusicVolume);
         expect(freshService.getEffectsVolume()).toBe(storedEffectsVolume);
+        expect(freshService.getAvatarsVolume()).toBe(storedAvatarsVolume);
     });
 
     it('should preload effects for a page', () => {
@@ -97,6 +111,17 @@ describe('AudioService', () => {
         expect(window.Audio).toHaveBeenCalledWith(`assets/audio/effects/${SOUND_EFFECTS_MAP[SoundEffect.Heal]}`);
         expect(audioElementSpy.load).toHaveBeenCalledTimes(2);
         expect(service['effects'].size).toBe(2);
+    });
+
+    it('should preload avatar sounds', () => {
+        (window.Audio as unknown as jasmine.Spy).and.returnValue(avatarAudioSpy);
+
+        service.preloadAvatarSounds([Avatar.Avatar1, Avatar.Avatar2]);
+
+        expect(window.Audio).toHaveBeenCalledWith(`assets/audio/avatars/${AVATAR_SOUNDS[Avatar.Avatar1]}`);
+        expect(window.Audio).toHaveBeenCalledWith(`assets/audio/avatars/${AVATAR_SOUNDS[Avatar.Avatar2]}`);
+        expect(avatarAudioSpy.load).toHaveBeenCalledTimes(2);
+        expect(service['avatarsSounds'].size).toBe(2);
     });
 
     it('should not reload effects that are already loaded', () => {
@@ -208,7 +233,7 @@ describe('AudioService', () => {
     it('should play attack effect when log includes COMBAT_LOG_PATTERNS.attack', () => {
         service['effects'].set(SoundEffect.Attack, effectAudioSpy);
 
-        const matchData = { logData: [{ content: 'abc ab' + COMBAT_LOG_PATTERNS.attack }] } as MatchData;
+        const matchData = { logData: [{ content: `abc ab${COMBAT_LOG_PATTERNS.attack}` }] } as MatchData;
 
         service.playCombatEffect(matchData);
 
@@ -218,7 +243,7 @@ describe('AudioService', () => {
     it('should play escape effect when log includes COMBAT_LOG_PATTERNS.flee', () => {
         service['effects'].set(SoundEffect.Flee, effectAudioSpy);
 
-        const matchData = { logData: [{ content: 'abc ab' + COMBAT_LOG_PATTERNS.flee }] } as MatchData;
+        const matchData = { logData: [{ content: `abc ab${COMBAT_LOG_PATTERNS.flee}` }] } as MatchData;
 
         service.playCombatEffect(matchData);
 
@@ -229,7 +254,7 @@ describe('AudioService', () => {
         service['backgroundMusic'] = audioElementSpy;
         service['effects'].set(SoundEffect.Death, effectAudioSpy);
 
-        const matchData = { logData: [{ content: 'abc ab ' + COMBAT_LOG_PATTERNS.victory }] } as MatchData;
+        const matchData = { logData: [{ content: `abc ab ${COMBAT_LOG_PATTERNS.victory}` }] } as MatchData;
 
         service.playCombatEffect(matchData);
 
@@ -265,7 +290,11 @@ describe('AudioService', () => {
         expect(audioElementSpy.volume).toBe(newVolume);
         expect(setItemSpy).toHaveBeenCalledWith(
             AUDIO_LOCAL_STORAGE_KEY,
-            JSON.stringify({ backgroundMusicVolume: newVolume, effectsVolume: AUDIO_CONFIG.effectsVolume }),
+            JSON.stringify({
+                backgroundMusicVolume: newVolume,
+                effectsVolume: AUDIO_CONFIG.effectsVolume,
+                avatarsVolume: AUDIO_CONFIG.avatarsVolume,
+            }),
         );
     });
 
@@ -278,7 +307,11 @@ describe('AudioService', () => {
         expect(service['backgroundMusicVolume']).toBe(newVolume);
         expect(setItemSpy).toHaveBeenCalledWith(
             AUDIO_LOCAL_STORAGE_KEY,
-            JSON.stringify({ backgroundMusicVolume: newVolume, effectsVolume: AUDIO_CONFIG.effectsVolume }),
+            JSON.stringify({
+                backgroundMusicVolume: newVolume,
+                effectsVolume: AUDIO_CONFIG.effectsVolume,
+                avatarsVolume: AUDIO_CONFIG.avatarsVolume,
+            }),
         );
     });
 
@@ -292,7 +325,11 @@ describe('AudioService', () => {
         expect(audioElementSpy.volume).toBe(expectedVolume);
         expect(setItemSpy).toHaveBeenCalledWith(
             AUDIO_LOCAL_STORAGE_KEY,
-            JSON.stringify({ backgroundMusicVolume: expectedVolume, effectsVolume: AUDIO_CONFIG.effectsVolume }),
+            JSON.stringify({
+                backgroundMusicVolume: expectedVolume,
+                effectsVolume: AUDIO_CONFIG.effectsVolume,
+                avatarsVolume: AUDIO_CONFIG.avatarsVolume,
+            }),
         );
     });
 
@@ -306,7 +343,11 @@ describe('AudioService', () => {
         expect(effectAudioSpy.volume).toBe(newVolume);
         expect(setItemSpy).toHaveBeenCalledWith(
             AUDIO_LOCAL_STORAGE_KEY,
-            JSON.stringify({ backgroundMusicVolume: AUDIO_CONFIG.backgroundMusicVolume, effectsVolume: newVolume }),
+            JSON.stringify({
+                backgroundMusicVolume: AUDIO_CONFIG.backgroundMusicVolume,
+                effectsVolume: newVolume,
+                avatarsVolume: AUDIO_CONFIG.avatarsVolume,
+            }),
         );
     });
 
@@ -336,7 +377,27 @@ describe('AudioService', () => {
         expect(effectAudioSpy.volume).toBe(expectedVolume);
         expect(setItemSpy).toHaveBeenCalledWith(
             AUDIO_LOCAL_STORAGE_KEY,
-            JSON.stringify({ backgroundMusicVolume: AUDIO_CONFIG.backgroundMusicVolume, effectsVolume: expectedVolume }),
+            JSON.stringify({
+                backgroundMusicVolume: AUDIO_CONFIG.backgroundMusicVolume,
+                effectsVolume: expectedVolume,
+                avatarsVolume: AUDIO_CONFIG.avatarsVolume,
+            }),
+        );
+    });
+
+    it('should set and persist avatars volume', () => {
+        const newVolume = AUDIO_CONFIG.avatarsVolume / 2;
+
+        service.setAvatarsVolume(newVolume);
+
+        expect(service.getAvatarsVolume()).toBe(newVolume);
+        expect(setItemSpy).toHaveBeenCalledWith(
+            AUDIO_LOCAL_STORAGE_KEY,
+            JSON.stringify({
+                backgroundMusicVolume: AUDIO_CONFIG.backgroundMusicVolume,
+                effectsVolume: AUDIO_CONFIG.effectsVolume,
+                avatarsVolume: newVolume,
+            }),
         );
     });
 
@@ -350,6 +411,7 @@ describe('AudioService', () => {
         expect(getItemSpy).toHaveBeenCalledWith(AUDIO_LOCAL_STORAGE_KEY);
         expect(freshService.getBackgroundMusicVolume()).toBe(AUDIO_CONFIG.backgroundMusicVolume);
         expect(freshService.getEffectsVolume()).toBe(AUDIO_CONFIG.effectsVolume);
+        expect(freshService.getAvatarsVolume()).toBe(AUDIO_CONFIG.avatarsVolume);
     });
 
     it('should use default value when volume is NaN', () => {

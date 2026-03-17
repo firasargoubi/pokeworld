@@ -16,7 +16,15 @@
         <div id="enemy-container">
             <div class="enemy-hp-container hp-container">
                 <div class="body">
-                    <p class="name">{{ matchService.data.players[visualData.enemyPlayer.playerIndex].name }}</p>
+                    <span class="name-container">
+                        <p class="name">{{ matchService.data.players[visualData.enemyPlayer.playerIndex].name }}</p>
+                        <img
+                            class="elemental-icon"
+                            [class.active]="this.matchService.data.playData.isElementalMode"
+                            src="{{ this.visualData.enemyElementalIcon }}"
+                        />
+                        <div class="advantage-icon" [class.active]="visualData.isEnemyElementalAdvantage"></div>
+                    </span>
                     <div class="hp-bar">
                         <div class="hp-backround">
                             <div
@@ -87,7 +95,15 @@
         </div>
         <div class="self-hp-container hp-container">
             <div class="body">
-                <p class="name">{{ matchService.data.players[visualData.selfPlayer.playerIndex].name }}</p>
+                <span class="name-container">
+                    <p class="name">{{ matchService.data.players[visualData.selfPlayer.playerIndex].name }}</p>
+                    <img
+                        class="elemental-icon"
+                        [class.active]="this.matchService.data.playData.isElementalMode"
+                        src="{{ visualData.selfElementalIcon }}"
+                    />
+                    <div class="advantage-icon" [class.active]="visualData.isSelfElementalAdvantage"></div>
+                </span>
                 <div class="hp-bar">
                     <div class="hp-backround">
                         <div

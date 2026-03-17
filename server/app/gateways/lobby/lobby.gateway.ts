@@ -1,5 +1,6 @@
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
+import { MatchSettings } from '@common/interfaces/match-data';
 import { Avatar, PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { LobbyEvent } from '@common/interfaces/socket-event.enum';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -45,11 +46,11 @@ export class LobbyGateway {
         }
     }
 
-    @SubscribeMessage(LobbyEvent.ChangeDropInStatus)
-    changeDropInStatus(socket: Socket, dropInStatus: boolean) {
+    @SubscribeMessage(LobbyEvent.ChangeMatchSettings)
+    changeMatchSettings(socket: Socket, matchSettings: MatchSettings) {
         const match = this.matchService.getMatchFromPlayerId(socket.id);
         if (match) {
-            this.lobbyService.changeDropInStatus(match, socket.id, dropInStatus);
+            this.lobbyService.changeMatchSettings(match, socket.id, matchSettings);
         }
     }
 
