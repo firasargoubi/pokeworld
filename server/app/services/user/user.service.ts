@@ -25,7 +25,16 @@ export class UserService {
     }
 
     associateSocket(userId: string, socketId: string) {
+        this.disassociateSocketBySocketId(socketId);
         this.userSocketMap.set(userId, socketId);
+    }
+
+    disassociateSocketBySocketId(socketId: string) {
+        for (const [mappedUserId, mappedSocketId] of this.userSocketMap.entries()) {
+            if (mappedSocketId === socketId) {
+                this.userSocketMap.delete(mappedUserId);
+            }
+        }
     }
 
     disassociateSocket(userId: string) {

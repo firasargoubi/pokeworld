@@ -49,11 +49,12 @@ export class LobbyService {
     }
 
     private onMatchUpdate(oldMatchData: MatchData) {
-        const oldIsConnected = oldMatchData.players.find((p) => p.id === this.socketService.selfId)?.isConnected ?? true;
+        const oldIsConnected = oldMatchData.players.find((p) => p.id === this.socketService.selfId)?.isConnected ?? false;
         const oldState = oldMatchData.state;
-        if (this.matchService.isState([MatchState.Lobby]) && !oldIsConnected && this.matchService.selfPlayer.isConnected) {
+        const playerJoinedInLobby = !oldIsConnected && this.matchService.selfPlayer.isConnected;
+        if (this.matchService.isState([MatchState.Lobby]) && playerJoinedInLobby) {
             this.router.navigate([PageEndpoint.Lobby]);
-        } else if (!this.matchService.isState([MatchState.Lobby]) && !oldIsConnected && this.matchService.selfPlayer.isConnected) {
+        } else if (!this.matchService.isState([MatchState.Lobby]) && playerJoinedInLobby) {
             this.router.navigate([PageEndpoint.Play]);
         } else if (oldState === MatchState.Lobby && this.matchService.isState([MatchState.TurnStart])) {
             this.router.navigate([PageEndpoint.Play]);

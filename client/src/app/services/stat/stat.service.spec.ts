@@ -127,7 +127,7 @@ describe('StatService', () => {
         matchService.data.players[0].isConnected = false;
 
         const playerStats = service['getPlayerStats']();
-        const expectedPlayers = mockTrackingData.players.filter((_, index) => index !== 0);
+        const expectedPlayers = mockTrackingData.players;
 
         expect(playerStats.length).toBe(expectedPlayers.length);
         playerStats.forEach((player, index) => {

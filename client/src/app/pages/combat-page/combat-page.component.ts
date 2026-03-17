@@ -155,19 +155,20 @@ export class CombatPageComponent implements OnDestroy {
     }
 
     private updatePlayersCombatData() {
-        const isFirstPlayer = this.matchService.data.combatData.playersCombatData[0].playerIndex === this.matchService.selfIndex;
+        const combatants = this.matchService.data.combatData.playersCombatData ?? [];
+        const isFirstPlayer = combatants[0].playerIndex === this.matchService.selfIndex;
         if (isFirstPlayer) {
-            this.visualData.selfPlayer = this.matchService.data.combatData.playersCombatData[0];
-            this.visualData.enemyPlayer = this.matchService.data.combatData.playersCombatData[1];
+            this.visualData.selfPlayer = combatants[0];
+            this.visualData.enemyPlayer = combatants[1];
             this.visualData.isSelfTurn = !this.matchService.data.combatData.isSecondPlayerTurn;
         } else {
-            this.visualData.selfPlayer = this.matchService.data.combatData.playersCombatData[1];
-            this.visualData.enemyPlayer = this.matchService.data.combatData.playersCombatData[0];
+            this.visualData.selfPlayer = combatants[1];
+            this.visualData.enemyPlayer = combatants[0];
             this.visualData.isSelfTurn = this.matchService.data.combatData.isSecondPlayerTurn;
         }
-        if (this.matchService.data.combatData.playersCombatData.find((p) => p.name === this.currentUser?.username)) {
-            this.isInCombat = true;
-        }
+        const hasCombatantMatchingSelfIndex = combatants.some((p) => p.playerIndex === this.matchService.selfIndex);
+
+        this.isInCombat = hasCombatantMatchingSelfIndex;
         this.updateSpectatorPanels();
     }
 

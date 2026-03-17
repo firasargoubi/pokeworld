@@ -49,7 +49,7 @@ export class StatService {
 
     private getPlayerStats(): PlayerStatData[] {
         const playerStats: PlayerStatData[] = [];
-        const connectedIds = new Set(this.matchService.data.players.filter((p) => p.isConnected).map((p) => p.id));
+        const connectedIds = new Set(this.matchService.data.players.map((p) => p.userId ?? p.id));
         for (const player of this.trackingData.players) {
             if (!connectedIds.has(player.id)) {
                 continue;

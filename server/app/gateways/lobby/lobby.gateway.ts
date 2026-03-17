@@ -1,5 +1,6 @@
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
+import { UserService } from '@app/services/user/user.service';
 import { MatchSettings } from '@common/interfaces/match-data';
 import { Avatar, PlayerData, PlayerType } from '@common/interfaces/player-data';
 import { LobbyEvent } from '@common/interfaces/socket-event.enum';
@@ -13,6 +14,7 @@ export class LobbyGateway {
     @WebSocketServer() private server: Server;
     @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
     @Inject(forwardRef(() => LobbyService)) private readonly lobbyService: LobbyService;
+    @Inject(forwardRef(() => UserService)) private readonly userService: UserService;
 
     @SubscribeMessage(LobbyEvent.KickPlayer)
     kickPlayer(socket: Socket, targetPlayerId: string) {
@@ -34,6 +36,8 @@ export class LobbyGateway {
     joinLobby(socket: Socket, playerData: PlayerData) {
         const match = this.matchService.getMatchFromPlayerId(socket.id);
         if (match) {
+            const resolvedFromMap = this.userService.getUserId(socket.id);
+            playerData.userId = resolvedFromMap ?? playerData.userId;
             this.lobbyService.joinLobby(match, socket.id, playerData);
         }
     }

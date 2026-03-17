@@ -23,7 +23,7 @@ export class ChatService {
     });
     channels = signal<Channel[]>([]);
     isFilterEnabled = signal(false);
-    isComponentVisible = signal(true);
+    isComponentVisible = signal(false);
     activeChannelName = computed(() => this.chatState().activeChannelName ?? '');
     activeChannelMessages = computed(() => {
         const name = this.chatState().activeChannelName;

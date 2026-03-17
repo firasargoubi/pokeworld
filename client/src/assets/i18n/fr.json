@@ -152,7 +152,8 @@
         "join": {
             "title": "REJOINDRE PARTIE",
             "enterCode": "Entrez votre code d'accès",
-            "pressEnter": "Appuyer sur Entrer pour valider"
+            "pressEnter": "Appuyer sur Entrer pour valider",
+            "joinButton": "REJOINDRE"
         },
         "create": {
             "title": "CRÉER PARTIE"
@@ -298,7 +299,9 @@
             "confirm": "VALIDER"
         },
         "gameCard": {
-            "play": "JOUER"
+            "play": "JOUER",
+            "players": "joueurs",
+            "code": "Code"
         },
         "header": {
             "back": "Retour"

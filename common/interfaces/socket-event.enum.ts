@@ -48,3 +48,11 @@ export enum ChatEvent {
 export enum UserEvent {
     Associate = 'associate',
 }
+
+export enum JoinPageEvent {
+    JoinRoom = 'joinJoinPageRoom',
+    LeaveRoom = 'leaveJoinPageRoom',
+    UpdateMatchList = 'updateMatchList',
+    Room = 'joinPageRoom',
+}
+

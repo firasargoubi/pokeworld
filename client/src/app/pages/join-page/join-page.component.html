@@ -1,32 +1,51 @@
 <div id="join-page-container">
+    @if(this.isCodeInputDisplayed) {
+    <div id="input-backdrop" (click)="this.toggleCodeInputDisplay()">
+        <div id="input-container">
+            <input
+                id="input"
+                [(ngModel)]="matchCode"
+                maxlength="{{ codeLength }}"
+                autofocus
+                (keyup)="onKeyUp($event)"
+                (click)="onInputClick($event)"
+                autocomplete="off"
+            />
+            <div id="input-container-body">
+                <p id="input-message">{{ 'pages.join.enterCode' | translate }}</p>
+
+                <div id="visual-input-container">
+                    <div class="number">{{ this.matchCode[0] }}</div>
+                    <div class="number">{{ this.matchCode[1] }}</div>
+                    <div class="number">{{ this.matchCode[2] }}</div>
+                    <div class="number">{{ this.matchCode[3] }}</div>
+                </div>
+
+                <p id="input-message">{{ 'pages.join.pressEnter' | translate }}</p>
+            </div>
+        </div>
+    </div>
+    }
     <div id="join-page-header">
         <app-header [onClick]="this.navigateToMenu.bind(this)" [stepNumber]="'1'" [title]="'pages.join.title'"></app-header>
     </div>
     <div id="join-page-border">
         <div id="join-page-body">
-            <div id="main-container">
-                <input
-                    id="input"
-                    [(ngModel)]="matchCode"
-                    maxlength="{{ codeLength }}"
-                    autofocus
-                    (keyup)="joinMatch($event)"
-                    (click)="this.audioService.playEffect(this.clickValue)"
-                />
-                <div id="main-container-body">
-                    <p id="main-message">{{ 'pages.join.enterCode' | translate }}</p>
-
-                    <div id="visual-input-container">
-                        <div class="number">{{ this.matchCode[0] }}</div>
-                        <div class="number">{{ this.matchCode[1] }}</div>
-                        <div class="number">{{ this.matchCode[2] }}</div>
-                        <div class="number">{{ this.matchCode[3] }}</div>
-                    </div>
-
-                    <p id="main-message">{{ 'pages.join.pressEnter' | translate }}</p>
-                </div>
+            <div id="game-grid">
+                @for(match of this.availableMaches; let i = $index; track match.code) {
+                <app-game-card [game]="match.gameData" [matchData]="match" [isAdminView]="false" [index]="i" (join)="joinMatch(match.code)">
+                </app-game-card>
+                }
             </div>
         </div>
+    </div>
+    <div id="poke-button">
+        <app-pokeball-button
+            [buttonContent]="'pages.join.joinButton' | translate"
+            [delay]="100"
+            [onClickAction]="this.toggleCodeInputDisplay.bind(this)"
+            [scale]="0.4"
+        ></app-pokeball-button>
     </div>
     <div class="chat-container">
         <app-chat [isInGame]="false"></app-chat>

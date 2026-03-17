@@ -11,7 +11,7 @@ import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
 import { GameData } from '@common/interfaces/game-data';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
-import { PlayerData, PlayerType } from '@common/interfaces/player-data';
+import { PlayerData } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -38,6 +38,7 @@ export class MatchService {
             this.matches.set(matchData.code, match);
             this.addPlayerToMatchCode(playerId, matchData.code);
             this.matchGateway.connectPlayer(playerId, matchData.code);
+            this.matchGateway.broadcastMatchListUpdate();
         }
         return matchData;
     }
@@ -45,6 +46,7 @@ export class MatchService {
     sendUpdate(match: Match) {
         this.matchGateway.emitUpdate(match.data.code, match.data);
         this.botService.onMatchUpdate(match);
+        this.matchGateway.broadcastMatchListUpdate();
     }
 
     sendMessage(matchCode: string, message: string, messageParams?: Record<string, string | number | boolean>) {
@@ -64,12 +66,24 @@ export class MatchService {
             this.addPlayerToMatchCode(playerId, matchCode);
             this.matchGateway.connectPlayer(playerId, matchCode);
             matchData = match.data;
+            this.matchGateway.broadcastMatchListUpdate();
         }
         return matchData;
     }
 
     addPlayerToMatchCode(playerId: string, matchCode: string) {
         this.playerToMatchCode.set(playerId, matchCode);
+    }
+
+    remapPlayerSocketId(oldPlayerId: string, newPlayerId: string, matchCode?: string) {
+        if (oldPlayerId === newPlayerId) {
+            return;
+        }
+        const resolvedMatchCode = matchCode ?? this.playerToMatchCode.get(oldPlayerId);
+        if (resolvedMatchCode) {
+            this.playerToMatchCode.delete(oldPlayerId);
+            this.playerToMatchCode.set(newPlayerId, resolvedMatchCode);
+        }
     }
 
     getMatchFromPlayerId(playerId: string): Match {
@@ -91,16 +105,15 @@ export class MatchService {
             this.chatService.logPlayerLeft(match, playerId);
             match.leave(playerId);
             if (match.getConnectedPlayerCount() === 0) {
-                match.data.players
-                    .filter((p) => p.type !== PlayerType.Player)
-                    .forEach((p) => {
-                        this.playerToMatchCode.delete(p.id);
-                    });
+                match.data.players.forEach((player) => {
+                    match.kickPlayer(player.id, Message.LastPlayerRemaining);
+                });
                 match.clearTimeout();
                 match.clearBotTimeout();
                 this.matches.delete(match.data.code);
             }
         }
+        this.matchGateway.broadcastMatchListUpdate();
     }
 
     killPlayerCombat(match: Match) {
@@ -124,7 +137,7 @@ export class MatchService {
                     player.name = newUsername;
                     hasChanges = true;
 
-                    const trackingPlayer = match.data.trackingData.players.find((tracking) => tracking.id === player.id);
+                    const trackingPlayer = match.data.trackingData.players.find((tracking) => tracking.id === (player.userId ?? player.id));
                     if (trackingPlayer) {
                         trackingPlayer.name = newUsername;
                     }
@@ -143,9 +156,28 @@ export class MatchService {
         });
     }
 
+    getAvailableMatches(): MatchData[] {
+        const matchesData: MatchData[] = [];
+        this.matches.forEach((match) => {
+            const isInLobby = match.data.state === MatchState.Lobby;
+            const isMatchLocked = match.data.lobbyData.isLocked;
+            const isMatchFull = match.isFull();
+
+            const isAvailableLobby = isInLobby && !isMatchLocked;
+            const isAvailableDropIn = !isInLobby && match.data.lobbyData.isDropInEnabled;
+
+            const isMatchAvailable = !isMatchFull && (isAvailableLobby || isAvailableDropIn);
+            if (isMatchAvailable) {
+                matchesData.push(match.data);
+            }
+        });
+        return matchesData;
+    }
+
     private disconnectPlayer(playerId: string) {
         this.playerToMatchCode.delete(playerId);
         this.matchGateway.disconnectPlayer(playerId);
+        this.matchGateway.broadcastMatchListUpdate();
     }
 
     private canJoinMatch(playerId: string, matchCode: string): boolean {

@@ -1,14 +1,14 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { HeaderComponent } from '@app/components/header/header.component';
-import { PageEndpoint } from '@common/interfaces/endpoint.enum';
-import { JoinPageComponent } from './join-page.component';
-import { MatchService } from '@app/services/match/match.service';
-import { AudioService } from '@app/services/audio/audio.service';
 import { ChatComponent } from '@app/components/chat/chat.component';
-import { Component } from '@angular/core';
+import { HeaderComponent } from '@app/components/header/header.component';
+import { AudioService } from '@app/services/audio/audio.service';
+import { MatchService } from '@app/services/match/match.service';
+import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { TranslateModule } from '@ngx-translate/core';
+import { JoinPageComponent } from './join-page.component';
 
 @Component({
     selector: 'app-chat',
@@ -52,10 +52,12 @@ describe('JoinPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should join match on enter key press', () => {
+    it('should join match on enter key press when input code is provided', () => {
+        const inputCode = 'TEST123';
+        component.matchCode = inputCode;
         const mockEvent = new KeyboardEvent('Enter', { key: 'Enter' });
-        component.joinMatch(mockEvent);
-        expect(matchServiceSpy.joinMatch).toHaveBeenCalled();
+        component.onKeyUp(mockEvent);
+        expect(matchServiceSpy.joinMatch).toHaveBeenCalledWith(inputCode);
     });
 
     it('should navigate to menu when navigateToMenu is called', () => {
