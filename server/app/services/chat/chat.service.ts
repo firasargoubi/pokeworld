@@ -3,6 +3,7 @@ import { Channel as ChannelDoc, ChannelDocument } from '@app/model/schema/channe
 import { User } from '@app/model/schema/user.schema';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ITEM_NAME } from '@common/consts/item-data.const';
+import { RESERVED_CHANNEL_NAMES } from '@common/consts/reserved-channel-names.const';
 import { Channel } from '@common/interfaces/channel';
 import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -22,7 +23,8 @@ export class ChatService {
         if (!channelName) return null;
 
         const isNameTaken = await this.channelModel.exists({ name: channelName });
-        if (isNameTaken) return null;
+        const channelNameIsNotAllowed = RESERVED_CHANNEL_NAMES.includes(channelName.toLowerCase());
+        if (isNameTaken || channelNameIsNotAllowed) return null;
 
         const newChannel = new this.channelModel({ name: channelName, membersUsernames: [userName] });
         const savedChannel = await newChannel.save();
@@ -45,6 +47,12 @@ export class ChatService {
 
     async deleteChannel(channelName: string): Promise<void> {
         await this.channelModel.deleteOne({ name: channelName });
+    }
+
+    async isUserInChannel(channelName: string, userName: string): Promise<boolean> {
+        if (!channelName || !userName) return false;
+        const exists = await this.channelModel.exists({ name: channelName, membersUsernames: userName });
+        return exists !== null;
     }
 
     async getChannels(): Promise<Channel[]> {

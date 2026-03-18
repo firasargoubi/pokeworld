@@ -290,7 +290,8 @@
             "messages": "Messages",
             "journal": "Journal",
             "searchPlaceholder": "Search/Create a channel",
-            "inputPlaceholder": "> Enter message [Enter]"
+            "inputPlaceholder": "> Enter a message",
+            "send": "Send"
         },
         "createGame": {
             "title": "New game",

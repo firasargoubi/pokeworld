@@ -127,24 +127,12 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         }
 
         const input = event.target as HTMLInputElement;
-        const message = input.value.trim();
-        if (!message) return;
+        this.sendMessageFromInput(input);
+    }
 
-        input.value = '';
-        const state = this.chatService.chatState();
-
-        switch (state.activeTab) {
-            case ChatTab.General:
-                this.chatService.sendGeneralMessage(message);
-                break;
-            case ChatTab.Match:
-                this.chatService.sendMessage(message);
-                break;
-            case ChatTab.Channels:
-                if (state.activeChannelName) this.chatService.sendChannelMessage(state.activeChannelName, message);
-                break;
-        }
-        this.shouldScrollToBottom = true;
+    sendMessageFromButton(input: HTMLInputElement): void {
+        this.audioService.playEffect(this.clickValue);
+        this.sendMessageFromInput(input);
     }
 
     switchVisibility(): void {
@@ -174,6 +162,28 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
     private resolveLogContent(log: ChatLog): string {
         return this.i18nService.translate(log.content, log.messageParams);
+    }
+
+    private sendMessageFromInput(input: HTMLInputElement): void {
+        const message = input.value.trim();
+        if (!message) return;
+
+        input.value = '';
+        const state = this.chatService.chatState();
+
+        switch (state.activeTab) {
+            case ChatTab.General:
+                this.chatService.sendGeneralMessage(message);
+                break;
+            case ChatTab.Match:
+                this.chatService.sendMessage(message);
+                break;
+            case ChatTab.Channels:
+                if (state.activeChannelName) this.chatService.sendChannelMessage(state.activeChannelName, message);
+                break;
+        }
+
+        this.shouldScrollToBottom = true;
     }
 
     private scrollToBottom(): void {

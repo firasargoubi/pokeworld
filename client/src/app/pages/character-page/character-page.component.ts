@@ -11,6 +11,7 @@ import { PopupMessage } from '@app/consts/popup-message.const';
 import { CharacterVisualData } from '@app/interfaces/character-visual-data';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
+import { ChatService } from '@app/services/chat/chat.service';
 import { I18nService } from '@app/services/i18n/i18n.service';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
@@ -42,6 +43,7 @@ export class CharacterPageComponent {
     private lobbyService: LobbyService = inject(LobbyService);
     private userService: UserService = inject(UserService);
     private i18nService: I18nService = inject(I18nService);
+    private readonly chatService: ChatService = inject(ChatService);
     private router: Router = inject(Router);
 
     constructor() {
@@ -58,7 +60,8 @@ export class CharacterPageComponent {
 
     @HostListener('document:keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
-        if (event.key === 'Enter') {
+        const chatIsNotVisible = !this.chatService.isComponentVisible();
+        if (event.key === 'Enter' && chatIsNotVisible) {
             this.joinLobby();
         }
     }

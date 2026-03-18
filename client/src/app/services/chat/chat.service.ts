@@ -6,6 +6,7 @@ import { ChatTab } from '@app/interfaces/chat-tab.enum';
 import { PopupService } from '@app/services/popup/popup.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { UserService } from '@app/services/user/user.service';
+import { RESERVED_CHANNEL_NAMES } from '@common/consts/reserved-channel-names.const';
 import { Channel, ChannelMessage, ChannelUser } from '@common/interfaces/channel';
 import { ChatMessage } from '@common/interfaces/chat-message';
 import { ChatEvent } from '@common/interfaces/socket-event.enum';
@@ -93,13 +94,15 @@ export class ChatService {
     createChannel(channelName: string): void {
         const username = this.user?.username;
         if (!username) return;
+        const channelNameIsNotAllowed = RESERVED_CHANNEL_NAMES.includes(channelName.toLowerCase());
         const channelExists = this.channels().some((channel) => channel.name === channelName);
-        if (channelExists) {
+        if (channelExists || channelNameIsNotAllowed) {
             this.popupService.showPopup({
                 message: PopupMessage.NameAlreadyExists,
                 hasCloseButton: true,
                 isConfirmation: false,
             });
+            return;
         }
         const channelUser: ChannelUser = { channelName, userName: username };
         this.socketService.emit(ChatEvent.CreateChannel, channelUser, (channel: Channel) => {
@@ -123,8 +126,10 @@ export class ChatService {
     }
 
     deleteChannel(channelName: string): void {
+        const username = this.user?.username;
+        if (!username) return;
         if (this.chatState().activeChannelName === channelName) this.showChannelList();
-        this.socketService.emit(ChatEvent.DeleteChannel, channelName);
+        this.socketService.emit(ChatEvent.DeleteChannel, { channelName, userName: username } as ChannelUser);
     }
 
     sendMessage(message: string): void {
