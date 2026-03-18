@@ -10,6 +10,7 @@ import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:flutter/material.dart';
 
 import '../consts/login_const.dart';
+import '../widgets/login_popup/login_popup_consts.dart';
 
 class LoginController {
   final UserService _userService = UserService();
@@ -33,6 +34,7 @@ class LoginController {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
   Function(void Function())? _setState;
 
@@ -53,7 +55,11 @@ class LoginController {
     final rawPassword = passwordController.text;
     final trimmedPassword = rawPassword.trim();
 
-    if (rawUsername.isEmpty || rawPassword.isEmpty || (isRegister && rawEmail.isEmpty)) {
+    final hasEmptyUsername = rawUsername.isEmpty;
+    final hasEmptyPassword = rawPassword.isEmpty;
+    final hasEmptyEmailOrConfirm = isRegister && (rawEmail.isEmpty || confirmPasswordController.text.isEmpty);
+
+    if (hasEmptyUsername || hasEmptyPassword || hasEmptyEmailOrConfirm) {
       _updateState(() {
         errorMessage = _translateError(ErrorMessage.EmptyFields.message);
       });
@@ -144,6 +150,13 @@ class LoginController {
       return false;
     }
 
+    if (rawPassword != confirmPasswordController.text) {
+      _updateState(() {
+        errorMessage = _translateError(LOGIN_POPUP_PASSWORD_MISMATCH);
+      });
+      return false;
+    }
+
     if (rawEmail != trimmedEmail || !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(trimmedEmail)) {
       _updateState(() {
         errorMessage = _translateError(ErrorMessage.InvalidEmail.message);
@@ -164,6 +177,7 @@ class LoginController {
     _updateState(() {
       isRegister = !isRegister;
       errorMessage = null;
+      confirmPasswordController.clear();
     });
   }
 
@@ -197,6 +211,7 @@ class LoginController {
   void dispose() {
     usernameController.dispose();
     emailController.dispose();
+    confirmPasswordController.dispose();
     passwordController.dispose();
   }
 }

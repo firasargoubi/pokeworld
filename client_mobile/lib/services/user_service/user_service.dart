@@ -41,6 +41,12 @@ class UserService {
     }
   }
 
+  void _addOptionalField(Map<String, String> payload, String fieldName, String? value) {
+    if (value != null && value.trim().isNotEmpty) {
+      payload[fieldName] = value.trim();
+    }
+  }
+
   Future<UserInfo> login(String username, String password) async {
     _ensureConfigured();
     final String uri = '$baseUrl/${UserEndpoint.UserLogin.path}';
@@ -109,10 +115,16 @@ class UserService {
     currentUser.value = null;
   }
 
-  Future<UserInfo> edit(String userId, String oldPassword, String password) async {
+  Future<UserInfo> edit({required String userId, String? oldPassword, String? password, String? username}) async {
     _ensureConfigured();
     final String uri = '$baseUrl/${UserEndpoint.UserEdit.path}';
-    final bodyJson = jsonEncode({'userId': userId, 'oldPassword': oldPassword, 'password': password});
+    final Map<String, String> payload = {'userId': userId};
+
+    _addOptionalField(payload, 'oldPassword', oldPassword);
+    _addOptionalField(payload, 'password', password);
+    _addOptionalField(payload, 'username', username);
+
+    final bodyJson = jsonEncode(payload);
     final response = await http.put(Uri.parse(uri), headers: {'Content-Type': 'application/json'}, body: bodyJson);
     if (response.statusCode == HttpStatusCode.Ok.code) {
       final Map<String, dynamic> responseMap = jsonDecode(response.body);
@@ -120,6 +132,9 @@ class UserService {
       currentUser.value = user;
       _socketService.emit(UserEvent.Associate.value, user);
       return user;
+    }
+    if (response.statusCode == HttpStatusCode.Conflict.code && username != null) {
+      throw AuthException(AuthError.usernameExists);
     }
     throw Exception(ErrorMessage.ChangeFailed.message);
   }

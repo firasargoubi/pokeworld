@@ -1,4 +1,5 @@
 import 'package:client_mobile/consts/auth_errors.dart';
+import 'package:client_mobile/consts/login_const.dart';
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/error_messages.dart';
 import 'package:client_mobile/models/popup_message.dart';
@@ -14,6 +15,7 @@ import 'package:client_mobile/utils/profile_image_provider.dart';
 import 'package:client_mobile/widgets/binary_toggle/binary_toggle.dart';
 import 'package:client_mobile/widgets/login_popup/login_popup.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'user_popup_consts.dart';
 
@@ -27,10 +29,19 @@ class UserPopup extends StatefulWidget {
 class _UserPopupState extends State<UserPopup> {
   final PreferencesService _preferencesService = PreferencesService();
   final I18nService _i18nService = I18nService();
+  final TextEditingController _newUsernameController = TextEditingController();
+  final TextEditingController _oldPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmNewPasswordController = TextEditingController();
   bool _editMode = false;
   String _oldPassword = '';
   String _newPassword = '';
+  String _confirmNewPassword = '';
+  String _newUsername = '';
+  String _usernameError = '';
   String _passwordError = '';
+  bool _isUpdatingUsername = false;
+  bool _isUpdatingPassword = false;
 
   String _translateError(Object error) {
     if (error is AuthException) {
@@ -125,30 +136,151 @@ class _UserPopupState extends State<UserPopup> {
   Future<void> _handleEditPassword() async {
     AudioService().playSoundEffect(SoundEffect.Select.path);
     final currentUser = UserService().currentUser.value;
-    if (currentUser == null || _oldPassword.trim().isEmpty || _newPassword.trim().isEmpty) {
+    final oldPassword = _oldPassword.trim();
+    final newPassword = _newPassword.trim();
+    final confirmNewPassword = _confirmNewPassword.trim();
+
+    if (currentUser == null || oldPassword.isEmpty || newPassword.isEmpty || confirmNewPassword.isEmpty) {
       setState(() {
         _passwordError = _i18nService.translate(USER_POPUP_REQUIRED_FIELDS_ERROR);
       });
       return;
     }
 
-    try {
-      await UserService().edit(currentUser.userId, _oldPassword.trim(), _newPassword.trim());
+    if (newPassword != confirmNewPassword) {
       setState(() {
-        _editMode = false;
+        _passwordError = _i18nService.translate(USER_POPUP_PASSWORD_MISMATCH);
+      });
+      return;
+    }
+
+    if (oldPassword == newPassword) {
+      setState(() {
+        _passwordError = _i18nService.translate(USER_POPUP_PASSWORD_UNCHANGED);
+      });
+      return;
+    }
+
+    try {
+      setState(() {
+        _isUpdatingPassword = true;
+      });
+      await UserService().edit(userId: currentUser.userId, oldPassword: oldPassword, password: newPassword);
+      _oldPasswordController.clear();
+      _newPasswordController.clear();
+      _confirmNewPasswordController.clear();
+      setState(() {
         _oldPassword = '';
         _newPassword = '';
+        _confirmNewPassword = '';
         _passwordError = '';
+        _isUpdatingPassword = false;
       });
       PopupService().showPopup(
         PopupMessage(message: I18nService().translate(PopupMessages.ChangeConfirmed.messageKey), hasCloseButton: true, isConfirmation: false),
       );
     } catch (e) {
       setState(() {
-        _passwordError = '';
+        _passwordError = _translateError(e);
+        _isUpdatingPassword = false;
+      });
+    }
+  }
+
+  Future<void> _confirmUsernameUpdate(String sanitizedUsername) async {
+    final currentUser = UserService().currentUser.value;
+    if (currentUser == null) return;
+
+    try {
+      setState(() {
+        _isUpdatingUsername = true;
+      });
+      final updatedUser = await UserService().edit(userId: currentUser.userId, username: sanitizedUsername);
+      if (!mounted) return;
+      setState(() {
+        _newUsername = updatedUser.username;
+        _newUsernameController.text = updatedUser.username;
+        _usernameError = '';
+        _isUpdatingUsername = false;
+      });
+      PopupService().showPopup(
+        PopupMessage(message: I18nService().translate(PopupMessages.ChangeConfirmed.messageKey), hasCloseButton: true, isConfirmation: false),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _usernameError = _translateError(e);
+        _isUpdatingUsername = false;
       });
       _showErrorPopup(e);
     }
+  }
+
+  void _handleEditUsername() {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
+    final currentUser = UserService().currentUser.value;
+    if (currentUser == null) return;
+
+    final sanitizedNewUsername = _newUsername.trim().toUpperCase();
+    if (sanitizedNewUsername.isEmpty) {
+      setState(() {
+        _usernameError = _i18nService.translate(USER_POPUP_USERNAME_REQUIRED);
+      });
+      return;
+    }
+
+    if (sanitizedNewUsername.length < MIN_USERNAME_LENGTH || sanitizedNewUsername.length > MAX_USERNAME_LENGTH) {
+      setState(() {
+        _usernameError = _i18nService.translate(USER_POPUP_USERNAME_LENGTH);
+      });
+      return;
+    }
+
+    if (sanitizedNewUsername == currentUser.username) {
+      setState(() {
+        _usernameError = _i18nService.translate(USER_POPUP_USERNAME_UNCHANGED);
+      });
+      return;
+    }
+
+    PopupService().showPopup(
+      PopupMessage(
+        message: _i18nService.translate(USER_POPUP_CONFIRM_USERNAME_CHANGE),
+        hasCloseButton: true,
+        isConfirmation: true,
+        action: () {
+          _confirmUsernameUpdate(sanitizedNewUsername);
+        },
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _newUsernameController.dispose();
+    _oldPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmNewPasswordController.dispose();
+    super.dispose();
+  }
+
+  void _toggleEditMode() {
+    final currentUsername = UserService().currentUser.value?.username ?? '';
+    _oldPasswordController.clear();
+    _newPasswordController.clear();
+    _confirmNewPasswordController.clear();
+    setState(() {
+      _editMode = !_editMode;
+      _oldPassword = '';
+      _newPassword = '';
+      _confirmNewPassword = '';
+      _passwordError = '';
+      _usernameError = '';
+      _newUsername = currentUsername;
+      _newUsernameController.text = currentUsername;
+      _isUpdatingUsername = false;
+      _isUpdatingPassword = false;
+    });
   }
 
   @override
@@ -208,15 +340,53 @@ class _UserPopupState extends State<UserPopup> {
                 if (_editMode) ...[
                   const SizedBox(height: 12),
                   TextField(
+                    controller: _newUsernameController,
+                    inputFormatters: [LengthLimitingTextInputFormatter(MAX_USERNAME_LENGTH)],
+                    onChanged: (value) {
+                      final upper = value.toUpperCase();
+                      if (upper != value) {
+                        _newUsernameController.value = TextEditingValue(
+                          text: upper,
+                          selection: TextSelection.collapsed(offset: upper.length),
+                        );
+                      }
+                      setState(() {
+                        _newUsername = upper;
+                        _usernameError = '';
+                      });
+                    },
+                    decoration: InputDecoration(
+                      labelText: _i18nService.translate(USER_POPUP_NEW_USERNAME_LABEL),
+                      hintText: _i18nService.translate(USER_POPUP_NEW_USERNAME_PLACEHOLDER),
+                      isDense: true,
+                    ),
+                    textCapitalization: TextCapitalization.characters,
+                  ),
+                  if (_usernameError.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(_usernameError, style: const TextStyle(color: Colors.red, fontSize: 12)),
+                    ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _oldPasswordController,
                     obscureText: true,
                     onChanged: (value) => _oldPassword = value,
                     decoration: InputDecoration(labelText: _i18nService.translate(USER_POPUP_OLD_PASSWORD_LABEL), isDense: true),
                   ),
                   const SizedBox(height: 8),
                   TextField(
+                    controller: _newPasswordController,
                     obscureText: true,
                     onChanged: (value) => _newPassword = value,
                     decoration: InputDecoration(labelText: _i18nService.translate(USER_POPUP_NEW_PASSWORD_LABEL), isDense: true),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _confirmNewPasswordController,
+                    obscureText: true,
+                    onChanged: (value) => _confirmNewPassword = value,
+                    decoration: InputDecoration(labelText: _i18nService.translate(USER_POPUP_CONFIRM_PASSWORD_PLACEHOLDER), isDense: true),
                   ),
                   if (_passwordError.isNotEmpty)
                     Padding(
@@ -233,16 +403,17 @@ class _UserPopupState extends State<UserPopup> {
         TextButton(
           onPressed: () {
             AudioService().playSoundEffect(SoundEffect.Select.path);
-            setState(() {
-              _editMode = !_editMode;
-              _oldPassword = '';
-              _newPassword = '';
-              _passwordError = '';
-            });
+            _toggleEditMode();
           },
           child: Text(_i18nService.translate(_editMode ? USER_POPUP_CANCEL : USER_POPUP_EDIT_PASSWORD)),
         ),
-        if (_editMode) TextButton(onPressed: () => _handleEditPassword(), child: Text(_i18nService.translate(USER_POPUP_CONFIRM))),
+        if (_editMode) ...[
+          TextButton(onPressed: _isUpdatingUsername ? null : _handleEditUsername, child: Text(_i18nService.translate(USER_POPUP_UPDATE_USERNAME))),
+          TextButton(
+            onPressed: _isUpdatingPassword ? null : () => _handleEditPassword(),
+            child: Text(_i18nService.translate(USER_POPUP_UPDATE_PASSWORD)),
+          ),
+        ],
         TextButton(
           onPressed: () {
             AudioService().playSoundEffect(SoundEffect.Select.path);

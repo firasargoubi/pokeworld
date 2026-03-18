@@ -5,6 +5,7 @@ import { PopupMessage } from '@app/consts/popup-message.const';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { UserService } from '@app/services/user/user.service';
+import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/player-data.const';
 import { UserInfo } from '@common/interfaces/user';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -17,6 +18,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 })
 export class UserPopupComponent {
     @Input() avatarImage: string = 'assets/images/menu/fullAvatars/fullAvatar0.png';
+    readonly maxNameLength = MAX_NAME_LENGTH;
     userService: UserService = inject(UserService);
     currentUser: UserInfo | null = null;
     showBack = false;
@@ -69,6 +71,10 @@ export class UserPopupComponent {
         const sanitizedUsername = (this.newUsername || '').toUpperCase().trim();
         if (!sanitizedUsername) {
             this.usernameError = this.translateService.instant('components.userPopup.usernameRequired');
+            return;
+        }
+        if (sanitizedUsername.length < MIN_NAME_LENGTH || sanitizedUsername.length > MAX_NAME_LENGTH) {
+            this.usernameError = this.translateService.instant('popup.usernameLength');
             return;
         }
         if (sanitizedUsername === this.currentUser.username) {
