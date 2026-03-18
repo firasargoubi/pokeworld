@@ -38,6 +38,7 @@
                         (ngModelChange)="newUsername = ($event || '').toUpperCase()"
                         class="text-input pixel-placeholder"
                         [placeholder]="'components.userPopup.newUsernamePlaceholder' | translate"
+                        [attr.maxlength]="maxNameLength"
                         style="text-transform: uppercase"
                     />
                     @if(usernameError) {

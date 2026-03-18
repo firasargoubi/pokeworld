@@ -16,7 +16,7 @@
         "logoutConfirmation": "Are you sure you want to log out?",
         "emptyFields": "Please fill in all fields",
         "usernameSpaces": "Username must not start or end with spaces",
-        "usernameLength": "Username must contain between 3 and 15 characters",
+        "usernameLength": "Username must contain between 3 and 10 characters",
         "invalidCredentials": "Username or password is invalid",
         "usernameTaken": "Username is already taken",
         "accountConnected": "This account is already connected on another platform",

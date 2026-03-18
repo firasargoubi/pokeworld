@@ -16,7 +16,7 @@
         "logoutConfirmation": "Êtes-vous sûr de vouloir vous déconnecter ?",
         "emptyFields": "Veuillez remplir tous les champs",
         "usernameSpaces": "Le nom d’utilisateur ne doit pas commencer ni finir par des espaces",
-        "usernameLength": "Le nom doit contenir entre 3 et 15 caractères",
+        "usernameLength": "Le nom doit contenir entre 3 et 10 caractères",
         "invalidCredentials": "Le nom d'utilisateur ou le mot de passe est invalide",
         "usernameTaken": "Le nom d'utilisateur est déjà utilisé",
         "accountConnected": "Le compte est déjà connecté sur une autre plateforme",

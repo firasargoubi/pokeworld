@@ -1,11 +1,11 @@
 import 'package:client_mobile/consts/avatar_list.dart';
 import 'package:client_mobile/consts/login_const.dart';
 import 'package:client_mobile/controllers/login_controller.dart';
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/user_preferences.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/widgets/binary_toggle/binary_toggle.dart';
-import 'package:client_mobile/models/audio.dart';
-import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -123,7 +123,7 @@ class _LoginPopupState extends State<LoginPopup> {
               decoration: InputDecoration(
                 labelText: i18n.translate(LOGIN_POPUP_USERNAME_LABEL),
                 hintText: i18n.translate(LOGIN_POPUP_USERNAME_HINT),
-                prefixIcon: Icon(Icons.person)
+                prefixIcon: Icon(Icons.person),
               ),
               onTap: () => AudioService().playSoundEffect(SoundEffect.Select.path),
             ),
@@ -138,6 +138,18 @@ class _LoginPopupState extends State<LoginPopup> {
               ),
               onTap: () => AudioService().playSoundEffect(SoundEffect.Select.path),
             ),
+            if (_controller.isRegister)
+              TextField(
+                controller: _controller.confirmPasswordController,
+                enabled: !_controller.isLoading,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: i18n.translate(LOGIN_POPUP_CONFIRM_PASSWORD_LABEL),
+                  hintText: i18n.translate(LOGIN_POPUP_CONFIRM_PASSWORD_HINT),
+                  prefixIcon: const Icon(Icons.lock_outline),
+                ),
+                onTap: () => AudioService().playSoundEffect(SoundEffect.Select.path),
+              ),
             if (_controller.errorMessage != null) Text(_controller.errorMessage!, style: TextStyle(color: Colors.red, fontSize: 12)),
             ElevatedButton(
               onPressed: _controller.isLoading
