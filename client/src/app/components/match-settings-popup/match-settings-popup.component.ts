@@ -36,6 +36,7 @@ export class MatchSettingsPopupComponent implements OnChanges {
     synchronizeSettings() {
         this.matchSettings.isElementalMode = this.matchService.data.playData.isElementalMode;
         this.matchSettings.isDropInEnabled = this.matchService.data.lobbyData.isDropInEnabled;
+        this.matchSettings.isRapidElimination = this.matchService.data.lobbyData.isRapidElimination;
     }
 
     toggleElementalMode() {
@@ -50,7 +51,7 @@ export class MatchSettingsPopupComponent implements OnChanges {
 
     toggleRapidElimination() {
         this.audioService.playEffect(SoundEffect.Click);
-        this.matchSettings.isRapidElimination = false;
+        this.matchSettings.isRapidElimination = !this.matchSettings.isRapidElimination;
     }
 
     onValidateSelection() {

@@ -37,6 +37,7 @@ $img-icon-crown: '../../../assets/images/menu/icons/crown.png';
 $img-icon-bot-defensive: '../../../assets/images/menu/icons/bot-defensive.png';
 $img-icon-bot-aggressive: '../../../assets/images/menu/icons/bot-aggressive.png';
 $img-icon-flag: '../../../assets/images/menu/icons/flag.png';
+$img-icon-eliminated: '../../../assets/images/menu/icons/match-mode/skull.png';
 
 $img-timer-right: '../../../assets/images/menu/timer/timer-right.png';
 $img-timer-left: '../../../assets/images/menu/timer/timer-left.png';
@@ -388,6 +389,15 @@ $player-card-gap: calc($base-size * 0.8);
     display: none;
     height: 50%;
     aspect-ratio: 1/1;
+}
+
+.eliminated-icon {
+    display: block;
+    height: 60%;
+    aspect-ratio: 1/1;
+    background-image: url($img-icon-eliminated);
+    background-size: auto 80%;
+    filter: invert(23%) sepia(93%) saturate(3745%) hue-rotate(348deg) brightness(95%) contrast(92%);
 }
 
 .is-aggressive-bot:not(.is-admin) .info-icon,

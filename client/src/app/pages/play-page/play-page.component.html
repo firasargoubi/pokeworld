@@ -59,9 +59,16 @@
                                 <div class="info-icon"></div>
                             </div>
                             <div class="player-card-right">
+                                @if (player.isObserver) {
+                                <div class="eliminated-icon"></div>
+                                }
                                 @if (player.team === 'none') {
                                 <div class="sword-icon"></div>
+                                @if (matchService.data.lobbyData.isRapidElimination) {
+                                <div class="player-combats">{{ player.combatsWon }}</div>
+                                } @else {
                                 <div class="player-combats">{{ player.combatsWon }}/3</div>
+                                }
                                 } @else {
                                 <div class="flag-icon"></div>
                                 <div class="sword-icon"></div>

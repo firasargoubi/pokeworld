@@ -19,6 +19,7 @@ import {
     PATH_DEFENSE_MODIFICATION,
 } from '@common/consts/combat-data.const';
 import { AVATAR_ELEMENT_TYPE_MAP, ELEMENT_TYPE_ADVANTAGE_BONUS, ELEMENT_TYPE_ADVANTAGES } from '@common/consts/elemental-type';
+import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatAction, MatchState, PlayerCombatData } from '@common/interfaces/match-data';
 import { PlayerData, PlayerType } from '@common/interfaces/player-data';
@@ -58,13 +59,18 @@ export class CombatService {
     startCombatEndDeath(match: Match) {
         const winner = this.getInactivePlayerData(match);
         const loser = this.getActivePlayerData(match);
+        const loserPlayer = match.data.players[loser.playerIndex];
         this.chatService.logCombatEnd(match, winner, true);
         match.data.state = MatchState.CombatEnd;
         match.data.combatData.lastCombatAction = CombatAction.None;
         this.trackingService.updateCombats(match, winner, loser);
         match.data.players[winner.playerIndex].combatsWon += 1;
         loser.currentHealth = 0;
-        this.respawnPlayer(match, match.data.players[loser.playerIndex]);
+        if (match.data.lobbyData.isRapidElimination) {
+            this.eliminatePlayer(match, loserPlayer);
+        } else {
+            this.respawnPlayer(match, loserPlayer);
+        }
         match.sendUpdate();
         const duration = this.getTimeoutDuration(match, COMBAT_END_DURATION);
         if (match.data.playData.activePlayerIndex === loser.playerIndex) {
@@ -106,10 +112,19 @@ export class CombatService {
 
     private canPlayerAct(match: Match, playerId: string): boolean {
         const index = match.getPlayerIndex(playerId);
+        const player = match.data.players[index];
         const isFirstPlayer = !match.data.combatData.isSecondPlayerTurn && match.data.combatData.playersCombatData[0].playerIndex === index;
         const isSecondPlayer = match.data.combatData.isSecondPlayerTurn && match.data.combatData.playersCombatData[1].playerIndex === index;
         const isActivePlayer = isFirstPlayer || isSecondPlayer;
-        return isActivePlayer && match.isState([MatchState.CombatWait]);
+        return isActivePlayer && !player?.isObserver && match.isState([MatchState.CombatWait]);
+    }
+
+    private eliminatePlayer(match: Match, player: PlayerData) {
+        this.itemService.dropItems(match, player.id, player.items);
+        player.items = [];
+        player.position = structuredClone(OUTSIDE_OF_MAP);
+        player.spawnPoint = structuredClone(OUTSIDE_OF_MAP);
+        player.isObserver = true;
     }
 
     private startCombatWait(match: Match) {

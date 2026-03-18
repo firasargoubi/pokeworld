@@ -15,6 +15,7 @@ export interface PlayerVisualData {
     name: string;
     avatarUrl: string;
     combatsWon: number;
+    isObserver?: boolean;
     isHost: boolean;
     isConnected: boolean;
     botType: string;

@@ -299,6 +299,17 @@ class GameStatsPanel extends StatelessWidget {
   final String Function(int ms) formatDuration;
   final String Function(double ratio) formatRatio;
 
+  String _winnerDisplayName() {
+    final winnerName = winner?.name ?? '';
+    if (winnerName == 'rouge' || winnerName == 'red') {
+      return I18nService().translate('teams.red').toUpperCase();
+    }
+    if (winnerName == 'bleu' || winnerName == 'blue') {
+      return I18nService().translate('teams.blue').toUpperCase();
+    }
+    return winnerName.toUpperCase();
+  }
+
   @override
   Widget build(BuildContext context) {
     final showFlagHolders = MatchService().matchData?.gameData.mapData.gameMode == GameMode.CTF;
@@ -336,11 +347,12 @@ class GameStatsPanel extends StatelessWidget {
                             value: formatRatio(stats.visitedTilesRatio),
                             baseSize: baseSize,
                           ),
-                          StatLine(
-                            label: I18nService().translate(STAT_TOGGLED_BRIDGES_LABEL_KEY),
-                            value: formatRatio(stats.toggledBridgesRatio),
-                            baseSize: baseSize,
-                          ),
+                          if (stats.toggledBridgesRatio != 0)
+                            StatLine(
+                              label: I18nService().translate(STAT_TOGGLED_BRIDGES_LABEL_KEY),
+                              value: formatRatio(stats.toggledBridgesRatio),
+                              baseSize: baseSize,
+                            ),
                           if (showFlagHolders)
                             StatLine(
                               label: I18nService().translate(STAT_FLAG_HOLDERS_LABEL_KEY),
@@ -358,7 +370,7 @@ class GameStatsPanel extends StatelessWidget {
               flex: 2,
               child: Column(
                 children: [
-                  StatSectionHeader(title: winner?.name.toUpperCase() ?? '', baseSize: baseSize),
+                  StatSectionHeader(title: _winnerDisplayName(), baseSize: baseSize),
                   Expanded(
                     child: Stack(
                       children: [

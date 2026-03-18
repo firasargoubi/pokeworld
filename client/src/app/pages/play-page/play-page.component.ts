@@ -164,6 +164,7 @@ export class PlayPageComponent {
                 name: player.name,
                 avatarUrl: AVATAR_DATA[player.avatar].imageCentered,
                 combatsWon: player.combatsWon,
+                isObserver: !!player.isObserver,
                 isHost: index === this.matchService.data.lobbyData.hostPlayerIndex,
                 botType: player.type,
                 isConnected: player.isConnected,

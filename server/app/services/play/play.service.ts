@@ -147,6 +147,10 @@ export class PlayService {
     }
 
     private checkWinConditionFfa(match: Match): boolean {
+        if (match.data.lobbyData.isRapidElimination) {
+            return this.checkWinConditionRapidElimination(match);
+        }
+
         const winner = match.data.players.find((p) => p.combatsWon >= MINIMUM_COMBATS_TO_WIN);
         if (winner) {
             match.data.state = MatchState.MatchEnd;
@@ -155,6 +159,21 @@ export class PlayService {
             this.chatService.logMatchWinner(match, winner.name);
         }
         return winner !== undefined;
+    }
+
+    private checkWinConditionRapidElimination(match: Match): boolean {
+        const activePlayers = match.data.players.filter((player) => player.isConnected && !player.isObserver);
+        const winner = activePlayers.length === 1 ? activePlayers[0] : undefined;
+
+        if (!winner) {
+            return false;
+        }
+
+        match.data.state = MatchState.MatchEnd;
+        match.sendMessage(Message.MatchWinner, { playerName: winner.name });
+        this.trackingService.updateWinner(match, winner);
+        this.chatService.logMatchWinner(match, winner.name);
+        return true;
     }
 
     private endMatch(match: Match) {
@@ -173,7 +192,7 @@ export class PlayService {
             hasWon = flagHolder.position.x === flagHolder.spawnPoint.x && flagHolder.position.y === flagHolder.spawnPoint.y;
             if (hasWon) {
                 this.trackingService.updateWinner(match, flagHolder);
-                const winningTeam = flagHolder.team;
+                const winningTeam = flagHolder.team === 'rouge' ? 'teams.red' : flagHolder.team === 'bleu' ? 'teams.blue' : flagHolder.team;
                 match.data.state = MatchState.MatchEnd;
                 match.sendMessage(Message.TeamWin, { team: winningTeam });
             }
@@ -221,7 +240,7 @@ export class PlayService {
     private getNextPlayerIndex(match: Match): number {
         let nextIndex = (match.data.playData.activePlayerIndex + 1) % match.data.players.length;
         let steps = 0;
-        while (steps <= match.data.players.length && !match.data.players[nextIndex].isConnected) {
+        while (steps <= match.data.players.length && (!match.data.players[nextIndex].isConnected || !!match.data.players[nextIndex].isObserver)) {
             nextIndex = (nextIndex + 1) % match.data.players.length;
             steps++;
         }

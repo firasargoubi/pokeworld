@@ -121,7 +121,12 @@ class MatchService {
   }
 
   void onMessage(MessageFromServer message) {
-    final translatedMessage = I18nService().translate(message.message, params: message.messageParams);
+    final messageParams = <String, Object?>{...message.messageParams};
+    if (message.message == 'server.messages.teamWin' && messageParams['team'] is String) {
+      messageParams['team'] = I18nService().translate(messageParams['team']! as String);
+    }
+
+    final translatedMessage = I18nService().translate(message.message, params: messageParams);    
     _popupService.showPopup(
       PopupMessage(
         message: translatedMessage,

@@ -63,10 +63,12 @@
                                     <div class="label">{{ 'pages.stat.visitedTiles' | translate }}</div>
                                     <div class="value">{{ statService.globalStats.visitedTilesRatio }} %</div>
                                 </div>
+                                @if(statService.globalStats.toggledBridgesRatio !== 0){
                                 <div class="stat-row">
                                     <div class="label">{{ 'pages.stat.manipulatedDoors' | translate }}</div>
                                     <div class="value">{{ statService.globalStats.toggledBridgesRatio }} %</div>
                                 </div>
+                                }
                                 @if(isModeCTF()){
                                 <div class="stat-row">
                                     <div class="label">{{ 'pages.stat.flagCarriers' | translate }}</div>
@@ -77,7 +79,16 @@
                             </div>
                             <div class="winner-container">
                                 <div class="header">
-                                    <div class="title">&nbsp;{{ statService.winnerData.name.toUpperCase() }}&nbsp;</div>
+                                    <div class="title">
+                                        &nbsp;{{
+                                            (statService.winnerData.name === 'rouge' || statService.winnerData.name === 'red'
+                                                ? ('teams.red' | translate)
+                                                : statService.winnerData.name === 'bleu' || statService.winnerData.name === 'blue'
+                                                  ? ('teams.blue' | translate)
+                                                  : statService.winnerData.name
+                                            ) | uppercase
+                                        }}&nbsp;
+                                    </div>
                                 </div>
                                 <img class="winner-battle-platform" src="{{ statService.winnerData.tileImage }}" />
                                 <img

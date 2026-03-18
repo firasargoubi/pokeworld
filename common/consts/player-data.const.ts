@@ -7,6 +7,7 @@ export const DEFAULT_PLAYER_DATA: PlayerData = {
     name: '',
     avatar: Avatar.Default,
     isConnected: false,
+    isObserver: false,
     spawnPoint: structuredClone(OUTSIDE_OF_MAP),
     items: [],
     health: 6,

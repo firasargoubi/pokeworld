@@ -201,12 +201,16 @@ export class MatchService {
             } else if (!isDropIn && match.data.lobbyData.isLocked) {
                 this.matchGateway.emitMessage(playerId, Message.RoomLocked, true);
                 canJoinMatch = false;
-            } else if (isDropIn && !match.hasAvailableSpawnPoint()) {
+            } else if (isDropIn && !match.hasAvailableSpawnPoint() && !this.hasDisconnectedObserver(match)) {
                 this.matchGateway.emitMessage(playerId, Message.NoAvailableSpawn, true);
                 canJoinMatch = false;
             }
         }
         return canJoinMatch;
+    }
+
+    private hasDisconnectedObserver(match: Match): boolean {
+        return match.data.players.some((player) => !player.isConnected && !!player.isObserver);
     }
 
     private async canCreateMatch(playerId: string, gameData: GameData): Promise<boolean> {

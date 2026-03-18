@@ -14,7 +14,7 @@ describe('MatchSettingsPopupComponent', () => {
     let matchServiceMock: {
         data: {
             playData: { isElementalMode: boolean };
-            lobbyData: { isDropInEnabled: boolean };
+            lobbyData: { isDropInEnabled: boolean; isRapidElimination: boolean };
         };
     };
 
@@ -23,7 +23,7 @@ describe('MatchSettingsPopupComponent', () => {
         matchServiceMock = {
             data: {
                 playData: { isElementalMode: true },
-                lobbyData: { isDropInEnabled: false },
+                lobbyData: { isDropInEnabled: false, isRapidElimination: false },
             },
         };
 
@@ -47,6 +47,7 @@ describe('MatchSettingsPopupComponent', () => {
     it('should synchronize settings when isVisible becomes true in ngOnChanges', () => {
         component.matchSettings.isElementalMode = false;
         component.matchSettings.isDropInEnabled = true;
+        component.matchSettings.isRapidElimination = true;
 
         component.ngOnChanges({
             isVisible: new SimpleChange(false, true, false),
@@ -54,11 +55,13 @@ describe('MatchSettingsPopupComponent', () => {
 
         expect(component.matchSettings.isElementalMode).toBeTrue();
         expect(component.matchSettings.isDropInEnabled).toBeFalse();
+        expect(component.matchSettings.isRapidElimination).toBeFalse();
     });
 
     it('should not synchronize settings when isVisible does not become true in ngOnChanges', () => {
         component.matchSettings.isElementalMode = false;
         component.matchSettings.isDropInEnabled = true;
+        component.matchSettings.isRapidElimination = false;
 
         component.ngOnChanges({
             isVisible: new SimpleChange(true, false, false),
@@ -66,16 +69,19 @@ describe('MatchSettingsPopupComponent', () => {
 
         expect(component.matchSettings.isElementalMode).toBeFalse();
         expect(component.matchSettings.isDropInEnabled).toBeTrue();
+        expect(component.matchSettings.isRapidElimination).toBeFalse();
     });
 
     it('should synchronize settings from MatchService', () => {
         matchServiceMock.data.playData.isElementalMode = false;
         matchServiceMock.data.lobbyData.isDropInEnabled = true;
+        matchServiceMock.data.lobbyData.isRapidElimination = true;
 
         component.synchronizeSettings();
 
         expect(component.matchSettings.isElementalMode).toBeFalse();
         expect(component.matchSettings.isDropInEnabled).toBeTrue();
+        expect(component.matchSettings.isRapidElimination).toBeTrue();
     });
 
     it('should toggle elemental mode and play click sound', () => {
@@ -96,13 +102,13 @@ describe('MatchSettingsPopupComponent', () => {
         expect(component.matchSettings.isDropInEnabled).toBeTrue();
     });
 
-    it('should set rapid elimination to false and play click sound', () => {
-        component.matchSettings.isRapidElimination = true;
+    it('should toggle rapid elimination and play click sound', () => {
+        component.matchSettings.isRapidElimination = false;
 
         component.toggleRapidElimination();
 
         expect(audioServiceSpy.playEffect).toHaveBeenCalledWith(SoundEffect.Click);
-        expect(component.matchSettings.isRapidElimination).toBeFalse();
+        expect(component.matchSettings.isRapidElimination).toBeTrue();
     });
 
     it('should emit selected settings and play click sound on validation', () => {

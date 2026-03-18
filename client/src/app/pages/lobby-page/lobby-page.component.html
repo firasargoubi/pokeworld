@@ -11,7 +11,7 @@
                     <div class="match-mode-icon">
                         <div class="mode-icon drop-icon" [class.visible]="this.matchService.data.lobbyData.isDropInEnabled"></div>
                         <div class="mode-icon elemental-icon" [class.visible]="this.matchService.data.playData.isElementalMode"></div>
-                        <div class="mode-icon re-icon"></div>
+                        <div class="mode-icon re-icon" [class.visible]="this.matchService.data.lobbyData.isRapidElimination"></div>
                     </div>
                 </div>
                 <div class="spacer"></div>

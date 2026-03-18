@@ -25,6 +25,7 @@ import { DiceType, PlayerType } from '@common/interfaces/player-data';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_MATCH_DATAS, MOCK_PLAYER_COMBAT_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
+import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createSandbox, createStubInstance, SinonSandbox, SinonStubbedInstance } from 'sinon';
 import { CombatService } from './combat.service';
@@ -153,6 +154,24 @@ describe('CombatService', () => {
 
         expect(mockMatch.data.state).toBe(MatchState.CombatEnd);
         expect(mockMatch.setTimeout.called).toBe(true);
+    });
+
+    it('start combat end death should eliminate loser in rapid elimination mode', () => {
+        mockMatch.data.lobbyData.isRapidElimination = true;
+        mockMatch.data.combatData.playersCombatData = [
+            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[0]), playerIndex: 0 },
+            { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), playerIndex: 1 },
+        ];
+        mockMatch.data.combatData.isSecondPlayerTurn = true;
+        mockMatch.data.playData.activePlayerIndex = 1;
+        mockMatch.data.players[1].items = [ItemType.Item1];
+
+        service.startCombatEndDeath(mockMatch);
+
+        expect(mockMatch.data.players[1].isObserver).toBe(true);
+        expect(mockMatch.data.players[1].position).toEqual(OUTSIDE_OF_MAP);
+        expect(mockMatch.data.players[1].spawnPoint).toEqual(OUTSIDE_OF_MAP);
+        expect(mockMatch.data.players[1].items).toEqual([]);
     });
 
     it('can player act should return false when not in combat', () => {
