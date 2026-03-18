@@ -73,7 +73,13 @@ export class ChatGateway {
     }
 
     @SubscribeMessage(ChatEvent.DeleteChannel)
-    async deleteChannel(socket: Socket, channelName: string): Promise<void> {
+    async deleteChannel(socket: Socket, channelUser: ChannelUser): Promise<void> {
+        const channelName = channelUser.channelName;
+        const userName = channelUser.userName;
+        const isUserInChannel = await this.chatService.isUserInChannel(channelName, userName);
+        if (!isUserInChannel) {
+            return;
+        }
         await this.chatService.deleteChannel(channelName);
         socket.leave(channelName);
         this.server.emit(ChatEvent.ChannelUpdate, await this.chatService.getChannels());

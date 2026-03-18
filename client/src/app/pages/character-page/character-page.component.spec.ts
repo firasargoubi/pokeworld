@@ -15,6 +15,7 @@ import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { CharacterPageComponent } from './character-page.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
+import { ChatService } from '@app/services/chat/chat.service';
 
 @Component({
     selector: 'app-chat',
@@ -32,6 +33,7 @@ describe('CharacterPageComponent', () => {
     let mockRouter: jasmine.SpyObj<Router>;
     let mockAudioService: jasmine.SpyObj<AudioService>;
     let mockUserService: jasmine.SpyObj<UserService>;
+    let mockChatService: jasmine.SpyObj<ChatService>;
 
     beforeEach(async () => {
         mockMatchService = jasmine.createSpyObj('MatchService', ['isInMatch', 'leaveMatch', 'selfPlayer', 'selfIndex', 'matchUpdate'], {
@@ -46,6 +48,7 @@ describe('CharacterPageComponent', () => {
         mockUserService = jasmine.createSpyObj('UserService', [], {
             user$: of({ username: 'test-user' }),
         });
+        mockChatService = jasmine.createSpyObj('ChatService', ['isComponentVisible']);
 
         await TestBed.configureTestingModule({
             imports: [ReactiveFormsModule, CharacterPageComponent, TranslateModule.forRoot()],
@@ -56,6 +59,7 @@ describe('CharacterPageComponent', () => {
                 { provide: Router, useValue: mockRouter },
                 { provide: AudioService, useValue: mockAudioService },
                 { provide: UserService, useValue: mockUserService },
+                { provide: ChatService, useValue: mockChatService },
             ],
         }).compileComponents();
 
@@ -123,10 +127,19 @@ describe('CharacterPageComponent', () => {
         expect(mockPopupService.showPopup).toHaveBeenCalled();
     });
 
-    it('should call joinLobby when Enter key is pressed', () => {
+    it('should call joinLobby when Enter key is pressed and chat is not visible', () => {
         spyOn(component, 'joinLobby');
         const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
+        mockChatService.isComponentVisible.and.returnValue(false);
         component.onKeyDown(enterEvent);
         expect(component.joinLobby).toHaveBeenCalled();
+    });
+
+    it('should not call joinLobby when Enter key is pressed and chat is visible', () => {
+        spyOn(component, 'joinLobby');
+        const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
+        mockChatService.isComponentVisible.and.returnValue(true);
+        component.onKeyDown(enterEvent);
+        expect(component.joinLobby).not.toHaveBeenCalled();
     });
 });

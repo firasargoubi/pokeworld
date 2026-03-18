@@ -20,6 +20,7 @@ $color-blue-1: #68a0d8;
 $color-blue-2: #80b8e0;
 
 $color-button-bg: #c0d0e0;
+$color-channel-item-light: #7a5c0c;
 $color-channel-item: #4d3a01;
 $color-channel-item-border: #302400;
 $color-active: #ffbd00;
@@ -350,7 +351,7 @@ $shadow-message: calc(0.1 * $chat-font-size) 0 0 $color-message-shadow;
     flex-direction: column;
     gap: calc($chat-base-size * 0.5);
     padding: calc($chat-base-size * 1);
-    overflow-y: auto;
+    overflow-y: scroll;
     scrollbar-width: thin;
 }
 
@@ -416,6 +417,7 @@ $stylized-medium-padding-size: calc($pixel-size * 8);
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
 
 .add-button {
@@ -438,6 +440,14 @@ $stylized-small-padding-size: calc($pixel-size * 5);
     background-size: 70%;
     background-repeat: no-repeat;
     background-position: center;
+}
+
+.channel-back-button {
+    @extend %channel-action-button;
+    background-color: transparent;
+    background-size: 40%;
+    @include pixel-button-shadow($stylized-small-padding-size, $color-channel-item-border, $color-channel-item-light);
+    border: none;
 }
 
 .channel-join-button {
@@ -651,6 +661,20 @@ $stylized-small-padding-size: calc($pixel-size * 5);
 
     padding: 0 calc($chat-base-size * 1);
     background-color: $color-blue-2;
+}
+
+.chat-send-button {
+    width: calc($chat-base-size * 12);
+    min-width: calc($chat-base-size * 10);
+    height: 70%;
+    padding: 0 calc($chat-base-size * 1.2);
+    background-color: transparent;
+    color: white;
+    font-size: calc($chat-base-size * 2);
+    text-shadow: calc(0.2 * $chat-base-size) 0 0 $color-text-shadow;
+    border: none;
+    cursor: pointer;
+    @include pixel-button-shadow($stylized-small-padding-size, $color-blue-1, $color-button-bg);
 }
 
 .message-input {

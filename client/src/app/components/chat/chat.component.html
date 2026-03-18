@@ -64,12 +64,12 @@
                 <div class="add-icon"></div>
             </div>
             } @else {
-            <button (click)="showChannelList()"><-</button>
-                <span class="channel-name">{{ chatService.activeChannelName() }}</span>
-                <div class="buttons-container flex-row">
-                    <div class="channel-leave-button button simple-small-stylized-padding" (click)="leaveChannel()"></div>
-                    <div class="channel-delete-button button simple-small-stylized-padding" (click)="deleteChannel()"></div>
-                </div>
+            <button type="button" class="channel-back-button button simple-small-stylized-padding" (click)="showChannelList()"><-</button>
+            <span class="channel-name">{{ chatService.activeChannelName() }}</span>
+            <div class="buttons-container flex-row">
+                <div class="channel-leave-button button simple-small-stylized-padding" (click)="leaveChannel()"></div>
+                <div class="channel-delete-button button simple-small-stylized-padding" (click)="deleteChannel()"></div>
+            </div>
             }
         </div>
         }
@@ -87,8 +87,8 @@
                         <div class="channel-join-button button simple-small-stylized-padding" (click)="joinChannel(channel.name, $event)"></div>
                         } @else {
                         <div class="channel-leave-button button simple-small-stylized-padding" (click)="leaveChannel(channel.name, $event)"></div>
-                        }
                         <div class="channel-delete-button button simple-small-stylized-padding" (click)="deleteChannel(channel.name, $event)"></div>
+                        }
                     </div>
                 </div>
                 }
@@ -125,8 +125,10 @@
             </p>
             } } }
         </div>
+        @if (!(chatService.chatState().isInChannelList && chatService.chatState().activeTab === chatTab.Channels)) {
         <div class="chat-input-container">
             <input
+                #chatInput
                 type="text"
                 [placeholder]="'components.chat.inputPlaceholder' | translate"
                 class="message-input"
@@ -134,7 +136,11 @@
                 [maxLength]="maxInputLength"
                 (click)="audioService.playEffect(clickValue)"
             />
+            <button type="button" class="chat-send-button button simple-small-stylized-padding" (click)="sendMessageFromButton(chatInput)">
+                {{ 'components.chat.send' | translate }}
+            </button>
         </div>
+        }
     </div>
     <div class="horizontal-border"></div>
 </div>
