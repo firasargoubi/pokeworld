@@ -33,6 +33,10 @@
         "deleteAccountFailed": "Account deletion failed: ",
         "changeFailed": "Failed to apply the change"
     },
+    "teams": {
+        "red": "Red",
+        "blue": "Blue"
+    },
     "server": {
         "messages": {
             "adminQuit": "The administrator left the match",

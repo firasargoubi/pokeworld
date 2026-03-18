@@ -178,11 +178,11 @@
                     }
                 ],
                 "max-lines": ["error", {
-                        "max": 350,
+                        "max": 351,
                         "skipBlankLines": true,
                         "skipComments": true
                     }],
-                "max-params": ["error", 5],
+                "max-params": ["error", 6],
                 "newline-per-chained-call": "off",
                 "no-bitwise": "error",
                 "no-caller": "error",

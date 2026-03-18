@@ -129,7 +129,11 @@ export class MatchService {
 
     private onMessage(messageFromServer: MessageFromServer) {
         if (this.router.url === PageEndpoint.Character) return;
-        const translatedMessage = this.i18nService.translate(messageFromServer.message, messageFromServer.messageParams);
+        const messageParams = { ...messageFromServer.messageParams };
+        if (messageFromServer.message === Message.TeamWin && typeof messageParams.team === 'string') {
+            messageParams.team = this.i18nService.translate(messageParams.team);
+        }
+        const translatedMessage = this.i18nService.translate(messageFromServer.message, messageParams);
         this.popupService.showPopup({
             message: translatedMessage,
             hasCloseButton: messageFromServer.hasCloseButton,

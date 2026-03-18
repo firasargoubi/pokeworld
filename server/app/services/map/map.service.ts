@@ -118,7 +118,7 @@ export class MapService {
 
     private hasEnemyPlayer(matchData: MatchData, position: Position): boolean {
         let hasEnemyPlayer = false;
-        const player = matchData.players.find((p) => p.position.x === position.x && p.position.y === position.y);
+        const player = matchData.players.find((p) => !p.isObserver && p.position.x === position.x && p.position.y === position.y);
         if (player) {
             if (matchData.gameData.mapData.gameMode === GameMode.CTF) {
                 const activePlayer = matchData.players[matchData.playData.activePlayerIndex];
@@ -135,7 +135,9 @@ export class MapService {
         const isWater = tile !== TileType.Water;
 
         const hasNoItems = this.hasNoItems(matchData, position);
-        const hasNoPlayers = !matchData.players.some((player) => player.position.x === position.x && player.position.y === position.y);
+        const hasNoPlayers = !matchData.players.some(
+            (player) => !player.isObserver && player.position.x === position.x && player.position.y === position.y,
+        );
 
         return isWater && hasNoItems && hasNoPlayers;
     }
@@ -247,7 +249,7 @@ export class MapService {
     }
 
     private isTileOccupiedByPlayer(matchData: MatchData, position: Position): boolean {
-        return matchData.players.some((p) => p.position.x === position.x && p.position.y === position.y);
+        return matchData.players.some((p) => !p.isObserver && p.position.x === position.x && p.position.y === position.y);
     }
 
     private isTileOccupiedByObject(matchData: MatchData, position: Position, ignoreSpawnpoints: boolean = false): boolean {

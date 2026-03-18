@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
 enum ShakeDirection { horizontal, vertical }
@@ -51,8 +51,10 @@ class MotionDetectionService {
   void startListening() {
     if (_isListening) return;
 
-    // Skip on desktop platforms (Windows, macOS, Linux)
-    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    // Skip on Web and desktop platforms (Windows, macOS, Linux)
+    if (kIsWeb || defaultTargetPlatform == TargetPlatform.windows || 
+                  defaultTargetPlatform == TargetPlatform.macOS || 
+                  defaultTargetPlatform == TargetPlatform.linux) {
       return;
     }
 

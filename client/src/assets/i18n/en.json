@@ -25,6 +25,10 @@
         "noWinner": "No winner",
         "unauthorizedAccessToGame": "This game is no longer accessible due to a change of state"
     },
+    "teams": {
+        "red": "Red",
+        "blue": "Blue"
+    },
     "server": {
         "messages": {
             "adminQuit": "The administrator left the match",

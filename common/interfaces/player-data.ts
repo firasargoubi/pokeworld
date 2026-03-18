@@ -62,6 +62,7 @@ export enum Avatar {
 export interface PlayerData {
     id: string;
     isConnected: boolean;
+    isObserver?: boolean;
     name: string;
     avatar: Avatar;
     items: ItemType[];

@@ -25,6 +25,10 @@
         "noWinner": "Aucun gagnant",
         "unauthorizedAccessToGame": "Ce jeu n'est plus accessible en raison d'un changement de son etat"
     },
+    "teams": {
+        "red": "Rouge",
+        "blue": "Bleu"
+    },
     "server": {
         "messages": {
             "adminQuit": "L'administrateur a quitté la partie",

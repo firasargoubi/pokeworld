@@ -188,6 +188,19 @@ describe('PlayService', () => {
         expect(mockMatch.data.state).toBe(MatchState.MatchEnd);
     });
 
+    it('check win condition ffa should return true in rapid elimination when one active player remains', () => {
+        mockMatch.data.lobbyData.isRapidElimination = true;
+        mockMatch.data.players = [
+            { ...structuredClone(MOCK_PLAYER_DATAS[0]), isConnected: true, isObserver: false },
+            { ...structuredClone(MOCK_PLAYER_DATAS[1]), isConnected: true, isObserver: true },
+        ];
+
+        const result = service['checkWinConditionFfa'](mockMatch);
+
+        expect(result).toBe(true);
+        expect(mockMatch.data.state).toBe(MatchState.MatchEnd);
+    });
+
     it('end match should update state', () => {
         service['endMatch'](mockMatch);
 
@@ -258,6 +271,19 @@ describe('PlayService', () => {
         const result = service['getNextPlayerIndex'](mockMatch);
 
         expect(result).toBe(2);
+    });
+
+    it('get next player index should skip observers', () => {
+        mockMatch.data.players = [
+            { ...structuredClone(MOCK_PLAYER_DATAS[0]), isConnected: true, isObserver: true },
+            { ...structuredClone(MOCK_PLAYER_DATAS[1]), isConnected: true, isObserver: false },
+            { ...structuredClone(MOCK_PLAYER_DATAS[2]), isConnected: true, isObserver: true },
+        ];
+        mockMatch.data.playData.activePlayerIndex = 0;
+
+        const result = service['getNextPlayerIndex'](mockMatch);
+
+        expect(result).toBe(1);
     });
 
     it('continueTurn should end match if win condition is met', () => {

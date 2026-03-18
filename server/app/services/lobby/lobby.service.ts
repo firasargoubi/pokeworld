@@ -215,47 +215,107 @@ export class LobbyService {
     }
 
     private handleDropIn(match: Match, playerId: string, playerData: PlayerData, existingIndex: number = -1) {
-        if (!match.data.lobbyData.isDropInEnabled) {
-            this.matchService.playerRemovedFromMatch(playerId, Message.DropInDisabled);
-            return;
-        }
-        const spawnPoint = match.getNextAvailableSpawnPoint();
-        if (!spawnPoint) {
-            this.matchService.playerRemovedFromMatch(playerId, Message.NoAvailableSpawn);
+        const existingPlayer = existingIndex !== -1 ? match.data.players[existingIndex] : undefined;
+        if (this.reconnectObserverIfNeeded(match, playerId, existingPlayer)) {
             return;
         }
 
+        const spawnPoint = this.tryGetDropInSpawnPoint(match, playerId);
+        if (!spawnPoint) {
+            return;
+        }
+
+        const storedVictories = this.prepareDropInPlayer(match, playerData, spawnPoint, existingIndex);
+
+        if (this.reconnectExistingPlayerIfNeeded(match, playerId, playerData, existingPlayer, existingIndex, storedVictories)) {
+            return;
+        }
+
+        this.insertNewDropInPlayer(match, playerData, playerId);
+    }
+
+    private reconnectObserverIfNeeded(match: Match, playerId: string, existingPlayer: PlayerData | undefined): boolean {
+        if (existingPlayer && existingPlayer.isObserver) {
+            existingPlayer.id = playerId;
+            existingPlayer.isConnected = true;
+            this.registerTrackingPlayer(match, playerId, existingPlayer);
+            match.sendUpdate();
+            return true;
+        }
+        return false;
+    }
+
+    private tryGetDropInSpawnPoint(match: Match, playerId: string): PlayerData['spawnPoint'] | null {
+        if (!match.data.lobbyData.isDropInEnabled) {
+            this.matchService.playerRemovedFromMatch(playerId, Message.DropInDisabled);
+            return null;
+        }
+
+        const spawnPoint = match.getNextAvailableSpawnPoint();
+        if (!spawnPoint) {
+            this.matchService.playerRemovedFromMatch(playerId, Message.NoAvailableSpawn);
+            return null;
+        }
+
+        this.addSpawnPointOnMapIfMissing(match, spawnPoint);
+        return spawnPoint;
+    }
+
+    private addSpawnPointOnMapIfMissing(match: Match, spawnPoint: PlayerData['spawnPoint']) {
         const isSpawnAlreadyOnMap = match.data.gameData.mapData.items.Spawn.some((pos) => pos.x === spawnPoint.x && pos.y === spawnPoint.y);
         if (!isSpawnAlreadyOnMap) {
             match.data.gameData.mapData.items.Spawn.push(structuredClone(spawnPoint));
         }
+    }
+
+    private prepareDropInPlayer(
+        match: Match,
+        playerData: PlayerData,
+        spawnPoint: PlayerData['spawnPoint'],
+        existingIndex: number,
+    ): number | undefined {
         const storedVictories = playerData.userId ? match.getPlayerVictories(playerData.userId) : undefined;
         if (storedVictories !== undefined) {
             playerData.combatsWon = storedVictories;
         } else if (existingIndex === -1) {
             playerData.combatsWon = 0;
         }
+
         playerData.spawnPoint = structuredClone(spawnPoint);
         const nearestAvailableTile = this.mapService.getNearestEmptyTile(match.data, playerData.spawnPoint);
         playerData.position = structuredClone(nearestAvailableTile);
         this.assignDropInTeam(match, playerData);
 
-        if (existingIndex !== -1) {
-            const existingPlayer = match.data.players[existingIndex];
-            if (existingPlayer && playerData.userId && existingPlayer.userId === playerData.userId) {
-                const updatedPlayer: PlayerData = {
-                    ...existingPlayer,
-                    ...playerData,
-                    id: playerId,
-                    isConnected: true,
-                };
-                updatedPlayer.combatsWon = storedVictories ?? existingPlayer.combatsWon;
-                match.data.players[existingIndex] = updatedPlayer;
-                this.registerTrackingPlayer(match, playerId, updatedPlayer);
-                match.sendUpdate();
-                return;
-            }
+        return storedVictories;
+    }
+
+    private reconnectExistingPlayerIfNeeded(
+        match: Match,
+        playerId: string,
+        playerData: PlayerData,
+        existingPlayer: PlayerData | undefined,
+        existingIndex: number,
+        storedVictories: number | undefined,
+    ): boolean {
+        if (existingIndex === -1 || !existingPlayer || !playerData.userId || existingPlayer.userId !== playerData.userId) {
+            return false;
         }
+
+        const updatedPlayer: PlayerData = {
+            ...existingPlayer,
+            ...playerData,
+            id: playerId,
+            isConnected: true,
+        };
+        updatedPlayer.combatsWon = storedVictories ?? existingPlayer.combatsWon;
+        updatedPlayer.isObserver = existingPlayer.isObserver;
+        match.data.players[existingIndex] = updatedPlayer;
+        this.registerTrackingPlayer(match, playerId, updatedPlayer);
+        match.sendUpdate();
+        return true;
+    }
+
+    private insertNewDropInPlayer(match: Match, playerData: PlayerData, playerId: string) {
         this.registerTrackingPlayer(match, playerId, playerData);
         const insertionIndex = this.getDropInInsertIndex(match, playerData.speed);
         match.data.players.splice(insertionIndex, 0, playerData);

@@ -12,6 +12,7 @@ export const MOCK_LOBBY_DATA: LobbyData = {
     isLocked: false,
     hostPlayerIndex: 0,
     isDropInEnabled: false,
+    isRapidElimination: false,
 };
 
 export const MOCK_PLAY_DATA: PlayData = {

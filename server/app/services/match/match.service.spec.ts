@@ -313,6 +313,27 @@ describe('MatchService', () => {
         expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.NoAvailableSpawn, true)).toBe(true);
     });
 
+    it('can join match should allow drop in with no spawn when a disconnected observer exists', () => {
+        const playerId = 'player1';
+        mockMatchGateway.emitMessage.resetHistory();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'hasMatchCode').returns(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'hasPlayerId').returns(false);
+        mockMatch.isFull.returns(false);
+        mockMatch.isState.returns(false);
+        mockMatch.data.lobbyData.isDropInEnabled = true;
+        mockMatch.hasAvailableSpawnPoint.returns(false);
+        mockMatch.data.players = [{ ...structuredClone(MOCK_PLAYER_DATAS[0]), isConnected: false, isObserver: true }];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'getMatch').returns(mockMatch);
+
+        const canJoin = service['canJoinMatch'](playerId, mockMatch.data.code);
+
+        expect(canJoin).toBe(true);
+        expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.NoAvailableSpawn, true)).toBe(false);
+    });
+
     it('can create match should return true if player is not in a match', async () => {
         const playerId = 'player1';
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
