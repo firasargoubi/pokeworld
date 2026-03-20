@@ -27,3 +27,9 @@ export const DEFAULT_GAME_DATA: GameData = {
         gameMode: GameMode.FFA,
     },
 };
+
+export const GAME_STATE_KEYS: Record<GameState, string> = {
+    [GameState.PUBLIC]: 'pages.edit.public',
+    [GameState.PRIVATE]: 'pages.edit.private',
+    [GameState.PRIVATE_SHARED]: 'pages.edit.privateShared',
+};

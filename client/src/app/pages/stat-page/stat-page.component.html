@@ -43,14 +43,16 @@
             </div>
         </div>
         <div class="bottom-container">
-            <div class="chat-container"><app-chat></app-chat></div>
+            <div class="main-chat-container"><app-chat></app-chat></div>
             <div class="match-stats-container">
                 <div class="section-container">
                     <div class="horizontal-border"></div>
                     <div class="section-body">
                         <div class="infos-container">
                             <div class="match-stats">
-                                <div class="header"><div class="title">&nbsp;{{ 'pages.stat.matchStats' | translate }}&nbsp;</div></div>
+                                <div class="header">
+                                    <div class="title">&nbsp;{{ 'pages.stat.matchStats' | translate }}&nbsp;</div>
+                                </div>
                                 <div class="stat-row">
                                     <div class="label">{{ 'pages.stat.duration' | translate }}</div>
                                     <div class="value">{{ statService.globalStats.gameDuration | date: 'mm:ss' }}</div>

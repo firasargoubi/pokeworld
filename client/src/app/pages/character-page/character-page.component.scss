@@ -196,10 +196,10 @@ main {
 
 #self-avatar {
     position: absolute;
-    top: 50%;
+    top: 60%;
     left: 50%;
     transform: translate(-50%, -50%);
-    height: 150%;
+    height: 100%;
     z-index: 2;
     user-select: none;
 }
@@ -494,6 +494,10 @@ main {
         box-shadow 0.2s ease-in-out;
 }
 
+.avatar-container img {
+    transition: all 0.2s ease-in-out;
+}
+
 .selected,
 :not(.locked).avatar-container:hover {
     border: calc($base-size * 1) solid white;
@@ -648,7 +652,7 @@ $type-cutout-size: calc($base-size * 0.4);
 }
 
 :not(.locked).avatar-container:active .type-container {
-    transform: scale(1.1);
+    transform: scale(0.9);
 }
 
 .type-container {

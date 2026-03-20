@@ -36,6 +36,7 @@ $item-container: '../../../assets/images/menu/containers/item/item-container.png
 $x-button: '../../../assets/images/menu/buttons/play/x-button.png';
 $d4-icon: '../../../assets/images/menu/icons/small-d4.png';
 $d6-icon: '../../../assets/images/menu/icons/small-d6.png';
+$img-avatar-frame: '../../../assets/images/menu/containers/dark-blue/party-ball.png';
 
 .pop-up {
     position: absolute;
@@ -72,6 +73,7 @@ $d6-icon: '../../../assets/images/menu/icons/small-d6.png';
 }
 
 .self-info-name {
+    position: relative;
     display: inline-block;
     vertical-align: top;
     line-height: calc(0.15 * $map-size);
@@ -87,8 +89,40 @@ $d6-icon: '../../../assets/images/menu/icons/small-d6.png';
         calc(0.06 * $map-size * 0.086) calc(0.06 * $map-size * 0.03) 0 $dark-text-shadow;
 }
 
-.profile-picture {
-    height: 60%;
+.profile-picture-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: calc(0.07 * $map-size);
+    aspect-ratio: 1/1;
+}
+
+.profile-picture-container .profile-picture-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url($img-avatar-frame);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: grayscale(0.8) brightness(0.5);
+    opacity: 0.8;
+    z-index: 0;
+}
+
+.profile-picture-container .profile-picture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+    z-index: 1;
 }
 
 button.close-button {

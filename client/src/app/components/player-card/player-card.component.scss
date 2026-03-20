@@ -272,6 +272,7 @@ $shadow-inner-gray:
     justify-content: start;
     align-items: center;
     gap: calc(0.5 * $base-size);
+    row-gap: calc(-0.25 * $base-size);
 
     width: 100%;
     height: fit-content;
@@ -281,6 +282,39 @@ $shadow-inner-gray:
     flex-wrap: wrap;
     overflow-wrap: break-word;
     word-break: break-all;
+}
+
+.player-card .profile-picture-container {
+    position: relative;
+    height: calc(3.5 * $base-size);
+    aspect-ratio: 1/1;
+}
+
+.player-card .profile-picture-container .profile-picture-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url($img-avatar-frame);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: grayscale(0.8) brightness(0.5);
+    opacity: 0.8;
+    z-index: 0;
+}
+
+.player-card .profile-picture-container .profile-picture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .player-card .crown {

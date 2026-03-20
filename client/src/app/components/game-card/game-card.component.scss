@@ -16,7 +16,7 @@ $card-border-width: calc($base-size * 0.7);
 $corner-square-size: calc($base-size * 0.7);
 $description-width: calc(var(--base-size) * 17);
 
-$button-cutout-size: calc(var(--base-size) * 0.4);
+$button-cutout-size: calc(var(--base-size) * 0.3);
 
 $color-gray-border: #636776;
 $color-card-border: rgb(246, 119, 56);
@@ -228,15 +228,24 @@ $bg-btn-red: linear-gradient(
     left: 5%;
     top: 2%;
     width: 94%;
-    height: 40%;
+
     white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    display: block;
+    display: flex;
+    flex-direction: column;
     overflow: visible;
     z-index: 1;
     font-size: calc(var(--base-size) * 3.5);
+    line-height: calc(var(--base-size) * 3);
     text-shadow: calc($base-size * 0.35) 0 0 $color-shadow-text-strong;
+}
+
+.game-owner {
+    font-size: calc(var(--base-size) * 1.5);
+    line-height: calc(var(--base-size) * 2.5);
+    color: rgb(80, 78, 78);
+    text-shadow: calc($base-size * 0.2) 0 0 rgb(221, 221, 221);
 }
 
 .size-info {
@@ -261,7 +270,6 @@ $bg-btn-red: linear-gradient(
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
-
 }
 
 .lobby {
@@ -372,15 +380,6 @@ $bg-btn-red: linear-gradient(
     z-index: 0;
 }
 
-.owner{
-    overflow: visible;
-    margin-top: 1px;
-    padding: 11px;
-    color: black;
-    height: 100%;
-    width: 100%;
-}
-
 .last-edited {
     letter-spacing: 0.2;
     width: 100%;
@@ -416,7 +415,7 @@ $bg-btn-red: linear-gradient(
 
 .admin-button-container {
     height: 75%;
-    aspect-ratio: 17/9;
+    aspect-ratio: 20/9;
     display: grid;
     place-items: center;
     grid-template-columns: $button-cutout-size 1fr $button-cutout-size;

@@ -6,6 +6,7 @@ import { AVATAR_LIST, FULL_AVATAR_LIST } from '@app/consts/avatar-list.const';
 import { DEFAULT_CHARACTER_VISUAL_DATA } from '@app/consts/player-data.const';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { CharacterVisualData } from '@app/interfaces/character-visual-data';
+import { PopupColor } from '@app/interfaces/popup';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { ChatService } from '@app/services/chat/chat.service';
@@ -153,6 +154,7 @@ export class AuthPopupComponent {
                         message: PopupMessage.SuccessfulAccountCreation,
                         hasCloseButton: true,
                         isConfirmation: false,
+                        popupColor: PopupColor.Green,
                     });
                 },
                 error: (error: HttpErrorResponse) => {
@@ -178,6 +180,7 @@ export class AuthPopupComponent {
                     message: PopupMessage.SuccessfulConnection,
                     hasCloseButton: true,
                     isConfirmation: false,
+                    popupColor: PopupColor.Green,
                 });
                 this.chatService.joinAllChannels();
             },

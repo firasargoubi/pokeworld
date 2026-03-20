@@ -1,11 +1,91 @@
-$card-width: min(620px, 92vw);
-$card-height: 480px;
 $font-family: 'pixel';
-$text-color: #0f1f3d;
+
 $input-border-color: rgba(255, 255, 255, 0.82);
 $input-bg-normal: hsla(231, 12%, 45%, 0.7);
 $input-bg-active: hsla(231, 12%, 45%, 0.6);
-$font-size: 16px;
+
+$base-size: min(1vh, 1vw);
+$border-size: calc($base-size * 3);
+
+$card-width: calc($base-size * 75);
+$card-height: calc($base-size * 65);
+$font-size: calc($base-size * 3);
+
+$img-user-border-left: '../../../assets/images/menu/containers/user-card/user-border-1.png';
+$img-user-border-center: '../../../assets/images/menu/containers/user-card/user-edge-1.png';
+$img-user-border-right: '../../../assets/images/menu/containers/user-card/user-border-2.png';
+
+$img-sub-edge-left: '../../../assets/images/menu/containers/user-card/sub-container-edge-1.png';
+$img-sub-edge-right: '../../../assets/images/menu/containers/user-card/sub-container-edge-2.png';
+
+$img-user-edge-left: '../../../assets/images/menu/containers/user-card/user-edge-2.png';
+$img-user-edge-right: '../../../assets/images/menu/containers/user-card/user-edge-3.png';
+
+$img-avatar-container: '../../../assets/images/menu/containers/user-card/avatar-container.png';
+$img-card-icon-bg: '../../../assets/images/menu/containers/user-card/user-card-icon-bg.png';
+$img-title-icon: '../../../assets/images/menu/containers/user-card/title-icon.png';
+$img-badge-container: '../../../assets/images/menu/containers/user-card/badge-container.png';
+
+$img-button-container-edge-left: '../../../assets/images/menu/containers/user-card/button-container-edge-1.png';
+$img-button-container-edge-right: '../../../assets/images/menu/containers/user-card/button-container-edge-2.png';
+$img-button-container-body: '../../../assets/images/menu/containers/user-card/button-container-body.png';
+
+$img-delete-container-edge-left: '../../../assets/images/menu/containers/user-card/button-delete-edge-1.png';
+$img-delete-container-edge-right: '../../../assets/images/menu/containers/user-card/button-delete-edge-2.png';
+$img-delete-container-body: '../../../assets/images/menu/containers/user-card/button-delete-body.png';
+
+$img-logout-icon: '../../../assets/images/menu/icons/user-card/logout.png';
+$img-settings-icon: '../../../assets/images/menu/icons/user-card/settings-cog.png';
+$img-inventory-icon: '../../../assets/images/menu/icons/user-card/archive-sharp.png';
+$img-friends-icon: '../../../assets/images/menu/icons/user-card/friends.png';
+$img-back-icon: '../../../assets/images/menu/icons/user-card/back-arrow.png';
+$img-trash-icon: '../../../assets/images/menu/icons/user-card/trash.png';
+
+$text-color: #484848;
+$text-shadow-color: #a0a0a0;
+
+$pixel-size: calc($base-size * 0.4);
+$color-1: #80b0e8;
+$color-2: #68a0e0;
+
+$gray-background-color: linear-gradient(
+    to bottom,
+    $color-1 0,
+    $color-1 calc(50% - 3 * $pixel-size),
+    $color-2 calc(50% - 3 * $pixel-size),
+    $color-2 calc(50% - 2 * $pixel-size),
+    $color-1 calc(50% - 2 * $pixel-size),
+    $color-1 calc(50% - 1 * $pixel-size),
+    $color-2 calc(50% - 1 * $pixel-size),
+    $color-2 calc(50% + 1 * $pixel-size),
+    $color-1 calc(50% + 1 * $pixel-size),
+    $color-1 calc(50% + 2 * $pixel-size),
+    $color-2 calc(50% + 2 * $pixel-size),
+    $color-2 calc(50% + 3 * $pixel-size),
+    $color-1 calc(50% + 3 * $pixel-size),
+    $color-1 100%
+);
+
+$flip-vertical-bleed: calc($base-size * 7);
+
+$corner-unit: calc($base-size * 0.5);
+$border-color: #a7dcff;
+$background-color: #ffffff;
+
+$pixel-corners-clip-path: polygon(
+    0 #{$corner-unit},
+    #{$corner-unit} #{$corner-unit},
+    #{$corner-unit} 0,
+    calc(100% - #{$corner-unit}) 0,
+    calc(100% - #{$corner-unit}) #{$corner-unit},
+    100% #{$corner-unit},
+    100% calc(100% - #{$corner-unit}),
+    calc(100% - #{$corner-unit}) calc(100% - #{$corner-unit}),
+    calc(100% - #{$corner-unit}) 100%,
+    #{$corner-unit} 100%,
+    #{$corner-unit} calc(100% - #{$corner-unit}),
+    0 calc(100% - #{$corner-unit})
+);
 
 .user-popup {
     display: flex;
@@ -18,256 +98,528 @@ $font-size: 16px;
 
 .user-card {
     position: relative;
-    width: $card-width;
-    height: $card-height;
-    overflow: hidden;
-}
-
-.card-face {
-    position: absolute;
-    inset: 0;
-    padding: 0;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    border-radius: 12px;
     display: flex;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+    width: $card-width;
+    height: calc($card-height + (#{$flip-vertical-bleed} * 2));
+    padding-block: $flip-vertical-bleed;
+    box-sizing: border-box;
+    perspective: calc($card-width * 6);
+    perspective-origin: center center;
+    overflow: visible;
+
+    &:not(.show-settings):not(.show-friends):not(.show-inventory) {
+        .card-front {
+            pointer-events: auto;
+        }
+
+        .card-back {
+            pointer-events: none;
+        }
+
+        .card-rotator {
+            transform: rotateX(0deg) rotateY(0deg);
+        }
+    }
+
+    &.show-settings,
+    &.show-inventory,
+    &.show-friends {
+        .card-front {
+            pointer-events: none;
+        }
+
+        .card-back {
+            pointer-events: auto;
+        }
+
+        .card-rotator {
+            transform: rotateX(-8deg) rotateY(180deg);
+        }
+    }
+
+    &.show-settings .card-rotator {
+        transform: rotateX(-8deg) rotateY(-180deg);
+    }
+
+    &.animations-enabled .card-rotator {
+        transition:
+            transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1),
+            filter 0.75s ease;
+    }
 }
 
 .card-front {
-    background-image: url('../../../assets/images/menu/containers/user-container.png');
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transform: translateX(0);
-    background-size: 100% 100%;
+    transform: rotateY(0deg) translateZ(calc($base-size * 0.8));
 }
 
 .card-back {
-    background-image: url('../../../assets/images/menu/containers/user-container-back.png');
-    transform: translateX(110%);
-    color: $text-color;
-    background-size: 100% 100%;
-    padding: 24px;
+    transform: rotateY(180deg) translateZ(calc($base-size * 0.8));
 }
 
-.user-card.show-back {
-    .card-front {
-        transform: translateX(-110%);
-    }
-
-    .card-back {
-        transform: translateX(0);
-    }
-}
-
-.user-card.animations-enabled {
-    .card-face {
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-}
-
-.front-content {
+.card-rotator {
     position: relative;
-    display: grid;
-    grid-template-columns: 63% 34%;
-    grid-template-rows: 7% 14% 14% 14% 14% 14% 16%;
     width: 100%;
     height: 100%;
-    margin-top: 5%;
-    margin-left: 2%;
+    transform-style: preserve-3d;
+    will-change: transform;
+    overflow: visible;
 }
 
-.info-email {
-    grid-column: 1;
-    grid-row: 2;
+.card-face {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    transform-origin: center center;
+}
+
+.card-container {
+    position: absolute;
+    inset: 0;
     display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-left: 7px;
-    margin-top: 7px;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
 }
 
-.info-name {
-    grid-column: 2;
-    grid-row: 2;
+.card-icon-background {
+    position: absolute;
+    top: calc($border-size * 0.47);
+    left: calc($border-size * 0.45);
+    width: 65%;
+    aspect-ratio: 1 / 1;
+    background-image: url($img-card-icon-bg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    z-index: 1;
+}
+
+.card-container .card-main-border {
+    width: 100%;
+    height: $border-size;
+    background-image: url($img-user-border-left), url($img-user-border-center), url($img-user-border-right);
+    background-repeat: no-repeat, no-repeat, no-repeat;
+    background-position:
+        left top,
+        center top,
+        right top;
+    background-size:
+        #{$border-size} 100%,
+        calc(100% - (1.9 * #{$border-size})) 100%,
+        #{$border-size} 100%;
+
+    &:last-child {
+        transform: rotate(180deg);
+    }
+}
+
+.card-container .card-body {
+    position: relative;
     display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-left: 7px;
-    margin-top: 7px;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 2%;
+    background-image: url($img-user-edge-left), url($img-user-edge-right);
+    background-repeat: no-repeat, no-repeat;
+    background-position:
+        left top,
+        right top;
+    background-size:
+        $border-size 100%,
+        $border-size 100%;
+    background-color: #5090e0;
 }
 
-.avatar-frame {
-    grid-column: 2;
-    grid-row: 3 /6;
+.card-body .title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 15%;
+    padding: 0 2%;
+    z-index: 1;
+    user-select: none;
+}
+
+.title-container .title-label {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 10px;
+    gap: $base-size;
+    height: 100%;
 }
 
-.full-avatar {
-    width: 90%;
-    height: 90%;
+.title-container .icon-wrapper {
+    height: 60%;
+    aspect-ratio: 1 / 1;
+    background-image: url($img-title-icon);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.title-container .title {
+    font-family: $font-family;
+    font-size: calc($font-size * 1.8);
+    color: #fff;
+    text-shadow: #2860a8 calc($font-size * 0.2) 0 0;
+    letter-spacing: calc($font-size * 0.1);
+}
+
+.card-body .title-container .header-buttons {
+    display: flex;
+    justify-content: end;
+    gap: calc($base-size * 1);
+    flex: 1;
+    height: 100%;
+}
+
+.card-body .header-buttons .button-container {
+    height: 80%;
+    aspect-ratio: 1 / 1;
+    background-size:
+        auto 100%,
+        70% 100%,
+        auto 100%;
+}
+
+.card-body .header-buttons .button-container .button-icon {
+    height: 80%;
+    aspect-ratio: 9 / 12;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    filter: invert(1);
+}
+
+.user-settings .button-icon {
+    background-image: url($img-settings-icon);
+}
+
+.user-friends .button-icon {
+    background-image: url($img-friends-icon);
+}
+
+.user-inventory .button-icon {
+    background-image: url($img-inventory-icon);
+}
+
+.card-body .card-infos-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    width: 100%;
+    user-select: none;
+}
+
+.card-body .card-infos-container .left-container {
+    display: flex;
+    flex: 3;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    gap: calc($base-size * 4);
+    height: 100%;
+    padding: 2%;
+}
+
+.info-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 95%;
+    height: 13%;
+    padding: 0 2%;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        opacity: 0.3;
+        background-image: url($img-sub-edge-left), url($img-sub-edge-right), linear-gradient(white, white);
+        background-repeat: no-repeat, no-repeat, no-repeat;
+        background-position:
+            left top,
+            right top,
+            center top;
+        background-size:
+            auto 100%,
+            auto 100%,
+            96% 100%;
+    }
+
+    > * {
+        position: relative;
+        z-index: 1;
+        font-size: $font-size;
+        color: $text-color;
+        text-shadow: $text-shadow-color calc($font-size * 0.1) 0 0;
+        letter-spacing: calc($font-size * 0.1);
+    }
+}
+
+.card-body .card-infos-container .right-container {
+    z-index: 1;
+    display: flex;
+    flex: 1.7;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    gap: calc($base-size * 2);
+    height: 100%;
+    padding: 2%;
+}
+
+.right-container .avatar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 95%;
+    aspect-ratio: 1 / 1;
+    background-image: url($img-avatar-container);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.avatar-container .full-avatar {
+    width: 80%;
+    height: 80%;
     object-fit: contain;
-    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(calc($base-size * 0.4) calc($base-size * 0.4) calc($base-size * 0.4) rgba(0, 0, 0, 0.3));
 }
 
-.label {
-    margin: 0;
-    font-family: $font-family;
-    font-size: 16px;
-    color: rgba($text-color, 0.7);
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.value {
-    margin: 0;
-    font-family: $font-family;
-    font-size: 18px;
-    color: #0f1f3d;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.button-row {
-    grid-column: 1 / 3;
-    grid-row: 7;
+.card-body .badges-container {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.primary-button {
-    background: hsl(203, 100%, 38%);
-}
-
-.card-back .back-content {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    gap: $base-size;
     width: 100%;
+    height: 12%;
+    background: $gray-background-color;
 }
 
-.back-header {
+.badges-container .badge-container {
+    height: 80%;
+    aspect-ratio: 1 / 1;
+    background-image: url($img-badge-container);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.right-container .logout-button {
+    width: 95%;
+    height: 15%;
+    background-size:
+        auto 100%,
+        92% 100%,
+        auto 100%;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: calc($base-size * 0.5);
+    cursor: pointer;
+    background-image: url($img-button-container-edge-left), url($img-button-container-body), url($img-button-container-edge-right);
+    background-repeat: no-repeat, space, no-repeat;
+    background-position:
+        left top,
+        center top,
+        right top;
+    background-size:
+        auto 100%,
+        90% 100%,
+        auto 100%;
+    transition: all 0.3s ease;
+
+    &:hover {
+        filter: brightness(1.1);
+        scale: 1.05;
+    }
+
+    &:active {
+        filter: brightness(0.9);
+        scale: 0.95;
+    }
+
+    p {
+        position: relative;
+        z-index: 1;
+        font-size: calc($font-size * 0.9);
+        color: #fff;
+        text-shadow: $text-shadow-color calc($font-size * 0.1) 0 0;
+        letter-spacing: calc($font-size * 0.1);
+        user-select: none;
+    }
+}
+
+.right-container .logout-button .button-icon {
+    height: 80%;
+    aspect-ratio: 9 / 14;
+    background-image: url($img-logout-icon);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    filter: invert(1);
+}
+
+.back-button {
+    height: 80%;
+    aspect-ratio: 1 / 1;
+    background-size:
+        auto 100%,
+        70% 100%,
+        auto 100%;
+}
+
+.back-button .button-icon {
+    height: 80%;
+    aspect-ratio: 9 / 12;
+    background-image: url($img-back-icon);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    filter: invert(1);
+}
+
+.card-back .card-infos-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex: 1;
+    flex-direction: column;
+    z-index: 1;
+    margin-top: calc($base-size * 2);
+}
+
+.card-back .update-container {
+    position: relative;
+    z-index: 1;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #fff;
+    width: 95%;
+    margin-bottom: $base-size;
+    padding: $base-size;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: $corner-unit solid $border-color;
+    clip-path: $pixel-corners-clip-path;
 }
 
-.back-title {
-    margin: 0;
-    font-family: $font-family;
-    font-size: 16px;
+.card-back .info-row {
+    width: 75%;
+    height: calc($base-size * 6);
 }
 
-.form-section {
-    background: rgba(255, 255, 255, 0.9);
-    padding: 12px;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.section-title {
-    margin: 0;
-    font-size: 13px;
-    font-family: $font-family;
-    color: $text-color;
-}
-
-.text-input {
-    width: 100%;
-    padding: 8px;
-    border: none;
-    font-family: $font-family;
-    font-size: $font-size;
-    background: hsla(231, 12%, 30%, 0.95);
-    color: #fff;
-}
-
-.text-input::placeholder {
-    color: rgba(255, 255, 255, 0.75);
-}
-
-.input-row {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-@media (min-width: 520px) {
-    .input-row {
-        flex-direction: row;
-    }
-
-    .input-row .text-input {
-        flex: 1;
-    }
-}
-
-.actions-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.primary-button,
-.secondary-button,
-.danger-button,
-.text-button {
-    display: block;
-    padding: 8px;
-    height: auto;
-    width: auto;
-    text-decoration: none;
+.card-back .info-row input {
+    position: relative;
+    width: 55%;
+    height: 80%;
+    padding: 0 $base-size;
+    background: transparent;
+    background-color: #b1e0f4;
+    border: $corner-unit solid #5c93cb;
+    clip-path: $pixel-corners-clip-path;
     outline: none;
-    appearance: none;
-    -webkit-appearance: none;
-    background: $input-bg-normal;
     font-family: $font-family;
-    font-size: $font-size;
-    color: #fff;
-    cursor: pointer;
 }
 
-.primary-button:hover,
-.secondary-button:hover,
-.danger-button:hover,
-.text-button:hover {
-    border-color: $input-border-color;
+.card-back .update-container .button-container {
+    width: 22%;
+    height: calc($base-size * 6);
+    background-size:
+        auto 100%,
+        90% 100%,
+        auto 100%;
 }
 
-.primary-button:active,
-.secondary-button:active,
-.danger-button:active,
-.text-button:active {
-    background: $input-bg-active;
+.card-back .button-container p {
+    font-size: calc($font-size * 0.85);
+    letter-spacing: calc($font-size * 0.02);
 }
 
-.primary-button {
-    background: hsl(203, 100%, 38%);
+.card-back .update-password-container {
+    display: flex;
+    flex: 3;
+    flex-direction: column;
+    align-items: start;
+    gap: calc($base-size * 1.5);
 }
 
-.primary-button:active {
-    background: hsl(203, 100%, 42%);
+.card-back .update-password-container .info-row input {
+    width: 40%;
 }
 
-.primary-button:disabled,
-.secondary-button:disabled,
-.danger-button:disabled,
-.text-button:disabled {
-    opacity: 0.6;
-    cursor: default;
+.card-back .update-password-container .update-password-button {
+    position: absolute;
+    right: $base-size;
+    bottom: $base-size;
+    height: calc($base-size * 6);
 }
 
-.error {
+.delete-account-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1.5;
+    width: 100%;
+}
+
+.card-back .delete-button {
+    background-image: url($img-delete-container-edge-left), url($img-delete-container-body), url($img-delete-container-edge-right);
+    width: 50%;
+    height: calc($base-size * 6);
+    background-size:
+        auto 100%,
+        95% 100%,
+        auto 100%;
+}
+
+.card-back .delete-button p {
+    font-size: calc($font-size * 1.2);
+    letter-spacing: calc($font-size * 0.02);
+}
+
+.delete-button .button-icon {
+    height: 80%;
+    aspect-ratio: 9 / 12;
+    background-image: url($img-trash-icon);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    filter: invert(1);
+}
+
+.error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+}
+
+.error-container .error {
+    width: 80%;
     color: #c62828;
-    font-size: 12px;
+    font-size: calc($font-size * 0.9);
     font-family: $font-family;
-    text-align: left;
+    text-align: center;
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }

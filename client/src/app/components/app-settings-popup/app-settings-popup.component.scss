@@ -1,10 +1,10 @@
 $scale: min(1vh, 1vw);
-$inner-border-width: calc(0.7 * $scale);
 
 $border-color2: #48485f;
 
-$corner-square-size: calc($scale * 0.6);
-$inner-shadow-width: calc($scale * 0.8);
+$corner-square-size: calc($scale * 1);
+$inner-border-width: calc(1 * $scale);
+$inner-shadow-width: calc($scale * 1);
 $clip-path: polygon(
     $corner-square-size 0%,
     calc(100% - #{$corner-square-size}) 0%,
@@ -36,22 +36,18 @@ $gray-background-color: linear-gradient(
 );
 
 .settings-body {
-    width: calc($scale * 80);
+    width: calc($scale * 75);
+    height: calc($scale * 60);
 
     z-index: 10;
     display: flex;
-    padding: 1% 2%;
+    padding: $inner-border-width;
     align-items: center;
     flex-direction: column;
 
-    background: $gray-background-color;
-    background-size: 100% 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    overflow: visible;
-
     border: calc($corner-square-size * 2) solid $border-color2;
     clip-path: $clip-path;
+    background-color: #ababab;
 
     box-shadow:
         inset $inner-border-width 0 0 0 #ababab,
@@ -60,16 +56,72 @@ $gray-background-color: linear-gradient(
         inset 0 calc(-1 * $inner-border-width) 0 0 #6e6e6e;
 }
 
-.settings-body .settings-title {
-    height: 20%;
+.settings-header {
+    display: flex;
     width: 100%;
+    height: calc($scale * 5);
+    justify-content: space-between;
+    align-items: center;
+    padding: 0% 5%;
+    background-color: #888888;
+}
+
+.settings-body .settings-title {
+    height: 100%;
     display: flex;
     justify-content: center;
+    align-items: center;
     font-size: calc($scale * 4);
-    letter-spacing: calc($scale * 0.4);
-    text-indent: calc($scale * 0.4);
     text-shadow: calc($scale * 0.35) 0 0 rgba(0, 0, 0, 0.25);
     user-select: none;
+}
+
+.tabs-container {
+    flex: 1;
+    display: flex;
+    justify-content: end;
+    gap: calc($scale * 2);
+}
+
+.tab-button {
+    display: flex;
+    padding: 2% 2%;
+    height: 100%;
+    font-family: 'pixel';
+    font-size: calc($scale * 2.4);
+    cursor: pointer;
+    color: white;
+    text-shadow: calc($scale * 0.3) 0 0 rgba(0, 0, 0, 0.25);
+    border: solid transparent;
+    border-width: 0 0 calc($scale * 0.4) 0;
+    text-transform: uppercase;
+    transition: border-color 0.15s;
+
+    &:hover {
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    &.active {
+        border-color: rgba(255, 255, 255, 0.82);
+    }
+}
+
+.spacer {
+    height: calc($scale * 3);
+    width: 100%;
+    background: $gray-background-color;
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: visible;
+}
+
+.tab-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 2%;
 }
 
 .settings-body .settings-container {
@@ -78,7 +130,7 @@ $gray-background-color: linear-gradient(
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
-    margin: calc($scale * 3) 0;
+    margin: 0 0 calc($scale * 2);
     gap: calc($scale * 3);
 }
 
@@ -205,7 +257,7 @@ $thumb-size: calc($scale * 3.2);
     color: white;
     border: 2px solid transparent;
     text-transform: uppercase;
-    transition: border-color 0.15s, background 0.15s;
+    transition: border-color 0.15s;
 
     &:hover {
         border-color: rgba(255, 255, 255, 0.5);

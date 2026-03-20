@@ -133,7 +133,7 @@
                 } }
             </div>
         </div>
-        <div class="chat-container">
+        <div class="main-chat-container">
             <app-chat></app-chat>
         </div>
 
@@ -189,11 +189,11 @@
             </div>
             } @else {
             <div id="spectator-full-container">
-                <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png" />
-                <div class="container-body">
-                    <div class="spectator-container">
-                        @for (fighter of spectatorPanels; track fighter.playerIndex; let i = $index) {
-                        <div class="spectator-player">
+                <div class="spectator-container">
+                    @for (fighter of spectatorPanels; track fighter.playerIndex; let i = $index) {
+                    <div id="action-container">
+                        <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-left-border.png" />
+                        <div class="container-body">
                             <div class="spectator-avatar">
                                 <img [src]="fighter.profilePicture" [alt]="fighter.name + ' profile picture'" />
                             </div>
@@ -227,14 +227,15 @@
                                 </div>
                             </div>
                         </div>
-                        @if (i === 0 && spectatorPanels.length > 1) {
-                        <div class="vs-divider">
-                            <span class="vs-text">VS</span>
-                        </div>
-                        } }
+                        <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
                     </div>
+
+                    @if (i === 0 && spectatorPanels.length > 1) {
+                    <div class="vs-divider">
+                        <span class="vs-text">VS</span>
+                    </div>
+                    } }
                 </div>
-                <img class="container-border" src="./assets/images/menu/containers/combat-container/combat-container-rigth-border.png" />
             </div>
             }
         </div>

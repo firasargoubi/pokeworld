@@ -344,7 +344,7 @@ app-item {
 }
 
 .input-description {
-    height: calc($final-side-width * 0.7);
+    height: calc($final-side-width * 0.4);
     padding-top: calc($final-side-width * 0.029);
     padding-bottom: calc($final-side-width * 0.029);
     padding-left: calc($final-side-width * 0.029);
@@ -408,7 +408,6 @@ app-item {
 
 .save-button {
     background: hsl(203, 100%, 38%);
-    margin-top: calc($final-side-width * 0.21);
 }
 
 .save-button:active {
@@ -470,15 +469,64 @@ app-warning-confirmation-popup {
 }
 
 .gamestates-form {
-  display: flex;       
-  flex-direction: row; 
-  gap: 20px;           
-  border: none;        
-  align-items: center; 
+    display: flex;
+    flex-direction: row;
+    border: none;
+    align-items: center;
+    width: 100%;
+    height: calc($final-side-width * 0.3);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
-.gamestate-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;            
+.editor-left .gamestate-option {
+    display: flex;
+    align-items: center;
+    font-size: calc($final-side-width * 0.07);
+    cursor: pointer;
+    border-radius: calc($final-side-width * 0.015);
+
+    text-decoration: none;
+    outline: none;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background: $input-bg-normal;
+    font-family: 'pixel';
+    border: calc($final-side-width * 0.0085) solid transparent;
+    font-size: calc($final-side-width * 0.085);
+    letter-spacing: calc($final-side-width * 0.0003);
+    padding: 0 calc($final-side-width * 0.02);
+    transition: all 0.2s ease;
+}
+
+.editor-left .gamestate-option:hover {
+    cursor: pointer;
+    border-color: $input-border-color;
+}
+
+.editor-left .gamestate-option:active {
+    background: hsl(203, 65%, 48%);
+}
+
+.gamestates-form .active {
+    background-color: hsl(203, 100%, 38%);
+}
+
+.gamestate-option input {
+    display: none;
+}
+
+.gamestate-option label {
+    cursor: pointer;
+}
+
+.action-input {
+    width: 100%;
+}
+
+.action-input input {
+    cursor: pointer;
+    width: 100%;
 }

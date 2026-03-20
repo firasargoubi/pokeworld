@@ -1,92 +1,183 @@
 <div class="user-popup">
-    <div class="user-card" [class.show-back]="showBack" [class.animations-enabled]="animationsEnabled">
-        <div class="card-face card-front">
-            <div class="front-content">
-                <div class="info-email">
-                    <span class="label">{{ 'components.userPopup.emailLabel' | translate }}</span>
-                    <span class="value">{{ currentUser?.email || ('components.userPopup.noneValue' | translate) }}</span>
-                </div>
-                <div class="info-name">
-                    <span class="label">{{ 'components.userPopup.nameLabel' | translate }}</span>
-                    <span class="value">{{ currentUser?.username || ('components.userPopup.noneValue' | translate) }}</span>
-                </div>
-                <div class="avatar-frame">
-                    <img [src]="avatarToDisplay" [attr.alt]="'components.userPopup.avatarAlt' | translate" class="full-avatar" />
-                </div>
-                <div class="button-row">
-                    <button class="primary-button" (click)="toggleCard()" [disabled]="!currentUser">
-                        {{ 'components.userPopup.configure' | translate }}
-                    </button>
-                </div>
-            </div>
-        </div>
+    <div
+        class="user-card"
+        [class.show-settings]="activeCard === userCardType.Settings"
+        [class.show-friends]="activeCard === userCardType.Friends"
+        [class.show-inventory]="activeCard === userCardType.Inventory"
+        [class.animations-enabled]="animationsEnabled"
+    >
+        <div class="card-rotator">
+            <div class="card-container card-face card-front">
+                <div class="card-icon-background"></div>
+                <div class="card-main-border"></div>
+                <div class="card-body">
+                    <div class="title-container">
+                        <div class="title-label">
+                            <div class="icon-wrapper"></div>
+                            <p class="title"></p>
+                            <p class="title">{{ 'components.userPopup.accountTitle' | translate }}</p>
+                            <div class="icon-wrapper"></div>
+                        </div>
+                        <div class="header-buttons">
+                            <div class="button-container user-inventory" (click)="openCard(userCardType.Inventory)">
+                                <div class="button-icon"></div>
+                            </div>
 
-        <div class="card-face card-back">
-            <div class="back-content">
-                <div class="back-header">
-                    <p class="back-title">{{ 'components.userPopup.accountSettingsTitle' | translate }}</p>
-                    <button class="text-button" (click)="toggleCard()">
-                        {{ 'components.userPopup.close' | translate }}
-                    </button>
-                </div>
+                            <div class="button-container user-friends" (click)="openCard(userCardType.Friends)">
+                                <div class="button-icon"></div>
+                            </div>
 
-                <div class="form-section">
-                    <p class="section-title">{{ 'components.userPopup.usernameSectionTitle' | translate }}</p>
-                    <input
-                        type="text"
-                        [ngModel]="newUsername"
-                        (ngModelChange)="newUsername = ($event || '').toUpperCase()"
-                        class="text-input pixel-placeholder"
-                        [placeholder]="'components.userPopup.newUsernamePlaceholder' | translate"
-                        [attr.maxlength]="maxNameLength"
-                        style="text-transform: uppercase"
-                    />
-                    @if(usernameError) {
-                    <div class="error">{{ usernameError }}</div>
-                    }
-                    <button class="primary-button" (click)="updateUsername()" [disabled]="isUpdatingUsername">
-                        {{ 'components.userPopup.updateUsername' | translate }}
-                    </button>
-                </div>
-
-                <div class="form-section">
-                    <p class="section-title">{{ 'components.userPopup.passwordSectionTitle' | translate }}</p>
-                    <div class="input-row">
-                        <input
-                            type="password"
-                            [(ngModel)]="oldPassword"
-                            class="text-input pixel-placeholder"
-                            [placeholder]="'components.userPopup.oldPassword' | translate"
-                        />
-                        <input
-                            type="password"
-                            [(ngModel)]="newPassword"
-                            class="text-input pixel-placeholder"
-                            [placeholder]="'components.userPopup.newPassword' | translate"
-                        />
-                        <input
-                            type="password"
-                            [(ngModel)]="confirmNewPassword"
-                            class="text-input pixel-placeholder"
-                            [placeholder]="'components.userPopup.confirmPasswordPlaceholder' | translate"
-                        />
+                            <div class="button-container user-settings" (click)="openCard(userCardType.Settings)">
+                                <div class="button-icon"></div>
+                            </div>
+                        </div>
                     </div>
-                    @if(passwordError) {
-                    <div class="error">{{ passwordError }}</div>
-                    }
-                    <button class="primary-button" (click)="editPassword()" [disabled]="isUpdatingPassword">
-                        {{ 'components.userPopup.updatePassword' | translate }}
-                    </button>
+                    <div class="card-infos-container">
+                        <div class="left-container">
+                            <div class="info-row">
+                                <span class="label">{{ 'components.userPopup.emailLabel' | translate }}</span>
+                                <span class="value">{{ currentUser?.email || ('components.userPopup.noneValue' | translate) }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">{{ 'components.userPopup.emailLabel' | translate }}</span>
+                                <span class="value">{{ currentUser?.email || ('components.userPopup.noneValue' | translate) }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">{{ 'components.userPopup.emailLabel' | translate }}</span>
+                                <span class="value">{{ currentUser?.email || ('components.userPopup.noneValue' | translate) }}</span>
+                            </div>
+                        </div>
+                        <div class="right-container">
+                            <div class="info-row">
+                                <span class="label">{{ 'components.userPopup.nameLabel' | translate }}</span>
+                                <span class="value">{{ currentUser?.username || ('components.userPopup.noneValue' | translate) }}</span>
+                            </div>
+                            <div class="avatar-container">
+                                <img [src]="avatarToDisplay" [attr.alt]="'components.userPopup.avatarAlt' | translate" class="full-avatar" />
+                            </div>
+                            <div class="button-container logout-button" (click)="logout()">
+                                <p>{{ 'components.userPopup.logout' | translate }}</p>
+                                <div class="button-icon"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="badges-container">
+                        <div class="badge-container"></div>
+                        <div class="badge-container"></div>
+                        <div class="badge-container"></div>
+                        <div class="badge-container"></div>
+                        <div class="badge-container"></div>
+                    </div>
                 </div>
+                <div class="card-main-border"></div>
+            </div>
 
-                <div class="actions-row">
-                    <button class="secondary-button" (click)="logout()">
-                        {{ 'components.userPopup.logout' | translate }}
-                    </button>
-                    <button class="danger-button" (click)="deleteAccount()">
-                        {{ 'components.userPopup.deleteAccount' | translate }}
-                    </button>
+            <div class="card-container card-face card-back">
+                <div class="card-icon-background"></div>
+                <div class="card-main-border"></div>
+                <div class="card-body">
+                    @if (activeCard === userCardType.Settings) {
+                    <div class="title-container">
+                        <div class="title-label">
+                            <div class="icon-wrapper"></div>
+                            <p class="title">{{ 'components.userPopup.accountSettingsTitle' | translate }}</p>
+                            <div class="icon-wrapper"></div>
+                        </div>
+                        <div class="button-container back-button" (click)="goToFront()">
+                            <div class="button-icon"></div>
+                        </div>
+                    </div>
+                    <div class="card-infos-container">
+                        <div class="update-container update-name-container">
+                            <div class="info-row">
+                                <span class="label">{{ 'components.userPopup.usernameSectionTitle' | translate }}</span>
+                                <input
+                                    type="text"
+                                    [ngModel]="newUsername"
+                                    (ngModelChange)="newUsername = ($event || '').toUpperCase()"
+                                    class="text-input pixel-placeholder"
+                                    [placeholder]="'components.userPopup.newUsernamePlaceholder' | translate"
+                                    style="text-transform: uppercase"
+                                />
+                            </div>
+                            <div class="button-container" (click)="updateUsername()" [class.disabled]="isUpdatingUsername">
+                                <p>{{ 'components.userPopup.updateUsername' | translate }}</p>
+                            </div>
+                        </div>
+                        <div class="update-container update-password-container">
+                            <div class="info-row">
+                                <span class="label">{{ 'components.userPopup.oldPassword' | translate }}</span>
+                                <input
+                                    type="password"
+                                    [(ngModel)]="oldPassword"
+                                    class="text-input pixel-placeholder"
+                                    [placeholder]="'components.userPopup.oldPassword' | translate"
+                                />
+                            </div>
+                            <div class="info-row">
+                                <span class="label">{{ 'components.userPopup.newPassword' | translate }}</span>
+                                <input
+                                    type="password"
+                                    [(ngModel)]="newPassword"
+                                    class="text-input pixel-placeholder"
+                                    [placeholder]="'components.userPopup.newPassword' | translate"
+                                />
+                            </div>
+                            <div class="info-row">
+                                <span class="label">{{ 'components.userPopup.confirmPasswordPlaceholder' | translate }}</span>
+                                <input
+                                    type="password"
+                                    [(ngModel)]="confirmNewPassword"
+                                    class="text-input pixel-placeholder"
+                                    [placeholder]="'components.userPopup.confirmPasswordPlaceholder' | translate"
+                                />
+                            </div>
+
+                            <div class="button-container update-password-button" (click)="editPassword()" [class.disabled]="isUpdatingPassword">
+                                <p>{{ 'components.userPopup.updatePassword' | translate }}</p>
+                            </div>
+                        </div>
+                        <div class="error-container">
+                            @if(usernameError) {
+                            <div class="error">{{ usernameError }}</div>
+                            } @if(passwordError) {
+                            <div class="error">{{ passwordError }}</div>
+                            }
+                        </div>
+                        <div class="delete-account-container">
+                            <div class="button-container delete-button" (click)="deleteAccount()">
+                                <p>{{ 'components.userPopup.deleteAccount' | translate }}</p>
+                                <div class="button-icon"></div>
+                            </div>
+                        </div>
+                    </div>
+                    }@else if (activeCard === userCardType.Friends) {
+                    <div class="title-container">
+                        <div class="title-label">
+                            <div class="icon-wrapper"></div>
+                            <p class="title">FRIENDS</p>
+                            <div class="icon-wrapper"></div>
+                        </div>
+                        <div class="button-container back-button" (click)="goToFront()">
+                            <div class="button-icon"></div>
+                        </div>
+                    </div>
+
+                    <div class="card-infos-container"></div>
+                    } @else if (activeCard === userCardType.Inventory) {
+                    <div class="title-container">
+                        <div class="title-label">
+                            <div class="icon-wrapper"></div>
+                            <p class="title">INVENTORY</p>
+                            <div class="icon-wrapper"></div>
+                        </div>
+                        <div class="button-container back-button" (click)="goToFront()">
+                            <div class="button-icon"></div>
+                        </div>
+                    </div>
+                    }
                 </div>
+                <div class="card-main-border"></div>
             </div>
         </div>
     </div>

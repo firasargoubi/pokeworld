@@ -97,7 +97,10 @@
             <p class="messages">
                 <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
                 @if(message.profilePicture){
-                <img [src]="message.profilePicture" alt="avatar" class="chat-avatar" />
+                <span class="profile-picture-container">
+                    <span class="profile-picture-background"></span>
+                    <img [src]="message.profilePicture" alt="avatar" class="profile-picture" />
+                </span>
                 } <span class="message-content sender">{{ message.sender }}: </span>
                 <span class="message-content message">{{ message.content }}</span>
             </p>
@@ -105,7 +108,10 @@
             <p class="messages">
                 <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
                 @if(message.profilePicture){
-                <img [src]="message.profilePicture" alt="avatar" class="chat-avatar" />
+                <span class="profile-picture-container">
+                    <span class="profile-picture-background"></span>
+                    <img [src]="message.profilePicture" alt="avatar" class="profile-picture" />
+                </span>
                 } <span class="message-content sender">{{ message.sender }}: </span>
                 <span class="message-content message">{{ message.content }}</span>
             </p>
@@ -113,7 +119,10 @@
             <p class="messages">
                 <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
                 @if(message.profilePicture){
-                <img [src]="message.profilePicture" alt="avatar" class="chat-avatar" />
+                <span class="profile-picture-container">
+                    <span class="profile-picture-background"></span>
+                    <img [src]="message.profilePicture" alt="avatar" class="profile-picture" />
+                </span>
                 }
                 <span class="message-content sender">{{ message.sender }}: </span>
                 <span class="message-content message">{{ message.content }}</span>
@@ -125,8 +134,10 @@
             </p>
             } } }
         </div>
-        @if (!(chatService.chatState().isInChannelList && chatService.chatState().activeTab === chatTab.Channels)) {
-        <div class="chat-input-container">
+        <div
+            class="chat-input-container"
+            [class.inactive]="chatService.chatState().isInChannelList && chatService.chatState().activeTab === chatTab.Channels"
+        >
             <input
                 #chatInput
                 type="text"
@@ -140,7 +151,6 @@
                 {{ 'components.chat.send' | translate }}
             </button>
         </div>
-        }
     </div>
     <div class="horizontal-border"></div>
 </div>
