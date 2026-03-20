@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { SettingsTab } from '@app/interfaces/settings';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { PreferencesService } from '@app/services/preferences/preferences.service';
@@ -19,6 +20,9 @@ export class AppSettingsPopupComponent {
 
     readonly appTheme = AppTheme;
     readonly appLanguage = AppLanguage;
+    readonly settingsTab = SettingsTab;
+
+    selectedTab: SettingsTab = this.settingsTab.Audio;
 
     private lastMusicVolume = this.audioService.getBackgroundMusicVolume();
     private lastEffectsVolume = this.audioService.getEffectsVolume();
@@ -30,6 +34,11 @@ export class AppSettingsPopupComponent {
 
     get currentLanguage(): AppLanguage {
         return this.preferencesService.currentLanguage;
+    }
+
+    selectTab(tab: SettingsTab): void {
+        this.playClickSound();
+        this.selectedTab = tab;
     }
 
     onVolumeChange(music: number, effects: number, avatars: number): void {
@@ -49,11 +58,13 @@ export class AppSettingsPopupComponent {
     }
 
     onMuteEffects(): void {
+        this.playClickSound();
         const fx = this.audioService.getEffectsVolume() === 0 ? this.lastEffectsVolume : 0;
         this.audioService.setEffectsVolume(fx);
     }
 
     onMuteAvatars(): void {
+        this.playClickSound();
         const av = this.audioService.getAvatarsVolume() === 0 ? this.lastAvatarsVolume : 0;
         this.audioService.setAvatarsVolume(av);
     }

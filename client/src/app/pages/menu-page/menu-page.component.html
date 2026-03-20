@@ -7,7 +7,7 @@
         </div>
         } @if(!currentUser) {
         <div class="user-auth-overlay" tabindex="0">
-            <app-auth-popup class="auth-card" (click)="$event.stopPropagation()"></app-auth-popup>
+            <app-auth-popup (click)="$event.stopPropagation()"></app-auth-popup>
         </div>
         } @if(currentUser && isUserPopupVisible) {
         <div class="user-popup-container" (click)="toggleUserPopup()">
@@ -16,11 +16,13 @@
         }
         <div class="top-container">
             <div class="top-left-container">
-                <div class="settings-button" (click)="this.toggleAudioSettings()">
-                    <div class="icon-settings"></div>
-                </div>
-                <div class="user-button" (click)="this.toggleUserPopup()">
-                    <div class="icon-user"></div>
+                <div class="top-buttons-container">
+                    <div class="top-button user-button" (click)="this.toggleUserPopup()">
+                        <div class="icon-container"></div>
+                    </div>
+                    <div class="top-button" (click)="this.toggleAudioSettings()">
+                        <div class="icon-container"></div>
+                    </div>
                 </div>
                 <div class="logo-container">
                     <p class="team-number">{{ 'pages.menu.teamNumber' | translate }}</p>

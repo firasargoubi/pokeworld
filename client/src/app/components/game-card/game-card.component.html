@@ -11,7 +11,10 @@
     <div class="game-card">
         <div class="card-body">
             <div class="game-thumbnail" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
-                <p class="game-name">{{ game.name }}</p>
+                <p class="game-name">
+                    {{ game.name }}<br />
+                    <span class="game-owner">{{ 'components.gameCard.owner' | translate }} {{ game.owner ? game.owner.userName : 'Unknown' }}</span>
+                </p>
                 <p class="size-info">{{ game.mapData.size }}x{{ game.mapData.size }}</p>
                 @if(matchData){
                 <div [className]="matchStateIconClass"></div>
@@ -28,12 +31,6 @@
                         <div class="mode-sub-background"></div>
                     </div>
                     <p class="last-edited">{{ gameMatchInfo }}</p>
-                    <div class="owner">
-                        Owner : 
-                        @if (game.owner) {
-                            {{game.owner.userName}}
-                        }
-                    </div>
                 </div>
                 <div class="game-interaction">
                     @if(isAdminView) {
@@ -55,7 +52,9 @@
                     } @else {
                     <div class="main-button-container" (click)="onJoin()">
                         <div class="button-edge"></div>
-                        <div class="button-body"><p>{{ 'components.gameCard.play' | translate }}</p></div>
+                        <div class="button-body">
+                            <p>{{ 'components.gameCard.play' | translate }}</p>
+                        </div>
                         <div class="button-edge"></div>
                     </div>
                     }

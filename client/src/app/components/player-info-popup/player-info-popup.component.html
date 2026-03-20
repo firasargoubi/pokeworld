@@ -7,7 +7,10 @@
         <div class="self-info-name">
             {{ matchService.data.players[playerIndex].name }}
             @if( matchService.data.players[playerIndex].profilePicture) {
-            <img src="{{ matchService.data.players[playerIndex].profilePicture }}" class="profile-picture" />
+            <div class="profile-picture-container">
+                <div class="profile-picture-background"></div>
+                <img src="{{ matchService.data.players[playerIndex].profilePicture }}" class="profile-picture" />
+            </div>
             }
         </div>
         <button class="close-button" (click)="closeButton(); this.audioService.playEffect(this.clickValue)">X</button>

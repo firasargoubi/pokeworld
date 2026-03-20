@@ -51,6 +51,25 @@ $bg-stripes: repeating-linear-gradient(
     $color-stripes-2 $stripes-step
 );
 
+$corner-unit: calc($base-size * 1);
+$border-color: #706880;
+$background-color: #dddae2;
+
+$pixel-corners-clip-path: polygon(
+    0 #{$corner-unit},
+    #{$corner-unit} #{$corner-unit},
+    #{$corner-unit} 0,
+    calc(100% - #{$corner-unit}) 0,
+    calc(100% - #{$corner-unit}) #{$corner-unit},
+    100% #{$corner-unit},
+    100% calc(100% - #{$corner-unit}),
+    calc(100% - #{$corner-unit}) calc(100% - #{$corner-unit}),
+    calc(100% - #{$corner-unit}) 100%,
+    #{$corner-unit} 100%,
+    #{$corner-unit} calc(100% - #{$corner-unit}),
+    0 calc(100% - #{$corner-unit})
+);
+
 * {
     font-family: 'pixel';
     color: $color-text;
@@ -507,6 +526,7 @@ $bg-stripes: repeating-linear-gradient(
     flex: 1;
     min-width: 0;
     overflow: hidden;
+    user-select: none;
 }
 
 #spectator-full-container .container-body {
@@ -514,6 +534,7 @@ $bg-stripes: repeating-linear-gradient(
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: calc($base-size * 3);
     overflow: hidden;
 }
 
@@ -531,14 +552,13 @@ $bg-stripes: repeating-linear-gradient(
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 auto;
-    padding: 0 calc($base-size * 2);
+    margin: 0 calc($base-size * 8);
 }
 
 .vs-text {
-    font-size: calc($base-size * 8);
-    font-weight: bold;
-    user-select: none;
+    font-size: calc($base-size * 10);
+    color: #f8f8f8;
+    text-shadow: calc($base-size * 0.4) 0 0 #807870;
 }
 
 .stat-container {
@@ -577,23 +597,21 @@ $bg-stripes: repeating-linear-gradient(
     overflow: hidden;
 }
 
-.spectator-player:not(:last-child) {
-    padding-right: calc($base-size * 1);
-}
-
 .spectator-avatar {
-    flex: 0 0 calc($base-size * 20);
     height: 80%;
-    width: 80%;
+    aspect-ratio: 1/1;
     display: flex;
-    //align-items: center;
-    //justify-content: center;
+    object-fit: contain;
+    padding: 2%;
+
+    background: transparent;
+    background-color: $background-color;
+    border: $corner-unit solid $border-color;
+    clip-path: $pixel-corners-clip-path;
+    outline: none;
 }
 
 .full-avatar img {
-    width: 90%;
-    height: 90%;
-    object-fit: contain;
     filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
 }
 
@@ -602,59 +620,22 @@ $bg-stripes: repeating-linear-gradient(
     flex-direction: column;
     gap: calc($base-size * 0.2);
     flex: 1;
-    min-width: 0;
-    overflow: hidden;
-}
-
-.fighter-header {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
 }
 
 .fighter-name {
-    font-size: calc($base-size * 3.8);
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.fighter-health {
-    font-size: calc($base-size * 3.2);
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.fighter-health-label {
-    margin-right: calc($base-size * 0.5);
+    font-size: calc($base-size * 4.2);
 }
 
 .spectator-stat-line {
     display: flex;
-    //justify-content: space-between;
-    gap: calc($base-size * 0.2);
-    font-size: calc($base-size * 3.2);
+    justify-content: space-between;
+    gap: calc($base-size * 0.1);
+    font-size: calc($base-size * 4.2);
     white-space: nowrap;
     overflow: hidden;
 }
 
-.spectator-stat-line .stat-label {
-    width: 29%;
-    //flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.spectator-stat-line .stat-value {
-    //flex: 0 0 auto;
-    text-align: right;
-}
-
-.chat-container {
+.main-chat-container {
     position: absolute;
     width: 38%;
     height: 40%;

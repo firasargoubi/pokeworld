@@ -1,86 +1,136 @@
-<div class="editor-left auth-popup">
-    <div class="auth-inner">
-        <div class="left-label">{{ isCreating ? ('components.authPopup.createAccountTitle' | translate) : ('components.authPopup.loginTitle' | translate) }}</div>
-        <div class="language-selector">
-            <button
-                class="lang-button"
-                [class.active]="selectedLanguage === appLanguage.French"
-                (click)="selectLanguage(appLanguage.French)"
-            >{{ 'components.authPopup.languageFr' | translate }}</button>
-            <button
-                class="lang-button"
-                [class.active]="selectedLanguage === appLanguage.English"
-                (click)="selectLanguage(appLanguage.English)"
-            >{{ 'components.authPopup.languageEn' | translate }}</button>
-        </div>
+<div class="auth-popup" [class.creating]="isCreating">
+    <div class="auth-card">
+        <div class="card-icon-background"></div>
+        <div class="card-main-border"></div>
 
-        <div class="form-row">
-            <div class="left-label-small">{{ 'components.authPopup.username' | translate }}</div>
-            <input
-                id="username-input"
-                type="text"
-                [formControl]="usernameForm"
-                maxlength="{{ visualData.nameMaxLength }}"
-                [placeholder]="'components.authPopup.usernamePlaceholder' | translate"
-                autofocus
-                autocomplete="off"
-                style="text-transform: uppercase"
-                (input)="onUsernameInput()"
-                (click)="this.audioService.playEffect(this.clickValue)"
-            />
-        </div>
+        <div class="card-body">
+            <div class="title-container">
+                <div class="title-label">
+                    <div class="icon-wrapper"></div>
+                    <p class="title">
+                        {{ isCreating ? ('components.authPopup.createAccountTitle' | translate) : ('components.authPopup.loginTitle' | translate) }}
+                    </p>
+                    <div class="icon-wrapper"></div>
+                </div>
 
-        @if(isCreating) {
-        <div class="form-row">
-            <div class="left-label-small">{{ 'components.authPopup.email' | translate }}</div>
-            <input
-                id="email-input"
-                type="email"
-                [formControl]="emailForm"
-                [placeholder]="'components.authPopup.emailPlaceholder' | translate"
-                autocomplete="off"
-                (click)="this.audioService.playEffect(this.clickValue)"
-            />
-        </div>
-        <div class="form-row">
-            <div class="left-label-small">{{ 'components.authPopup.avatar' | translate }}</div>
-            <div class="avatar-list">
-                @for(avatar of avatarList; track $index) {
-                <img
-                    [src]="avatar"
-                    [class.selected]="selectedAvatar === avatar"
-                    (click)="selectAvatar(avatar)"
-                    class="avatar-option"
-                    [attr.alt]="'components.authPopup.avatarAlt' | translate: { index: $index + 1 }"
-                />
+                <div class="language-selector">
+                    <div
+                        class="button-container lang-button"
+                        [class.active]="selectedLanguage === appLanguage.French"
+                        (click)="selectLanguage(appLanguage.French)"
+                    >
+                        <span>{{ 'components.authPopup.languageFr' | translate }}</span>
+                    </div>
+                    <div
+                        class="button-container lang-button"
+                        [class.active]="selectedLanguage === appLanguage.English"
+                        (click)="selectLanguage(appLanguage.English)"
+                    >
+                        <span>{{ 'components.authPopup.languageEn' | translate }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-container">
+                <div class="form-panel">
+                    <div class="panel-frame">
+                        <div class="form-row">
+                            <div class="label">{{ 'components.authPopup.username' | translate }}</div>
+                            <input
+                                id="username-input"
+                                type="text"
+                                [formControl]="usernameForm"
+                                [attr.maxlength]="visualData.nameMaxLength"
+                                [placeholder]="'components.authPopup.usernamePlaceholder' | translate"
+                                autofocus
+                                autocomplete="off"
+                                style="text-transform: uppercase"
+                                (input)="onUsernameInput()"
+                                (click)="this.audioService.playEffect(this.clickValue)"
+                            />
+                        </div>
+
+                        @if (isCreating) {
+                        <div class="form-row">
+                            <div class="label">{{ 'components.authPopup.email' | translate }}</div>
+                            <input
+                                id="email-input"
+                                type="email"
+                                [formControl]="emailForm"
+                                [placeholder]="'components.authPopup.emailPlaceholder' | translate"
+                                autocomplete="off"
+                                (click)="this.audioService.playEffect(this.clickValue)"
+                            />
+                        </div>
+                        }
+
+                        <div class="form-row">
+                            <div class="label">{{ 'components.authPopup.password' | translate }}</div>
+                            <input
+                                class="input-password"
+                                type="password"
+                                [(ngModel)]="password"
+                                (click)="this.audioService.playEffect(this.clickValue)"
+                            />
+                        </div>
+
+                        @if (isCreating) {
+                        <div class="form-row">
+                            <div class="label">{{ 'components.authPopup.confirmPasswordPlaceholder' | translate }}</div>
+                            <input
+                                class="input-password"
+                                type="password"
+                                [(ngModel)]="confirmPassword"
+                                [placeholder]="'components.authPopup.confirmPasswordPlaceholder' | translate"
+                                (click)="this.audioService.playEffect(this.clickValue)"
+                            />
+                        </div>
+                        }
+                        <div class="error-container">
+                            @if (errorMessage) {
+                            <div class="error">{{ errorMessage | translate }}</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @if (isCreating) {
+                <div class="avatar-panel">
+                    <div class="panel-frame avatar-frame">
+                        <div class="avatar-title-row">
+                            <span class="label">{{ 'components.authPopup.avatar' | translate }}</span>
+                        </div>
+                        <div class="avatar-list">
+                            @for (avatar of avatarList; track $index) {
+                            <img
+                                [src]="avatar"
+                                [class.selected]="selectedAvatar === avatar"
+                                (click)="selectAvatar(avatar)"
+                                class="avatar-option"
+                                [attr.alt]="'components.authPopup.avatarAlt' | translate: { index: $index + 1 }"
+                            />
+                            }
+                        </div>
+                    </div>
+                </div>
                 }
             </div>
-        </div>
-        }
 
-        <div class="form-row">
-            <div class="left-label-small">{{ 'components.authPopup.password' | translate }}</div>
-            <input class="input-password" type="password" [(ngModel)]="password" (click)="this.audioService.playEffect(this.clickValue)" />
-        </div>
-        @if(isCreating) {
-        <div class="form-row">
-            <div class="left-label-small">{{ 'components.authPopup.confirmPassword' | translate }}</div>
-            <input
-                class="input-password"
-                type="password"
-                [(ngModel)]="confirmPassword"
-                [placeholder]="'components.authPopup.confirmPasswordPlaceholder' | translate"
-                (click)="this.audioService.playEffect(this.clickValue)"
-            />
-        </div>
-        }
-        @if(errorMessage) {
-        <div class="error">{{ errorMessage | translate }}</div>
-        }
+            <div class="footer-actions">
+                <div (click)="primaryAction()" class="button-container main-action">
+                    <p>
+                        {{ isCreating ? ('components.authPopup.createAccountButton' | translate) : ('components.authPopup.loginButton' | translate) }}
+                    </p>
+                </div>
 
-        <div class="buttons">
-            <button (click)="primaryAction()" class="save-button">{{ isCreating ? ('components.authPopup.createAccountButton' | translate) : ('components.authPopup.loginButton' | translate) }}</button>
-            <button (click)="toggleAction()" class="change-button">{{ isCreating ? ('components.authPopup.loginButton' | translate) : ('components.authPopup.createAccountButton' | translate) }}</button>
+                <div (click)="toggleAction()" class="button-container secondary-action">
+                    <p>
+                        {{ isCreating ? ('components.authPopup.loginButton' | translate) : ('components.authPopup.createAccountButton' | translate) }}
+                    </p>
+                </div>
+            </div>
         </div>
+
+        <div class="card-main-border"></div>
     </div>
 </div>

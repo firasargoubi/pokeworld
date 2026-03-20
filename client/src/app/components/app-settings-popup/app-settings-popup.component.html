@@ -1,28 +1,44 @@
 <div class="settings-body">
-    <div class="settings-title">{{ 'components.appSettings.title' | translate }}</div>
+    <div class="settings-header">
+        <p class="settings-title">{{ 'components.appSettings.title' | translate }}</p>
 
-    <div class="section-title">{{ 'components.appSettings.language' | translate }}</div>
-    <div class="option-row">
-        <button class="option-button" [class.active]="currentLanguage === appLanguage.French" (click)="selectLanguage(appLanguage.French)">
-            {{ 'components.appSettings.languageFr' | translate }}
-        </button>
-        <button class="option-button" [class.active]="currentLanguage === appLanguage.English" (click)="selectLanguage(appLanguage.English)">
-            {{ 'components.appSettings.languageEn' | translate }}
-        </button>
+        <div class="tabs-container">
+            <div class="tab-button" [class.active]="selectedTab === settingsTab.Audio" (click)="selectTab(settingsTab.Audio)">
+                {{ 'components.appSettings.audio' | translate }}
+            </div>
+            <div class="tab-button" [class.active]="selectedTab === settingsTab.Preferences" (click)="selectTab(settingsTab.Preferences)">
+                {{ 'components.appSettings.preferences' | translate }}
+            </div>
+        </div>
     </div>
+    <div class="spacer"></div>
 
-    <div class="section-title">{{ 'components.appSettings.theme' | translate }}</div>
-    <div class="option-row">
-        <button class="option-button" [class.active]="currentTheme === appTheme.Default" (click)="selectTheme(appTheme.Default)">
-            {{ 'components.appSettings.themeDefault' | translate }}
-        </button>
-        <button class="option-button" [class.active]="currentTheme === appTheme.Dark" (click)="selectTheme(appTheme.Dark)">
-            {{ 'components.appSettings.themeDark' | translate }}
-        </button>
+    @if(selectedTab === settingsTab.Preferences){
+    <div class="tab-content">
+        <div class="section-title">{{ 'components.appSettings.language' | translate }}</div>
+        <div class="option-row">
+            <button class="option-button" [class.active]="currentLanguage === appLanguage.French" (click)="selectLanguage(appLanguage.French)">
+                {{ 'components.appSettings.languageFr' | translate }}
+            </button>
+            <button class="option-button" [class.active]="currentLanguage === appLanguage.English" (click)="selectLanguage(appLanguage.English)">
+                {{ 'components.appSettings.languageEn' | translate }}
+            </button>
+        </div>
+
+        <div class="section-title">{{ 'components.appSettings.theme' | translate }}</div>
+        <div class="option-row">
+            <button class="option-button" [class.active]="currentTheme === appTheme.Default" (click)="selectTheme(appTheme.Default)">
+                {{ 'components.appSettings.themeDefault' | translate }}
+            </button>
+            <button class="option-button" [class.active]="currentTheme === appTheme.Dark" (click)="selectTheme(appTheme.Dark)">
+                {{ 'components.appSettings.themeDark' | translate }}
+            </button>
+        </div>
     </div>
+    } @if(selectedTab === settingsTab.Audio){
+    <div class="tab-content settings-container">
+        <div class="section-title">{{ 'components.appSettings.audio' | translate }}</div>
 
-    <div class="section-title">{{ 'components.appSettings.audio' | translate }}</div>
-    <div class="settings-container">
         <div class="setting-line">
             <label for="volMusic">{{ 'components.appSettings.music' | translate }}</label>
             <input
@@ -95,4 +111,5 @@
             </div>
         </div>
     </div>
+    }
 </div>

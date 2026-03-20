@@ -2,6 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PopupMessage } from '@app/consts/popup-message.const';
+import { PopupColor } from '@app/interfaces/popup';
+import { SoundEffect } from '@app/interfaces/sound-service';
+import { UserCardType } from '@app/interfaces/user';
+import { AudioService } from '@app/services/audio/audio.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { UserService } from '@app/services/user/user.service';
@@ -21,7 +25,8 @@ export class UserPopupComponent {
     readonly maxNameLength = MAX_NAME_LENGTH;
     userService: UserService = inject(UserService);
     currentUser: UserInfo | null = null;
-    showBack = false;
+    userCardType = UserCardType;
+    activeCard: UserCardType = UserCardType.Front;
     animationsEnabled = false;
     oldPassword: string = '';
     newPassword: string = '';
@@ -34,6 +39,7 @@ export class UserPopupComponent {
     private popupService: PopupService = inject(PopupService);
     private readonly preferencesService: PreferencesService = inject(PreferencesService);
     private readonly translateService: TranslateService = inject(TranslateService);
+    private readonly audioService: AudioService = inject(AudioService);
 
     constructor() {
         this.userService.user$.subscribe((user: UserInfo | null) => {
@@ -50,22 +56,29 @@ export class UserPopupComponent {
         return this.currentUser?.fullProfilePicture || this.currentUser?.profilePicture || this.avatarImage;
     }
 
-    toggleCard(): void {
+    openCard(card: UserCardType): void {
+        this.audioService.playEffect(SoundEffect.Click);
         if (!this.currentUser) return;
+
         if (!this.animationsEnabled) {
             this.animationsEnabled = true;
         }
-        this.showBack = !this.showBack;
-        if (this.showBack) {
-            this.usernameError = '';
-            this.passwordError = '';
-            this.newUsername = this.currentUser.username;
-        } else {
-            this.resetForms();
-        }
+
+        this.activeCard = card;
+
+        this.usernameError = '';
+        this.passwordError = '';
+        this.newUsername = this.currentUser.username;
+    }
+
+    goToFront(): void {
+        this.audioService.playEffect(SoundEffect.Click);
+        this.activeCard = UserCardType.Front;
+        this.resetForms();
     }
 
     updateUsername(): void {
+        this.audioService.playEffect(SoundEffect.Click);
         if (!this.currentUser) return;
         this.usernameError = '';
         const sanitizedUsername = (this.newUsername || '').toUpperCase().trim();
@@ -90,6 +103,7 @@ export class UserPopupComponent {
     }
 
     editPassword(): void {
+        this.audioService.playEffect(SoundEffect.Click);
         this.passwordError = '';
         if (!this.currentUser) return;
         const oldPwd = this.oldPassword.trim();
@@ -119,6 +133,7 @@ export class UserPopupComponent {
                     message: PopupMessage.ChangeConfirmed,
                     hasCloseButton: true,
                     isConfirmation: false,
+                    popupColor: PopupColor.Green,
                 });
             },
             error: (err) => {
@@ -129,6 +144,7 @@ export class UserPopupComponent {
     }
 
     logout(): void {
+        this.audioService.playEffect(SoundEffect.Click);
         this.popupService.showPopup({
             message: PopupMessage.LogoutConfirmation,
             hasCloseButton: true,
@@ -138,6 +154,7 @@ export class UserPopupComponent {
     }
 
     deleteAccount(): void {
+        this.audioService.playEffect(SoundEffect.Click);
         this.popupService.showPopup({
             message: PopupMessage.DeleteAccountConfirmation,
             hasCloseButton: true,
@@ -158,6 +175,7 @@ export class UserPopupComponent {
                     message: PopupMessage.ChangeConfirmed,
                     hasCloseButton: true,
                     isConfirmation: false,
+                    popupColor: PopupColor.Green,
                 });
             },
             error: (err) => {
@@ -191,7 +209,7 @@ export class UserPopupComponent {
         if (!this.currentUser) return;
         this.userService.delete(this.currentUser.userId).subscribe({
             next: () => {
-                this.showBack = false;
+                this.activeCard = UserCardType.Front;
                 this.userService.setUser(null);
             },
         });

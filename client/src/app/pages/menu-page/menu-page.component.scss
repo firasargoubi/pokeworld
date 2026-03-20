@@ -11,7 +11,7 @@ $icon-vulpix: '../../../assets/images/menu/pokemons/chibi/vulpix.png';
 $icon-poliwag: '../../../assets/images/menu/pokemons/chibi/poliwag.png';
 $icon-cubone: '../../../assets/images/menu/pokemons/chibi/cubone.png';
 $icon-settings: '../../../assets/images/menu/icons/settings/settings.svg';
-$icon-user-card: '../../../assets/images/menu/icons/user_card.png';
+$icon-user-card: '../../../assets/images/menu/icons/menu/user.svg';
 $gray-box-rectangle: '../../../assets/images/menu/containers/gray/rectangle.png';
 $user-button-color: hsl(194, 86%, 66%);
 $user-button-color-dark: hsl(194, 86%, 42%);
@@ -222,15 +222,6 @@ app-menu-button {
     background-image: url($icon-cubone);
 }
 
-.icon-user {
-    width: calc($base-size * 8);
-    height: calc($base-size * 8);
-    background-image: url($icon-user-card);
-    background-size: contain;
-    background-position: bottom;
-    background-repeat: no-repeat;
-}
-
 $inner-border-width: calc(0.6 * $base-size);
 
 $border-color2: #48485f;
@@ -254,7 +245,13 @@ $clip-path: polygon(
     $corner-square-size $corner-square-size
 );
 
-.settings-button {
+.top-buttons-container {
+    display: flex;
+    flex-direction: column;
+    gap: calc($base-size * 0.5);
+}
+
+.top-button {
     width: calc($base-size * 10);
     margin: 0 calc($base-size * 2) auto calc($base-size * 2);
     aspect-ratio: 1 / 1;
@@ -293,7 +290,7 @@ $clip-path: polygon(
     }
 }
 
-.icon-settings {
+.top-button .icon-container {
     width: 70%;
     height: 70%;
     background-image: url($icon-settings);
@@ -301,6 +298,15 @@ $clip-path: polygon(
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+.user-button .icon-container {
+    background-image: url($icon-user-card);
+}
+
+.user-button.disabled {
+    opacity: 0.3;
+    pointer-events: none;
 }
 
 .audio-settings-container {
@@ -341,24 +347,9 @@ $clip-path: polygon(
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: clamp(1rem, 4vw, 3rem);
     background-color: $user-overlay-color;
-    backdrop-filter: blur(min(0.8vh, 0.8vw));
-    z-index: 13;
-}
-
-.auth-card {
-    width: min(520px, 90vw);
-    padding: clamp(1.5rem, 3vw, 2.5rem);
-    background-image: url($gray-box-rectangle);
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    gap: clamp(1rem, 2vw, 1.5rem);
-    font-family: 'pixel';
-    text-transform: uppercase;
+    backdrop-filter: blur($base-size);
+    z-index: 20;
 }
 
 .user-popup-container {
@@ -380,34 +371,4 @@ $clip-path: polygon(
     opacity: 0;
     transform: scale(0.96);
     animation: audio-overlay-in 0.2s forwards ease-in-out;
-}
-
-.user-button {
-    @extend .settings-button;
-    margin-left: 0;
-    background: $user-button-color;
-    opacity: 0.9;
-    box-shadow:
-        inset $inner-border-width 0 0 0 $user-button-color-light,
-        inset calc(-1 * $inner-border-width) 0 0 0 $user-button-color-dark,
-        inset 0 $inner-border-width 0 0 $user-button-color-light,
-        inset 0 calc(-1 * $inner-border-width) 0 0 $user-button-color-dark;
-
-    &:hover {
-        opacity: 1;
-    }
-
-    &:active {
-        filter: brightness(0.9);
-        box-shadow:
-            inset $inner-border-width 0 0 0 $user-button-color-dark,
-            inset calc(-1 * $inner-border-width) 0 0 0 $user-button-color-light,
-            inset 0 $inner-border-width 0 0 $user-button-color-dark,
-            inset 0 calc(-1 * $inner-border-width) 0 0 $user-button-color-light;
-    }
-}
-
-.user-button.disabled {
-    opacity: 0.3;
-    pointer-events: none;
 }

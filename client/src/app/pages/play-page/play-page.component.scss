@@ -37,6 +37,7 @@ $img-icon-crown: '../../../assets/images/menu/icons/crown.png';
 $img-icon-bot-defensive: '../../../assets/images/menu/icons/bot-defensive.png';
 $img-icon-bot-aggressive: '../../../assets/images/menu/icons/bot-aggressive.png';
 $img-icon-flag: '../../../assets/images/menu/icons/flag.png';
+$img-avatar-frame: '../../../assets/images/menu/containers/dark-blue/party-ball.png';
 $img-icon-eliminated: '../../../assets/images/menu/icons/match-mode/skull.png';
 
 $img-timer-right: '../../../assets/images/menu/timer/timer-right.png';
@@ -142,10 +143,6 @@ main {
     background-size:
         calc(100% - #{calc($base-size * 2)}) 100%,
         #{calc($base-size * 2)} 100%;
-}
-
-.profile-picture {
-    height: 100%;
 }
 
 .timer-text {
@@ -342,7 +339,7 @@ $player-card-gap: calc($base-size * 0.8);
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: calc($base-size * 1);
+    gap: calc($base-size * 0.5);
     height: 100%;
     flex: 1;
 }
@@ -364,6 +361,39 @@ $player-card-gap: calc($base-size * 0.8);
     text-shadow: calc($base-size * 0.15) 0 $shadow-text-dark;
 }
 
+.player-card .profile-picture-container {
+    position: relative;
+    height: calc(2.5 * $base-size);
+    aspect-ratio: 1/1;
+}
+
+.player-card .profile-picture-container .profile-picture-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url($img-avatar-frame);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: grayscale(0.8) brightness(0.5);
+    opacity: 0.6;
+    z-index: 0;
+}
+
+.player-card .profile-picture-container .profile-picture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+    z-index: 1;
+}
+
 .has-left {
     filter: grayscale(1);
 }
@@ -383,6 +413,13 @@ $player-card-gap: calc($base-size * 0.8);
     height: 0.12em;
     background: currentColor;
     pointer-events: none;
+}
+
+.profile-picture {
+    height: 40%;
+    aspect-ratio: 1 / 1;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
 .info-icon {
@@ -452,7 +489,7 @@ $player-card-gap: calc($base-size * 0.8);
     visibility: visible;
 }
 
-.chat-container {
+.main-chat-container {
     position: relative;
     margin: calc($base-size * 2) 0 0 auto;
     flex: 1;
