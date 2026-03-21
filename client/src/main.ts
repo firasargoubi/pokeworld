@@ -1,10 +1,9 @@
 import { provideHttpClient } from '@angular/common/http';
 import { enableProdMode, importProvidersFrom } from '@angular/core';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { TranslateHttpLoader, provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { Routes, provideRouter, withHashLocation } from '@angular/router';
+import { authGuard } from '@app/guards/auth/auth.guard';
 import { AdminPageComponent } from '@app/pages/admin-page/admin-page.component';
 import { AppComponent } from '@app/pages/app/app.component';
 import { CharacterPageComponent } from '@app/pages/character-page/character-page.component';
@@ -16,8 +15,9 @@ import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { MenuPageComponent } from '@app/pages/menu-page/menu-page.component';
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
 import { StatPageComponent } from '@app/pages/stat-page/stat-page.component';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader, provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { environment } from './environments/environment';
-
 
 if (environment.production) {
     enableProdMode();
@@ -25,15 +25,15 @@ if (environment.production) {
 
 const routes: Routes = [
     { path: '', component: MenuPageComponent, pathMatch: 'full' },
-    { path: 'play', component: PlayPageComponent },
-    { path: 'lobby', component: LobbyPageComponent },
-    { path: 'join', component: JoinPageComponent },
-    { path: 'admin', component: AdminPageComponent },
-    { path: 'create', component: CreatePageComponent },
-    { path: 'edit', component: EditPageComponent },
-    { path: 'combat', component: CombatPageComponent },
-    { path: 'stat', component: StatPageComponent },
-    { path: 'character', component: CharacterPageComponent },
+    { path: 'play', component: PlayPageComponent, canActivate: [authGuard] },
+    { path: 'lobby', component: LobbyPageComponent, canActivate: [authGuard] },
+    { path: 'join', component: JoinPageComponent, canActivate: [authGuard] },
+    { path: 'admin', component: AdminPageComponent, canActivate: [authGuard] },
+    { path: 'create', component: CreatePageComponent, canActivate: [authGuard] },
+    { path: 'edit', component: EditPageComponent, canActivate: [authGuard] },
+    { path: 'combat', component: CombatPageComponent, canActivate: [authGuard] },
+    { path: 'stat', component: StatPageComponent, canActivate: [authGuard] },
+    { path: 'character', component: CharacterPageComponent, canActivate: [authGuard] },
     { path: '**', redirectTo: '' },
 ];
 
