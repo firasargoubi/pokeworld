@@ -45,4 +45,8 @@ export class SocketService {
     off<T>(event: string, callback?: (...args: T[]) => void) {
         this.socket.off(event, callback);
     }
+
+    isConnected(): boolean {
+        return this.socket.connected;
+    }
 }
