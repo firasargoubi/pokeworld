@@ -264,11 +264,11 @@ $player-card-width: calc($base-size * 70);
     transition: filter 0.2s ease-in-out;
 }
 
-.button-container:hover * {
+.button-container:hover *:not(.icon) {
     filter: brightness(1.1);
 }
 
-.button-container:active * {
+.button-container:active *:not(.icon) {
     rotate: 180deg;
     filter: brightness(0.98);
 }
@@ -334,6 +334,7 @@ $player-card-width: calc($base-size * 70);
 
 .settings-icon {
     background-image: url($img-settings);
+    filter: brightness(0) invert(1);
 }
 
 .disabled {

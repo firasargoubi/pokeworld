@@ -299,6 +299,10 @@ $pixel-corners-clip-path: polygon(
     padding-top: calc($base-size * 0.5);
 }
 
+.hidden-file-input {
+    display: none;
+}
+
 .avatar-option {
     width: calc($base-size * 6.4);
     aspect-ratio: 1 / 1;
@@ -317,6 +321,45 @@ $pixel-corners-clip-path: polygon(
         background: rgba(255, 255, 255, 0.18);
         box-shadow: calc($base-size * 0.4) calc($base-size * 0.4) 0 rgba(72, 72, 95, 0.9);
     }
+}
+
+.upload-avatar-option {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: $font-family;
+    font-size: calc($font-size * 1.5);
+    line-height: 1;
+}
+
+.custom-avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: auto;
+}
+
+.remove-custom-avatar {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    background: rgba(40, 40, 40, 0.45);
+    color: #fff;
+    font-family: $font-family;
+    font-size: calc($font-size * 1.2);
+    transition: opacity 0.2s ease;
+}
+
+.upload-avatar-option:hover .remove-custom-avatar {
+    opacity: 1;
 }
 
 .footer-actions {

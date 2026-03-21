@@ -16,6 +16,7 @@ import { UserService } from '@app/services/user/user.service';
 import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/player-data.const';
 import { AppLanguage, AppTheme } from '@common/interfaces/preferences';
 import { TranslateModule } from '@ngx-translate/core';
+import imageCompression from 'browser-image-compression';
 
 @Component({
     selector: 'app-auth-popup',
@@ -49,12 +50,20 @@ export class AuthPopupComponent {
     fullAvatarList: string[] = structuredClone(FULL_AVATAR_LIST);
     selectedFullAvatar: string = this.fullAvatarList[0];
     fullAvatarUrl: string = '';
+    customAvatarDataUrl: string = '';
 
     audioService: AudioService = inject(AudioService);
     private userService: UserService = inject(UserService);
     private popupService: PopupService = inject(PopupService);
     private chatService: ChatService = inject(ChatService);
     private preferencesService: PreferencesService = inject(PreferencesService);
+
+    private readonly customAvatarToken = '__custom_avatar__';
+    private readonly maxAvatarSizeBytes = 1000000;
+    private readonly maxAvatarDimension = 1024;
+    private readonly bytesPerKilobyte = 1024;
+    private readonly base64BytesPerBlock = 3;
+    private readonly base64CharsPerBlock = 4;
 
     get selectedLanguage(): AppLanguage {
         return this.preferencesService.currentLanguage;
@@ -130,8 +139,9 @@ export class AuthPopupComponent {
     }
 
     async register() {
-        this.avatarUrl = await this.getAvatarDataUrl(this.selectedAvatar);
-        this.fullAvatarUrl = await this.getAvatarDataUrl(this.selectedFullAvatar);
+        const isCustomAvatarSelected = this.selectedAvatar === this.customAvatarToken && !!this.customAvatarDataUrl;
+        this.avatarUrl = isCustomAvatarSelected ? this.customAvatarDataUrl : await this.getAvatarDataUrl(this.selectedAvatar);
+        this.fullAvatarUrl = isCustomAvatarSelected ? this.customAvatarDataUrl : await this.getAvatarDataUrl(this.selectedFullAvatar);
         this.userService
             .createAccount(
                 {
@@ -165,10 +175,51 @@ export class AuthPopupComponent {
 
     selectAvatar(avatar: string) {
         this.selectedAvatar = avatar;
+        this.customAvatarDataUrl = '';
         const selectedIndex = this.avatarList.indexOf(avatar);
         const normalizedIndex = selectedIndex >= 0 ? selectedIndex : 0;
         this.selectedFullAvatar = this.fullAvatarList[normalizedIndex] ?? this.fullAvatarList[0];
         this.audioService.playEffect(this.clickValue);
+    }
+
+    openAvatarPicker(input: HTMLInputElement) {
+        this.audioService.playEffect(this.clickValue);
+        input.click();
+    }
+
+    removeCustomAvatar(event: Event) {
+        event.stopPropagation();
+        this.audioService.playEffect(this.clickValue);
+        this.customAvatarDataUrl = '';
+        this.selectedAvatar = this.avatarList[0];
+        this.selectedFullAvatar = this.fullAvatarList[0] ?? this.fullAvatarList[0];
+    }
+
+    async onCustomAvatarUpload(event: Event) {
+        const target = event.target as HTMLInputElement;
+        const file = target.files?.[0];
+        if (!file) {
+            return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+            this.errorMessage = 'components.authPopup.invalidImageFile';
+            target.value = '';
+            return;
+        }
+
+        const compressedAvatar = await this.compressImageToMaxSize(file, this.maxAvatarSizeBytes);
+        if (!compressedAvatar) {
+            this.errorMessage = 'components.authPopup.imageTooLarge';
+            target.value = '';
+            return;
+        }
+
+        this.customAvatarDataUrl = compressedAvatar;
+        this.selectedAvatar = this.customAvatarToken;
+        this.selectedFullAvatar = this.customAvatarToken;
+        this.errorMessage = '';
+        target.value = '';
     }
 
     login() {
@@ -209,6 +260,33 @@ export class AuthPopupComponent {
     selectLanguage(language: AppLanguage): void {
         this.audioService.playEffect(this.clickValue);
         this.preferencesService.setLanguageBeforeAuth(language);
+    }
+
+    private async compressImageToMaxSize(file: File, maxBytes: number): Promise<string | null> {
+        try {
+            const compressedFile = await imageCompression(file, {
+                maxSizeMB: maxBytes / (this.bytesPerKilobyte * this.bytesPerKilobyte),
+                maxWidthOrHeight: this.maxAvatarDimension,
+                useWebWorker: true,
+                initialQuality: 0.85,
+                alwaysKeepResolution: false,
+                fileType: 'image/jpeg',
+            });
+            const compressedDataUrl = await imageCompression.getDataUrlFromFile(compressedFile);
+            if (this.dataUrlSizeInBytes(compressedDataUrl) > maxBytes) {
+                return null;
+            }
+
+            return compressedDataUrl;
+        } catch {
+            return null;
+        }
+    }
+
+    private dataUrlSizeInBytes(dataUrl: string): number {
+        const base64Data = dataUrl.split(',')[1] ?? '';
+        const padding = base64Data.endsWith('==') ? 2 : base64Data.endsWith('=') ? 1 : 0;
+        return Math.floor((base64Data.length * this.base64BytesPerBlock) / this.base64CharsPerBlock) - padding;
     }
 
     private handleNotFoundError(error: HttpErrorResponse, isRegister: boolean) {

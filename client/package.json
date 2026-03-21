@@ -31,6 +31,7 @@
         "@angular/router": "19.0.4",
         "@ngx-translate/core": "^17.0.0",
         "@ngx-translate/http-loader": "^17.0.0",
+        "browser-image-compression": "^2.0.2",
         "electron-packager": "^17.1.2",
         "electron-squirrel-startup": "^1.0.1",
         "rxjs": "7.8.1",
