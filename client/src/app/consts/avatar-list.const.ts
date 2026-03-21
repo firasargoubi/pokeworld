@@ -10,7 +10,6 @@ export const AVATAR_LIST: string[] = [
     'assets/images/menu/avatars/avatar8.png',
     'assets/images/menu/avatars/avatar9.png',
     'assets/images/menu/avatars/avatar10.png',
-    'assets/images/menu/avatars/avatar11.png',
 ];
 
 export const FULL_AVATAR_LIST: string[] = [
@@ -25,5 +24,4 @@ export const FULL_AVATAR_LIST: string[] = [
     'assets/images/menu/fullAvatars/fullAvatar8.png',
     'assets/images/menu/fullAvatars/fullAvatar9.png',
     'assets/images/menu/fullAvatars/fullAvatar10.png',
-    'assets/images/menu/fullAvatars/fullAvatar11.png',
 ];

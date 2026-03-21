@@ -285,7 +285,9 @@
             "invalidEmail": "Adresse courriel invalide",
             "passwordMismatch": "Les mots de passe ne correspondent pas",
             "confirmAccountCreation": "Voulez-vous confirmer la création du compte ?",
-            "avatarAlt": "Avatar {{index}}"
+            "avatarAlt": "Avatar {{index}}",
+            "invalidImageFile": "Le fichier sélectionné n'est pas une image valide",
+            "imageTooLarge": "L'image est trop volumineuse"
         },
         "botCreation": {
             "title": "Ajouter un robot",

@@ -100,7 +100,26 @@
                         <div class="avatar-title-row">
                             <span class="label">{{ 'components.authPopup.avatar' | translate }}</span>
                         </div>
+                        <input #customAvatarUpload type="file" accept="image/*" class="hidden-file-input" (change)="onCustomAvatarUpload($event)" />
                         <div class="avatar-list">
+                            <div
+                                class="avatar-option upload-avatar-option"
+                                [class.selected]="selectedAvatar === '__custom_avatar__'"
+                                (click)="!customAvatarDataUrl && openAvatarPicker(customAvatarUpload)"
+                            >
+                                @if (customAvatarDataUrl) {
+                                <img [src]="customAvatarDataUrl" class="custom-avatar-image" [attr.alt]="'components.authPopup.uploadAvatar' | translate" />
+                                <button
+                                    type="button"
+                                    class="remove-custom-avatar"
+                                    (click)="removeCustomAvatar($event)"
+                                >
+                                    x
+                                </button>
+                                } @else {
+                                +
+                                }
+                            </div>
                             @for (avatar of avatarList; track $index) {
                             <img
                                 [src]="avatar"
