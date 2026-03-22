@@ -1,14 +1,11 @@
+import 'package:client_mobile/utils/profile_image_provider.dart';
+import 'package:client_mobile/widgets/user_profile_image/user_profile_image.dart';
 import 'package:flutter/material.dart';
 
 import 'player_card_const.dart';
 
 class ActionButton extends StatelessWidget {
-  const ActionButton({
-    super.key,
-    required this.isPressed,
-    required this.onPressedChanged,
-    this.onTap,
-  });
+  const ActionButton({super.key, required this.isPressed, required this.onPressedChanged, this.onTap});
 
   final bool isPressed;
   final ValueChanged<bool> onPressedChanged;
@@ -16,9 +13,7 @@ class ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final buttonAsset = isPressed
-        ? ACTION_BUTTON_PRESSED_ASSET
-        : ACTION_BUTTON_ASSET;
+    final buttonAsset = isPressed ? ACTION_BUTTON_PRESSED_ASSET : ACTION_BUTTON_ASSET;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -32,22 +27,13 @@ class ActionButton extends StatelessWidget {
         children: [
           DecoratedBox(
             decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(buttonAsset),
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.none,
-              ),
+              image: DecorationImage(image: AssetImage(buttonAsset), fit: BoxFit.contain, filterQuality: FilterQuality.none),
             ),
           ),
           const Center(
             child: FractionallySizedBox(
               widthFactor: 0.7,
-              child: Image(
-                image: AssetImage(ACTION_ICON_ASSET),
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.none,
-                color: ACTION_ICON_TINT,
-              ),
+              child: Image(image: AssetImage(ACTION_ICON_ASSET), fit: BoxFit.contain, filterQuality: FilterQuality.none, color: ACTION_ICON_TINT),
             ),
           ),
         ],
@@ -89,12 +75,7 @@ class PlayerCardBody extends StatelessWidget {
   final ColorFilter? inactiveBodyFilter;
 
   DecorationImage _backgroundImage(String asset, {ColorFilter? filter}) {
-    return DecorationImage(
-      image: AssetImage(asset),
-      fit: BoxFit.fill,
-      filterQuality: FilterQuality.none,
-      colorFilter: filter,
-    );
+    return DecorationImage(image: AssetImage(asset), fit: BoxFit.fill, filterQuality: FilterQuality.none, colorFilter: filter);
   }
 
   TextStyle _pixelTextStyle(double fontSize) {
@@ -103,13 +84,7 @@ class PlayerCardBody extends StatelessWidget {
       color: Colors.white,
       fontSize: fontSize,
       height: 0.9,
-      shadows: [
-        Shadow(
-          offset: Offset(fontSize * 0.10, 0),
-          color: SHADOW_COLOR,
-          blurRadius: 0,
-        ),
-      ],
+      shadows: [Shadow(offset: Offset(fontSize * 0.10, 0), color: SHADOW_COLOR, blurRadius: 0)],
     );
   }
 
@@ -120,10 +95,7 @@ class PlayerCardBody extends StatelessWidget {
         final bodyWidth = constraints.maxWidth;
         final bodyHeight = constraints.maxHeight;
 
-        final edgeWidth = (bodyHeight * EDGE_WIDTH_TO_HEIGHT_RATIO).clamp(
-          0.0,
-          bodyWidth / 2,
-        );
+        final edgeWidth = (bodyHeight * EDGE_WIDTH_TO_HEIGHT_RATIO).clamp(0.0, bodyWidth / 2);
 
         final inactiveFontSize = bodyHeight * 0.6;
         final inactiveStyle = TextStyle(
@@ -131,13 +103,7 @@ class PlayerCardBody extends StatelessWidget {
           color: INACTIVE_TEXT_COLOR,
           fontSize: inactiveFontSize,
           height: 0.9,
-          shadows: [
-            Shadow(
-              offset: Offset(inactiveFontSize * 0.10, 0),
-              color: INACTIVE_TEXT_SHADOW_COLOR,
-              blurRadius: 0,
-            ),
-          ],
+          shadows: [Shadow(offset: Offset(inactiveFontSize * 0.10, 0), color: INACTIVE_TEXT_SHADOW_COLOR, blurRadius: 0)],
         );
 
         if (isInactive) {
@@ -154,33 +120,18 @@ class PlayerCardBody extends StatelessWidget {
                   SizedBox(
                     width: edgeWidth,
                     child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        image: _backgroundImage(
-                          leftAsset,
-                          filter: inactiveBodyFilter,
-                        ),
-                      ),
+                      decoration: BoxDecoration(image: _backgroundImage(leftAsset, filter: inactiveBodyFilter)),
                     ),
                   ),
                   Expanded(
                     child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        image: _backgroundImage(
-                          midAsset,
-                          filter: inactiveBodyFilter,
-                        ),
-                      ),
+                      decoration: BoxDecoration(image: _backgroundImage(midAsset, filter: inactiveBodyFilter)),
                     ),
                   ),
                   SizedBox(
                     width: edgeWidth,
                     child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        image: _backgroundImage(
-                          rightAsset,
-                          filter: inactiveBodyFilter,
-                        ),
-                      ),
+                      decoration: BoxDecoration(image: _backgroundImage(rightAsset, filter: inactiveBodyFilter)),
                     ),
                   ),
                 ],
@@ -189,12 +140,7 @@ class PlayerCardBody extends StatelessWidget {
                 left: inactiveLabelLeft,
                 top: inactiveLabelTop,
                 right: edgeWidth * 0.6,
-                child: Text(
-                  inactiveLabel,
-                  style: inactiveStyle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                child: Text(inactiveLabel, style: inactiveStyle, maxLines: 1, overflow: TextOverflow.ellipsis),
               ),
             ],
           );
@@ -230,27 +176,17 @@ class PlayerCardBody extends StatelessWidget {
               children: [
                 SizedBox(
                   width: edgeWidth,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      image: _backgroundImage(leftAsset),
-                    ),
-                  ),
+                  child: DecoratedBox(decoration: BoxDecoration(image: _backgroundImage(leftAsset))),
                 ),
                 Expanded(
                   child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      image: _backgroundImage(midAsset),
-                    ),
+                    decoration: BoxDecoration(image: _backgroundImage(midAsset)),
                     child: child ?? const SizedBox.shrink(),
                   ),
                 ),
                 SizedBox(
                   width: edgeWidth,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      image: _backgroundImage(rightAsset),
-                    ),
-                  ),
+                  child: DecoratedBox(decoration: BoxDecoration(image: _backgroundImage(rightAsset))),
                 ),
               ],
             ),
@@ -261,11 +197,7 @@ class PlayerCardBody extends StatelessWidget {
               height: hpBarHeight,
               child: const DecoratedBox(
                 decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(HP_BAR_ASSET),
-                    fit: BoxFit.fill,
-                    filterQuality: FilterQuality.none,
-                  ),
+                  image: DecorationImage(image: AssetImage(HP_BAR_ASSET), fit: BoxFit.fill, filterQuality: FilterQuality.none),
                 ),
               ),
             ),
@@ -279,12 +211,7 @@ class PlayerCardBody extends StatelessWidget {
                 children: [
                   Flexible(
                     fit: FlexFit.loose,
-                    child: Text(
-                      username,
-                      style: pixelStyle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    child: Text(username, style: pixelStyle, maxLines: 1, overflow: TextOverflow.ellipsis),
                   ),
                   if (hasUsernameIcon) ...[
                     SizedBox(width: iconGap),
@@ -293,11 +220,7 @@ class PlayerCardBody extends StatelessWidget {
                       height: iconSize,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(usernameIcon),
-                            fit: BoxFit.contain,
-                            filterQuality: FilterQuality.none,
-                          ),
+                          image: DecorationImage(image: AssetImage(usernameIcon), fit: BoxFit.contain, filterQuality: FilterQuality.none),
                         ),
                       ),
                     ),
@@ -307,15 +230,7 @@ class PlayerCardBody extends StatelessWidget {
                     SizedBox(
                       width: iconSize,
                       height: iconSize,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(userProfilePicture),
-                            fit: BoxFit.contain,
-                            filterQuality: FilterQuality.none,
-                          ),
-                        ),
-                      ),
+                      child: LayeredProfileImage(foregroundImage: profilePictureImageProvider(userProfilePicture)),
                     ),
                   ],
                 ],
@@ -324,12 +239,7 @@ class PlayerCardBody extends StatelessWidget {
             Positioned(
               right: hpValueRightOffset,
               bottom: hpValueBottomOffset,
-              child: Text(
-                hpValue,
-                style: pixelStyle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              child: Text(hpValue, style: pixelStyle, maxLines: 1, overflow: TextOverflow.ellipsis),
             ),
           ],
         );

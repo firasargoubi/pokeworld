@@ -51,11 +51,18 @@ class MatchData {
 class LobbyData {
   final bool isLocked;
   final int hostPlayerIndex;
+  final bool isDropInEnabled;
+  final bool isRapidElimination;
 
-  LobbyData({required this.isLocked, required this.hostPlayerIndex});
+  LobbyData({required this.isLocked, required this.hostPlayerIndex, required this.isDropInEnabled, required this.isRapidElimination});
 
   factory LobbyData.fromJson(Map<String, dynamic> json) {
-    return LobbyData(isLocked: json['isLocked'] as bool, hostPlayerIndex: (json['hostPlayerIndex'] as num).toInt());
+    return LobbyData(
+      isLocked: json['isLocked'] as bool,
+      hostPlayerIndex: (json['hostPlayerIndex'] as num).toInt(),
+      isDropInEnabled: json['isDropInEnabled'] as bool,
+      isRapidElimination: json['isRapidElimination'] as bool,
+    );
   }
 }
 
@@ -65,8 +72,16 @@ class PlayData {
   final int activePlayerIndex;
   final bool hasAction;
   final int movementLeft;
+  final bool isElementalMode;
 
-  PlayData({required this.timeLeft, required this.isDebugMode, required this.activePlayerIndex, required this.hasAction, required this.movementLeft});
+  PlayData({
+    required this.timeLeft,
+    required this.isDebugMode,
+    required this.activePlayerIndex,
+    required this.hasAction,
+    required this.movementLeft,
+    required this.isElementalMode,
+  });
 
   factory PlayData.fromJson(Map<String, dynamic> json) {
     return PlayData(
@@ -75,6 +90,7 @@ class PlayData {
       activePlayerIndex: (json['activePlayerIndex'] as num).toInt(),
       hasAction: json['hasAction'] as bool,
       movementLeft: (json['movementLeft'] as num).toInt(),
+      isElementalMode: json['isElementalMode'] as bool,
     );
   }
 }
@@ -230,6 +246,25 @@ class TrackingPlayerData {
       hpInflicted: (json['hpInflicted'] as num).toInt(),
       hpLost: (json['hpLost'] as num).toInt(),
     );
+  }
+}
+
+class MatchSettings {
+  final bool isElementalMode;
+  final bool isDropInEnabled;
+  final bool isRapidElimination;
+  const MatchSettings({required this.isElementalMode, required this.isDropInEnabled, required this.isRapidElimination});
+
+  factory MatchSettings.fromJson(Map<String, dynamic> json) {
+    return MatchSettings(
+      isElementalMode: json['isElementalMode'] as bool? ?? false,
+      isDropInEnabled: json['isDropInEnabled'] as bool? ?? false,
+      isRapidElimination: json['isRapidElimination'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'isElementalMode': isElementalMode, 'isDropInEnabled': isDropInEnabled, 'isRapidElimination': isRapidElimination};
   }
 }
 

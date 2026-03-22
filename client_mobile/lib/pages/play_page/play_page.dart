@@ -8,8 +8,8 @@ import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/models/popup_message.dart';
-import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/play_service/play_service.dart';
 import 'package:client_mobile/services/popup_service/popup_service.dart';
@@ -35,7 +35,13 @@ class _PlayPageState extends State<PlayPage> {
 
   MatchData get matchData => _matchData;
   GameData get gameData => _matchData.gameData;
-  List<PlayerData> get players => _matchData.players;
+  List<PlayerData> get players {
+    if (MatchService().matchData!.lobbyData.isDropInEnabled) {
+      return _matchData.players.where((player) => player.isConnected).toList();
+    }
+    return _matchData.players;
+  }
+
   PlayerData get selfPlayer => MatchService().selfPlayer!;
 
   bool get isSelfTurn => MatchService().isActivePlayer();
@@ -102,7 +108,8 @@ class _PlayPageState extends State<PlayPage> {
         message: I18nService().translate(PopupMessages.Surrender.messageKey),
         isConfirmation: true,
         action: () => MatchService().leaveMatch(),
-      ),    );
+      ),
+    );
   }
 
   double _computeBaseSize(Size screenSize) {

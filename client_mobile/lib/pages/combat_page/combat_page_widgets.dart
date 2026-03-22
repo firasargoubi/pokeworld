@@ -6,6 +6,7 @@ import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
+import 'package:client_mobile/utils/profile_image_provider.dart';
 import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
 import 'package:flutter/material.dart';
 
@@ -60,6 +61,7 @@ class SpriteAnimator {
 TextStyle pixelStyle(double fontSize) => TextStyle(fontFamily: PIXEL_FONT, color: PIXEL_TEXT_COLOR, fontSize: fontSize, height: 1.0);
 
 TextStyle footerStyle(double fontSize) => TextStyle(fontFamily: PIXEL_FONT, color: FOOTER_TEXT_COLOR, fontSize: fontSize, height: 1.0);
+TextStyle footerSubStyle(double fontSize) => TextStyle(fontFamily: PIXEL_FONT, color: FOOTER_SUB_TEXT_COLOR, fontSize: fontSize, height: 1.0);
 
 Size computeArenaSize(double availableWidth, double availableHeight) {
   late final double arenaWidth;
@@ -586,12 +588,81 @@ class _CombatTimerState extends State<CombatTimer> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(MatchService().matchData!.playData.isDebugMode ? '${I18nService().translate(DEBUG_MODE_LABEL_KEY)} ' : '', style: pixelStyle(widget.baseSize * 0.05)),
+            Text(
+              MatchService().matchData!.playData.isDebugMode ? '${I18nService().translate(DEBUG_MODE_LABEL_KEY)} ' : '',
+              style: pixelStyle(widget.baseSize * 0.05),
+            ),
             Text('$currentTime/${widget.maxTime}', style: pixelStyle(widget.baseSize * 0.05)),
             SizedBox(width: widget.baseSize * 0.02),
             Image.asset(TIMER_ASSET, width: widget.baseSize * 0.05, height: widget.baseSize * 0.05, fit: BoxFit.contain),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class CombatSpectatorContent extends StatelessWidget {
+  const CombatSpectatorContent({super.key, required this.baseSize, required this.player, required this.combatData});
+
+  final double baseSize;
+  final PlayerData player;
+  final PlayerCombatData combatData;
+
+  @override
+  Widget build(BuildContext context) {
+    final i18n = I18nService();
+    final fontSize = baseSize * 0.03;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: baseSize * 0.015, vertical: baseSize * 0.01),
+      child: Row(
+        children: [
+          SizedBox(
+            height: baseSize * 0.15,
+            width: baseSize * 0.15,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                image: DecorationImage(image: AssetImage(FOOTER_SPECTATE_ASSET), fit: BoxFit.fill, filterQuality: FilterQuality.none),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(baseSize * 0.008),
+                child: Image(image: profilePictureImageProvider(player.fullProfilePicture), fit: BoxFit.contain, filterQuality: FilterQuality.none),
+              ),
+            ),
+          ),
+          SizedBox(width: baseSize * 0.015),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(player.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: footerStyle(fontSize)),
+                SizedBox(height: baseSize * 0.006),
+                StatRow(
+                  label: '${i18n.translate(FOOTER_ATTACK_STAT_LABEL_KEY)} (${player.attackDice.displayName()})',
+                  value: '${combatData.attack}/4',
+                  style: footerStyle,
+                  fontSize: fontSize,
+                ),
+                SizedBox(height: baseSize * 0.006),
+                StatRow(
+                  label: '${i18n.translate(FOOTER_DEFENSE_STAT_LABEL_KEY)} (${player.defenseDice.displayName()})',
+                  value: '${combatData.defense}/4',
+                  style: footerStyle,
+                  fontSize: fontSize,
+                ),
+                SizedBox(height: baseSize * 0.006),
+                StatRow(
+                  label: i18n.translate(FOOTER_SPEED_STAT_LABEL_KEY),
+                  value: '${player.speed}/${player.speed}',
+                  style: footerStyle,
+                  fontSize: fontSize,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -24,9 +24,17 @@ const String CODE_CONTAINER_ASSET = 'assets/images/menu/containers/lobby/code.pn
 const String LOCK_ICON_ASSET = 'assets/images/menu/icons/lobby/lock.png';
 const String UNLOCK_ICON_ASSET = 'assets/images/menu/icons/lobby/unlock.png';
 const String COPY_ICON_ASSET = 'assets/images/menu/icons/lobby/copy.png';
+const String SETTINGS_ICON_ASSET = 'assets/images/menu/icons/lobby/settings-cog.png';
+
+const String DROP_ICON_ASSET = 'assets/images/menu/icons/lobby/drop.png';
+const String ELEMENTAL_ICON_ASSET = 'assets/images/menu/icons/lobby/elemental.png';
+const String RAPID_ELIMINATION_ICON_ASSET = 'assets/images/menu/icons/lobby/skull.png';
 
 const String BLUE_BUTTON_ASSET = 'assets/images/menu/containers/lobby/blue-button.png';
 const String BLUE_BUTTON_ACTIVE_ASSET = 'assets/images/menu/containers/lobby/blue-button-active.png';
 
 const String GREEN_BUTTON_ASSET = 'assets/images/menu/containers/lobby/green-button.png';
 const String GREEN_BUTTON_ACTIVE_ASSET = 'assets/images/menu/containers/lobby/green-button-active.png';
+
+const String GRAY_BUTTON_ASSET = 'assets/images/menu/containers/lobby/gray-button.png';
+const String GRAY_BUTTON_ACTIVE_ASSET = 'assets/images/menu/containers/lobby/gray-button-active.png';

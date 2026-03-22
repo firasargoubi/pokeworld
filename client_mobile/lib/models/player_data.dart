@@ -18,6 +18,9 @@ class PlayerData {
     required this.combatsWon,
     required this.type,
     required this.team,
+    this.userId,
+    this.profilePicture,
+    this.fullProfilePicture,
   });
 
   final String id;
@@ -34,6 +37,9 @@ class PlayerData {
   final int combatsWon;
   final PlayerType type;
   final Team team;
+  final String? userId;
+  final String? profilePicture;
+  final String? fullProfilePicture;
 
   factory PlayerData.fromJson(Map<String, dynamic> json) {
     return PlayerData(
@@ -51,6 +57,9 @@ class PlayerData {
       combatsWon: (json['combatsWon'] as num).toInt(),
       type: PlayerType.fromValue(json['type'] as String),
       team: Team.fromValue(json['team'] as String),
+      userId: json['userId'] as String?,
+      profilePicture: json['profilePicture'] as String?,
+      fullProfilePicture: json['fullProfilePicture'] as String?,
     );
   }
 
@@ -70,6 +79,9 @@ class PlayerData {
       'combatsWon': combatsWon,
       'type': type.value,
       'team': team.value,
+      'userId': userId,
+      'profilePicture': profilePicture,
+      'fullProfilePicture': fullProfilePicture,
     };
   }
 }

@@ -57,7 +57,9 @@
             "turnStart": "Start of {{playerName}}'s turn",
             "matchWinner": "{{playerName}} won the match",
             "teamWin": "Team {{team}} wins the match!",
-            "playerLeftMatch": "{{playerName}} left the match"
+            "playerLeftMatch": "{{playerName}} left the match",
+            "dropInDisabled": "Le drop-in est désactivé pour cette partie",
+            "NoAvailableSpawn": "Aucun point d'apparition n'est disponible pour le moment"
         },
         "logs": {
             "itemPickup": "{{playerName}} picked up {{itemName}}",
@@ -375,6 +377,13 @@
             "close": "Close",
             "confirm": "Confirm",
             "cancel": "Cancel"
+        },
+        "matchSettings": {
+            "title": "Match settings",
+            "dropInDropOut": "Drop in, drop out",
+            "elementalMode": "Elemental mode",
+            "rapidElimination": "Rapid elimination",
+            "validate": "VALIDATE"
         }
     }
 }

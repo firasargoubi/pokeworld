@@ -3,10 +3,11 @@ import 'dart:math';
 import 'package:client_mobile/consts/avatar_data_const.dart';
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/player_data.dart';
-import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'player_card_const.dart';
@@ -79,7 +80,10 @@ class _PlayerCardState extends State<PlayerCard> {
 
     avatarIconAsset = player != null ? (AVATAR_DATA[player.avatar]?.image ?? FALLBACK_AVATAR_ASSET) : FALLBACK_AVATAR_ASSET;
 
-    userProfilePictureAsset = FALLBACK_AVATAR_ASSET;
+    userProfilePictureAsset = player?.profilePicture ?? "";
+    if (kDebugMode) {
+      print('PlayerCard: userProfilePictureAsset set to ${player?.userId}');
+    }
 
     final playerType = player?.type;
     isBot = playerType != null && playerType != PlayerType.Player;

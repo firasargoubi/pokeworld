@@ -42,11 +42,16 @@ class LobbyService {
   }
 
   void joinLobby(PlayerData playerData) {
+    
     _socketService.emit(LobbyEvent.JoinLobby.value, playerData.toJson());
   }
 
   void changeLockStatus(bool lockStatus) {
     _socketService.emit(LobbyEvent.ChangeLockStatus.value, lockStatus);
+  }
+
+  void changeMatchSettings(MatchSettings matchSettings) {
+    _socketService.emit(LobbyEvent.ChangeMatchSettings.value, matchSettings);
   }
 
   void startMatch() {
@@ -65,18 +70,27 @@ class LobbyService {
 
     final oldIsConnected = oldSelf.isNotEmpty && oldSelf.first.isConnected;
     final newIsConnected = newSelf.isNotEmpty && newSelf.first.isConnected;
+    final justConnected = !oldIsConnected && newIsConnected;
 
-    if (newMatchData.state == MatchState.Lobby && !oldIsConnected && newIsConnected) {
-      final nav = NavigationService.navigatorKey.currentState;
-      if (nav == null) return;
+    final nav = NavigationService.navigatorKey.currentState;
+    if (nav == null) return;
 
+    if (justConnected && newMatchData.state == MatchState.Lobby) {
       final route = MaterialPageRoute(builder: (_) => const LobbyPage());
       nav.pushAndRemoveUntil(route, (r) => false);
+      return;
     }
-    if (oldMatchData.state == MatchState.Lobby && newMatchData.state == MatchState.TurnStart) {
-      final nav = NavigationService.navigatorKey.currentState;
-      if (nav == null) return;
+    if (justConnected &&
+        (newMatchData.state == MatchState.TurnStart ||
+            newMatchData.state == MatchState.TurnWait ||
+            newMatchData.state == MatchState.MovementAnimation)) {
+      PlayService().onMatchUpdate(oldMatchData, newMatchData);
+      final route = MaterialPageRoute(builder: (_) => const PlayPage());
+      nav.pushAndRemoveUntil(route, (r) => false);
+      return;
+    }
 
+    if (oldMatchData.state == MatchState.Lobby && newMatchData.state == MatchState.TurnStart && oldIsConnected && newIsConnected) {
       PlayService().onMatchUpdate(oldMatchData, newMatchData);
       final route = MaterialPageRoute(builder: (_) => const PlayPage());
       nav.pushAndRemoveUntil(route, (r) => false);

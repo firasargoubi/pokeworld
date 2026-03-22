@@ -1,4 +1,5 @@
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
+import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,7 @@ class LobbyCodePanel extends StatelessWidget {
     required this.codeStyle,
     required this.onToggleLock,
     required this.onCopy,
+    required this.onSettings,
   });
 
   final String code;
@@ -25,11 +27,12 @@ class LobbyCodePanel extends StatelessWidget {
 
   final VoidCallback onToggleLock;
   final VoidCallback onCopy;
+  final VoidCallback onSettings;
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 16 / 9,
+      aspectRatio: 16 / 11,
       child: DecoratedBox(
         decoration: const BoxDecoration(
           image: DecorationImage(image: AssetImage(CODE_CONTAINER_ASSET), fit: BoxFit.fill, filterQuality: FilterQuality.none),
@@ -45,19 +48,75 @@ class LobbyCodePanel extends StatelessWidget {
             ),
             Expanded(
               flex: 7,
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(code, style: codeStyle),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final boxHeight = constraints.maxHeight;
+                  final boxWidth = boxHeight * 0.5;
+
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(code, style: codeStyle),
+                      ),
+                      Positioned(
+                        right: boxHeight * 0.85,
+                        top: 0,
+                        child: SizedBox(
+                          width: boxWidth,
+                          height: boxHeight,
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Center(
+                                  child: Image.asset(
+                                    DROP_ICON_ASSET,
+                                    fit: BoxFit.contain,
+                                    filterQuality: FilterQuality.none,
+                                    color: Color(0xFFaae7f7).withValues(alpha: MatchService().matchData!.lobbyData.isDropInEnabled ? 1 : 0.3),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Center(
+                                  child: Image.asset(
+                                    ELEMENTAL_ICON_ASSET,
+                                    fit: BoxFit.contain,
+                                    filterQuality: FilterQuality.none,
+                                    color: const Color(0xFFaae7f7).withValues(alpha: MatchService().matchData!.playData.isElementalMode ? 1 : 0.3),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Center(
+                                  child: Image.asset(
+                                    RAPID_ELIMINATION_ICON_ASSET,
+                                    fit: BoxFit.contain,
+                                    filterQuality: FilterQuality.none,
+                                    color: const Color(
+                                      0xFFaae7f7,
+                                    ).withValues(alpha: MatchService().matchData!.lobbyData.isRapidElimination ? 1 : 0.3),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
             Expanded(
               flex: 8,
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final panelHeight = constraints.maxHeight;
+                  final panelHeight = constraints.maxHeight * 0.8;
 
                   final optionBoxHeight = panelHeight * 0.5;
-                  final optionBoxGap = optionBoxHeight;
+                  final optionBoxGap = optionBoxHeight * 0.5;
                   final bottomPadding = panelHeight * 0.15;
 
                   final lockIcon = isLocked ? LOCK_ICON_ASSET : UNLOCK_ICON_ASSET;
@@ -78,6 +137,18 @@ class LobbyCodePanel extends StatelessWidget {
                             onTap: onToggleLock,
                           ),
                           SizedBox(width: optionBoxGap),
+                          if (isAdmin) ...[
+                            PressableOptionBox(
+                              height: optionBoxHeight,
+                              backgroundAsset: GRAY_BUTTON_ASSET,
+                              backgroundActiveAsset: GRAY_BUTTON_ACTIVE_ASSET,
+                              iconAsset: SETTINGS_ICON_ASSET,
+                              displayBackground: true,
+                              enabled: isAdmin,
+                              onTap: onSettings,
+                            ),
+                            SizedBox(width: optionBoxGap),
+                          ],
                           PressableOptionBox(
                             height: optionBoxHeight,
                             backgroundAsset: GREEN_BUTTON_ASSET,

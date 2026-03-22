@@ -213,15 +213,13 @@ class PlayService {
   }
 
   void checkForRedirection(MatchData oldMatchData, MatchData newMatchData) {
-    final isSelfInCombat = newMatchData.combatData.playersCombatData.any((p) => p.playerIndex == MatchService().selfIndex);
-
     final wasInCombatState =
         oldMatchData.state == MatchState.CombatWait || oldMatchData.state == MatchState.CombatAnimation || oldMatchData.state == MatchState.CombatEnd;
 
     final isMatchInCombatState =
         newMatchData.state == MatchState.CombatWait || newMatchData.state == MatchState.CombatAnimation || newMatchData.state == MatchState.CombatEnd;
 
-    if (isSelfInCombat && isMatchInCombatState && !wasInCombatState) {
+    if (isMatchInCombatState && !wasInCombatState) {
       _navigateAndReplace((_) => const CombatPage());
     } else if (wasInCombatState && (newMatchData.state == MatchState.TurnWait || newMatchData.state == MatchState.TurnStart)) {
       _navigateAndReplace((_) => const PlayPage());
