@@ -51,6 +51,8 @@ export class CombatPageComponent implements OnDestroy {
     private popupService: PopupService = inject(PopupService);
     private i18nService: I18nService = inject(I18nService);
 
+    private animationTurnIsSelf: boolean | null = null;
+
     constructor() {
         if (this.matchService.isInMatch()) {
             this.userService.user$.subscribe((user: UserInfo | null) => (this.currentUser = user));
@@ -114,7 +116,7 @@ export class CombatPageComponent implements OnDestroy {
 
     private onMatchUpdate(oldMatchData: MatchData) {
         this.checkForRedirect();
-        this.updatePlayersCombatData();
+        this.updatePlayersCombatData(oldMatchData);
         this.checkHealingAnimation(oldMatchData);
         this.audioService.playCombatEffect(oldMatchData);
     }
@@ -154,20 +156,41 @@ export class CombatPageComponent implements OnDestroy {
         }
     }
 
-    private updatePlayersCombatData() {
+    private updatePlayersCombatData(oldMatchData?: MatchData) {
         const combatants = this.matchService.data.combatData.playersCombatData ?? [];
+        if (combatants.length < 2) {
+            return;
+        }
+
         const isFirstPlayer = combatants[0].playerIndex === this.matchService.selfIndex;
+        const liveIsSelfTurn = isFirstPlayer
+            ? !this.matchService.data.combatData.isSecondPlayerTurn
+            : this.matchService.data.combatData.isSecondPlayerTurn;
+
+        const isEnteringCombatAnimation =
+            this.matchService.data.state === MatchState.CombatAnimation && oldMatchData?.state !== MatchState.CombatAnimation;
+
+        const shouldFreezeTurnSide =
+            this.matchService.data.state === MatchState.CombatAnimation ||
+            (this.matchService.data.state === MatchState.CombatEnd &&
+                this.matchService.data.combatData.lastCombatAction === CombatAction.SuccessEscape);
+
+        if (isEnteringCombatAnimation) {
+            this.animationTurnIsSelf = !liveIsSelfTurn;
+        } else if (!shouldFreezeTurnSide) {
+            this.animationTurnIsSelf = null;
+        }
         if (isFirstPlayer) {
             this.visualData.selfPlayer = combatants[0];
             this.visualData.enemyPlayer = combatants[1];
-            this.visualData.isSelfTurn = !this.matchService.data.combatData.isSecondPlayerTurn;
         } else {
             this.visualData.selfPlayer = combatants[1];
             this.visualData.enemyPlayer = combatants[0];
-            this.visualData.isSelfTurn = this.matchService.data.combatData.isSecondPlayerTurn;
         }
-        const hasCombatantMatchingSelfIndex = combatants.some((p) => p.playerIndex === this.matchService.selfIndex);
 
+        this.visualData.isSelfTurn = shouldFreezeTurnSide && this.animationTurnIsSelf !== null ? this.animationTurnIsSelf : liveIsSelfTurn;
+
+        const hasCombatantMatchingSelfIndex = combatants.some((p) => p.playerIndex === this.matchService.selfIndex);
         this.isInCombat = hasCombatantMatchingSelfIndex;
         this.updateSpectatorPanels();
     }
