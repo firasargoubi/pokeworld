@@ -58,3 +58,13 @@ enum CombatEvent {
   const CombatEvent(this.value);
   final String value;
 }
+
+enum JoinPageEvent {
+  JoinRoom('joinJoinPageRoom'),
+  LeaveRoom('leaveJoinPageRoom'),
+  UpdateMatchList('updateMatchList'),
+  Room('joinPageRoom');
+
+  const JoinPageEvent(this.value);
+  final String value;
+}

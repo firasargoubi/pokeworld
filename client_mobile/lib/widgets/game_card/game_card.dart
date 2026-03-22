@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:client_mobile/consts/game_card.dart';
+import 'package:client_mobile/consts/player_data_const.dart';
 import 'package:client_mobile/models/game_card_config.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/map_data.dart';
+import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
 import 'package:flutter/material.dart';
@@ -12,11 +14,12 @@ import 'package:flutter/material.dart';
 import 'game_card_const.dart';
 
 class GameCard extends StatelessWidget {
-  const GameCard({super.key, required this.isCreateCard, required this.game, required this.onTap});
+  const GameCard({super.key, required this.isCreateCard, required this.game, required this.onTap, this.matchData});
 
   final bool isCreateCard;
   final GameData game;
   final VoidCallback onTap;
+  final MatchData? matchData;
 
   static List<Shadow> pixelShadow(double cardWidth, double factor) => [
     Shadow(offset: Offset(cardWidth * factor, 0), color: GAME_CARD_SHADOW_COLOR, blurRadius: 0),
@@ -44,6 +47,22 @@ class GameCard extends StatelessWidget {
     fontSize: cardWidth * 0.09,
     height: 0.9,
     shadows: pixelShadow(cardWidth, 0.008),
+  );
+
+  static TextStyle subtitleStyle(double cardWidth) => TextStyle(
+    fontFamily: GAME_CARD_PIXEL_FONT,
+    color: Colors.white,
+    fontSize: cardWidth * 0.08,
+    height: 0.8,
+    shadows: pixelShadow(cardWidth, 0.012),
+  );
+
+  static TextStyle ownerStyle(double cardWidth) => TextStyle(
+    fontFamily: GAME_CARD_PIXEL_FONT,
+    color: const Color.fromARGB(255, 80, 78, 78),
+    fontSize: cardWidth * 0.08,
+    height: 0.8,
+    shadows: [Shadow(offset: Offset(cardWidth * 0.01, 0), color: const Color.fromARGB(255, 221, 221, 221), blurRadius: 0)],
   );
 
   String formatDate(DateTime dt) {
@@ -80,11 +99,14 @@ class GameCard extends StatelessWidget {
 
     final isFFA = game.mapData.gameMode == GameMode.FFA;
 
-    final isWaiting = GAME_CARD_DEFAULT_IS_WAITING;
-    final countPlayers = GAME_CARD_DEFAULT_COUNT_PLAYERS;
-    final code = GAME_CARD_DEFAULT_CODE;
+    final activePlayerCount = matchData?.players.where((player) => player.isConnected).length ?? 0;
+    final maxPlayers = MAX_PLAYERS[game.mapData.size] ?? 0;
+    final code = matchData?.code ?? '';
+    final isWaiting = (matchData?.state ?? MatchState.Lobby) == MatchState.Lobby;
 
-    final infoText = isCreateCard ? formatDate(game.lastEdited) : '$countPlayers Joueurs  Code: $code';
+    final infoText = isCreateCard
+        ? formatDate(game.lastEdited)
+        : '$activePlayerCount/$maxPlayers ${i18n.translate(GAME_CARD_PLAYERS_LABEL_KEY)}  ${i18n.translate(GAME_CARD_CODE_LABEL_KEY)}: $code';
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -118,6 +140,17 @@ class GameCard extends StatelessWidget {
                     top: cardWidth * 0.02,
                     width: cardWidth * 0.9,
                     child: Text(nameText, style: cornerLabelStyle(cardWidth), softWrap: true),
+                  ),
+                  Positioned(
+                    left: cardWidth * 0.02,
+                    top: cardWidth * 0.15,
+                    width: cardWidth * 0.9,
+                    child: Text(
+                      game.owner != null ? '${i18n.translate(GAME_CARD_OWNER_LABEL_KEY)} ${game.owner!.userName}' : '',
+                      style: ownerStyle(cardWidth * 0.8),
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   Positioned(
                     right: cardWidth * 0.02,
@@ -193,7 +226,7 @@ class GameCard extends StatelessWidget {
                       child: Padding(
                         padding: EdgeInsets.only(left: cardWidth * 0.03),
                         child: SizedBox(
-                          width: cardWidth * 0.35,
+                          width: cardWidth * 0.39,
                           height: cardHeight * 0.12,
                           child: PressableBackground(
                             backgroundAsset: config.buttonImage,

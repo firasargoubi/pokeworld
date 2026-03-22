@@ -296,7 +296,10 @@
         },
         "gameCard": {
             "play": "JOUER",
-            "join": "REJOINDRE"
+            "join": "JOUER",
+            "players": "Joueurs",
+            "code": "Code",
+            "owner": "par"
         },
         "header": {
             "back": "Retour"
