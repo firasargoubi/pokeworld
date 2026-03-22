@@ -31,6 +31,7 @@ const String CROWN_ICON_ASSET = 'assets/images/menu/icons/play/crown.png';
 const String SWORD_ICON_ASSET = 'assets/images/menu/icons/play/sword.png';
 const String AGGRESSIVE_BOT_ICON_ASSET = 'assets/images/menu/icons/play/bot-aggressive.png';
 const String DEFENSIVE_BOT_ICON_ASSET = 'assets/images/menu/icons/play/bot-defensive.png';
+const String SKULL_ICON_ASSET = 'assets/images/menu/icons/lobby/skull.png';
 
 const String MOVEMENT_LABEL_KEY = 'pages.play.movement';
 const String ACTION_KEY = 'pages.play.action';
