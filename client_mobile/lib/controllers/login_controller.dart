@@ -157,7 +157,7 @@ class LoginController {
       return false;
     }
 
-    if (rawEmail != trimmedEmail || !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(trimmedEmail)) {
+    if (rawEmail != trimmedEmail || !RegExp(r'^([a-zA-Z0-9_\-.+]+)@([a-zA-Z0-9\-.]+)\.([a-zA-Z]{2,})$').hasMatch(trimmedEmail)) {
       _updateState(() {
         errorMessage = _translateError(ErrorMessage.InvalidEmail.message);
       });

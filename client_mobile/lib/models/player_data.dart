@@ -21,6 +21,7 @@ class PlayerData {
     this.userId,
     this.profilePicture,
     this.fullProfilePicture,
+    this.isObserver = false,
   });
 
   final String id;
@@ -40,6 +41,7 @@ class PlayerData {
   final String? userId;
   final String? profilePicture;
   final String? fullProfilePicture;
+  final bool isObserver;
 
   factory PlayerData.fromJson(Map<String, dynamic> json) {
     return PlayerData(
@@ -60,6 +62,7 @@ class PlayerData {
       userId: json['userId'] as String?,
       profilePicture: json['profilePicture'] as String?,
       fullProfilePicture: json['fullProfilePicture'] as String?,
+      isObserver: (json['isObserver'] as bool?) ?? false,
     );
   }
 
@@ -82,6 +85,7 @@ class PlayerData {
       'userId': userId,
       'profilePicture': profilePicture,
       'fullProfilePicture': fullProfilePicture,
+      'isObserver': isObserver,
     };
   }
 }

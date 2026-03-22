@@ -125,6 +125,7 @@ class LeftPanel extends StatelessWidget {
                             ).copyWith(decoration: isConnected ? TextDecoration.none : TextDecoration.lineThrough);
 
                             final isFFA = MatchService().matchData?.gameData.mapData.gameMode == GameMode.FFA;
+                            final isRapidElimination = MatchService().matchData?.lobbyData.isRapidElimination ?? false;
 
                             return Opacity(
                               opacity: opacity,
@@ -186,6 +187,18 @@ class LeftPanel extends StatelessWidget {
                                               ),
                                             ),
                                             SizedBox(width: baseBodySize * 0.005),
+                                            if (player.isObserver)
+                                              SizedBox(
+                                                width: iconSize,
+                                                height: iconSize,
+                                                child: ColorFiltered(
+                                                  colorFilter: const ColorFilter.mode(Color(0xFFD32F2F), BlendMode.srcIn),
+                                                  child: DecoratedBox(
+                                                    decoration: BoxDecoration(image: DecorationImage(image: AssetImage(SKULL_ICON_ASSET))),
+                                                  ),
+                                                ),
+                                              ),
+                                            if (player.isObserver) SizedBox(width: baseBodySize * 0.005),
                                             SizedBox(
                                               width: iconSize,
                                               height: iconSize,
@@ -194,7 +207,7 @@ class LeftPanel extends StatelessWidget {
                                               ),
                                             ),
                                             SizedBox(width: baseBodySize * 0.005),
-                                            Text('${player.combatsWon}${isFFA ? "/3" : ""}', style: pixelLineStyle(textSize)),
+                                            Text('${player.combatsWon}${isFFA && !isRapidElimination ? "/3" : ""}', style: pixelLineStyle(textSize)),
                                           ],
                                         ),
                                       ),
