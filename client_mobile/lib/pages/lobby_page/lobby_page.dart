@@ -8,14 +8,15 @@ import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/models/popup_message.dart';
-import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/popup_service/popup_service.dart';
 import 'package:client_mobile/widgets/add_bot_popup/add_bot_popup.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/header/header.dart';
+import 'package:client_mobile/widgets/match_settings_popup/match_settings_popup.dart';
 import 'package:client_mobile/widgets/player_card/player_card.dart';
 import 'package:client_mobile/widgets/poke_button/poke_button.dart';
 import 'package:client_mobile/widgets/stripe_painter/stripe_painter.dart';
@@ -88,6 +89,17 @@ class _LobbyPageState extends State<LobbyPage> {
   Future<void> _copyCodeToClipboard() => Clipboard.setData(ClipboardData(text: code));
 
   void _toggleLock() => LobbyService().changeLockStatus(!isLocked);
+
+  void _showSettingsPopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => DefaultTextStyle(
+        style: const TextStyle(decoration: TextDecoration.none),
+        child: MatchSettingsPopup(onClose: () => Navigator.of(context).pop()),
+      ),
+    );
+  }
 
   void _showAddBotPopup() {
     showDialog(
@@ -210,6 +222,7 @@ class _LobbyPageState extends State<LobbyPage> {
                                                 codeStyle: codeStyle,
                                                 onToggleLock: _toggleLock,
                                                 onCopy: _copyCodeToClipboard,
+                                                onSettings: _showSettingsPopup,
                                               ),
                                             ],
                                           ),

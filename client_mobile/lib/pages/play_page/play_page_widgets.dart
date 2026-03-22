@@ -13,9 +13,11 @@ import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/play_service/play_service.dart';
+import 'package:client_mobile/utils/profile_image_provider.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/map/map.dart';
 import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
+import 'package:client_mobile/widgets/user_profile_image/user_profile_image.dart';
 import 'package:flutter/material.dart';
 
 import 'play_page_const.dart';
@@ -158,9 +160,7 @@ class LeftPanel extends StatelessWidget {
                                             SizedBox(
                                               width: textSize,
                                               height: textSize,
-                                              child: DecoratedBox(
-                                                decoration: BoxDecoration(image: DecorationImage(image: AssetImage(avatarAsset))),
-                                              ),
+                                              child: LayeredProfileImage(foregroundImage: profilePictureImageProvider(player.profilePicture)),
                                             ),
                                             SizedBox(width: baseBodySize * 0.006),
                                             if (playerIcon.isNotEmpty)
@@ -335,7 +335,10 @@ class InfoPanel extends StatelessWidget {
                   '${I18nService().translate(MAP_SIZE_LABEL_KEY)}${gameData.mapData.size.value}x${gameData.mapData.size.value}',
                   style: pixelLineStyle(lineFontSize),
                 ),
-                Text('${I18nService().translate(GAME_MODE_LABEL_KEY)}${gameData.mapData.gameMode.value}', style: pixelLineStyle(lineFontSize)),
+                Text(
+                  '${I18nService().translate(GAME_MODE_LABEL_KEY)}${gameData.mapData.gameMode.value}${MatchService().matchData!.playData.isDebugMode ? ' (DEBUG)' : ''}',
+                  style: pixelLineStyle(lineFontSize),
+                ),
                 Text(
                   '${I18nService().translate(PLAYER_COUNT_LABEL_KEY)}${MatchService().matchData!.players.length} / ${MAP_SIZE_PLAYER_COUNT[gameData.mapData.size]}',
                   style: pixelLineStyle(lineFontSize),
@@ -414,7 +417,7 @@ class SelfPanel extends StatelessWidget {
                       SizedBox(
                         width: smallIconSize,
                         height: smallIconSize,
-                        child: Image.asset(avatarAsset, fit: BoxFit.contain, filterQuality: FilterQuality.none),
+                        child: LayeredProfileImage(foregroundImage: profilePictureImageProvider(selfPlayer.profilePicture)),
                       ),
                     ],
                   );

@@ -19,8 +19,8 @@ MatchData buildMatchData({MapData? mapData, List<PlayerData> players = const []}
   code: 'TEST',
   state: MatchState.TurnStart,
   gameData: GameData(id: 'g1', name: 'Game', description: '', lastEdited: DateTime(2024), mapData: mapData ?? buildMapData(), thumbnail: ''),
-  lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0),
-  playData: PlayData(timeLeft: 60, isDebugMode: false, activePlayerIndex: 0, hasAction: false, movementLeft: 3),
+  lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0, isDropInEnabled: false, isRapidElimination: false),
+  playData: PlayData(timeLeft: 60, isDebugMode: false, activePlayerIndex: 0, hasAction: false, movementLeft: 3, isElementalMode: false),
   combatData: CombatData(
     lastCombatAction: CombatAction.None,
     turnDuration: 0,

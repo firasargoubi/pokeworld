@@ -12,6 +12,7 @@ const String TIMER_ASSET = 'assets/images/menu/icons/combat/timer.gif';
 
 const Color PIXEL_TEXT_COLOR = Color(0xFF585851);
 const Color FOOTER_TEXT_COLOR = Color(0xFF464641);
+const Color FOOTER_SUB_TEXT_COLOR = Color(0xFFf9f9f9);
 const String PIXEL_FONT = 'Pixel';
 
 const Color FOOTER_COLOR = Color(0xFF283030);
@@ -53,6 +54,7 @@ const Color ESCAPE_TINT_COLOR = Color(0xFF000000);
 
 const String FOOTER_LEFT_BORDER_ASSET = 'assets/images/menu/containers/combat/combat-container-left-border.png';
 const String FOOTER_BODY_ASSET = 'assets/images/menu/containers/combat/combat-container-body.png';
+const String FOOTER_SPECTATE_ASSET = 'assets/images/menu/containers/combat/spectate-container.png';
 const double FOOTER_BORDER_ASPECT_RATIO = 10 / 88;
 
 const Color HP_EMPTY_COLOR = Color(0xFF727272);

@@ -11,8 +11,15 @@ MatchData GET_DEFAULT_MATCH_DATA() {
     code: '',
     state: MatchState.Lobby,
     gameData: GET_DEFAULT_GAME_DATA(),
-    lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0),
-    playData: PlayData(timeLeft: TURN_WAIT_DURATION, activePlayerIndex: 0, isDebugMode: false, hasAction: false, movementLeft: 0),
+    lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0, isDropInEnabled: false, isRapidElimination: false),
+    playData: PlayData(
+      timeLeft: TURN_WAIT_DURATION,
+      activePlayerIndex: 0,
+      isDebugMode: false,
+      hasAction: false,
+      movementLeft: 0,
+      isElementalMode: false,
+    ),
     combatData: CombatData(
       lastCombatAction: CombatAction.None,
       turnDuration: 0,

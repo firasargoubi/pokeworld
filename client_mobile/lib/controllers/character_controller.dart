@@ -50,6 +50,9 @@ class CharacterController {
       combatsWon: selfPlayer.combatsWon,
       type: selfPlayer.type,
       team: selfPlayer.team,
+      userId: _userService.currentUser.value?.userId,
+      profilePicture: _userService.currentUser.value?.profilePicture,
+      fullProfilePicture: _userService.currentUser.value?.fullProfilePicture,
     );
   }
 

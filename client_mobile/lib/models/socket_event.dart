@@ -33,7 +33,8 @@ enum LobbyEvent {
   ChangeLockStatus('changeLockStatus'),
   StartMatch('startMatch'),
   AddBot('addBot'),
-  KickPlayer('kickPlayer');
+  KickPlayer('kickPlayer'),
+  ChangeMatchSettings('changeMatchSettings');
 
   const LobbyEvent(this.value);
   final String value;

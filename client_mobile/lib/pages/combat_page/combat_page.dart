@@ -27,6 +27,8 @@ class CombatPage extends StatefulWidget {
 }
 
 class _CombatPageState extends State<CombatPage> {
+  late bool isSelfInCombat;
+
   final SpriteAnimator selfSprite = SpriteAnimator();
   final SpriteAnimator enemySprite = SpriteAnimator();
 
@@ -73,16 +75,16 @@ class _CombatPageState extends State<CombatPage> {
       final prevEnemyHealth = enemyCombatData.currentHealth;
 
       final attackerPlayerIndex = rawCombat.playersCombatData[rawCombat.isSecondPlayerTurn ? 0 : 1].playerIndex;
-      final selfWasAttacker = attackerPlayerIndex == MatchService().selfIndex;
+      final bottomPlayerWasAttacker = attackerPlayerIndex == selfCombatData.playerIndex;
 
       setState(() {
         _syncFromService();
-        _updateDiceText(selfWasAttacker, rawCombat);
+        _updateDiceText(bottomPlayerWasAttacker, rawCombat);
         _updateAnimations(
           newMatchState: newMatchState,
           prevSelfHealth: prevSelfHealth,
           prevEnemyHealth: prevEnemyHealth,
-          selfWasAttacker: selfWasAttacker,
+          bottomPlayerWasAttacker: bottomPlayerWasAttacker,
           action: rawCombat.lastCombatAction,
           turnFlag: rawCombat.isSecondPlayerTurn,
         );
@@ -100,22 +102,34 @@ class _CombatPageState extends State<CombatPage> {
   void _syncFromService() {
     final matchData = MatchService().matchData!;
     final combatData = matchData.combatData;
-    selfPlayer = MatchService().selfPlayer!;
     maxTime = combatData.turnDuration;
 
     final first = combatData.playersCombatData[0];
     final second = combatData.playersCombatData[1];
+    final selfIndex = MatchService().selfIndex;
 
-    if (first.playerIndex == MatchService().selfIndex) {
+    final selfIsFirst = first.playerIndex == selfIndex;
+    final selfIsSecond = second.playerIndex == selfIndex;
+    isSelfInCombat = selfIsFirst || selfIsSecond;
+
+    if (selfIsFirst) {
+      selfPlayer = matchData.players[first.playerIndex];
       selfCombatData = first;
-      enemyCombatData = second;
       enemyPlayer = matchData.players[second.playerIndex];
+      enemyCombatData = second;
       isSelfTurn = !combatData.isSecondPlayerTurn;
-    } else {
+    } else if (selfIsSecond) {
+      selfPlayer = matchData.players[second.playerIndex];
       selfCombatData = second;
-      enemyCombatData = first;
       enemyPlayer = matchData.players[first.playerIndex];
+      enemyCombatData = first;
       isSelfTurn = combatData.isSecondPlayerTurn;
+    } else {
+      selfPlayer = matchData.players[first.playerIndex];
+      selfCombatData = first;
+      enemyPlayer = matchData.players[second.playerIndex];
+      enemyCombatData = second;
+      isSelfTurn = false;
     }
   }
 
@@ -133,7 +147,7 @@ class _CombatPageState extends State<CombatPage> {
     }
   }
 
-  void _updateDiceText(bool selfWasAttacker, CombatData rawCombat) {
+  void _updateDiceText(bool bottomPlayerWasAttacker, CombatData rawCombat) {
     final i18n = I18nService();
     final action = rawCombat.lastCombatAction;
     if (action != CombatAction.SuccessAttack && action != CombatAction.FailAttack) return;
@@ -141,7 +155,7 @@ class _CombatPageState extends State<CombatPage> {
     final attackRoll = rawCombat.lastRolledAttack;
     final defenseRoll = rawCombat.lastRolledDefense;
 
-    if (selfWasAttacker) {
+    if (bottomPlayerWasAttacker) {
       selfRolledDiceText = i18n.translate(COMBAT_ATTACK_ROLL_LABEL_KEY, params: {'value': attackRoll});
       enemyRolledDiceText = i18n.translate(COMBAT_DEFENSE_ROLL_LABEL_KEY, params: {'value': defenseRoll});
     } else {
@@ -154,7 +168,7 @@ class _CombatPageState extends State<CombatPage> {
     required MatchState newMatchState,
     required int prevSelfHealth,
     required int prevEnemyHealth,
-    required bool selfWasAttacker,
+    required bool bottomPlayerWasAttacker,
     required CombatAction action,
     required bool turnFlag,
   }) {
@@ -168,8 +182,8 @@ class _CombatPageState extends State<CombatPage> {
       _lastAnimatedTurnFlag = turnFlag;
 
       if (action == CombatAction.SuccessAttack || action == CombatAction.FailAttack) {
-        final attacker = selfWasAttacker ? selfSprite : enemySprite;
-        final defender = selfWasAttacker ? enemySprite : selfSprite;
+        final attacker = bottomPlayerWasAttacker ? selfSprite : enemySprite;
+        final defender = bottomPlayerWasAttacker ? enemySprite : selfSprite;
 
         if (action == CombatAction.SuccessAttack) {
           _playAttack(attacker);
@@ -178,7 +192,7 @@ class _CombatPageState extends State<CombatPage> {
           _playAttack(attacker);
         }
       } else if (action == CombatAction.SuccessEscape) {
-        final escaper = selfWasAttacker ? selfSprite : enemySprite;
+        final escaper = bottomPlayerWasAttacker ? selfSprite : enemySprite;
         _playEscape(escaper);
       }
     }
@@ -315,58 +329,9 @@ class _CombatPageState extends State<CombatPage> {
                         width: double.infinity,
                         color: FOOTER_COLOR,
                         padding: EdgeInsets.all(footerPadding),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 4,
-                              child: CombatFooterSection(
-                                child: CombatButtons(
-                                  baseSize: baseSize,
-                                  onAttack: CombatService().attack,
-                                  onRun: CombatService().escape,
-                                  runText: '${i18n.translate(FOOTER_RUN_KEY)} ${selfCombatData.currentEscapes}/${selfCombatData.maxEscapes}',
-                                  attackTextStyle: pixelStyle(baseSize * 0.05),
-                                  isSelfTurn: isSelfTurn,
-                                  currentEscapes: selfCombatData.currentEscapes,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: footerGap),
-                            Expanded(
-                              flex: 3,
-                              child: CombatFooterSection(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: baseSize * 0.01, vertical: baseSize * 0.01),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      StatRow(
-                                        label: '${i18n.translate(FOOTER_ATTACK_STAT_LABEL_KEY)} (${selfPlayer.attackDice.displayName()})',
-                                        value: '${selfCombatData.attack}/4',
-                                        style: footerStyle,
-                                        fontSize: footerStatFont,
-                                      ),
-                                      SizedBox(height: baseSize * 0.01),
-                                      StatRow(
-                                        label: '${i18n.translate(FOOTER_DEFENSE_STAT_LABEL_KEY)} (${selfPlayer.defenseDice.displayName()})',
-                                        value: '${selfCombatData.defense}/4',
-                                        style: footerStyle,
-                                        fontSize: footerStatFont,
-                                      ),
-                                      SizedBox(height: baseSize * 0.01),
-                                      StatRow(
-                                        label: i18n.translate(FOOTER_SPEED_STAT_LABEL_KEY),
-                                        value: '${selfPlayer.speed}/${selfPlayer.speed}',
-                                        style: footerStyle,
-                                        fontSize: footerStatFont,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        child: isSelfInCombat
+                            ? _buildPlayerFooter(baseSize, footerGap, footerStatFont, i18n)
+                            : _buildSpectatorFooter(baseSize, footerGap, footerStatFont, i18n),
                       ),
                     ],
                   ),
@@ -390,6 +355,82 @@ class _CombatPageState extends State<CombatPage> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildPlayerFooter(double baseSize, double footerGap, double footerStatFont, I18nService i18n) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 4,
+          child: CombatFooterSection(
+            child: CombatButtons(
+              baseSize: baseSize,
+              onAttack: CombatService().attack,
+              onRun: CombatService().escape,
+              runText: '${i18n.translate(FOOTER_RUN_KEY)} ${selfCombatData.currentEscapes}/${selfCombatData.maxEscapes}',
+              attackTextStyle: pixelStyle(baseSize * 0.05),
+              isSelfTurn: isSelfTurn,
+              currentEscapes: selfCombatData.currentEscapes,
+            ),
+          ),
+        ),
+        SizedBox(width: footerGap),
+        Expanded(
+          flex: 3,
+          child: CombatFooterSection(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: baseSize * 0.01, vertical: baseSize * 0.01),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  StatRow(
+                    label: '${i18n.translate(FOOTER_ATTACK_STAT_LABEL_KEY)} (${selfPlayer.attackDice.displayName()})',
+                    value: '${selfCombatData.attack}/4',
+                    style: footerStyle,
+                    fontSize: footerStatFont,
+                  ),
+                  SizedBox(height: baseSize * 0.01),
+                  StatRow(
+                    label: '${i18n.translate(FOOTER_DEFENSE_STAT_LABEL_KEY)} (${selfPlayer.defenseDice.displayName()})',
+                    value: '${selfCombatData.defense}/4',
+                    style: footerStyle,
+                    fontSize: footerStatFont,
+                  ),
+                  SizedBox(height: baseSize * 0.01),
+                  StatRow(
+                    label: i18n.translate(FOOTER_SPEED_STAT_LABEL_KEY),
+                    value: '${selfPlayer.speed}/${selfPlayer.speed}',
+                    style: footerStyle,
+                    fontSize: footerStatFont,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSpectatorFooter(double baseSize, double footerGap, double footerStatFont, I18nService i18n) {
+    return Row(
+      children: [
+        Expanded(
+          child: CombatFooterSection(
+            child: CombatSpectatorContent(baseSize: baseSize, player: selfPlayer, combatData: selfCombatData),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: footerGap),
+          child: Text('VS', style: footerSubStyle(baseSize * 0.05)),
+        ),
+        Expanded(
+          child: CombatFooterSection(
+            child: CombatSpectatorContent(baseSize: baseSize, player: enemyPlayer, combatData: enemyCombatData),
+          ),
+        ),
+      ],
     );
   }
 }

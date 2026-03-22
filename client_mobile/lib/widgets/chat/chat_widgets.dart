@@ -1,9 +1,10 @@
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/chat_message.dart';
-import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/utils/profile_image_provider.dart';
 import 'package:client_mobile/widgets/stripe_painter/stripe_painter.dart';
+import 'package:client_mobile/widgets/user_profile_image/user_profile_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -166,16 +167,14 @@ class ChatMessagesList extends StatelessWidget {
                       ),
                     ),
                     WidgetSpan(
-                      child: Image(
-                        image: profilePictureImageProvider(message.profilePicture),
+                      child: SizedBox(
                         width: baseSize * 0.35,
-                        height: baseSize * CHAT_MESSAGE_TEXT_SIZE_FACTOR,
-                        filterQuality: FilterQuality.none,
-                        fit: BoxFit.fitHeight,
+                        height: baseSize * 0.35,
+                        child: LayeredProfileImage(foregroundImage: profilePictureImageProvider(message.profilePicture)),
                       ),
                     ),
                     TextSpan(
-                      text: '${message.sender}: ',
+                      text: ' ${message.sender}: ',
                       style: TextStyle(
                         fontFamily: CHAT_FONT_FAMILY,
                         fontSize: baseSize * CHAT_MESSAGE_TEXT_SIZE_FACTOR,
