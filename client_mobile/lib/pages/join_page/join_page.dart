@@ -1,12 +1,13 @@
 import 'dart:math';
 
 import 'package:client_mobile/models/audio.dart';
-import 'package:client_mobile/models/game_data.dart';
+import 'package:client_mobile/models/match_data.dart';
+import 'package:client_mobile/models/socket_event.dart';
 import 'package:client_mobile/pages/home_page/home_page.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
-import 'package:client_mobile/services/game_save/game_save.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/navigation_service/navigation_service.dart';
+import 'package:client_mobile/services/socket_service/socket_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/game_cards_shell/game_cards_shell.dart';
 import 'package:client_mobile/widgets/header/header.dart';
@@ -25,18 +26,33 @@ class JoinPage extends StatefulWidget {
 }
 
 class _JoinPageState extends State<JoinPage> {
-  late final Future<List<GameData>> gamesFuture = GameSaveService.getAllGames();
+  final SocketService socketService = SocketService();
 
   final TextEditingController codeController = TextEditingController();
-  bool showOverlay = false;
 
-  void _openOverlay() => setState(() => showOverlay = true);
+  String matchCode = '';
+  bool isCodeInputDisplayed = false;
+  List<MatchData> availableMatches = const [];
 
-  void _closeOverlay() => setState(() => showOverlay = false);
+  void _openOverlay() => setState(() => isCodeInputDisplayed = true);
+
+  void _closeOverlay() => setState(() => isCodeInputDisplayed = false);
 
   @override
   void initState() {
     super.initState();
+
+    socketService.emit(JoinPageEvent.JoinRoom.value);
+    socketService.socket.on(JoinPageEvent.UpdateMatchList.value, (payload) {
+      final matches = ((payload as List?) ?? const []).cast<Map>().map((e) => MatchData.fromJson(e.cast<String, dynamic>())).toList();
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        availableMatches = matches;
+      });
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       AudioService().playBackgroundMusic(BackgroundMusic.Menu.path);
     });
@@ -44,6 +60,8 @@ class _JoinPageState extends State<JoinPage> {
 
   @override
   void dispose() {
+    socketService.emit(JoinPageEvent.LeaveRoom.value);
+    socketService.socket.off(JoinPageEvent.UpdateMatchList.value);
     codeController.dispose();
     super.dispose();
   }
@@ -79,7 +97,11 @@ class _JoinPageState extends State<JoinPage> {
               SizedBox(
                 height: baseSize * 0.1,
                 width: double.infinity,
-                child: AppHeader(index: 1, text: i18n.translate(JOIN_PAGE_HEADER_TEXT), onTap: () => NavigationService().navigateAndReplace((_) => const HomePage())),
+                child: AppHeader(
+                  index: 1,
+                  text: i18n.translate(JOIN_PAGE_HEADER_TEXT),
+                  onTap: () => NavigationService().navigateAndReplace((_) => const HomePage()),
+                ),
               ),
               Expanded(
                 child: Container(
@@ -93,12 +115,10 @@ class _JoinPageState extends State<JoinPage> {
                     child: CustomPaint(
                       painter: StripePainter(stripeSize: baseSize * 0.02, color1: JOIN_PAGE_STRIPE_COLOR_1, color2: JOIN_PAGE_STRIPE_COLOR_2),
                       child: ClipRect(
-                        child: FutureBuilder<List<GameData>>(
-                          future: gamesFuture,
-                          builder: (context, snapshot) {
-                            final games = snapshot.data ?? const <GameData>[];
-                            return GameCardsPageShell(games: games, isCreateCard: false);
-                          },
+                        child: GameCardsPageShell(
+                          games: availableMatches.map((match) => match.gameData).toList(),
+                          isCreateCard: false,
+                          matches: availableMatches,
                         ),
                       ),
                     ),
@@ -114,7 +134,7 @@ class _JoinPageState extends State<JoinPage> {
             height: baseSize * 0.15,
             child: PokeButton(text: i18n.translate(JOIN_PAGE_FLOATING_BUTTON_TEXT), onTap: _openOverlay),
           ),
-          if (showOverlay)
+          if (isCodeInputDisplayed)
             Positioned.fill(
               child: JoinCodePopup(baseSize: baseSize, controller: codeController, onClose: _closeOverlay),
             ),

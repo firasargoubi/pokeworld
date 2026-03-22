@@ -11,7 +11,7 @@ const String GAME_CARD_CTF_ICON_ASSET = 'assets/images/menu/containers/game/CTF-
 
 const String GAME_CARD_JOIN_BUTTON_KEY = 'components.gameCard.join';
 const String GAME_CARD_CREATE_BUTTON_KEY = 'components.gameCard.play';
+const String GAME_CARD_PLAYERS_LABEL_KEY = 'components.gameCard.players';
+const String GAME_CARD_CODE_LABEL_KEY = 'components.gameCard.code';
+const String GAME_CARD_OWNER_LABEL_KEY = 'components.gameCard.owner';
 
-const bool GAME_CARD_DEFAULT_IS_WAITING = true;
-const String GAME_CARD_DEFAULT_COUNT_PLAYERS = '1/4';
-const String GAME_CARD_DEFAULT_CODE = '6969';

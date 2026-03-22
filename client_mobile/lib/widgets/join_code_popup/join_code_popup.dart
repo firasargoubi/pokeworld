@@ -126,7 +126,7 @@ class _OverlayCodeInput extends StatelessWidget {
                   controller: controller,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.left,
-                  maxLength: 4,
+                  maxLength: JOIN_PAGE_CODE_LENGTH,
                   onSubmitted: (value) {
                     if (value.isNotEmpty) {
                       MatchService().joinMatch(value);

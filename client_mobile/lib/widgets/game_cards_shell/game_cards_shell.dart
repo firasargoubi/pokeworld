@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/game_data.dart';
+import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/widgets/game_card/game_card.dart';
@@ -10,10 +11,11 @@ import 'package:flutter/material.dart';
 import 'game_cards_shell_const.dart';
 
 class GameCardsPageShell extends StatefulWidget {
-  const GameCardsPageShell({super.key, required this.games, required this.isCreateCard});
+  const GameCardsPageShell({super.key, required this.games, required this.isCreateCard, this.matches});
 
   final List<GameData> games;
   final bool isCreateCard;
+  final List<MatchData>? matches;
 
   @override
   State<GameCardsPageShell> createState() => _GameCardsPageShellState();
@@ -24,6 +26,8 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
   late List<LayerLink> links = _makeLinks(widget.games.length);
   late final MatchService matchService = MatchService();
 
+  int get _cardsLength => widget.matches?.length ?? widget.games.length;
+
   static List<LayerLink> _makeLinks(int length) {
     return List.generate(length, (_) => LayerLink());
   }
@@ -32,9 +36,11 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
   void didUpdateWidget(covariant GameCardsPageShell oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.games.length != widget.games.length) {
-      links = _makeLinks(widget.games.length);
-      if (openIndex != null && openIndex! >= widget.games.length) {
+    final oldCardsLength = oldWidget.matches?.length ?? oldWidget.games.length;
+    final newCardsLength = _cardsLength;
+    if (oldCardsLength != newCardsLength) {
+      links = _makeLinks(newCardsLength);
+      if (openIndex != null && openIndex! >= newCardsLength) {
         openIndex = null;
       }
     }
@@ -42,6 +48,9 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
 
   @override
   Widget build(BuildContext context) {
+    final matches = widget.matches;
+    final cards = matches ?? widget.games;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final availableWidth = constraints.maxWidth;
@@ -57,7 +66,7 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
         final cardHeight = cardWidth * (96 / 79);
         final descriptionPanelWidth = cardWidth * 0.55;
 
-        final rows = (widget.games.length / GAME_CARDS_SHELL_COLUMNS).ceil();
+        final rows = (cards.length / GAME_CARDS_SHELL_COLUMNS).ceil();
         final totalGridHeight = rows * cardHeight + (rows - 1) * gap;
 
         final horizontalPadding = max(0, (availableWidth - (GAME_CARDS_SHELL_COLUMNS * cardWidth) - (GAME_CARDS_SHELL_COLUMNS - 1) * gap) / 2);
@@ -80,7 +89,7 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
             clipBehavior: Clip.none,
             children: [
               GridView.builder(
-                itemCount: widget.games.length,
+                itemCount: cards.length,
                 clipBehavior: Clip.none,
                 shrinkWrap: fitsVertically,
                 physics: fitsVertically ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
@@ -92,7 +101,8 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
                   childAspectRatio: 79 / 96,
                 ),
                 itemBuilder: (context, index) {
-                  final game = widget.games[index];
+                  final match = matches?[index];
+                  final game = match?.gameData ?? widget.games[index];
 
                   return CompositedTransformTarget(
                     link: links[index],
@@ -103,8 +113,17 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
                           key: ValueKey(game.id),
                           isCreateCard: widget.isCreateCard,
                           game: game,
+                          matchData: match,
                           onTap: () {
-                            matchService.createMatch(game);
+                            if (widget.isCreateCard) {
+                              matchService.createMatch(game);
+                              return;
+                            }
+
+                            final matchCode = match?.code;
+                            if (matchCode != null && matchCode.isNotEmpty) {
+                              matchService.joinMatch(matchCode);
+                            }
                           },
                         ),
                         Align(
@@ -133,7 +152,7 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
                 child: IgnorePointer(
                   child: Stack(
                     clipBehavior: Clip.none,
-                    children: List.generate(widget.games.length, (index) {
+                    children: List.generate(cards.length, (index) {
                       final isOpen = openIndex == index;
 
                       return CompositedTransformFollower(
@@ -169,7 +188,7 @@ class _GameCardsPageShellState extends State<GameCardsPageShell> {
                                         child: Align(
                                           alignment: Alignment.topLeft,
                                           child: Text(
-                                            widget.games[index].description,
+                                            (matches?[index].gameData ?? widget.games[index]).description,
                                             style: TextStyle(
                                               color: Colors.black,
                                               fontSize: descriptionPanelWidth * 0.12,

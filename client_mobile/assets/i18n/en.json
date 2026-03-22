@@ -296,7 +296,10 @@
         },
         "gameCard": {
             "play": "PLAY",
-            "join": "JOIN"
+            "join": "PLAY",
+            "players": "Players",
+            "code": "Code",
+            "owner": "by"
         },
         "header": {
             "back": "Back"
