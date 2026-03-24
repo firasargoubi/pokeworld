@@ -36,4 +36,6 @@ export const DEFAULT_PLAYER_TRACKING_DATA: TrackingPlayerData = {
     hpInflicted: 0,
     pickedUpItems: [],
     coveredGroundTiles: [],
+    balanceGain: 0,
+    currentBalance: 0,
 };

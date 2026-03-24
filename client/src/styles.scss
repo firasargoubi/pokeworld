@@ -61,7 +61,7 @@ body {
 }
 
 body.app-theme-dark {
-    filter: invert(1);
+    filter: brightness(85%) contrast(120%) saturate(90%) hue-rotate(190deg);
 }
 
 .cdk-overlay-container {

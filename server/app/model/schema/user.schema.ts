@@ -1,9 +1,19 @@
+import { INITIAL_USER_BALANCE } from '@common/consts/shop.const';
+import { AppLanguage, AppTheme } from '@common/interfaces/preferences';
+import { InventoryItem } from '@common/interfaces/shop';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger/dist/decorators/api-property.decorator';
-import { AppLanguage, AppTheme } from '@common/interfaces/preferences';
 import { Document } from 'mongoose';
 
 export type UserDocument = User & Document;
+
+export class InventoryItemSchema implements InventoryItem {
+    @Prop({ required: true })
+    itemId: string;
+
+    @Prop({ required: true })
+    price: number;
+}
 
 export class UserPreferencesSchema {
     @Prop({ type: String, enum: Object.values(AppTheme), default: AppTheme.Default })
@@ -31,8 +41,11 @@ export class User {
     @Prop()
     fullProfilePicture: string;
 
-    @Prop()
+    @Prop({ required: true, default: INITIAL_USER_BALANCE })
     balance: number;
+
+    @Prop({ type: [InventoryItemSchema], default: [] })
+    inventory: InventoryItemSchema[];
 
     @Prop({ required: true, default: false })
     isLoggedIn: boolean;

@@ -19,6 +19,10 @@ export class UserService {
     private readonly http: HttpClient = inject(HttpClient);
     private readonly socketService: SocketService = inject(SocketService);
 
+    get currentUser(): UserInfo | null {
+        return this.currentUserSubject.value;
+    }
+
     getAllUsers(): Observable<UserInfo[]> {
         return this.http.get<UserInfo[]>(`${this.baseUrl}/${ApiEndpoint.User}`);
     }

@@ -5,6 +5,7 @@ import { AppSettingsPopupComponent } from '@app/components/app-settings-popup/ap
 import { AuthPopupComponent } from '@app/components/auth-popup/auth-popup.component';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { MenuButtonComponent } from '@app/components/menu-button/menu-button.component';
+import { ShopPopupComponent } from '@app/components/shop-popup/shop-popup.component';
 import { UserPopupComponent } from '@app/components/user-popup/user-popup.component';
 import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
@@ -23,6 +24,7 @@ import { TranslateModule } from '@ngx-translate/core';
         RouterModule,
         AppSettingsPopupComponent,
         AuthPopupComponent,
+        ShopPopupComponent,
         UserPopupComponent,
         ChatComponent,
         TranslateModule,
@@ -35,6 +37,7 @@ export class MenuPageComponent {
     readonly clickValue = SoundEffect.Click;
     isFirstTime = true;
     isAudioSettingsVisible = false;
+    isShopPopupVisible = false;
     isUserPopupVisible = false;
     currentUser: UserInfo | null = null;
 
@@ -42,6 +45,7 @@ export class MenuPageComponent {
         this.userService.user$.subscribe((u) => {
             this.currentUser = u;
             if (!u) {
+                this.isShopPopupVisible = false;
                 this.isUserPopupVisible = false;
             }
         });
@@ -61,8 +65,22 @@ export class MenuPageComponent {
         this.isAudioSettingsVisible = !this.isAudioSettingsVisible;
     }
 
+    toggleShopPopup() {
+        if (!this.currentUser) {
+            return;
+        }
+        this.audioService.playEffect(this.clickValue);
+        if (!this.isShopPopupVisible) {
+            this.isUserPopupVisible = false;
+        }
+        this.isShopPopupVisible = !this.isShopPopupVisible;
+    }
+
     toggleUserPopup() {
         this.audioService.playEffect(this.clickValue);
+        if (!this.isUserPopupVisible) {
+            this.isShopPopupVisible = false;
+        }
         this.isUserPopupVisible = !this.isUserPopupVisible;
     }
 }

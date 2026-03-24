@@ -234,6 +234,9 @@
             "title": "FIN DE PARTIE",
             "playersStats": "STATS JOUEURS",
             "matchStats": "STATS PARTIE :",
+            "yourReward": "VOTRE SOLDE",
+            "balanceGain": "GAIN :",
+            "currentBalance": "SOLDE :",
             "duration": "DURÉE :",
             "turns": "TOURS :",
             "visitedTiles": "TUILES VISITÉES :",
@@ -350,6 +353,8 @@
         "userPopup": {
             "nameLabel": "Nom:",
             "emailLabel": "Courriel:",
+            "balanceLabel": "Solde:",
+            "inventoryLabel": "Achats:",
             "noneValue": "Aucun",
             "logout": "DECONNEXION",
             "deleteAccount": "SUPPRIMER COMPTE",
@@ -376,6 +381,22 @@
             "confirmUsernameChange": "Voulez-vous confirmer le changement du nom ?",
             "usernameUpdateError": "Erreur lors du changement de nom",
             "avatarAlt": "Avatar complet"
+        },
+        "shopPopup": {
+            "title": "Boutique",
+            "inventoryTitle": "Historique d'achats",
+            "emptyInventory": "Aucun achat pour le moment",
+            "insufficientFunds": "Vous n'avez pas assez d'argent pour cet achat.",
+            "purchaseSuccess": "{{itemName}} a été ajouté à votre inventaire.",
+            "purchaseError": "L'achat n'a pas pu être complété.",
+            "unknownItem": "Objet inconnu",
+            "items": {
+                "item1": "Item 1",
+                "item2": "Item 2",
+                "item3": "Item 3",
+                "item4": "Item 4",
+                "item5": "Item 5"
+            }
         },
         "warningConfirmation": {
             "close": "Fermer",

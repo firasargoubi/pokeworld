@@ -1,7 +1,7 @@
-import { ItemType } from "./item-type.enum";
-import { Position } from "./position";
-import { Avatar, Team } from "./player-data";
-import { TileType } from "./tile-type.enum";
+import { ItemType } from './item-type.enum';
+import { Position } from './position';
+import { Avatar, Team } from './player-data';
+import { TileType } from './tile-type.enum';
 
 export interface TrackingPlayerData {
     id: string;
@@ -15,6 +15,8 @@ export interface TrackingPlayerData {
     escapes: number;
     hpInflicted: number;
     hpLost: number;
+    balanceGain: number;
+    currentBalance: number;
 }
 
 export interface WinnerData {

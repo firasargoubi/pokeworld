@@ -1,7 +1,7 @@
 import { CreateUserDto } from '@app/model/dto/user/create-user.dto';
 import { LoginUserDto } from '@app/model/dto/user/login-user.dto';
-import { UpdatePreferencesDto } from '@app/model/dto/user/update-preferences.dto';
 import { UserResponseDto } from '@app/model/dto/user/response-user.dto';
+import { UpdatePreferencesDto } from '@app/model/dto/user/update-preferences.dto';
 import { UserService } from '@app/services/user/user.service';
 import { AppLanguage, AppTheme, DEFAULT_PREFERENCES } from '@common/interfaces/preferences';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -19,6 +19,7 @@ describe('UserController', () => {
         profilePicture: '',
         fullProfilePicture: '',
         balance: 0,
+        inventory: [],
         preferences: DEFAULT_PREFERENCES,
     };
 

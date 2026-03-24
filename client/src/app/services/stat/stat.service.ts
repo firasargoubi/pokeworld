@@ -3,6 +3,7 @@ import { BATTLE_PLATFORM_IMAGES } from '@app/consts/images.const';
 import { GlobalStatData, Order, PlayerStatData, TotalTiles, WinnerVisualData } from '@app/interfaces/stat-data';
 import { PlayerStatType } from '@app/interfaces/stat-type.enum';
 import { MatchService } from '@app/services/match/match.service';
+import { UserService } from '@app/services/user/user.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { DECIMAL_FACTOR, PERCENTAGE_FACTOR } from '@common/consts/track-data.const';
 import { TrackingData } from '@common/interfaces/match-data';
@@ -20,6 +21,7 @@ export class StatService {
     private trackingData: TrackingData;
     private mapTotalTiles: TotalTiles;
     private matchService: MatchService = inject(MatchService);
+    private userService: UserService = inject(UserService);
 
     initializeData() {
         this.trackingData = this.matchService.data.trackingData;
@@ -27,6 +29,7 @@ export class StatService {
         this.winnerData = this.getWinnerAssets();
         this.globalStats = this.getGlobalStats();
         this.playerStats = this.getPlayerStats();
+        this.syncCurrentUserBalance();
     }
 
     sortPlayerStatsBy(statType: PlayerStatType, order: Order) {
@@ -58,6 +61,8 @@ export class StatService {
                 id: player.id,
                 name: player.name,
                 team: player.team,
+                balanceGain: player.balanceGain,
+                currentBalance: player.currentBalance,
                 [PlayerStatType.DiscoveredItemsCount]: player.pickedUpItems.length,
                 [PlayerStatType.VisitedTilesRatio]: this.getTileRatio(player.coveredGroundTiles),
                 [PlayerStatType.Combats]: player.combats,
@@ -69,6 +74,23 @@ export class StatService {
             });
         }
         return playerStats;
+    }
+
+    private syncCurrentUserBalance() {
+        const currentUser = this.userService.currentUser;
+        if (!currentUser) {
+            return;
+        }
+
+        const trackingPlayer = this.trackingData.players.find((player) => player.id === currentUser.userId);
+        if (!trackingPlayer || typeof trackingPlayer.currentBalance !== 'number') {
+            return;
+        }
+
+        this.userService.setUser({
+            ...currentUser,
+            balance: trackingPlayer.currentBalance,
+        });
     }
 
     private getGameDuration(): number {

@@ -1,6 +1,7 @@
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { BalanceController } from './controllers/balance/balance.controller';
 import { GameController } from './controllers/game/game.controller';
 import { UserController } from './controllers/user/user.controller';
 import { ChatGateway } from './gateways/chat/chat.gateway';
@@ -11,6 +12,7 @@ import { PlayGateway } from './gateways/play/play.gateway';
 import { Channel, channelSchema } from './model/schema/channel.schema';
 import { Game, gameSchema } from './model/schema/game.schema';
 import { User, userSchema } from './model/schema/user.schema';
+import { BalanceService } from './services/balance/balance.service';
 import { BotService } from './services/bot/bot.service';
 import { ChatService } from './services/chat/chat.service';
 import { CombatService } from './services/combat/combat.service';
@@ -39,10 +41,11 @@ import { UserService } from './services/user/user.service';
             { name: Channel.name, schema: channelSchema },
         ]),
     ],
-    controllers: [GameController, UserController],
+    controllers: [GameController, UserController, BalanceController],
     providers: [
         Logger,
 
+        BalanceService,
         GameService,
         MatchService,
         LobbyService,

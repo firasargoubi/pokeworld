@@ -11,6 +11,7 @@ $icon-vulpix: '../../../assets/images/menu/pokemons/chibi/vulpix.png';
 $icon-poliwag: '../../../assets/images/menu/pokemons/chibi/poliwag.png';
 $icon-cubone: '../../../assets/images/menu/pokemons/chibi/cubone.png';
 $icon-settings: '../../../assets/images/menu/icons/settings/settings.svg';
+$icon-shop: '../../../assets/images/menu/icons/crown.png';
 $icon-user-card: '../../../assets/images/menu/icons/menu/user.svg';
 $gray-box-rectangle: '../../../assets/images/menu/containers/gray/rectangle.png';
 $user-button-color: hsl(194, 86%, 66%);
@@ -222,6 +223,15 @@ app-menu-button {
     background-image: url($icon-cubone);
 }
 
+.icon-shop {
+    width: 64%;
+    height: 64%;
+    background-image: url($icon-shop);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 $inner-border-width: calc(0.6 * $base-size);
 
 $border-color2: #48485f;
@@ -367,8 +377,48 @@ $clip-path: polygon(
     backdrop-filter: blur(min(0.5vh, 0.5vw));
 }
 
+.shop-popup-container {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 13;
+    background-color: rgba($color: #000000, $alpha: 0.5);
+    backdrop-filter: blur(min(0.5vh, 0.5vw));
+}
+
+.shop-popup,
 .user-popup {
     opacity: 0;
     transform: scale(0.96);
     animation: audio-overlay-in 0.2s forwards ease-in-out;
+}
+
+.shop-button {
+    background: hsl(45, 93%, 62%);
+    box-shadow:
+        inset $inner-border-width 0 0 0 hsl(47, 100%, 84%),
+        inset calc(-1 * $inner-border-width) 0 0 0 hsl(35, 83%, 44%),
+        inset 0 $inner-border-width 0 0 hsl(47, 100%, 84%),
+        inset 0 calc(-1 * $inner-border-width) 0 0 hsl(35, 83%, 44%);
+
+    &:active {
+        filter: brightness(0.9);
+        box-shadow:
+            inset $inner-border-width 0 0 0 hsl(35, 83%, 44%),
+            inset calc(-1 * $inner-border-width) 0 0 0 hsl(47, 100%, 84%),
+            inset 0 $inner-border-width 0 0 hsl(35, 83%, 44%),
+            inset 0 calc(-1 * $inner-border-width) 0 0 hsl(47, 100%, 84%);
+    }
+}
+
+.shop-button.disabled,
+.user-button.disabled {
+    opacity: 0.3;
+    pointer-events: none;
 }

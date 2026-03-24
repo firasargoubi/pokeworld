@@ -38,6 +38,7 @@ describe('ChatService', () => {
             userId: 'defaultId',
             passwordHash: 'defaultHash',
             balance: 0,
+            inventory: [],
             isLoggedIn: true,
             deleted: false,
             preferences: {

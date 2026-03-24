@@ -9,6 +9,10 @@
         <div class="user-auth-overlay" tabindex="0">
             <app-auth-popup (click)="$event.stopPropagation()"></app-auth-popup>
         </div>
+        } @if(currentUser && isShopPopupVisible) {
+        <div class="shop-popup-container" (click)="toggleShopPopup()">
+            <app-shop-popup class="shop-popup" (click)="$event.stopPropagation()"></app-shop-popup>
+        </div>
         } @if(currentUser && isUserPopupVisible) {
         <div class="user-popup-container" (click)="toggleUserPopup()">
             <app-user-popup class="user-popup" (click)="$event.stopPropagation()"></app-user-popup>
@@ -22,6 +26,9 @@
                     </div>
                     <div class="top-button" (click)="this.toggleAudioSettings()">
                         <div class="icon-container"></div>
+                    </div>
+                    <div class="top-button shop-button" (click)="this.toggleShopPopup()" [class.disabled]="!currentUser">
+                        <div class="icon-shop"></div>
                     </div>
                 </div>
                 <div class="logo-container">

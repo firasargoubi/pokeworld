@@ -234,6 +234,9 @@
             "title": "END OF MATCH",
             "playersStats": "PLAYER STATS",
             "matchStats": "MATCH STATS:",
+            "yourReward": "YOUR BALANCE",
+            "balanceGain": "GAIN:",
+            "currentBalance": "BALANCE:",
             "duration": "DURATION:",
             "turns": "TURNS:",
             "visitedTiles": "VISITED TILES:",
@@ -350,6 +353,8 @@
         "userPopup": {
             "nameLabel": "Name:",
             "emailLabel": "Email:",
+            "balanceLabel": "Balance:",
+            "inventoryLabel": "Purchases:",
             "noneValue": "None",
             "logout": "LOG OUT",
             "deleteAccount": "DELETE ACCOUNT",
@@ -376,6 +381,22 @@
             "confirmUsernameChange": "Do you want to confirm the username change?",
             "usernameUpdateError": "Error while changing the name",
             "avatarAlt": "Full avatar image"
+        },
+        "shopPopup": {
+            "title": "Shop",
+            "inventoryTitle": "Purchase history",
+            "emptyInventory": "No purchases yet",
+            "insufficientFunds": "You do not have enough money for this purchase.",
+            "purchaseSuccess": "{{itemName}} was added to your inventory.",
+            "purchaseError": "The purchase could not be completed.",
+            "unknownItem": "Unknown item",
+            "items": {
+                "item1": "Item 1",
+                "item2": "Item 2",
+                "item3": "Item 3",
+                "item4": "Item 4",
+                "item5": "Item 5"
+            }
         },
         "warningConfirmation": {
             "close": "Close",

@@ -39,8 +39,8 @@
                                 <span class="value">{{ currentUser?.email || ('components.userPopup.noneValue' | translate) }}</span>
                             </div>
                             <div class="info-row">
-                                <span class="label">{{ 'components.userPopup.emailLabel' | translate }}</span>
-                                <span class="value">{{ currentUser?.email || ('components.userPopup.noneValue' | translate) }}</span>
+                                <span class="label">{{ 'components.userPopup.balanceLabel' | translate }}</span>
+                                <span class="value">{{ currentUser?.balance || 0 }} $</span>
                             </div>
                             <div class="info-row">
                                 <span class="label">{{ 'components.userPopup.emailLabel' | translate }}</span>
@@ -173,6 +173,19 @@
                         </div>
                         <div class="button-container back-button" (click)="goToFront()">
                             <div class="button-icon"></div>
+                        </div>
+                    </div>
+                    <div class="card-infos-container">
+                        <div class="items-grid">
+                            @for(item of currentUser?.inventory; track $index) {
+                            <button class="shop-item" type="button">
+                                <span class="item-edge"></span>
+                                <span class="item-body">
+                                    <span class="item-name">{{ item.itemId }} </span>
+                                </span>
+                                <span class="item-edge"></span>
+                            </button>
+                            }
                         </div>
                     </div>
                     }

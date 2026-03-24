@@ -388,7 +388,8 @@ $section-stripe-step: calc($section-stripe-size * 2);
         auto;
 
     display: flex;
-    justify-content: space-between;
+    align-items: stretch;
+    gap: calc($base-size-2 * 1.5);
 }
 
 .header {
@@ -446,7 +447,8 @@ $section-stripe-step: calc($section-stripe-size * 2);
 }
 
 .stat-row .value {
-    width: calc($base-size-2 * 4);
+    min-width: calc($base-size-2 * 6);
+    text-align: right;
     overflow: visible;
 }
 
@@ -461,6 +463,7 @@ $section-stripe-step: calc($section-stripe-size * 2);
     justify-content: space-between;
     user-select: none;
     pointer-events: none;
+    margin-left: auto;
 }
 
 .winner-battle-platform {
@@ -473,6 +476,10 @@ $section-stripe-step: calc($section-stripe-size * 2);
     left: 50%;
     bottom: calc($base-size-2 * 1);
     transform: translate(-50%);
+}
+
+.balance-gain {
+    color: #1e8a4c;
 }
 
 #quit-button {

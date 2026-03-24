@@ -1,4 +1,5 @@
 import { Match } from '@app/classes/match/match';
+import { BalanceService } from '@app/services/balance/balance.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
 import { ItemService } from '@app/services/item/item.service';
@@ -22,6 +23,7 @@ describe('PlayService', () => {
     let mockMapService: SinonStubbedInstance<MapService>;
     let mockCombatService: SinonStubbedInstance<CombatService>;
     let mockChatService: SinonStubbedInstance<ChatService>;
+    let mockBalanceService: SinonStubbedInstance<BalanceService>;
     let mocktrackingService: SinonStubbedInstance<TrackingService>;
     let mockItemService: SinonStubbedInstance<ItemService>;
     let mockMatch: SinonStubbedInstance<Match>;
@@ -31,6 +33,7 @@ describe('PlayService', () => {
         mockMapService = createStubInstance(MapService);
         mockCombatService = createStubInstance(CombatService);
         mockChatService = createStubInstance(ChatService);
+        mockBalanceService = createStubInstance(BalanceService);
         mocktrackingService = createStubInstance(TrackingService);
         mockItemService = createStubInstance(ItemService);
         mockMatch = createStubInstance(Match);
@@ -41,6 +44,7 @@ describe('PlayService', () => {
                 { provide: MapService, useValue: mockMapService },
                 { provide: CombatService, useValue: mockCombatService },
                 { provide: ChatService, useValue: mockChatService },
+                { provide: BalanceService, useValue: mockBalanceService },
                 { provide: TrackingService, useValue: mocktrackingService },
                 { provide: ItemService, useValue: mockItemService },
             ],
@@ -201,10 +205,12 @@ describe('PlayService', () => {
         expect(mockMatch.data.state).toBe(MatchState.MatchEnd);
     });
 
-    it('end match should update state', () => {
-        service['endMatch'](mockMatch);
+    it('end match should apply rewards before sending the final stats update', async () => {
+        await service['endMatch'](mockMatch);
 
         expect(mockMatch.data.state).toBe(MatchState.Statistics);
+        expect(mocktrackingService.stopTrackingMatch.calledBefore(mockBalanceService.applyMatchRewards)).toBe(true);
+        expect(mockBalanceService.applyMatchRewards.calledBefore(mockChatService.logEndMatch)).toBe(true);
         expect(mockMatch.clearTimeout.called).toBe(true);
     });
 
