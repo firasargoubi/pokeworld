@@ -49,6 +49,13 @@ export class StatPageComponent {
         }
     }
 
+    get formattedBalanceGain(): string {
+        const selfPlayerId = this.matchService.selfPlayer.userId ?? this.matchService.selfPlayer.id;
+        const selfPlayerStat = this.statService.playerStats.find((player) => player.id === selfPlayerId);
+        const value = selfPlayerStat?.balanceGain ?? 0;
+        return `${value >= 0 ? '+' : ''}${value} $`;
+    }
+
     updateSorting(statType: PlayerStatType) {
         this.audioService.playEffect(SoundEffect.Click);
         if (statType === this.sortingStat()) {

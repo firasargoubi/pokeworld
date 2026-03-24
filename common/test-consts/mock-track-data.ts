@@ -16,6 +16,8 @@ export const MOCK_TRACKING_PLAYER_DATAS: TrackingPlayerData[] = [
         escapes: 0,
         hpInflicted: 0,
         hpLost: 0,
+        balanceGain: 0,
+        currentBalance: 0,
     },
     {
         id: MOCK_PLAYER_DATAS[1].id,
@@ -28,6 +30,8 @@ export const MOCK_TRACKING_PLAYER_DATAS: TrackingPlayerData[] = [
         escapes: 0,
         hpInflicted: 0,
         hpLost: 0,
+        balanceGain: 0,
+        currentBalance: 0,
     },
     {
         id: MOCK_PLAYER_DATAS[2].id,
@@ -40,6 +44,8 @@ export const MOCK_TRACKING_PLAYER_DATAS: TrackingPlayerData[] = [
         escapes: 0,
         hpInflicted: 0,
         hpLost: 0,
+        balanceGain: 0,
+        currentBalance: 0,
     },
 ];
 

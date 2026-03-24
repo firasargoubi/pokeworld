@@ -77,6 +77,10 @@
                                     <div class="value">{{ statService.globalStats.flagHoldersCount }}</div>
                                 </div>
                                 }
+                                <div class="stat-row">
+                                    <div class="label">{{ 'pages.stat.balanceGain' | translate }}</div>
+                                    <div class="value balance-gain">{{ formattedBalanceGain }}</div>
+                                </div>
                                 <div id="quit-button" (click)="navigateToMenu()">{{ 'pages.stat.quit' | translate }}</div>
                             </div>
                             <div class="winner-container">

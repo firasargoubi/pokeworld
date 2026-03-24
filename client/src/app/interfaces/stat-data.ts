@@ -13,6 +13,8 @@ export interface PlayerStatData {
     id: string;
     name: string;
     team?: Team;
+    balanceGain: number;
+    currentBalance: number;
     [PlayerStatType.DiscoveredItemsCount]: number;
     [PlayerStatType.VisitedTilesRatio]: number;
     [PlayerStatType.Combats]: number;

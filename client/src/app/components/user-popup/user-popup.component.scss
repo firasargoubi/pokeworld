@@ -71,6 +71,9 @@ $flip-vertical-bleed: calc($base-size * 7);
 $corner-unit: calc($base-size * 0.5);
 $border-color: #a7dcff;
 $background-color: #ffffff;
+$button-cutout-size: 8px;
+$pixel-corner-size: 8px;
+$pixel-shadow-size: 4px;
 
 $pixel-corners-clip-path: polygon(
     0 #{$corner-unit},
@@ -85,6 +88,15 @@ $pixel-corners-clip-path: polygon(
     #{$corner-unit} 100%,
     #{$corner-unit} calc(100% - #{$corner-unit}),
     0 calc(100% - #{$corner-unit})
+);
+$shop-button-background: linear-gradient(
+    to bottom,
+    #d0f0d0 0,
+    #d0f0d0 $button-cutout-size,
+    #90c890 $button-cutout-size,
+    #90c890 calc(100% - $button-cutout-size),
+    #407540 calc(100% - $button-cutout-size),
+    #407540 100%
 );
 
 .user-popup {
@@ -622,4 +634,53 @@ $pixel-corners-clip-path: polygon(
     overflow: visible;
     overflow-wrap: anywhere;
     word-break: break-word;
+}
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.shop-item {
+    min-height: 148px;
+    border: none;
+    padding: 0;
+    background: transparent;
+    display: grid;
+    grid-template-columns: $button-cutout-size 1fr $button-cutout-size;
+    cursor: pointer;
+    transition:
+        transform 0.15s ease,
+        filter 0.15s ease;
+}
+
+.shop-item .item-edge,
+.shop-item .item-body {
+    background: $shop-button-background;
+}
+
+.shop-item .item-edge {
+    width: 100%;
+    height: calc(100% - $button-cutout-size * 2);
+    align-self: center;
+}
+
+.shop-item .item-edge:first-child {
+    margin-right: calc($button-cutout-size * -0.2);
+}
+
+.shop-item .item-edge:last-child {
+    margin-left: calc($button-cutout-size * -0.2);
+}
+
+.shop-item .item-body {
+    width: 100%;
+    height: 100%;
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
 }

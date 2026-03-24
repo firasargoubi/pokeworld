@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { UserPreferences } from '@common/interfaces/preferences';
+import { InventoryItem } from '@common/interfaces/shop';
 
 export class UserResponseDto {
     @ApiProperty()
@@ -19,6 +20,9 @@ export class UserResponseDto {
 
     @ApiProperty()
     balance: number;
+
+    @ApiProperty()
+    inventory: InventoryItem[];
 
     @ApiProperty()
     isLoggedIn: boolean;

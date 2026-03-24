@@ -1,0 +1,188 @@
+$card-width: min(620px, 92vw);
+$card-height: 480px;
+$font-family: 'pixel';
+$text-color: #0f1f3d;
+$button-cutout-size: 8px;
+$pixel-corner-size: 8px;
+$pixel-shadow-size: 4px;
+
+$shop-button-background: linear-gradient(
+    to bottom,
+    #d0f0d0 0,
+    #d0f0d0 $button-cutout-size,
+    #90c890 $button-cutout-size,
+    #90c890 calc(100% - $button-cutout-size),
+    #407540 calc(100% - $button-cutout-size),
+    #407540 100%
+);
+
+$shop-button-background-disabled: linear-gradient(
+    to bottom,
+    #d9d9d9 0,
+    #d9d9d9 $button-cutout-size,
+    #a7a7a7 $button-cutout-size,
+    #a7a7a7 calc(100% - $button-cutout-size),
+    #707070 calc(100% - $button-cutout-size),
+    #707070 100%
+);
+
+$pixel-clip-path: polygon(
+    $pixel-corner-size 0%,
+    calc(100% - #{$pixel-corner-size}) 0%,
+    calc(100% - #{$pixel-corner-size}) $pixel-corner-size,
+    100% $pixel-corner-size,
+    100% calc(100% - #{$pixel-corner-size}),
+    calc(100% - #{$pixel-corner-size}) calc(100% - #{$pixel-corner-size}),
+    calc(100% - #{$pixel-corner-size}) 100%,
+    $pixel-corner-size 100%,
+    $pixel-corner-size calc(100% - #{$pixel-corner-size}),
+    0% calc(100% - #{$pixel-corner-size}),
+    0% $pixel-corner-size,
+    $pixel-corner-size $pixel-corner-size
+);
+
+.shop-popup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.shop-card {
+    width: $card-width;
+    min-height: $card-height;
+    background-image: url('../../../assets/images/menu/containers/user-container-back.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    padding: 24px;
+}
+
+.shop-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+}
+
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.title {
+    margin: 0;
+    color: white;
+    font-family: $font-family;
+    font-size: 18px;
+}
+
+.balance-pill {
+    min-width: 96px;
+    padding: 10px 16px;
+    background: #ffffff;
+    border: $pixel-shadow-size solid #49506b;
+    clip-path: $pixel-clip-path;
+    font-family: $font-family;
+    font-size: 16px;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-align: center;
+    text-shadow: 1px 0 0 rgba(255, 255, 255, 0.7);
+    color: $text-color;
+}
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.shop-item {
+    min-height: 148px;
+    border: none;
+    padding: 0;
+    background: transparent;
+    display: grid;
+    grid-template-columns: $button-cutout-size 1fr $button-cutout-size;
+    cursor: pointer;
+    transition:
+        transform 0.15s ease,
+        filter 0.15s ease;
+}
+
+.shop-item .item-edge,
+.shop-item .item-body {
+    background: $shop-button-background;
+}
+
+.shop-item.owned .item-edge,
+.shop-item.owned .item-body {
+    background: $shop-button-background-disabled;
+}
+
+.shop-item .item-edge {
+    width: 100%;
+    height: calc(100% - $button-cutout-size * 2);
+    align-self: center;
+}
+
+.shop-item .item-edge:first-child {
+    margin-right: calc($button-cutout-size * -0.2);
+}
+
+.shop-item .item-edge:last-child {
+    margin-left: calc($button-cutout-size * -0.2);
+}
+
+.shop-item .item-body {
+    width: 100%;
+    height: 100%;
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+.shop-item:hover:not(:disabled) {
+    transform: translateY(-3px);
+    filter: brightness(1.04);
+}
+
+.shop-item:disabled {
+    cursor: default;
+}
+
+.item-name,
+.item-price {
+    font-family: $font-family;
+    color: $text-color;
+}
+
+.item-name {
+    width: 100%;
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.35;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.item-price {
+    width: 100%;
+    padding-top: 10px;
+    border-top: 2px solid rgba(15, 31, 61, 0.25);
+    text-align: center;
+    font-size: 18px;
+}
+
+@media (max-width: 720px) {
+    .items-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

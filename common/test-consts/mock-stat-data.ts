@@ -1,9 +1,8 @@
-import { GlobalStatData, PlayerStatData } from '@app/interfaces/stat-data';
-import { PlayerStatType } from '@app/interfaces/stat-type.enum';
-import { MOCK_TRACKING_DATA } from './mock-track-data';
 import { BATTLE_PLATFORM_IMAGES } from '@app/consts/images.const';
-import { WinnerVisualData } from '@app/interfaces/stat-data';
+import { GlobalStatData, PlayerStatData, WinnerVisualData } from '@app/interfaces/stat-data';
+import { PlayerStatType } from '@app/interfaces/stat-type.enum';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
+import { MOCK_TRACKING_DATA } from './mock-track-data';
 
 export const MOCK_GLOBAL_STAT_DATA: GlobalStatData = {
     gameDuration: 0,
@@ -25,6 +24,8 @@ export const MOCK_PLAYER_STAT_DATA: PlayerStatData[] = [
         [PlayerStatType.Escapes]: 0,
         [PlayerStatType.HpInflicted]: 0,
         [PlayerStatType.HpLost]: 0,
+        balanceGain: 0,
+        currentBalance: 0,
     },
     {
         id: 'player2',
@@ -37,6 +38,8 @@ export const MOCK_PLAYER_STAT_DATA: PlayerStatData[] = [
         [PlayerStatType.Escapes]: 0,
         [PlayerStatType.HpInflicted]: 0,
         [PlayerStatType.HpLost]: 0,
+        balanceGain: 0,
+        currentBalance: 0,
     },
     {
         id: 'player3',
@@ -49,6 +52,8 @@ export const MOCK_PLAYER_STAT_DATA: PlayerStatData[] = [
         [PlayerStatType.Escapes]: 0,
         [PlayerStatType.HpInflicted]: 0,
         [PlayerStatType.HpLost]: 0,
+        balanceGain: 0,
+        currentBalance: 0,
     },
 ];
 

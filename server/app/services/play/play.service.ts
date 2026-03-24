@@ -1,4 +1,5 @@
 import { Match } from '@app/classes/match/match';
+import { BalanceService } from '@app/services/balance/balance.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
 import { ItemService } from '@app/services/item/item.service';
@@ -22,6 +23,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PlayService {
+    @Inject(BalanceService) private readonly balanceService: BalanceService;
     @Inject(MapService) private readonly mapService: MapService;
     @Inject(TrackingService) private readonly trackingService: TrackingService;
     @Inject(forwardRef(() => ItemService)) private readonly itemService: ItemService;
@@ -176,11 +178,11 @@ export class PlayService {
         return true;
     }
 
-    private endMatch(match: Match) {
+    private async endMatch(match: Match) {
         match.data.state = MatchState.Statistics;
         this.trackingService.stopTrackingMatch(match);
+        await this.balanceService.applyMatchRewards(match);
         this.chatService.logEndMatch(match);
-
         match.sendUpdate();
         match.clearTimeout();
     }

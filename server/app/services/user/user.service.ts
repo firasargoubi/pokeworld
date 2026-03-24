@@ -6,6 +6,7 @@ import { UpdatePreferencesDto } from '@app/model/dto/user/update-preferences.dto
 import { User, UserDocument } from '@app/model/schema/user.schema';
 import { GameService } from '@app/services/game/game.service';
 import { MatchService } from '@app/services/match/match.service';
+import { INITIAL_USER_BALANCE } from '@common/consts/shop.const';
 import { AppLanguage, AppTheme, DEFAULT_PREFERENCES, UserPreferences } from '@common/interfaces/preferences';
 import { BadRequestException, ConflictException, forwardRef, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -85,6 +86,8 @@ export class UserService {
             profilePicture: createUserDto.profilePicture,
             fullProfilePicture: createUserDto.fullProfilePicture ?? createUserDto.profilePicture,
             passwordHash,
+            balance: INITIAL_USER_BALANCE,
+            inventory: [],
             userId,
             isLoggedIn: true,
             preferences: createUserDto.preferences ?? DEFAULT_PREFERENCES,
@@ -227,7 +230,8 @@ export class UserService {
             email: user.email,
             profilePicture: user.profilePicture,
             fullProfilePicture: user.fullProfilePicture ?? user.profilePicture,
-            balance: user.balance,
+            balance: user.balance || 0,
+            inventory: user.inventory ?? [],
             isLoggedIn: user.isLoggedIn,
             preferences,
         };

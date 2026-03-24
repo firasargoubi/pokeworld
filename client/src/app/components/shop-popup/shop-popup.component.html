@@ -1,0 +1,29 @@
+<div class="shop-popup">
+    <div class="shop-card">
+        <div class="shop-content">
+            <div class="header-row">
+                <p class="title">{{ 'components.shopPopup.title' | translate }}</p>
+                <div class="balance-pill">{{ currentUser?.balance ?? 0 }} $</div>
+            </div>
+
+            <div class="items-grid">
+                @for(item of shopItems; track item.id) {
+                <button
+                    class="shop-item"
+                    type="button"
+                    [class.owned]="isOwned(item.id)"
+                    (click)="purchaseItem(item)"
+                    [disabled]="!currentUser || isLoading || isOwned(item.id)"
+                >
+                    <span class="item-edge"></span>
+                    <span class="item-body">
+                        <span class="item-name">{{ item.nameKey | translate }}</span>
+                        <span class="item-price">{{ item.price }} $</span>
+                    </span>
+                    <span class="item-edge"></span>
+                </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>

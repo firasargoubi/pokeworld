@@ -1,3 +1,4 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { Order } from '@app/interfaces/stat-data';
 import { PlayerStatType } from '@app/interfaces/stat-type.enum';
@@ -20,7 +21,7 @@ describe('StatService', () => {
         });
 
         TestBed.configureTestingModule({
-            providers: [StatService, { provide: MatchService, useValue: matchService }],
+            providers: [StatService, { provide: MatchService, useValue: matchService }, provideHttpClient(withInterceptorsFromDi())],
         });
         service = TestBed.inject(StatService);
     });

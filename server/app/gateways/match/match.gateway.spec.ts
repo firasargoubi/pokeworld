@@ -159,6 +159,7 @@ describe('MatchGateway', () => {
             isLoggedIn: true,
             balance: 0,
             createdAt: new Date(),
+            inventory: [],
             preferences: {
                 language: AppLanguage.French,
                 theme: AppTheme.Default,
