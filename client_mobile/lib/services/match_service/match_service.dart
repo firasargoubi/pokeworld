@@ -20,6 +20,7 @@ import '../i18n_service/i18n_service.dart';
 import '../navigation_service/navigation_service.dart';
 import '../popup_service/popup_service.dart';
 import '../socket_service/socket_service.dart';
+import '../user_service/user_service.dart';
 
 class MatchService {
   static final MatchService _instance = MatchService._internal();
@@ -30,6 +31,7 @@ class MatchService {
   }
 
   late final SocketService _socketService;
+  final UserService _userService = UserService();
   final PopupService _popupService = PopupService();
   bool _listenersInitialized = false;
   MatchData? _matchData = GET_DEFAULT_MATCH_DATA();
@@ -40,7 +42,7 @@ class MatchService {
   MatchData? get matchData => _matchData;
   Stream<MatchData> get matchUpdates => _matchUpdateController.stream;
 
-  String? get selfId => _socketService.socket.id;
+  String? get selfId => _userService.currentUser.value?.userId;
   PlayerData? get selfPlayer => _selfPlayer;
   int? get selfIndex => _selfIndex;
 
@@ -126,7 +128,7 @@ class MatchService {
       messageParams['team'] = I18nService().translate(messageParams['team']! as String);
     }
 
-    final translatedMessage = I18nService().translate(message.message, params: messageParams);    
+    final translatedMessage = I18nService().translate(message.message, params: messageParams);
     _popupService.showPopup(
       PopupMessage(
         message: translatedMessage,

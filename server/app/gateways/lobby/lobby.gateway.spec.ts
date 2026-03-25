@@ -28,7 +28,7 @@ describe('LobbyGateway', () => {
         emitStub = stub();
         mockMatch = createStubInstance<Match>(Match);
         mockMatchService.getMatchFromPlayerId.returns(mockMatch);
-        mockUserService.getUserId.returns('user-1');
+        mockUserService.resolvePlayerId.returns('user-1');
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -56,13 +56,13 @@ describe('LobbyGateway', () => {
     it('should call kick player on kick player event', () => {
         const targetPlayerId = 'player2';
         gateway.kickPlayer(mockSocket, targetPlayerId);
-        expect(mockLobbyService.kickPlayer.calledWith(mockMatch, mockSocket.id, targetPlayerId)).toBeTruthy();
+        expect(mockLobbyService.kickPlayer.calledWith(mockMatch, 'user-1', targetPlayerId)).toBeTruthy();
     });
 
     it('should call change avatar on change avatar event', () => {
         const avatar = Avatar.Avatar8;
         gateway.changeAvatar(mockSocket, avatar);
-        expect(mockLobbyService.changeAvatar.calledWith(mockMatch, mockSocket.id, avatar)).toBeTruthy();
+        expect(mockLobbyService.changeAvatar.calledWith(mockMatch, 'user-1', avatar)).toBeTruthy();
     });
 
     it('should call add bot on add bot event', () => {
@@ -74,18 +74,25 @@ describe('LobbyGateway', () => {
     it('should call join lobby on join lobby event', () => {
         const playerData = structuredClone(MOCK_PLAYER_DATAS[0]);
         gateway.joinLobby(mockSocket, playerData);
-        expect(playerData.userId).toBe('user-1');
-        expect(mockLobbyService.joinLobby.calledWith(mockMatch, mockSocket.id, playerData)).toBeTruthy();
+        expect(mockLobbyService.joinLobby.calledWith(mockMatch, 'user-1', playerData)).toBeTruthy();
     });
 
     it('should call change lock status on change lock status event', () => {
         const lockStatus = true;
         gateway.changeLockStatus(mockSocket, lockStatus);
-        expect(mockLobbyService.changeLockStatus.calledWith(mockMatch, mockSocket.id, lockStatus)).toBeTruthy();
+        expect(mockLobbyService.changeLockStatus.calledWith(mockMatch, 'user-1', lockStatus)).toBeTruthy();
     });
 
     it('should call start match on change start match event', () => {
         gateway.startMatch(mockSocket);
-        expect(mockLobbyService.startMatch.calledWith(mockMatch, mockSocket.id)).toBeTruthy();
+        expect(mockLobbyService.startMatch.calledWith(mockMatch, 'user-1')).toBeTruthy();
+    });
+
+    it('should fall back to socket id when no user id is associated', () => {
+        mockUserService.resolvePlayerId.returns(mockSocket.id);
+
+        gateway.changeAvatar(mockSocket, Avatar.Avatar8);
+
+        expect(mockLobbyService.changeAvatar.calledWith(mockMatch, mockSocket.id, Avatar.Avatar8)).toBeTruthy();
     });
 });

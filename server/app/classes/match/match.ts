@@ -24,14 +24,14 @@ export class Match {
         this.matchService.sendUpdate(this);
     }
 
-    sendMessage(message: string, messageParams?: Record<string, string | number | boolean>) {
+    sendMessage(message: string, messageParams?: Record<string, string | number | boolean>, toHost: boolean = false) {
         this.sendUpdate();
-        this.matchService.sendMessage(this.data.code, message, messageParams);
+        this.matchService.sendMessage(this.data.code, message, messageParams, toHost);
     }
 
     sendMessageToHost(message: string, messageParams?: Record<string, string | number | boolean>) {
         this.sendUpdate();
-        this.matchService.sendMessage(this.data.players[this.data.lobbyData.hostPlayerIndex].id, message, messageParams);
+        this.matchService.sendMessage(this.data.players[this.data.lobbyData.hostPlayerIndex].id, message, messageParams, true);
     }
 
     setTimeout(callback: () => void, duration: number) {

@@ -134,7 +134,7 @@ export class LobbyService {
 
     private joinDropInState(match: Match, playerId: string, playerData: PlayerData) {
         match.data.players = match.data.players.filter((p) => !(p.id === playerId && !p.name));
-        const reconnectUserId = playerData.userId?.trim();
+        const reconnectUserId = playerData.id?.trim();
         const disconnectedPlayerIndex = reconnectUserId ? this.findDisconnectedPlayerIndexByUserId(match, reconnectUserId) : -1;
 
         if (disconnectedPlayerIndex === -1) {
@@ -155,7 +155,7 @@ export class LobbyService {
         if (!userId) {
             return -1;
         }
-        return match.data.players.findIndex((player) => player.userId === userId && !player.isConnected);
+        return match.data.players.findIndex((player) => player.id === userId && !player.isConnected);
     }
 
     private remapReconnectingPlayerSocket(match: Match, disconnectedPlayerIndex: number, newPlayerId: string) {

@@ -52,24 +52,54 @@ describe('MatchGateway', () => {
 
     it('should call create match on create match event', () => {
         const mockGameData = structuredClone(MOCK_GAME_DATAS[0]);
+        mockUserService.getUserId.returns('user123');
         gateway.createMatch(mockSocket, mockGameData);
-        expect(mockMatchService.createMatch.calledWith(mockSocket.id, mockGameData)).toBeTruthy();
+        expect(mockMatchService.createMatch.calledWith('user123', mockGameData)).toBeTruthy();
     });
 
     it('should call join match on join match event', () => {
         const matchCode = '1234';
+        mockUserService.getUserId.returns('user123');
         gateway.joinMatch(mockSocket, matchCode);
-        expect(mockMatchService.joinMatch.calledWith(mockSocket.id, matchCode)).toBeTruthy();
+        expect(mockMatchService.joinMatch.calledWith('user123', matchCode)).toBeTruthy();
     });
 
     it('should call leave match on leave match event', () => {
+        mockUserService.getUserId.returns('user123');
         gateway.leaveMatch(mockSocket);
-        expect(mockMatchService.leaveMatch.calledWith(mockSocket.id)).toBeTruthy();
+        expect(mockMatchService.leaveMatch.calledWith('user123')).toBeTruthy();
     });
 
     it('should call leave match on handle disconnect', () => {
+        mockUserService.getUserId.returns('user123');
         gateway.handleDisconnect(mockSocket);
         expect(mockMatchService.leaveMatch.called).toBeTruthy();
+    });
+
+    it('should not create a match when the socket is not associated to a user', async () => {
+        mockUserService.getUserId.returns(undefined);
+
+        const result = await gateway.createMatch(mockSocket, structuredClone(MOCK_GAME_DATAS[0]));
+
+        expect(result).toBeNull();
+        expect(mockMatchService.createMatch.called).toBeFalsy();
+    });
+
+    it('should not join a match when the socket is not associated to a user', () => {
+        mockUserService.getUserId.returns(undefined);
+
+        const result = gateway.joinMatch(mockSocket, '1234');
+
+        expect(result).toBeNull();
+        expect(mockMatchService.joinMatch.called).toBeFalsy();
+    });
+
+    it('should not leave a match when the socket is not associated to a user', () => {
+        mockUserService.getUserId.returns(undefined);
+
+        gateway.leaveMatch(mockSocket);
+
+        expect(mockMatchService.leaveMatch.called).toBeFalsy();
     });
 
     it('should connect player to match', () => {
@@ -97,16 +127,16 @@ describe('MatchGateway', () => {
         expect(emitStub.calledWith(MatchEvent.Update, matchData)).toBeTruthy();
     });
 
-    it('should emit message to socket', () => {
+    it('should emit message to host', () => {
         const matchCode = '1234';
         const message = 'hello';
-        const hasCloseButton = false;
+        const toHost = true;
         const expectedPayload = {
             message,
-            hasCloseButton,
+            hasCloseButton: toHost,
         };
-
-        gateway.emitMessage(matchCode, message);
+        mockUserService.getSocketId.returns(matchCode);
+        gateway.emitMessage(matchCode, message, toHost);
 
         expect(mockSocket.emit.calledWith(MatchEvent.Message, expectedPayload)).toBeTruthy();
     });
@@ -114,15 +144,13 @@ describe('MatchGateway', () => {
     it('should emit message to room', () => {
         const matchCode = '1234';
         const message = 'hello';
-        const hasCloseButton = false;
+        const toHost = false;
         const expectedPayload = {
             message,
-            hasCloseButton,
+            hasCloseButton: toHost,
         };
 
-        mockSocket = null;
-
-        gateway.emitMessage(matchCode, message, hasCloseButton);
+        gateway.emitMessage(matchCode, message, toHost);
 
         expect(emitStub.calledWith(MatchEvent.Message, expectedPayload)).toBeTruthy();
     });
@@ -137,13 +165,13 @@ describe('MatchGateway', () => {
     it('should emit message with close button', () => {
         const matchCode = '1234';
         const message = 'hello';
-        const hasCloseButton = true;
+        const toHost = true;
         const expectedPayload = {
             message,
-            hasCloseButton,
+            hasCloseButton: toHost,
         };
-
-        gateway.emitMessage(matchCode, message, hasCloseButton);
+        mockUserService.getSocketId.returns(matchCode);
+        gateway.emitMessage(matchCode, message, toHost);
 
         expect(mockSocket.emit.calledWith(MatchEvent.Message, expectedPayload)).toBeTruthy();
     });

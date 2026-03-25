@@ -18,17 +18,29 @@ export class MatchGateway {
 
     @SubscribeMessage(MatchEvent.CreateMatch)
     async createMatch(socket: Socket, gameData: GameData): Promise<MatchData | null> {
-        return this.matchService.createMatch(socket.id, gameData);
+        const playerId = this.userService.getUserId(socket.id);
+        if (!playerId) {
+            return null;
+        }
+        return this.matchService.createMatch(playerId, gameData);
     }
 
     @SubscribeMessage(MatchEvent.JoinMatch)
     joinMatch(socket: Socket, matchCode: string): MatchData | null {
-        return this.matchService.joinMatch(socket.id, matchCode);
+        const playerId = this.userService.getUserId(socket.id);
+        if (!playerId) {
+            return null;
+        }
+        return this.matchService.joinMatch(playerId, matchCode);
     }
 
     @SubscribeMessage(MatchEvent.LeaveMatch)
     leaveMatch(socket: Socket) {
-        this.matchService.leaveMatch(socket.id);
+        const playerId = this.userService.getUserId(socket.id);
+        if (!playerId) {
+            return;
+        }
+        this.matchService.leaveMatch(playerId);
     }
 
     @SubscribeMessage(UserEvent.Associate)
@@ -65,14 +77,16 @@ export class MatchGateway {
     }
 
     connectPlayer(playerId: string, matchCode: string) {
-        const socket = this.server.sockets.sockets.get(playerId);
+        const socketId = this.userService.getSocketId(playerId);
+        const socket = this.server.sockets.sockets.get(socketId);
         if (socket) {
             socket.join(matchCode);
         }
     }
 
     disconnectPlayer(playerId: string) {
-        const socket = this.server.sockets.sockets.get(playerId);
+        const socketId = this.userService.getSocketId(playerId);
+        const socket = this.server.sockets.sockets.get(socketId);
         if (socket) {
             socket.rooms.forEach((room) => {
                 socket.leave(room);
@@ -84,24 +98,29 @@ export class MatchGateway {
         this.server.to(matchCode).emit(MatchEvent.Update, matchData);
     }
 
-    emitMessage(matchCode: string, message: string, hasCloseButton: boolean = false, messageParams?: Record<string, string | number | boolean>) {
-        const socket = this.server.sockets.sockets.get(matchCode);
+    emitMessage(matchCode: string, message: string, toHost: boolean = false, messageParams?: Record<string, string | number | boolean>) {
         const messageFromServer: MessageFromServer = {
             message,
-            hasCloseButton,
+            hasCloseButton: toHost,
         };
         if (messageParams) {
             messageFromServer.messageParams = messageParams;
         }
-        if (socket) {
-            socket.emit(MatchEvent.Message, messageFromServer);
+
+        if (toHost) {
+            const socketId = this.userService.getSocketId(matchCode);
+            const socket = this.server.sockets.sockets.get(socketId);
+            if (socket) {
+                socket.emit(MatchEvent.Message, messageFromServer);
+            }
         } else {
             this.server.to(matchCode).emit(MatchEvent.Message, messageFromServer);
         }
     }
 
     emitRemovedFromMatch(playerId: string, reason: string) {
-        const socket = this.server.sockets.sockets.get(playerId);
+        const socketId = this.userService.getSocketId(playerId);
+        const socket = this.server.sockets.sockets.get(socketId);
         if (socket) {
             socket.emit(MatchEvent.RemovedFromMatch, reason);
         }

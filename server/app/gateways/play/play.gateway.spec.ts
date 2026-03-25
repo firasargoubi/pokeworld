@@ -2,6 +2,7 @@ import { Match } from '@app/classes/match/match';
 import { ItemService } from '@app/services/item/item.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
+import { UserService } from '@app/services/user/user.service';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchData, MatchState } from '@common/interfaces/match-data';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -16,6 +17,7 @@ describe('PlayGayteway', () => {
     let mockPlayService: SinonStubbedInstance<PlayService>;
     let mockMatchService: SinonStubbedInstance<MatchService>;
     let mockItemService: SinonStubbedInstance<ItemService>;
+    let mockUserService: SinonStubbedInstance<UserService>;
     let emitStub: SinonStub;
     let mockMatch: SinonStubbedInstance<Match>;
 
@@ -24,10 +26,12 @@ describe('PlayGayteway', () => {
         mockPlayService = createStubInstance<PlayService>(PlayService);
         mockMatchService = createStubInstance<MatchService>(MatchService);
         mockItemService = createStubInstance<ItemService>(ItemService);
+        mockUserService = createStubInstance<UserService>(UserService);
         mockServer = createStubInstance<Server>(Server);
         emitStub = stub();
         mockMatch = createStubInstance<Match>(Match);
         mockMatchService.getMatchFromPlayerId.returns(mockMatch);
+        mockUserService.resolvePlayerId.returns('user-1');
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -35,6 +39,7 @@ describe('PlayGayteway', () => {
                 { provide: MatchService, useValue: mockMatchService },
                 { provide: PlayService, useValue: mockPlayService },
                 { provide: ItemService, useValue: mockItemService },
+                { provide: UserService, useValue: mockUserService },
                 { provide: Server, useValue: mockServer },
             ],
         }).compile();
@@ -54,38 +59,47 @@ describe('PlayGayteway', () => {
 
     it('should call end turn on end turn event', () => {
         gateway.endTurn(mockSocket);
-        expect(mockPlayService.endTurn.calledWith(mockMatch)).toBeTruthy();
+        expect(mockPlayService.endTurn.calledWith(mockMatch, 'user-1')).toBeTruthy();
     });
 
     it('should call move on move event', () => {
         const position = { x: 2, y: 2 };
         gateway.move(mockSocket, position);
-        expect(mockPlayService.move.calledWith(mockMatch, mockSocket.id, position)).toBeTruthy();
+        expect(mockPlayService.move.calledWith(mockMatch, 'user-1', position)).toBeTruthy();
     });
 
     it('should call action on action event', () => {
         const position = { x: 2, y: 2 };
         gateway.action(mockSocket, position);
-        expect(mockPlayService.action.calledWith(mockMatch, mockSocket.id, position)).toBeTruthy();
+        expect(mockPlayService.action.calledWith(mockMatch, 'user-1', position)).toBeTruthy();
     });
 
     it('should call debug move on debug move event', () => {
         const position = { x: 2, y: 2 };
         gateway.debugMove(mockSocket, position);
-        expect(mockPlayService.debugMove.calledWith(mockMatch, mockSocket.id, position)).toBeTruthy();
+        expect(mockPlayService.debugMove.calledWith(mockMatch, 'user-1', position)).toBeTruthy();
     });
 
     it('should call change debug mode on change debug mode event', () => {
         const isLocked = true;
         gateway.changeDebugMode(mockSocket, isLocked);
-        expect(mockPlayService.changeDebugMode.calledWith(mockMatch, mockSocket.id, isLocked)).toBeTruthy();
+        expect(mockPlayService.changeDebugMode.calledWith(mockMatch, 'user-1', isLocked)).toBeTruthy();
     });
     it('should call drop items on drop item event and continue turn', () => {
         const itemType = ItemType.Item1;
         mockMatch.data = { state: MatchState.Lobby } as MatchData;
         gateway.dropItem(mockSocket, itemType);
-        expect(mockItemService.dropItems.calledWith(mockMatch, mockSocket.id, [itemType])).toBeTruthy();
+        expect(mockItemService.dropItems.calledWith(mockMatch, 'user-1', [itemType])).toBeTruthy();
         expect(mockMatch.data.state).toBe(MatchState.TurnWait);
         expect(mockPlayService.continueTurn.calledWith(mockMatch)).toBeTruthy();
+    });
+
+    it('should fall back to socket id when no user id is associated', () => {
+        const position = { x: 2, y: 2 };
+        mockUserService.resolvePlayerId.returns(mockSocket.id);
+
+        gateway.move(mockSocket, position);
+
+        expect(mockPlayService.move.calledWith(mockMatch, mockSocket.id, position)).toBeTruthy();
     });
 });
