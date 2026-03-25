@@ -49,8 +49,8 @@ export class MatchService {
         this.matchGateway.broadcastMatchListUpdate();
     }
 
-    sendMessage(matchCode: string, message: string, messageParams?: Record<string, string | number | boolean>) {
-        this.matchGateway.emitMessage(matchCode, message, false, messageParams);
+    sendMessage(matchCode: string, message: string, messageParams?: Record<string, string | number | boolean>, toHost: boolean = false) {
+        this.matchGateway.emitMessage(matchCode, message, toHost, messageParams);
     }
 
     playerRemovedFromMatch(playerId: string, reason: string) {

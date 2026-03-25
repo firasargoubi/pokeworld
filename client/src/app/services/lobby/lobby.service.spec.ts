@@ -18,10 +18,11 @@ describe('LobbyService', () => {
 
     beforeEach(() => {
         mockSocketService = jasmine.createSpyObj('SocketService', ['emit'], { selfId: 'self-id' });
-        mockMatchService = jasmine.createSpyObj('MatchService', ['isState'], {
+        mockMatchService = jasmine.createSpyObj('MatchService', ['isState', 'isSelfPlayer'], {
             matchUpdate: { pipe: () => ({ subscribe: () => ({}) }) },
             selfPlayer: { isConnected: true },
         });
+        mockMatchService.isSelfPlayer.and.callFake((player) => player?.userId === 'user-123' || player?.id === 'self-id');
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
         TestBed.configureTestingModule({
@@ -79,10 +80,9 @@ describe('LobbyService', () => {
 
     it('on match update should navigate to lobby', () => {
         mockMatchService.isState.and.returnValue(true);
-        Object.defineProperty(mockSocketService, 'selfId', { value: 'selfId' });
         const oldMatchData = structuredClone(MOCK_MATCH_DATAS[0]);
         oldMatchData.players[0].isConnected = false;
-        oldMatchData.players[0].id = 'selfId';
+        oldMatchData.players[0].userId = 'user-123';
         mockMatchService.selfPlayer.isConnected = true;
         service['onMatchUpdate'](oldMatchData);
         expect(mockRouter.navigate).toHaveBeenCalledWith([PageEndpoint.Lobby]);
@@ -90,10 +90,9 @@ describe('LobbyService', () => {
 
     it('on match update should navigate to play when leaving lobby', () => {
         mockMatchService.isState.and.callFake((states: MatchState[]) => states.includes(MatchState.TurnStart));
-        Object.defineProperty(mockSocketService, 'selfId', { value: 'selfId' });
         const oldMatchData = structuredClone(MOCK_MATCH_DATAS[0]);
         oldMatchData.state = MatchState.Lobby;
-        oldMatchData.players[0].id = 'selfId';
+        oldMatchData.players[0].userId = 'user-123';
         oldMatchData.players[0].isConnected = true;
         mockMatchService.selfPlayer.isConnected = true;
         service['onMatchUpdate'](oldMatchData);
@@ -102,10 +101,9 @@ describe('LobbyService', () => {
 
     it('on match update should navigate to play on drop in', () => {
         mockMatchService.isState.and.returnValue(false);
-        Object.defineProperty(mockSocketService, 'selfId', { value: 'selfId' });
         const oldMatchData = structuredClone(MOCK_MATCH_DATAS[0]);
         oldMatchData.players[0].isConnected = false;
-        oldMatchData.players[0].id = 'selfId';
+        oldMatchData.players[0].userId = 'user-123';
         mockMatchService.selfPlayer.isConnected = true;
         service['onMatchUpdate'](oldMatchData);
         expect(mockRouter.navigate).toHaveBeenCalledWith([PageEndpoint.Play]);

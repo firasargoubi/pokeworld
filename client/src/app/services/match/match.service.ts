@@ -10,6 +10,7 @@ import { I18nService } from '@app/services/i18n/i18n.service';
 import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { SocketService } from '@app/services/socket/socket.service';
+import { UserService } from '@app/services/user/user.service';
 import { DEFAULT_MATCH_DATA, DEFAULT_SELF_INDEX } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA, MAX_ITEMS } from '@common/consts/player-data.const';
 import { WARNING_MESSAGES } from '@common/consts/warning-messages';
@@ -36,6 +37,7 @@ export class MatchService {
     private popupService: PopupService = inject(PopupService);
     private chatService: ChatService = inject(ChatService);
     private i18nService: I18nService = inject(I18nService);
+    private userService: UserService = inject(UserService);
     private router: Router = inject(Router);
 
     constructor() {
@@ -98,13 +100,27 @@ export class MatchService {
         return this.isActivePlayer() ? this.data.playData.movementLeft : 0;
     }
 
+    isSelfPlayer(player: PlayerData | null): boolean {
+        if (!player) {
+            return false;
+        }
+
+        const currentUserId = this.userService.currentUser?.userId;
+        const socketId = this.socketService.selfId;
+
+        return [currentUserId, socketId].some((candidateId) => !!candidateId && (player.id === candidateId || player.userId === candidateId));
+    }
+
     private onNavigationUpdate(event: RouterEvent) {
         if (event instanceof NavigationStart && event.navigationTrigger !== 'imperative') {
             this.leaveMatch();
         }
     }
 
-    private onMatchJoined(matchData: MatchData) {
+    private onMatchJoined(matchData: MatchData | null) {
+        if (!matchData) {
+            return;
+        }
         this.onUpdate(matchData);
         this.router.navigate([PageEndpoint.Character]);
     }
@@ -121,8 +137,8 @@ export class MatchService {
     private onUpdate(matchData: MatchData) {
         const oldMatchData = this.data;
         this.data = matchData;
-        this.selfIndex = matchData.players.findIndex((p) => p.id === this.socketService.selfId);
-        this.selfPlayer = matchData.players[this.selfIndex];
+        this.selfIndex = matchData.players.findIndex((player) => this.isSelfPlayer(player));
+        this.selfPlayer = this.selfIndex >= 0 ? matchData.players[this.selfIndex] : structuredClone(DEFAULT_PLAYER_DATA);
         this.gameDataService.setGameData(matchData.gameData);
         this.matchUpdate.next(oldMatchData);
     }

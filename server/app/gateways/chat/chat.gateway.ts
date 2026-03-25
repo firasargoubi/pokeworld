@@ -19,14 +19,14 @@ export class ChatGateway {
 
     @SubscribeMessage(ChatEvent.Message)
     async message(socket: Socket, message: string) {
-        const match = this.matchService.getMatchFromPlayerId(socket.id);
-        let user: User | null = null;
         const userId = this.userService.getUserId(socket.id);
+        const match = this.matchService.getMatchFromPlayerId(userId);
+        let user: User | null = null;
         if (userId) {
             user = await this.userService.getUserById(userId);
         }
         if (match) {
-            this.chatService.message(match, socket.id, message, user);
+            this.chatService.message(match, userId, message, user);
         }
     }
 

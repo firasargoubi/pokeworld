@@ -18,57 +18,62 @@ export class LobbyGateway {
 
     @SubscribeMessage(LobbyEvent.KickPlayer)
     kickPlayer(socket: Socket, targetPlayerId: string) {
-        const match = this.matchService.getMatchFromPlayerId(socket.id);
+        const playerId = this.userService.resolvePlayerId(socket);
+        const match = this.matchService.getMatchFromPlayerId(playerId);
         if (match) {
-            this.lobbyService.kickPlayer(match, socket.id, targetPlayerId);
+            this.lobbyService.kickPlayer(match, playerId, targetPlayerId);
         }
     }
 
     @SubscribeMessage(LobbyEvent.ChangeAvatar)
     changeAvatar(socket: Socket, avatar: Avatar) {
-        const match = this.matchService.getMatchFromPlayerId(socket.id);
+        const playerId = this.userService.resolvePlayerId(socket);
+        const match = this.matchService.getMatchFromPlayerId(playerId);
         if (match) {
-            this.lobbyService.changeAvatar(match, socket.id, avatar);
+            this.lobbyService.changeAvatar(match, playerId, avatar);
         }
     }
 
     @SubscribeMessage(LobbyEvent.JoinLobby)
     joinLobby(socket: Socket, playerData: PlayerData) {
-        const match = this.matchService.getMatchFromPlayerId(socket.id);
+        const playerId = this.userService.resolvePlayerId(socket);
+        const match = this.matchService.getMatchFromPlayerId(playerId);
         if (match) {
-            const resolvedFromMap = this.userService.getUserId(socket.id);
-            playerData.userId = resolvedFromMap ?? playerData.userId;
-            this.lobbyService.joinLobby(match, socket.id, playerData);
+            this.lobbyService.joinLobby(match, playerId, playerData);
         }
     }
 
     @SubscribeMessage(LobbyEvent.ChangeLockStatus)
     changeLockStatus(socket: Socket, lockStatus: boolean) {
-        const match = this.matchService.getMatchFromPlayerId(socket.id);
+        const playerId = this.userService.resolvePlayerId(socket);
+        const match = this.matchService.getMatchFromPlayerId(playerId);
         if (match) {
-            this.lobbyService.changeLockStatus(match, socket.id, lockStatus);
+            this.lobbyService.changeLockStatus(match, playerId, lockStatus);
         }
     }
 
     @SubscribeMessage(LobbyEvent.ChangeMatchSettings)
     changeMatchSettings(socket: Socket, matchSettings: MatchSettings) {
-        const match = this.matchService.getMatchFromPlayerId(socket.id);
+        const playerId = this.userService.resolvePlayerId(socket);
+        const match = this.matchService.getMatchFromPlayerId(playerId);
         if (match) {
-            this.lobbyService.changeMatchSettings(match, socket.id, matchSettings);
+            this.lobbyService.changeMatchSettings(match, playerId, matchSettings);
         }
     }
 
     @SubscribeMessage(LobbyEvent.StartMatch)
     startMatch(socket: Socket) {
-        const match = this.matchService.getMatchFromPlayerId(socket.id);
+        const playerId = this.userService.resolvePlayerId(socket);
+        const match = this.matchService.getMatchFromPlayerId(playerId);
         if (match) {
-            this.lobbyService.startMatch(match, socket.id);
+            this.lobbyService.startMatch(match, playerId);
         }
     }
 
     @SubscribeMessage(LobbyEvent.AddBot)
     addBot(socket: Socket, botType: PlayerType) {
-        const match = this.matchService.getMatchFromPlayerId(socket.id);
+        const playerId = this.userService.resolvePlayerId(socket);
+        const match = this.matchService.getMatchFromPlayerId(playerId);
         if (match) {
             this.lobbyService.addBot(match, botType);
         }

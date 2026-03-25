@@ -12,6 +12,7 @@ import { BadRequestException, ConflictException, forwardRef, Inject, Injectable,
 import { InjectModel } from '@nestjs/mongoose';
 import * as crypto from 'crypto';
 import { Model } from 'mongoose';
+import { Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -23,6 +24,10 @@ export class UserService {
 
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {
         this.passkey = process.env.PASSWORD_PASSKEY;
+    }
+
+    resolvePlayerId(socket: Socket): string {
+        return this.getUserId(socket.id) ?? socket.id;
     }
 
     associateSocket(userId: string, socketId: string) {

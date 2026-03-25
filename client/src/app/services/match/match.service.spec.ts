@@ -7,6 +7,7 @@ import { I18nService } from '@app/services/i18n/i18n.service';
 import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { SocketService } from '@app/services/socket/socket.service';
+import { UserService } from '@app/services/user/user.service';
 import { MAX_ITEMS } from '@common/consts/player-data.const';
 import { WARNING_MESSAGES } from '@common/consts/warning-messages';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
@@ -28,6 +29,7 @@ describe('MatchService', () => {
     let routerSpy: jasmine.SpyObj<Router>;
     let chatServiceSpy: jasmine.SpyObj<ChatService>;
     let i18nServiceSpy: jasmine.SpyObj<I18nService>;
+    let userServiceSpy: jasmine.SpyObj<UserService>;
 
     beforeEach(() => {
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['emit', 'on'], { selfId: 'selfId' });
@@ -39,6 +41,7 @@ describe('MatchService', () => {
         chatServiceSpy.isFilterEnabled = jasmine.createSpyObj('signal', ['get', 'set']);
         i18nServiceSpy = jasmine.createSpyObj('I18nService', ['translate']);
         i18nServiceSpy.translate.and.callFake((message: string) => message);
+        userServiceSpy = jasmine.createSpyObj('UserService', [], { currentUser: { userId: 'user-123' } });
 
         TestBed.configureTestingModule({
             providers: [
@@ -50,6 +53,7 @@ describe('MatchService', () => {
                 { provide: Router, useValue: routerSpy },
                 { provide: ChatService, useValue: chatServiceSpy },
                 { provide: I18nService, useValue: i18nServiceSpy },
+                { provide: UserService, useValue: userServiceSpy },
             ],
         });
 
@@ -172,13 +176,21 @@ describe('MatchService', () => {
         expect(routerSpy.navigate).toHaveBeenCalledWith([PageEndpoint.Menu]);
     });
 
-    it('on update should update match data', () => {
+    it('on update should resolve self player with user id', () => {
         const matchData = structuredClone(MOCK_MATCH_DATAS[0]);
-        matchData.players[0].id = 'selfId';
+        matchData.players[0].id = 'socket-1';
+        matchData.players[0].userId = 'user-123';
         service['onUpdate'](matchData);
         expect(service.data).toBe(matchData);
         expect(service.selfIndex).toBe(0);
+        expect(service.selfPlayer).toEqual(matchData.players[0]);
         expect(gameDataServiceSpy.setGameData).toHaveBeenCalledWith(matchData.gameData);
+    });
+
+    it('isSelfPlayer should fall back to socket id when current user is unavailable', () => {
+        Object.defineProperty(userServiceSpy, 'currentUser', { get: () => null });
+
+        expect(service.isSelfPlayer({ id: 'selfId' } as PlayerData)).toBeTrue();
     });
 
     it('on message should show popup with message', () => {
