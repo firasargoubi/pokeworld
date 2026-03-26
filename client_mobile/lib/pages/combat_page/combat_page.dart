@@ -61,6 +61,7 @@ class _CombatPageState extends State<CombatPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _readyForAnimations = true;
       AudioService().playBackgroundMusic(BackgroundMusic.Combat.path);
+      AudioService().playAvatarSounds([AVATAR_SOUNDS[selfPlayer.avatar]!, AVATAR_SOUNDS[enemyPlayer.avatar]!]);
     });
 
     PlayService().startListeningToMotion();
@@ -359,6 +360,12 @@ class _CombatPageState extends State<CombatPage> {
   }
 
   Widget _buildPlayerFooter(double baseSize, double footerGap, double footerStatFont, I18nService i18n) {
+    Color combatStatColor(int statValue, {int threshold = 4}) {
+      if (statValue > threshold) return Colors.green;
+      if (statValue < threshold) return Colors.red;
+      return FOOTER_TEXT_COLOR;
+    }
+
     return Row(
       children: [
         Expanded(
@@ -386,14 +393,18 @@ class _CombatPageState extends State<CombatPage> {
                 children: [
                   StatRow(
                     label: '${i18n.translate(FOOTER_ATTACK_STAT_LABEL_KEY)} (${selfPlayer.attackDice.displayName()})',
-                    value: '${selfCombatData.attack}/4',
+                    value: '${selfCombatData.attack}',
+                    valueSuffix: '/4',
+                    valueColor: combatStatColor(selfCombatData.attack),
                     style: footerStyle,
                     fontSize: footerStatFont,
                   ),
                   SizedBox(height: baseSize * 0.01),
                   StatRow(
                     label: '${i18n.translate(FOOTER_DEFENSE_STAT_LABEL_KEY)} (${selfPlayer.defenseDice.displayName()})',
-                    value: '${selfCombatData.defense}/4',
+                    value: '${selfCombatData.defense}',
+                    valueSuffix: '/4',
+                    valueColor: combatStatColor(selfCombatData.defense),
                     style: footerStyle,
                     fontSize: footerStatFont,
                   ),

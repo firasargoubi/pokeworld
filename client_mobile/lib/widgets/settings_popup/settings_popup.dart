@@ -22,6 +22,7 @@ class SettingsPopup extends StatefulWidget {
 class _SettingsPopupState extends State<SettingsPopup> {
   late double _musicVolume;
   late double _effectsVolume;
+  late double _avatarsVolume;
   SettingsTab _selectedTab = SettingsTab.audio;
 
   final PreferencesService _preferencesService = PreferencesService();
@@ -31,9 +32,10 @@ class _SettingsPopupState extends State<SettingsPopup> {
     super.initState();
     _musicVolume = AudioService().backgroundVolume.value;
     _effectsVolume = AudioService().effectsVolume.value;
-
+    _avatarsVolume = AudioService().avatarsVolume.value;
     AudioService().backgroundVolume.addListener(_onMusicVolumeChanged);
     AudioService().effectsVolume.addListener(_onEffectsVolumeChanged);
+    AudioService().avatarsVolume.addListener(_onAvatarsVolumeChanged);
     _preferencesService.currentLanguage.addListener(_onPreferencesChanged);
     _preferencesService.currentTheme.addListener(_onPreferencesChanged);
   }
@@ -42,6 +44,7 @@ class _SettingsPopupState extends State<SettingsPopup> {
   void dispose() {
     AudioService().backgroundVolume.removeListener(_onMusicVolumeChanged);
     AudioService().effectsVolume.removeListener(_onEffectsVolumeChanged);
+    AudioService().avatarsVolume.removeListener(_onAvatarsVolumeChanged);
     _preferencesService.currentLanguage.removeListener(_onPreferencesChanged);
     _preferencesService.currentTheme.removeListener(_onPreferencesChanged);
     super.dispose();
@@ -53,6 +56,10 @@ class _SettingsPopupState extends State<SettingsPopup> {
 
   void _onEffectsVolumeChanged() {
     if (mounted) setState(() => _effectsVolume = AudioService().effectsVolume.value);
+  }
+
+  void _onAvatarsVolumeChanged() {
+    if (mounted) setState(() => _avatarsVolume = AudioService().avatarsVolume.value);
   }
 
   void _onPreferencesChanged() {
@@ -96,6 +103,11 @@ class _SettingsPopupState extends State<SettingsPopup> {
     AudioService().setEffectsVolume(value);
   }
 
+  void _onAvatarsVolumeChange(double value) {
+    setState(() => _avatarsVolume = value);
+    AudioService().setAvatarsVolume(value);
+  }
+
   void _selectLanguage(AppLanguage language) {
     _preferencesService.setLanguage(language);
   }
@@ -121,6 +133,15 @@ class _SettingsPopupState extends State<SettingsPopup> {
           label: i18n.translate(EFFECTS_LABEL),
           value: _effectsVolume,
           onChanged: _onEffectsVolumeChange,
+          labelStyle: labelStyle,
+          sliderWidth: sliderWidth,
+          sliderHeight: sliderHeight,
+        ),
+        SizedBox(height: sliderHeight),
+        VolumeSlider(
+          label: i18n.translate(AVATARS_LABEL),
+          value: _avatarsVolume,
+          onChanged: _onAvatarsVolumeChange,
           labelStyle: labelStyle,
           sliderWidth: sliderWidth,
           sliderHeight: sliderHeight,

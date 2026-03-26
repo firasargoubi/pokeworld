@@ -5,6 +5,8 @@ export enum SoundEffect {
     Heal = 'heal',
     Item = 'item',
     Click = 'click',
+    Shiny = 'shiny',
+    Evolve = 'evolve',
 }
 
 export enum BackgroundMusic {

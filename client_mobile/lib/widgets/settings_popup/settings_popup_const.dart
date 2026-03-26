@@ -10,6 +10,7 @@ const Color SHADOW_COLOR = Color.fromARGB(255, 100, 100, 100);
 const String TITLE_TEXT = 'components.appSettings.title';
 const String MUSIC_LABEL = 'components.appSettings.music';
 const String EFFECTS_LABEL = 'components.appSettings.effects';
+const String AVATARS_LABEL = 'components.appSettings.avatars';
 const String CLOSE_BUTTON_TEXT = 'components.appSettings.close';
 
 // Tab labels

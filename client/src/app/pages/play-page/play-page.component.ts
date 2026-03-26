@@ -46,7 +46,8 @@ export class PlayPageComponent {
     private mapService: MapService = inject(MapService);
     private router: Router = inject(Router);
     private readonly audioService: AudioService = inject(AudioService);
-    private lastLogSize: number = 0;
+    private previousItems: ItemType[] = [];
+    private previousActivePlayerIndex: number = -1;
 
     constructor() {
         if (this.matchService.isInMatch()) {
@@ -123,16 +124,7 @@ export class PlayPageComponent {
     }
 
     private onMatchUpdate() {
-        const lastLog = this.matchService.data.logData[this.matchService.data.logData.length - 1];
-
-        if (
-            lastLog?.messageParams?.playerName === this.matchService.selfPlayer.name &&
-            lastLog.content.includes('itemPickup') &&
-            this.lastLogSize !== this.matchService.data.logData.length
-        ) {
-            this.lastLogSize = this.matchService.data.logData.length;
-            this.audioService.playEffect(SoundEffect.Item);
-        }
+        this.computeItemSFX();
         this.updateVisual();
         this.checkForRedirect();
     }
@@ -184,5 +176,30 @@ export class PlayPageComponent {
     private async generateThumbnail() {
         const url = await this.thumbnailService.getThumbnail(this.matchService.data.gameData.mapData, false);
         this.visualData.thumbnailUrl = url;
+    }
+
+    private computeItemSFX() {
+        const activePlayerIndex = this.matchService.data.playData.activePlayerIndex;
+        if (activePlayerIndex < 0) return;
+
+        const currentItems = this.matchService.data.players[activePlayerIndex].items;
+
+        if (activePlayerIndex !== this.previousActivePlayerIndex) {
+            this.previousItems = [...currentItems];
+            this.previousActivePlayerIndex = activePlayerIndex;
+            return;
+        }
+
+        if (currentItems.length > this.previousItems.length) {
+            const newItem = currentItems[currentItems.length - 1];
+            if (newItem === ItemType.Item1) {
+                this.audioService.playEffect(SoundEffect.Shiny);
+            } else if (newItem === ItemType.Item2) {
+                this.audioService.playEffect(SoundEffect.Evolve);
+            } else {
+                this.audioService.playEffect(SoundEffect.Item);
+            }
+        }
+        this.previousItems = [...currentItems];
     }
 }

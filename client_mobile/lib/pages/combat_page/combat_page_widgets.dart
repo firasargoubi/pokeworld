@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:client_mobile/consts/battle_platfrom.dart';
+import 'package:client_mobile/consts/elemental_type_const.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
@@ -79,21 +80,43 @@ Size computeArenaSize(double availableWidth, double availableHeight) {
 }
 
 class StatRow extends StatelessWidget {
-  const StatRow({super.key, required this.label, required this.value, required this.style, required this.fontSize});
+  const StatRow({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.style,
+    required this.fontSize,
+    this.valueSuffix = '',
+    this.valueColor,
+  });
 
   final String label;
   final String value;
+  final String valueSuffix;
+  final Color? valueColor;
   final TextStyle Function(double fontSize) style;
   final double fontSize;
 
   @override
   Widget build(BuildContext context) {
+    final baseTextStyle = style(fontSize);
+
     return Row(
       children: [
-        Expanded(child: Text(label, style: style(fontSize))),
+        Expanded(child: Text(label, style: baseTextStyle)),
         Align(
           alignment: Alignment.centerRight,
-          child: Text(value, style: style(fontSize)),
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: value,
+                  style: baseTextStyle.copyWith(color: valueColor),
+                ),
+                TextSpan(text: valueSuffix, style: baseTextStyle),
+              ],
+            ),
+          ),
         ),
       ],
     );
@@ -180,7 +203,8 @@ class BattleHudCard extends StatelessWidget {
     super.key,
     required this.baseSize,
     required this.mirrored,
-    required this.playerName,
+    required this.player,
+    required this.opponent,
     required this.currentHp,
     required this.maxHp,
     required this.attackText,
@@ -192,7 +216,8 @@ class BattleHudCard extends StatelessWidget {
   final double baseSize;
   final bool mirrored;
 
-  final String playerName;
+  final PlayerData player;
+  final PlayerData opponent;
   final int currentHp;
   final int maxHp;
   final String attackText;
@@ -220,6 +245,16 @@ class BattleHudCard extends StatelessWidget {
     final hpBarWidth = baseSize * 0.27;
     final hpBarHeight = baseSize * 0.025;
 
+    final isElementalMode = MatchService().matchData?.playData.isElementalMode ?? false;
+
+    final playerElement = AVATAR_ELEMENT_TYPE_MAP[player.avatar];
+    final opponentElement = AVATAR_ELEMENT_TYPE_MAP[opponent.avatar];
+
+    final playerElementIcon = playerElement == null ? null : ELEMENTAL_TYPE_ICONS[playerElement];
+
+    final hasAdvantage =
+        playerElement != null && opponentElement != null && (ELEMENT_TYPE_ADVANTAGES[playerElement]?.contains(opponentElement) ?? false);
+
     return Stack(
       children: [
         Positioned.fill(
@@ -241,7 +276,21 @@ class BattleHudCard extends StatelessWidget {
         Positioned(
           top: nameTop,
           left: nameLeft,
-          child: Text(playerName, style: style(nameFont)),
+          child: Row(
+            spacing: baseSize * 0.01,
+            children: [
+              Text(player.name, style: style(nameFont)),
+              if (isElementalMode && playerElementIcon != null)
+                Image.asset(playerElementIcon, height: baseSize * 0.025, fit: BoxFit.fill, filterQuality: FilterQuality.none),
+              if (isElementalMode && hasAdvantage)
+                Image.asset(
+                  'assets/images/menu/icons/combat/advantage-arrow.png',
+                  height: baseSize * 0.025,
+                  fit: BoxFit.fill,
+                  filterQuality: FilterQuality.none,
+                ),
+            ],
+          ),
         ),
         Positioned(
           bottom: contentBottom,
@@ -508,7 +557,8 @@ class CombatHudLayer extends StatelessWidget {
           child: BattleHudCard(
             baseSize: baseSize,
             mirrored: true,
-            playerName: enemyPlayer.name,
+            player: enemyPlayer,
+            opponent: selfPlayer,
             currentHp: enemyCombatData.currentHealth,
             maxHp: enemyPlayer.health,
             attackText: enemyRolledDiceText,
@@ -525,7 +575,8 @@ class CombatHudLayer extends StatelessWidget {
           child: BattleHudCard(
             baseSize: baseSize,
             mirrored: false,
-            playerName: selfPlayer.name,
+            player: selfPlayer,
+            opponent: enemyPlayer,
             currentHp: selfCombatData.currentHealth,
             maxHp: selfPlayer.health,
             attackText: selfRolledDiceText,
@@ -614,6 +665,12 @@ class CombatSpectatorContent extends StatelessWidget {
     final i18n = I18nService();
     final fontSize = baseSize * 0.03;
 
+    combatStatColor(int statValue, {int threshold = 4}) {
+      if (statValue > threshold) return Colors.green;
+      if (statValue < threshold) return Colors.red;
+      return FOOTER_TEXT_COLOR;
+    }
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: baseSize * 0.015, vertical: baseSize * 0.01),
       child: Row(
@@ -641,14 +698,18 @@ class CombatSpectatorContent extends StatelessWidget {
                 SizedBox(height: baseSize * 0.006),
                 StatRow(
                   label: '${i18n.translate(FOOTER_ATTACK_STAT_LABEL_KEY)} (${player.attackDice.displayName()})',
-                  value: '${combatData.attack}/4',
+                  value: '${combatData.attack}',
+                  valueSuffix: '/4',
+                  valueColor: combatStatColor(combatData.attack),
                   style: footerStyle,
                   fontSize: fontSize,
                 ),
                 SizedBox(height: baseSize * 0.006),
                 StatRow(
                   label: '${i18n.translate(FOOTER_DEFENSE_STAT_LABEL_KEY)} (${player.defenseDice.displayName()})',
-                  value: '${combatData.defense}/4',
+                  value: '${combatData.defense}',
+                  valueSuffix: '/4',
+                  valueColor: combatStatColor(combatData.defense),
                   style: footerStyle,
                   fontSize: fontSize,
                 ),

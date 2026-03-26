@@ -8,9 +8,11 @@ export const SOUND_EFFECTS_MAP: Record<SoundEffect, string> = {
     [SoundEffect.Heal]: 'heal.wav',
     [SoundEffect.Item]: 'item.wav',
     [SoundEffect.Click]: 'select.wav',
+    [SoundEffect.Shiny]: 'shiny.mp3',
+    [SoundEffect.Evolve]: 'evolve.mp3',
 };
 
-export const PLAY_PAGE_EFFECT: SoundEffect[] = [SoundEffect.Item];
+export const PLAY_PAGE_EFFECT: SoundEffect[] = [SoundEffect.Item, SoundEffect.Shiny, SoundEffect.Evolve];
 
 export const COMBAT_PAGE_EFFECTS: SoundEffect[] = [SoundEffect.Attack, SoundEffect.Death, SoundEffect.Heal, SoundEffect.Flee];
 

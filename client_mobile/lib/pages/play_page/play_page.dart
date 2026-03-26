@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:client_mobile/consts/player_data_const.dart';
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/game_data.dart';
+import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/models/popup_message.dart';
@@ -61,6 +62,7 @@ class _PlayPageState extends State<PlayPage> {
     _matchDataSubscription = MatchService().matchUpdates.listen((updatedMatchData) {
       if (!mounted) return;
 
+      _computeItemSFX();
       _showItemDropPopup();
       if (matchData.state == MatchState.ItemDropSelection) {
         _hideItemDropPopup();
@@ -81,6 +83,25 @@ class _PlayPageState extends State<PlayPage> {
     _matchDataSubscription.cancel();
     PlayService().stopListeningToMotion();
     super.dispose();
+  }
+
+  void _computeItemSFX() {
+    final activePlayerIndex = MatchService().matchData!.playData.activePlayerIndex;
+    if (activePlayerIndex < 0) return;
+
+    final previousItems = _matchData.players[activePlayerIndex].items;
+    final currentItems = MatchService().matchData!.players[activePlayerIndex].items;
+
+    if (currentItems.length > previousItems.length) {
+      final newItem = currentItems.last;
+      if (newItem == ItemType.Item1) {
+        AudioService().playSoundEffect(SoundEffect.Shiny.path);
+      } else if (newItem == ItemType.Item2) {
+        AudioService().playSoundEffect(SoundEffect.Evolve.path);
+      } else {
+        AudioService().playSoundEffect(SoundEffect.Item.path);
+      }
+    }
   }
 
   void _showItemDropPopup() {

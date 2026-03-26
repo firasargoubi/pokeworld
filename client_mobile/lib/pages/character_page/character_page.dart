@@ -12,8 +12,8 @@ import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/popup_service/popup_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
+import 'package:client_mobile/widgets/cut_out_button/cut_out_button.dart';
 import 'package:client_mobile/widgets/header/header.dart';
-import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
 import 'package:client_mobile/widgets/stripe_painter/stripe_painter.dart';
 import 'package:flutter/material.dart';
 
@@ -68,7 +68,6 @@ class _CharacterPageState extends State<CharacterPage> {
     setState(() {
       selectedAvatar = selfPlayer.avatar;
 
-      // Lock avatars selected by other players
       lockedAvatars = matchData.players.where((p) => p.id != selfPlayer.id).map((p) => p.avatar).toList();
     });
   }
@@ -171,11 +170,9 @@ class _CharacterPageState extends State<CharacterPage> {
                   width: double.infinity,
                   child: Row(
                     children: [
-                      // ================= LEFT SIDE =================
                       Expanded(
                         child: Column(
                           children: [
-                            // Top left panel (avatar + username)
                             SizedBox(
                               height: baseSize * 0.2,
                               width: double.infinity,
@@ -257,7 +254,6 @@ class _CharacterPageState extends State<CharacterPage> {
                               ),
                             ),
 
-                            // Bottom left panel (stats)
                             Expanded(
                               child: SizedBox(
                                 width: double.infinity,
@@ -288,7 +284,6 @@ class _CharacterPageState extends State<CharacterPage> {
                         ),
                       ),
 
-                      // ================= RIGHT SIDE =================
                       SizedBox(
                         width: baseSize * 0.5,
                         child: BorderedBox(
@@ -317,7 +312,6 @@ class _CharacterPageState extends State<CharacterPage> {
                 ),
               ),
 
-              // ================= BOTTOM BUTTON =================
               SizedBox(
                 height: baseSize * 0.15,
                 width: double.infinity,
@@ -327,18 +321,21 @@ class _CharacterPageState extends State<CharacterPage> {
                   child: SizedBox(
                     width: baseSize * 0.3,
                     height: baseSize * 0.1,
-                    child: PressableBackground(
-                      backgroundAsset: START_GAME_BUTTON_ASSET,
-                      activeBackgroundAsset: START_GAME_BUTTON_ACTIVE_ASSET,
-                      onTap: joinLobby,
-                      text: i18n.translate(START_GAME_KEY),
-                      textStyle: pixelTextStyle(
-                        fontFamily: PIXEL_FONT,
-                        shadowColor: SHADOW_COLOR,
-                        fontSize: baseSize * 0.04,
-                        height: 1.0,
-                        letterSpacing: baseSize * 0.003,
-                        shadowOffsetX: baseSize * 0.004,
+                    child: CutOutButton(
+                      lightColor: Color(0xFF7bcee6),
+                      mainColor: Color(0xFF4ba6c6),
+                      darkColor: Color(0xFF2a7a99),
+                      onAction: joinLobby,
+                      child: Text(
+                        i18n.translate(START_GAME_KEY),
+                        style: pixelTextStyle(
+                          fontFamily: PIXEL_FONT,
+                          shadowColor: SHADOW_COLOR,
+                          fontSize: baseSize * 0.05,
+                          height: 1,
+                          letterSpacing: baseSize * 0.002,
+                          shadowOffsetX: baseSize * 0.005,
+                        ),
                       ),
                     ),
                   ),

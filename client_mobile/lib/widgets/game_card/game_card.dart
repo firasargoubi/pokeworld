@@ -8,7 +8,7 @@ import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
-import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
+import 'package:client_mobile/widgets/cut_out_button/cut_out_button.dart';
 import 'package:flutter/material.dart';
 
 import 'game_card_const.dart';
@@ -226,15 +226,14 @@ class GameCard extends StatelessWidget {
                       child: Padding(
                         padding: EdgeInsets.only(left: cardWidth * 0.03),
                         child: SizedBox(
-                          width: cardWidth * 0.39,
-                          height: cardHeight * 0.12,
-                          child: PressableBackground(
-                            backgroundAsset: config.buttonImage,
-                            activeBackgroundAsset: config.buttonImageActive,
-                            onTap: onTap,
-                            text: cardButtonText,
-                            textStyle: buttonTextStyle(cardWidth),
-                            activeTextStyle: buttonTextStyle(cardWidth),
+                          width: cardWidth * 0.3,
+                          height: cardHeight * 0.1,
+                          child: CutOutButton(
+                            lightColor: config.buttonLightColor,
+                            mainColor: config.buttonMainColor,
+                            darkColor: config.buttonDarkColor,
+                            onAction: onTap,
+                            child: Text(cardButtonText, style: buttonTextStyle(cardWidth * 1.1)),
                           ),
                         ),
                       ),
