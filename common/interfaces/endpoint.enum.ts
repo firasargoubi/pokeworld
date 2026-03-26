@@ -16,5 +16,6 @@ export enum ApiEndpoint {
     Toggle = 'toggle',
     IsNameUnique = 'is-name-unique',
     User = 'user',
+    Social = 'social',
     Balance = 'balance',
 }

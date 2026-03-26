@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BalanceController } from './controllers/balance/balance.controller';
 import { GameController } from './controllers/game/game.controller';
+import { SocialController } from './controllers/social/social.controller';
 import { UserController } from './controllers/user/user.controller';
 import { ChatGateway } from './gateways/chat/chat.gateway';
 import { CombatGateway } from './gateways/combat/combat.gateway';
@@ -11,6 +12,7 @@ import { MatchGateway } from './gateways/match/match.gateway';
 import { PlayGateway } from './gateways/play/play.gateway';
 import { Channel, channelSchema } from './model/schema/channel.schema';
 import { Game, gameSchema } from './model/schema/game.schema';
+import { UserRelationships, userRelationshipsSchema } from './model/schema/user-relationships.schema';
 import { User, userSchema } from './model/schema/user.schema';
 import { BalanceService } from './services/balance/balance.service';
 import { BotService } from './services/bot/bot.service';
@@ -24,6 +26,7 @@ import { MatchService } from './services/match/match.service';
 import { PlayService } from './services/play/play.service';
 import { TrackingService } from './services/tracking/tracking.service';
 import { UserService } from './services/user/user.service';
+import { SocialService } from './services/social/social.service';
 
 @Module({
     imports: [
@@ -39,9 +42,10 @@ import { UserService } from './services/user/user.service';
             { name: Game.name, schema: gameSchema },
             { name: User.name, schema: userSchema },
             { name: Channel.name, schema: channelSchema },
+            { name: UserRelationships.name, schema: userRelationshipsSchema },
         ]),
     ],
-    controllers: [GameController, UserController, BalanceController],
+    controllers: [GameController, UserController, BalanceController, SocialController],
     providers: [
         Logger,
 
@@ -56,6 +60,7 @@ import { UserService } from './services/user/user.service';
         BotService,
         ItemService,
         UserService,
+        SocialService,
 
         MatchGateway,
         LobbyGateway,

@@ -23,7 +23,8 @@
         "changeConfirmed": "Change applied successfully!",
         "deleteAccountConfirmation": "Do you really want to delete your account?",
         "noWinner": "No winner",
-        "unauthorizedAccessToGame": "This game is no longer accessible due to a change of state"
+        "unauthorizedAccessToGame": "This game is no longer accessible due to a change of state",
+        "confirmBlockUser": "Are you sure you want to block this user? You'll no longer be able to interact with them."
     },
     "teams": {
         "red": "Red",
@@ -380,7 +381,10 @@
             "usernameUnchanged": "No changes detected",
             "confirmUsernameChange": "Do you want to confirm the username change?",
             "usernameUpdateError": "Error while changing the name",
-            "avatarAlt": "Full avatar image"
+            "avatarAlt": "Full avatar image",
+            "searchPlaceholder": "Search for a user",
+            "friends": "FRIENDS",
+            "noUsersFound": "No users found"
         },
         "shopPopup": {
             "title": "Shop",

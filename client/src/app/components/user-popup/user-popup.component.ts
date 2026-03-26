@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { PopupColor } from '@app/interfaces/popup';
@@ -8,10 +8,15 @@ import { UserCardType } from '@app/interfaces/user';
 import { AudioService } from '@app/services/audio/audio.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PreferencesService } from '@app/services/preferences/preferences.service';
+import { SocialService } from '@app/services/social/social.service';
 import { UserService } from '@app/services/user/user.service';
 import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/player-data.const';
+import { RelationshipType, SocialListTab } from '@common/interfaces/social';
 import { UserInfo } from '@common/interfaces/user';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { DEBOUNCE_TIME_MS } from '@app/consts/social.const';
 
 @Component({
     selector: 'app-user-popup',
@@ -20,7 +25,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     standalone: true,
     imports: [CommonModule, FormsModule, TranslateModule],
 })
-export class UserPopupComponent {
+export class UserPopupComponent implements OnDestroy {
     @Input() avatarImage: string = 'assets/images/menu/fullAvatars/fullAvatar0.png';
     readonly maxNameLength = MAX_NAME_LENGTH;
     userService: UserService = inject(UserService);
@@ -36,6 +41,12 @@ export class UserPopupComponent {
     usernameError: string = '';
     isUpdatingPassword = false;
     isUpdatingUsername = false;
+    friendsTab = SocialListTab;
+    relationshipType = RelationshipType;
+    readonly socialService: SocialService = inject(SocialService);
+    private readonly searchDebounceMs = DEBOUNCE_TIME_MS;
+    private readonly searchSubject: Subject<string> = new Subject<string>();
+    private searchSub?: Subscription;
     private popupService: PopupService = inject(PopupService);
     private readonly preferencesService: PreferencesService = inject(PreferencesService);
     private readonly translateService: TranslateService = inject(TranslateService);
@@ -50,10 +61,23 @@ export class UserPopupComponent {
                 this.resetForms();
             }
         });
+
+        this.searchSub = this.searchSubject.pipe(debounceTime(this.searchDebounceMs), distinctUntilChanged()).subscribe((value) => {
+            this.socialService.setSearchQuery(value);
+        });
     }
 
     get avatarToDisplay(): string {
         return this.currentUser?.fullProfilePicture || this.currentUser?.profilePicture || this.avatarImage;
+    }
+
+    onSearchInput(value: string): void {
+        this.searchSubject.next(value ?? '');
+    }
+
+    ngOnDestroy(): void {
+        this.searchSub?.unsubscribe();
+        this.searchSubject.complete();
     }
 
     openCard(card: UserCardType): void {
@@ -66,9 +90,17 @@ export class UserPopupComponent {
 
         this.activeCard = card;
 
+        if (card === UserCardType.Friends && this.currentUser) {
+            this.socialService.initialize(this.currentUser.userId);
+        }
+
         this.usernameError = '';
         this.passwordError = '';
         this.newUsername = this.currentUser.username;
+    }
+
+    switchTab(tab: SocialListTab): void {
+        this.socialService.setActiveTab(tab);
     }
 
     goToFront(): void {
@@ -194,6 +226,8 @@ export class UserPopupComponent {
         this.isUpdatingPassword = false;
         this.isUpdatingUsername = false;
         this.newUsername = this.currentUser?.username ?? '';
+        this.socialService.setActiveTab(SocialListTab.Search);
+        this.socialService.setSearchQuery('');
     }
 
     private confirmLogout(): void {
