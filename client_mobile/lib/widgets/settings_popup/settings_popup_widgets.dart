@@ -1,3 +1,5 @@
+import 'package:client_mobile/models/audio.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 
 import 'settings_popup_const.dart';
@@ -83,7 +85,6 @@ class _CubicSliderState extends State<CubicSlider> {
         child: Stack(
           alignment: Alignment.centerLeft,
           children: [
-            // Track background
             Positioned(
               left: thumbSize / 2,
               child: Container(
@@ -95,12 +96,10 @@ class _CubicSliderState extends State<CubicSlider> {
                 ),
               ),
             ),
-            // Track fill
             Positioned(
               left: thumbSize / 2,
               child: Container(width: effectiveWidth * widget.value, height: trackHeight, color: SLIDER_FILL_COLOR),
             ),
-            // Thumb
             Positioned(
               left: thumbPosition,
               child: Container(
@@ -115,6 +114,98 @@ class _CubicSliderState extends State<CubicSlider> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class SettingsTabBar extends StatelessWidget {
+  const SettingsTabBar({
+    super.key,
+    required this.selectedTab,
+    required this.onTabSelected,
+    required this.tabStyle,
+    required this.audioLabel,
+    required this.preferencesLabel,
+    required this.baseSize,
+  });
+
+  final SettingsTab selectedTab;
+  final ValueChanged<SettingsTab> onTabSelected;
+  final TextStyle tabStyle;
+  final String audioLabel;
+  final String preferencesLabel;
+  final double baseSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      spacing: baseSize * 0.05,
+      children: [
+        _TabButton(
+          label: audioLabel,
+          isActive: selectedTab == SettingsTab.audio,
+          onTap: () => onTabSelected(SettingsTab.audio),
+          style: tabStyle,
+          baseSize: baseSize,
+        ),
+        _TabButton(
+          label: preferencesLabel,
+          isActive: selectedTab == SettingsTab.preferences,
+          onTap: () => onTabSelected(SettingsTab.preferences),
+          style: tabStyle,
+          baseSize: baseSize,
+        ),
+      ],
+    );
+  }
+}
+
+class _TabButton extends StatelessWidget {
+  const _TabButton({required this.label, required this.isActive, required this.onTap, required this.style, required this.baseSize});
+
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+  final TextStyle style;
+  final double baseSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => {AudioService().playSoundEffect(SoundEffect.Select.path), onTap()},
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: baseSize * 0.01, vertical: baseSize * 0.005),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: isActive ? TAB_UNDERLINE_ACTIVE : TAB_UNDERLINE_INACTIVE, width: 2)),
+        ),
+        child: Text(label.toUpperCase(), style: style),
+      ),
+    );
+  }
+}
+
+class OptionButton extends StatelessWidget {
+  const OptionButton({super.key, required this.label, required this.isActive, required this.onTap, required this.style, required this.baseSize});
+
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+  final TextStyle style;
+  final double baseSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => {AudioService().playSoundEffect(SoundEffect.Select.path), onTap()},
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: baseSize * 0.03, vertical: baseSize * 0.015),
+        decoration: BoxDecoration(
+          color: isActive ? OPTION_BUTTON_ACTIVE_BG : OPTION_BUTTON_BG,
+          border: Border.all(color: isActive ? OPTION_BUTTON_BORDER_ACTIVE : Colors.transparent, width: 2),
+        ),
+        child: Text(label.toUpperCase(), style: style),
       ),
     );
   }

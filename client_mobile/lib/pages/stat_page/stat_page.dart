@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/stat_data.dart';
-import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/stat_service/stat_service.dart';
 import 'package:client_mobile/widgets/header/header.dart';
@@ -139,7 +139,7 @@ class _StatPageState extends State<StatPage> {
                     children: [
                       Expanded(
                         flex: STAT_MAIN_SECTION_FLEX.toInt(),
-                        child: StatContainer(
+                        child: FramedContainer(
                           baseSize: baseSize * STAT_PAGE_BASE_WIDGET_SIZE_FACTOR,
                           child: Row(
                             children: [

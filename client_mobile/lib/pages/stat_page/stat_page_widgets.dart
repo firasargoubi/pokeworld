@@ -316,7 +316,7 @@ class GameStatsPanel extends StatelessWidget {
 
     return AspectRatio(
       aspectRatio: STAT_GAME_PANEL_ASPECT_RATIO,
-      child: StatContainer(
+      child: FramedContainer(
         baseSize: baseSize * STAT_PAGE_BASE_WIDGET_SIZE_FACTOR,
         child: Row(
           children: [
