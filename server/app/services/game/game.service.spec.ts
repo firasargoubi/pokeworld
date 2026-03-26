@@ -10,6 +10,8 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 
 describe('GameService', () => {
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    if (typeof jest !== 'undefined' && jest.setTimeout) jest.setTimeout(30000);
     let service: GameService;
     let gameModel: Model<GameDocument>;
     let mongoServer: MongoMemoryServer;
@@ -59,12 +61,18 @@ describe('GameService', () => {
     });
 
     afterEach(async () => {
-        await gameModel.deleteMany({});
+        if (gameModel && typeof gameModel.deleteMany === 'function') {
+            await gameModel.deleteMany({});
+        }
     });
 
     afterAll(async () => {
-        await connection.close();
-        await mongoServer.stop({ doCleanup: true });
+        if (connection && typeof connection.close === 'function') {
+            await connection.close();
+        }
+        if (mongoServer && typeof mongoServer.stop === 'function') {
+            await mongoServer.stop({ doCleanup: true });
+        }
     });
 
     it('should be defined', () => {

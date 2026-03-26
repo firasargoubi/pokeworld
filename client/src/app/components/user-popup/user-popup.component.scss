@@ -35,11 +35,19 @@ $img-delete-container-edge-right: '../../../assets/images/menu/containers/user-c
 $img-delete-container-body: '../../../assets/images/menu/containers/user-card/button-delete-body.png';
 
 $img-logout-icon: '../../../assets/images/menu/icons/user-card/logout.png';
-$img-settings-icon: '../../../assets/images/menu/icons/user-card/settings-cog.png';
+$img-settings-icon: '../../../assets/images/menu/icons/user-card/settings-cog-user-card.png';
 $img-inventory-icon: '../../../assets/images/menu/icons/user-card/archive-sharp.png';
 $img-friends-icon: '../../../assets/images/menu/icons/user-card/friends.png';
 $img-back-icon: '../../../assets/images/menu/icons/user-card/back-arrow.png';
 $img-trash-icon: '../../../assets/images/menu/icons/user-card/trash.png';
+
+$img-block-icon: '../../../assets/images/menu/icons/user-card/block.svg';
+$img-search-icon: '../../../assets/images/menu/icons/user-card/search.svg';
+$img-add-friend-icon: '../../../assets/images/menu/icons/user-card/add-friend.svg';
+$img-remove-friend-icon: '../../../assets/images/menu/icons/user-card/remove-friend.svg';
+$img-unblock-icon: '../../../assets/images/menu/icons/user-card/unblock.svg';
+$img-pending-icon: '../../../assets/images/menu/icons/wait-icon.png';
+$img-received-requests-icon: '../../../assets/images/menu/icons/mail.png';
 
 $text-color: #484848;
 $text-shadow-color: #a0a0a0;
@@ -169,6 +177,159 @@ $shop-button-background: linear-gradient(
 
 .card-back {
     transform: rotateY(180deg) translateZ(calc($base-size * 0.8));
+}
+
+.card-back .left-container {
+    width: 100%;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    width: 96%;
+    height: calc($base-size * 6);
+    padding: 0 2%;
+    background-image: url($img-button-container-edge-left), url($img-button-container-body), url($img-button-container-edge-right);
+    background-repeat: no-repeat, space, no-repeat;
+    background-position:
+        left top,
+        center top,
+        right top;
+    background-size:
+        auto 100%,
+        98% 100%,
+        auto 100%;
+}
+
+.search-bar .message-input {
+    width: 100%;
+    padding: 2%;
+    background: transparent;
+    border: none;
+    color: $text-color;
+    font-family: $font-family;
+    font-size: calc($font-size * 0.9);
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.friend-list {
+    display: flex;
+    flex-direction: column;
+    gap: calc($base-size * 1);
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    position: relative;
+}
+
+.friend-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: calc($base-size * 9);
+    padding: 0 2%;
+    background-image: url($img-button-container-edge-left), url($img-button-container-body), url($img-button-container-edge-right);
+    background-repeat: no-repeat, space, no-repeat;
+    background-position:
+        left top,
+        center top,
+        right top;
+    background-size:
+        auto 100%,
+        97% 100%,
+        auto 100%;
+}
+
+.no-results {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: calc($base-size * 2);
+    color: $text-color;
+    font-family: $font-family;
+    font-size: calc($font-size * 0.9);
+    text-align: center;
+}
+
+.search-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+.pokeball {
+    width: calc($base-size * 8);
+    height: calc($base-size * 8);
+    animation: pokeball-spin 1s infinite;
+    background-image: url($img-title-icon);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+@keyframes pokeball-spin {
+    to {
+        transform: rotate(0.5turn);
+    }
+}
+
+.friend-info {
+    display: flex;
+    align-items: center;
+    gap: calc($base-size * 1);
+    min-width: 0;
+}
+
+.friend-name {
+    margin: 0;
+    color: #fff;
+    font-family: $font-family;
+    font-size: calc($font-size * 0.9);
+    text-shadow: #2860a8 calc($font-size * 0.12) 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.friend-item .profile-picture-container {
+    width: calc($base-size * 5);
+    height: calc($base-size * 5);
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.friend-item .profile-picture {
+    width: 85%;
+    height: 85%;
+    object-fit: cover;
+    position: relative;
+    z-index: 1;
+}
+
+.friend-item .buttons-container {
+    display: flex;
+    align-items: center;
+    gap: calc($base-size * 0.5);
+}
+
+.friend-item .button {
+    width: calc($base-size * 6);
+    height: calc($base-size * 6);
+}
+
+.pending-button {
+    opacity: 0.65;
+    pointer-events: none;
 }
 
 .card-rotator {
@@ -311,6 +472,20 @@ $shop-button-background: linear-gradient(
     filter: invert(1);
 }
 
+.friend-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: $base-size;
+    flex-shrink: 1;
+    height: 80%;
+}
+
+.back-button .button-icon {
+    background-image: url($img-back-icon);
+}
+
 .user-settings .button-icon {
     background-image: url($img-settings-icon);
 }
@@ -321,6 +496,51 @@ $shop-button-background: linear-gradient(
 
 .user-inventory .button-icon {
     background-image: url($img-inventory-icon);
+}
+
+.friends-button .button-icon {
+    background-image: url($img-friends-icon);
+}
+
+.search-button .button-icon {
+    background-image: url($img-search-icon);
+}
+
+.received-requests-button .button-icon {
+    background-image: url($img-received-requests-icon);
+    filter: invert(0) !important;
+}
+
+.block-button .button-icon {
+    background-image: url($img-block-icon);
+    filter: brightness(0) saturate(100%) invert(32%) sepia(36%) saturate(5718%) hue-rotate(344deg) brightness(96%) contrast(83%) !important;
+}
+
+.add-friend-button .button-icon,
+.accept-button .button-icon {
+    background-image: url($img-add-friend-icon);
+    filter: invert(0) !important;
+}
+
+.remove-friend-button .button-icon {
+    background-image: url($img-remove-friend-icon);
+    filter: invert(0) !important;
+}
+
+.unblock-button .button-icon {
+    background-image: url($img-block-icon);
+    filter: brightness(0) saturate(100%) invert(57%) sepia(67%) saturate(799%) hue-rotate(74deg) brightness(100%) contrast(97%) !important;
+}
+
+.pending-button .button-icon {
+    background-image: url($img-pending-icon);
+    filter: invert(0) !important;
+}
+
+.is-active {
+    scale: 0.9;
+    opacity: 0.8;
+    pointer-events: none;
 }
 
 .card-body .card-infos-container {
@@ -488,7 +708,7 @@ $shop-button-background: linear-gradient(
     filter: invert(1);
 }
 
-.back-button {
+.button-container {
     height: 80%;
     aspect-ratio: 1 / 1;
     background-size:
@@ -497,10 +717,9 @@ $shop-button-background: linear-gradient(
         auto 100%;
 }
 
-.back-button .button-icon {
+.button-container .button-icon {
     height: 80%;
     aspect-ratio: 9 / 12;
-    background-image: url($img-back-icon);
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;

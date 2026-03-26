@@ -155,15 +155,143 @@
                     <div class="title-container">
                         <div class="title-label">
                             <div class="icon-wrapper"></div>
-                            <p class="title">FRIENDS</p>
+                            <p class="title">{{ 'components.userPopup.friends' | translate }}</p>
                             <div class="icon-wrapper"></div>
+                        </div>
+                        <div class="friend-buttons">
+                            <div
+                                class="button-container search-button"
+                                [class.is-active]="this.socialService.activeTab() === friendsTab.Search"
+                                (click)="switchTab(friendsTab.Search)"
+                            >
+                                <div class="button-icon"></div>
+                            </div>
+                            <div
+                                class="button-container friends-button"
+                                [class.is-active]="this.socialService.activeTab() === friendsTab.Friends"
+                                (click)="switchTab(friendsTab.Friends)"
+                            >
+                                <div class="button-icon"></div>
+                            </div>
+                            <div
+                                class="button-container received-requests-button"
+                                [class.is-active]="this.socialService.activeTab() === friendsTab.ReceivedRequests"
+                                (click)="switchTab(friendsTab.ReceivedRequests)"
+                            >
+                                <div class="button-icon"></div>
+                            </div>
+                            <div
+                                class="button-container block-button"
+                                [class.is-active]="this.socialService.activeTab() === friendsTab.Blocked"
+                                (click)="switchTab(friendsTab.Blocked)"
+                            >
+                                <div class="button-icon"></div>
+                            </div>
                         </div>
                         <div class="button-container back-button" (click)="goToFront()">
                             <div class="button-icon"></div>
                         </div>
                     </div>
 
-                    <div class="card-infos-container"></div>
+                    <div class="card-infos-container">
+                        <div class="left-container">
+                            <div class="search-bar">
+                                <input
+                                    type="text"
+                                    [placeholder]="'components.userPopup.searchPlaceholder' | translate"
+                                    class="message-input"
+                                    [ngModel]="socialService.searchQuery()"
+                                    (ngModelChange)="onSearchInput($event)"
+                                    [maxLength]="this.maxNameLength"
+                                />
+                            </div>
+
+                            <div class="friend-list">
+                                @if(this.socialService.isLoading()) {
+                                <div class="search-loading">
+                                    <div alt="loading" class="pokeball"></div>
+                                </div>
+                                } @else if (socialService.relationshipsToDisplay().length === 0) {
+                                <div class="no-results">{{ 'components.userPopup.noUsersFound' | translate }}</div>
+                                } @else { @for (relationship of socialService.relationshipsToDisplay(); track relationship.user.userId) {
+                                <div class="friend-item stylized-padding">
+                                    <div class="friend-info flex-row">
+                                        <span class="profile-picture-container">
+                                            <span class="profile-picture-background"></span>
+                                            <img [src]="relationship.user.profilePicture || avatarToDisplay" alt="avatar" class="profile-picture" />
+                                        </span>
+                                        <p class="friend-name">{{ relationship.user.username }}</p>
+                                    </div>
+                                    <div class="buttons-container flex-row">
+                                        @switch (relationship.relation) { @case (relationshipType.None) {
+                                        <div
+                                            class="add-friend-button button button-container"
+                                            (click)="socialService.sendFriendRequest(relationship.user.userId)"
+                                        >
+                                            <div class="button-icon"></div>
+                                        </div>
+                                        <div
+                                            class="block-button button button-container"
+                                            (click)="socialService.blockUser(relationship.user.userId)"
+                                        >
+                                            <div class="button-icon"></div>
+                                        </div>
+                                        } @case (relationshipType.PendingSent) {
+                                        <div class="pending-button button button-container" button-container>
+                                            <div class="button-icon"></div>
+                                        </div>
+                                        <div
+                                            class="block-button button button-container"
+                                            (click)="socialService.blockUser(relationship.user.userId)"
+                                        >
+                                            <div class="button-icon"></div>
+                                        </div>
+                                        } @case (relationshipType.PendingReceived) {
+                                        <div
+                                            class="accept-button button button-container"
+                                            (click)="socialService.acceptFriendRequest(relationship.user.userId)"
+                                        >
+                                            <div class="button-icon"></div>
+                                        </div>
+                                        <div
+                                            class="remove-friend-button button button-container"
+                                            (click)="socialService.declineFriendRequest(relationship.user.userId)"
+                                        >
+                                            <div class="button-icon"></div>
+                                        </div>
+                                        <div
+                                            class="block-button button button-container"
+                                            (click)="socialService.blockUser(relationship.user.userId)"
+                                        >
+                                            <div class="button-icon"></div>
+                                        </div>
+                                        } @case (relationshipType.Friend) {
+                                        <div
+                                            class="remove-friend-button button button-container"
+                                            (click)="socialService.removeFriend(relationship.user.userId)"
+                                        >
+                                            <div class="button-icon"></div>
+                                        </div>
+                                        <div
+                                            class="block-button button button-container"
+                                            (click)="socialService.blockUser(relationship.user.userId)"
+                                        >
+                                            <div class="button-icon"></div>
+                                        </div>
+                                        } @case (relationshipType.Blocked) {
+                                        <div
+                                            class="unblock-button button button-container"
+                                            (click)="socialService.unblockUser(relationship.user.userId)"
+                                        >
+                                            <div class="button-icon"></div>
+                                        </div>
+                                        } }
+                                    </div>
+                                </div>
+                                } }
+                            </div>
+                        </div>
+                    </div>
                     } @else if (activeCard === userCardType.Inventory) {
                     <div class="title-container">
                         <div class="title-label">
