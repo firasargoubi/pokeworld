@@ -1,9 +1,10 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:client_mobile/models/user_preferences.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
-import 'package:client_mobile/widgets/poke_button/poke_button.dart';
+import 'package:client_mobile/services/preferences_service/preferences_service.dart';
 import 'package:flutter/material.dart';
 
 import 'settings_popup_const.dart';
@@ -21,6 +22,9 @@ class SettingsPopup extends StatefulWidget {
 class _SettingsPopupState extends State<SettingsPopup> {
   late double _musicVolume;
   late double _effectsVolume;
+  SettingsTab _selectedTab = SettingsTab.audio;
+
+  final PreferencesService _preferencesService = PreferencesService();
 
   @override
   void initState() {
@@ -28,32 +32,31 @@ class _SettingsPopupState extends State<SettingsPopup> {
     _musicVolume = AudioService().backgroundVolume.value;
     _effectsVolume = AudioService().effectsVolume.value;
 
-    // Listen to changes from AudioService
     AudioService().backgroundVolume.addListener(_onMusicVolumeChanged);
     AudioService().effectsVolume.addListener(_onEffectsVolumeChanged);
+    _preferencesService.currentLanguage.addListener(_onPreferencesChanged);
+    _preferencesService.currentTheme.addListener(_onPreferencesChanged);
   }
 
   @override
   void dispose() {
     AudioService().backgroundVolume.removeListener(_onMusicVolumeChanged);
     AudioService().effectsVolume.removeListener(_onEffectsVolumeChanged);
+    _preferencesService.currentLanguage.removeListener(_onPreferencesChanged);
+    _preferencesService.currentTheme.removeListener(_onPreferencesChanged);
     super.dispose();
   }
 
   void _onMusicVolumeChanged() {
-    if (mounted) {
-      setState(() {
-        _musicVolume = AudioService().backgroundVolume.value;
-      });
-    }
+    if (mounted) setState(() => _musicVolume = AudioService().backgroundVolume.value);
   }
 
   void _onEffectsVolumeChanged() {
-    if (mounted) {
-      setState(() {
-        _effectsVolume = AudioService().effectsVolume.value;
-      });
-    }
+    if (mounted) setState(() => _effectsVolume = AudioService().effectsVolume.value);
+  }
+
+  void _onPreferencesChanged() {
+    if (mounted) setState(() {});
   }
 
   TextStyle _pixelTextStyle(double fontSize) => TextStyle(
@@ -93,17 +96,108 @@ class _SettingsPopupState extends State<SettingsPopup> {
     AudioService().setEffectsVolume(value);
   }
 
+  void _selectLanguage(AppLanguage language) {
+    _preferencesService.setLanguage(language);
+  }
+
+  void _selectTheme(AppTheme theme) {
+    _preferencesService.setTheme(theme);
+  }
+
+  Widget _buildAudioTab(I18nService i18n, TextStyle labelStyle, double sliderWidth, double sliderHeight) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        VolumeSlider(
+          label: i18n.translate(MUSIC_LABEL),
+          value: _musicVolume,
+          onChanged: _onMusicVolumeChange,
+          labelStyle: labelStyle,
+          sliderWidth: sliderWidth,
+          sliderHeight: sliderHeight,
+        ),
+        SizedBox(height: sliderHeight),
+        VolumeSlider(
+          label: i18n.translate(EFFECTS_LABEL),
+          value: _effectsVolume,
+          onChanged: _onEffectsVolumeChange,
+          labelStyle: labelStyle,
+          sliderWidth: sliderWidth,
+          sliderHeight: sliderHeight,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPreferencesTab(I18nService i18n, TextStyle labelStyle, TextStyle optionStyle, double baseSize) {
+    final currentLanguage = _preferencesService.currentLanguage.value;
+    final currentTheme = _preferencesService.currentTheme.value;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(i18n.translate(LANGUAGE_LABEL), style: labelStyle),
+        SizedBox(height: baseSize * 0.015),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OptionButton(
+              label: i18n.translate(LANGUAGE_FR_LABEL),
+              isActive: currentLanguage == AppLanguage.French,
+              onTap: () => _selectLanguage(AppLanguage.French),
+              style: optionStyle,
+              baseSize: baseSize,
+            ),
+            SizedBox(width: baseSize * 0.02),
+            OptionButton(
+              label: i18n.translate(LANGUAGE_EN_LABEL),
+              isActive: currentLanguage == AppLanguage.English,
+              onTap: () => _selectLanguage(AppLanguage.English),
+              style: optionStyle,
+              baseSize: baseSize,
+            ),
+          ],
+        ),
+        SizedBox(height: baseSize * 0.03),
+        Text(i18n.translate(THEME_LABEL), style: labelStyle),
+        SizedBox(height: baseSize * 0.015),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OptionButton(
+              label: i18n.translate(THEME_DEFAULT_LABEL),
+              isActive: currentTheme == AppTheme.DefaultTheme,
+              onTap: () => _selectTheme(AppTheme.DefaultTheme),
+              style: optionStyle,
+              baseSize: baseSize,
+            ),
+            SizedBox(width: baseSize * 0.02),
+            OptionButton(
+              label: i18n.translate(THEME_DARK_LABEL),
+              isActive: currentTheme == AppTheme.Dark,
+              onTap: () => _selectTheme(AppTheme.Dark),
+              style: optionStyle,
+              baseSize: baseSize,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final i18n = I18nService();
     final baseSize = _computeBaseSize(MediaQuery.of(context).size);
 
-    final dialogHeight = baseSize * 0.55;
-    final dialogWidth = dialogHeight * 16 / 9;
+    final dialogHeight = baseSize * 0.75;
+    final dialogWidth = dialogHeight * 9 / 10;
     final contentPadding = baseSize * 0.055;
 
     final titleStyle = _pixelTextStyle(baseSize * 0.05);
     final labelStyle = _pixelTextStyle(baseSize * 0.035);
+    final tabStyle = _pixelTextStyle(baseSize * 0.025);
+    final optionStyle = _pixelTextStyle(baseSize * 0.025);
 
     final sliderWidth = dialogWidth * 0.6;
     final sliderHeight = baseSize * 0.045;
@@ -135,45 +229,27 @@ class _SettingsPopupState extends State<SettingsPopup> {
                     padding: EdgeInsets.all(contentPadding),
                     child: Column(
                       children: [
-                        Expanded(
-                          flex: 2,
-                          child: Center(child: Text(i18n.translate(TITLE_TEXT), style: titleStyle)),
-                        ),
-                        Expanded(
-                          flex: 3,
-                          child: Center(
-                            child: VolumeSlider(
-                              label: i18n.translate(MUSIC_LABEL),
-                              value: _musicVolume,
-                              onChanged: _onMusicVolumeChange,
-                              labelStyle: labelStyle,
-                              sliderWidth: sliderWidth,
-                              sliderHeight: sliderHeight,
-                            ),
+                        SizedBox(
+                          height: baseSize * 0.06,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(i18n.translate(TITLE_TEXT), style: titleStyle),
+                              SettingsTabBar(
+                                selectedTab: _selectedTab,
+                                onTabSelected: (tab) => setState(() => _selectedTab = tab),
+                                tabStyle: tabStyle,
+                                audioLabel: i18n.translate(AUDIO_TAB_LABEL),
+                                preferencesLabel: i18n.translate(PREFERENCES_TAB_LABEL),
+                                baseSize: baseSize,
+                              ),
+                            ],
                           ),
                         ),
                         Expanded(
-                          flex: 3,
-                          child: Center(
-                            child: VolumeSlider(
-                              label: i18n.translate(EFFECTS_LABEL),
-                              value: _effectsVolume,
-                              onChanged: _onEffectsVolumeChange,
-                              labelStyle: labelStyle,
-                              sliderWidth: sliderWidth,
-                              sliderHeight: sliderHeight,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Center(
-                            child: SizedBox(
-                              width: baseSize * 0.35,
-                              height: baseSize * 0.18,
-                              child: PokeButton(text: i18n.translate(CLOSE_BUTTON_TEXT), onTap: widget.onClose),
-                            ),
-                          ),
+                          child: _selectedTab == SettingsTab.audio
+                              ? _buildAudioTab(i18n, labelStyle, sliderWidth, sliderHeight)
+                              : _buildPreferencesTab(i18n, labelStyle, optionStyle, baseSize),
                         ),
                       ],
                     ),

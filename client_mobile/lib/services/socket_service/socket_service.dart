@@ -23,6 +23,10 @@ class SocketService {
     socket.disconnect();
   }
 
+  void onDisconnect(void Function(dynamic) callback) {
+    socket.onDisconnect(callback);
+  }
+
   void emit(String event, [dynamic data, void Function(dynamic)? ack]) {
     if (ack == null) {
       socket.emit(event, data);

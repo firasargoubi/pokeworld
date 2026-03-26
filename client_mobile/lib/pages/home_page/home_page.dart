@@ -3,10 +3,8 @@ import 'dart:math';
 import 'package:client_mobile/consts/ui.dart';
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
-import 'package:client_mobile/services/user_service/user_service.dart';
-import 'package:client_mobile/widgets/login_popup/login_popup.dart';
 import 'package:client_mobile/widgets/settings_popup/settings_popup.dart';
-import 'package:client_mobile/widgets/user_popup/user_popup.dart';
+import 'package:client_mobile/widgets/user_profile_popup/user_profile_popup.dart';
 import 'package:flutter/material.dart';
 
 import 'home_page_widgets.dart';
@@ -19,41 +17,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool _didShowLoginPopup = false;
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       AudioService().playBackgroundMusic(BackgroundMusic.Menu.path);
-      _maybeShowLoginPopup();
     });
-  }
-
-  void _maybeShowLoginPopup() {
-    if (!mounted) return;
-    final isLoggedIn = UserService().currentUser.value != null;
-    if (!isLoggedIn && !_didShowLoginPopup) {
-      _didShowLoginPopup = true;
-      _showLoginPopup();
-    }
-  }
-
-  void _showLoginPopup() {
-    if (!mounted) return;
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return PopScope(canPop: false, onPopInvokedWithResult: (didPop, result) {}, child: const LoginPopup());
-      },
-    );
   }
 
   void _showUserPopup() {
     if (!mounted) return;
-    showDialog(context: context, barrierDismissible: true, builder: (context) => const UserPopup());
+    showUserCardPopup(context);
+    // showDialog(context: context, barrierDismissible: true, builder: (context) => const UserPopup());
   }
 
   void _showSettingsPopup() {

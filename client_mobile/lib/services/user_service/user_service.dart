@@ -68,7 +68,14 @@ class UserService {
     }
   }
 
-  Future<UserInfo> register(String username, String email, String password, String avatarPath, String fullAvatarPath, {UserPreferences? preferences}) async {
+  Future<UserInfo> register(
+    String username,
+    String email,
+    String password,
+    String avatarPath,
+    String fullAvatarPath, {
+    UserPreferences? preferences,
+  }) async {
     _ensureConfigured();
     final String uri = '$baseUrl/${UserEndpoint.UserRegister.path}';
 
@@ -194,5 +201,11 @@ class UserService {
     }
 
     throw Exception(ErrorMessage.ChangeFailed.message);
+  }
+
+  void listenToSocketDisconnect() {
+    _socketService.onDisconnect((_) {
+      currentUser.value = null;
+    });
   }
 }

@@ -1,4 +1,5 @@
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -21,6 +22,7 @@ Future<void> main() async {
   await PreferencesService().initialize();
 
   SocketService().connect();
+  UserService().listenToSocketDisconnect();
   ChatService().initListeners();
   runApp(const PokeWorldApp());
 }
