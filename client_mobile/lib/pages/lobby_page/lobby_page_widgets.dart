@@ -1,6 +1,6 @@
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
-import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
+import 'package:client_mobile/widgets/cut_out_button/cut_out_button.dart';
 import 'package:flutter/material.dart';
 
 import 'lobby_page_const.dart';
@@ -129,8 +129,9 @@ class LobbyCodePanel extends StatelessWidget {
                         children: [
                           PressableOptionBox(
                             height: optionBoxHeight,
-                            backgroundAsset: BLUE_BUTTON_ASSET,
-                            backgroundActiveAsset: BLUE_BUTTON_ACTIVE_ASSET,
+                            lightColor: Color(0xFF7bcee6),
+                            mainColor: Color(0xFF4ba6c6),
+                            darkColor: Color(0xFF2a7a99),
                             iconAsset: lockIcon,
                             displayBackground: isAdmin,
                             enabled: isAdmin,
@@ -140,8 +141,9 @@ class LobbyCodePanel extends StatelessWidget {
                           if (isAdmin) ...[
                             PressableOptionBox(
                               height: optionBoxHeight,
-                              backgroundAsset: GRAY_BUTTON_ASSET,
-                              backgroundActiveAsset: GRAY_BUTTON_ACTIVE_ASSET,
+                              lightColor: Color.fromARGB(255, 208, 208, 208),
+                              mainColor: Color.fromARGB(255, 160, 160, 160),
+                              darkColor: Color.fromARGB(255, 96, 96, 96),
                               iconAsset: SETTINGS_ICON_ASSET,
                               displayBackground: true,
                               enabled: isAdmin,
@@ -151,8 +153,9 @@ class LobbyCodePanel extends StatelessWidget {
                           ],
                           PressableOptionBox(
                             height: optionBoxHeight,
-                            backgroundAsset: GREEN_BUTTON_ASSET,
-                            backgroundActiveAsset: GREEN_BUTTON_ACTIVE_ASSET,
+                            lightColor: Color(0xFFd0f0d0),
+                            mainColor: Color(0xFF90c890),
+                            darkColor: Color(0xFF407540),
                             iconAsset: COPY_ICON_ASSET,
                             displayBackground: true,
                             enabled: true,
@@ -176,18 +179,20 @@ class PressableOptionBox extends StatelessWidget {
   const PressableOptionBox({
     super.key,
     required this.height,
-    required this.backgroundAsset,
-    required this.backgroundActiveAsset,
     required this.iconAsset,
+    required this.darkColor,
+    required this.lightColor,
+    required this.mainColor,
     this.displayBackground = true,
     this.enabled = true,
     this.onTap,
   });
 
   final double height;
-  final String backgroundAsset;
-  final String backgroundActiveAsset;
   final String iconAsset;
+  final Color darkColor;
+  final Color lightColor;
+  final Color mainColor;
 
   final bool displayBackground;
   final bool enabled;
@@ -208,12 +213,7 @@ class PressableOptionBox extends StatelessWidget {
           child: Opacity(
             opacity: enabled ? 1.0 : 0.5,
             child: displayBackground
-                ? PressableBackground(
-                    backgroundAsset: backgroundAsset,
-                    activeBackgroundAsset: backgroundActiveAsset,
-                    onTap: onTap ?? () {},
-                    child: icon,
-                  )
+                ? CutOutButton(darkColor: darkColor, lightColor: lightColor, mainColor: mainColor, onAction: onTap, child: icon)
                 : GestureDetector(onTap: onTap, behavior: HitTestBehavior.opaque, child: icon),
           ),
         ),

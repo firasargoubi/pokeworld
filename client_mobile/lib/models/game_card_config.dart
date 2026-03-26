@@ -1,9 +1,12 @@
+import 'dart:ui';
+
 enum GameCardColor { Blue, Green, Pink }
 
 class GameCardConfig {
   final String backgroundImage;
-  final String buttonImage;
-  final String buttonImageActive;
+  final Color buttonLightColor;
+  final Color buttonMainColor;
+  final Color buttonDarkColor;
 
-  const GameCardConfig({required this.backgroundImage, required this.buttonImage, required this.buttonImageActive, required});
+  const GameCardConfig({required this.backgroundImage, required this.buttonLightColor, required this.buttonMainColor, required this.buttonDarkColor});
 }

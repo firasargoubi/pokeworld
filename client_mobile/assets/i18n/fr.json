@@ -197,7 +197,18 @@
             "attack": "ATTAQUE",
             "defense": "DÉFENSE",
             "startGame": "COMMENCER",
-            "chooseAvatarWarning": "Veuillez choisir un avatar"
+            "chooseAvatarWarning": "Veuillez choisir un avatar",
+            "elementalType": {
+                "dragon": "DRAGON",
+                "electric": "ÉLEC",
+                "fairy": "FÉE",
+                "fire": "FEU",
+                "grass": "PLANTE",
+                "ground": "SOL",
+                "normal": "NORMAL",
+                "psychic": "PSY",
+                "water": "EAU"
+            }
         },
         "play": {
             "mapSize": "Taille carte : ",
@@ -254,6 +265,7 @@
             "audio": "Audio",
             "music": "Musique",
             "effects": "Effets",
+            "avatars": "Avatars",
             "preferences": "Préférences",
             "close": "Fermer"
         },

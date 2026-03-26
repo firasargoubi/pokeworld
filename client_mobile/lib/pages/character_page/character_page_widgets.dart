@@ -1,7 +1,9 @@
 import 'dart:math';
 
+import 'package:client_mobile/consts/elemental_type_const.dart';
 import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
+import 'package:client_mobile/widgets/cut_out_button/cut_out_button.dart';
 import 'package:flutter/material.dart';
 
 import 'character_page_const.dart';
@@ -75,8 +77,6 @@ TextStyle pixelTextStyle({
 ColorFilter grayScaleColorFilter() {
   return const ColorFilter.matrix(<double>[0.2126, 0.7152, 0.0722, 0, 0, 0.2126, 0.7152, 0.0722, 0, 0, 0.2126, 0.7152, 0.0722, 0, 0, 0, 0, 0, 1, 0]);
 }
-
-// ===================== STATS PANEL =====================
 
 class CharacterStatsPanel extends StatelessWidget {
   const CharacterStatsPanel({
@@ -246,8 +246,6 @@ class CharacterStatsPanel extends StatelessWidget {
   }
 }
 
-// ===================== AVATAR GRID =====================
-
 class CharacterAvatarGrid extends StatelessWidget {
   const CharacterAvatarGrid({
     super.key,
@@ -334,6 +332,35 @@ class CharacterAvatarGrid extends StatelessWidget {
                         )
                       : avatarImage;
 
+                  final elementalTypeLabelConfig = ELEMENTAL_TYPE_LABEL_CONFIG[AVATAR_ELEMENT_TYPE_MAP[avatar]]!;
+                  final cutOutButton = Positioned(
+                    bottom: cell * 0.15,
+                    right: cell * 0.15,
+                    child: SizedBox(
+                      height: cell * 0.25,
+                      width: cell * 0.55,
+                      child: CutOutButton(
+                        darkColor: elementalTypeLabelConfig.darkColor,
+                        lightColor: elementalTypeLabelConfig.lightColor,
+                        mainColor: elementalTypeLabelConfig.mainColor,
+                        opacity: isSelected ? null : 0.4,
+                        child: Text(
+                          I18nService().translate(elementalTypeLabelConfig.textKey),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: pixelTextStyle(
+                            fontFamily: PIXEL_FONT,
+                            shadowColor: SHADOW_COLOR,
+                            fontSize: cell * 0.15,
+                            height: 1,
+                            letterSpacing: 0,
+                            shadowOffsetX: cell * 0.02,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+
                   return GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: isLocked ? null : () => onSelectAvatar(avatar),
@@ -342,7 +369,9 @@ class CharacterAvatarGrid extends StatelessWidget {
                       children: [
                         if (isSelected)
                           Image.asset(selectFrameAsset, width: cell, height: cell, fit: BoxFit.cover, filterQuality: FilterQuality.none),
+                        if (!isSelected) cutOutButton,
                         filteredAvatarImage,
+                        if (isSelected) cutOutButton,
                       ],
                     ),
                   );

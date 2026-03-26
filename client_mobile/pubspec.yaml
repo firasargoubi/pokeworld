@@ -115,6 +115,9 @@ flutter:
         - assets/audio/music/
         - assets/images/menu/avatars/
         - assets/images/menu/fullAvatars/
+        - assets/images/menu/buttons/cut-out/
+        - assets/images/game/elemental-icons/
+        - assets/audio/avatars/
         - assets/images/menu/containers/user-card/
         - assets/images/menu/icons/user-card/
         - assets/images/menu/containers/settings/

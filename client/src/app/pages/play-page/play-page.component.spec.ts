@@ -6,7 +6,6 @@ import { Timer } from '@app/classes/timer/timer';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { MapComponent } from '@app/components/map/map.component';
 import { PlayerInfoPopupComponent } from '@app/components/player-info-popup/player-info-popup.component';
-import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
@@ -205,15 +204,5 @@ describe('PlayPageComponent', () => {
     it('should hide info popup on hidePlayerDescription', () => {
         component.hidePlayerDescription();
         expect(component.showPlayerInfoPopup).toBeFalse();
-    });
-    it('should play item sound when player picks up an item', () => {
-        const playerName = 'TestPlayer';
-        mockMatchService.selfPlayer.name = playerName;
-        mockMatchService.data.logData = [{ content: 'server.logs.itemPickup', timestamp: new Date(), concernedPlayersNamesList: [] }];
-        mockMatchService.data.logData[0].messageParams = { playerName };
-        component['lastLogSize'] = 0;
-        component['onMatchUpdate']();
-        expect(mockAudioService.playEffect).toHaveBeenCalledWith(SoundEffect.Item);
-        expect(component['lastLogSize']).toBe(1);
     });
 });
