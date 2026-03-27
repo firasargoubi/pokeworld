@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:client_mobile/consts/login_const.dart';
 import 'package:client_mobile/models/menu_config.dart';
+import 'package:client_mobile/models/social.dart';
 import 'package:client_mobile/models/ui.dart';
 import 'package:client_mobile/models/user_info.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
@@ -10,13 +11,16 @@ import 'package:client_mobile/utils/profile_image_provider.dart';
 import 'package:client_mobile/widgets/cut_corner_container/cut_corner_container.dart';
 import 'package:client_mobile/widgets/edge_body_button/edge_body_button.dart';
 import 'package:client_mobile/widgets/stat_container/stat_container.dart';
+import 'package:client_mobile/widgets/user_profile_popup/user_profile_popup_friends_card/user_profile_popup_friends_controller.dart';
 import 'package:client_mobile/widgets/user_profile_popup/user_profile_popup_profile_card/user_profile_popup_profile_controller.dart';
 import 'package:client_mobile/widgets/user_profile_popup/user_profile_popup_settings_card/user_profile_popup_settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 part 'user_profile_popup_const.dart';
 part 'user_profile_popup_friends_card/user_profile_popup_friends_card.dart';
+part 'user_profile_popup_friends_card/user_profile_popup_friends_card_widgets.dart';
 part 'user_profile_popup_inventory_card/user_profile_popup_inventory_card.dart';
 part 'user_profile_popup_profile_card/user_profile_popup_profile_card.dart';
 part 'user_profile_popup_settings_card/user_profile_popup_settings_card.dart';
