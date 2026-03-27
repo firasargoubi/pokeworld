@@ -4,6 +4,7 @@ enum ErrorMessage {
   UsernameStartsOrEndsWithSpaces('popup.usernameSpaces'),
   PasswordOnlySpaces('popup.passwordSpaces'),
   InvalidEmail('popup.invalidEmail'),
+  ImageTooLarge('components.authPopup.imageTooLarge'),
   UsernameExists('popup.usernameTaken'),
   InvalidCredentials('popup.invalidCredentials'),
   UserNotFound('popup.userNotFound'),

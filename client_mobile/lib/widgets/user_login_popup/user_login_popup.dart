@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:client_mobile/consts/auth_errors.dart';
@@ -10,15 +11,18 @@ import 'package:client_mobile/models/popup_message.dart';
 import 'package:client_mobile/models/ui.dart';
 import 'package:client_mobile/models/user_preferences.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/services/camera_service/camera_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/popup_service/popup_service.dart';
 import 'package:client_mobile/services/preferences_service/preferences_service.dart';
 import 'package:client_mobile/services/user_service/user_service.dart';
+import 'package:client_mobile/utils/profile_image_provider.dart';
 import 'package:client_mobile/widgets/cut_corner_container/cut_corner_container.dart';
 import 'package:client_mobile/widgets/edge_body_button/edge_body_button.dart';
 import 'package:client_mobile/widgets/stat_container/stat_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 
 part 'user_login_popup_const.dart';
 part 'user_login_popup_controller.dart';
@@ -134,7 +138,10 @@ class _UserLoginPopupState extends State<UserLoginPopup> with SingleTickerProvid
                     _controller.switchLanguage(lang);
                   },
                   selectedAvatarIndex: _controller.selectedAvatarIndex,
+                  isCustomAvatarSelected: _controller.isCustomAvatarSelected,
+                  customAvatarDataUrl: _controller.customAvatarDataUrl,
                   onAvatarSelected: _controller.selectAvatar,
+                  onCustomAvatarTapped: _controller.onCustomAvatarTapped,
                   isLoading: _controller.isLoading,
                   errorMessage: _controller.errorMessage,
                   onAction: () => _controller.handleAction(
