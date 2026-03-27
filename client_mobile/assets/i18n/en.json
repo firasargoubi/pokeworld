@@ -287,7 +287,8 @@
             "invalidEmail": "Invalid email address",
             "passwordMismatch": "Passwords do not match",
             "confirmAccountCreation": "Do you want to confirm account creation?",
-            "avatarAlt": "Avatar {{index}}"
+            "avatarAlt": "Avatar {{index}}",
+            "imageTooLarge": "Image is too large"
         },
         "botCreation": {
             "title": "Add a bot",

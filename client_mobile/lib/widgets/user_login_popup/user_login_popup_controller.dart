@@ -13,6 +13,8 @@ class UserLoginController {
   LoginPopupView currentView = LoginPopupView.login;
   String selectedLanguage = LANG_LABEL_FR;
   int? selectedAvatarIndex = 0;
+  bool isCustomAvatarSelected = false;
+  String? customAvatarDataUrl;
   bool isLoading = false;
   String? errorMessage;
 
@@ -50,7 +52,39 @@ class UserLoginController {
   }
 
   void selectAvatar(int index) {
-    _updateState(() => selectedAvatarIndex = index);
+    _updateState(() {
+      selectedAvatarIndex = index;
+      isCustomAvatarSelected = false;
+      customAvatarDataUrl = null;
+    });
+  }
+
+  Future<void> onCustomAvatarTapped() async {
+    try {
+      final XFile? capturedImage = await CameraService().openCamera(maxWidth: 1024, maxHeight: 1024, imageQuality: 85);
+      if (capturedImage != null) {
+        final List<int> imageBytes = await capturedImage.readAsBytes();
+        if (imageBytes.length > 1024 * 1024) {
+          _updateState(() {
+            errorMessage = _translateError(ErrorMessage.ImageTooLarge.message);
+          });
+          return;
+        }
+
+        final String base64Image = base64Encode(imageBytes);
+        final String mimeType = capturedImage.mimeType ?? 'image/jpeg';
+        final String encodedDataUrl = 'data:$mimeType;base64,$base64Image';
+
+        _updateState(() {
+          customAvatarDataUrl = encodedDataUrl;
+          isCustomAvatarSelected = true;
+          selectedAvatarIndex = null;
+          errorMessage = null;
+        });
+      }
+    } catch (error) {
+      debugPrint('Error capturing image: $error');
+    }
   }
 
   String? _validateLogin() {
@@ -89,7 +123,10 @@ class UserLoginController {
     if (rawEmail != trimmedEmail || !RegExp(r'^([a-zA-Z0-9_\-.+]+)@([a-zA-Z0-9\-.]+)\.([a-zA-Z]{2,})$').hasMatch(trimmedEmail)) {
       return ErrorMessage.InvalidEmail.message;
     }
-    if (selectedAvatarIndex == null) {
+    if (!isCustomAvatarSelected && selectedAvatarIndex == null) {
+      return LOGIN_POPUP_AVATAR_REQUIRED_ERROR;
+    }
+    if (isCustomAvatarSelected && (customAvatarDataUrl == null || customAvatarDataUrl!.isEmpty)) {
       return LOGIN_POPUP_AVATAR_REQUIRED_ERROR;
     }
     return null;
@@ -109,12 +146,13 @@ class UserLoginController {
 
     try {
       if (isRegister) {
+        final bool useCustomAvatar = isCustomAvatarSelected && customAvatarDataUrl != null && customAvatarDataUrl!.isNotEmpty;
         await _userService.register(
           usernameController.text.trim(),
           emailController.text.trim(),
           passwordController.text,
-          USER_PROFILE_PICTURES[selectedAvatarIndex!],
-          USER_FULL_PROFILE_PICTURES[selectedAvatarIndex!],
+          useCustomAvatar ? customAvatarDataUrl! : USER_PROFILE_PICTURES[selectedAvatarIndex!],
+          useCustomAvatar ? customAvatarDataUrl! : USER_FULL_PROFILE_PICTURES[selectedAvatarIndex!],
           preferences: UserPreferences(language: _preferencesService.currentLanguage.value, theme: _preferencesService.currentTheme.value),
         );
         _popupService.showPopup(

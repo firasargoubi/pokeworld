@@ -79,13 +79,8 @@ class UserService {
     _ensureConfigured();
     final String uri = '$baseUrl/${UserEndpoint.UserRegister.path}';
 
-    final avatarByteData = await rootBundle.load(avatarPath);
-    final avatarBytes = avatarByteData.buffer.asUint8List();
-    String avatarImg64 = 'data:image/png;base64,${base64Encode(avatarBytes)}';
-
-    final fullAvatarByteData = await rootBundle.load(fullAvatarPath);
-    final fullAvatarBytes = fullAvatarByteData.buffer.asUint8List();
-    String fullAvataImg64 = 'data:image/png;base64,${base64Encode(fullAvatarBytes)}';
+    final String avatarImg64 = await _resolveImageInput(avatarPath);
+    final String fullAvataImg64 = await _resolveImageInput(fullAvatarPath);
 
     final postBody = {
       'username': username,
@@ -108,6 +103,16 @@ class UserService {
     } else {
       throw Exception('Failed to register: ${response.body}');
     }
+  }
+
+  Future<String> _resolveImageInput(String source) async {
+    if (source.startsWith('data:image')) {
+      return source;
+    }
+
+    final ByteData byteData = await rootBundle.load(source);
+    final Uint8List bytes = byteData.buffer.asUint8List();
+    return 'data:image/png;base64,${base64Encode(bytes)}';
   }
 
   Future<void> logout() async {

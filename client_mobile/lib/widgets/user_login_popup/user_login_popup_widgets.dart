@@ -12,7 +12,10 @@ class _LoginCardFace extends StatelessWidget {
     required this.selectedLanguage,
     required this.onLanguageSwitch,
     required this.selectedAvatarIndex,
+    required this.isCustomAvatarSelected,
+    required this.customAvatarDataUrl,
     required this.onAvatarSelected,
+    required this.onCustomAvatarTapped,
     required this.isLoading,
     required this.errorMessage,
     required this.onAction,
@@ -28,7 +31,10 @@ class _LoginCardFace extends StatelessWidget {
   final String selectedLanguage;
   final void Function(String) onLanguageSwitch;
   final int? selectedAvatarIndex;
+  final bool isCustomAvatarSelected;
+  final String? customAvatarDataUrl;
   final void Function(int) onAvatarSelected;
+  final Future<void> Function() onCustomAvatarTapped;
   final bool isLoading;
   final String? errorMessage;
   final VoidCallback onAction;
@@ -175,25 +181,65 @@ class _LoginCardFace extends StatelessWidget {
                                       crossAxisCount: 3,
                                       mainAxisSpacing: baseSize * 0.01,
                                       crossAxisSpacing: baseSize * 0.01,
-                                      children: List.generate(
-                                        USER_PROFILE_PICTURES.length,
-                                        (index) => GestureDetector(
+                                      children: List.generate(USER_PROFILE_PICTURES.length + 1, (index) {
+                                        if (index == 0) {
+                                          return GestureDetector(
+                                            onTap: isLoading
+                                                ? null
+                                                : () {
+                                                    AudioService().playSoundEffect(SoundEffect.Select.path);
+                                                    onCustomAvatarTapped();
+                                                  },
+                                            child: CutCornerBorderContainer(
+                                              backgroundColor: const Color.fromARGB(255, 255, 255, 255).withValues(alpha: 0.1),
+                                              borderColor: isCustomAvatarSelected
+                                                  ? const Color.fromARGB(255, 255, 255, 255)
+                                                  : const Color.fromARGB(255, 255, 255, 255).withValues(alpha: 0.1),
+                                              borderWidth: baseSize * 0.007,
+                                              child: Center(
+                                                child: customAvatarDataUrl != null && customAvatarDataUrl!.isNotEmpty
+                                                    ? Image(
+                                                        image: profilePictureImageProvider(customAvatarDataUrl),
+                                                        fit: BoxFit.cover,
+                                                        filterQuality: FilterQuality.none,
+                                                      )
+                                                    : Text(
+                                                        '+',
+                                                        style: TextStyle(
+                                                          fontFamily: 'Pixel',
+                                                          color: Colors.white,
+                                                          fontSize: baseSize * 0.05,
+                                                          decoration: TextDecoration.none,
+                                                          height: 0.9,
+                                                        ),
+                                                      ),
+                                              ),
+                                            ),
+                                          );
+                                        }
+
+                                        final int avatarIndex = index - 1;
+                                        return GestureDetector(
                                           onTap: isLoading
                                               ? null
                                               : () {
-                                                  onAvatarSelected(index);
+                                                  onAvatarSelected(avatarIndex);
                                                   AudioService().playSoundEffect(SoundEffect.Select.path);
                                                 },
                                           child: CutCornerBorderContainer(
                                             backgroundColor: const Color.fromARGB(255, 255, 255, 255).withValues(alpha: 0.1),
-                                            borderColor: selectedAvatarIndex == index
+                                            borderColor: selectedAvatarIndex == avatarIndex
                                                 ? const Color.fromARGB(255, 255, 255, 255)
                                                 : const Color.fromARGB(255, 255, 255, 255).withValues(alpha: 0.1),
                                             borderWidth: baseSize * 0.007,
-                                            child: Image.asset(USER_PROFILE_PICTURES[index], fit: BoxFit.contain, filterQuality: FilterQuality.none),
+                                            child: Image.asset(
+                                              USER_PROFILE_PICTURES[avatarIndex],
+                                              fit: BoxFit.contain,
+                                              filterQuality: FilterQuality.none,
+                                            ),
                                           ),
-                                        ),
-                                      ),
+                                        );
+                                      }),
                                     ),
                                   ),
                                 ),
