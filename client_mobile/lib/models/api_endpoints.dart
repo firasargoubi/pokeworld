@@ -15,3 +15,11 @@ enum GameEndpoint {
   final String path;
   const GameEndpoint(this.path);
 }
+
+enum SocialEndpoint {
+  Base('social'),
+  List('social/list');
+
+  final String path;
+  const SocialEndpoint(this.path);
+}

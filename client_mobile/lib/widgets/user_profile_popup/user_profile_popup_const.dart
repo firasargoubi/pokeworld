@@ -30,6 +30,8 @@ const String USER_POPUP_DELETE_ACCOUNT_CONFIRMATION = 'components.userPopup.dele
 const String USER_POPUP_REQUIRED_FIELDS_ERROR = 'components.userPopup.requiredFieldsError';
 const String USER_POPUP_PASSWORD_MISMATCH = 'components.userPopup.passwordMismatch';
 const String USER_POPUP_PASSWORD_UNCHANGED = 'components.userPopup.passwordUnchanged';
+const String USER_POPUP_SEARCH_PLACEHOLDER = 'components.userPopup.searchPlaceholder';
+const String USER_POPUP_NO_USERS_FOUND = 'components.userPopup.noUsersFound';
 
 const String ASSET_CARD_ICON_BG = 'assets/images/menu/containers/user-card/user-card-icon-bg.png';
 const String ASSET_TITLE_ICON = 'assets/images/menu/containers/user-card/title-icon.png';
@@ -51,11 +53,40 @@ const String ASSET_DELETE_BUTTON_EDGE_2 = 'assets/images/menu/containers/user-ca
 const String ASSET_DELETE_BUTTON_BODY = 'assets/images/menu/containers/user-card/button-delete-body.png';
 
 const String ASSET_ICON_ARCHIVE = 'assets/images/menu/icons/user-card/archive-sharp.png';
+const String ASSET_ICON_SEARCH = 'assets/images/menu/icons/user-card/search.svg';
+const String ASSET_ICON_BLOCK = 'assets/images/menu/icons/user-card/block.svg';
+const String ASSET_ICON_ADD_FRIEND = 'assets/images/menu/icons/user-card/add-friend.svg';
+const String ASSET_ICON_REMOVE_FRIEND = 'assets/images/menu/icons/user-card/remove-friend.svg';
 const String ASSET_ICON_FRIENDS = 'assets/images/menu/icons/user-card/friends.png';
+const String ASSET_ICON_PENDING_INVITATION = 'assets/images/menu/icons/user-card/wait-icon.png';
+const String ASSET_ICON_MAIL = 'assets/images/menu/icons/chat/mail.png';
 const String ASSET_ICON_SETTINGS = 'assets/images/menu/icons/user-card/settings-cog.png';
 const String ASSET_ICON_BACK_ARROW = 'assets/images/menu/icons/user-card/back-arrow.png';
 const String ASSET_ICON_LOGOUT = 'assets/images/menu/icons/user-card/logout.png';
 const String ASSET_ICON_TRASH = 'assets/images/menu/icons/user-card/trash.png';
+
+const double FRIENDS_TAB_BUTTON_SIZE_FACTOR = 0.1;
+const double FRIENDS_TAB_ICON_SIZE_FACTOR = 0.055;
+const double FRIENDS_TAB_GAP_FACTOR = 0.012;
+const double FRIENDS_TAB_ACTIVE_SCALE = 0.7;
+const double FRIENDS_TAB_ACTIVE_OPACITY = 0.8;
+const Duration FRIENDS_TAB_ANIMATION_DURATION = Duration(milliseconds: 120);
+const Color FRIENDS_TAB_ASSET_ICON_COLOR = Colors.white;
+const Color FRIENDS_BLOCKED_TAB_ICON_COLOR = Color(0xFFd85b5b);
+const Color FRIENDS_ACTION_UNBLOCK_ICON_COLOR = Color(0xFF73d67c);
+const double FRIENDS_SEARCH_BAR_HEIGHT_FACTOR = 0.08;
+const double FRIENDS_SEARCH_BAR_PADDING_FACTOR = 0.02;
+const double FRIENDS_SEARCH_BAR_BORDER_FACTOR = 0.007;
+const double FRIENDS_SEARCH_BAR_ICON_SIZE_FACTOR = 0.045;
+const double FRIENDS_SEARCH_BAR_SPACING_FACTOR = 0.015;
+const double FRIENDS_SEARCH_INPUT_TEXT_FACTOR = 0.032;
+const double FRIENDS_RESULT_ITEM_HEIGHT_FACTOR = 0.12;
+const double FRIENDS_RESULT_ITEM_RADIUS_FACTOR = 0.02;
+const double FRIENDS_RESULT_ITEM_PADDING_FACTOR = 0.015;
+const double FRIENDS_RESULT_AVATAR_RADIUS_FACTOR = 0.03;
+const double FRIENDS_RESULT_NAME_TEXT_FACTOR = 0.032;
+const double FRIENDS_RESULT_LIST_SPACING_FACTOR = 0.01;
+const double FRIENDS_ACTION_BUTTON_SIZE_FACTOR = 0.08;
 
 const FramedContainerStyle USER_CARD_STYLE = FramedContainerStyle(
   borderAsset: 'assets/images/menu/containers/user-card/user-border-1.png',
