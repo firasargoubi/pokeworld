@@ -56,6 +56,8 @@ $img-icon-filter: '#{$img-base}/icons/chat/filter.svg';
 $img-icon-bin: '#{$img-base}/buttons/admin-button/bin.png';
 $img-icon-join: '#{$img-base}/icons/chat/join.svg';
 $img-icon-leave: '#{$img-base}/icons/chat/leave.svg';
+$img-icon-attach: '#{$img-base}/icons/attach.png';
+$img-icon-detach: '#{$img-base}/icons/detach.png';
 
 $img-avatar-frame: '../../../assets/images/menu/containers/dark-blue/party-ball.png';
 
@@ -160,7 +162,7 @@ $shadow-message: calc(0.1 * $chat-font-size) 0 0 $color-message-shadow;
 }
 
 .chat-container {
-    --chat-base-size: calc(min(1vh, 1vw) * var(--scale-factor));
+    --chat-base-size: calc(min(1vh, 1vw) * var(--scale-factor) * var(--detached-scale-factor, 1));
     position: absolute;
     bottom: 0;
     left: 0;
@@ -341,6 +343,55 @@ $shadow-message: calc(0.1 * $chat-font-size) 0 0 $color-message-shadow;
     transition: all 0.1s;
 
     @include pixel-clip-top(calc($pixel-size * 5), calc($pixel-size * 10));
+}
+
+.window-mode-button {
+    width: calc($chat-base-size * 5);
+    align-self: flex-end;
+    aspect-ratio: 1 / 1;
+
+    justify-content: center;
+    align-items: center;
+
+    cursor: pointer;
+    background-color: $color-button-bg;
+    transition: all 0.1s;
+
+    @include pixel-clip-top(calc($pixel-size * 5), calc($pixel-size * 10));
+}
+
+.window-mode-icon {
+    width: 55%;
+    aspect-ratio: 1 / 1;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.attach-icon {
+    background-image: url($img-icon-attach);
+}
+
+.detach-icon {
+    background-image: url($img-icon-detach);
+}
+
+.window-mode-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.window-mode-container {
+    height: 100%;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+}
+
+.window-mode-container:hover .window-mode-button {
+    filter: brightness(1.08);
+    height: calc($chat-base-size * 4.5);
 }
 
 .channel-list {

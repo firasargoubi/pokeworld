@@ -1,8 +1,16 @@
-﻿<div class="chat-container" [class.hidden]="!this.isComponentVisible" [class.hide-labels]="hideLabels" [style.--scale-factor]="scaleFactor">
+<div
+    class="chat-container"
+    [class.hidden]="!this.isComponentVisible"
+    [class.hide-labels]="hideLabels"
+    [style.--scale-factor]="scaleFactor"
+    [style.--detached-scale-factor]="isDetachedWindow ? 2 : 1"
+>
+    @if (!isDetachedWindow) {
     <div class="chat-toggle-button" (click)="switchVisibility()"></div>
     <div class="horizontal-border" (click)="switchVisibility()">
         <p>></p>
     </div>
+    }
     <div class="chat-body">
         <div class="chat-interactions-container">
             <div class="categories-container">
@@ -46,6 +54,11 @@
                 <div class="icon"></div>
             </div>
             }
+            <div class="window-mode-container">
+                <div class="window-mode-button" (click)="toggleWindowMode()">
+                    <div class="window-mode-icon" [class.attach-icon]="isDetachedWindow" [class.detach-icon]="!isDetachedWindow"></div>
+                </div>
+            </div>
         </div>
         @if (chatService.chatState().activeTab === chatTab.Channels) {
         <div class="channel-header">

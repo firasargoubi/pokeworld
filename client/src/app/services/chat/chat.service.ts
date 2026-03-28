@@ -25,6 +25,8 @@ export class ChatService {
     channels = signal<Channel[]>([]);
     isFilterEnabled = signal(false);
     isComponentVisible = signal(false);
+    isWindowDetached = signal(false);
+    detachedWindow: Window | null = null;
     activeChannelName = computed(() => this.chatState().activeChannelName ?? '');
     activeChannelMessages = computed(() => {
         const name = this.chatState().activeChannelName;
@@ -43,6 +45,9 @@ export class ChatService {
         this.userService.user$.subscribe((user) => {
             if (this.user?.userId !== user?.userId) this.generalMessagesSignal.update(() => []);
             this.user = user;
+            if (!user) {
+                this.closeDetachedWindow();
+            }
         });
         this.socketService.on(ChatEvent.GeneralMessage, (chatMessage: ChatMessage) => {
             if (this.user) this.generalMessagesSignal.update((messages) => [...messages, chatMessage]);
@@ -176,5 +181,15 @@ export class ChatService {
                 this.joinChannel(channel.name);
             }
         });
+    }
+
+    private closeDetachedWindow(): void {
+        const popup = this.detachedWindow;
+        this.detachedWindow = null;
+        this.isWindowDetached.set(false);
+
+        if (popup && !popup.closed) {
+            popup.close();
+        }
     }
 }
