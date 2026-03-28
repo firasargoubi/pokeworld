@@ -3,6 +3,8 @@ import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { UserService } from '@app/services/user/user.service';
+import { UserInfo } from '@common/interfaces/user';
+import { BehaviorSubject } from 'rxjs';
 import { ChatService } from './chat.service';
 
 describe('ChatService', () => {
@@ -11,6 +13,7 @@ describe('ChatService', () => {
     let mockSocketService: jasmine.SpyObj<SocketService>;
     let mockUserService: jasmine.SpyObj<UserService>;
     let mockPopupService: jasmine.SpyObj<PopupService>;
+    let userSubject: BehaviorSubject<UserInfo | null>;
 
     beforeEach(() => {
         mockMatchService = jasmine.createSpyObj('MatchService', ['isInMatch'], {
@@ -19,11 +22,10 @@ describe('ChatService', () => {
 
         mockSocketService = jasmine.createSpyObj('SocketService', ['emit', 'on']);
         mockPopupService = jasmine.createSpyObj('PopupService', ['showPopup']);
+        userSubject = new BehaviorSubject<UserInfo | null>({ userId: 'u-1', username: 'TestUser' } as UserInfo);
 
         mockUserService = jasmine.createSpyObj('UserService', [], {
-            user$: {
-                subscribe: () => undefined,
-            },
+            user$: userSubject.asObservable(),
         });
 
         TestBed.configureTestingModule({
@@ -48,5 +50,17 @@ describe('ChatService', () => {
         mockSocketService.emit.and.callFake(async () => Promise.resolve(false));
         service.sendMessage(message);
         expect(mockSocketService.emit).toHaveBeenCalled();
+    });
+
+    it('should close detached window when user disconnects', () => {
+        const popup = jasmine.createSpyObj<Window>('Window', ['close'], { closed: false });
+        service.detachedWindow = popup;
+        service.isWindowDetached.set(true);
+
+        userSubject.next(null);
+
+        expect(popup.close).toHaveBeenCalled();
+        expect(service.detachedWindow).toBeNull();
+        expect(service.isWindowDetached()).toBeFalse();
     });
 });

@@ -268,7 +268,7 @@ $player-card-width: calc($base-size * 70);
     filter: brightness(1.1);
 }
 
-.button-container:active *:not(.icon) {
+.button-container:active * {
     rotate: 180deg;
     filter: brightness(0.98);
 }

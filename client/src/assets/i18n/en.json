@@ -306,7 +306,8 @@
             "journal": "Journal",
             "searchPlaceholder": "Search/Create a channel",
             "inputPlaceholder": "> Enter a message",
-            "send": "Send"
+            "send": "Send",
+            "windowTitle": "Chat"
         },
         "createGame": {
             "title": "New game",

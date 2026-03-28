@@ -39,6 +39,7 @@ describe('ChatComponent', () => {
             isGeneralChatActive: signal(false),
             isFilterEnabled: signal(false),
             isComponentVisible: signal(true),
+            isWindowDetached: signal(false),
             generalMessages$: of([]),
             channelMessages$: of({}),
         });
@@ -197,5 +198,27 @@ describe('ChatComponent', () => {
         component.switchVisibility();
 
         expect(component.isComponentVisible).toBe(initialVisibility);
+    });
+
+    it('should detach chat window when toggling window mode from integrated mode', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        const detachSpy = spyOn<any>(component, 'detachToExternalWindow');
+        component.isDetachedWindow = false;
+
+        component.toggleWindowMode();
+
+        expect(mockAudioService.playEffect).toHaveBeenCalledWith(SoundEffect.Click);
+        expect(detachSpy).toHaveBeenCalled();
+    });
+
+    it('should reattach chat window when toggling window mode from detached mode', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        const reattachSpy = spyOn<any>(component, 'reattachToMainWindow');
+        component.isDetachedWindow = true;
+
+        component.toggleWindowMode();
+
+        expect(mockAudioService.playEffect).toHaveBeenCalledWith(SoundEffect.Click);
+        expect(reattachSpy).toHaveBeenCalled();
     });
 });
