@@ -291,13 +291,15 @@ class GameStatsPanel extends StatelessWidget {
     required this.winner,
     required this.formatDuration,
     required this.formatRatio,
+    required this.formattedBalanceGain,
   });
 
   final double baseSize;
-  final dynamic stats;
+  final GlobalStatData stats;
   final WinnerVisualData? winner;
   final String Function(int ms) formatDuration;
   final String Function(double ratio) formatRatio;
+  final String formattedBalanceGain;
 
   String _winnerDisplayName() {
     final winnerName = winner?.name ?? '';
@@ -359,6 +361,7 @@ class GameStatsPanel extends StatelessWidget {
                               value: stats.flagHoldersCount.toString(),
                               baseSize: baseSize,
                             ),
+                          StatLine(label: I18nService().translate(STAT_BALANCE_GAIN_LABEL_KEY), value: formattedBalanceGain, baseSize: baseSize),
                         ],
                       ),
                     ),

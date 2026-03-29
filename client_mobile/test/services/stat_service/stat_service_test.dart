@@ -43,6 +43,8 @@ TrackingPlayerData _buildTrackingPlayer({
   int escapes = 0,
   int hpInflicted = 0,
   int hpLost = 0,
+  int balanceGain = 0,
+  int currentBalance = 0,
 }) => TrackingPlayerData(
   id: id,
   name: name,
@@ -55,6 +57,8 @@ TrackingPlayerData _buildTrackingPlayer({
   escapes: escapes,
   hpInflicted: hpInflicted,
   hpLost: hpLost,
+  balanceGain: balanceGain,
+  currentBalance: currentBalance,
 );
 
 TrackingData _buildTrackingData({

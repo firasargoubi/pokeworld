@@ -199,6 +199,7 @@ class UserService {
           balance: existingUser.balance,
           createdAt: existingUser.createdAt,
           preferences: preferences,
+          inventory: existingUser.inventory,
         );
       }
 

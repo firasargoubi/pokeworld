@@ -169,7 +169,7 @@ class TrackingData {
   final List<Position> coveredGroundTiles;
   final int rounds;
   final int flagHoldersCount;
-  final dynamic matchWinner; // WinnerData (not modeled)
+  final dynamic matchWinner;
   final List<TrackingPlayerData> players;
 
   TrackingData({
@@ -213,6 +213,8 @@ class TrackingPlayerData {
   final int escapes;
   final int hpInflicted;
   final int hpLost;
+  final int balanceGain;
+  final int currentBalance;
 
   TrackingPlayerData({
     required this.id,
@@ -226,6 +228,8 @@ class TrackingPlayerData {
     required this.escapes,
     required this.hpInflicted,
     required this.hpLost,
+    required this.balanceGain,
+    required this.currentBalance,
   });
 
   factory TrackingPlayerData.fromJson(Map<String, dynamic> json) {
@@ -245,6 +249,8 @@ class TrackingPlayerData {
       escapes: (json['escapes'] as num).toInt(),
       hpInflicted: (json['hpInflicted'] as num).toInt(),
       hpLost: (json['hpLost'] as num).toInt(),
+      balanceGain: (json['balanceGain'] as num).toInt(),
+      currentBalance: (json['currentBalance'] as num).toInt(),
     );
   }
 }

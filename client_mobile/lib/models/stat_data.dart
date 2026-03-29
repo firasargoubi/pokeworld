@@ -12,6 +12,8 @@ class StatData {
   final int escapes;
   final int hpInflicted;
   final int hpLost;
+  final int balanceGain;
+  final int currentBalance;
 
   StatData({
     required this.id,
@@ -25,6 +27,8 @@ class StatData {
     required this.escapes,
     required this.hpInflicted,
     required this.hpLost,
+    required this.balanceGain,
+    required this.currentBalance,
   });
 }
 

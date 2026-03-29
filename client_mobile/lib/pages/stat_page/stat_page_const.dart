@@ -21,6 +21,7 @@ const String STAT_HP_LOST_LABEL_KEY = 'pages.stat.playerColumns.hpLost';
 const String STAT_DURATION_LABEL_KEY = 'pages.stat.duration';
 const String STAT_ROUNDS_LABEL_KEY = 'pages.stat.turns';
 const String STAT_VISITED_TILES_LABEL_KEY = 'pages.stat.visitedTiles';
+const String STAT_BALANCE_GAIN_LABEL_KEY = 'pages.stat.balanceGain';
 const String STAT_TOGGLED_BRIDGES_LABEL_KEY = 'pages.stat.manipulatedDoors';
 const String STAT_FLAG_HOLDERS_LABEL_KEY = 'pages.stat.flagCarriers';
 

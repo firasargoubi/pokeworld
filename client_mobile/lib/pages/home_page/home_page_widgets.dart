@@ -29,11 +29,12 @@ class HomePageBlurredBackground extends StatelessWidget {
 }
 
 class HomePageTopSection extends StatelessWidget {
-  const HomePageTopSection({super.key, required this.baseSize, required this.onSettingsTap, required this.onAccountTap});
+  const HomePageTopSection({super.key, required this.baseSize, required this.onSettingsTap, required this.onAccountTap, required this.onShopTap});
 
   final double baseSize;
   final VoidCallback onSettingsTap;
   final VoidCallback onAccountTap;
+  final VoidCallback onShopTap;
 
   @override
   Widget build(BuildContext context) {
@@ -55,8 +56,10 @@ class HomePageTopSection extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         _HomePageTopButton(baseSize: baseSize, iconAsset: HOME_PAGE_ACCOUNT_ICON_ASSET, onTap: onAccountTap),
-                        SizedBox(height: baseSize * 0),
+                        SizedBox(height: baseSize * 0.01),
                         _HomePageTopButton(baseSize: baseSize, iconAsset: HOME_PAGE_SETTINGS_ICON_ASSET, onTap: onSettingsTap),
+                        SizedBox(height: baseSize * 0.01),
+                        _HomePageTopButton(baseSize: baseSize, iconAsset: HOME_PAGE_SHOP_ICON_ASSET, onTap: onShopTap),
                       ],
                     ),
                   ),
@@ -83,8 +86,8 @@ class _HomePageTopButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       flex: 10,
-      child: SizedBox(
-        height: double.infinity,
+      child: AspectRatio(
+        aspectRatio: 1,
         child: Align(
           alignment: Alignment.topCenter,
           child: Padding(

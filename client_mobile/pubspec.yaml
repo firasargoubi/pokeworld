@@ -122,6 +122,7 @@ flutter:
         - assets/images/menu/containers/user-card/
         - assets/images/menu/icons/user-card/
         - assets/images/menu/containers/settings/
+        - assets/images/menu/containers/shop/
 
     # The following line ensures that the Material Icons font is
     # included with your application, so that you can use the icons in

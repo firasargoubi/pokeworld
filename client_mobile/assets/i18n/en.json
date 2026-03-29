@@ -239,6 +239,7 @@
             "duration": "DURATION:",
             "turns": "TURNS:",
             "visitedTiles": "VISITED TILES:",
+            "balanceGain": "GAIN:",
             "manipulatedDoors": "MANIPULATED DOORS:",
             "flagCarriers": "FLAG CARRIERS:",
             "quit": "< QUIT",
@@ -357,6 +358,7 @@
             "userTitle": "User",
             "nameLabel": "Name:",
             "emailLabel": "Email:",
+            "balanceLabel": "Balance:",
             "noneValue": "None",
             "logout": "LOG OUT",
             "deleteAccount": "DELETE ACCOUNT",
@@ -406,6 +408,26 @@
             "elementalMode": "Elemental mode",
             "rapidElimination": "Rapid elimination",
             "validate": "VALIDATE"
+        },
+        "shopPopup": {
+            "title": "POKE-SHOP",
+            "description": "Description",
+            "buy": "BUY",
+            "balance": "Balance:",
+            "owned": "OWNED",
+            "inventoryTitle": "Purchase history",
+            "emptyInventory": "No purchases yet",
+            "insufficientFunds": "You do not have enough money for this purchase.",
+            "purchaseSuccess": "{{itemName}} was added to your inventory.",
+            "purchaseError": "The purchase could not be completed.",
+            "unknownItem": "Unknown item",
+            "items": {
+                "item1": "Item 1",
+                "item2": "Item 2",
+                "item3": "Item 3",
+                "item4": "Item 4",
+                "item5": "Item 5"
+            }
         }
     }
 }

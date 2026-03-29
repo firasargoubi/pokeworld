@@ -85,6 +85,8 @@ class StatService {
         escapes: player.escapes,
         hpInflicted: player.hpInflicted,
         hpLost: player.hpLost,
+        balanceGain: player.balanceGain,
+        currentBalance: player.currentBalance,
       );
     }).toList();
   }

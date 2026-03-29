@@ -12,6 +12,7 @@ const String INVENTORY_DISPLAY_TITLE = 'components.userPopup.inventoryTitle';
 
 const String NAME_LABEL = 'components.userPopup.nameLabel';
 const String EMAIL_LABEL = 'components.userPopup.emailLabel';
+const String BALANCE_LABEL = 'components.userPopup.balanceLabel';
 const String UPDATE_BUTTON_LABEL = 'components.userPopup.update';
 const String DELETE_ACCOUNT_BUTTON_LABEL = 'components.userPopup.deleteAccount';
 
@@ -52,6 +53,20 @@ const String ASSET_DELETE_BUTTON_EDGE_1 = 'assets/images/menu/containers/user-ca
 const String ASSET_DELETE_BUTTON_EDGE_2 = 'assets/images/menu/containers/user-card/button-delete-edge-2.png';
 const String ASSET_DELETE_BUTTON_BODY = 'assets/images/menu/containers/user-card/button-delete-body.png';
 
+const String ASSET_INVENTORY_ITEM_CONTAINER = 'assets/images/menu/containers/shop/item-container.png';
+const String ASSET_INVENTORY_ITEM_CONTAINER_ACTIVE = 'assets/images/menu/containers/shop/item-container-active.png';
+const String ASSET_INVENTORY_MAIN_ITEM_CONTAINER = 'assets/images/menu/containers/shop/main-item-container.png';
+const String ASSET_INVENTORY_ITEM_PLACEHOLDER = 'assets/images/menu/containers/shop/item1.png';
+
+const String INVENTORY_PRICE_SUFFIX = ' \$';
+const String INVENTORY_ERROR_PREFIX = 'Error: ';
+const Color INVENTORY_BALANCE_BACKGROUND_COLOR = Color(0xFF80b0e8);
+const Color INVENTORY_CENTER_DIVIDER_COLOR = Color.fromARGB(100, 255, 255, 255);
+const String INVENTORY_PIXEL_FONT_FAMILY = 'Pixel';
+const Color INVENTORY_DEFAULT_TEXT_COLOR = Colors.white;
+const double INVENTORY_TILE_SELECTED_OPACITY = 0.9;
+const double INVENTORY_TILE_DEFAULT_OPACITY = 0.45;
+
 const String ASSET_ICON_ARCHIVE = 'assets/images/menu/icons/user-card/archive-sharp.png';
 const String ASSET_ICON_SEARCH = 'assets/images/menu/icons/user-card/search.svg';
 const String ASSET_ICON_BLOCK = 'assets/images/menu/icons/user-card/block.svg';
@@ -67,7 +82,7 @@ const String ASSET_ICON_TRASH = 'assets/images/menu/icons/user-card/trash.png';
 
 const double FRIENDS_TAB_BUTTON_SIZE_FACTOR = 0.1;
 const double FRIENDS_TAB_ICON_SIZE_FACTOR = 0.055;
-const double FRIENDS_TAB_GAP_FACTOR = 0.012;
+const double FRIENDS_TAB_GAP_FACTOR = 0.0;
 const double FRIENDS_TAB_ACTIVE_SCALE = 0.7;
 const double FRIENDS_TAB_ACTIVE_OPACITY = 0.8;
 const Duration FRIENDS_TAB_ANIMATION_DURATION = Duration(milliseconds: 120);
@@ -128,4 +143,18 @@ TextStyle LABEL_TEXT_STYLE(double fontSize) => TextStyle(
   decoration: TextDecoration.none,
   height: 0.9,
   shadows: [Shadow(offset: Offset(fontSize * 0.10, 0), blurRadius: 0, color: Color(0xFFa0a0a0))],
+);
+
+// ignore: non_constant_identifier_names
+TextStyle INVENTORY_DEFAULT_TEXT_STYLE(double fontSize) =>
+    TextStyle(color: INVENTORY_DEFAULT_TEXT_COLOR, fontSize: fontSize, fontFamily: INVENTORY_PIXEL_FONT_FAMILY);
+
+// ignore: non_constant_identifier_names
+TextStyle INVENTORY_OUTLINE_TEXT_STYLE(double fontSize) => TextStyle(
+  fontSize: fontSize,
+  fontFamily: INVENTORY_PIXEL_FONT_FAMILY,
+  foreground: Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 2
+    ..color = Colors.black,
 );
