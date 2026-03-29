@@ -4,6 +4,7 @@ import 'package:client_mobile/consts/ui.dart';
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/widgets/settings_popup/settings_popup.dart';
+import 'package:client_mobile/widgets/shop_popup/shop_popup.dart';
 import 'package:client_mobile/widgets/user_profile_popup/user_profile_popup.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +30,6 @@ class _HomePageState extends State<HomePage> {
   void _showUserPopup() {
     if (!mounted) return;
     showUserCardPopup(context);
-    // showDialog(context: context, barrierDismissible: true, builder: (context) => const UserPopup());
   }
 
   void _showSettingsPopup() {
@@ -39,6 +39,11 @@ class _HomePageState extends State<HomePage> {
       barrierDismissible: true,
       builder: (context) => SettingsPopup(onClose: () => Navigator.of(context).pop()),
     );
+  }
+
+  void _showShopPopup() {
+    if (!mounted) return;
+    showShopPopup(context);
   }
 
   Future<void> _push(Widget page) async {
@@ -80,7 +85,12 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Column(
                         children: [
-                          HomePageTopSection(baseSize: baseSize, onSettingsTap: _showSettingsPopup, onAccountTap: _showUserPopup),
+                          HomePageTopSection(
+                            baseSize: baseSize,
+                            onSettingsTap: _showSettingsPopup,
+                            onAccountTap: _showUserPopup,
+                            onShopTap: _showShopPopup,
+                          ),
                           HomePageMiddleSection(baseSize: baseSize, onPush: _push),
                         ],
                       ),

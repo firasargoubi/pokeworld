@@ -42,6 +42,7 @@ class _StatPageState extends State<StatPage> {
     });
 
     _statService.initializeData();
+    _updateSorting(_sortingStat);
   }
 
   @override
@@ -71,6 +72,13 @@ class _StatPageState extends State<StatPage> {
   }
 
   String _formatRatio(double ratio) => '${ratio.toStringAsFixed(0)}%';
+
+  String _formattedBalanceGain() {
+    final selfPlayerId = MatchService().selfId;
+    final selfPlayerStat = StatService().playerStats.firstWhere((player) => player.id == selfPlayerId);
+    final value = selfPlayerStat.balanceGain;
+    return '${value >= 0 ? '+' : ''}$value \$';
+  }
 
   (double, double) _computeBaseDimensions(double screenWidth, double screenHeight) {
     if (screenWidth / screenHeight > STAT_PAGE_DESIGN_ASPECT_RATIO) {
@@ -234,6 +242,7 @@ class _StatPageState extends State<StatPage> {
                                   winner: winner,
                                   formatDuration: _formatDuration,
                                   formatRatio: _formatRatio,
+                                  formattedBalanceGain: _formattedBalanceGain(),
                                 ),
                               ),
                             ],

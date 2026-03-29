@@ -17,6 +17,7 @@ class _ProfileCardFace extends StatelessWidget {
       builder: (context, user, _) {
         final username = user?.username ?? I18nService().translate(USER_POPUP_UNKNOWN_USER);
         final email = user?.email ?? I18nService().translate(USER_POPUP_UNKNOWN_EMAIL);
+        final balance = user?.balance.toStringAsFixed(0) ?? '0';
         final avatar = profilePictureImageProvider(user?.fullProfilePicture, fallback: const AssetImage(ASSET_DEFAULT_AVATAR));
 
         return Column(
@@ -56,7 +57,7 @@ class _ProfileCardFace extends StatelessWidget {
                         spacing: baseSize * 0.02,
                         children: [
                           _CardInfoRow(label: I18nService().translate(EMAIL_LABEL), value: email, baseSize: baseSize),
-                          _CardInfoRow(label: I18nService().translate(EMAIL_LABEL), value: email, baseSize: baseSize),
+                          _CardInfoRow(label: I18nService().translate(BALANCE_LABEL), value: '$balance \$', baseSize: baseSize),
                         ],
                       ),
                     ),

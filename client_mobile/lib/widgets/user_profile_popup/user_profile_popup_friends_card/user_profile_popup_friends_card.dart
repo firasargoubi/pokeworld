@@ -55,7 +55,7 @@ class _FriendsCardFaceState extends State<_FriendsCardFace> {
                 Expanded(
                   flex: 4,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       _FriendsTabButton(
                         baseSize: baseSize,

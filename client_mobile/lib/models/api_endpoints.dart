@@ -16,6 +16,13 @@ enum GameEndpoint {
   const GameEndpoint(this.path);
 }
 
+enum ShopEndpoint {
+  Balance('balance');
+
+  final String path;
+  const ShopEndpoint(this.path);
+}
+
 enum SocialEndpoint {
   Base('social'),
   List('social/list');

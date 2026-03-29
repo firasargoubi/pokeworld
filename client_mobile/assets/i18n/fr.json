@@ -240,6 +240,7 @@
             "turns": "TOURS :",
             "visitedTiles": "TUILES VISITÉES :",
             "manipulatedDoors": "PORTES MANIPULEES :",
+            "balanceGain": "GAIN:",
             "flagCarriers": "PORTEURS DE DRAPEAU :",
             "quit": "< QUITTER",
             "playerColumns": {
@@ -357,6 +358,7 @@
             "userTitle": "Utilisateur",
             "nameLabel": "Nom:",
             "emailLabel": "Courriel:",
+            "balanceLabel": "Solde:",
             "noneValue": "Aucun",
             "logout": "Déconnexion",
             "deleteAccount": "SUPPRIMER COMPTE",
@@ -406,6 +408,26 @@
             "elementalMode": "Mode élémentaire",
             "rapidElimination": "Élimination rapide",
             "validate": "VALIDER"
+        },
+        "shopPopup": {
+            "title": "POKE-BOUTIQUE",
+            "description": "Description",
+            "buy": "ACHETER",
+            "balance": "Solde:",
+            "owned": "POSSÉDÉ",
+            "inventoryTitle": "Historique d'achats",
+            "emptyInventory": "Aucun achat pour le moment",
+            "insufficientFunds": "Vous n'avez pas assez d'argent pour cet achat.",
+            "purchaseSuccess": "{{itemName}} a été ajouté à votre inventaire.",
+            "purchaseError": "L'achat n'a pas pu être complété.",
+            "unknownItem": "Objet inconnu",
+            "items": {
+                "item1": "Item 1",
+                "item2": "Item 2",
+                "item3": "Item 3",
+                "item4": "Item 4",
+                "item5": "Item 5"
+            }
         }
     }
 }

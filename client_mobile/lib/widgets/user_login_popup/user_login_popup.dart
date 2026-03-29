@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:client_mobile/consts/auth_errors.dart';
 import 'package:client_mobile/consts/avatar_list.dart';
@@ -40,11 +41,14 @@ Future<void> showUserLoginPopup(BuildContext context) {
     context: context,
     barrierDismissible: false,
     barrierColor: Colors.black54,
-    builder: (_) => const PopScope(
-      canPop: false,
-      child: Material(
-        type: MaterialType.transparency,
-        child: Center(child: UserLoginPopup()),
+    builder: (_) => BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+      child: const PopScope(
+        canPop: false,
+        child: Material(
+          type: MaterialType.transparency,
+          child: Center(child: UserLoginPopup()),
+        ),
       ),
     ),
   );

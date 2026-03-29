@@ -25,6 +25,7 @@ UserInfo buildUserInfo() => UserInfo(
   balance: 0,
   createdAt: null,
   preferences: UserPreferences.defaults,
+  inventory: []
 );
 
 MatchData buildMatchData({List<ChatMessage> messages = const [], List<ChatLog> logs = const []}) => MatchData(

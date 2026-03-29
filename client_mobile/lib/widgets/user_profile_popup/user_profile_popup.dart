@@ -1,10 +1,13 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:client_mobile/consts/login_const.dart';
 import 'package:client_mobile/models/menu_config.dart';
+import 'package:client_mobile/models/shop.dart';
 import 'package:client_mobile/models/social.dart';
 import 'package:client_mobile/models/ui.dart';
 import 'package:client_mobile/models/user_info.dart';
+import 'package:client_mobile/services/balance/balance_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:client_mobile/utils/profile_image_provider.dart';
@@ -31,9 +34,12 @@ Future<void> showUserCardPopup(BuildContext context) {
     context: context,
     barrierDismissible: true,
     barrierColor: Colors.black54,
-    builder: (_) => const Material(
-      type: MaterialType.transparency,
-      child: Center(child: UserCard()),
+    builder: (_) => BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+      child: const Material(
+        type: MaterialType.transparency,
+        child: Center(child: UserCard()),
+      ),
     ),
   );
 }
