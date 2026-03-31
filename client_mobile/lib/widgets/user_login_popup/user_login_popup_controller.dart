@@ -147,28 +147,53 @@ class UserLoginController {
     try {
       if (isRegister) {
         final bool useCustomAvatar = isCustomAvatarSelected && customAvatarDataUrl != null && customAvatarDataUrl!.isNotEmpty;
-        await _userService.register(
-          usernameController.text.trim(),
-          emailController.text.trim(),
-          passwordController.text,
-          useCustomAvatar ? customAvatarDataUrl! : USER_PROFILE_PICTURES[selectedAvatarIndex!],
-          useCustomAvatar ? customAvatarDataUrl! : USER_FULL_PROFILE_PICTURES[selectedAvatarIndex!],
-          preferences: UserPreferences(language: _preferencesService.currentLanguage.value, theme: _preferencesService.currentTheme.value),
-        );
         _popupService.showPopup(
           PopupMessage(
-            message: I18nService().translate(PopupMessages.SuccessfulAccountCreation.messageKey),
-            hasCloseButton: true,
-            isConfirmation: false,
+            message: I18nService().translate(PopupMessages.ConfirmAccountCreation.messageKey),
+            isConfirmation: true,
+            popupColor: PopupColor.Orange,
+            action: () async {
+              try {
+                await _userService.register(
+                  usernameController.text.trim(),
+                  emailController.text.trim(),
+                  passwordController.text,
+                  useCustomAvatar ? customAvatarDataUrl! : USER_PROFILE_PICTURES[selectedAvatarIndex!],
+                  useCustomAvatar ? customAvatarDataUrl! : USER_FULL_PROFILE_PICTURES[selectedAvatarIndex!],
+                  preferences: UserPreferences(language: _preferencesService.currentLanguage.value, theme: _preferencesService.currentTheme.value),
+                );
+                _popupService.showPopup(
+                  PopupMessage(
+                    message: I18nService().translate(PopupMessages.SuccessfulAccountCreation.messageKey),
+                    hasCloseButton: true,
+                    isConfirmation: false,
+                    popupColor: PopupColor.Green,
+                  ),
+                );
+                onSuccess();
+              } catch (e) {
+                _updateState(() {
+                  errorMessage = _resolveErrorMessage(e);
+                  isLoading = false;
+                });
+              }
+            },
           ),
         );
+        _updateState(() => isLoading = false);
+        return;
       } else {
         await _userService.login(usernameController.text.trim(), passwordController.text);
         _preferencesService.syncPreferencesFromUser();
         final I18nService i18n = I18nService();
         await i18n.use(_preferencesService.currentLanguage.value);
         _popupService.showPopup(
-          PopupMessage(message: i18n.translate(PopupMessages.SuccessfulConnection.messageKey), hasCloseButton: true, isConfirmation: false),
+          PopupMessage(
+            message: i18n.translate(PopupMessages.SuccessfulConnection.messageKey),
+            hasCloseButton: true,
+            isConfirmation: false,
+            popupColor: PopupColor.Green,
+          ),
         );
       }
       onSuccess();

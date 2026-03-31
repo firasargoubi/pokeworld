@@ -1,6 +1,7 @@
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/widgets/cut_out_button/cut_out_button.dart';
+import 'package:client_mobile/widgets/default_container/default_container.dart';
 import 'package:flutter/material.dart';
 
 import 'lobby_page_const.dart';
@@ -8,6 +9,7 @@ import 'lobby_page_const.dart';
 class LobbyCodePanel extends StatelessWidget {
   const LobbyCodePanel({
     super.key,
+    required this.baseSize,
     required this.code,
     required this.isAdmin,
     required this.isLocked,
@@ -17,6 +19,8 @@ class LobbyCodePanel extends StatelessWidget {
     required this.onCopy,
     required this.onSettings,
   });
+
+  final double baseSize;
 
   final String code;
   final bool isAdmin;
@@ -33,10 +37,9 @@ class LobbyCodePanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: 16 / 11,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          image: DecorationImage(image: AssetImage(CODE_CONTAINER_ASSET), fit: BoxFit.fill, filterQuality: FilterQuality.none),
-        ),
+      child: DefaultContainer(
+        baseSize: baseSize,
+        config: BLUE_CONTAINER_CONFIG,
         child: Column(
           children: [
             Expanded(

@@ -1,7 +1,9 @@
 import 'package:client_mobile/consts/menu_card_data.dart';
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/menu_config.dart';
+import 'package:client_mobile/models/ui.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/widgets/default_container/default_container.dart';
 import 'package:flutter/material.dart';
 
 import 'menu_card_const.dart';
@@ -34,7 +36,8 @@ class _MenuCardState extends State<MenuCard> {
   @override
   Widget build(BuildContext context) {
     final config = MENU_CARD_SETUP[widget.color]!;
-    final backgroundImage = _isPressed ? config.activeBackgroundImage : config.backgroundImage;
+    final innerBorderBottomRightColor = !_isPressed ? config.innerBorderBottomRightColor : config.innerBorderTopLeftColor;
+    final innerBorderTopLeftColor = !_isPressed ? config.innerBorderTopLeftColor : config.innerBorderBottomRightColor;
     final pokemonImage = config.pokemonImage;
     final pokemonWidthFactor = config.pokemonWidthFactor;
     final pokemonHeightFactor = config.pokemonHeightFactor;
@@ -50,10 +53,17 @@ class _MenuCardState extends State<MenuCard> {
       child: SizedBox(
         width: widget.size,
         height: widget.size,
-        child: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(image: AssetImage(backgroundImage), fit: BoxFit.cover, filterQuality: FilterQuality.none),
+        child: DefaultContainer(
+          baseSize: widget.size,
+          config: DefaultContainerConfig(
+            backgroundRatio: 0.63,
+            borderColor: config.borderColor,
+            backgroundTopColor: config.backgroundTopColor,
+            backgroundBottomColor: config.backgroundBottomColor,
+            innerBorderBottomRightColor: innerBorderBottomRightColor,
+            innerBorderTopLeftColor: innerBorderTopLeftColor,
           ),
+
           child: Stack(
             clipBehavior: Clip.none,
             children: [

@@ -1,3 +1,4 @@
+import 'package:client_mobile/models/ui.dart';
 import 'package:flutter/material.dart';
 
 // Ratio
@@ -40,3 +41,15 @@ const String GREEN_BUTTON_ACTIVE_ASSET = 'assets/images/menu/containers/lobby/gr
 
 const String GRAY_BUTTON_ASSET = 'assets/images/menu/containers/lobby/gray-button.png';
 const String GRAY_BUTTON_ACTIVE_ASSET = 'assets/images/menu/containers/lobby/gray-button-active.png';
+
+const DefaultContainerConfig BLUE_CONTAINER_CONFIG = DefaultContainerConfig(
+  borderWidthFactor: 0.02,
+  innerBorderWidthFactor: 0.015,
+  separatorHeightFactor: 0.008,
+  backgroundRatio: 0.67,
+  borderColor: Color(0xFF484860),
+  innerBorderBottomRightColor: Color(0xFF2878b0),
+  innerBorderTopLeftColor: Color(0xFF80c0d8),
+  backgroundTopColor: Color(0xFF3890d8),
+  backgroundBottomColor: Color(0xFF80c0d8),
+);

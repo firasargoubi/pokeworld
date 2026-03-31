@@ -118,12 +118,12 @@ class _CutOutButtonState extends State<CutOutButton> {
 
   Future<void> loadButtonImages() async {
     final List<ui.Image> loadedImages = await Future.wait([
-      remapImageColors(CUT_OUT_BUTTON_LEFT_EDGE_PATH, widget.darkColor, widget.mainColor, widget.lightColor),
-      remapImageColors(CUT_OUT_BUTTON_BODY_PATH, widget.darkColor, widget.mainColor, widget.lightColor),
-      remapImageColors(CUT_OUT_BUTTON_RIGHT_EDGE_PATH, widget.darkColor, widget.mainColor, widget.lightColor),
       remapImageColors(CUT_OUT_BUTTON_LEFT_EDGE_PATH, widget.lightColor, widget.mainColor, widget.darkColor),
       remapImageColors(CUT_OUT_BUTTON_BODY_PATH, widget.lightColor, widget.mainColor, widget.darkColor),
       remapImageColors(CUT_OUT_BUTTON_RIGHT_EDGE_PATH, widget.lightColor, widget.mainColor, widget.darkColor),
+      remapImageColors(CUT_OUT_BUTTON_LEFT_EDGE_PATH, widget.darkColor, widget.mainColor, widget.lightColor),
+      remapImageColors(CUT_OUT_BUTTON_BODY_PATH, widget.darkColor, widget.mainColor, widget.lightColor),
+      remapImageColors(CUT_OUT_BUTTON_RIGHT_EDGE_PATH, widget.darkColor, widget.mainColor, widget.lightColor),
     ]);
 
     if (!mounted) {

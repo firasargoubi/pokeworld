@@ -1,3 +1,4 @@
+import 'package:client_mobile/models/ui.dart';
 import 'package:flutter/material.dart';
 
 // Assets (cards)
@@ -50,3 +51,44 @@ const Color ACTION_ICON_TINT = Color(0xFFFFA844);
 
 const Color INACTIVE_TEXT_COLOR = Color.fromARGB(255, 119, 119, 119);
 const Color INACTIVE_TEXT_SHADOW_COLOR = Color(0xFF3F3F3F);
+
+const double BORDER_WIDTH_FACTOR = 0.085;
+const double INNER_BORDER_WIDTH_FACTOR = 0.065;
+const double SEPARATOR_HEIGHT_FACTOR = 0.065;
+const double BACKGROUND_RATIO = 0.65;
+
+const DefaultContainerConfig BLUE_CONTAINER_CONFIG = DefaultContainerConfig(
+  borderWidthFactor: BORDER_WIDTH_FACTOR,
+  innerBorderWidthFactor: INNER_BORDER_WIDTH_FACTOR,
+  separatorHeightFactor: SEPARATOR_HEIGHT_FACTOR,
+  backgroundRatio: BACKGROUND_RATIO,
+  borderColor: Color(0xFF484860),
+  innerBorderBottomRightColor: Color(0xFF2878b0),
+  innerBorderTopLeftColor: Color(0xFF80c0d8),
+  backgroundTopColor: Color(0xFF3890d8),
+  backgroundBottomColor: Color(0xFF80c0d8),
+);
+
+const DefaultContainerConfig PINK_CONTAINER_CONFIG = DefaultContainerConfig(
+  borderWidthFactor: BORDER_WIDTH_FACTOR,
+  innerBorderWidthFactor: INNER_BORDER_WIDTH_FACTOR,
+  separatorHeightFactor: SEPARATOR_HEIGHT_FACTOR,
+  backgroundRatio: BACKGROUND_RATIO,
+  borderColor: Color(0xFFf87030),
+  innerBorderBottomRightColor: Color(0xFFe7a383),
+  innerBorderTopLeftColor: Color(0xFFffdee4),
+  backgroundTopColor: Color(0xFFf7ba93),
+  backgroundBottomColor: Color(0xFFf7d1d8),
+);
+
+const GRAY_CONTAINER_CONFIG = DefaultContainerConfig(
+  borderWidthFactor: BORDER_WIDTH_FACTOR,
+  innerBorderWidthFactor: INNER_BORDER_WIDTH_FACTOR,
+  separatorHeightFactor: SEPARATOR_HEIGHT_FACTOR,
+  backgroundRatio: BACKGROUND_RATIO,
+  borderColor: Color(0xFF484860),
+  innerBorderBottomRightColor: Color(0xFF616161),
+  innerBorderTopLeftColor: Color(0xFFacacac),
+  backgroundTopColor: Color(0xFF888888),
+  backgroundBottomColor: Color(0xFFacacac),
+);

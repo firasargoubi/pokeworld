@@ -9,6 +9,7 @@ import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/widgets/cut_out_button/cut_out_button.dart';
+import 'package:client_mobile/widgets/default_container/default_container.dart';
 import 'package:flutter/material.dart';
 
 import 'game_card_const.dart';
@@ -117,10 +118,11 @@ class GameCard extends StatelessWidget {
           fit: StackFit.expand,
           clipBehavior: Clip.none,
           children: [
+            DefaultContainer(baseSize: cardWidth, config: config.containerConfig),
             Positioned(
-              left: cardWidth * 0.089,
-              top: cardHeight * 0.073,
-              width: cardWidth * 0.823,
+              left: cardWidth * (config.containerConfig.borderWidthFactor + config.containerConfig.innerBorderWidthFactor),
+              top: cardWidth * (config.containerConfig.borderWidthFactor + config.containerConfig.innerBorderWidthFactor),
+              right: cardWidth * (config.containerConfig.borderWidthFactor + config.containerConfig.innerBorderWidthFactor),
               height: cardWidth * 0.685,
               child: Stack(
                 clipBehavior: Clip.none,
@@ -173,12 +175,11 @@ class GameCard extends StatelessWidget {
                 ],
               ),
             ),
-            Image.asset(config.backgroundImage, fit: BoxFit.fill, filterQuality: FilterQuality.none),
             Positioned(
               left: cardWidth * 0.089,
               bottom: cardHeight * 0.073,
               width: cardWidth * 0.823,
-              height: cardHeight * 0.25,
+              height: cardHeight * 0.26,
               child: Column(
                 children: [
                   Expanded(
@@ -226,8 +227,8 @@ class GameCard extends StatelessWidget {
                       child: Padding(
                         padding: EdgeInsets.only(left: cardWidth * 0.03),
                         child: SizedBox(
-                          width: cardWidth * 0.3,
-                          height: cardHeight * 0.1,
+                          width: cardWidth * 0.32,
+                          height: cardHeight * 0.12,
                           child: CutOutButton(
                             lightColor: config.buttonLightColor,
                             mainColor: config.buttonMainColor,

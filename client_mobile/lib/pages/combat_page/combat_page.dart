@@ -7,11 +7,13 @@ import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
+import 'package:client_mobile/models/popup_message.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/combat_service/combat_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/play_service/play_service.dart';
+import 'package:client_mobile/services/popup_service/popup_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/stripe_painter/stripe_painter.dart';
 import 'package:flutter/material.dart';
@@ -97,6 +99,7 @@ class _CombatPageState extends State<CombatPage> {
   void dispose() {
     _matchSubscription?.cancel();
     PlayService().stopListeningToMotion();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _displayPopupMessage());
     super.dispose();
   }
 
@@ -248,6 +251,34 @@ class _CombatPageState extends State<CombatPage> {
       onChanged: _rebuild,
     );
     sprite.setFilter(color: ESCAPE_TINT_COLOR, resetAfter: ESCAPE_ANIMATION_DURATION, opacity: 0.1, onChanged: _rebuild);
+  }
+
+  void _displayPopupMessage() {
+    final i18n = I18nService();
+    String winnerName = '';
+
+    if (selfCombatData.currentHealth <= 0) {
+      winnerName = enemyPlayer.name;
+    } else if (enemyCombatData.currentHealth <= 0) {
+      winnerName = selfPlayer.name;
+    }
+
+    PopupService().keepMessages();
+
+    if (winnerName.isNotEmpty) {
+      PopupService().showPopup(
+        PopupMessage(
+          message: '$winnerName ${i18n.translate('pages.combat.winnerSuffix')}',
+          hasCloseButton: false,
+          isConfirmation: false,
+          popupColor: PopupColor.Blue,
+        ),
+      );
+    } else {
+      PopupService().showPopup(
+        PopupMessage(message: i18n.translate('popup.noWinner'), hasCloseButton: false, isConfirmation: false, popupColor: PopupColor.Blue),
+      );
+    }
   }
 
   @override

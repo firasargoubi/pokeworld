@@ -1,3 +1,4 @@
+import 'package:client_mobile/models/ui.dart';
 import 'package:flutter/material.dart';
 
 const String HOME_PAGE_BACKGROUND_ASSET = 'assets/images/menu/backgrounds/main-menu.png';
@@ -16,3 +17,15 @@ const String HOME_PAGE_PIXEL_FONT = 'Pixel';
 
 const Color HOME_PAGE_TEXT_COLOR = Colors.white;
 const Color HOME_PAGE_SHADOW_COLOR = Color(0xFF787878);
+
+const DefaultContainerConfig TOP_BUTTON_CONFIG = DefaultContainerConfig(
+  borderWidthFactor: 0.014,
+  innerBorderWidthFactor: 0.008,
+  separatorHeightFactor: 0.025,
+  backgroundRatio: 0.63,
+  borderColor: Color(0xFF484860),
+  innerBorderBottomRightColor: Color(0xFF616161),
+  innerBorderTopLeftColor: Color(0xFFacacac),
+  backgroundTopColor: Color(0xFF888888),
+  backgroundBottomColor: Color(0xFF888888),
+);

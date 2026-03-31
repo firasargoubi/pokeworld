@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:client_mobile/consts/avatar_data_const.dart';
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/player_data.dart';
+import 'package:client_mobile/models/ui.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
@@ -102,7 +103,7 @@ class _PlayerCardState extends State<PlayerCard> {
     return ColorFilter.matrix(<double>[brightness, 0, 0, 0, 0, 0, brightness, 0, 0, 0, 0, 0, brightness, 0, 0, 0, 0, 0, 1, 0]);
   }
 
-  static ({String left, String mid, String right, String overlayIcon}) resolveCardAssets({
+  static DefaultContainerConfig resolveCardAssets({
     required bool isInactive,
     required bool isSelf,
     required bool isBot,
@@ -110,27 +111,37 @@ class _PlayerCardState extends State<PlayerCard> {
     required bool isAdmin,
   }) {
     if (isInactive) {
-      return (left: PLAYER_LEFT_ASSET, mid: PLAYER_MID_ASSET, right: PLAYER_RIGHT_ASSET, overlayIcon: '');
+      return BLUE_CONTAINER_CONFIG;
     }
 
-    final (left, mid, right) = isSelf
-        ? (SELF_LEFT_ASSET, SELF_MID_ASSET, SELF_RIGHT_ASSET)
+    return isSelf
+        ? PINK_CONTAINER_CONFIG
         : isBot
-        ? (BOT_LEFT_ASSET, BOT_MID_ASSET, BOT_RIGHT_ASSET)
-        : (PLAYER_LEFT_ASSET, PLAYER_MID_ASSET, PLAYER_RIGHT_ASSET);
+        ? GRAY_CONTAINER_CONFIG
+        : BLUE_CONTAINER_CONFIG;
+  }
 
-    final overlayIcon = isAdmin
+  static String resolveCardIcon({
+    required bool isInactive,
+    required bool isSelf,
+    required bool isBot,
+    required bool isAggressiveBot,
+    required bool isAdmin,
+  }) {
+    if (isInactive) {
+      return '';
+    }
+    return isAdmin
         ? CROWN_ASSET
         : isBot
         ? (isAggressiveBot ? AGGRESSIVE_BOT_ASSET : DEFENSIVE_BOT_ASSET)
         : '';
-
-    return (left: left, mid: mid, right: right, overlayIcon: overlayIcon);
   }
 
   @override
   Widget build(BuildContext context) {
-    final assets = resolveCardAssets(isInactive: isInactive, isSelf: isSelf, isBot: isBot, isAggressiveBot: isAggressiveBot, isAdmin: isAdmin);
+    final config = resolveCardAssets(isInactive: isInactive, isSelf: isSelf, isBot: isBot, isAggressiveBot: isAggressiveBot, isAdmin: isAdmin);
+    final assets = resolveCardIcon(isInactive: isInactive, isSelf: isSelf, isBot: isBot, isAggressiveBot: isAggressiveBot, isAdmin: isAdmin);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -159,11 +170,9 @@ class _PlayerCardState extends State<PlayerCard> {
                 inactiveLabel: inactiveLabel,
                 username: username,
                 hpValue: hpValue,
-                usernameIcon: assets.overlayIcon,
+                usernameIcon: assets,
                 userProfilePicture: userProfilePictureAsset,
-                leftAsset: assets.left,
-                midAsset: assets.mid,
-                rightAsset: assets.right,
+                containerConfig: config,
                 inactiveBodyFilter: isInactive ? brightnessFilter(INACTIVE_IMAGE_BRIGHTNESS) : null,
                 child: isInactive ? null : widget.child,
               ),

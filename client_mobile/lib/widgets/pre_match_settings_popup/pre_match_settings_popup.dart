@@ -1,9 +1,12 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/match_data.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
+import 'package:client_mobile/widgets/default_container/default_container.dart';
 import 'package:client_mobile/widgets/poke_button/poke_button.dart';
 import 'package:flutter/material.dart';
 
@@ -66,6 +69,7 @@ class _PreMatchSettingsPopupState extends State<PreMatchSettingsPopup> {
   }
 
   void _setFriendOnly(bool value) {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
     setState(() {
       _isFriendOnly = value;
     });
@@ -79,12 +83,12 @@ class _PreMatchSettingsPopupState extends State<PreMatchSettingsPopup> {
   Widget build(BuildContext context) {
     final baseSize = _computeBaseSize(MediaQuery.of(context).size);
     final dialogHeight = baseSize * 0.72;
-    final dialogWidth = baseSize * 1.02;
+    final dialogWidth = baseSize * 0.97;
     final contentPadding = baseSize * 0.055;
 
-    final titleStyle = _pixelTextStyle(baseSize * 0.05);
+    final titleStyle = _pixelTextStyle(baseSize * 0.06);
     final labelStyle = _pixelTextStyle(baseSize * 0.035);
-    final optionStyle = _pixelTextStyle(baseSize * 0.03);
+    final optionStyle = _pixelTextStyle(baseSize * 0.035);
 
     final i18n = I18nService();
 
@@ -110,7 +114,7 @@ class _PreMatchSettingsPopupState extends State<PreMatchSettingsPopup> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(CONTAINER_ASSET, fit: BoxFit.fill, filterQuality: FilterQuality.none),
+                  DefaultContainer(baseSize: baseSize, config: GRAY_CONTAINER_CONFIG),
                   Padding(
                     padding: EdgeInsets.all(contentPadding),
                     child: Column(
@@ -133,12 +137,10 @@ class _PreMatchSettingsPopupState extends State<PreMatchSettingsPopup> {
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      // Accessibility Section
                                       Row(
-                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(i18n.translate(ACCESSIBILITY_KEY), style: labelStyle),
-                                          SizedBox(width: sectionHeight * 0.1),
                                           PreMatchSettingsOptionButton(
                                             text: i18n.translate(OPEN_KEY),
                                             selected: !_isFriendOnly,
@@ -147,7 +149,7 @@ class _PreMatchSettingsPopupState extends State<PreMatchSettingsPopup> {
                                             style: optionStyle,
                                             onTap: () => _setFriendOnly(false),
                                           ),
-                                          SizedBox(width: sectionHeight * 0.05),
+                                          SizedBox(width: sectionHeight * 0),
                                           PreMatchSettingsOptionButton(
                                             text: i18n.translate(FRIEND_ONLY_KEY),
                                             selected: _isFriendOnly,

@@ -7,8 +7,8 @@ import 'package:client_mobile/pages/create_page/create_page.dart';
 import 'package:client_mobile/pages/join_page/join_page.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
+import 'package:client_mobile/widgets/default_container/default_container.dart';
 import 'package:client_mobile/widgets/menu_card/menu_card.dart';
-import 'package:client_mobile/widgets/pressable_background/pressable_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -95,9 +95,9 @@ class _HomePageTopButton extends StatelessWidget {
             child: SizedBox(
               width: baseSize * 0.12,
               height: baseSize * 0.15,
-              child: PressableBackground(
-                backgroundAsset: HOME_PAGE_SETTINGS_BUTTON_ASSET,
-                activeBackgroundAsset: HOME_PAGE_SETTINGS_BUTTON_ACTIVE_ASSET,
+              child: DefaultContainer(
+                baseSize: baseSize,
+                config: TOP_BUTTON_CONFIG,
                 onTap: onTap,
                 child: Center(
                   child: SvgPicture.asset(

@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/popup_message.dart';
-import 'package:client_mobile/services/i18n_service/i18n_service.dart';
+import 'package:client_mobile/models/ui.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/widgets/cut_out_button/cut_out_button.dart';
+import 'package:client_mobile/widgets/default_container/default_container.dart';
 import 'package:flutter/material.dart';
 
 import 'warning_confirmation_popup_const.dart';
@@ -22,58 +26,109 @@ class WarningConfirmationPopup extends StatelessWidget {
   final PopupColor popupColor;
   final ValueChanged<bool> onClosed;
 
-  Color get _cardColor {
-    return popupColor == PopupColor.Orange ? WARNING_CONFIRMATION_POPUP_ORANGE_COLOR : WARNING_CONFIRMATION_POPUP_BLUE_COLOR;
+  DefaultContainerConfig get _cardConfig {
+    switch (popupColor) {
+      case PopupColor.Orange:
+        return ORANGE_CONTAINER_CONFIG;
+      case PopupColor.Blue:
+        return BLUE_CONTAINER_CONFIG;
+      case PopupColor.Green:
+        return GREEN_CONTAINER_CONFIG;
+    }
   }
 
-  TextStyle get _textStyle {
-    return const TextStyle(color: WARNING_CONFIRMATION_POPUP_TEXT_COLOR, fontSize: WARNING_CONFIRMATION_POPUP_TEXT_SIZE);
-  }
+  TextStyle _label(double b) => TextStyle(
+    fontFamily: PIXEL_FONT,
+    color: Colors.white,
+    fontSize: b * 0.035,
+    height: 0.9,
+    shadows: [Shadow(offset: Offset(b * 0.004, 0), color: SHADOW_COLOR, blurRadius: 0)],
+  );
 
-  TextStyle get _buttonTextStyle {
-    return const TextStyle(color: WARNING_CONFIRMATION_POPUP_TEXT_COLOR);
+  double _computeBaseSize(Size screenSize) {
+    final screenWidth = screenSize.width;
+    final screenHeight = screenSize.height;
+
+    late final double baseWidth;
+    late final double baseHeight;
+
+    if (screenWidth / screenHeight > DESIGN_ASPECT_RATIO) {
+      baseHeight = screenHeight;
+      baseWidth = baseHeight * DESIGN_ASPECT_RATIO;
+    } else {
+      baseWidth = screenWidth;
+      baseHeight = baseWidth / DESIGN_ASPECT_RATIO;
+    }
+
+    return min(baseWidth, baseHeight);
   }
 
   @override
   Widget build(BuildContext context) {
-    final i18n = I18nService();
+    final baseSize = _computeBaseSize(MediaQuery.of(context).size);
     return Material(
       color: Colors.transparent,
       child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: WARNING_CONFIRMATION_POPUP_MAX_WIDTH),
-          child: Card(
-            color: _cardColor,
-            margin: const EdgeInsets.all(WARNING_CONFIRMATION_POPUP_MARGIN),
-            child: Padding(
-              padding: const EdgeInsets.all(WARNING_CONFIRMATION_POPUP_PADDING),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(message, textAlign: TextAlign.center, style: _textStyle),
-                  const SizedBox(height: WARNING_CONFIRMATION_POPUP_PADDING),
-                  if (isConfirmation)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        TextButton(
-                          onPressed: () => {onClosed(true), AudioService().playSoundEffect(SoundEffect.Select.path)},
-                          child: Text(i18n.translate(WARNING_CONFIRMATION_POPUP_CONFIRM_KEY), style: _buttonTextStyle),
+        child: Padding(
+          padding: EdgeInsets.all(baseSize * 0.03),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: baseSize * 0.9),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: DefaultContainer(baseSize: baseSize, config: _cardConfig),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: baseSize * 0.05, bottom: baseSize * 0.04, left: baseSize * 0.08, right: baseSize * 0.08),
+                  child: Column(
+                    children: <Widget>[
+                      Text(message, textAlign: TextAlign.center, style: _label(baseSize)),
+                      SizedBox(height: baseSize * 0.07),
+                      if (isConfirmation)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(
+                              width: baseSize * 0.12,
+                              height: baseSize * 0.06,
+                              child: CutOutButton(
+                                lightColor: RED_BUTTON_LIGHT_COLOR,
+                                mainColor: RED_BUTTON_MAIN_COLOR,
+                                darkColor: RED_BUTTON_DARK_COLOR,
+                                onAction: () => {onClosed(false), AudioService().playSoundEffect(SoundEffect.Select.path)},
+                                child: Icon(Icons.close, color: Colors.white, size: baseSize * 0.035),
+                              ),
+                            ),
+                            SizedBox(width: baseSize * 0.05),
+                            SizedBox(
+                              width: baseSize * 0.12,
+                              height: baseSize * 0.06,
+                              child: CutOutButton(
+                                lightColor: GREEN_BUTTON_LIGHT_COLOR,
+                                mainColor: GREEN_BUTTON_MAIN_COLOR,
+                                darkColor: GREEN_BUTTON_DARK_COLOR,
+                                onAction: () => {onClosed(true), AudioService().playSoundEffect(SoundEffect.Select.path)},
+                                child: Icon(Icons.check, color: Colors.white, size: baseSize * 0.035),
+                              ),
+                            ),
+                          ],
+                        )
+                      else if (hasCloseButton)
+                        SizedBox(
+                          width: baseSize * 0.12,
+                          height: baseSize * 0.06,
+                          child: CutOutButton(
+                            lightColor: RED_BUTTON_LIGHT_COLOR,
+                            mainColor: RED_BUTTON_MAIN_COLOR,
+                            darkColor: RED_BUTTON_DARK_COLOR,
+                            onAction: () => {onClosed(false), AudioService().playSoundEffect(SoundEffect.Select.path)},
+                            child: Icon(Icons.close, color: Colors.white, size: baseSize * 0.035),
+                          ),
                         ),
-                        const SizedBox(width: WARNING_CONFIRMATION_POPUP_BUTTON_SPACING),
-                        TextButton(
-                          onPressed: () => {onClosed(false), AudioService().playSoundEffect(SoundEffect.Select.path)},
-                          child: Text(i18n.translate(WARNING_CONFIRMATION_POPUP_CANCEL_KEY), style: _buttonTextStyle),
-                        ),
-                      ],
-                    )
-                  else if (hasCloseButton)
-                    TextButton(
-                      onPressed: () => {onClosed(false), AudioService().playSoundEffect(SoundEffect.Select.path)},
-                      child: Text(i18n.translate(WARNING_CONFIRMATION_POPUP_CLOSE_KEY), style: _buttonTextStyle),
-                    ),
-                ],
-              ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),

@@ -1,4 +1,6 @@
+import 'package:client_mobile/models/ui.dart';
 import 'package:client_mobile/utils/profile_image_provider.dart';
+import 'package:client_mobile/widgets/default_container/default_container.dart';
 import 'package:client_mobile/widgets/user_profile_image/user_profile_image.dart';
 import 'package:flutter/material.dart';
 
@@ -52,9 +54,7 @@ class PlayerCardBody extends StatelessWidget {
     required this.hpValue,
     required this.usernameIcon,
     required this.userProfilePicture,
-    required this.leftAsset,
-    required this.midAsset,
-    required this.rightAsset,
+    required this.containerConfig,
     required this.inactiveBodyFilter,
   });
 
@@ -68,15 +68,8 @@ class PlayerCardBody extends StatelessWidget {
   final String usernameIcon;
   final String userProfilePicture;
 
-  final String leftAsset;
-  final String midAsset;
-  final String rightAsset;
-
+  final DefaultContainerConfig containerConfig;
   final ColorFilter? inactiveBodyFilter;
-
-  DecorationImage _backgroundImage(String asset, {ColorFilter? filter}) {
-    return DecorationImage(image: AssetImage(asset), fit: BoxFit.fill, filterQuality: FilterQuality.none, colorFilter: filter);
-  }
 
   TextStyle _pixelTextStyle(double fontSize) {
     return TextStyle(
@@ -114,28 +107,12 @@ class PlayerCardBody extends StatelessWidget {
             fit: StackFit.expand,
             clipBehavior: Clip.hardEdge,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(
-                    width: edgeWidth,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(image: _backgroundImage(leftAsset, filter: inactiveBodyFilter)),
-                    ),
-                  ),
-                  Expanded(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(image: _backgroundImage(midAsset, filter: inactiveBodyFilter)),
-                    ),
-                  ),
-                  SizedBox(
-                    width: edgeWidth,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(image: _backgroundImage(rightAsset, filter: inactiveBodyFilter)),
-                    ),
-                  ),
-                ],
-              ),
+              inactiveBodyFilter != null
+                  ? ColorFiltered(
+                      colorFilter: inactiveBodyFilter!,
+                      child: DefaultContainer(baseSize: bodyHeight, config: containerConfig),
+                    )
+                  : DefaultContainer(baseSize: bodyHeight, config: containerConfig),
               Positioned(
                 left: inactiveLabelLeft,
                 top: inactiveLabelTop,
@@ -171,25 +148,7 @@ class PlayerCardBody extends StatelessWidget {
           fit: StackFit.expand,
           clipBehavior: Clip.hardEdge,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(
-                  width: edgeWidth,
-                  child: DecoratedBox(decoration: BoxDecoration(image: _backgroundImage(leftAsset))),
-                ),
-                Expanded(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(image: _backgroundImage(midAsset)),
-                    child: child ?? const SizedBox.shrink(),
-                  ),
-                ),
-                SizedBox(
-                  width: edgeWidth,
-                  child: DecoratedBox(decoration: BoxDecoration(image: _backgroundImage(rightAsset))),
-                ),
-              ],
-            ),
+            DefaultContainer(baseSize: bodyHeight, config: containerConfig),
             Positioned(
               bottom: hpBarBottomOffset,
               right: hpBarRightOffset,
@@ -228,8 +187,8 @@ class PlayerCardBody extends StatelessWidget {
                   if (hasProfilePic) ...[
                     SizedBox(width: iconGap),
                     SizedBox(
-                      width: iconSize,
-                      height: iconSize,
+                      width: iconSize * 1.3,
+                      height: iconSize * 1.3,
                       child: LayeredProfileImage(foregroundImage: profilePictureImageProvider(userProfilePicture)),
                     ),
                   ],
