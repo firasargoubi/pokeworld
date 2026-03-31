@@ -71,6 +71,7 @@ export class Match {
         this.data.playData.isElementalMode = matchSettings.isElementalMode;
         this.data.lobbyData.isDropInEnabled = matchSettings.isDropInEnabled;
         this.data.lobbyData.isRapidElimination = matchSettings.isRapidElimination;
+        this.data.lobbyData.isFriendOnly = matchSettings.isFriendOnly;
     }
 
     leave(playerId: string): void {

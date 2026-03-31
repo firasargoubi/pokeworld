@@ -63,6 +63,7 @@ describe('LobbyService', () => {
             isElementalMode: true,
             isDropInEnabled: true,
             isRapidElimination: false,
+            isFriendOnly: false,
         };
         service.changeMatchSettings(mockMatchSettings);
         expect(mockSocketService.emit).toHaveBeenCalledWith(LobbyEvent.ChangeMatchSettings, mockMatchSettings);

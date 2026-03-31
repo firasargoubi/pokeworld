@@ -4,15 +4,18 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
+import { PreMatchSettingsPopupComponent } from '@app/components/pre-match-settings-popup/pre-match-settings-popup.component';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
+import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
 import { GameState } from '@common/interfaces/game-state.enum';
+import { MatchSettings } from '@common/interfaces/match-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { TranslateModule } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
@@ -36,6 +39,15 @@ class MockGameCardComponent {
 })
 class MockChatComponent {}
 
+@Component({
+    selector: 'app-match-settings-popup',
+    standalone: true,
+    template: '',
+})
+class MockMatchSettingsPopupComponent {
+    @Input() isVisible: boolean = false;
+}
+
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
     let fixture: ComponentFixture<CreatePageComponent>;
@@ -45,6 +57,7 @@ describe('CreatePageComponent', () => {
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let mockAudioService: jasmine.SpyObj<AudioService>;
     let gameDataService: jasmine.SpyObj<GameDataService>;
+    let lobbyServiceSpy: jasmine.SpyObj<LobbyService>;
     let mockGames: GameData[];
 
     beforeEach(async () => {
@@ -56,6 +69,7 @@ describe('CreatePageComponent', () => {
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage', 'playCombatEffect']);
         gameDataService = jasmine.createSpyObj('GameDataService', ['isOwner']);
+        lobbyServiceSpy = jasmine.createSpyObj('LobbyService', ['changeMatchSettings']);
         gameSaveServiceSpy.getGame.and.returnValue(of(mockGames[0]));
         await TestBed.configureTestingModule({
             imports: [TranslateModule.forRoot()],
@@ -66,12 +80,13 @@ describe('CreatePageComponent', () => {
                 { provide: PopupService, useValue: popupServiceSpy },
                 { provide: AudioService, useValue: mockAudioService },
                 { provide: GameDataService, useValue: gameDataService },
+                { provide: LobbyService, useValue: lobbyServiceSpy },
             ],
         }).compileComponents();
 
         TestBed.overrideComponent(CreatePageComponent, {
-            add: { imports: [MockGameCardComponent, MockChatComponent] },
-            remove: { imports: [GameCardComponent, ChatComponent] },
+            add: { imports: [MockGameCardComponent, MockChatComponent, MockMatchSettingsPopupComponent] },
+            remove: { imports: [GameCardComponent, ChatComponent, PreMatchSettingsPopupComponent] },
         });
 
         fixture = TestBed.createComponent(CreatePageComponent);
@@ -79,14 +94,36 @@ describe('CreatePageComponent', () => {
         fixture.detectChanges();
     });
 
+    const mockMatchSettings: MatchSettings = {
+        isElementalMode: false,
+        isDropInEnabled: false,
+        isRapidElimination: false,
+        isFriendOnly: false,
+    };
+
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should open settings popup when openSettings is called', () => {
+        component.openSettings(mockGames[0]);
+        expect(component.isSettingsPopupVisible).toBeTrue();
+        expect(component.pendingGame).toEqual(mockGames[0]);
+    });
+
+    it('should close popup and call createMatch on settings selected', () => {
+        component.openSettings(mockGames[0]);
+        spyOn(component, 'createMatch');
+        component.onSettingsSelected(mockMatchSettings);
+        expect(component.isSettingsPopupVisible).toBeFalse();
+        expect(component.createMatch).toHaveBeenCalledWith(mockGames[0], mockMatchSettings);
+        expect(component.pendingGame).toBeNull();
     });
 
     it('should create match call create match', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(component, 'isGameAccessible').and.returnValue(true);
-        component.createMatch(mockGames[0]);
+        component.createMatch(mockGames[0], mockMatchSettings);
         expect(matchServiceSpy.createMatch).toHaveBeenCalled();
     });
 
@@ -95,7 +132,7 @@ describe('CreatePageComponent', () => {
         const unauthorizedSpy = spyOn<any>(component, 'handleUnauthorizedAccess');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(component, 'isGameAccessible').and.returnValue(false);
-        component.createMatch(mockGames[0]);
+        component.createMatch(mockGames[0], mockMatchSettings);
         expect(matchServiceSpy.createMatch).not.toHaveBeenCalled();
         expect(unauthorizedSpy).toHaveBeenCalled();
     });

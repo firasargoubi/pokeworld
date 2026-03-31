@@ -93,6 +93,8 @@ $img-settings: '../../../assets/images/menu/icons/settings/settings-cog.png';
 $elemental-icon: '../../../assets/images/menu/icons/match-mode/elemental.png';
 $drop-icon: '../../../assets/images/menu/icons/match-mode/drop.png';
 $re-icon: '../../../assets/images/menu/icons/match-mode/skull.png';
+$open-image: '../../../assets/images/menu/icons/match-mode/open.svg';
+$friend-only-image: '../../../assets/images/menu/icons/user-card/friends.png';
 
 $player-card-height: calc($base-size * 10);
 $player-card-width: calc($base-size * 70);
@@ -134,7 +136,7 @@ $player-card-width: calc($base-size * 70);
 
 .access-code-container {
     justify-self: center;
-    width: calc($base-size * 50);
+    width: calc($base-size * 60);
     height: fit-content;
     display: flex;
     flex-direction: column;
@@ -190,19 +192,40 @@ $player-card-width: calc($base-size * 70);
     width: 100%;
     height: calc($base-size * 10);
     background-color: $color-access-main;
-    padding: 0 0 0 calc($base-size * 5);
+    gap: 2%;
 }
 
 .access-code p {
     width: auto;
 }
 
-.match-mode-icon {
+.match-mode-icon,
+.match-accessibility-icons {
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
     justify-content: center;
-    width: calc($base-size * 5);
+    width: calc($base-size * 3);
     height: 100%;
+    overflow: visible;
+    gap: 2%;
+    margin-right: 3%;
+}
+
+.match-accessibility-icons {
+    padding: 2% 0;
+    justify-content: space-between;
+    margin-right: 0%;
+}
+
+.match-accessibility-icons .mode-icon {
+    opacity: 1;
+}
+
+.match-accessibility-icons p {
+    font-size: calc($base-size * 2);
+    color: $color-access-code;
+    user-select: none;
 }
 
 .mode-icon {
@@ -213,22 +236,28 @@ $player-card-width: calc($base-size * 70);
     background-size: contain;
     filter: invert(88%) sepia(24%) saturate(435%) hue-rotate(120deg) brightness(97%) contrast(92%);
     transition: all 0.3s ease-in-out;
+    opacity: 0.2;
 }
 
 .drop-icon {
-    opacity: 0.2;
     background-image: url($drop-icon);
 }
 
 .re-icon {
-    opacity: 0.2;
     background-image: url($re-icon);
     background-size: auto 80%;
 }
 
 .elemental-icon {
-    opacity: 0.2;
     background-image: url($elemental-icon);
+}
+
+.open-icon {
+    background-image: url($open-image);
+}
+
+.friend-only-icon {
+    background-image: url($friend-only-image);
 }
 
 .match-mode-icon .visible {

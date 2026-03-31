@@ -4,27 +4,33 @@ import { Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { PreMatchSettingsPopupComponent } from '@app/components/pre-match-settings-popup/pre-match-settings-popup.component';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
+import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
 import { GameState } from '@common/interfaces/game-state.enum';
+import { MatchSettings } from '@common/interfaces/match-data';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-create-page',
     templateUrl: './create-page.component.html',
     styleUrls: ['./create-page.component.scss'],
-    imports: [GameCardComponent, HeaderComponent, ChatComponent, TranslateModule],
+    imports: [GameCardComponent, HeaderComponent, ChatComponent, TranslateModule, PreMatchSettingsPopupComponent],
 })
 export class CreatePageComponent implements OnInit {
     games: GameData[] = [];
+    isSettingsPopupVisible = false;
+    pendingGame: GameData | null = null;
     private readonly audioService: AudioService = inject(AudioService);
+    private readonly lobbyService: LobbyService = inject(LobbyService);
     private isCreatingMatch = false;
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);
@@ -42,7 +48,20 @@ export class CreatePageComponent implements OnInit {
         this.audioService.playBackgroundMusic(BackgroundMusic.Home);
     }
 
-    async createMatch(gameData: GameData) {
+    openSettings(gameData: GameData) {
+        this.pendingGame = gameData;
+        this.isSettingsPopupVisible = true;
+    }
+
+    onSettingsSelected(matchSettings: MatchSettings) {
+        this.isSettingsPopupVisible = false;
+        if (this.pendingGame) {
+            this.createMatch(this.pendingGame, matchSettings);
+            this.pendingGame = null;
+        }
+    }
+
+    async createMatch(gameData: GameData, matchSettings: MatchSettings) {
         this.gameSaveService.getGame(gameData._id).subscribe({
             next: async (updatedGame: GameData) => {
                 gameData = updatedGame;
@@ -53,6 +72,7 @@ export class CreatePageComponent implements OnInit {
                 if (!this.isCreatingMatch) {
                     this.isCreatingMatch = true;
                     const isMatchCreated = await this.matchService.createMatch(gameData);
+                    this.lobbyService.changeMatchSettings(matchSettings);
                     if (!isMatchCreated) {
                         this.loadGames();
                         this.isCreatingMatch = false;

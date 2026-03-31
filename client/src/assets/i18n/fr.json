@@ -52,7 +52,8 @@
             "teamWin": "L'équipe {{team}} remporte la partie !",
             "playerLeftMatch": "{{playerName}} a quitté la partie",
             "dropInDisabled": "Le drop-in est désactivé pour cette partie",
-            "NoAvailableSpawn": "Aucun point d'apparition n'est disponible pour le moment"
+            "NoAvailableSpawn": "Aucun point d'apparition n'est disponible pour le moment",
+            "notFriend": "Vous ne pouvez pas rejoindre cette partie car elle est réservée aux amis et vous n'êtes pas ami avec l'hôte"
         },
         "logs": {
             "itemPickup": "{{playerName}} a ramassé {{itemName}}",
@@ -413,6 +414,14 @@
             "dropInDropOut": "Drop in, drop out",
             "elementalMode": "Mode élémentaire",
             "rapidElimination": "Élimination rapide",
+            "validate": "Valider"
+        },
+        "preMatchSettings": {
+            "title": "Paramètres d'accessibilité",
+            "accessibility": "Accessibilité :",
+            "friendOnly": "Amis seulement",
+            "open": "Ouvert à tous",
+            "price": "Prix :",
             "validate": "Valider"
         }
     }

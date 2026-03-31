@@ -105,6 +105,7 @@ describe('LobbyPageComponent', () => {
             isElementalMode: true,
             isDropInEnabled: false,
             isRapidElimination: true,
+            isFriendOnly: false,
         };
         component.isMatchSettingsPopupVisible = true;
         component.handleSettingsSelected(mockMatchSettings);

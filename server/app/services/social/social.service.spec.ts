@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { UserRelationships } from '@app/model/schema/user-relationships.schema';
-import { User } from '@app/model/schema/user.schema';
 import { UserService } from '@app/services/user/user.service';
 import { RelationshipType, SocialListTab } from '@common/interfaces/social';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { getModelToken } from '@nestjs/mongoose';
-import { Test, TestingModule } from '@nestjs/testing';
 import { SocialService } from './social.service';
 
 describe('SocialService', () => {
@@ -23,7 +19,7 @@ describe('SocialService', () => {
         pendingRequestsReceived: ['r1'],
     };
 
-    beforeEach(async () => {
+    beforeEach(() => {
         relModel = {
             findOne: jest.fn(),
             findOneAndUpdate: jest.fn(),
@@ -32,17 +28,8 @@ describe('SocialService', () => {
         userModel = {
             countDocuments: jest.fn(),
         };
-        const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                SocialService,
-                { provide: getModelToken(UserRelationships.name), useValue: relModel },
-                { provide: getModelToken(User.name), useValue: userModel },
-                { provide: UserService, useValue: { getAllUsers: jest.fn() } },
-            ],
-        }).compile();
-
-        service = module.get<SocialService>(SocialService);
-        userService = module.get<UserService>(UserService);
+        userService = { getAllUsers: jest.fn() } as unknown as UserService;
+        service = new SocialService(relModel as any, userModel as any, userService as any);
     });
 
     it('sendFriendRequest should skip if users are already related', async () => {

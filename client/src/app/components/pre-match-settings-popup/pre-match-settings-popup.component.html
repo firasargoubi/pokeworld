@@ -1,0 +1,51 @@
+<div class="pop-up">
+    <div class="title">{{ 'components.preMatchSettings.title' | translate }}</div>
+
+    <div class="options">
+        <span class="option-row accessibility-row">
+            <p class="option-label">{{ 'components.preMatchSettings.accessibility' | translate }}</p>
+
+            <div class="option" [ngClass]="{ selected: !matchSettings.isFriendOnly }" (click)="setFriendOnly(false)">
+                <div class="check-box"></div>
+                <div class="option-icon open-icon"></div>
+                <p>{{ 'components.preMatchSettings.open' | translate }}</p>
+            </div>
+
+            <div class="option" [ngClass]="{ selected: matchSettings.isFriendOnly }" (click)="setFriendOnly(true)">
+                <div class="check-box"></div>
+                <div class="option-icon friend-only-icon"></div>
+                <p>{{ 'components.preMatchSettings.friendOnly' | translate }}</p>
+            </div>
+        </span>
+
+        <span class="option-row price-row">
+            <p class="option-label">{{ 'components.preMatchSettings.price' | translate }}</p>
+
+            <div class="input-option">
+                <div class="button-container">
+                    <div class="button-edge"></div>
+                    <div class="button-body"><p>+</p></div>
+                    <div class="button-edge"></div>
+                </div>
+                <input class="price-input" type="number" placeholder="0 $" min="0" pattern="[0-9]*" />
+                <div class="button-container">
+                    <div class="button-edge"></div>
+                    <div class="button-body"><p>-</p></div>
+                    <div class="button-edge"></div>
+                </div>
+            </div>
+        </span>
+    </div>
+    <div class="spacer"></div>
+
+    <div class="button-section">
+        <div class="button">
+            <app-pokeball-button
+                [buttonContent]="'components.preMatchSettings.validate' | translate"
+                [delay]="0"
+                [onClickAction]="onValidateSelection.bind(this)"
+                [scale]="0.3"
+            ></app-pokeball-button>
+        </div>
+    </div>
+</div>

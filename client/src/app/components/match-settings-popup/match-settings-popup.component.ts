@@ -22,6 +22,7 @@ export class MatchSettingsPopupComponent implements OnChanges {
         isElementalMode: false,
         isDropInEnabled: false,
         isRapidElimination: false,
+        isFriendOnly: false,
     };
 
     private readonly matchService: MatchService = inject(MatchService);
