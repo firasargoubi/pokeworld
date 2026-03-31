@@ -29,6 +29,8 @@ const String SETTINGS_ICON_ASSET = 'assets/images/menu/icons/lobby/settings-cog.
 const String DROP_ICON_ASSET = 'assets/images/menu/icons/lobby/drop.png';
 const String ELEMENTAL_ICON_ASSET = 'assets/images/menu/icons/lobby/elemental.png';
 const String RAPID_ELIMINATION_ICON_ASSET = 'assets/images/menu/icons/lobby/skull.png';
+const String OPEN_ICON_ASSET = 'assets/images/menu/icons/lobby/open.png';
+const String FRIEND_ONLY_ICON_ASSET = 'assets/images/menu/icons/user-card/friends.png';
 
 const String BLUE_BUTTON_ASSET = 'assets/images/menu/containers/lobby/blue-button.png';
 const String BLUE_BUTTON_ACTIVE_ASSET = 'assets/images/menu/containers/lobby/blue-button-active.png';

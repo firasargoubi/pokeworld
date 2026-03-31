@@ -20,6 +20,7 @@ class MatchSettingsPopup extends StatefulWidget {
     isDropInEnabled: MatchService().matchData?.lobbyData.isDropInEnabled ?? false,
     isElementalMode: MatchService().matchData?.playData.isElementalMode ?? false,
     isRapidElimination: MatchService().matchData?.lobbyData.isRapidElimination ?? false,
+    isFriendOnly: MatchService().matchData?.lobbyData.isFriendOnly ?? false,
   );
 
   @override
@@ -30,9 +31,9 @@ class _MatchSettingsPopupState extends State<MatchSettingsPopup> {
   late bool _isDropIn;
   late bool _isElemental;
   late bool _isRapidElimination;
-
+  late bool _isFriendOnly;
   MatchSettings get matchSettings =>
-      MatchSettings(isDropInEnabled: _isDropIn, isElementalMode: _isElemental, isRapidElimination: _isRapidElimination);
+      MatchSettings(isDropInEnabled: _isDropIn, isElementalMode: _isElemental, isRapidElimination: _isRapidElimination, isFriendOnly: _isFriendOnly);
 
   @override
   void initState() {
@@ -41,6 +42,7 @@ class _MatchSettingsPopupState extends State<MatchSettingsPopup> {
     _isDropIn = widget.initialMatchSettings.isDropInEnabled;
     _isElemental = widget.initialMatchSettings.isElementalMode;
     _isRapidElimination = widget.initialMatchSettings.isRapidElimination;
+    _isFriendOnly = widget.initialMatchSettings.isFriendOnly;
   }
 
   TextStyle _pixelTextStyle(double fontSize) => TextStyle(
