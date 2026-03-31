@@ -3,15 +3,21 @@ import 'dart:ui';
 enum MenuCardColor { Blue, Orange }
 
 class MenuCardConfig {
-  final String backgroundImage;
-  final String activeBackgroundImage;
+  final Color borderColor;
+  final Color backgroundTopColor;
+  final Color backgroundBottomColor;
+  final Color innerBorderBottomRightColor;
+  final Color innerBorderTopLeftColor;
   final String pokemonImage;
   final double pokemonWidthFactor;
   final double pokemonHeightFactor;
 
   const MenuCardConfig({
-    required this.backgroundImage,
-    required this.activeBackgroundImage,
+    required this.borderColor,
+    required this.backgroundTopColor,
+    required this.backgroundBottomColor,
+    required this.innerBorderBottomRightColor,
+    required this.innerBorderTopLeftColor,
     required this.pokemonImage,
     required this.pokemonWidthFactor,
     required this.pokemonHeightFactor,

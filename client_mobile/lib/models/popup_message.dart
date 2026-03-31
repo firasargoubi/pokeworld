@@ -14,7 +14,7 @@ class PopupMessage {
   final void Function()? action;
 }
 
-enum PopupColor { Orange, Blue }
+enum PopupColor { Orange, Blue, Green }
 
 enum PopupMessages {
   DeleteGame('popup.deleteGame'),
@@ -37,7 +37,8 @@ enum PopupMessages {
   InvalidCredentials('popup.invalidCredentials'),
   UsernameTaken('popup.usernameTaken'),
   AccountConnected('popup.accountConnected'),
-  ChangeConfirmed('popup.changeConfirmed');
+  ChangeConfirmed('popup.changeConfirmed'),
+  ConfirmAccountCreation('components.authPopup.confirmAccountCreation');
 
   const PopupMessages(this.messageKey);
 

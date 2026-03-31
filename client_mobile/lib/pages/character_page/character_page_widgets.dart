@@ -2,8 +2,10 @@ import 'dart:math';
 
 import 'package:client_mobile/consts/elemental_type_const.dart';
 import 'package:client_mobile/models/avatar_data.dart';
+import 'package:client_mobile/models/ui.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/widgets/cut_out_button/cut_out_button.dart';
+import 'package:client_mobile/widgets/default_container/default_container.dart';
 import 'package:flutter/material.dart';
 
 import 'character_page_const.dart';
@@ -122,7 +124,7 @@ class CharacterStatsPanel extends StatelessWidget {
         Widget labeledStatBox({
           required String topText,
           required String bottomText,
-          required String backgroundImage,
+          required DefaultContainerConfig containerConfig,
           required String icon,
           VoidCallback? onTap,
           double opacity = 1.0,
@@ -156,7 +158,7 @@ class CharacterStatsPanel extends StatelessWidget {
                       clipBehavior: Clip.none,
                       children: [
                         Positioned.fill(
-                          child: Image.asset(backgroundImage, fit: BoxFit.fill, filterQuality: FilterQuality.none),
+                          child: DefaultContainer(baseSize: size, config: containerConfig),
                         ),
                         Positioned(
                           top: -boxHeight * 0.12,
@@ -200,7 +202,7 @@ class CharacterStatsPanel extends StatelessWidget {
         final hpBox = labeledStatBox(
           topText: i18n.translate(STAT_HP_TOP_KEY),
           bottomText: hpBottomText,
-          backgroundImage: STAT_PINK_ASSET,
+          containerConfig: PINK_CONTAINER_CONFIG,
           icon: HEART_ICON_ASSET,
           onTap: onToggleHpVit,
           opacity: hpOpacity,
@@ -209,7 +211,7 @@ class CharacterStatsPanel extends StatelessWidget {
         final vitBox = labeledStatBox(
           topText: i18n.translate(STAT_VIT_TOP_KEY),
           bottomText: vitBottomText,
-          backgroundImage: STAT_GREEN_ASSET,
+          containerConfig: GREEN_CONTAINER_CONFIG,
           icon: LIGHTNING_ICON_ASSET,
           onTap: onToggleHpVit,
           opacity: vitOpacity,
@@ -218,7 +220,7 @@ class CharacterStatsPanel extends StatelessWidget {
         final atkBox = labeledStatBox(
           topText: i18n.translate(STAT_ATK_TOP_KEY),
           bottomText: i18n.translate(STAT_ATK_BOTTOM_KEY),
-          backgroundImage: STAT_BLUE_ASSET,
+          containerConfig: BLUE_CONTAINER_CONFIG,
           icon: attackIconAsset,
           onTap: onToggleAtkDef,
         );
@@ -226,7 +228,7 @@ class CharacterStatsPanel extends StatelessWidget {
         final defBox = labeledStatBox(
           topText: i18n.translate(STAT_DEF_TOP_KEY),
           bottomText: i18n.translate(STAT_DEF_BOTTOM_KEY),
-          backgroundImage: STAT_ORANGE_ASSET,
+          containerConfig: ORANGE_CONTAINER_CONFIG,
           icon: defenseIconAsset,
           onTap: onToggleAtkDef,
         );

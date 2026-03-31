@@ -69,12 +69,7 @@ class MatchService {
     _socketService.socket.on(MatchEvent.Message.value, (payload) {
       final data = (payload as Map).cast<String, dynamic>();
 
-      final message = MessageFromServer(
-        message: data['message'] as String,
-        hasCloseButton: (data['hasCloseButton'] as bool?) ?? false,
-        messageParams: (data['messageParams'] as Map?)?.cast<String, Object?>() ?? const {},
-      );
-
+      final message = MessageFromServer.fromJson(data);
       onMessage(message);
     });
 

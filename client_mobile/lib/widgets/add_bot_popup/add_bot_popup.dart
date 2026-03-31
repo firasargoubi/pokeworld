@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:client_mobile/models/player_data.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
+import 'package:client_mobile/widgets/default_container/default_container.dart';
 import 'package:client_mobile/widgets/poke_button/poke_button.dart';
 import 'package:flutter/material.dart';
 
@@ -87,7 +88,7 @@ class _AddBotPopupState extends State<AddBotPopup> {
             behavior: HitTestBehavior.opaque,
             onTap: widget.onClose,
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: BLUR_SIGMA, sigmaY: BLUR_SIGMA),
+              filter: ImageFilter.blur(sigmaX: BLUR_SIGMA * 4, sigmaY: BLUR_SIGMA * 4),
               child: Container(color: Colors.black.withValues(alpha: OVERLAY_ALPHA)),
             ),
           ),
@@ -102,7 +103,7 @@ class _AddBotPopupState extends State<AddBotPopup> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(CONTAINER_ASSET, fit: BoxFit.fill, filterQuality: FilterQuality.none),
+                  DefaultContainer(baseSize: baseSize, config: GRAY_CONTAINER_CONFIG),
                   Padding(
                     padding: EdgeInsets.all(contentPadding),
                     child: Column(

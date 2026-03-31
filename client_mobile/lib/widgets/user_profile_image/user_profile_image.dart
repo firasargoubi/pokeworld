@@ -19,7 +19,7 @@ class LayeredProfileImage extends StatelessWidget {
           Align(
             alignment: Alignment.center,
             child: FractionallySizedBox(
-              heightFactor: 0.8,
+              heightFactor: 0.95,
               child: Image(image: foregroundImage, filterQuality: FilterQuality.none, fit: BoxFit.contain),
             ),
           ),

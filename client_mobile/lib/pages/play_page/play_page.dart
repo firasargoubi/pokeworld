@@ -62,10 +62,12 @@ class _PlayPageState extends State<PlayPage> {
     _matchDataSubscription = MatchService().matchUpdates.listen((updatedMatchData) {
       if (!mounted) return;
 
-      _computeItemSFX();
-      _showItemDropPopup();
-      if (matchData.state == MatchState.ItemDropSelection) {
-        _hideItemDropPopup();
+      if (updatedMatchData.players.isNotEmpty) {
+        _computeItemSFX();
+        _showItemDropPopup();
+        if (matchData.state == MatchState.ItemDropSelection) {
+          _hideItemDropPopup();
+        }
       }
 
       setState(() => _matchData = updatedMatchData);

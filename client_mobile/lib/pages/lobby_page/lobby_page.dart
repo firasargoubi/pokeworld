@@ -215,6 +215,7 @@ class _LobbyPageState extends State<LobbyPage> {
                                             crossAxisAlignment: CrossAxisAlignment.stretch,
                                             children: [
                                               LobbyCodePanel(
+                                                baseSize: b,
                                                 code: code,
                                                 isAdmin: isAdmin,
                                                 isLocked: isLocked,

@@ -1,3 +1,4 @@
+import 'package:client_mobile/models/ui.dart';
 import 'package:flutter/material.dart';
 
 const double DESIGN_ASPECT_RATIO = 2000 / 1300;
@@ -43,3 +44,15 @@ const Color OPTION_BUTTON_ACTIVE_BG = Color(0xFF0070C0);
 const Color OPTION_BUTTON_BORDER_ACTIVE = Color.fromRGBO(255, 255, 255, 0.82);
 
 enum SettingsTab { audio, preferences }
+
+const CONTAINER_CONFIG = DefaultContainerConfig(
+  borderWidthFactor: 0.025,
+  innerBorderWidthFactor: 0.015,
+  separatorHeightFactor: 0.015,
+  backgroundRatio: 0.116,
+  borderColor: Color(0xFF484860),
+  innerBorderBottomRightColor: Color(0xFF616161),
+  innerBorderTopLeftColor: Color(0xFFacacac),
+  backgroundTopColor: Color(0xFF888888),
+  backgroundBottomColor: Color(0xFFacacac),
+);

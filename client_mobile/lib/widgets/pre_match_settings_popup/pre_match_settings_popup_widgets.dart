@@ -30,33 +30,39 @@ class PreMatchSettingsOptionButton extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Checkbox
-          Container(
-            width: checkboxSize,
-            height: checkboxSize,
-            padding: EdgeInsets.all(checkboxInnerPadding),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.white, width: borderWidth),
-            ),
-            child: selected ? Container(color: Colors.white) : const SizedBox(),
+      child: SizedBox(
+        height: checkboxSize * 2,
+        child: Opacity(
+          opacity: selected ? 1.0 : 0.6,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Checkbox
+              Container(
+                width: checkboxSize,
+                height: checkboxSize,
+                padding: EdgeInsets.all(checkboxInnerPadding),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white, width: borderWidth),
+                ),
+                child: selected ? Container(color: Colors.white) : const SizedBox(),
+              ),
+              SizedBox(width: padding),
+              if (hasIcon)
+                SizedBox(
+                  width: checkboxSize,
+                  height: checkboxSize,
+                  child: iconAsset != null
+                      ? Image.asset(iconAsset!, fit: BoxFit.contain, color: Colors.white)
+                      : DecoratedBox(
+                          decoration: BoxDecoration(border: Border.all(color: Colors.white)),
+                        ),
+                ),
+              if (hasIcon) SizedBox(width: padding),
+              Text(text, style: style),
+            ],
           ),
-          SizedBox(width: padding),
-          if (hasIcon)
-            SizedBox(
-              width: checkboxSize,
-              height: checkboxSize,
-              child: iconAsset != null
-                  ? Image.asset(iconAsset!, fit: BoxFit.contain, color: Colors.white)
-                  : DecoratedBox(
-                      decoration: BoxDecoration(border: Border.all(color: Colors.white)),
-                    ),
-            ),
-          if (hasIcon) SizedBox(width: padding),
-          Text(text, style: style),
-        ],
+        ),
       ),
     );
   }

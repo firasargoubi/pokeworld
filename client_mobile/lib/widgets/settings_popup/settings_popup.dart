@@ -5,6 +5,7 @@ import 'package:client_mobile/models/user_preferences.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/preferences_service/preferences_service.dart';
+import 'package:client_mobile/widgets/default_container/default_container.dart';
 import 'package:flutter/material.dart';
 
 import 'settings_popup_const.dart';
@@ -245,7 +246,7 @@ class _SettingsPopupState extends State<SettingsPopup> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(CONTAINER_ASSET, fit: BoxFit.fill, filterQuality: FilterQuality.none),
+                  DefaultContainer(baseSize: baseSize, config: CONTAINER_CONFIG),
                   Padding(
                     padding: EdgeInsets.all(contentPadding),
                     child: Column(

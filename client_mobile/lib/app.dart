@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:client_mobile/consts/popup_messages_const.dart';
 import 'package:flutter/material.dart';
 
 import 'models/popup_message.dart';
@@ -93,15 +96,37 @@ class _PokeWorldAppState extends State<PokeWorldApp> {
                       return const SizedBox.shrink();
                     }
 
-                    final popup = popups.last;
-                    return WarningConfirmationPopup(
-                      message: popup.message,
-                      hasCloseButton: popup.hasCloseButton,
-                      isConfirmation: popup.isConfirmation,
-                      popupColor: popup.popupColor,
-                      onClosed: (confirmed) {
-                        _popupService.handlePopupClose(message: popup, confirmed: confirmed);
+                    return GestureDetector(
+                      onTap: () {
+                        for (final popup in List<PopupMessage>.from(popups)) {
+                          _popupService.handlePopupClose(message: popup, confirmed: false);
+                        }
                       },
+                      child: Container(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: popups.map((popup) {
+                                return GestureDetector(
+                                  onTap: () {},
+                                  child: WarningConfirmationPopup(
+                                    message: popup.message,
+                                    hasCloseButton: popup.hasCloseButton,
+                                    isConfirmation: popup.isConfirmation,
+                                    popupColor: popup.popupColor,
+                                    onClosed: (confirmed) {
+                                      _popupService.handlePopupClose(message: popup, confirmed: confirmed);
+                                    },
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                      ),
                     );
                   },
                 ),
@@ -113,57 +138,12 @@ class _PokeWorldAppState extends State<PokeWorldApp> {
             }
 
             return ColorFiltered(
-              colorFilter: const ColorFilter.matrix(<double>[
-                -0.525,
-                1.543,
-                -0.018,
-                0,
-                0,
-                0.398,
-                0.410,
-                0.192,
-                0,
-                0,
-                0.559,
-                1.295,
-                -0.854,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-              ]),
+              colorFilter: POPUP_COLOR_FILTER,
               child: ColorFiltered(
-                colorFilter: const ColorFilter.matrix(<double>[
-                  0.9213,
-                  0.0715,
-                  0.0072,
-                  0,
-                  0,
-                  0.0213,
-                  0.9715,
-                  0.0072,
-                  0,
-                  0,
-                  0.0213,
-                  0.0715,
-                  0.9072,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  0,
-                ]),
+                colorFilter: DARK_DESATURATION_FILTER,
                 child: ColorFiltered(
-                  colorFilter: const ColorFilter.matrix(<double>[1.2, 0, 0, 0, -25.5, 0, 1.2, 0, 0, -25.5, 0, 0, 1.2, 0, -25.5, 0, 0, 0, 1, 0]),
-                  child: ColorFiltered(
-                    colorFilter: const ColorFilter.matrix(<double>[0.85, 0, 0, 0, 0, 0, 0.85, 0, 0, 0, 0, 0, 0.85, 0, 0, 0, 0, 0, 1, 0]),
-                    child: content,
-                  ),
+                  colorFilter: DARK_CONTRAST_FILTER,
+                  child: ColorFiltered(colorFilter: DARK_BRIGHTNESS_FILTER, child: content),
                 ),
               ),
             );
