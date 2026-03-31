@@ -11,7 +11,7 @@ MatchData GET_DEFAULT_MATCH_DATA() {
     code: '',
     state: MatchState.Lobby,
     gameData: GET_DEFAULT_GAME_DATA(),
-    lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0, isDropInEnabled: false, isRapidElimination: false),
+    lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0, isDropInEnabled: false, isRapidElimination: false, isFriendOnly: false),
     playData: PlayData(
       timeLeft: TURN_WAIT_DURATION,
       activePlayerIndex: 0,

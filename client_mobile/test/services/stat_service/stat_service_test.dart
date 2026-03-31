@@ -87,7 +87,7 @@ MatchData _buildMatchData({MapData? mapData, TrackingData? trackingData}) {
     code: 'TEST',
     state: MatchState.Statistics,
     gameData: _buildGameData(md),
-    lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0, isDropInEnabled: false, isRapidElimination: false),
+    lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0, isDropInEnabled: false, isRapidElimination: false, isFriendOnly: false),
     playData: PlayData(timeLeft: 60, isDebugMode: false, activePlayerIndex: 0, hasAction: false, movementLeft: 0, isElementalMode: false),
     combatData: _emptyCombatData(),
     trackingData: trackingData ?? _buildTrackingData(),

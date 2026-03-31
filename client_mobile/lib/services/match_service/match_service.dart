@@ -37,6 +37,7 @@ class MatchService {
   MatchData? _matchData = GET_DEFAULT_MATCH_DATA();
   PlayerData? _selfPlayer = DEFAULT_PLAYER_DATA;
   int? _selfIndex = DEFAULT_SELF_INDEX;
+  VoidCallback? _onCreateMatchSuccess;
   final StreamController<MatchData> _matchUpdateController = StreamController<MatchData>.broadcast();
 
   MatchData? get matchData => _matchData;
@@ -98,7 +99,8 @@ class MatchService {
     });
   }
 
-  void createMatch(GameData gameData) {
+  void createMatch(GameData gameData, {VoidCallback? onSuccess}) {
+    _onCreateMatchSuccess = onSuccess;
     _socketService.emit(MatchEvent.CreateMatch.value, gameData, (payload) {
       onMatchJoin(payload);
     });
@@ -107,6 +109,8 @@ class MatchService {
   void onMatchJoin(dynamic payload) {
     final matchData = MatchData.fromJson((payload as Map).cast<String, dynamic>());
     onUpdate(matchData);
+    _onCreateMatchSuccess?.call();
+    _onCreateMatchSuccess = null;
 
     NavigationService.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const CharacterPage()));
   }

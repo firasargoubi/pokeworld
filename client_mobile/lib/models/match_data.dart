@@ -53,8 +53,15 @@ class LobbyData {
   final int hostPlayerIndex;
   final bool isDropInEnabled;
   final bool isRapidElimination;
+  final bool isFriendOnly;
 
-  LobbyData({required this.isLocked, required this.hostPlayerIndex, required this.isDropInEnabled, required this.isRapidElimination});
+  LobbyData({
+    required this.isLocked,
+    required this.hostPlayerIndex,
+    required this.isDropInEnabled,
+    required this.isRapidElimination,
+    required this.isFriendOnly,
+  });
 
   factory LobbyData.fromJson(Map<String, dynamic> json) {
     return LobbyData(
@@ -62,6 +69,7 @@ class LobbyData {
       hostPlayerIndex: (json['hostPlayerIndex'] as num).toInt(),
       isDropInEnabled: json['isDropInEnabled'] as bool,
       isRapidElimination: json['isRapidElimination'] as bool,
+      isFriendOnly: json['isFriendOnly'] as bool,
     );
   }
 }
@@ -259,18 +267,25 @@ class MatchSettings {
   final bool isElementalMode;
   final bool isDropInEnabled;
   final bool isRapidElimination;
-  const MatchSettings({required this.isElementalMode, required this.isDropInEnabled, required this.isRapidElimination});
+  final bool isFriendOnly;
+  const MatchSettings({required this.isElementalMode, required this.isDropInEnabled, required this.isRapidElimination, required this.isFriendOnly});
 
   factory MatchSettings.fromJson(Map<String, dynamic> json) {
     return MatchSettings(
       isElementalMode: json['isElementalMode'] as bool? ?? false,
       isDropInEnabled: json['isDropInEnabled'] as bool? ?? false,
       isRapidElimination: json['isRapidElimination'] as bool? ?? false,
+      isFriendOnly: json['isFriendOnly'] as bool? ?? false,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'isElementalMode': isElementalMode, 'isDropInEnabled': isDropInEnabled, 'isRapidElimination': isRapidElimination};
+    return {
+      'isElementalMode': isElementalMode,
+      'isDropInEnabled': isDropInEnabled,
+      'isRapidElimination': isRapidElimination,
+      'isFriendOnly': isFriendOnly,
+    };
   }
 }
 

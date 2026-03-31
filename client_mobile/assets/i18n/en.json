@@ -60,7 +60,8 @@
             "teamWin": "Team {{team}} wins the match!",
             "playerLeftMatch": "{{playerName}} left the match",
             "dropInDisabled": "Le drop-in est désactivé pour cette partie",
-            "NoAvailableSpawn": "Aucun point d'apparition n'est disponible pour le moment"
+            "NoAvailableSpawn": "Aucun point d'apparition n'est disponible pour le moment",
+            "notFriend": "You cannot join this match because it's friend-only and you are not friends with the host"
         },
         "logs": {
             "itemPickup": "{{playerName}} picked up {{itemName}}",
@@ -407,7 +408,16 @@
             "dropInDropOut": "Drop in, drop out",
             "elementalMode": "Elemental mode",
             "rapidElimination": "Rapid elimination",
-            "validate": "VALIDATE"
+            "accessibility": "Accessibility",
+            "validate": "Validate"
+        },
+        "preMatchSettings": {
+            "title": "Accessibility settings",
+            "accessibility": "Accessibility :",
+            "friendOnly": "Friend-only",
+            "open": "Open to all",
+            "price": "Price :",
+            "validate": "Validate"
         },
         "shopPopup": {
             "title": "POKE-SHOP",

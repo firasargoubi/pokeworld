@@ -52,6 +52,7 @@ class LobbyCodePanel extends StatelessWidget {
                 builder: (context, constraints) {
                   final boxHeight = constraints.maxHeight;
                   final boxWidth = boxHeight * 0.5;
+                  final sideInset = boxHeight * 0.85;
 
                   return Stack(
                     clipBehavior: Clip.none,
@@ -61,7 +62,7 @@ class LobbyCodePanel extends StatelessWidget {
                         child: Text(code, style: codeStyle),
                       ),
                       Positioned(
-                        right: boxHeight * 0.85,
+                        left: sideInset,
                         top: 0,
                         child: SizedBox(
                           width: boxWidth,
@@ -101,6 +102,22 @@ class LobbyCodePanel extends StatelessWidget {
                                 ),
                               ),
                             ],
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: sideInset,
+                        top: 0,
+                        child: SizedBox(
+                          width: boxWidth,
+                          height: boxHeight * 0.3,
+                          child: Center(
+                            child: Image.asset(
+                              MatchService().matchData!.lobbyData.isFriendOnly ? FRIEND_ONLY_ICON_ASSET : OPEN_ICON_ASSET,
+                              fit: BoxFit.contain,
+                              filterQuality: FilterQuality.none,
+                              color: const Color(0xFFaae7f7),
+                            ),
                           ),
                         ),
                       ),
