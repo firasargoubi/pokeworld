@@ -20,4 +20,5 @@ export enum Message {
     PlayerLeftMatch = 'server.messages.playerLeftMatch',
     DropInDisabled = 'server.messages.dropInDisabled',
     NoAvailableSpawn = 'server.messages.NoAvailableSpawn',
+    NotFriend = 'server.messages.notFriend',
 }

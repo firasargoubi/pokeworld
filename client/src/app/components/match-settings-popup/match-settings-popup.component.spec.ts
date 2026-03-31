@@ -117,6 +117,7 @@ describe('MatchSettingsPopupComponent', () => {
             isElementalMode: true,
             isDropInEnabled: true,
             isRapidElimination: false,
+            isFriendOnly: false,
         };
 
         component.onValidateSelection();

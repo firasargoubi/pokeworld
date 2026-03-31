@@ -26,12 +26,12 @@ export class MatchGateway {
     }
 
     @SubscribeMessage(MatchEvent.JoinMatch)
-    joinMatch(socket: Socket, matchCode: string): MatchData | null {
+    async joinMatch(socket: Socket, matchCode: string): Promise<MatchData | null> {
         const playerId = this.userService.getUserId(socket.id);
         if (!playerId) {
             return null;
         }
-        return this.matchService.joinMatch(playerId, matchCode);
+        return await this.matchService.joinMatch(playerId, matchCode);
     }
 
     @SubscribeMessage(MatchEvent.LeaveMatch)
@@ -53,9 +53,14 @@ export class MatchGateway {
     }
 
     @SubscribeMessage(JoinPageEvent.JoinRoom)
-    handleJoinRoom(socket: Socket) {
+    async handleJoinRoom(socket: Socket) {
         socket.join(JoinPageEvent.Room);
-        socket.emit(JoinPageEvent.UpdateMatchList, this.matchService.getAvailableMatches());
+        const playerId = this.userService.getUserId(socket.id);
+        if (!playerId) {
+            return null;
+        }
+        const matches = await this.matchService.getAvailableMatches(playerId);
+        socket.emit(JoinPageEvent.UpdateMatchList, matches);
     }
 
     @SubscribeMessage(JoinPageEvent.LeaveRoom)
@@ -63,9 +68,15 @@ export class MatchGateway {
         socket.leave(JoinPageEvent.Room);
     }
 
-    broadcastMatchListUpdate() {
-        const availableMatches = this.matchService.getAvailableMatches();
-        this.server.to(JoinPageEvent.Room).emit(JoinPageEvent.UpdateMatchList, availableMatches);
+    async broadcastMatchListUpdate() {
+        const sockets = this.server.sockets.sockets;
+        sockets.forEach(async (socket) => {
+            if (socket.rooms.has(JoinPageEvent.Room)) {
+                const userId = this.userService.getUserId(socket.id);
+                const matches = await this.matchService.getAvailableMatches(userId);
+                socket.emit(JoinPageEvent.UpdateMatchList, matches);
+            }
+        });
     }
 
     handleDisconnect(socket: Socket) {

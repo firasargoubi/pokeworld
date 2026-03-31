@@ -1,0 +1,265 @@
+$scale: min(40vw, 60vh);
+
+$inner-shadow-width: calc($scale * 0.02);
+$clip-size: calc($scale * 0.02);
+
+$border-color: #49485e;
+
+$background-image: '../../../assets/images/menu/containers/gray/gray-scrare-body.png';
+$open-button-image: '../../../assets/images/menu/icons/match-mode/open.svg';
+$friend-only-button-image: '../../../assets/images/menu/icons/user-card/friends.png';
+
+$button-cutout-size: calc($scale * 0.006);
+$bg-button-gray: linear-gradient(
+    to bottom,
+    #d0d0d0 0,
+    #d0d0d0 $button-cutout-size,
+    #a0a0a0 $button-cutout-size,
+    #a0a0a0 calc(100% - $button-cutout-size),
+    #606060 calc(100% - $button-cutout-size),
+    #606060 100%
+);
+
+.pop-up {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: calc($scale * 1.1);
+    width: calc($scale * 1.7);
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
+    border: calc($scale * 0.039) solid $border-color;
+    clip-path: polygon(
+        $clip-size 0%,
+        calc(100% - #{$clip-size}) 0%,
+        calc(100% - #{$clip-size}) $clip-size,
+        100% $clip-size,
+        100% calc(100% - #{$clip-size}),
+        calc(100% - #{$clip-size}) calc(100% - #{$clip-size}),
+        calc(100% - #{$clip-size}) 100%,
+        $clip-size 100%,
+        $clip-size calc(100% - #{$clip-size}),
+        0% calc(100% - #{$clip-size}),
+        0% $clip-size,
+        $clip-size $clip-size
+    );
+    box-sizing: border-box;
+    padding: $inner-shadow-width;
+    box-shadow:
+        inset $inner-shadow-width 0 0 0 #ababab,
+        inset calc($inner-shadow-width * -1) 0 0 0 #6b6b6b,
+        inset 0 $inner-shadow-width 0 0 #ababab,
+        inset 0 calc($inner-shadow-width * -1) 0 0 #6b6b6b;
+}
+
+.title {
+    height: calc($scale * 0.2);
+    width: 100%;
+    background-color: #888888;
+    font-size: calc($scale * 0.13);
+    text-align: center;
+    user-select: none;
+}
+
+.options {
+    background-color: #888888;
+    font-size: calc($scale * 0.05);
+    height: calc($scale * 0.5);
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    gap: calc($scale * 0.1);
+    align-items: center;
+    user-select: none;
+    box-sizing: border-box;
+}
+
+.option-row {
+    width: 95%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+    gap: calc($clip-size * 2);
+    cursor: pointer;
+}
+
+.option-label {
+    font-size: calc($scale * 0.07);
+    user-select: none;
+}
+
+.option {
+    opacity: 0.4;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left;
+    cursor: pointer;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.option:hover:not(.selected) {
+    opacity: 0.5;
+}
+
+.selected {
+    opacity: 1;
+}
+
+.check-box {
+    width: calc($clip-size * 4.3);
+    height: calc($clip-size * 4.3);
+    border: calc($clip-size * 0.54) solid white;
+    padding: calc($clip-size * 0.47);
+    background-color: transparent;
+    box-shadow: calc($clip-size * 0.6667) calc($clip-size * 0.6667) 0 rgba(0, 0, 0, 0.6);
+    transition: background-color 0.2s ease-in-out;
+}
+
+.selected .check-box {
+    background-color: white;
+    background-clip: content-box;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.option:hover .check-box {
+    background-color: white;
+}
+
+.option-icon {
+    width: calc($clip-size * 4.3);
+    height: calc($clip-size * 4.3);
+    margin: 0 calc($clip-size * 1) 0 calc($clip-size * 1.6667);
+    background-size: cover;
+    background-position: center;
+}
+
+.accessibility-row .open-icon {
+    background-image: url($open-button-image);
+    filter: invert(1);
+}
+
+.accessibility-row .friend-only-icon {
+    background-image: url($friend-only-button-image);
+    filter: invert(1);
+}
+
+.input-option {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: calc($clip-size * 1);
+    align-items: center;
+    justify-content: center;
+}
+
+.input-option input {
+    all: unset;
+    width: 30%;
+    height: calc($clip-size * 3);
+    border: calc($clip-size * 0.54) solid white;
+    padding: calc($clip-size * 0.47);
+    background-color: transparent;
+    box-shadow: calc($clip-size * 0.6667) calc($clip-size * 0.6667) 0 rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: calc($scale * 0.05);
+    font-family: 'Pixel';
+    margin-right: calc($clip-size * 0.54);
+}
+
+.input-option input:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.455);
+    color: black;
+    transition:
+        background-color 0.2s ease-in-out,
+        color 0.2s ease-in-out;
+}
+
+.input-option input::placeholder {
+    color: rgba(255, 255, 255, 0.749);
+    font-family: 'Pixel';
+    transition: color 0.2s ease-in-out;
+}
+
+.button-container {
+    height: calc($clip-size * 3.5);
+    width: calc($clip-size * 6);
+    display: grid;
+    place-items: center;
+    grid-template-columns: $button-cutout-size 1fr $button-cutout-size;
+    transition: filter 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.button-container .button-edge {
+    width: 100%;
+    height: calc(100% - $button-cutout-size * 2);
+    background: $bg-button-gray;
+    margin-right: calc($button-cutout-size * -0.2);
+}
+
+.button-container .button-body {
+    width: 100%;
+    height: 100%;
+    background: $bg-button-gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.button-container .button-edge:last-child {
+    margin-left: calc($button-cutout-size * -0.3);
+    margin-right: 0;
+}
+
+.button-container:hover {
+    filter: brightness(1.1);
+}
+
+.button-container:active *:not(p) {
+    position: relative;
+    filter: brightness(0.98);
+    background: $bg-button-gray;
+}
+
+.button-container:active *:not(p)::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: $bg-button-gray;
+    transform: rotate(180deg);
+    z-index: -1;
+}
+
+.spacer {
+    height: calc($inner-shadow-width * 3);
+    width: 100%;
+    background: linear-gradient(to bottom, #ababab 0%, #ababab 50%, #888888 50%, #888888 100%);
+}
+
+.button-section {
+    flex: 1;
+    width: 100%;
+    background-color: #ababab;
+    overflow: visible;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button {
+    position: relative;
+    height: calc($scale * 0.17);
+    width: calc($scale * 0.48);
+    overflow: visible;
+}

@@ -1,11 +1,14 @@
 import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { Game } from '@app/model/schema/game.schema';
+import { UserRelationships } from '@app/model/schema/user-relationships.schema';
 import { BotService } from '@app/services/bot/bot.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
 import { GameService } from '@app/services/game/game.service';
 import { PlayService } from '@app/services/play/play.service';
+import { SocialService } from '@app/services/social/social.service';
+import { UserService } from '@app/services/user/user.service';
 import { DEFAULT_MATCH_DATA, MATCH_CODE_LENGTH, MATCH_CODE_RANGE } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
 import { GameData } from '@common/interfaces/game-data';
@@ -17,10 +20,12 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 @Injectable()
 export class MatchService {
     @Inject(forwardRef(() => MatchGateway)) private matchGateway: MatchGateway;
+    @Inject(forwardRef(() => UserService)) private userService: UserService;
     @Inject(forwardRef(() => CombatService)) private combatService: CombatService;
     @Inject(forwardRef(() => PlayService)) private playService: PlayService;
     @Inject(forwardRef(() => BotService)) private botService: BotService;
     @Inject(forwardRef(() => ChatService)) private chatService: ChatService;
+    @Inject(forwardRef(() => SocialService)) private socialService: SocialService;
     @Inject(GameService) private gameService: GameService;
     private matches: Map<string, Match> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
@@ -32,7 +37,7 @@ export class MatchService {
                 ...structuredClone(DEFAULT_MATCH_DATA),
                 code: this.getNewMatchCode(),
                 gameData,
-                players: [{ ...structuredClone(DEFAULT_PLAYER_DATA), id: playerId }],
+                players: [{ ...structuredClone(DEFAULT_PLAYER_DATA), id: playerId, userId: playerId }],
             };
             const match = new Match(matchData, this);
             this.matches.set(matchData.code, match);
@@ -58,9 +63,9 @@ export class MatchService {
         this.disconnectPlayer(playerId);
     }
 
-    joinMatch(playerId: string, matchCode: string): MatchData | null {
+    async joinMatch(playerId: string, matchCode: string): Promise<MatchData | null> {
         let matchData = null;
-        if (this.canJoinMatch(playerId, matchCode)) {
+        if (await this.canJoinMatch(playerId, matchCode)) {
             const match = this.getMatch(matchCode);
             match.join(playerId);
             this.addPlayerToMatchCode(playerId, matchCode);
@@ -156,9 +161,9 @@ export class MatchService {
         });
     }
 
-    getAvailableMatches(): MatchData[] {
+    async getAvailableMatches(viewerUserId: string): Promise<MatchData[]> {
         const matchesData: MatchData[] = [];
-        this.matches.forEach((match) => {
+        for (const match of this.matches.values()) {
             const isInLobby = match.data.state === MatchState.Lobby;
             const isMatchLocked = match.data.lobbyData.isLocked;
             const isMatchFull = match.isFull();
@@ -167,10 +172,21 @@ export class MatchService {
             const isAvailableDropIn = !isInLobby && match.data.lobbyData.isDropInEnabled;
 
             const isMatchAvailable = !isMatchFull && (isAvailableLobby || isAvailableDropIn);
-            if (isMatchAvailable) {
-                matchesData.push(match.data);
+            if (!isMatchAvailable) {
+                continue;
             }
-        });
+
+            if (match.data.lobbyData.isFriendOnly) {
+                const joiningUserRelationships = await this.socialService.getRelationships(viewerUserId);
+
+                if (!this.canJoinFriendOnlyMatch(joiningUserRelationships, match)) {
+                    continue;
+                }
+            }
+
+            matchesData.push(match.data);
+        }
+
         return matchesData;
     }
 
@@ -180,33 +196,68 @@ export class MatchService {
         this.matchGateway.broadcastMatchListUpdate();
     }
 
-    private canJoinMatch(playerId: string, matchCode: string): boolean {
-        let canJoinMatch = true;
+    private async canJoinMatch(playerId: string, matchCode: string): Promise<boolean> {
         if (!this.hasMatchCode(matchCode)) {
             this.matchGateway.emitMessage(playerId, Message.InvalidMatchCode, true);
-            canJoinMatch = false;
-        } else if (this.hasPlayerId(playerId)) {
+            return false;
+        }
+
+        if (this.hasPlayerId(playerId)) {
             this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch, true);
-            canJoinMatch = false;
-        } else {
-            const match = this.getMatch(matchCode);
-            const isInLobby = match.isState([MatchState.Lobby]);
-            const isDropIn = match.data.lobbyData.isDropInEnabled && !isInLobby;
-            if (match.isFull()) {
-                this.matchGateway.emitMessage(playerId, Message.RoomFull, true);
-                canJoinMatch = false;
-            } else if (!isInLobby && !isDropIn) {
-                this.matchGateway.emitMessage(playerId, Message.DropInDisabled, true);
-                canJoinMatch = false;
-            } else if (!isDropIn && match.data.lobbyData.isLocked) {
-                this.matchGateway.emitMessage(playerId, Message.RoomLocked, true);
-                canJoinMatch = false;
-            } else if (isDropIn && !match.hasAvailableSpawnPoint() && !this.hasDisconnectedObserver(match)) {
-                this.matchGateway.emitMessage(playerId, Message.NoAvailableSpawn, true);
-                canJoinMatch = false;
+            return false;
+        }
+
+        const match = this.getMatch(matchCode);
+        return await this.evaluateMatchJoinConditions(match, playerId);
+    }
+
+    private async evaluateMatchJoinConditions(match: Match, playerId: string): Promise<boolean> {
+        const isInLobby = match.isState([MatchState.Lobby]);
+
+        if (match.isFull()) {
+            this.matchGateway.emitMessage(playerId, Message.RoomFull, true);
+            return false;
+        }
+
+        const isDropIn = match.data.lobbyData.isDropInEnabled && !isInLobby;
+        if (!isInLobby && !isDropIn) {
+            this.matchGateway.emitMessage(playerId, Message.DropInDisabled, true);
+            return false;
+        }
+
+        if (!isDropIn && match.data.lobbyData.isLocked) {
+            this.matchGateway.emitMessage(playerId, Message.RoomLocked, true);
+            return false;
+        }
+
+        const joiningUserRelationships = await this.socialService.getRelationships(playerId);
+
+        if (match.data.lobbyData.isFriendOnly) {
+            const canJoinFriendOnlyMatch = this.canJoinFriendOnlyMatch(joiningUserRelationships, match);
+            if (!canJoinFriendOnlyMatch) {
+                this.matchGateway.emitMessage(playerId, Message.NotFriend, true);
+                return false;
             }
         }
-        return canJoinMatch;
+
+        if (isDropIn && !match.hasAvailableSpawnPoint() && !this.hasDisconnectedObserver(match)) {
+            this.matchGateway.emitMessage(playerId, Message.NoAvailableSpawn, true);
+            return false;
+        }
+
+        return true;
+    }
+
+    private canJoinFriendOnlyMatch(joiningUserRelationships: UserRelationships, match: Match): boolean {
+        const hostPlayer = match.data.players[match.data.lobbyData.hostPlayerIndex];
+        const hostUserId = hostPlayer?.userId;
+        if (!hostUserId) {
+            return false;
+        }
+        if (hostUserId === joiningUserRelationships.userId) {
+            return true;
+        }
+        return joiningUserRelationships.friends.includes(hostUserId);
     }
 
     private hasDisconnectedObserver(match: Match): boolean {
@@ -224,24 +275,6 @@ export class MatchService {
             canCreateMatch = false;
         }
         return canCreateMatch;
-    }
-
-    private isMatchFull(matchCode: string): boolean {
-        let isMatchFull = false;
-        const match = this.getMatch(matchCode);
-        if (match) {
-            isMatchFull = match.isFull();
-        }
-        return isMatchFull;
-    }
-
-    private isMatchLocked(matchCode: string): boolean {
-        let isMatchLocked = false;
-        const match = this.getMatch(matchCode);
-        if (match) {
-            isMatchLocked = match.data.lobbyData.isLocked;
-        }
-        return isMatchLocked;
     }
 
     private getMatch(matchCode: string): Match {

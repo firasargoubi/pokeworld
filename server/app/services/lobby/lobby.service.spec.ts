@@ -190,9 +190,16 @@ describe('LobbyService', () => {
         const playerId = 'playerId';
         mockMatch.isHost.returns(true);
 
-        service.changeMatchSettings(mockMatch, playerId, { isElementalMode: true, isDropInEnabled: true, isRapidElimination: false });
+        service.changeMatchSettings(mockMatch, playerId, {
+            isElementalMode: true,
+            isDropInEnabled: true,
+            isRapidElimination: false,
+            isFriendOnly: false,
+        });
 
-        expect(mockMatch.changeSettings.calledWith({ isElementalMode: true, isDropInEnabled: true, isRapidElimination: false })).toBeTruthy();
+        expect(
+            mockMatch.changeSettings.calledWith({ isElementalMode: true, isDropInEnabled: true, isRapidElimination: false, isFriendOnly: false }),
+        ).toBeTruthy();
         expect(mockMatch.sendUpdate.calledOnce).toBeTruthy();
     });
 

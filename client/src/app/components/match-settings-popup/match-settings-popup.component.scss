@@ -6,14 +6,16 @@ $clip-size: calc($scale * 0.02);
 $border-color: #49485e;
 
 $background-image: '../../../assets/images/menu/containers/gray/gray-scrare-body.png';
+$open-button-image: '../../../assets/images/menu/icons/match-mode/open.svg';
+$friend-only-button-image: '../../../assets/images/menu/icons/user-card/friends.png';
 
 .pop-up {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    height: calc($scale * 0.95);
-    width: calc($scale * 1.3);
+    height: calc($scale * 1.1);
+    width: calc($scale * 1.5);
     overflow: visible;
     display: flex;
     flex-direction: column;
@@ -55,7 +57,7 @@ $background-image: '../../../assets/images/menu/containers/gray/gray-scrare-body
 
 .options {
     background-color: #888888;
-    font-size: calc($scale * 0.07);
+    font-size: calc($scale * 0.05);
     height: calc($scale * 0.55);
     width: 100%;
     display: flex;

@@ -85,10 +85,10 @@ describe('MatchGateway', () => {
         expect(mockMatchService.createMatch.called).toBeFalsy();
     });
 
-    it('should not join a match when the socket is not associated to a user', () => {
+    it('should not join a match when the socket is not associated to a user', async () => {
         mockUserService.getUserId.returns(undefined);
 
-        const result = gateway.joinMatch(mockSocket, '1234');
+        const result = await gateway.joinMatch(mockSocket, '1234');
 
         expect(result).toBeNull();
         expect(mockMatchService.joinMatch.called).toBeFalsy();

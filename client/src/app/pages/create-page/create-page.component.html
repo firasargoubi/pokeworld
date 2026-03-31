@@ -6,7 +6,7 @@
         <div id="admin-page-body">
             <div id="game-grid">
                 @for(game of games; let i = $index; track game._id) {
-                <app-game-card [game]="game" [isAdminView]="false" [index]="i" (join)="createMatch(game)"> </app-game-card>
+                <app-game-card [game]="game" [isAdminView]="false" [index]="i" (join)="openSettings(game)"> </app-game-card>
                 }
             </div>
         </div>
@@ -14,4 +14,13 @@
     <div class="chat-container">
         <app-chat [isInGame]="false"></app-chat>
     </div>
+    @if (isSettingsPopupVisible) {
+    <div class="settings-popup-overlay" (click)="isSettingsPopupVisible = false">
+        <app-pre-match-settings-popup
+            (click)="$event.stopPropagation()"
+            [isVisible]="isSettingsPopupVisible"
+            (settingsSelected)="onSettingsSelected($event)"
+        ></app-pre-match-settings-popup>
+    </div>
+    }
 </div>

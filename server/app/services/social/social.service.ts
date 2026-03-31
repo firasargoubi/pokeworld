@@ -14,6 +14,11 @@ export class SocialService {
         private readonly userService: UserService,
     ) {}
 
+    async areFriends(userId1: string, userId2: string): Promise<boolean> {
+        const rel = await this.getRelationshipsLean(userId1);
+        return rel.friends.includes(userId2);
+    }
+
     async sendFriendRequest(fromUserId: string, toUserId: string): Promise<void> {
         const [fromRel, toRel] = await this.preparePair(fromUserId, toUserId);
         const isBlocked = fromRel.blockedUsers.includes(toUserId) || toRel.blockedUsers.includes(fromUserId);
