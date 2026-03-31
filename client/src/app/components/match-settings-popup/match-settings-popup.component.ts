@@ -38,6 +38,7 @@ export class MatchSettingsPopupComponent implements OnChanges {
         this.matchSettings.isElementalMode = this.matchService.data.playData.isElementalMode;
         this.matchSettings.isDropInEnabled = this.matchService.data.lobbyData.isDropInEnabled;
         this.matchSettings.isRapidElimination = this.matchService.data.lobbyData.isRapidElimination;
+        this.matchSettings.isFriendOnly = this.matchService.data.lobbyData.isFriendOnly;
     }
 
     toggleElementalMode() {
