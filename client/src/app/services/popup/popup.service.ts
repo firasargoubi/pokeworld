@@ -4,7 +4,7 @@ import { ComponentRef, inject, Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { WarningConfirmationPopupComponent } from '@app/components/warning-confirmation-popup/warning-confirmation-popup.component';
 import { KEYWORDS_TO_REPLACE } from '@app/consts/popup-message.const';
-import { Popup } from '@app/interfaces/popup';
+import { Popup, PopupColor } from '@app/interfaces/popup';
 import { I18nService } from '@app/services/i18n/i18n.service';
 import { filter } from 'rxjs/operators';
 import { POPUP_DELAY } from './popup.service.const';
@@ -42,6 +42,16 @@ export class PopupService {
         }
         this.messages.push({ ...popupMessage, message: this.i18nService.translate(popupMessage.message) });
         this.displayPopup();
+    }
+
+    showWarningPopup(message: string) {
+        const warningPopup: Popup = {
+            message,
+            hasCloseButton: true,
+            isConfirmation: false,
+            popupColor: PopupColor.Orange,
+        };
+        this.showPopup(warningPopup);
     }
 
     clearMessages() {

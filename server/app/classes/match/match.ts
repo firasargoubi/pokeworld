@@ -54,7 +54,7 @@ export class Match {
     }
 
     join(playerId: string) {
-        this.data.players.push({ ...structuredClone(DEFAULT_PLAYER_DATA), id: playerId });
+        this.data.players.push({ ...structuredClone(DEFAULT_PLAYER_DATA), id: playerId, userId: playerId });
         this.sendUpdate();
     }
 

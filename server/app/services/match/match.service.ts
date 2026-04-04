@@ -8,7 +8,6 @@ import { CombatService } from '@app/services/combat/combat.service';
 import { GameService } from '@app/services/game/game.service';
 import { PlayService } from '@app/services/play/play.service';
 import { SocialService } from '@app/services/social/social.service';
-import { UserService } from '@app/services/user/user.service';
 import { DEFAULT_MATCH_DATA, MATCH_CODE_LENGTH, MATCH_CODE_RANGE } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
 import { GameData } from '@common/interfaces/game-data';
@@ -20,7 +19,6 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 @Injectable()
 export class MatchService {
     @Inject(forwardRef(() => MatchGateway)) private matchGateway: MatchGateway;
-    @Inject(forwardRef(() => UserService)) private userService: UserService;
     @Inject(forwardRef(() => CombatService)) private combatService: CombatService;
     @Inject(forwardRef(() => PlayService)) private playService: PlayService;
     @Inject(forwardRef(() => BotService)) private botService: BotService;
@@ -63,9 +61,9 @@ export class MatchService {
         this.disconnectPlayer(playerId);
     }
 
-    async joinMatch(playerId: string, matchCode: string): Promise<MatchData | null> {
+    async joinMatch(playerId: string, matchCode: string, confirmJoinBlockedUser: boolean = false): Promise<MatchData | null> {
         let matchData = null;
-        if (await this.canJoinMatch(playerId, matchCode)) {
+        if (await this.canJoinMatch(playerId, matchCode, confirmJoinBlockedUser)) {
             const match = this.getMatch(matchCode);
             match.join(playerId);
             this.addPlayerToMatchCode(playerId, matchCode);
@@ -116,6 +114,7 @@ export class MatchService {
                 match.clearTimeout();
                 match.clearBotTimeout();
                 this.matches.delete(match.data.code);
+                this.chatService.deleteChannel(match.data.code);
             }
         }
         this.matchGateway.broadcastMatchListUpdate();
@@ -163,7 +162,12 @@ export class MatchService {
 
     async getAvailableMatches(viewerUserId: string): Promise<MatchData[]> {
         const matchesData: MatchData[] = [];
+        const joiningUserRelationships = await this.socialService.getRelationships(viewerUserId);
         for (const match of this.matches.values()) {
+            if (match.data.players.length === 0 || match.getConnectedPlayerCount() === 0) {
+                continue;
+            }
+
             const isInLobby = match.data.state === MatchState.Lobby;
             const isMatchLocked = match.data.lobbyData.isLocked;
             const isMatchFull = match.isFull();
@@ -176,12 +180,12 @@ export class MatchService {
                 continue;
             }
 
-            if (match.data.lobbyData.isFriendOnly) {
-                const joiningUserRelationships = await this.socialService.getRelationships(viewerUserId);
+            if (!this.canJoinFriendOnlyMatch(joiningUserRelationships, match) && match.data.lobbyData.isFriendOnly) {
+                continue;
+            }
 
-                if (!this.canJoinFriendOnlyMatch(joiningUserRelationships, match)) {
-                    continue;
-                }
+            if (this.isBlockedByPlayerInGame(joiningUserRelationships, match)) {
+                continue;
             }
 
             matchesData.push(match.data);
@@ -196,7 +200,7 @@ export class MatchService {
         this.matchGateway.broadcastMatchListUpdate();
     }
 
-    private async canJoinMatch(playerId: string, matchCode: string): Promise<boolean> {
+    private async canJoinMatch(playerId: string, matchCode: string, confirmJoinBlockedUser = false): Promise<boolean> {
         if (!this.hasMatchCode(matchCode)) {
             this.matchGateway.emitMessage(playerId, Message.InvalidMatchCode, true);
             return false;
@@ -208,10 +212,10 @@ export class MatchService {
         }
 
         const match = this.getMatch(matchCode);
-        return await this.evaluateMatchJoinConditions(match, playerId);
+        return await this.evaluateMatchJoinConditions(match, playerId, matchCode, confirmJoinBlockedUser);
     }
 
-    private async evaluateMatchJoinConditions(match: Match, playerId: string): Promise<boolean> {
+    private async evaluateMatchJoinConditions(match: Match, playerId: string, matchCode: string, confirmJoinBlockedUser: boolean): Promise<boolean> {
         const isInLobby = match.isState([MatchState.Lobby]);
 
         if (match.isFull()) {
@@ -232,12 +236,22 @@ export class MatchService {
 
         const joiningUserRelationships = await this.socialService.getRelationships(playerId);
 
-        if (match.data.lobbyData.isFriendOnly) {
-            const canJoinFriendOnlyMatch = this.canJoinFriendOnlyMatch(joiningUserRelationships, match);
-            if (!canJoinFriendOnlyMatch) {
-                this.matchGateway.emitMessage(playerId, Message.NotFriend, true);
-                return false;
-            }
+        const isBlockedByPlayerInGame = this.isBlockedByPlayerInGame(joiningUserRelationships, match);
+        if (isBlockedByPlayerInGame) {
+            this.matchGateway.emitMessage(playerId, Message.BlockedByPlayer, true);
+            return false;
+        }
+
+        const canJoinFriendOnlyMatch = this.canJoinFriendOnlyMatch(joiningUserRelationships, match);
+        if (!canJoinFriendOnlyMatch && match.data.lobbyData.isFriendOnly) {
+            this.matchGateway.emitMessage(playerId, Message.NotFriend, true);
+            return false;
+        }
+
+        const hasBlockedPlayerInGame = this.hasBlockedPlayerInGame(joiningUserRelationships, match);
+        if (!confirmJoinBlockedUser && hasBlockedPlayerInGame) {
+            this.matchGateway.emitMessage(playerId, Message.BlockedPlayerInLobby, true, { matchCode });
+            return false;
         }
 
         if (isDropIn && !match.hasAvailableSpawnPoint() && !this.hasDisconnectedObserver(match)) {
@@ -258,6 +272,16 @@ export class MatchService {
             return true;
         }
         return joiningUserRelationships.friends.includes(hostUserId);
+    }
+
+    private isBlockedByPlayerInGame(joiningUserRelationships: UserRelationships, match: Match): boolean {
+        return joiningUserRelationships.blockedByUsers.some((blockedByUserId) =>
+            match.data.players.some((player) => player.userId === blockedByUserId),
+        );
+    }
+
+    private hasBlockedPlayerInGame(joiningUserRelationships: UserRelationships, match: Match): boolean {
+        return joiningUserRelationships.blockedUsers.some((blockedUserId) => match.data.players.some((player) => player.userId === blockedUserId));
     }
 
     private hasDisconnectedObserver(match: Match): boolean {

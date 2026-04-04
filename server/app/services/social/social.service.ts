@@ -136,6 +136,16 @@ export class SocialService {
         return this.getRelationshipsLean(userId);
     }
 
+    async getBlockedUsers(userId: string): Promise<string[]> {
+        const relationship = await this.getRelationshipsLean(userId);
+        return relationship.blockedUsers;
+    }
+
+    async isBlockedBy(targetUserId: string, blockerUserId: string): Promise<boolean> {
+        const blockerRelationships = await this.getRelationshipsLean(blockerUserId);
+        return blockerRelationships.blockedUsers.includes(targetUserId);
+    }
+
     private async updatePairRelations(
         userId1: string,
         update1: Record<string, unknown>,

@@ -13,4 +13,5 @@ export interface ChannelMessage {
 export interface ChannelUser {
     userName: string;
     channelName: string;
+    isDedicatedChannel?: boolean;
 }

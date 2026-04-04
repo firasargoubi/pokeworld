@@ -1,8 +1,10 @@
 import { TestBed } from '@angular/core/testing';
+import { ChatTab } from '@app/interfaces/chat-tab.enum';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { UserService } from '@app/services/user/user.service';
+import { MOCK_USER_INFO } from '@common/test-consts/mock-user-info';
 import { UserInfo } from '@common/interfaces/user';
 import { BehaviorSubject } from 'rxjs';
 import { ChatService } from './chat.service';
@@ -47,6 +49,9 @@ describe('ChatService', () => {
 
     it('should send a message', () => {
         const message = 'Hello, world!';
+        service['user'] = MOCK_USER_INFO[0];
+        service.chatState.set({ activeTab: ChatTab.General, isInChannelList: true, activeChannelName: undefined, activeMatchCode: undefined });
+
         mockSocketService.emit.and.callFake(async () => Promise.resolve(false));
         service.sendMessage(message);
         expect(mockSocketService.emit).toHaveBeenCalled();

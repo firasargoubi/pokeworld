@@ -1,15 +1,11 @@
 import { Match } from '@app/classes/match/match';
 import { Channel } from '@app/model/schema/channel.schema';
-import { User } from '@app/model/schema/user.schema';
-import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ITEM_NAME } from '@common/consts/item-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { CombatData, PlayerCombatData } from '@common/interfaces/match-data';
-import { AppLanguage, AppTheme } from '@common/interfaces/preferences';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
-import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createSandbox, createStubInstance, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
@@ -21,34 +17,25 @@ describe('ChatService', () => {
     let mockMatch: SinonStubbedInstance<Match>;
     let addLogToMatchStub: SinonStub;
 
-    let defaultUser: User;
     beforeEach(async () => {
         sandbox = createSandbox();
 
         mockMatch = createStubInstance<Match>(Match);
         mockMatch.data = structuredClone(MOCK_MATCH_DATAS[0]);
-        mockMatch.data.chatData = [];
         mockMatch.data.logData = [];
 
-        defaultUser = {
-            profilePicture: 'defaultPic',
-            fullProfilePicture: 'defaultFullPic',
-            username: 'defaultUser',
-            email: 'default@example.com',
-            userId: 'defaultId',
-            passwordHash: 'defaultHash',
-            balance: 0,
-            inventory: [],
-            isLoggedIn: true,
-            deleted: false,
-            preferences: {
-                language: AppLanguage.French,
-                theme: AppTheme.Default,
-            },
-        };
-
         const module: TestingModule = await Test.createTestingModule({
-            providers: [{ provide: getModelToken(Channel.name), useValue: {} }, ChatService],
+            providers: [
+                {
+                    provide: getModelToken(Channel.name),
+                    useValue: {
+                        deleteMany: () => ({ exec: async () => null }),
+                        exists: async () => null,
+                        find: async () => [],
+                    },
+                },
+                ChatService,
+            ],
         }).compile();
 
         service = module.get<ChatService>(ChatService);
@@ -62,27 +49,6 @@ describe('ChatService', () => {
 
     it('should be defined', () => {
         expect(service).toBeDefined();
-    });
-
-    it('should add valid message to chat data', () => {
-        const messageContent = 'Test message';
-        mockMatch.getPlayer.returns(MOCK_PLAYER_DATAS[0]);
-
-        service.message(mockMatch, MOCK_PLAYER_DATAS[0].id, messageContent, defaultUser);
-
-        expect(mockMatch.data.chatData.length).toBe(1);
-        expect(mockMatch.data.chatData[0].content).toEqual(messageContent);
-        expect(mockMatch.data.chatData[0].profilePicture).toEqual(defaultUser.profilePicture);
-        expect(mockMatch.sendUpdate.calledOnce).toBe(true);
-    });
-
-    it('should reject message exceeding max length', () => {
-        const longMessage = 'A'.repeat(MAX_MESSAGE_LENGTH + 1);
-
-        service.message(mockMatch, MOCK_PLAYER_DATAS[0].id, longMessage, defaultUser);
-
-        expect(mockMatch.data.chatData.length).toBe(0);
-        expect(mockMatch.sendUpdate.called).toBe(false);
     });
 
     it('should add log with concerned players and without', () => {

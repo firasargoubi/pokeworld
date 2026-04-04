@@ -40,7 +40,6 @@ export const DEFAULT_MATCH_DATA: MatchData = {
     combatData: structuredClone(DEFAULT_COMBAT_DATA),
     trackingData: structuredClone(DEFAULT_TRACKING_DATA),
     players: [],
-    chatData: [],
     logData: [],
 };
 

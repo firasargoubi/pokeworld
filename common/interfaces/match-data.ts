@@ -1,4 +1,4 @@
-import { ChatLog, ChatMessage } from './chat-message';
+import { ChatLog } from './chat-message';
 import { GameData } from './game-data';
 import { PlayerData, PlayerType } from './player-data';
 import { Position } from './position';
@@ -14,7 +14,6 @@ export interface MatchData {
     combatData: CombatData;
     trackingData: TrackingData;
     players: PlayerData[];
-    chatData: ChatMessage[];
     logData: ChatLog[];
 }
 

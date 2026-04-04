@@ -8,6 +8,9 @@ export class Channel {
     @Prop({ required: true, unique: true })
     name: string;
 
+    @Prop({ default: false })
+    isDedicatedChannel: boolean;
+
     @Prop({ type: [String], default: [] })
     membersUsernames: string[];
 }

@@ -21,4 +21,6 @@ export enum Message {
     DropInDisabled = 'server.messages.dropInDisabled',
     NoAvailableSpawn = 'server.messages.NoAvailableSpawn',
     NotFriend = 'server.messages.notFriend',
+    BlockedByPlayer = 'server.messages.blockedByPlayer',
+    BlockedPlayerInLobby = 'server.messages.blockedPlayerInLobby',
 }
