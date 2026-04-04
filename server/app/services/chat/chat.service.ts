@@ -1,11 +1,9 @@
 import { Match } from '@app/classes/match/match';
 import { Channel as ChannelDoc, ChannelDocument } from '@app/model/schema/channel.schema';
-import { User } from '@app/model/schema/user.schema';
-import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ITEM_NAME } from '@common/consts/item-data.const';
 import { RESERVED_CHANNEL_NAMES } from '@common/consts/reserved-channel-names.const';
 import { Channel } from '@common/interfaces/channel';
-import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
+import { ChatLog } from '@common/interfaces/chat-message';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { PlayerCombatData } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
@@ -17,16 +15,20 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class ChatService {
-    constructor(@InjectModel(ChannelDoc.name) private channelModel: Model<ChannelDocument>) {}
+    constructor(@InjectModel(ChannelDoc.name) private channelModel: Model<ChannelDocument>) {
+        this.channelModel.deleteMany({ name: { $regex: '^\\d{4}$' } }).exec();
+    }
 
-    async createChannel(channelName: string, userName: string): Promise<Channel | null> {
+    async createChannel(channelName: string, userName: string, isDedicatedChannel: boolean = false): Promise<Channel | null> {
         if (!channelName) return null;
 
+        channelName = channelName.trim();
         const isNameTaken = await this.channelModel.exists({ name: channelName });
         const channelNameIsNotAllowed = RESERVED_CHANNEL_NAMES.includes(channelName.toLowerCase());
-        if (isNameTaken || channelNameIsNotAllowed) return null;
+        const forbiddenCharactersRegex = /^\d{4}$/.test(channelName);
+        if (isNameTaken || ((channelNameIsNotAllowed || forbiddenCharactersRegex) && !isDedicatedChannel)) return null;
 
-        const newChannel = new this.channelModel({ name: channelName, membersUsernames: [userName] });
+        const newChannel = new this.channelModel({ name: channelName, membersUsernames: [userName], isDedicatedChannel });
         const savedChannel = await newChannel.save();
         return { name: savedChannel.name, membersUsernames: savedChannel.membersUsernames };
     }
@@ -56,21 +58,8 @@ export class ChatService {
     }
 
     async getChannels(): Promise<Channel[]> {
-        const channels = await this.channelModel.find().lean().exec();
+        const channels = await this.channelModel.find({ isDedicatedChannel: false }).lean().exec();
         return channels.map((channel) => ({ name: channel.name, membersUsernames: channel.membersUsernames }));
-    }
-
-    message(match: Match, playerId: string, message: string, user: User | null) {
-        if (message.length <= MAX_MESSAGE_LENGTH) {
-            const chatMessage: ChatMessage = {
-                content: message,
-                profilePicture: user ? user.profilePicture : null,
-                sender: match.getPlayer(playerId).name,
-                timestamp: new Date(),
-            };
-            match.data.chatData.push(chatMessage);
-            match.sendUpdate();
-        }
     }
 
     logItemPickup(match: Match, name: string, itemType: ItemType) {

@@ -60,7 +60,7 @@ describe('MatchGateway', () => {
     it('should call join match on join match event', () => {
         const matchCode = '1234';
         mockUserService.getUserId.returns('user123');
-        gateway.joinMatch(mockSocket, matchCode);
+        gateway.joinMatch(mockSocket, { matchCode, confirmJoinBlockedUser: false });
         expect(mockMatchService.joinMatch.calledWith('user123', matchCode)).toBeTruthy();
     });
 
@@ -88,7 +88,7 @@ describe('MatchGateway', () => {
     it('should not join a match when the socket is not associated to a user', async () => {
         mockUserService.getUserId.returns(undefined);
 
-        const result = await gateway.joinMatch(mockSocket, '1234');
+        const result = await gateway.joinMatch(mockSocket, { matchCode: '1234', confirmJoinBlockedUser: false });
 
         expect(result).toBeNull();
         expect(mockMatchService.joinMatch.called).toBeFalsy();

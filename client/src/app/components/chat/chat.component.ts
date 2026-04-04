@@ -180,7 +180,6 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     }
 
     private updateChatData(): void {
-        this.chatMessages = this.matchService.data.chatData;
         this.filterLogs();
         this.shouldScrollToBottom = true;
     }
@@ -207,19 +206,8 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
         if (!message) return;
 
         input.value = '';
-        const state = this.chatService.chatState();
 
-        switch (state.activeTab) {
-            case ChatTab.General:
-                this.chatService.sendGeneralMessage(message);
-                break;
-            case ChatTab.Match:
-                this.chatService.sendMessage(message);
-                break;
-            case ChatTab.Channels:
-                if (state.activeChannelName) this.chatService.sendChannelMessage(state.activeChannelName, message);
-                break;
-        }
+        this.chatService.sendMessage(message);
 
         this.shouldScrollToBottom = true;
     }

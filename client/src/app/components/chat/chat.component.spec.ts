@@ -21,11 +21,6 @@ describe('ChatComponent', () => {
     let scrollToBottomSpy: jasmine.Spy;
     let mockAudioService: jasmine.SpyObj<AudioService>;
 
-    const mockChatData = [
-        { sender: 'Player1', content: 'Hello', timestamp: new Date() },
-        { sender: 'Player2', content: 'Hi there', timestamp: new Date() },
-    ];
-
     const mockLogData: ChatLog[] = [
         { sender: 'System', content: 'Player1 joined the game', timestamp: new Date(), concernedPlayersNamesList: ['Player1'] },
         { sender: 'System', content: 'Player2 joined the game', timestamp: new Date(), concernedPlayersNamesList: ['Player2'] },
@@ -47,7 +42,6 @@ describe('ChatComponent', () => {
 
         matchServiceSpy = jasmine.createSpyObj('MatchService', [], {
             data: {
-                chatData: mockChatData,
                 logData: mockLogData,
             },
             selfPlayer: { name: 'Player1' },
@@ -144,18 +138,6 @@ describe('ChatComponent', () => {
         component.sendMessage(event);
 
         expect(chatServiceSpy.sendMessage).not.toHaveBeenCalled();
-    });
-
-    it('should update chat messages and logs from match service', () => {
-        component['updateChatData']();
-
-        expect(component.chatMessages).toEqual(mockChatData);
-        expect(component.logs.length).toBe(2);
-        expect(scrollToBottomSpy).toHaveBeenCalled();
-
-        chatServiceSpy.isFilterEnabled.set(true);
-        component['updateChatData']();
-        expect(component.logs.length).toBe(1);
     });
 
     it('should filter logs based on player name when filter is enabled', () => {

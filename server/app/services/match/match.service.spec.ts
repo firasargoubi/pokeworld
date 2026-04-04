@@ -43,6 +43,8 @@ describe('MatchService', () => {
         mockGameService = createStubInstance<GameService>(GameService);
         mockUserService = createStubInstance<UserService>(UserService);
         mockSocialService = createStubInstance<SocialService>(SocialService);
+        mockUserService = createStubInstance<UserService>(UserService);
+        mockSocialService = createStubInstance<SocialService>(SocialService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -53,6 +55,8 @@ describe('MatchService', () => {
                 { provide: BotService, useValue: mockBotService },
                 { provide: ChatService, useValue: mockChatService },
                 { provide: GameService, useValue: mockGameService },
+                { provide: UserService, useValue: mockUserService },
+                { provide: SocialService, useValue: mockSocialService },
                 { provide: UserService, useValue: mockUserService },
                 { provide: SocialService, useValue: mockSocialService },
             ],
@@ -316,6 +320,16 @@ describe('MatchService', () => {
         mockMatch.hasAvailableSpawnPoint.returns(false);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getMatch').returns(mockMatch);
+        mockSocialService.getRelationships.returns(
+            Promise.resolve({
+                userId: playerId,
+                friends: [],
+                pendingRequestsSent: [],
+                pendingRequestsReceived: [],
+                blockedUsers: [],
+                blockedByUsers: [],
+            }),
+        );
         const canJoin = await service['canJoinMatch'](playerId, mockMatch.data.code);
         expect(canJoin).toBe(false);
         expect(mockMatchGateway.emitMessage.calledWith(playerId, Message.NoAvailableSpawn, true)).toBe(true);
@@ -335,6 +349,16 @@ describe('MatchService', () => {
         mockMatch.data.players = [{ ...structuredClone(MOCK_PLAYER_DATAS[0]), isConnected: false, isObserver: true }];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getMatch').returns(mockMatch);
+        mockSocialService.getRelationships.returns(
+            Promise.resolve({
+                userId: playerId,
+                friends: [],
+                pendingRequestsSent: [],
+                pendingRequestsReceived: [],
+                blockedUsers: [],
+                blockedByUsers: [],
+            }),
+        );
         const canJoin = await service['canJoinMatch'](playerId, mockMatch.data.code);
 
         expect(canJoin).toBe(true);
@@ -370,6 +394,18 @@ describe('MatchService', () => {
         mockGameService.findGame.returns(Promise.resolve(game));
         const canCreate = await service['canCreateMatch'](playerId, game);
         expect(canCreate).toBe(true);
+    });
+
+    it('is match locked should return true if match is locked', () => {
+        mockMatch.data.lobbyData.isLocked = true;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        sandbox.stub(service as any, 'getMatch').returns(mockMatch);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
+        const match = (service as any).getMatch(mockMatch.data.code) as Match;
+        const isLocked = !!match.data.lobbyData.isLocked;
+
+        expect(isLocked).toBe(true);
     });
 
     it('get match should return the match for the given code', () => {

@@ -23,6 +23,7 @@ export enum PopupMessage {
     DeleteAccountConfirmation = 'popup.deleteAccountConfirmation',
     UnauthorizedAccessToGame = 'popup.unauthorizedAccessToGame',
     ConfirmBlockUser = 'popup.confirmBlockUser',
+    FourLetterChannelNameWarning = 'popup.fourLetterChannelNameWarning',
 }
 
 export const KEYWORDS_TO_REPLACE = ['debug'];

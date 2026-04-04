@@ -21,6 +21,7 @@ export class ChatService {
         activeTab: ChatTab.Channels,
         isInChannelList: true,
         activeChannelName: undefined,
+        activeMatchCode: undefined,
     });
     channels = signal<Channel[]>([]);
     isFilterEnabled = signal(false);
@@ -31,6 +32,10 @@ export class ChatService {
     activeChannelMessages = computed(() => {
         const name = this.chatState().activeChannelName;
         return name ? this.channelMessages()[name] ?? [] : [];
+    });
+    activeMatchMessages = computed(() => {
+        const activeMatchCode = this.chatState().activeMatchCode;
+        return this.channelMessages()[activeMatchCode ?? ''] ?? [];
     });
     generalMessages$: Observable<ChatMessage[]>;
     channelMessages$: Observable<Record<string, ChatMessage[]>>;
@@ -77,6 +82,10 @@ export class ChatService {
         return !!channel && channel.membersUsernames.includes(username);
     }
 
+    setActiveMatchCode(matchCode: string | undefined): void {
+        this.chatState.update((state) => ({ ...state, activeMatchCode: matchCode }));
+    }
+
     switchTab(tab: ChatTab): void {
         this.chatState.update((state) => ({ ...state, activeTab: tab }));
     }
@@ -89,27 +98,29 @@ export class ChatService {
         if (!channelName || !this.isInChannel(channelName)) {
             return;
         }
-        this.chatState.update(() => ({
+        this.chatState.update((state) => ({
+            ...state,
             activeTab: ChatTab.Channels,
             isInChannelList: false,
             activeChannelName: channelName,
         }));
     }
 
-    createChannel(channelName: string): void {
+    createChannel(channelName: string, isDedicatedChannel: boolean = false): void {
         const username = this.user?.username;
         if (!username) return;
-        const channelNameIsNotAllowed = RESERVED_CHANNEL_NAMES.includes(channelName.toLowerCase());
-        const channelExists = this.channels().some((channel) => channel.name === channelName);
-        if (channelExists || channelNameIsNotAllowed) {
-            this.popupService.showPopup({
-                message: PopupMessage.NameAlreadyExists,
-                hasCloseButton: true,
-                isConfirmation: false,
-            });
+        const forbiddenCharactersRegex = /^\d{4}$/.test(channelName);
+        if (forbiddenCharactersRegex && !isDedicatedChannel) {
+            this.popupService.showWarningPopup(PopupMessage.FourLetterChannelNameWarning);
             return;
         }
-        const channelUser: ChannelUser = { channelName, userName: username };
+        const channelNameIsNotAllowed = RESERVED_CHANNEL_NAMES.includes(channelName.toLowerCase());
+        const channelExists = this.channels().some((channel) => channel.name === channelName);
+        if (channelExists || (channelNameIsNotAllowed && !isDedicatedChannel)) {
+            this.popupService.showWarningPopup(PopupMessage.NameAlreadyExists);
+            return;
+        }
+        const channelUser: ChannelUser = { channelName, userName: username, isDedicatedChannel };
         this.socketService.emit(ChatEvent.CreateChannel, channelUser, (channel: Channel) => {
             if (channel) {
                 this.openChannel(channel.name);
@@ -127,6 +138,11 @@ export class ChatService {
         const username = this.user?.username;
         if (!username) return;
         if (this.chatState().activeChannelName === channelName) this.showChannelList();
+        this.channelMessages.update((channel) => {
+            const updated = { ...channel };
+            delete updated[channelName];
+            return updated;
+        });
         this.socketService.emit(ChatEvent.LeaveChannel, { channelName, userName: username } as ChannelUser);
     }
 
@@ -138,10 +154,6 @@ export class ChatService {
     }
 
     sendMessage(message: string): void {
-        this.socketService.emit(ChatEvent.Message, message);
-    }
-
-    sendGeneralMessage(message: string): void {
         const username = this.user?.username;
         if (!username) {
             return;
@@ -152,26 +164,22 @@ export class ChatService {
             timestamp: new Date(),
             profilePicture: this.user ? this.user.profilePicture : null,
         };
-        this.socketService.emit(ChatEvent.GeneralMessage, chatMessage);
-    }
-
-    sendChannelMessage(channelName: string, message: string): void {
-        const isSendingToActiveChannel = this.chatState().activeChannelName === channelName;
-        if (!isSendingToActiveChannel || !this.isInChannel(channelName)) {
-            return;
+        let channelName = '';
+        switch (this.chatState().activeTab) {
+            case ChatTab.General:
+                this.socketService.emit(ChatEvent.GeneralMessage, chatMessage);
+                break;
+            case ChatTab.Channels:
+                channelName = this.activeChannelName();
+                if (!channelName || !this.isInChannel(channelName)) return;
+                this.socketService.emit(ChatEvent.ChannelMessage, { channelName, message: chatMessage });
+                break;
+            case ChatTab.Match:
+                channelName = this.chatState().activeMatchCode ?? '';
+                if (!channelName) return;
+                this.socketService.emit(ChatEvent.ChannelMessage, { channelName, message: chatMessage });
+                break;
         }
-        const username = this.user?.username;
-        if (!username) {
-            return;
-        }
-        const chatMessage: ChatMessage = {
-            sender: username,
-            content: message,
-            timestamp: new Date(),
-            profilePicture: this.user ? this.user.profilePicture : null,
-        };
-        const channelMessage: ChannelMessage = { channelName, message: chatMessage };
-        this.socketService.emit(ChatEvent.ChannelMessage, channelMessage);
     }
 
     joinAllChannels(): void {

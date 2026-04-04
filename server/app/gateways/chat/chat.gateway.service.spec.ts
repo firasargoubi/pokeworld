@@ -1,6 +1,7 @@
 import { Match } from '@app/classes/match/match';
 import { ChatService } from '@app/services/chat/chat.service';
 import { MatchService } from '@app/services/match/match.service';
+import { SocialService } from '@app/services/social/social.service';
 import { UserService } from '@app/services/user/user.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStub, SinonStubbedInstance, createStubInstance, stub } from 'sinon';
@@ -22,6 +23,7 @@ describe('LobbyGateway', () => {
         mockChatService = createStubInstance<ChatService>(ChatService);
         mockMatchService = createStubInstance<MatchService>(MatchService);
         mockUserService = createStubInstance<UserService>(UserService);
+        const mockSocialService = createStubInstance<SocialService>(SocialService);
         mockServer = createStubInstance<Server>(Server);
         emitStub = stub();
         mockMatch = createStubInstance<Match>(Match);
@@ -33,6 +35,7 @@ describe('LobbyGateway', () => {
                 { provide: MatchService, useValue: mockMatchService },
                 { provide: ChatService, useValue: mockChatService },
                 { provide: UserService, useValue: mockUserService },
+                { provide: SocialService, useValue: mockSocialService },
                 { provide: Server, useValue: mockServer },
             ],
         }).compile();
@@ -48,14 +51,5 @@ describe('LobbyGateway', () => {
 
     it('should be defined', () => {
         expect(gateway).toBeDefined();
-    });
-
-    it('should handle new message successfully', () => {
-        const testMessage = 'Hello world';
-
-        gateway.message(mockSocket, testMessage);
-
-        expect(mockMatchService.getMatchFromPlayerId.calledWith(mockSocket.id)).toBe(true);
-        expect(mockChatService.message.calledWith(mockMatch, mockSocket.id, testMessage)).toBe(true);
     });
 });

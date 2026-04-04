@@ -106,7 +106,7 @@
                 </div>
                 }
             </div>
-            } @else { @for (message of chatService.activeChannelMessages(); track message.timestamp) {
+            } @else { @for (message of chatService.activeChannelMessages(); track $index) {
             <p class="messages">
                 <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
                 @if(message.profilePicture){
@@ -128,7 +128,7 @@
                 } <span class="message-content sender">{{ message.sender }}: </span>
                 <span class="message-content message">{{ message.content }}</span>
             </p>
-            } } @case (chatTab.Match) { @for (message of chatMessages; track $index) {
+            } } @case (chatTab.Match) { @for (message of chatService.activeMatchMessages(); track $index) {
             <p class="messages">
                 <span class="message-content timestamp">[{{ message.timestamp | date: 'HH:mm:ss' }}] </span>
                 @if(message.profilePicture){

@@ -37,7 +37,15 @@ describe('MatchService', () => {
         mapServiceSpy = jasmine.createSpyObj('MapService', ['startMatch', 'setPlayers', 'clearOverlays']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'keepMessages', 'clearMessages']);
         routerSpy = jasmine.createSpyObj('Router', ['navigate'], { events: { subscribe: () => ({}) } });
-        chatServiceSpy = jasmine.createSpyObj('ChatService', ['sendMessage', 'sendGeneralMessage', 'isChatActive', 'isFilterEnabled', 'switchTab']);
+        chatServiceSpy = jasmine.createSpyObj('ChatService', [
+            'sendMessage',
+            'sendGeneralMessage',
+            'isChatActive',
+            'isFilterEnabled',
+            'switchTab',
+            'leaveChannel',
+            'setActiveMatchCode',
+        ]);
         chatServiceSpy.isFilterEnabled = jasmine.createSpyObj('signal', ['get', 'set']);
         i18nServiceSpy = jasmine.createSpyObj('I18nService', ['translate']);
         i18nServiceSpy.translate.and.callFake((message: string) => message);
@@ -80,7 +88,7 @@ describe('MatchService', () => {
     it('join match should emit join match event', () => {
         const matchCode = 'testCode';
         service.joinMatch(matchCode);
-        expect(socketServiceSpy.emit).toHaveBeenCalledWith(MatchEvent.JoinMatch, matchCode, jasmine.any(Function));
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(MatchEvent.JoinMatch, { matchCode, confirmJoinBlockedUser: false }, jasmine.any(Function));
     });
 
     it('is active player should return true if self is active', () => {

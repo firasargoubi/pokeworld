@@ -32,10 +32,10 @@ export class MatchService {
     selfPlayer: PlayerData = structuredClone(DEFAULT_PLAYER_DATA);
     data: MatchData = structuredClone(DEFAULT_MATCH_DATA);
     private socketService: SocketService = inject(SocketService);
+    private chatService: ChatService = inject(ChatService);
     private gameDataService: GameDataService = inject(GameDataService);
     private mapService: MapService = inject(MapService);
     private popupService: PopupService = inject(PopupService);
-    private chatService: ChatService = inject(ChatService);
     private i18nService: I18nService = inject(I18nService);
     private userService: UserService = inject(UserService);
     private router: Router = inject(Router);
@@ -49,11 +49,23 @@ export class MatchService {
     }
 
     async createMatch(gameData: GameData): Promise<boolean> {
-        return await this.socketService.emit(MatchEvent.CreateMatch, gameData, this.onMatchJoined.bind(this));
+        const matchCreated = await this.socketService.emit(MatchEvent.CreateMatch, gameData, this.onMatchJoined.bind(this));
+        if (matchCreated) {
+            this.chatService.createChannel(this.data.code, true);
+            this.chatService.setActiveMatchCode(this.data.code);
+        }
+        return matchCreated;
     }
 
-    async joinMatch(matchCode: string): Promise<boolean> {
-        return await this.socketService.emit(MatchEvent.JoinMatch, matchCode, this.onMatchJoined.bind(this));
+    async joinMatch(matchCode: string, confirmJoinBlockedUser: boolean = false): Promise<boolean> {
+        const payload = { matchCode, confirmJoinBlockedUser };
+        const matchJoined = await this.socketService.emit(MatchEvent.JoinMatch, payload, this.onMatchJoined.bind(this));
+        if (matchJoined) {
+            this.chatService.joinChannel(matchCode);
+            this.chatService.setActiveMatchCode(matchCode);
+        }
+
+        return matchJoined;
     }
 
     leaveMatch() {
@@ -150,6 +162,23 @@ export class MatchService {
             messageParams.team = this.i18nService.translate(messageParams.team);
         }
         const translatedMessage = this.i18nService.translate(messageFromServer.message, messageParams);
+
+        if (messageFromServer.message === Message.BlockedPlayerInLobby) {
+            this.popupService.showPopup({
+                message: translatedMessage,
+                hasCloseButton: true,
+                isConfirmation: true,
+                popupColor: PopupColor.Orange,
+                action: () => {
+                    const requestedMatchCode = messageFromServer.messageParams?.matchCode as string;
+                    if (requestedMatchCode) {
+                        this.joinMatch(requestedMatchCode, true);
+                    }
+                },
+            });
+            return;
+        }
+
         this.popupService.showPopup({
             message: translatedMessage,
             hasCloseButton: messageFromServer.hasCloseButton,
@@ -189,6 +218,8 @@ export class MatchService {
         this.mapService.clearOverlays();
         this.chatService.switchTab(ChatTab.Channels);
         this.chatService.isFilterEnabled.set(false);
+        this.chatService.leaveChannel(this.data.code);
+        this.chatService.setActiveMatchCode(undefined);
         this.matchUpdate.next(this.data);
     }
 }

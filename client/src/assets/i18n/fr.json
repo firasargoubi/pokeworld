@@ -24,7 +24,8 @@
         "deleteAccountConfirmation": "Voulez-vous vraiment supprimer votre compte ?",
         "noWinner": "Aucun gagnant",
         "unauthorizedAccessToGame": "Ce jeu n'est plus accessible en raison d'un changement de son etat",
-        "confirmBlockUser": "Êtes-vous sûr de vouloir bloquer cet utilisateur ? Vous ne pourrez plus interagir avec lui."
+        "confirmBlockUser": "Êtes-vous sûr de vouloir bloquer cet utilisateur ? Vous ne pourrez plus interagir avec lui.",
+        "fourLetterChannelNameWarning": "Le nom du canal ne doit pas être une combinaison de 4 chiffres"
     },
     "teams": {
         "red": "Rouge",
@@ -53,7 +54,9 @@
             "playerLeftMatch": "{{playerName}} a quitté la partie",
             "dropInDisabled": "Le drop-in est désactivé pour cette partie",
             "NoAvailableSpawn": "Aucun point d'apparition n'est disponible pour le moment",
-            "notFriend": "Vous ne pouvez pas rejoindre cette partie car elle est réservée aux amis et vous n'êtes pas ami avec l'hôte"
+            "notFriend": "Vous ne pouvez pas rejoindre cette partie car elle est réservée aux amis et vous n'êtes pas ami avec l'hôte",
+            "blockedByPlayer": "Un joueur dans la salle vous a bloqué, vous ne pouvez pas rejoindre.",
+            "blockedPlayerInLobby": "Un joueur que vous avez bloqué est déjà dans la salle, voulez-vous continuer ?"
         },
         "logs": {
             "itemPickup": "{{playerName}} a ramassé {{itemName}}",

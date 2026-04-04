@@ -26,12 +26,14 @@ export class MatchGateway {
     }
 
     @SubscribeMessage(MatchEvent.JoinMatch)
-    async joinMatch(socket: Socket, matchCode: string): Promise<MatchData | null> {
+    async joinMatch(socket: Socket, payload: { matchCode: string; confirmJoinBlockedUser?: boolean }): Promise<MatchData | null> {
         const playerId = this.userService.getUserId(socket.id);
         if (!playerId) {
             return null;
         }
-        return await this.matchService.joinMatch(playerId, matchCode);
+        const matchCode = payload.matchCode;
+        const confirmJoinBlockedUser = payload.confirmJoinBlockedUser ?? true;
+        return await this.matchService.joinMatch(playerId, matchCode, confirmJoinBlockedUser);
     }
 
     @SubscribeMessage(MatchEvent.LeaveMatch)
@@ -55,11 +57,8 @@ export class MatchGateway {
     @SubscribeMessage(JoinPageEvent.JoinRoom)
     async handleJoinRoom(socket: Socket) {
         socket.join(JoinPageEvent.Room);
-        const playerId = this.userService.getUserId(socket.id);
-        if (!playerId) {
-            return null;
-        }
-        const matches = await this.matchService.getAvailableMatches(playerId);
+        const userId = this.userService.getUserId(socket.id);
+        const matches = await this.matchService.getAvailableMatches(userId);
         socket.emit(JoinPageEvent.UpdateMatchList, matches);
     }
 

@@ -1,7 +1,7 @@
-import { User } from '@app/model/schema/user.schema';
 import { ChatService } from '@app/services/chat/chat.service';
-import { MatchService } from '@app/services/match/match.service';
+import { SocialService } from '@app/services/social/social.service';
 import { UserService } from '@app/services/user/user.service';
+import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { Channel, ChannelMessage, ChannelUser } from '@common/interfaces/channel';
 import { ChatMessage } from '@common/interfaces/chat-message';
 import { ChatEvent } from '@common/interfaces/socket-event.enum';
@@ -13,39 +13,28 @@ import { Server, Socket } from 'socket.io';
 @Injectable()
 export class ChatGateway {
     @WebSocketServer() private server: Server;
-    @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
     @Inject(forwardRef(() => ChatService)) private readonly chatService: ChatService;
     @Inject(forwardRef(() => UserService)) private readonly userService: UserService;
-
-    @SubscribeMessage(ChatEvent.Message)
-    async message(socket: Socket, message: string) {
-        const userId = this.userService.getUserId(socket.id);
-        const match = this.matchService.getMatchFromPlayerId(userId);
-        let user: User | null = null;
-        if (userId) {
-            user = await this.userService.getUserById(userId);
-        }
-        if (match) {
-            this.chatService.message(match, userId, message, user);
-        }
-    }
+    @Inject(forwardRef(() => SocialService)) private readonly socialService: SocialService;
 
     @SubscribeMessage(ChatEvent.GeneralMessage)
-    generalMessage(socket: Socket, chatMessage: ChatMessage) {
+    async generalMessage(socket: Socket, chatMessage: ChatMessage) {
         const chatMessageToSend: ChatMessage = {
             sender: chatMessage.sender,
             content: chatMessage.content,
             profilePicture: chatMessage.profilePicture || null,
             timestamp: new Date(),
         };
-        this.server.emit(ChatEvent.GeneralMessage, chatMessageToSend);
+
+        await this.emitWithBlockFilter(socket.id, ChatEvent.GeneralMessage, chatMessageToSend);
     }
 
     @SubscribeMessage(ChatEvent.CreateChannel)
     async createChannel(socket: Socket, channelUser: ChannelUser): Promise<Channel> {
         const channelName = channelUser.channelName;
         const userName = channelUser.userName;
-        const channel = await this.chatService.createChannel(channelName, userName);
+        const isDedicatedChannel = channelUser.isDedicatedChannel;
+        const channel = await this.chatService.createChannel(channelName, userName, isDedicatedChannel);
         if (!channel) {
             return null;
         }
@@ -86,11 +75,25 @@ export class ChatGateway {
     }
 
     @SubscribeMessage(ChatEvent.ChannelMessage)
-    channelMessage(socket: Socket, data: ChannelMessage): void {
-        this.server.to(data.channelName).emit(ChatEvent.ChannelMessage, data);
+    async channelMessage(socket: Socket, data: ChannelMessage): Promise<void> {
+        if (data.message.content.trim().length > MAX_MESSAGE_LENGTH) return;
+        await this.emitWithBlockFilter(socket.id, ChatEvent.ChannelMessage, data, data.channelName);
     }
 
     async handleConnection(socket: Socket): Promise<void> {
         socket.emit(ChatEvent.ChannelUpdate, await this.chatService.getChannels());
+    }
+
+    private async emitWithBlockFilter(senderSocketId: string, event: string, data: ChannelMessage | ChatMessage, room?: string): Promise<void> {
+        const senderId = this.userService.getUserId(senderSocketId);
+        const relationships = senderId ? await this.socialService.getRelationships(senderId) : null;
+        const blocked = relationships ? [...relationships.blockedUsers, ...relationships.blockedByUsers] : [];
+
+        for (const [, socket] of this.server.sockets.sockets) {
+            if (room && !socket.rooms.has(room)) continue;
+            const userId = this.userService.getUserId(socket.id);
+            if (blocked.includes(userId)) continue;
+            socket.emit(event, data);
+        }
     }
 }

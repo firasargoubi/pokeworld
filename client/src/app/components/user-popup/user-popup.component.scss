@@ -227,8 +227,9 @@ $shop-button-background: linear-gradient(
     width: 100%;
     flex: 1;
     overflow-y: auto;
-    scrollbar-width: thin;
     position: relative;
+    padding-right: calc($base-size * 1);
+    scrollbar-color: rgba(255, 255, 255, 0.6) transparent;
 }
 
 .friend-item {
@@ -457,6 +458,7 @@ $shop-button-background: linear-gradient(
     gap: calc($base-size * 1);
     flex: 1;
     height: 100%;
+    align-items: center;
 }
 
 .card-body .header-buttons .button-container {
@@ -485,6 +487,7 @@ $shop-button-background: linear-gradient(
     gap: $base-size;
     flex-shrink: 1;
     height: 80%;
+    overflow: visible;
 }
 
 .back-button .button-icon {
@@ -542,10 +545,16 @@ $shop-button-background: linear-gradient(
     filter: invert(0) !important;
 }
 
-.is-active {
-    scale: 0.9;
-    opacity: 0.8;
+.card-body .friend-buttons .is-active {
+    scale: 1.2;
+    opacity: 1;
     pointer-events: none;
+    filter: brightness(1);
+}
+
+.friend-buttons .button-container {
+    opacity: 0.5;
+    filter: brightness(0.4);
 }
 
 .card-body .card-infos-container {
@@ -768,9 +777,9 @@ $shop-button-background: linear-gradient(
     background: transparent;
     background-color: #b1e0f4;
     border: $corner-unit solid #5c93cb;
-    clip-path: $pixel-corners-clip-path;
     outline: none;
     font-family: $font-family;
+    clip-path: $pixel-corners-clip-path;
 }
 
 .card-back .update-container .button-container {

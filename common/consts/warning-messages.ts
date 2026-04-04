@@ -12,5 +12,7 @@ export const WARNING_MESSAGES: string[] = [
     Message.LockedFromLobby,
     Message.LastPlayerRemaining,
     Message.RoomLocked,
-    Message.NotLocked
+    Message.NotLocked,
+    Message.BlockedByPlayer,
+    Message.BlockedPlayerInLobby,
 ];

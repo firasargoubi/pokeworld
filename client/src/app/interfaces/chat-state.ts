@@ -4,4 +4,5 @@ export interface ChatState {
     activeTab: ChatTab;
     isInChannelList?: boolean;
     activeChannelName?: string;
+    activeMatchCode?: string;
 }
