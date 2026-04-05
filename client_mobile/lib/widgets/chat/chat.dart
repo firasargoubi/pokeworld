@@ -49,6 +49,14 @@ class _ChatState extends State<Chat> {
 
   List<ChatMessage> get _currentMessages => _selectedChannel == ChatChannel.General ? _generalMessages : _matchMessages;
 
+  void _updateMatchMessages() {
+    final messages = _chatService.activeMatchMessages;
+    setState(() => _matchMessages = messages);
+    if (_selectedChannel == ChatChannel.Match) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    }
+  }
+
   void _toggleCompact() {
     setState(() => _isCompact = !_isCompact);
     AudioService().playSoundEffect(SoundEffect.Select.path);
@@ -61,7 +69,7 @@ class _ChatState extends State<Chat> {
     super.initState();
 
     _generalMessages = _chatService.allMessages;
-    _matchMessages = _chatService.matchMessages;
+    _matchMessages = _chatService.activeMatchMessages;
 
     _generalSubscription = _chatService.generalMessagesStream.listen((messages) {
       setState(() => _generalMessages = messages);
@@ -71,10 +79,7 @@ class _ChatState extends State<Chat> {
     });
 
     _matchSubscription = _chatService.matchMessagesStream.listen((messages) {
-      setState(() => _matchMessages = messages);
-      if (_selectedChannel == ChatChannel.Match) {
-        WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
-      }
+      _updateMatchMessages();
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
