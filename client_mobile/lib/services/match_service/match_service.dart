@@ -16,6 +16,7 @@ import '../../models/popup_message.dart';
 import '../../models/socket_event.dart';
 import '../../pages/character_page/character_page.dart';
 import '../../pages/home_page/home_page.dart';
+import '../chat_service/chat_service.dart';
 import '../i18n_service/i18n_service.dart';
 import '../navigation_service/navigation_service.dart';
 import '../popup_service/popup_service.dart';
@@ -33,6 +34,7 @@ class MatchService {
   late final SocketService _socketService;
   final UserService _userService = UserService();
   final PopupService _popupService = PopupService();
+  final ChatService _chatService = ChatService();
   bool _listenersInitialized = false;
   MatchData? _matchData = GET_DEFAULT_MATCH_DATA();
   PlayerData? _selfPlayer = DEFAULT_PLAYER_DATA;
@@ -88,9 +90,14 @@ class MatchService {
     });
   }
 
-  void joinMatch(String matchCode) {
-    _socketService.emit(MatchEvent.JoinMatch.value, matchCode, (payload) {
-      onMatchJoin(payload);
+  void joinMatch(String matchCode, {bool confirmJoinBlockedUser = false}) {
+    final payload = {'matchCode': matchCode, 'confirmJoinBlockedUser': confirmJoinBlockedUser};
+    _socketService.emit(MatchEvent.JoinMatch.value, payload, (response) {
+      onMatchJoin(response);
+      if (_matchData != null) {
+        _chatService.joinChannel(_matchData!.code);
+        _chatService.setActiveMatchCode(_matchData!.code);
+      }
     });
   }
 
@@ -98,6 +105,10 @@ class MatchService {
     _onCreateMatchSuccess = onSuccess;
     _socketService.emit(MatchEvent.CreateMatch.value, gameData, (payload) {
       onMatchJoin(payload);
+      if (_matchData != null) {
+        _chatService.createChannel(_matchData!.code, isDedicatedChannel: true);
+        _chatService.setActiveMatchCode(_matchData!.code);
+      }
     });
   }
 
@@ -209,9 +220,14 @@ class MatchService {
   }
 
   void resetMatchData() {
+    final oldCode = _matchData?.code;
     _selfIndex = DEFAULT_SELF_INDEX;
     _matchData = GET_DEFAULT_MATCH_DATA();
     _selfPlayer = DEFAULT_PLAYER_DATA;
+    if (oldCode != null && oldCode.isNotEmpty) {
+      _chatService.leaveChannel(oldCode);
+    }
+    _chatService.setActiveMatchCode(null);
     _matchUpdateController.add(_matchData!);
   }
 

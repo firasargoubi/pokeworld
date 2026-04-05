@@ -12,6 +12,16 @@ Map<String, dynamic> buildMessageJson({String sender = 'Alice', String content =
   'timestamp': '2024-01-01T00:00:00.000',
 };
 
+Map<String, dynamic> buildChannelMessageJson({String channelName = 'test-channel', String content = 'Hello'}) => {
+  'channelName': channelName,
+  'message': buildMessageJson(content: content),
+};
+
+Map<String, dynamic> buildChannelJson({String name = 'general', List<String> members = const []}) => {
+  'name': name,
+  'membersUsernames': members,
+};
+
 ChatMessage buildChatMessage({String content = 'Hello'}) => ChatMessage(content: content, timestamp: DateTime(2024));
 
 ChatLog buildChatLog() => ChatLog(content: 'Player joined', timestamp: DateTime(2024), concernedPlayersNamesList: ['Alice']);

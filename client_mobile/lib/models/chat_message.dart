@@ -1,4 +1,49 @@
-enum ChatChannel { General, Match }
+enum ChatChannel { General, Match, Channels }
+
+class Channel {
+  final String name;
+  final List<String> membersUsernames;
+
+  Channel({required this.name, required this.membersUsernames});
+
+  factory Channel.fromJson(Map<String, dynamic> json) {
+    final membersRaw = json['membersUsernames'] as List<dynamic>? ?? [];
+    return Channel(
+      name: (json['name'] ?? '').toString(),
+      membersUsernames: membersRaw.map((e) => e.toString()).toList(),
+    );
+  }
+}
+
+class ChannelMessage {
+  final String channelName;
+  final ChatMessage message;
+
+  ChannelMessage({required this.channelName, required this.message});
+
+  factory ChannelMessage.fromJson(Map<String, dynamic> json) {
+    return ChannelMessage(
+      channelName: (json['channelName'] ?? '').toString(),
+      message: ChatMessage.fromJson(Map<String, dynamic>.from(json['message'] as Map)),
+    );
+  }
+}
+
+class ChannelUser {
+  final String userName;
+  final String channelName;
+  final bool isDedicatedChannel;
+
+  ChannelUser({required this.userName, required this.channelName, this.isDedicatedChannel = false});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userName': userName,
+      'channelName': channelName,
+      if (isDedicatedChannel) 'isDedicatedChannel': isDedicatedChannel,
+    };
+  }
+}
 
 class ChatMessage {
   final String? sender;

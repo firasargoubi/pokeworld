@@ -1,6 +1,12 @@
 enum ChatEvent {
   Message('message'),
-  GeneralMessage('generalMessage');
+  GeneralMessage('generalMessage'),
+  CreateChannel('createChannel'),
+  JoinChannel('joinChannel'),
+  LeaveChannel('leaveChannel'),
+  DeleteChannel('deleteChannel'),
+  ChannelMessage('channelMessage'),
+  ChannelUpdate('channelUpdate');
 
   const ChatEvent(this.value);
   final String value;
