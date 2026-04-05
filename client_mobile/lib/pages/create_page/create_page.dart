@@ -7,6 +7,7 @@ import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/game_save/game_save.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/navigation_service/navigation_service.dart';
+import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/game_cards_shell/game_cards_shell.dart';
 import 'package:client_mobile/widgets/header/header.dart';
@@ -23,7 +24,19 @@ class CreatePage extends StatefulWidget {
 }
 
 class _CreatePageState extends State<CreatePage> {
-  late final Future<List<GameData>> gamesFuture = GameSaveService.getAllGames();
+  late final Future<List<GameData>> gamesFuture = _loadAccessibleGames();
+
+  Future<List<GameData>> _loadAccessibleGames() async {
+    final games = await GameSaveService.getAllGames();
+    return games.where(_isGameAccessible).toList();
+  }
+
+  bool _isGameAccessible(GameData game) {
+    final currentUserId = UserService().currentUser.value?.userId;
+    final isOwner = game.owner == null || game.owner!.userId == currentUserId;
+    final isStateAccessible = game.gameState == GameState.public || game.gameState == GameState.privateShared;
+    return isOwner || isStateAccessible;
+  }
 
   @override
   void initState() {

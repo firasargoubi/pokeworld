@@ -1,6 +1,19 @@
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/owner.dart';
 
+enum GameState {
+  public('Public'),
+  privateShared('Private Shared'),
+  private('Private');
+
+  const GameState(this.value);
+  final String value;
+
+  static GameState fromString(String? value) {
+    return GameState.values.firstWhere((e) => e.value == value, orElse: () => GameState.private);
+  }
+}
+
 class GameData {
   GameData({
     required this.id,
@@ -10,6 +23,7 @@ class GameData {
     required this.mapData,
     required this.thumbnail,
     this.owner,
+    this.gameState,
   });
 
   final String id;
@@ -19,6 +33,7 @@ class GameData {
   final MapData mapData;
   final String thumbnail;
   final Owner? owner;
+  final GameState? gameState;
 
   factory GameData.fromJson(Map<String, dynamic> json) {
     return GameData(
@@ -29,6 +44,7 @@ class GameData {
       mapData: MapData.fromJson((json['mapData'] as Map).cast<String, dynamic>()),
       thumbnail: json['thumbnail'] as String,
       owner: json['owner'] != null ? Owner.fromJson((json['owner'] as Map).cast<String, dynamic>()) : null,
+      gameState: GameState.fromString(json['gameState'] as String?),
     );
   }
 
@@ -41,6 +57,7 @@ class GameData {
       'mapData': mapData.toJson(),
       'thumbnail': thumbnail,
       'owner': owner?.toJson(),
+      'gameState': gameState?.value,
     };
   }
 }
