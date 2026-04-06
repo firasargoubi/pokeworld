@@ -13,7 +13,9 @@ enum Message {
   NotLocked('server.messages.notLocked'),
   NotEvenPlayers('server.messages.notEvenPlayers'),
   DeleteGame('server.messages.deletedGame'),
-  InvisibleGame('server.messages.invisibleGame');
+  InvisibleGame('server.messages.invisibleGame'),
+  BlockedByPlayer('server.messages.blockedByPlayer'),
+  BlockedPlayerInLobby('server.messages.blockedPlayerInLobby');
 
   const Message(this.message);
 
