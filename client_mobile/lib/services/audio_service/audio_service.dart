@@ -1,6 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:client_mobile/consts/avatar_data_const.dart';
 import 'package:client_mobile/models/audio.dart';
+import 'package:client_mobile/models/match_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,6 +16,7 @@ class AudioService {
 
   final AudioPlayer _backgroundPlayer = AudioPlayer();
   final AudioPlayer _soundEffectPlayer = AudioPlayer();
+  final AudioPlayer _notificationPlayer = AudioPlayer();
   final AudioPlayer _avatarPlayer = AudioPlayer();
 
   final Map<String, AudioPlayer> _preloadedBackgroundPlayers = {};
@@ -46,6 +48,8 @@ class AudioService {
       _backgroundPlayer.setAudioContext(BACKGROUND_AUDIO_CONTEXT),
       _soundEffectPlayer.setReleaseMode(ReleaseMode.release),
       _soundEffectPlayer.setAudioContext(EFFECTS_AUDIO_CONTEXT),
+      _notificationPlayer.setReleaseMode(ReleaseMode.release),
+      _notificationPlayer.setAudioContext(EFFECTS_AUDIO_CONTEXT),
       _avatarPlayer.setReleaseMode(ReleaseMode.release),
       _avatarPlayer.setAudioContext(AVATARS_AUDIO_CONTEXT),
     ]);
@@ -61,6 +65,7 @@ class AudioService {
     await Future.wait([
       _backgroundPlayer.setVolume(savedBackgroundVolume),
       _soundEffectPlayer.setVolume(savedEffectsVolume),
+      _notificationPlayer.setVolume(savedEffectsVolume),
       _avatarPlayer.setVolume(savedAvatarsVolume),
     ]);
   }
@@ -117,6 +122,14 @@ class AudioService {
     });
   }
 
+  Future<void> playNotificationSoundEffect() async {
+    await init();
+
+    await _notificationPlayer.stop();
+    await _notificationPlayer.setVolume(effectsVolume.value);
+    await _notificationPlayer.play(AssetSource(SoundEffect.Notification.path));
+  }
+
   Future<void> playAvatarSounds(List<String> assetPaths) async {
     await init();
 
@@ -134,6 +147,50 @@ class AudioService {
       final duration = await player.getDuration() ?? const Duration(seconds: 3);
       await Future.any<void>([player.onPlayerComplete.first.then((_) {}), Future<void>.delayed(duration)]);
     }
+  }
+
+  Future<void> stopAllAudio() async {
+    await init();
+
+    await Future.wait([
+      _activeBackgroundPlayer.pause(),
+      _notificationPlayer.stop(),
+      _avatarPlayer.stop(),
+      ..._preloadedAvatarPlayers.values.map((player) => player.stop()),
+      ..._activeSoundEffectPlayers.map((player) => player.stop()),
+      ..._availableSoundEffectPlayers.map((player) => player.stop()),
+    ]);
+
+    _activeSoundEffectPlayers.clear();
+  }
+
+  Future<void> resumeBackgroundMusicIfNeeded() async {
+    await init();
+
+    final lastBackgroundPath = _activeBackgroundPath;
+    if (lastBackgroundPath == null) {
+      return;
+    }
+
+    if (_activeBackgroundPlayer.state == PlayerState.paused) {
+      await _activeBackgroundPlayer.setVolume(backgroundVolume.value);
+      await _activeBackgroundPlayer.resume();
+      return;
+    }
+
+    await playBackgroundMusic(lastBackgroundPath, transitionDuration: Duration.zero);
+  }
+
+  Future<void> resumeBackgroundMusicForMatchState(MatchState? state) async {
+    await init();
+
+    final expectedBackgroundMusic = BACKGROUND_MUSIC_BY_MATCH_STATE[state];
+    if (expectedBackgroundMusic == null) {
+      await resumeBackgroundMusicIfNeeded();
+      return;
+    }
+
+    await playBackgroundMusic(expectedBackgroundMusic.path, transitionDuration: Duration.zero);
   }
 
   Future<AudioPlayer> _getAvailableSoundEffectPlayer() async {
@@ -171,6 +228,7 @@ class AudioService {
 
     await Future.wait([
       _soundEffectPlayer.setVolume(normalizedVolume),
+      _notificationPlayer.setVolume(normalizedVolume),
       ..._preloadedSoundEffectPlayers.values.map((player) => player.setVolume(normalizedVolume)),
       ..._activeSoundEffectPlayers.map((player) => player.setVolume(normalizedVolume)),
       ..._availableSoundEffectPlayers.map((player) => player.setVolume(normalizedVolume)),
