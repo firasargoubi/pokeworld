@@ -59,9 +59,11 @@
             "matchWinner": "{{playerName}} won the match",
             "teamWin": "Team {{team}} wins the match!",
             "playerLeftMatch": "{{playerName}} left the match",
-            "dropInDisabled": "Le drop-in est désactivé pour cette partie",
-            "NoAvailableSpawn": "Aucun point d'apparition n'est disponible pour le moment",
-            "notFriend": "You cannot join this match because it's friend-only and you are not friends with the host"
+            "dropInDisabled": "Drop-in is disabled for this match",
+            "NoAvailableSpawn": "No spawn point is available right now",
+            "notFriend": "You cannot join this match because it's friend-only and you are not friends with the host",
+            "blockedByPlayer": "A player in the lobby has blocked you so you cannot join.",
+            "blockedPlayerInLobby": "A blocked player is in the lobby; do you still want to join?"
         },
         "logs": {
             "itemPickup": "{{playerName}} picked up {{itemName}}",

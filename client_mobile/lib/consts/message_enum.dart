@@ -14,4 +14,6 @@ final List<String> WARNING_MESSAGES = <String>[
   Message.LastPlayerRemaining.message,
   Message.RoomLocked.message,
   Message.NotLocked.message,
+  Message.BlockedByPlayer.message,
+  Message.BlockedPlayerInLobby.message,
 ];

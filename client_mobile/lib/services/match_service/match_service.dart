@@ -139,12 +139,35 @@ class MatchService {
     }
 
     final translatedMessage = I18nService().translate(message.message, params: messageParams);
+
+    if (message.message == Message.BlockedPlayerInLobby.message) {
+      _showBlockedPlayerInLobbyPopup(message, translatedMessage);
+      return;
+    }
+
     _popupService.showPopup(
       PopupMessage(
         message: translatedMessage,
         hasCloseButton: message.hasCloseButton,
         isConfirmation: false,
         popupColor: WARNING_MESSAGES.contains(message.message) ? PopupColor.Orange : PopupColor.Blue,
+      ),
+    );
+  }
+
+  void _showBlockedPlayerInLobbyPopup(MessageFromServer message, String translatedMessage) {
+    _popupService.showPopup(
+      PopupMessage(
+        message: translatedMessage,
+        hasCloseButton: true,
+        isConfirmation: true,
+        popupColor: PopupColor.Orange,
+        action: () {
+          final requestedMatchCode = message.messageParams['matchCode'] as String?;
+          if (requestedMatchCode != null && requestedMatchCode.isNotEmpty) {
+            joinMatch(requestedMatchCode, confirmJoinBlockedUser: true);
+          }
+        },
       ),
     );
   }

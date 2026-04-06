@@ -1,7 +1,7 @@
 import 'package:client_mobile/models/chat_message.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'notification_service_const.dart';
@@ -16,7 +16,8 @@ class NotificationService extends ChangeNotifier {
   final Map<ChatChannel, int> _receivedCountByChannel = {ChatChannel.General: 0, ChatChannel.Match: 0};
   final Map<ChatChannel, int> _unreadCountByChannel = {ChatChannel.General: 0, ChatChannel.Match: 0};
   final Map<ChatChannel, bool> _isChannelRead = {ChatChannel.General: true, ChatChannel.Match: true};
-  final FlutterLocalNotificationsPlugin _localNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin? _localNotificationsPlugin =
+      (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) ? FlutterLocalNotificationsPlugin() : null;
 
   bool _isChatOpen = false;
   bool _isAppInBackground = false;
@@ -25,7 +26,7 @@ class NotificationService extends ChangeNotifier {
   int _notificationIdCounter = 0;
 
   Future<void> init() async {
-    if (_isInitialized) {
+    if (_isInitialized || _localNotificationsPlugin == null) {
       return;
     }
 
@@ -64,7 +65,7 @@ class NotificationService extends ChangeNotifier {
 
   Future<void> clearSystemNotifications() async {
     await init();
-    await _localNotificationsPlugin.cancelAll();
+    await _localNotificationsPlugin?.cancelAll();
   }
 
   void onChannelMessagesUpdated(ChatChannel channel, List<ChatMessage> messages) {
@@ -168,6 +169,7 @@ class NotificationService extends ChangeNotifier {
       final messageContent = message.content.trim();
       final notificationBody = messageContent.isEmpty ? I18nService().translate('components.notifications.newMessage') : messageContent;
 
+      if (_localNotificationsPlugin == null) return;
       await _localNotificationsPlugin.show(
         _notificationIdCounter++,
         notificationTitle,
