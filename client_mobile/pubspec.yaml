@@ -38,6 +38,7 @@ dependencies:
     flutter_svg: ^2.0.0
     mocktail: ^1.0.4
     audioplayers: ^6.1.0
+    flutter_local_notifications: ^17.2.2
     image_picker: ^1.1.2
 
     # The following adds the Cupertino Icons font to your application.

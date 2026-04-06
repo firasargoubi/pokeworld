@@ -15,7 +15,8 @@ enum SoundEffect {
   Item('audio/effects/item.wav'),
   Select('audio/effects/select.wav'),
   Shiny('audio/effects/shiny.mp3'),
-  Evolve('audio/effects/evolve.mp3');
+  Evolve('audio/effects/evolve.mp3'),
+  Notification('audio/effects/notification.mp3');
 
   final String path;
   const SoundEffect(this.path);

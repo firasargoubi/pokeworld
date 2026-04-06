@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'models/popup_message.dart';
 import 'models/user_preferences.dart';
 import 'pages/home_page/home_page.dart';
+import 'services/audio_service/audio_service.dart';
+import 'services/match_service/match_service.dart';
 import 'services/navigation_service/navigation_service.dart';
+import 'services/notification_service/notification_service.dart';
 import 'services/popup_service/popup_service.dart';
 import 'services/preferences_service/preferences_service.dart';
 import 'services/user_service/user_service.dart';
@@ -20,16 +23,19 @@ class PokeWorldApp extends StatefulWidget {
   State<PokeWorldApp> createState() => _PokeWorldAppState();
 }
 
-class _PokeWorldAppState extends State<PokeWorldApp> {
+class _PokeWorldAppState extends State<PokeWorldApp> with WidgetsBindingObserver {
   final PopupService _popupService = PopupService();
   final PreferencesService _preferencesService = PreferencesService();
   final UserService _userService = UserService();
+  final AudioService _audioService = AudioService();
+  final NotificationService _notificationService = NotificationService();
 
   bool _wasLoggedIn = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _wasLoggedIn = _userService.currentUser.value != null;
     _userService.currentUser.addListener(_onUserChanged);
 
@@ -42,8 +48,27 @@ class _PokeWorldAppState extends State<PokeWorldApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _userService.currentUser.removeListener(_onUserChanged);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _notificationService.setAppInBackground(false);
+        _notificationService.clearSystemNotifications();
+        _audioService.resumeBackgroundMusicForMatchState(MatchService().matchData?.state);
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.detached:
+        _notificationService.setAppInBackground(true);
+        _audioService.stopAllAudio();
+        break;
+    }
   }
 
   void _onUserChanged() {

@@ -25,16 +25,19 @@ class PlayTimerWidget extends StatefulWidget {
   State<PlayTimerWidget> createState() => _PlayTimerWidgetState();
 }
 
-class _PlayTimerWidgetState extends State<PlayTimerWidget> with SingleTickerProviderStateMixin {
+class _PlayTimerWidgetState extends State<PlayTimerWidget> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late final AnimationController _controller;
   StreamSubscription? _matchSubscription;
   MatchState? _previousState;
+  DateTime? _countdownEndsAt;
+  Duration? _pausedRemaining;
 
   static double? _savedProgress;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     _controller = AnimationController(
       vsync: this,
@@ -72,14 +75,24 @@ class _PlayTimerWidgetState extends State<PlayTimerWidget> with SingleTickerProv
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _matchSubscription?.cancel();
     _controller.dispose();
     super.dispose();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _syncControllerWithWallClock();
+    }
+  }
+
   void _start() {
     if (widget.durationSeconds <= 0) return;
     _savedProgress = null;
+    _pausedRemaining = null;
+    _countdownEndsAt = DateTime.now().add(Duration(seconds: widget.durationSeconds));
     _controller
       ..duration = Duration(seconds: widget.durationSeconds)
       ..reset()
@@ -87,6 +100,8 @@ class _PlayTimerWidgetState extends State<PlayTimerWidget> with SingleTickerProv
   }
 
   void _pause() {
+    _pausedRemaining = _remainingFromWallClock();
+    _countdownEndsAt = null;
     _savedProgress = _controller.value;
     _controller.stop();
   }
@@ -97,6 +112,15 @@ class _PlayTimerWidgetState extends State<PlayTimerWidget> with SingleTickerProv
       _start();
       return;
     }
+
+    final pausedRemaining = _pausedRemaining;
+    if (pausedRemaining != null) {
+      _countdownEndsAt = DateTime.now().add(pausedRemaining);
+      _pausedRemaining = null;
+    } else {
+      _countdownEndsAt ??= DateTime.now().add(_remainingFromController());
+    }
+
     _controller.forward();
   }
 
@@ -106,10 +130,57 @@ class _PlayTimerWidgetState extends State<PlayTimerWidget> with SingleTickerProv
     final saved = _savedProgress;
     if (saved != null && saved > 0.0 && saved < 1.0) {
       _savedProgress = null;
+      _pausedRemaining = null;
       _controller.value = saved;
+      _countdownEndsAt = DateTime.now().add(_remainingFromController());
       _controller.forward();
     } else {
       _start();
+    }
+  }
+
+  Duration _remainingFromController() {
+    final total = _controller.duration ?? Duration.zero;
+    final remainingFactor = (1.0 - _controller.value).clamp(0.0, 1.0);
+    return Duration(microseconds: (total.inMicroseconds * remainingFactor).round());
+  }
+
+  Duration _remainingFromWallClock() {
+    final endAt = _countdownEndsAt;
+    if (endAt == null) {
+      return _remainingFromController();
+    }
+    final remaining = endAt.difference(DateTime.now());
+    return remaining.isNegative ? Duration.zero : remaining;
+  }
+
+  void _syncControllerWithWallClock() {
+    if (_previousState != MatchState.TurnWait) {
+      return;
+    }
+
+    final endAt = _countdownEndsAt;
+    if (endAt == null) {
+      return;
+    }
+
+    final total = _controller.duration ?? Duration.zero;
+    if (total <= Duration.zero) {
+      return;
+    }
+
+    final remaining = endAt.difference(DateTime.now());
+    if (remaining <= Duration.zero) {
+      _controller.value = 1.0;
+      _controller.stop();
+      return;
+    }
+
+    final remainingFactor = remaining.inMicroseconds / total.inMicroseconds;
+    _controller.value = (1.0 - remainingFactor).clamp(0.0, 1.0);
+
+    if (!_controller.isAnimating) {
+      _controller.forward();
     }
   }
 

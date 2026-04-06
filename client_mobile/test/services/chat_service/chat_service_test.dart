@@ -11,6 +11,8 @@ import 'chat_service_test_const.dart';
 class _MockSocket extends Mock implements io.Socket {}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   late _MockSocket mockSocket;
   final Map<String, dynamic Function(dynamic)> socketHandlers = {};
 

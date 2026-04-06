@@ -11,9 +11,16 @@ const String CHAT_BORDER_ASSET = 'assets/images/menu/containers/chat/chat-border
 const String CHAT_BORDER_2_ASSET = 'assets/images/menu/containers/chat/chat-border-2.png';
 const String CHAT_EDGE_ASSET = 'assets/images/menu/containers/chat/chat-edge.png';
 const String CHAT_EDGE_2_ASSET = 'assets/images/menu/containers/chat/chat-edge-2.png';
-const String CHAT_CHANNEL_ASSET = 'assets/images/menu/containers/chat/canal.png';
+
+const String CHAT_CHANNEL_BODY_ASSET = 'assets/images/menu/containers/chat/canal-body.png';
+const String CHAT_CHANNEL_BODY_ACTIVE_ASSET = 'assets/images/menu/containers/chat/canal-body-active.png';
+const String CHAT_CHANNEL_EDGE_1_ASSET = 'assets/images/menu/containers/chat/canal-edge-1.png';
+const String CHAT_CHANNEL_EDGE_2_ASSET = 'assets/images/menu/containers/chat/canal-edge-2.png';
+const String CHAT_CHANNEL_EDGE_1_ACTIVE_ASSET = 'assets/images/menu/containers/chat/canal-edge-1-active.png';
+const String CHAT_CHANNEL_EDGE_2_ACTIVE_ASSET = 'assets/images/menu/containers/chat/canal-edge-2-active.png';
 
 const String CHAT_MESSAGES_ICON_ASSET = 'assets/images/menu/icons/chat/messages.svg';
+const String CHAT_GENERAL_ICON_ASSET = 'assets/images/menu/icons/chat/general.png';
 const String CHAT_MAIL_ICON_ASSET = 'assets/images/menu/icons/chat/mail.png';
 
 const String CHAT_GENERAL_LABEL_KEY = 'components.chat.general';
@@ -79,5 +86,7 @@ const double CHAT_COLLAPSE_TEXT_HEIGHT_FACTOR = 0.005;
 const double CHAT_COLLAPSE_TEXT_SHADOW_OFFSET_FACTOR = -0.02;
 
 const double CHAT_COLLAPSED_MAIL_ICON_SIZE_FACTOR = 0.35;
+
+const int CHAT_UNREAD_BADGE_MAX_VALUE = 9;
 
 const double CHAT_CENTER_STRIPE_SIZE_FACTOR = 0.17;

@@ -307,6 +307,10 @@
             "searchPlaceholder": "Search/Create a channel",
             "inputPlaceholder": "> Enter message [Enter]"
         },
+        "notifications": {
+            "newMessage": "New message",
+            "newMessageFrom": "New message from {{senderName}}"
+        },
         "createGame": {
             "title": "New game",
             "gridSize": "Grid size",

@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/chat_message.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/services/notification_service/notification_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/chat_service/chat_service.dart';
@@ -32,7 +33,7 @@ class Chat extends StatefulWidget {
   State<Chat> createState() => _ChatState();
 }
 
-class _ChatState extends State<Chat> {
+class _ChatState extends State<Chat> with WidgetsBindingObserver {
   static bool _isCompact = true;
   static ChatChannel _selectedChannel = ChatChannel.General;
 
@@ -41,6 +42,7 @@ class _ChatState extends State<Chat> {
   final FocusNode _focusNode = FocusNode();
 
   final ChatService _chatService = ChatService();
+  final NotificationService _notificationService = NotificationService();
   StreamSubscription<List<ChatMessage>>? _generalSubscription;
   StreamSubscription<List<ChatMessage>>? _matchSubscription;
 
@@ -58,8 +60,14 @@ class _ChatState extends State<Chat> {
   }
 
   void _toggleCompact() {
+    final openingChat = _isCompact;
     setState(() => _isCompact = !_isCompact);
     AudioService().playSoundEffect(SoundEffect.Select.path);
+    _syncNotificationVisibility();
+
+    if (openingChat) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _markCurrentChannelAsRead());
+    }
   }
 
   double _lerp(double start, double end, double t) => start + (end - start) * t;
@@ -67,9 +75,11 @@ class _ChatState extends State<Chat> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     _generalMessages = _chatService.allMessages;
     _matchMessages = _chatService.activeMatchMessages;
+    _syncNotificationVisibility();
 
     _generalSubscription = _chatService.generalMessagesStream.listen((messages) {
       setState(() => _generalMessages = messages);
@@ -87,12 +97,30 @@ class _ChatState extends State<Chat> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _generalSubscription?.cancel();
     _matchSubscription?.cancel();
     _scrollController.dispose();
     _messageController.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.detached:
+        if (!_isCompact) {
+          setState(() => _isCompact = true);
+          _syncNotificationVisibility();
+        }
+        break;
+    }
   }
 
   void _scrollToBottom() {
@@ -113,6 +141,14 @@ class _ChatState extends State<Chat> {
     _messageController.clear();
     _focusNode.requestFocus();
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+  }
+
+  void _markCurrentChannelAsRead() {
+    _notificationService.onChannelRead(_selectedChannel);
+  }
+
+  void _syncNotificationVisibility() {
+    _notificationService.updateChatVisibility(isChatOpen: !_isCompact, selectedChannel: _selectedChannel);
   }
 
   @override
@@ -180,7 +216,13 @@ class _ChatState extends State<Chat> {
                               showMatchChannel: widget.showMatchChannel,
                               onChannelChanged: (ch) {
                                 setState(() => _selectedChannel = ch);
-                                WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+                                _syncNotificationVisibility();
+                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  _scrollToBottom();
+                                  if (!_isCompact) {
+                                    _markCurrentChannelAsRead();
+                                  }
+                                });
                               },
                             ),
                           ),

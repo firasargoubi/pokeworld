@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:client_mobile/models/chat_message.dart';
+import 'package:client_mobile/services/notification_service/notification_service.dart';
 import 'package:client_mobile/services/user_service/user_service.dart';
 
 import '../../models/socket_event.dart';
@@ -14,6 +15,7 @@ class ChatService {
   }
 
   late final SocketService _socketService;
+  final NotificationService _notificationService = NotificationService();
   bool _listenersInitialized = false;
 
   String? get _currentUserName => UserService().currentUser.value?.username;
@@ -58,6 +60,7 @@ class ChatService {
       if (data is Map<String, dynamic>) {
         final chatMsg = ChatMessage.fromJson(Map<String, dynamic>.from(data));
         _generalMessages.add(chatMsg);
+        _notificationService.onChannelMessagesUpdated(ChatChannel.General, List.unmodifiable(_generalMessages));
         _generalMessagesController.add(List.unmodifiable(_generalMessages));
       }
     });
@@ -77,6 +80,7 @@ class ChatService {
         _channelMessagesController.add(Map.unmodifiable(_channelMessages));
 
         if (channelMsg.channelName == _activeMatchCode) {
+          _notificationService.onChannelMessagesUpdated(ChatChannel.Match, activeMatchMessages);
           _matchMessagesController.add(activeMatchMessages);
         }
       }
@@ -85,6 +89,7 @@ class ChatService {
 
   void setActiveMatchCode(String? matchCode) {
     _activeMatchCode = matchCode;
+    _notificationService.onChannelMessagesUpdated(ChatChannel.Match, activeMatchMessages);
     _matchMessagesController.add(activeMatchMessages);
   }
 
@@ -154,6 +159,7 @@ class ChatService {
   void clearChatHistory() {
     _generalMessages.clear();
     _channelMessages.clear();
+    _notificationService.clear();
     _generalMessagesController.add(List.unmodifiable(_generalMessages));
     _channelMessagesController.add(Map.unmodifiable(_channelMessages));
     _matchMessagesController.add([]);

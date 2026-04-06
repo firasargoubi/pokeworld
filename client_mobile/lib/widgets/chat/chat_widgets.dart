@@ -2,7 +2,9 @@ import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/chat_message.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
+import 'package:client_mobile/services/notification_service/notification_service.dart';
 import 'package:client_mobile/utils/profile_image_provider.dart';
+import 'package:client_mobile/widgets/edge_body_button/edge_body_button.dart';
 import 'package:client_mobile/widgets/stripe_painter/stripe_painter.dart';
 import 'package:client_mobile/widgets/user_profile_image/user_profile_image.dart';
 import 'package:flutter/material.dart';
@@ -12,13 +14,35 @@ import '../../services/user_service/user_service.dart';
 import '../../utils/time_utils.dart';
 import 'chat_const.dart';
 
+String _formatUnreadBadgeText(int count) {
+  return count > CHAT_UNREAD_BADGE_MAX_VALUE ? '$CHAT_UNREAD_BADGE_MAX_VALUE+' : count.toString();
+}
+
 class ChatChannelButton extends StatelessWidget {
-  const ChatChannelButton({super.key, required this.baseSize, required this.label, required this.isSelected, this.onTap});
+  const ChatChannelButton({
+    super.key,
+    required this.baseSize,
+    required this.label,
+    required this.isSelected,
+    required this.iconAsset,
+    this.unreadCount = 0,
+    this.onTap,
+  });
 
   final double baseSize;
   final String label;
   final bool isSelected;
+  final String iconAsset;
+  final int unreadCount;
   final VoidCallback? onTap;
+
+  Widget _buildIcon() {
+    if (iconAsset.toLowerCase().endsWith('.svg')) {
+      return SvgPicture.asset(iconAsset, fit: BoxFit.contain, colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn));
+    }
+
+    return Image.asset(iconAsset, fit: BoxFit.contain, color: Colors.white, colorBlendMode: BlendMode.srcIn);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,45 +56,59 @@ class ChatChannelButton extends StatelessWidget {
         onTap?.call();
         AudioService().playSoundEffect(SoundEffect.Select.path);
       },
-      child: Container(
-        width: baseSize * CHAT_CHANNEL_WIDTH_FACTOR,
+      child: SizedBox(
         height: height,
-        padding: EdgeInsets.only(top: topPadding),
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: const AssetImage(CHAT_CHANNEL_ASSET),
-            fit: BoxFit.fitWidth,
-            alignment: Alignment.topCenter,
-            filterQuality: FilterQuality.none,
-            colorFilter: ColorFilter.mode(isSelected ? CHAT_SELECTED_CHANNEL_COLOR : CHAT_UNSELECTED_CHANNEL_COLOR, BlendMode.srcIn),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            SizedBox(
-              width: baseSize * CHAT_CHANNEL_ICON_SIZE_FACTOR,
-              height: baseSize * CHAT_CHANNEL_ICON_SIZE_FACTOR,
-              child: Padding(
-                padding: EdgeInsets.all(baseSize * CHAT_CHANNEL_ICON_PADDING_FACTOR),
-                child: SvgPicture.asset(
-                  CHAT_MESSAGES_ICON_ASSET,
-                  fit: BoxFit.contain,
-                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+            Positioned.fill(
+              child: EdgeBodyButton(
+                leftEdgePath: isSelected ? CHAT_CHANNEL_EDGE_1_ACTIVE_ASSET : CHAT_CHANNEL_EDGE_1_ASSET,
+                rightEdgePath: isSelected ? CHAT_CHANNEL_EDGE_2_ACTIVE_ASSET : CHAT_CHANNEL_EDGE_2_ASSET,
+                bodyPath: isSelected ? CHAT_CHANNEL_BODY_ACTIVE_ASSET : CHAT_CHANNEL_BODY_ASSET,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: topPadding, left: baseSize * 0.1, right: baseSize * 0.1),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: baseSize * CHAT_CHANNEL_ICON_SIZE_FACTOR,
+                    height: baseSize * CHAT_CHANNEL_ICON_SIZE_FACTOR,
+                    child: Padding(padding: EdgeInsets.all(baseSize * CHAT_CHANNEL_ICON_PADDING_FACTOR), child: _buildIcon()),
+                  ),
+                  if (isSelected) ...[
+                    SizedBox(width: baseSize * CHAT_CHANNEL_GAP_FACTOR),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: CHAT_FONT_FAMILY,
+                        fontSize: baseSize * CHAT_CHANNEL_TEXT_SIZE_FACTOR,
+                        height: textHeight,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (unreadCount > 0)
+              Positioned(
+                top: baseSize * 0.03,
+                right: baseSize * 0.05,
+                child: Container(
+                  constraints: BoxConstraints(minWidth: baseSize * 0.24, minHeight: baseSize * 0.24),
+                  padding: EdgeInsets.symmetric(horizontal: baseSize * 0.05, vertical: baseSize * 0.02),
+                  decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                  alignment: Alignment.center,
+                  child: Text(
+                    _formatUnreadBadgeText(unreadCount),
+                    style: TextStyle(color: Colors.white, fontFamily: CHAT_FONT_FAMILY, fontSize: baseSize * 0.16, height: 1),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(width: baseSize * CHAT_CHANNEL_GAP_FACTOR),
-            Text(
-              label,
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: CHAT_FONT_FAMILY,
-                fontSize: baseSize * CHAT_CHANNEL_TEXT_SIZE_FACTOR,
-                height: textHeight,
-              ),
-            ),
           ],
         ),
       ),
@@ -95,38 +133,49 @@ class ChatHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final i18n = I18nService();
-    return Container(
-      height: baseSize * CHAT_HEADER_HEIGHT_FACTOR,
-      width: double.infinity,
-      color: CHAT_HEADER_BACKGROUND_COLOR,
-      padding: EdgeInsets.symmetric(horizontal: baseSize * CHAT_HEADER_HORIZONTAL_PADDING_FACTOR),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          ChatChannelButton(
-            baseSize: baseSize,
-            label: i18n.translate(CHAT_GENERAL_LABEL_KEY),
-            isSelected: selectedChannel == ChatChannel.General,
-            onTap: () {
-              onChannelChanged(ChatChannel.General);
-              AudioService().playSoundEffect(SoundEffect.Select.path);
-            },
-          ),
-          SizedBox(width: baseSize * CHAT_CHANNELS_GAP_FACTOR),
-          if (showMatchChannel) ...{
-            ChatChannelButton(
-              baseSize: baseSize,
-              label: i18n.translate(CHAT_PARTY_LABEL_KEY),
-              isSelected: selectedChannel == ChatChannel.Match,
-              onTap: () {
-                onChannelChanged(ChatChannel.Match);
-                AudioService().playSoundEffect(SoundEffect.Select.path);
+    final notificationService = NotificationService();
+
+    return AnimatedBuilder(
+      animation: notificationService,
+      builder: (context, _) {
+        return Container(
+          height: baseSize * CHAT_HEADER_HEIGHT_FACTOR,
+          width: double.infinity,
+          color: CHAT_HEADER_BACKGROUND_COLOR,
+          padding: EdgeInsets.symmetric(horizontal: baseSize * CHAT_HEADER_HORIZONTAL_PADDING_FACTOR),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              ChatChannelButton(
+                baseSize: baseSize,
+                label: i18n.translate(CHAT_GENERAL_LABEL_KEY),
+                isSelected: selectedChannel == ChatChannel.General,
+                iconAsset: CHAT_GENERAL_ICON_ASSET,
+                unreadCount: notificationService.unreadCount(ChatChannel.General),
+                onTap: () {
+                  onChannelChanged(ChatChannel.General);
+                  AudioService().playSoundEffect(SoundEffect.Select.path);
+                },
+              ),
+              SizedBox(width: baseSize * CHAT_CHANNELS_GAP_FACTOR),
+              if (showMatchChannel) ...{
+                ChatChannelButton(
+                  baseSize: baseSize,
+                  label: i18n.translate(CHAT_PARTY_LABEL_KEY),
+                  isSelected: selectedChannel == ChatChannel.Match,
+                  iconAsset: CHAT_MESSAGES_ICON_ASSET,
+                  unreadCount: notificationService.unreadCount(ChatChannel.Match),
+                  onTap: () {
+                    onChannelChanged(ChatChannel.Match);
+                    AudioService().playSoundEffect(SoundEffect.Select.path);
+                  },
+                ),
               },
-            ),
-          },
-        ],
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -324,14 +373,47 @@ class ChatCollapsedCenterIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Image.asset(
-        CHAT_MAIL_ICON_ASSET,
-        width: baseSize * CHAT_COLLAPSED_MAIL_ICON_SIZE_FACTOR,
-        height: baseSize * CHAT_COLLAPSED_MAIL_ICON_SIZE_FACTOR,
-        filterQuality: FilterQuality.none,
-        fit: BoxFit.contain,
-      ),
+    final notificationService = NotificationService();
+
+    return AnimatedBuilder(
+      animation: notificationService,
+      builder: (context, _) {
+        final totalUnreadCount = notificationService.totalUnreadCount();
+
+        return SizedBox.expand(
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Center(
+                child: Image.asset(
+                  CHAT_MAIL_ICON_ASSET,
+                  width: baseSize * CHAT_COLLAPSED_MAIL_ICON_SIZE_FACTOR,
+                  height: baseSize * CHAT_COLLAPSED_MAIL_ICON_SIZE_FACTOR,
+                  filterQuality: FilterQuality.none,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              if (totalUnreadCount > 0)
+                Positioned(
+                  top: baseSize * 0.04,
+                  right: baseSize * 0.05,
+                  child: Container(
+                    constraints: BoxConstraints(minWidth: baseSize * 0.5, minHeight: baseSize * 0.3),
+                    padding: EdgeInsets.symmetric(horizontal: baseSize * 0.1),
+                    decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                    child: Center(
+                      child: Text(
+                        _formatUnreadBadgeText(totalUnreadCount),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white, fontFamily: CHAT_FONT_FAMILY, fontSize: baseSize * 0.2, height: 1),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

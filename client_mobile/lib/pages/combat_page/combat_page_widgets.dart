@@ -600,31 +600,56 @@ class CombatTimer extends StatefulWidget {
   State<CombatTimer> createState() => _CombatTimerState();
 }
 
-class _CombatTimerState extends State<CombatTimer> {
+class _CombatTimerState extends State<CombatTimer> with WidgetsBindingObserver {
   late int currentTime;
   Timer? _timer;
+  DateTime? _countdownEndsAt;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     currentTime = widget.maxTime;
+    _countdownEndsAt = DateTime.now().add(Duration(seconds: widget.maxTime));
     _startTimer();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _syncTimeWithWallClock();
+    }
   }
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (currentTime > 0) {
-        setState(() {
-          currentTime--;
-        });
-      } else {
-        _timer?.cancel();
-      }
+      _syncTimeWithWallClock();
     });
+
+    _syncTimeWithWallClock();
+  }
+
+  void _syncTimeWithWallClock() {
+    final countdownEndsAt = _countdownEndsAt;
+    if (countdownEndsAt == null) return;
+
+    final remaining = countdownEndsAt.difference(DateTime.now());
+    final nextTime = remaining.isNegative ? 0 : ((remaining.inMilliseconds + 999) ~/ 1000);
+
+    if (nextTime != currentTime) {
+      setState(() {
+        currentTime = nextTime;
+      });
+    }
+
+    if (nextTime <= 0) {
+      _timer?.cancel();
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     super.dispose();
   }

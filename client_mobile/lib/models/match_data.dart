@@ -1,3 +1,4 @@
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/chat_message.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/map_data.dart';
@@ -323,3 +324,16 @@ enum MatchState {
     return MatchState.values.firstWhere((e) => e.value == v, orElse: () => MatchState.Lobby);
   }
 }
+
+const Map<MatchState, BackgroundMusic> BACKGROUND_MUSIC_BY_MATCH_STATE = {
+  MatchState.CombatWait: BackgroundMusic.Combat,
+  MatchState.CombatAnimation: BackgroundMusic.Combat,
+  MatchState.CombatEnd: BackgroundMusic.Combat,
+  MatchState.TurnStart: BackgroundMusic.Play,
+  MatchState.TurnWait: BackgroundMusic.Play,
+  MatchState.MovementAnimation: BackgroundMusic.Play,
+  MatchState.ItemDropSelection: BackgroundMusic.Play,
+  MatchState.MatchEnd: BackgroundMusic.Play,
+  MatchState.Lobby: BackgroundMusic.Menu,
+  MatchState.Statistics: BackgroundMusic.Menu,
+};

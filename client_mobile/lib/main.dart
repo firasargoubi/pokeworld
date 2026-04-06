@@ -1,4 +1,5 @@
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/services/notification_service/notification_service.dart';
 import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,6 +19,7 @@ Future<void> main() async {
   }
   WidgetsFlutterBinding.ensureInitialized();
   await AudioService().init();
+  await NotificationService().init();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
   await PreferencesService().initialize();
 
