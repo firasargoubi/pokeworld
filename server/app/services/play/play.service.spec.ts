@@ -1,4 +1,5 @@
 import { Match } from '@app/classes/match/match';
+import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { BalanceService } from '@app/services/balance/balance.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
@@ -26,6 +27,7 @@ describe('PlayService', () => {
     let mockBalanceService: SinonStubbedInstance<BalanceService>;
     let mocktrackingService: SinonStubbedInstance<TrackingService>;
     let mockItemService: SinonStubbedInstance<ItemService>;
+    let mockMatchGateway: SinonStubbedInstance<MatchGateway>;
     let mockMatch: SinonStubbedInstance<Match>;
 
     beforeAll(async () => {
@@ -36,6 +38,7 @@ describe('PlayService', () => {
         mockBalanceService = createStubInstance(BalanceService);
         mocktrackingService = createStubInstance(TrackingService);
         mockItemService = createStubInstance(ItemService);
+        mockMatchGateway = createStubInstance(MatchGateway);
         mockMatch = createStubInstance(Match);
 
         const module: TestingModule = await Test.createTestingModule({
@@ -47,6 +50,7 @@ describe('PlayService', () => {
                 { provide: BalanceService, useValue: mockBalanceService },
                 { provide: TrackingService, useValue: mocktrackingService },
                 { provide: ItemService, useValue: mockItemService },
+                { provide: MatchGateway, useValue: mockMatchGateway },
             ],
         }).compile();
 

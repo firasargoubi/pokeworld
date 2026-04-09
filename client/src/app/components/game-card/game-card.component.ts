@@ -47,9 +47,11 @@ export class GameCardComponent {
         if (this.matchData) {
             const maxPlayers = MAX_PLAYERS[this.game.mapData.size];
             const nbPlayers = this.matchData.players.filter((player) => player.isConnected).length;
-            const formattedMatchInfo = `${nbPlayers}/${maxPlayers} ${this.translate.instant('components.gameCard.players')}\n${this.translate.instant(
-                'components.gameCard.code',
-            )}: ${this.matchData.code}`;
+            const lines = [
+                `${nbPlayers}/${maxPlayers} ${this.translate.instant('components.gameCard.players')}`,
+                `${this.translate.instant('components.gameCard.code')}: ${this.matchData.code}`,
+            ];
+            const formattedMatchInfo = lines.join('\n');
             return formattedMatchInfo;
         }
         return this.formatDate(this.game.lastEdited);

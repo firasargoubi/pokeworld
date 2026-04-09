@@ -22,6 +22,7 @@ export interface LobbyData {
     hostPlayerIndex: number;
     isDropInEnabled: boolean;
     isRapidElimination: boolean;
+    entryFee: number;
     isFriendOnly: boolean;
 }
 
@@ -85,7 +86,13 @@ export interface MatchSettings {
     isElementalMode: boolean;
     isDropInEnabled: boolean;
     isRapidElimination: boolean;
+    entryFee: number;
     isFriendOnly: boolean;
+}
+
+export interface CreateMatchPayload {
+    gameData: GameData;
+    matchSettings: MatchSettings;
 }
 
 export enum CombatAction {

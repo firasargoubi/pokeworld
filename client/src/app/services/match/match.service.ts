@@ -16,7 +16,7 @@ import { DEFAULT_PLAYER_DATA, MAX_ITEMS } from '@common/consts/player-data.const
 import { WARNING_MESSAGES } from '@common/consts/warning-messages';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
-import { MatchData, MatchState } from '@common/interfaces/match-data';
+import { MatchData, MatchSettings, MatchState } from '@common/interfaces/match-data';
 import { MessageFromServer } from '@common/interfaces/message-from-server';
 import { Message } from '@common/interfaces/message.enum';
 import { PlayerData } from '@common/interfaces/player-data';
@@ -48,8 +48,8 @@ export class MatchService {
         this.router.events.subscribe(this.onNavigationUpdate.bind(this));
     }
 
-    async createMatch(gameData: GameData): Promise<boolean> {
-        const matchCreated = await this.socketService.emit(MatchEvent.CreateMatch, gameData, this.onMatchJoined.bind(this));
+    async createMatch(gameData: GameData, matchSettings: MatchSettings): Promise<boolean> {
+        const matchCreated = await this.socketService.emit(MatchEvent.CreateMatch, { gameData, matchSettings }, this.onMatchJoined.bind(this));
         if (matchCreated) {
             this.chatService.createChannel(this.data.code, true);
             this.chatService.setActiveMatchCode(this.data.code);

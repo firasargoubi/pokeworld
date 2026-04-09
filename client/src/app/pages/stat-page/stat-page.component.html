@@ -31,7 +31,9 @@
                             </div>
                             <div class="stat-container">
                                 @for(player of playerStatList() ; track player.id){
-                                <div class="stat-value" [class.self]="isSelfPlayer(player.id)">{{ player[statType] }}</div>
+                                <div class="stat-value" [class.self]="isSelfPlayer(player.id)" [class.balance-gain]="isBalanceGainColumn(statType)">
+                                    {{ isBalanceGainColumn(statType) ? formatGain(player[statType]) : player[statType] }}
+                                </div>
                                 }
                                 <div class="stat-separator"></div>
                             </div>
@@ -77,10 +79,6 @@
                                     <div class="value">{{ statService.globalStats.flagHoldersCount }}</div>
                                 </div>
                                 }
-                                <div class="stat-row">
-                                    <div class="label">{{ 'pages.stat.balanceGain' | translate }}</div>
-                                    <div class="value balance-gain">{{ formattedBalanceGain }}</div>
-                                </div>
                                 <div id="quit-button" (click)="navigateToMenu()">{{ 'pages.stat.quit' | translate }}</div>
                             </div>
                             <div class="winner-container">

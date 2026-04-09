@@ -12,7 +12,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 @Injectable()
 export class ItemService {
     @Inject(MapService) private readonly mapService: MapService;
-    @Inject(TrackingService) private readonly trackingService: TrackingService;
+    @Inject(forwardRef(() => TrackingService)) private readonly trackingService: TrackingService;
     @Inject(forwardRef(() => PlayService)) private readonly playService: PlayService;
     @Inject(forwardRef(() => ChatService)) private readonly chatService: ChatService;
 

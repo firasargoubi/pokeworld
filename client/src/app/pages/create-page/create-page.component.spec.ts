@@ -9,7 +9,6 @@ import { PopupMessage } from '@app/consts/popup-message.const';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
-import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
@@ -30,6 +29,7 @@ class MockGameCardComponent {
     @Input() game: GameData = structuredClone(MOCK_GAME_DATAS[0]);
     @Input() isAdminView: boolean = false;
     @Input() cardColor: string = 'blue-card';
+    @Input() index: number = 0;
 }
 
 @Component({
@@ -37,7 +37,9 @@ class MockGameCardComponent {
     standalone: true,
     template: '',
 })
-class MockChatComponent {}
+class MockChatComponent {
+    @Input() isInGame: boolean = false;
+}
 
 @Component({
     selector: 'app-match-settings-popup',
@@ -57,7 +59,6 @@ describe('CreatePageComponent', () => {
     let popupServiceSpy: jasmine.SpyObj<PopupService>;
     let mockAudioService: jasmine.SpyObj<AudioService>;
     let gameDataService: jasmine.SpyObj<GameDataService>;
-    let lobbyServiceSpy: jasmine.SpyObj<LobbyService>;
     let mockGames: GameData[];
 
     beforeEach(async () => {
@@ -69,7 +70,6 @@ describe('CreatePageComponent', () => {
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage', 'playCombatEffect']);
         gameDataService = jasmine.createSpyObj('GameDataService', ['isOwner']);
-        lobbyServiceSpy = jasmine.createSpyObj('LobbyService', ['changeMatchSettings']);
         gameSaveServiceSpy.getGame.and.returnValue(of(mockGames[0]));
         await TestBed.configureTestingModule({
             imports: [TranslateModule.forRoot()],
@@ -80,7 +80,6 @@ describe('CreatePageComponent', () => {
                 { provide: PopupService, useValue: popupServiceSpy },
                 { provide: AudioService, useValue: mockAudioService },
                 { provide: GameDataService, useValue: gameDataService },
-                { provide: LobbyService, useValue: lobbyServiceSpy },
             ],
         }).compileComponents();
 
@@ -98,6 +97,7 @@ describe('CreatePageComponent', () => {
         isElementalMode: false,
         isDropInEnabled: false,
         isRapidElimination: false,
+        entryFee: 0,
         isFriendOnly: false,
     };
 
@@ -124,7 +124,7 @@ describe('CreatePageComponent', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(component, 'isGameAccessible').and.returnValue(true);
         component.createMatch(mockGames[0], mockMatchSettings);
-        expect(matchServiceSpy.createMatch).toHaveBeenCalled();
+        expect(matchServiceSpy.createMatch).toHaveBeenCalledWith(mockGames[0], mockMatchSettings);
     });
 
     it('should call handleUnauthorizedAccess when game is not accessible', () => {

@@ -11,6 +11,7 @@ export const DROP_ITEMS_DURATION = 10000;
 export const TIME_SCALE = 1000;
 export const TIMER_INTERVAL = 10;
 export const SOCKET_TIMEOUT_DURATION = 1000;
+export const FEE_ENTRY_STEP = 500;
 
 export const DEFAULT_SELF_INDEX = -1;
 
@@ -20,6 +21,7 @@ export const DEFAULT_LOBBY_DATA: LobbyData = {
     isDropInEnabled: false,
     isRapidElimination: false,
     isFriendOnly: false,
+    entryFee: 0,
 };
 
 export const DEFAULT_PLAY_DATA: PlayData = {
@@ -48,3 +50,4 @@ export const MATCH_CODE_LENGTH = 4;
 export const RANDOM_THRESHOLD = 0.5;
 export const MS_CONVERSION_FACTOR = 10;
 export const MINIMUM_COMBATS_TO_WIN = 3;
+export const ENTRY_FEE_WINNER_DIVISOR = 3;

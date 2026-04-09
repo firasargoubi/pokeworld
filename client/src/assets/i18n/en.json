@@ -53,7 +53,8 @@
             "teamWin": "Team {{team}} wins the match!",
             "playerLeftMatch": "{{playerName}} left the match",
             "dropInDisabled": "Drop-in is disabled for this match",
-            "NoAvailableSpawn": "No spawn point is available right now",
+            "NoAvailableSpawn": "No spawn point is currently available",
+            "insufficientFunds": "Insufficient balance to join this match",
             "notFriend": "You cannot join this match because it's friend-only and you are not friends with the host",
             "blockedByPlayer": "A player in the lobby has blocked you so you cannot join.",
             "blockedPlayerInLobby": "A blocked player is in the lobby; do you still want to join?"
@@ -173,7 +174,8 @@
             "start": "START",
             "dropInLabel": "DROP-IN",
             "dropInOn": "ON",
-            "dropInOff": "OFF"
+            "dropInOff": "OFF",
+            "entryFee": "Fee"
         },
         "edit": {
             "title": "Edit game",
@@ -241,6 +243,7 @@
             "matchStats": "MATCH STATS:",
             "yourReward": "YOUR BALANCE",
             "balanceGain": "GAIN:",
+            "entryFeeGain": "POT GAIN:",
             "currentBalance": "BALANCE:",
             "duration": "DURATION:",
             "turns": "TURNS:",
@@ -249,6 +252,7 @@
             "flagCarriers": "FLAG CARRIERS:",
             "quit": "< QUIT",
             "playerColumns": {
+                "gain": "GAIN",
                 "items": "ITEMS",
                 "tiles": "% TILES",
                 "combats": "COMBATS",
@@ -323,7 +327,8 @@
             "play": "PLAY",
             "owner": "by",
             "players": "players",
-            "code": "Code"
+            "code": "Code",
+            "entryFee": "Fee"
         },
         "header": {
             "back": "Back"
@@ -418,6 +423,7 @@
             "dropInDropOut": "Drop in, drop out",
             "elementalMode": "Elemental mode",
             "rapidElimination": "Rapid elimination",
+            "entryFee": "Entry fee (coins)",
             "validate": "Validate"
         },
         "preMatchSettings": {

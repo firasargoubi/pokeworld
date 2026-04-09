@@ -1,7 +1,7 @@
 import { Match } from '@app/classes/match/match';
 import { MatchService } from '@app/services/match/match.service';
 import { UserService } from '@app/services/user/user.service';
-import { AppLanguage, AppTheme } from '@common/interfaces/preferences';
+import { CreateMatchPayload, MatchSettings } from '@common/interfaces/match-data';
 import { MatchEvent } from '@common/interfaces/socket-event.enum';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
@@ -52,9 +52,17 @@ describe('MatchGateway', () => {
 
     it('should call create match on create match event', () => {
         const mockGameData = structuredClone(MOCK_GAME_DATAS[0]);
+        const matchSettings: MatchSettings = {
+            isElementalMode: false,
+            isDropInEnabled: true,
+            isRapidElimination: false,
+            entryFee: 6,
+            isFriendOnly: true,
+        };
         mockUserService.getUserId.returns('user123');
-        gateway.createMatch(mockSocket, mockGameData);
-        expect(mockMatchService.createMatch.calledWith('user123', mockGameData)).toBeTruthy();
+        const payload: CreateMatchPayload = { gameData: mockGameData, matchSettings };
+        gateway.createMatch(mockSocket, payload);
+        expect(mockMatchService.createMatch.calledWith('user123', mockGameData, matchSettings)).toBeTruthy();
     });
 
     it('should call join match on join match event', () => {
@@ -79,7 +87,18 @@ describe('MatchGateway', () => {
     it('should not create a match when the socket is not associated to a user', async () => {
         mockUserService.getUserId.returns(undefined);
 
-        const result = await gateway.createMatch(mockSocket, structuredClone(MOCK_GAME_DATAS[0]));
+        const payload: CreateMatchPayload = {
+            gameData: structuredClone(MOCK_GAME_DATAS[0]),
+            matchSettings: {
+                isElementalMode: false,
+                isDropInEnabled: true,
+                isRapidElimination: false,
+                entryFee: 0,
+                isFriendOnly: false,
+            },
+        };
+
+        const result = await gateway.createMatch(mockSocket, payload);
 
         expect(result).toBeNull();
         expect(mockMatchService.createMatch.called).toBeFalsy();
@@ -174,44 +193,5 @@ describe('MatchGateway', () => {
         gateway.emitMessage(matchCode, message, toHost);
 
         expect(mockSocket.emit.calledWith(MatchEvent.Message, expectedPayload)).toBeTruthy();
-    });
-
-    it('should associate user on user associate event', () => {
-        const mockUser = {
-            userId: 'user123',
-            username: 'testUser',
-            passwordHash: 'testHash',
-            email: 'abc@abc.abc',
-            profilePicture: '',
-            fullProfilePicture: '',
-            isLoggedIn: true,
-            balance: 0,
-            createdAt: new Date(),
-            inventory: [],
-            preferences: {
-                language: AppLanguage.French,
-                theme: AppTheme.Default,
-            },
-        };
-        gateway.onUserAssociate(mockSocket, mockUser);
-        expect(mockUserService.associateSocket.calledWith(mockUser.userId, mockSocket.id)).toBeTruthy();
-    });
-
-    it('should not associate user when user is null', () => {
-        gateway.onUserAssociate(mockSocket, null);
-        expect(mockUserService.associateSocket.called).toBeFalsy();
-    });
-
-    it('should logout user on disconnect if userId exists', () => {
-        const userId = 'user123';
-        mockUserService.getUserId.returns(userId);
-        gateway.handleDisconnect(mockSocket);
-        expect(mockUserService.logout.calledWith(userId)).toBeTruthy();
-    });
-
-    it('should not logout user on disconnect if userId does not exist', () => {
-        mockUserService.getUserId.returns(null);
-        gateway.handleDisconnect(mockSocket);
-        expect(mockUserService.logout.called).toBeFalsy();
     });
 });

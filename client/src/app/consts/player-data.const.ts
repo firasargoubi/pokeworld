@@ -16,4 +16,5 @@ export const DEFAULT_LOBBY_VISUAL_DATA: LobbyVisualData = {
     players: [],
     isSelfHost: false,
     isDropInEnabled: false,
+    entryFee: 0,
 };

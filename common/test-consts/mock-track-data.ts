@@ -1,8 +1,8 @@
-import { MOCK_PLAYER_DATAS } from './mock-players';
-import { TrackingPlayerData } from '../interfaces/track-data';
 import { TrackingData } from '../interfaces/match-data';
 import { Avatar } from '../interfaces/player-data';
 import { TileType } from '../interfaces/tile-type.enum';
+import { TrackingPlayerData } from '../interfaces/track-data';
+import { MOCK_PLAYER_DATAS } from './mock-players';
 
 export const MOCK_TRACKING_PLAYER_DATAS: TrackingPlayerData[] = [
     {

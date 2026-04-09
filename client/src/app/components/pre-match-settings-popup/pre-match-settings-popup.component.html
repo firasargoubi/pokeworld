@@ -22,15 +22,24 @@
             <p class="option-label">{{ 'components.preMatchSettings.price' | translate }}</p>
 
             <div class="input-option">
-                <div class="button-container">
-                    <div class="button-edge"></div>
-                    <div class="button-body"><p>+</p></div>
-                    <div class="button-edge"></div>
-                </div>
-                <input class="price-input" type="number" placeholder="0 $" min="0" pattern="[0-9]*" />
-                <div class="button-container">
+                <div class="button-container" (click)="decrementEntryFee()">
                     <div class="button-edge"></div>
                     <div class="button-body"><p>-</p></div>
+                    <div class="button-edge"></div>
+                </div>
+                <input
+                    class="price-input"
+                    type="number"
+                    placeholder="0 $"
+                    min="0"
+                    [max]="maxEntryFee"
+                    pattern="[0-9]*"
+                    [ngModel]="matchSettings.entryFee"
+                    (ngModelChange)="setEntryFee($event)"
+                />
+                <div class="button-container" (click)="incrementEntryFee()">
+                    <div class="button-edge"></div>
+                    <div class="button-body"><p>+</p></div>
                     <div class="button-edge"></div>
                 </div>
             </div>

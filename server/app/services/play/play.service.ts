@@ -1,4 +1,5 @@
 import { Match } from '@app/classes/match/match';
+import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { BalanceService } from '@app/services/balance/balance.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
@@ -23,12 +24,13 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PlayService {
-    @Inject(BalanceService) private readonly balanceService: BalanceService;
+    @Inject(forwardRef(() => BalanceService)) private readonly balanceService: BalanceService;
     @Inject(MapService) private readonly mapService: MapService;
     @Inject(TrackingService) private readonly trackingService: TrackingService;
     @Inject(forwardRef(() => ItemService)) private readonly itemService: ItemService;
     @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
     @Inject(forwardRef(() => ChatService)) private readonly chatService: ChatService;
+    @Inject(forwardRef(() => MatchGateway)) private readonly matchGateway: MatchGateway;
 
     endTurn(match: Match, playerId: string) {
         if (match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {

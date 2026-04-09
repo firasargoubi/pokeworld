@@ -14,7 +14,7 @@ describe('MatchSettingsPopupComponent', () => {
     let matchServiceMock: {
         data: {
             playData: { isElementalMode: boolean };
-            lobbyData: { isDropInEnabled: boolean; isRapidElimination: boolean };
+            lobbyData: { isDropInEnabled: boolean; isRapidElimination: boolean; isFriendOnly: boolean; entryFee: number };
         };
     };
 
@@ -23,7 +23,7 @@ describe('MatchSettingsPopupComponent', () => {
         matchServiceMock = {
             data: {
                 playData: { isElementalMode: true },
-                lobbyData: { isDropInEnabled: false, isRapidElimination: false },
+                lobbyData: { isDropInEnabled: false, isRapidElimination: false, isFriendOnly: false, entryFee: 3 },
             },
         };
 
@@ -76,12 +76,15 @@ describe('MatchSettingsPopupComponent', () => {
         matchServiceMock.data.playData.isElementalMode = false;
         matchServiceMock.data.lobbyData.isDropInEnabled = true;
         matchServiceMock.data.lobbyData.isRapidElimination = true;
+        matchServiceMock.data.lobbyData.entryFee = 9;
 
         component.synchronizeSettings();
 
         expect(component.matchSettings.isElementalMode).toBeFalse();
         expect(component.matchSettings.isDropInEnabled).toBeTrue();
         expect(component.matchSettings.isRapidElimination).toBeTrue();
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        expect(component.matchSettings.entryFee).toBe(9);
     });
 
     it('should toggle elemental mode and play click sound', () => {
@@ -118,6 +121,7 @@ describe('MatchSettingsPopupComponent', () => {
             isDropInEnabled: true,
             isRapidElimination: false,
             isFriendOnly: false,
+            entryFee: 0,
         };
 
         component.onValidateSelection();

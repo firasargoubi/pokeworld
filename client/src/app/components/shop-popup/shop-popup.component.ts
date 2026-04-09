@@ -34,6 +34,13 @@ export class ShopPopupComponent {
                 this.shopItems = items;
             },
         });
+
+        const userId = this.userService.currentUser?.userId;
+        if (userId) {
+            this.userService.getById(userId).subscribe({
+                next: (user) => this.userService.setUser(user),
+            });
+        }
     }
 
     isOwned(itemId: string): boolean {

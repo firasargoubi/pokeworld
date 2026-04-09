@@ -64,6 +64,14 @@ export class UserService {
         return user ? user : null;
     }
 
+    async getUserResponseById(userId: string): Promise<UserResponseDto> {
+        const user = await this.userModel.findOne({ userId, deleted: false }).exec();
+        if (!user) {
+            throw new NotFoundException(`User ${userId} not found`);
+        }
+        return this.toUserResponse(user);
+    }
+
     async getAllUsers(filters?: Record<string, unknown>): Promise<UserResponseDto[]> {
         const query = filters || {};
         const users = await this.userModel.find(query).select('-passwordHash').exec();
@@ -218,6 +226,18 @@ export class UserService {
         await user.save();
 
         return nextPreferences;
+    }
+
+    async deductBalance(userId: string, amount: number): Promise<number | null> {
+        const updated = await this.userModel
+            .findOneAndUpdate({ userId, balance: { $gte: amount } }, { $inc: { balance: -amount } }, { new: true })
+            .exec();
+        return updated ? updated.balance : null;
+    }
+
+    async updateBalance(userId: string, amount: number): Promise<number> {
+        const updated = await this.userModel.findOneAndUpdate({ userId }, { $inc: { balance: amount } }, { new: true }).exec();
+        return updated?.balance ?? 0;
     }
 
     private hashPassword(password: string): string {

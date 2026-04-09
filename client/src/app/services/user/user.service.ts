@@ -23,6 +23,10 @@ export class UserService {
         return this.currentUserSubject.value;
     }
 
+    getById(userId: string): Observable<UserInfo> {
+        return this.http.get<UserInfo>(`${this.baseUrl}/${ApiEndpoint.User}/${userId}`);
+    }
+
     getAllUsers(): Observable<UserInfo[]> {
         return this.http.get<UserInfo[]>(`${this.baseUrl}/${ApiEndpoint.User}`);
     }

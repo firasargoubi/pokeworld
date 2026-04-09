@@ -2,12 +2,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { GAME_CARD_ROW_LENGTHS, TABLET_BREAKPOINT } from '@app/consts/ui.const';
 import { AudioService } from '@app/services/audio/audio.service';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { MapSize } from '@common/interfaces/map-data';
 import { MOCK_GAME_DATAS } from '@common/test-consts/mock-games';
 import { TranslateModule } from '@ngx-translate/core';
 import { GameCardComponent } from './game-card.component';
-import { GameDataService } from '@app/services/game-data/game-data.service';
 
 describe('GameCardComponent', () => {
     let component: GameCardComponent;
