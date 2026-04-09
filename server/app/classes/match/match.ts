@@ -14,6 +14,7 @@ export class Match {
     private botTimeout: NodeJS.Timeout | null = null;
     private availableSpawnPoints: Position[] = [];
     private dropOutVictories: Map<string, number> = new Map();
+    private paidEntryFeeUserIds: Set<string> = new Set();
 
     constructor(matchData: MatchData, matchService: MatchService) {
         this.data = matchData;
@@ -72,6 +73,23 @@ export class Match {
         this.data.lobbyData.isDropInEnabled = matchSettings.isDropInEnabled;
         this.data.lobbyData.isRapidElimination = matchSettings.isRapidElimination;
         this.data.lobbyData.isFriendOnly = matchSettings.isFriendOnly;
+        this.data.lobbyData.entryFee = matchSettings.entryFee >= 0 ? Math.floor(matchSettings.entryFee) : 0;
+    }
+
+    hasPaidEntryFee(userId: string): boolean {
+        return this.paidEntryFeeUserIds.has(userId);
+    }
+
+    markEntryFeePaid(userId: string): void {
+        this.paidEntryFeeUserIds.add(userId);
+    }
+
+    removePaidEntryFee(userId: string): void {
+        this.paidEntryFeeUserIds.delete(userId);
+    }
+
+    getPaidEntryFeeCount(): number {
+        return this.paidEntryFeeUserIds.size;
     }
 
     leave(playerId: string): void {
@@ -217,6 +235,9 @@ export class Match {
         }
         const connectedPlayers = this.data.players.filter((p) => p.isConnected);
         if (connectedPlayers.length === 1) {
+            if (this.data.state !== MatchState.Lobby) {
+                this.matchService.handleLastPlayerWin(this, connectedPlayers[0]);
+            }
             this.kickPlayer(connectedPlayers[0].id, Message.LastPlayerRemaining);
         } else {
             if (this.isActivePlayer(player.id) && this.isState([MatchState.TurnWait])) {

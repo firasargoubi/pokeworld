@@ -4,6 +4,7 @@ import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { TrackingService } from '@app/services/tracking/tracking.service';
+import { UserService } from '@app/services/user/user.service';
 import { REGULAR_ITEMS } from '@common/consts/map-data.const';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode } from '@common/interfaces/map-data';
@@ -24,6 +25,7 @@ describe('LobbyService', () => {
     let mockMatch: SinonStubbedInstance<Match>;
     let mocktrackingService: SinonStubbedInstance<TrackingService>;
     let mockMapService: SinonStubbedInstance<MapService>;
+    let mockUserService: SinonStubbedInstance<UserService>;
 
     beforeAll(async () => {
         sandbox = createSandbox();
@@ -33,6 +35,7 @@ describe('LobbyService', () => {
         mockMatch = createStubInstance<Match>(Match);
         mocktrackingService = createStubInstance<TrackingService>(TrackingService);
         mockMapService = createStubInstance<MapService>(MapService);
+        mockUserService = createStubInstance<UserService>(UserService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -42,6 +45,7 @@ describe('LobbyService', () => {
                 { provide: BotService, useValue: mockBotService },
                 { provide: TrackingService, useValue: mocktrackingService },
                 { provide: MapService, useValue: mockMapService },
+                { provide: UserService, useValue: mockUserService },
             ],
         }).compile();
 
@@ -52,6 +56,8 @@ describe('LobbyService', () => {
         mockMatch = createStubInstance<Match>(Match);
         mockMatch.data = structuredClone(MOCK_MATCH_DATAS[1]);
         mockMatch.isState.returns(true);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        mockUserService.deductBalance.resolves(1000);
         mockMapService.getNearestEmptyTile.resetHistory();
         mockMapService.getNearestEmptyTile.callsFake((_matchData, position) => position);
     });
@@ -84,36 +90,36 @@ describe('LobbyService', () => {
         expect(player.avatar).toBe(Avatar.Avatar11);
     });
 
-    it('should change is connected on join lobby', () => {
+    it('should change is connected on join lobby', async () => {
         const player = structuredClone(MOCK_PLAYER_DATAS[0]);
 
-        service.joinLobby(mockMatch, player.id, player);
+        await service.joinLobby(mockMatch, player.id, player);
 
         expect(player.isConnected).toBe(true);
     });
 
-    it('should remove player when drop in disabled mid match', () => {
+    it('should remove player when drop in disabled mid match', async () => {
         const player = structuredClone(MOCK_PLAYER_DATAS[0]);
         mockMatch.isState.returns(false);
         mockMatch.data.lobbyData.isDropInEnabled = false;
 
-        service.joinLobby(mockMatch, player.id, player);
+        await service.joinLobby(mockMatch, player.id, player);
 
         expect(mockMatchService.playerRemovedFromMatch.calledWith(player.id, Message.DropInDisabled)).toBeTruthy();
     });
 
-    it('should remove player when no spawn points are available', () => {
+    it('should remove player when no spawn points are available', async () => {
         const player = structuredClone(MOCK_PLAYER_DATAS[0]);
         mockMatch.isState.returns(false);
         mockMatch.data.lobbyData.isDropInEnabled = true;
         mockMatch.getNextAvailableSpawnPoint.returns(null);
 
-        service.joinLobby(mockMatch, player.id, player);
+        await service.joinLobby(mockMatch, player.id, player);
 
         expect(mockMatchService.playerRemovedFromMatch.calledWith(player.id, Message.NoAvailableSpawn)).toBeTruthy();
     });
 
-    it('should handle drop in when enabled', () => {
+    it('should handle drop in when enabled', async () => {
         const player = structuredClone(MOCK_PLAYER_DATAS[0]);
         mockMatch.isState.returns(false);
         mockMatch.data.lobbyData.isDropInEnabled = true;
@@ -121,7 +127,7 @@ describe('LobbyService', () => {
         const nearestTile = { x: 3, y: 4 };
         mockMapService.getNearestEmptyTile.returns(nearestTile);
 
-        service.joinLobby(mockMatch, player.id, player);
+        await service.joinLobby(mockMatch, player.id, player);
 
         expect(player.spawnPoint).toEqual({ x: 2, y: 2 });
         expect(player.position).toEqual(nearestTile);
@@ -129,7 +135,7 @@ describe('LobbyService', () => {
         expect(mockMatch.sendUpdate.calledOnce).toBeTruthy();
     });
 
-    it('should assign drop in team in ctf mode', () => {
+    it('should assign drop in team in ctf mode', async () => {
         const player = structuredClone(MOCK_PLAYER_DATAS[2]);
         mockMatch.isState.returns(false);
         mockMatch.data.lobbyData.isDropInEnabled = true;
@@ -141,12 +147,12 @@ describe('LobbyService', () => {
         ] as PlayerData[];
         mockMatch.getNextAvailableSpawnPoint.returns({ x: 4, y: 4 });
 
-        service.joinLobby(mockMatch, player.id, player);
+        await service.joinLobby(mockMatch, player.id, player);
 
         expect(player.team).toBe(Team.Blue);
     });
 
-    it('should insert drop in player by speed and update indexes', () => {
+    it('should insert drop in player by speed and update indexes', async () => {
         const player = { ...structuredClone(MOCK_PLAYER_DATAS[3]), id: 'dropPlayer', name: 'dropPlayerName', speed: 5 };
         const spawn = { x: 9, y: 9 };
         mockMatch.isState.returns(false);
@@ -164,7 +170,7 @@ describe('LobbyService', () => {
             { ...structuredClone(MOCK_PLAYER_COMBAT_DATAS[1]), playerIndex: 2 },
         ];
 
-        service.joinLobby(mockMatch, player.id, player);
+        await service.joinLobby(mockMatch, player.id, player);
 
         expect(mockMatch.data.players.map((p) => p.id)).toEqual(['hostPlayer', 'dropPlayer', 'midPlayer', 'slowPlayer']);
         expect(player.spawnPoint).toEqual(spawn);
@@ -195,10 +201,17 @@ describe('LobbyService', () => {
             isDropInEnabled: true,
             isRapidElimination: false,
             isFriendOnly: false,
+            entryFee: 0,
         });
 
         expect(
-            mockMatch.changeSettings.calledWith({ isElementalMode: true, isDropInEnabled: true, isRapidElimination: false, isFriendOnly: false }),
+            mockMatch.changeSettings.calledWith({
+                isElementalMode: true,
+                isDropInEnabled: true,
+                isRapidElimination: false,
+                isFriendOnly: false,
+                entryFee: 0,
+            }),
         ).toBeTruthy();
         expect(mockMatch.sendUpdate.calledOnce).toBeTruthy();
     });

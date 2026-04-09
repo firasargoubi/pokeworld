@@ -17,7 +17,12 @@
                 </p>
                 <p class="size-info">{{ game.mapData.size }}x{{ game.mapData.size }}</p>
                 @if(matchData){
-                <div [className]="matchStateIconClass"></div>
+                <div class="match-state-container">
+                    <div [className]="matchStateIconClass"></div>
+                    @if(matchData.lobbyData.entryFee > 0) {
+                    <p class="entry-fee-label">{{ matchData.lobbyData.entryFee }}$</p>
+                    }
+                </div>
                 }
                 <div style="background-image: url('{{ this.game.thumbnail }}');" [class.visible]="this.game.thumbnail !== ''" class="thumbnail"></div>
                 <div class="thumbnail-separator"></div>

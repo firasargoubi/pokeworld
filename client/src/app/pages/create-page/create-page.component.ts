@@ -10,7 +10,6 @@ import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
-import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
@@ -30,7 +29,6 @@ export class CreatePageComponent implements OnInit {
     isSettingsPopupVisible = false;
     pendingGame: GameData | null = null;
     private readonly audioService: AudioService = inject(AudioService);
-    private readonly lobbyService: LobbyService = inject(LobbyService);
     private isCreatingMatch = false;
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);
@@ -71,8 +69,7 @@ export class CreatePageComponent implements OnInit {
                 }
                 if (!this.isCreatingMatch) {
                     this.isCreatingMatch = true;
-                    const isMatchCreated = await this.matchService.createMatch(gameData);
-                    this.lobbyService.changeMatchSettings(matchSettings);
+                    const isMatchCreated = await this.matchService.createMatch(gameData, matchSettings);
                     if (!isMatchCreated) {
                         this.loadGames();
                         this.isCreatingMatch = false;

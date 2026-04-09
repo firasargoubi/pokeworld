@@ -81,8 +81,15 @@ describe('MatchService', () => {
 
     it('create match should emit create match event', () => {
         const gameData = structuredClone(MOCK_GAME_DATAS[0]);
-        service.createMatch(gameData);
-        expect(socketServiceSpy.emit).toHaveBeenCalledWith(MatchEvent.CreateMatch, gameData, jasmine.any(Function));
+        const matchSettings = {
+            isElementalMode: false,
+            isDropInEnabled: false,
+            isRapidElimination: false,
+            entryFee: 7,
+            isFriendOnly: true,
+        };
+        service.createMatch(gameData, matchSettings);
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(MatchEvent.CreateMatch, { gameData, matchSettings }, jasmine.any(Function));
     });
 
     it('join match should emit join match event', () => {

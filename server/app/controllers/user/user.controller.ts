@@ -21,6 +21,15 @@ export class UserController {
         return this.userService.getAllUsers(filters);
     }
 
+    @Get(':userId')
+    @ApiOperation({ summary: 'Get user by ID' })
+    @ApiParam({ name: 'userId', description: 'User ID' })
+    @ApiResponse({ status: 200, description: 'Returns user', type: UserResponseDto })
+    @ApiResponse({ status: 404, description: 'User not found' })
+    async getUserById(@Param('userId') userId: string): Promise<UserResponseDto> {
+        return this.userService.getUserResponseById(userId);
+    }
+
     @Get('check/:username')
     @ApiOperation({ summary: 'Check if username exists' })
     @ApiParam({ name: 'username', description: 'Username to check' })

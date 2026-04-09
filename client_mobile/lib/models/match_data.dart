@@ -290,6 +290,17 @@ class MatchSettings {
   }
 }
 
+class CreateMatchPayload {
+  final GameData gameData;
+  final MatchSettings matchSettings;
+
+  const CreateMatchPayload({required this.gameData, required this.matchSettings});
+
+  Map<String, dynamic> toJson() {
+    return {'gameData': gameData.toJson(), 'matchSettings': matchSettings.toJson()};
+  }
+}
+
 enum CombatAction {
   None('none'),
   SuccessAttack('successAttack'),

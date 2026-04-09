@@ -1,7 +1,6 @@
 import { MatchService } from '@app/services/match/match.service';
 import { UserService } from '@app/services/user/user.service';
-import { GameData } from '@common/interfaces/game-data';
-import { MatchData } from '@common/interfaces/match-data';
+import { CreateMatchPayload, MatchData } from '@common/interfaces/match-data';
 import { MessageFromServer } from '@common/interfaces/message-from-server';
 import { JoinPageEvent, MatchEvent, UserEvent } from '@common/interfaces/socket-event.enum';
 import { UserInfo } from '@common/interfaces/user';
@@ -17,12 +16,12 @@ export class MatchGateway {
     @Inject(forwardRef(() => UserService)) private readonly userService: UserService;
 
     @SubscribeMessage(MatchEvent.CreateMatch)
-    async createMatch(socket: Socket, gameData: GameData): Promise<MatchData | null> {
+    async createMatch(socket: Socket, payload: CreateMatchPayload): Promise<MatchData | null> {
         const playerId = this.userService.getUserId(socket.id);
         if (!playerId) {
             return null;
         }
-        return this.matchService.createMatch(playerId, gameData);
+        return this.matchService.createMatch(playerId, payload.gameData, payload.matchSettings);
     }
 
     @SubscribeMessage(MatchEvent.JoinMatch)
@@ -45,15 +44,6 @@ export class MatchGateway {
         this.matchService.leaveMatch(playerId);
     }
 
-    @SubscribeMessage(UserEvent.Associate)
-    onUserAssociate(socket: Socket, user: UserInfo) {
-        if (user) {
-            this.userService.associateSocket(user.userId, socket.id);
-        } else {
-            this.userService.disassociateSocketBySocketId(socket.id);
-        }
-    }
-
     @SubscribeMessage(JoinPageEvent.JoinRoom)
     async handleJoinRoom(socket: Socket) {
         socket.join(JoinPageEvent.Room);
@@ -67,6 +57,15 @@ export class MatchGateway {
         socket.leave(JoinPageEvent.Room);
     }
 
+    @SubscribeMessage(UserEvent.Associate)
+    onUserAssociate(socket: Socket, user: UserInfo) {
+        if (user) {
+            this.userService.associateSocket(user.userId, socket.id);
+        } else {
+            this.userService.disassociateSocketBySocketId(socket.id);
+        }
+    }
+
     async broadcastMatchListUpdate() {
         const sockets = this.server.sockets.sockets;
         sockets.forEach(async (socket) => {
@@ -77,13 +76,12 @@ export class MatchGateway {
             }
         });
     }
-
     handleDisconnect(socket: Socket) {
-        this.leaveMatch(socket);
         const userId = this.userService.getUserId(socket.id);
         if (userId) {
             this.userService.logout(userId);
         }
+        this.leaveMatch(socket);
     }
 
     connectPlayer(playerId: string, matchCode: string) {

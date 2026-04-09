@@ -55,4 +55,3 @@ export enum JoinPageEvent {
     UpdateMatchList = 'updateMatchList',
     Room = 'joinPageRoom',
 }
-

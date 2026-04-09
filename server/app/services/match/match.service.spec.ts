@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
+import { User } from '@app/model/schema/user.schema';
 import { BotService } from '@app/services/bot/bot.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
@@ -70,6 +71,7 @@ describe('MatchService', () => {
         mockMatch.isState.returns(true);
         mockMatch.isFull.returns(false);
         mockMatch.hasAvailableSpawnPoint.returns(true);
+        mockUserService.getUserById.resolves({ userId: 'any', balance: 999999 } as unknown as User);
         service['matches'] = new Map();
         service['playerToMatchCode'] = new Map();
     });
@@ -86,16 +88,28 @@ describe('MatchService', () => {
         const playerId = 'player1';
         const matchCode = '1234';
         const gameData = structuredClone(MOCK_GAME_DATAS[0]);
+        const matchSettings = {
+            isElementalMode: true,
+            isDropInEnabled: true,
+            isRapidElimination: false,
+            entryFee: 8,
+            isFriendOnly: true,
+        };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'canCreateMatch').returns(true);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getNewMatchCode').returns('1234');
 
-        const matchData = await service.createMatch(playerId, gameData);
+        const matchData = await service.createMatch(playerId, gameData, matchSettings);
 
         expect(matchData.code).toBe(matchCode);
         expect(matchData.gameData).toBe(gameData);
         expect(matchData.players[0].id).toBe(playerId);
+        expect(matchData.playData.isElementalMode).toBe(true);
+        expect(matchData.lobbyData.isDropInEnabled).toBe(true);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        expect(matchData.lobbyData.entryFee).toBe(8);
+        expect(matchData.lobbyData.isFriendOnly).toBe(true);
         expect(mockMatchGateway.connectPlayer.calledWith(playerId, matchCode)).toBe(true);
     });
 

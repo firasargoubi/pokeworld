@@ -22,6 +22,7 @@ export class MatchSettingsPopupComponent implements OnChanges {
         isElementalMode: false,
         isDropInEnabled: false,
         isRapidElimination: false,
+        entryFee: 0,
         isFriendOnly: false,
     };
 
@@ -39,6 +40,7 @@ export class MatchSettingsPopupComponent implements OnChanges {
         this.matchSettings.isDropInEnabled = this.matchService.data.lobbyData.isDropInEnabled;
         this.matchSettings.isRapidElimination = this.matchService.data.lobbyData.isRapidElimination;
         this.matchSettings.isFriendOnly = this.matchService.data.lobbyData.isFriendOnly;
+        this.matchSettings.entryFee = this.matchService.data.lobbyData.entryFee ?? 0;
     }
 
     toggleElementalMode() {

@@ -4,6 +4,7 @@ import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { TrackingService } from '@app/services/tracking/tracking.service';
+import { UserService } from '@app/services/user/user.service';
 import { REGULAR_ITEMS } from '@common/consts/map-data.const';
 import { RANDOM_THRESHOLD } from '@common/consts/match-data.const';
 import { MIN_PLAYERS } from '@common/consts/player-data.const';
@@ -22,15 +23,13 @@ export class LobbyService {
     @Inject(forwardRef(() => BotService)) private readonly botService: BotService;
     @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
     @Inject(MapService) private readonly mapService: MapService;
+    @Inject(forwardRef(() => UserService)) private readonly userService: UserService;
 
     kickPlayer(match: Match, playerId: string, targetPlayerId: string) {
-        const isHost = match.isHost(playerId);
-        const isTryingToKickThemselve = playerId === targetPlayerId;
-
-        if (isHost && !isTryingToKickThemselve) {
-            match.kickPlayer(targetPlayerId, Message.Kick);
-            match.sendUpdate();
-        }
+        if (!match.isHost(playerId) || playerId === targetPlayerId) return;
+        this.matchService.refundEntryFeeIfPaid(match, targetPlayerId);
+        match.kickPlayer(targetPlayerId, Message.Kick);
+        match.sendUpdate();
     }
 
     changeAvatar(match: Match, playerId: string, avatar: Avatar) {
@@ -39,13 +38,10 @@ export class LobbyService {
         match.sendUpdate();
     }
 
-    joinLobby(match: Match, playerId: string, playerData: PlayerData) {
-        if (match.isState([MatchState.Lobby])) {
-            this.joinLobbyState(match, playerId, playerData);
-            return;
-        }
-
-        this.joinDropInState(match, playerId, playerData);
+    async joinLobby(match: Match, playerId: string, playerData: PlayerData) {
+        await (match.isState([MatchState.Lobby])
+            ? this.joinLobbyState(match, playerId, playerData)
+            : this.joinDropInState(match, playerId, playerData));
     }
 
     changeLockStatus(match: Match, playerId: string, lockStatus: boolean) {
@@ -63,64 +59,62 @@ export class LobbyService {
     }
 
     startMatch(match: Match, playerId: string) {
-        const isInLobby = match.isState([MatchState.Lobby]);
-        const hasEnoughPlayers = match.data.players.length >= MIN_PLAYERS;
-        const isLocked = match.data.lobbyData.isLocked;
-        const isHost = match.isHost(playerId);
-        const isEvenPlayers = match.data.players.length % 2 === 0;
-        const isCtfMode = match.data.gameData.mapData.gameMode === GameMode.CTF;
-
-        if (isInLobby && isHost) {
-            if (!hasEnoughPlayers) {
-                match.sendMessageToHost(Message.NotEnoughPlayers);
-            } else if (!isLocked) {
-                match.sendMessageToHost(Message.NotLocked);
-            } else if (isCtfMode && !isEvenPlayers) {
-                match.sendMessageToHost(Message.NotEvenPlayers);
-            } else {
-                this.startMatchFirstTurn(match);
-            }
+        if (!match.isState([MatchState.Lobby]) || !match.isHost(playerId)) return;
+        if (match.data.players.length < MIN_PLAYERS) return match.sendMessageToHost(Message.NotEnoughPlayers);
+        if (!match.data.lobbyData.isLocked) return match.sendMessageToHost(Message.NotLocked);
+        if (match.data.gameData.mapData.gameMode === GameMode.CTF && match.data.players.length % 2 !== 0) {
+            return match.sendMessageToHost(Message.NotEvenPlayers);
         }
+        this.startMatchFirstTurn(match);
     }
 
     addBot(match: Match, botType: PlayerType) {
-        if (!match.isFull()) {
-            const botData = this.botService.getBotData(match);
-            if (botData !== null) {
-                botData.type = botType;
-                match.data.players.push(botData);
-                this.matchService.addPlayerToMatchCode(botData.id, match.data.code);
-                if (match.isFull()) {
-                    match.changeLockStatus(true);
-                }
-                match.sendUpdate();
-            }
-        }
+        if (match.isFull()) return;
+        const botData = this.botService.getBotData(match);
+        if (!botData) return;
+        botData.type = botType;
+        match.data.players.push(botData);
+        this.matchService.addPlayerToMatchCode(botData.id, match.data.code);
+        if (match.isFull()) match.changeLockStatus(true);
+        match.sendUpdate();
     }
 
     getUniqueName(match: Match, playerId: string, name: string): string {
         let newName = name;
         let suffix = 2;
         while (match.data.players.some((p) => p.name === newName && p.id !== playerId)) {
-            newName = `${name}-${suffix}`;
-            suffix++;
+            newName = `${name}-${suffix++}`;
         }
         return newName;
     }
 
-    private joinLobbyState(match: Match, playerId: string, playerData: PlayerData) {
+    private async ensureEntryFeePaid(match: Match, playerId: string, userId?: string): Promise<boolean> {
+        const entryFee = match.data.lobbyData.entryFee;
+        if (entryFee <= 0 || !userId || match.hasPaidEntryFee(userId)) return true;
+
+        const newBalance = await this.userService.deductBalance(userId, entryFee);
+        if (newBalance === null) {
+            this.matchService.playerRemovedFromMatch(playerId, Message.InsufficientFunds);
+            return false;
+        }
+
+        match.markEntryFeePaid(userId);
+        return true;
+    }
+
+    private mergePlayer(existingPlayer: PlayerData, incoming: PlayerData, playerId: string): PlayerData {
+        return { ...existingPlayer, ...incoming, id: playerId, isConnected: true };
+    }
+
+    private async joinLobbyState(match: Match, playerId: string, playerData: PlayerData) {
+        if (!(await this.ensureEntryFeePaid(match, playerId, playerData.userId))) return;
+
         const placeholderIndex = this.findPlaceholderIndex(match, playerId);
         playerData.name = this.getUniqueName(match, playerId, playerData.name);
         playerData.isConnected = true;
 
         if (placeholderIndex !== -1) {
-            const existingPlayer = match.data.players[placeholderIndex];
-            const updatedPlayer: PlayerData = {
-                ...existingPlayer,
-                ...playerData,
-                id: playerId,
-                isConnected: true,
-            };
+            const updatedPlayer = this.mergePlayer(match.data.players[placeholderIndex], playerData, playerId);
             this.registerTrackingPlayer(match, playerId, updatedPlayer);
             match.data.players[placeholderIndex] = updatedPlayer;
         } else {
@@ -132,16 +126,15 @@ export class LobbyService {
         match.sendUpdate();
     }
 
-    private joinDropInState(match: Match, playerId: string, playerData: PlayerData) {
+    private async joinDropInState(match: Match, playerId: string, playerData: PlayerData) {
+        if (!(await this.ensureEntryFeePaid(match, playerId, playerData.userId))) return;
+
         match.data.players = match.data.players.filter((p) => !(p.id === playerId && !p.name));
         const reconnectUserId = playerData.id?.trim();
         const disconnectedPlayerIndex = reconnectUserId ? this.findDisconnectedPlayerIndexByUserId(match, reconnectUserId) : -1;
 
-        if (disconnectedPlayerIndex === -1) {
-            playerData.name = this.getUniqueName(match, playerId, playerData.name);
-        } else {
-            this.remapReconnectingPlayerSocket(match, disconnectedPlayerIndex, playerId);
-        }
+        if (disconnectedPlayerIndex !== -1) this.remapReconnectingPlayerSocket(match, disconnectedPlayerIndex, playerId);
+        else playerData.name = this.getUniqueName(match, playerId, playerData.name);
 
         playerData.isConnected = true;
         this.handleDropIn(match, playerId, playerData, disconnectedPlayerIndex);
@@ -178,15 +171,10 @@ export class LobbyService {
     }
 
     private assignTeams(match: Match) {
-        if (match.data.gameData.mapData.gameMode === GameMode.CTF) {
-            const connectedPlayers = match.data.players.filter((p) => p.isConnected);
-            const shuffled = connectedPlayers.sort(() => Math.random() - RANDOM_THRESHOLD);
-            const half = shuffled.length / 2;
-
-            shuffled.forEach((player, index) => {
-                player.team = index < half ? Team.Red : Team.Blue;
-            });
-        }
+        if (match.data.gameData.mapData.gameMode !== GameMode.CTF) return;
+        const shuffled = match.data.players.filter((p) => p.isConnected).sort(() => Math.random() - RANDOM_THRESHOLD);
+        const half = shuffled.length / 2;
+        shuffled.forEach((player, index) => (player.team = index < half ? Team.Red : Team.Blue));
     }
 
     private sortPlayers(match: Match): void {
@@ -201,13 +189,11 @@ export class LobbyService {
     }
 
     private assignSpawnPoints(match: Match) {
-        const spawnPoints = structuredClone(match.data.gameData.mapData.items.Spawn);
-        const shuffledSpawnPoints = spawnPoints.sort(() => Math.random() - RANDOM_THRESHOLD);
-        const assignedSpawnPoints = shuffledSpawnPoints.slice(0, match.data.players.length);
-        match.setAvailableSpawnPoints(shuffledSpawnPoints.slice(match.data.players.length));
-        match.data.gameData.mapData.items.Spawn = assignedSpawnPoints;
+        const spawnPoints = structuredClone(match.data.gameData.mapData.items.Spawn).sort(() => Math.random() - RANDOM_THRESHOLD);
+        match.data.gameData.mapData.items.Spawn = spawnPoints.slice(0, match.data.players.length);
+        match.setAvailableSpawnPoints(spawnPoints.slice(match.data.players.length));
 
-        assignedSpawnPoints.forEach((spawnPoint, i) => {
+        match.data.gameData.mapData.items.Spawn.forEach((spawnPoint, i) => {
             const player = match.data.players[i];
             player.spawnPoint = spawnPoint;
             player.position = spawnPoint;
@@ -301,12 +287,7 @@ export class LobbyService {
             return false;
         }
 
-        const updatedPlayer: PlayerData = {
-            ...existingPlayer,
-            ...playerData,
-            id: playerId,
-            isConnected: true,
-        };
+        const updatedPlayer = this.mergePlayer(existingPlayer, playerData, playerId);
         updatedPlayer.combatsWon = storedVictories ?? existingPlayer.combatsWon;
         updatedPlayer.isObserver = existingPlayer.isObserver;
         match.data.players[existingIndex] = updatedPlayer;
@@ -324,20 +305,19 @@ export class LobbyService {
     }
 
     private registerTrackingPlayer(match: Match, playerId: string, playerData: PlayerData) {
+        const isValidTile = (pos?: { x: number; y: number }) => !!pos && pos.x >= 0 && pos.y >= 0;
         const trackingPlayerId = playerData.userId ?? playerId;
         const trackingPlayer = match.data.trackingData.players.find((player) => player.id === trackingPlayerId);
 
-        const hasSpawnPoint = playerData.spawnPoint && playerData.spawnPoint.x >= 0 && playerData.spawnPoint.y >= 0;
+        const hasSpawnPoint = isValidTile(playerData.spawnPoint);
         if (trackingPlayer) {
             trackingPlayer.id = trackingPlayerId;
             trackingPlayer.team = playerData.team;
 
-            const hasPosition =
-                playerData.position &&
-                playerData.position.x >= 0 &&
-                playerData.position.y >= 0 &&
-                !trackingPlayer.coveredGroundTiles.some((position) => position.x === playerData.position.x && position.y === playerData.position.y);
-            if (hasPosition) {
+            if (
+                isValidTile(playerData.position) &&
+                !trackingPlayer.coveredGroundTiles.some((pos) => pos.x === playerData.position.x && pos.y === playerData.position.y)
+            ) {
                 trackingPlayer.coveredGroundTiles.push(structuredClone(playerData.position));
             }
             return;
@@ -364,12 +344,8 @@ export class LobbyService {
     }
 
     private getDropInInsertIndex(match: Match, playerSpeed: number): number {
-        for (let i = 0; i < match.data.players.length; i++) {
-            if (playerSpeed > match.data.players[i].speed) {
-                return i;
-            }
-        }
-        return match.data.players.length;
+        const index = match.data.players.findIndex((p) => playerSpeed > p.speed);
+        return index === -1 ? match.data.players.length : index;
     }
 
     private updateIndexesAfterDropIn(match: Match, insertIndex: number) {
@@ -391,9 +367,7 @@ export class LobbyService {
     private setupRandomItems(match: Match): void {
         const matchData: MatchData = match.data;
         const items = matchData.gameData.mapData.items;
-        const unusedItems = REGULAR_ITEMS.filter((itemType) => {
-            return !items[itemType] || items[itemType].length === 0;
-        });
+        const unusedItems = REGULAR_ITEMS.filter((itemType) => !items[itemType]?.length);
 
         unusedItems.sort(() => Math.random() - RANDOM_THRESHOLD);
 

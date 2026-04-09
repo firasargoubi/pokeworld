@@ -62,6 +62,13 @@ export class UserPopupComponent implements OnDestroy {
             }
         });
 
+        const userId = this.userService.currentUser?.userId;
+        if (userId) {
+            this.userService.getById(userId).subscribe({
+                next: (user) => this.userService.setUser(user),
+            });
+        }
+
         this.searchSub = this.searchSubject.pipe(debounceTime(this.searchDebounceMs), distinctUntilChanged()).subscribe((value) => {
             this.socialService.setSearchQuery(value);
         });

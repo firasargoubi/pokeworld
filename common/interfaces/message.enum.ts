@@ -20,7 +20,9 @@ export enum Message {
     PlayerLeftMatch = 'server.messages.playerLeftMatch',
     DropInDisabled = 'server.messages.dropInDisabled',
     NoAvailableSpawn = 'server.messages.NoAvailableSpawn',
+    InsufficientFunds = 'server.messages.insufficientFunds',
     NotFriend = 'server.messages.notFriend',
+    AccountNotFound = 'server.messages.accountNotFound',
     BlockedByPlayer = 'server.messages.blockedByPlayer',
     BlockedPlayerInLobby = 'server.messages.blockedPlayerInLobby',
 }

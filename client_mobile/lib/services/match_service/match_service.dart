@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import '../../consts/match_data_const.dart';
 import '../../consts/message_enum.dart';
 import '../../consts/player_data_const.dart';
-import '../../models/game_data.dart';
 import '../../models/match_data.dart';
 import '../../models/message_from_server.dart';
 import '../../models/player_data.dart';
@@ -101,10 +100,10 @@ class MatchService {
     });
   }
 
-  void createMatch(GameData gameData, {VoidCallback? onSuccess}) {
+  void createMatch(CreateMatchPayload payload, {VoidCallback? onSuccess}) {
     _onCreateMatchSuccess = onSuccess;
-    _socketService.emit(MatchEvent.CreateMatch.value, gameData, (payload) {
-      onMatchJoin(payload);
+    _socketService.emit(MatchEvent.CreateMatch.value, payload.toJson(), (responsePayload) {
+      onMatchJoin(responsePayload);
       if (_matchData != null) {
         _chatService.createChannel(_matchData!.code, isDedicatedChannel: true);
         _chatService.setActiveMatchCode(_matchData!.code);

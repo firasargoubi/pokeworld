@@ -27,6 +27,7 @@ export class StatPageComponent {
     });
     playerStatTypes: PlayerStatType[] = Object.values(PlayerStatType);
     statTypeLabels: Record<PlayerStatType, string> = {
+        [PlayerStatType.BalanceGain]: 'pages.stat.playerColumns.gain',
         [PlayerStatType.DiscoveredItemsCount]: 'pages.stat.playerColumns.items',
         [PlayerStatType.VisitedTilesRatio]: 'pages.stat.playerColumns.tiles',
         [PlayerStatType.Combats]: 'pages.stat.playerColumns.combats',
@@ -49,11 +50,12 @@ export class StatPageComponent {
         }
     }
 
-    get formattedBalanceGain(): string {
-        const selfPlayerId = this.matchService.selfPlayer.userId ?? this.matchService.selfPlayer.id;
-        const selfPlayerStat = this.statService.playerStats.find((player) => player.id === selfPlayerId);
-        const value = selfPlayerStat?.balanceGain ?? 0;
-        return `${value >= 0 ? '+' : ''}${value} $`;
+    isBalanceGainColumn(statType: PlayerStatType): boolean {
+        return statType === PlayerStatType.BalanceGain;
+    }
+
+    formatGain(value: number): string {
+        return `${value >= 0 ? '+' : ''}${value}$`;
     }
 
     updateSorting(statType: PlayerStatType) {

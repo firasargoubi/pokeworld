@@ -259,17 +259,35 @@ $bg-btn-red: linear-gradient(
     text-shadow: calc($base-size * 0.35) 0 0 $color-shadow-text-strong;
 }
 
-.state-icon {
+.match-state-container {
     position: absolute;
-    aspect-ratio: 1/1;
-    min-height: 20%;
     bottom: 3%;
     left: 2%;
-    overflow: visible;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: visible;
+}
+
+.state-icon {
+    position: static;
+    aspect-ratio: 1/1;
+    min-height: calc(var(--base-size) * 5);
+    overflow: visible;
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
+    width: calc(var(--base-size) * 5);
+}
+
+.entry-fee-label {
+    font-size: calc(var(--base-size) * 2);
+    text-shadow: calc($base-size * 0.2) 0 0 $color-shadow-text;
+    text-align: center;
+    color: $color-white;
+    -webkit-text-stroke: calc($base-size * 0.4) $color-gray-border;
+    paint-order: stroke fill;
 }
 
 .lobby {

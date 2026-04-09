@@ -8,10 +8,12 @@ import { CombatService } from '@app/services/combat/combat.service';
 import { GameService } from '@app/services/game/game.service';
 import { PlayService } from '@app/services/play/play.service';
 import { SocialService } from '@app/services/social/social.service';
-import { DEFAULT_MATCH_DATA, MATCH_CODE_LENGTH, MATCH_CODE_RANGE } from '@common/consts/match-data.const';
+import { UserService } from '@app/services/user/user.service';
+import { DEFAULT_MATCH_DATA, ENTRY_FEE_WINNER_DIVISOR, MATCH_CODE_LENGTH, MATCH_CODE_RANGE } from '@common/consts/match-data.const';
 import { DEFAULT_PLAYER_DATA } from '@common/consts/player-data.const';
+import { MATCH_BALANCE_REWARDS } from '@common/consts/shop.const';
 import { GameData } from '@common/interfaces/game-data';
-import { MatchData, MatchState } from '@common/interfaces/match-data';
+import { MatchData, MatchSettings, MatchState } from '@common/interfaces/match-data';
 import { Message } from '@common/interfaces/message.enum';
 import { PlayerData } from '@common/interfaces/player-data';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -24,20 +26,25 @@ export class MatchService {
     @Inject(forwardRef(() => BotService)) private botService: BotService;
     @Inject(forwardRef(() => ChatService)) private chatService: ChatService;
     @Inject(forwardRef(() => SocialService)) private socialService: SocialService;
+    @Inject(forwardRef(() => UserService)) private userService: UserService;
     @Inject(GameService) private gameService: GameService;
     private matches: Map<string, Match> = new Map();
     private playerToMatchCode: Map<string, string> = new Map();
 
-    async createMatch(playerId: string, gameData: GameData): Promise<MatchData | null> {
+    async createMatch(playerId: string, gameData: GameData, matchSettings?: MatchSettings): Promise<MatchData | null> {
         let matchData = null;
-        if (await this.canCreateMatch(playerId, gameData)) {
-            matchData = {
+        if (await this.canCreateMatch(playerId, gameData, matchSettings?.entryFee || 0)) {
+            const initialMatchData = {
                 ...structuredClone(DEFAULT_MATCH_DATA),
                 code: this.getNewMatchCode(),
                 gameData,
                 players: [{ ...structuredClone(DEFAULT_PLAYER_DATA), id: playerId, userId: playerId }],
             };
-            const match = new Match(matchData, this);
+            const match = new Match(initialMatchData, this);
+            if (matchSettings) {
+                match.changeSettings(matchSettings);
+            }
+            matchData = match.data;
             this.matches.set(matchData.code, match);
             this.addPlayerToMatchCode(playerId, matchData.code);
             this.matchGateway.connectPlayer(playerId, matchData.code);
@@ -100,6 +107,12 @@ export class MatchService {
 
     leaveMatch(playerId: string) {
         const match = this.getMatchFromPlayerId(playerId);
+        if (match && match.isState([MatchState.Lobby])) {
+            this.refundEntryFeeIfPaid(match, playerId);
+            if (match.isHost(playerId)) {
+                match.data.players.filter((p) => p.id !== playerId && p.isConnected).forEach(async (p) => this.refundEntryFeeIfPaid(match, p.id));
+            }
+        }
         this.disconnectPlayer(playerId);
         if (match) {
             if (match.isHost(playerId) && match.data.playData.isDebugMode) {
@@ -118,6 +131,32 @@ export class MatchService {
             }
         }
         this.matchGateway.broadcastMatchListUpdate();
+    }
+
+    async refundEntryFeeIfPaid(match: Match, playerId: string): Promise<void> {
+        if (!match.isState([MatchState.Lobby])) return;
+        const player = match.getPlayer(playerId);
+        const entryFee = match.data.lobbyData.entryFee;
+        if (player?.userId && entryFee > 0 && match.hasPaidEntryFee(player.userId)) {
+            match.removePaidEntryFee(player.userId);
+            await this.userService.updateBalance(player.userId, entryFee);
+        }
+    }
+
+    async handleLastPlayerWin(match: Match, winner: PlayerData): Promise<void> {
+        if (!winner.userId) return;
+
+        await this.userService.updateBalance(winner.userId, MATCH_BALANCE_REWARDS.win);
+
+        const entryFee = match.data.lobbyData.entryFee;
+        const paidCount = match.getPaidEntryFeeCount();
+        if (entryFee > 0 && paidCount > 0) {
+            const totalPot = entryFee * paidCount;
+            const winnerReward = Math.round((totalPot * (ENTRY_FEE_WINNER_DIVISOR - 1)) / ENTRY_FEE_WINNER_DIVISOR);
+            if (winnerReward > 0) {
+                await this.userService.updateBalance(winner.userId, winnerReward);
+            }
+        }
     }
 
     killPlayerCombat(match: Match) {
@@ -163,8 +202,12 @@ export class MatchService {
     async getAvailableMatches(viewerUserId: string): Promise<MatchData[]> {
         const matchesData: MatchData[] = [];
         const joiningUserRelationships = await this.socialService.getRelationships(viewerUserId);
+        const userData = await this.userService.getUserById(viewerUserId);
         for (const match of this.matches.values()) {
             if (match.data.players.length === 0 || match.getConnectedPlayerCount() === 0) {
+                continue;
+            }
+            if (match.data.lobbyData.entryFee > 0 && userData && userData.balance < match.data.lobbyData.entryFee) {
                 continue;
             }
 
@@ -212,6 +255,16 @@ export class MatchService {
         }
 
         const match = this.getMatch(matchCode);
+
+        const user = await this.userService.getUserById(playerId);
+        if (!user) {
+            this.matchGateway.emitMessage(playerId, Message.AccountNotFound, true);
+            return false;
+        }
+        if (match.data.lobbyData.entryFee > 0 && user.balance < match.data.lobbyData.entryFee) {
+            this.matchGateway.emitMessage(playerId, Message.InsufficientFunds, true);
+            return false;
+        }
         return await this.evaluateMatchJoinConditions(match, playerId, matchCode, confirmJoinBlockedUser);
     }
 
@@ -288,7 +341,7 @@ export class MatchService {
         return match.data.players.some((player) => !player.isConnected && !!player.isObserver);
     }
 
-    private async canCreateMatch(playerId: string, gameData: GameData): Promise<boolean> {
+    private async canCreateMatch(playerId: string, gameData: GameData, entryFee: number = 0): Promise<boolean> {
         const game: Game = await this.gameService.findGame(gameData._id);
         let canCreateMatch = true;
         if (this.hasPlayerId(playerId)) {
@@ -297,6 +350,15 @@ export class MatchService {
         } else if (!game) {
             this.matchGateway.emitMessage(playerId, Message.DeletedGame, true);
             canCreateMatch = false;
+        }
+        const user = await this.userService.getUserById(playerId);
+        if (!user) {
+            this.matchGateway.emitMessage(playerId, Message.AccountNotFound, true);
+            return false;
+        }
+        if (entryFee > 0 && user.balance < entryFee) {
+            this.matchGateway.emitMessage(playerId, Message.InsufficientFunds, true);
+            return false;
         }
         return canCreateMatch;
     }

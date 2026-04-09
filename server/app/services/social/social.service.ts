@@ -2,7 +2,7 @@ import { UserRelationships, UserRelationshipsDocument } from '@app/model/schema/
 import { User, UserDocument } from '@app/model/schema/user.schema';
 import { UserService } from '@app/services/user/user.service';
 import { RelationshipType, SocialListItem, SocialListTab } from '@common/interfaces/social';
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -11,7 +11,7 @@ export class SocialService {
     constructor(
         @InjectModel(UserRelationships.name) private readonly userRelationshipsModel: Model<UserRelationshipsDocument>,
         @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-        private readonly userService: UserService,
+        @Inject(forwardRef(() => UserService)) private readonly userService: UserService,
     ) {}
 
     async areFriends(userId1: string, userId2: string): Promise<boolean> {

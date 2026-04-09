@@ -142,6 +142,7 @@ export class LobbyPageComponent {
                 profilePicture: p.profilePicture,
             }))
             .filter((p) => p.isConnected);
+        this.visualData.entryFee = this.matchService.data.lobbyData.entryFee;
         const playersVisualData = this.visualData.players;
         const maxPlayersCount = MAX_PLAYERS[this.matchService.data.gameData.mapData.size];
         while (playersVisualData.length < maxPlayersCount) {
