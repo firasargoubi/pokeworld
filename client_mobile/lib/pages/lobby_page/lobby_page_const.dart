@@ -8,6 +8,7 @@ const double DESIGN_ASPECT_RATIO = 2000 / 1300;
 const String HEADER_KEY = 'pages.lobby.title';
 const String LAUNCH_KEY = 'pages.lobby.start';
 const String CODE_LABEL_KEY = 'pages.lobby.accessCode';
+const String ENTRY_FEE_LABEL_KEY = 'pages.lobby.entryFee';
 
 // Colors
 const Color OUTER_BORDER_COLOR = Color(0xFF636776);

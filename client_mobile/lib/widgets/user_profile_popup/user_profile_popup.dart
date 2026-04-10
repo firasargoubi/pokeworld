@@ -55,6 +55,7 @@ class _UserCardState extends State<UserCard> with SingleTickerProviderStateMixin
   late final AnimationController _controller;
   late Animation<double> _rotateXAnimation;
   late Animation<double> _rotateYAnimation;
+  final UserService _userService = UserService();
 
   UserCardView _currentView = UserCardView.front;
   UserCardView _targetView = UserCardView.front;
@@ -72,6 +73,24 @@ class _UserCardState extends State<UserCard> with SingleTickerProviderStateMixin
         });
       }
     });
+
+    _refreshCurrentUser();
+  }
+
+  Future<void> _refreshCurrentUser() async {
+    final String? userId = _userService.currentUser.value?.userId;
+    if (userId == null) {
+      return;
+    }
+
+    try {
+      final UserInfo user = await _userService.getById(userId);
+      if (!mounted) {
+        return;
+      }
+      _userService.currentUser.value = user;
+    } catch (_) {
+    }
   }
 
   @override

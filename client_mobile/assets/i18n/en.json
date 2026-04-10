@@ -60,7 +60,8 @@
             "teamWin": "Team {{team}} wins the match!",
             "playerLeftMatch": "{{playerName}} left the match",
             "dropInDisabled": "Drop-in is disabled for this match",
-            "NoAvailableSpawn": "No spawn point is available right now",
+            "NoAvailableSpawn": "No spawn point is currently available",
+            "insufficientFunds": "Insufficient balance to join this match",
             "notFriend": "You cannot join this match because it's friend-only and you are not friends with the host",
             "blockedByPlayer": "A player in the lobby has blocked you so you cannot join.",
             "blockedPlayerInLobby": "A blocked player is in the lobby; do you still want to join?"
@@ -177,7 +178,8 @@
         "lobby": {
             "title": "Lobby",
             "accessCode": "Your access code",
-            "start": "START"
+            "start": "START",
+            "entryFee": "Fee"
         },
         "edit": {
             "title": "Edit game",
@@ -243,10 +245,12 @@
             "turns": "TURNS:",
             "visitedTiles": "VISITED TILES:",
             "balanceGain": "GAIN:",
+            "entryFeeGain": "POT GAIN:",
             "manipulatedDoors": "MANIPULATED DOORS:",
             "flagCarriers": "FLAG CARRIERS:",
             "quit": "< QUIT",
             "playerColumns": {
+                "gain": "GAIN",
                 "items": "ITEMS",
                 "tiles": "% TILES",
                 "combats": "COMBATS",
@@ -324,7 +328,8 @@
             "join": "PLAY",
             "players": "Players",
             "code": "Code",
-            "owner": "by"
+            "owner": "by",
+            "entryFee": "Fee"
         },
         "header": {
             "back": "Back"
@@ -417,6 +422,7 @@
             "elementalMode": "Elemental mode",
             "rapidElimination": "Rapid elimination",
             "accessibility": "Accessibility",
+            "entryFee": "Entry fee (coins)",
             "validate": "Validate"
         },
         "preMatchSettings": {

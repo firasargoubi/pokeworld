@@ -73,10 +73,7 @@ class _StatPageState extends State<StatPage> {
 
   String _formatRatio(double ratio) => '${ratio.toStringAsFixed(0)}%';
 
-  String _formattedBalanceGain() {
-    final selfPlayerId = MatchService().selfId;
-    final selfPlayerStat = StatService().playerStats.firstWhere((player) => player.id == selfPlayerId);
-    final value = selfPlayerStat.balanceGain;
+  String _formatGain(int value) {
     return '${value >= 0 ? '+' : ''}$value \$';
   }
 
@@ -95,6 +92,7 @@ class _StatPageState extends State<StatPage> {
   Widget _buildStatColumn(String title, List<String> values, List<bool> selfValues, double baseSize, {PlayerStatType? statType}) {
     final isSorting = statType != null && statType == _sortingStat;
     final isAscending = _sortingOrder == SortOrder.ascending;
+    final valueTextColor = statType == PlayerStatType.balanceGain ? STAT_BALANCE_GAIN_COLOR : null;
 
     return StatColumn(
       title: title,
@@ -103,6 +101,7 @@ class _StatPageState extends State<StatPage> {
       baseSize: baseSize,
       isSorting: isSorting,
       isAscending: isAscending,
+      valueTextColor: valueTextColor,
       onTap: statType != null ? () => _updateSorting(statType) : null,
     );
   }
@@ -157,6 +156,13 @@ class _StatPageState extends State<StatPage> {
                                   scrollDirection: Axis.horizontal,
                                   child: Row(
                                     children: [
+                                      _buildStatColumn(
+                                        I18nService().translate(STAT_GAIN_COLUMN_LABEL_KEY),
+                                        _statService.playerStats.map((player) => _formatGain(player.balanceGain)).toList(),
+                                        isSelfList,
+                                        baseSize,
+                                        statType: PlayerStatType.balanceGain,
+                                      ),
                                       _buildStatColumn(
                                         I18nService().translate(STAT_ITEMS_LABEL_KEY),
                                         _statService.playerStats.map((player) => player.discoveredItemsCount.toString()).toList(),
@@ -242,7 +248,6 @@ class _StatPageState extends State<StatPage> {
                                   winner: winner,
                                   formatDuration: _formatDuration,
                                   formatRatio: _formatRatio,
-                                  formattedBalanceGain: _formattedBalanceGain(),
                                 ),
                               ),
                             ],

@@ -3,10 +3,12 @@ import 'dart:typed_data';
 
 import 'package:client_mobile/consts/game_card.dart';
 import 'package:client_mobile/consts/player_data_const.dart';
+import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/game_card_config.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/widgets/cut_out_button/cut_out_button.dart';
 import 'package:client_mobile/widgets/default_container/default_container.dart';
@@ -81,13 +83,35 @@ class GameCard extends StatelessWidget {
     return base64Decode(base64Part);
   }
 
+  GameCardConfig getCardConfig() {
+    if (game.mapData.size == MapSize.Small) return GAME_CARD_CONFIGS[GameCardColor.Blue]!;
+    if (game.mapData.size == MapSize.Medium) return GAME_CARD_CONFIGS[GameCardColor.Green]!;
+    return GAME_CARD_CONFIGS[GameCardColor.Pink]!;
+  }
+
+  String gameMatchInfo(I18nService i18n) {
+    if (isCreateCard) {
+      return formatDate(game.lastEdited);
+    }
+
+    final activePlayerCount = matchData?.players.where((player) => player.isConnected).length ?? 0;
+    final maxPlayers = MAX_PLAYERS[game.mapData.size] ?? 0;
+    final code = matchData?.code ?? '';
+    return '$activePlayerCount/$maxPlayers ${i18n.translate(GAME_CARD_PLAYERS_LABEL_KEY)}  ${i18n.translate(GAME_CARD_CODE_LABEL_KEY)}: $code';
+  }
+
+  bool isWaiting() {
+    return (matchData?.state ?? MatchState.Lobby) == MatchState.Lobby;
+  }
+
+  void onJoinOrCreate() {
+    AudioService().playSoundEffect(SoundEffect.Select.path);
+    onTap();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final config = game.mapData.size == MapSize.Small
-        ? GAME_CARD_CONFIGS[GameCardColor.Blue]!
-        : game.mapData.size == MapSize.Medium
-        ? GAME_CARD_CONFIGS[GameCardColor.Green]!
-        : GAME_CARD_CONFIGS[GameCardColor.Pink]!;
+    final config = getCardConfig();
 
     final i18n = I18nService();
     final buttonKey = isCreateCard ? GAME_CARD_CREATE_BUTTON_KEY : GAME_CARD_JOIN_BUTTON_KEY;
@@ -100,14 +124,7 @@ class GameCard extends StatelessWidget {
 
     final isFFA = game.mapData.gameMode == GameMode.FFA;
 
-    final activePlayerCount = matchData?.players.where((player) => player.isConnected).length ?? 0;
-    final maxPlayers = MAX_PLAYERS[game.mapData.size] ?? 0;
-    final code = matchData?.code ?? '';
-    final isWaiting = (matchData?.state ?? MatchState.Lobby) == MatchState.Lobby;
-
-    final infoText = isCreateCard
-        ? formatDate(game.lastEdited)
-        : '$activePlayerCount/$maxPlayers ${i18n.translate(GAME_CARD_PLAYERS_LABEL_KEY)}  ${i18n.translate(GAME_CARD_CODE_LABEL_KEY)}: $code';
+    final infoText = gameMatchInfo(i18n);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -163,13 +180,28 @@ class GameCard extends StatelessWidget {
                     Positioned(
                       left: cardWidth * 0.02,
                       bottom: cardWidth * 0.02,
-                      width: cardWidth * 0.13,
-                      height: cardWidth * 0.10,
-                      child: Image.asset(
-                        isWaiting ? GAME_CARD_WAIT_ICON_ASSET : GAME_CARD_LIVE_ICON_ASSET,
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.none,
-                        alignment: Alignment.bottomLeft,
+                      child: SizedBox(
+                        width: cardWidth * 0.18,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: cardWidth * 0.15,
+                              height: cardWidth * 0.115,
+                              child: Image.asset(
+                                isWaiting() ? GAME_CARD_WAIT_ICON_ASSET : GAME_CARD_LIVE_ICON_ASSET,
+                                fit: BoxFit.contain,
+                                filterQuality: FilterQuality.none,
+                                alignment: Alignment.center,
+                              ),
+                            ),
+                            if ((matchData?.lobbyData.entryFee ?? 0) > 0) ...[
+                              SizedBox(height: cardWidth * 0.01),
+                              Text('${matchData!.lobbyData.entryFee}\$', style: subtitleStyle(cardWidth * 0.75), textAlign: TextAlign.center),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
                 ],
@@ -233,7 +265,7 @@ class GameCard extends StatelessWidget {
                             lightColor: config.buttonLightColor,
                             mainColor: config.buttonMainColor,
                             darkColor: config.buttonDarkColor,
-                            onAction: onTap,
+                            onAction: onJoinOrCreate,
                             child: Text(cardButtonText, style: buttonTextStyle(cardWidth * 1.1)),
                           ),
                         ),

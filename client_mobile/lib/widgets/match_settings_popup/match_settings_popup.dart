@@ -21,6 +21,7 @@ class MatchSettingsPopup extends StatefulWidget {
     isDropInEnabled: MatchService().matchData?.lobbyData.isDropInEnabled ?? false,
     isElementalMode: MatchService().matchData?.playData.isElementalMode ?? false,
     isRapidElimination: MatchService().matchData?.lobbyData.isRapidElimination ?? false,
+    entryFee: MatchService().matchData?.lobbyData.entryFee ?? 0,
     isFriendOnly: MatchService().matchData?.lobbyData.isFriendOnly ?? false,
   );
 
@@ -33,8 +34,9 @@ class _MatchSettingsPopupState extends State<MatchSettingsPopup> {
   late bool _isElemental;
   late bool _isRapidElimination;
   late bool _isFriendOnly;
+  late int _entryFee;
   MatchSettings get matchSettings =>
-      MatchSettings(isDropInEnabled: _isDropIn, isElementalMode: _isElemental, isRapidElimination: _isRapidElimination, isFriendOnly: _isFriendOnly);
+      MatchSettings(isDropInEnabled: _isDropIn, isElementalMode: _isElemental, isRapidElimination: _isRapidElimination, entryFee: _entryFee, isFriendOnly: _isFriendOnly);
 
   @override
   void initState() {
@@ -43,6 +45,7 @@ class _MatchSettingsPopupState extends State<MatchSettingsPopup> {
     _isDropIn = widget.initialMatchSettings.isDropInEnabled;
     _isElemental = widget.initialMatchSettings.isElementalMode;
     _isRapidElimination = widget.initialMatchSettings.isRapidElimination;
+    _entryFee = widget.initialMatchSettings.entryFee;
     _isFriendOnly = widget.initialMatchSettings.isFriendOnly;
   }
 

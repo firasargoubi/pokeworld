@@ -47,6 +47,19 @@ class UserService {
     }
   }
 
+  Future<UserInfo> getById(String userId) async {
+    _ensureConfigured();
+    final String uri = '$baseUrl/${UserEndpoint.User.path}/$userId';
+    final response = await http.get(Uri.parse(uri), headers: {'Content-Type': 'application/json'});
+
+    if (response.statusCode == HttpStatusCode.Ok.code) {
+      final Map<String, dynamic> responseMap = jsonDecode(response.body);
+      return UserInfo.fromJson(responseMap);
+    }
+
+    throw Exception('Failed to fetch user: ${response.body}');
+  }
+
   Future<UserInfo> login(String username, String password) async {
     _ensureConfigured();
     final String uri = '$baseUrl/${UserEndpoint.UserLogin.path}';

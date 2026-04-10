@@ -63,7 +63,8 @@
             "NoAvailableSpawn": "Aucun point d'apparition n'est disponible pour le moment",
             "notFriend": "Vous ne pouvez pas rejoindre cette partie car elle est réservée aux amis et vous n'êtes pas ami avec l'hôte",
             "blockedByPlayer": "Un joueur dans la salle vous a bloqué, vous ne pouvez pas rejoindre.",
-            "blockedPlayerInLobby": "Un joueur que vous avez bloqué est déjà dans la salle, voulez-vous continuer ?"
+            "blockedPlayerInLobby": "Un joueur que vous avez bloqué est déjà dans la salle, voulez-vous continuer ?",
+            "insufficientFunds": "Solde insuffisant pour rejoindre cette partie"
         },
         "logs": {
             "itemPickup": "{{playerName}} a ramassé {{itemName}}",
@@ -177,7 +178,8 @@
         "lobby": {
             "title": "Page d'attente",
             "accessCode": "Votre code d'accès",
-            "start": "LANCER"
+            "start": "LANCER",
+            "entryFee": "Prix"
         },
         "edit": {
             "title": "Modifier un jeu",
@@ -244,9 +246,11 @@
             "visitedTiles": "TUILES VISITÉES :",
             "manipulatedDoors": "PORTES MANIPULEES :",
             "balanceGain": "GAIN:",
+            "entryFeeGain": "GAIN POT :",
             "flagCarriers": "PORTEURS DE DRAPEAU :",
             "quit": "< QUITTER",
             "playerColumns": {
+                "gain": "GAIN",
                 "items": "ITEMS",
                 "tiles": "% TUILES",
                 "combats": "COMBATS",
@@ -324,7 +328,8 @@
             "join": "JOUER",
             "players": "Joueurs",
             "code": "Code",
-            "owner": "par"
+            "owner": "par",
+            "entryFee": "Prix"
         },
         "header": {
             "back": "Retour"
@@ -416,6 +421,7 @@
             "dropInDropOut": "Drop in, drop out",
             "elementalMode": "Mode élémentaire",
             "rapidElimination": "Élimination rapide",
+            "entryFee": "Prix d'entrée (pièces)",
             "accessibility": "Amis uniquement",
             "validate": "Valider"
         },

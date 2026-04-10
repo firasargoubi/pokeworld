@@ -30,7 +30,7 @@ MatchData _matchData({MatchState state = MatchState.TurnStart, List<PlayerData> 
     ),
     thumbnail: '',
   ),
-  lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0, isDropInEnabled: false, isRapidElimination: false, isFriendOnly: false),
+  lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0, isDropInEnabled: false, isRapidElimination: false, entryFee: 0, isFriendOnly: false),
   playData: PlayData(timeLeft: 60, isDebugMode: false, activePlayerIndex: 0, actionsLeft: 0, movementLeft: 3, isElementalMode: false),
   combatData: CombatData(
     lastCombatAction: CombatAction.None,
