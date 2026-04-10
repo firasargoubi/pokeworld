@@ -47,6 +47,35 @@
             </div>
             <div class="left-label-medium">{{ 'pages.edit.size' | translate }} : {{ gameDataService.getMapSizeString() }}</div>
             <div class="left-label-medium">{{ 'pages.edit.mode' | translate }} : {{ gameDataService.getGameModeString() }}</div>
+            
+            <div class="generator-section">
+                <div class="left-label-medium"> {{ 'pages.edit.generator' | translate }} </div>
+                <div class="generator-input">
+                    <label for="bushPercentage" class="left-label-small"> {{ 'pages.edit.bush' | translate }}: {{ this.mapGeneratorService.bushPercentage }}%</label>
+                    <input 
+                        id="bushPercentage" 
+                        type="range" 
+                        min="0" 
+                        max="100" 
+                        [value]="this.mapGeneratorService.bushPercentage"
+                        (input)="this.mapGeneratorService.onBushPercentageChange($any($event).target.value)"
+                    />
+                </div>
+                <div class="generator-input">
+                    <label for="pathPercentage" class="left-label-small">{{'pages.edit.path' | translate }} : {{ this.mapGeneratorService.pathPercentage }}%</label>
+                    <input 
+                        id="pathPercentage" 
+                        type="range" 
+                        min="0" 
+                        max="100" 
+                        [value]="this.mapGeneratorService.pathPercentage"
+                        (input)="this.mapGeneratorService.onPathPercentageChange($any($event).target.value)"
+                    />
+                </div>
+                <div class="left-label-small">Total: {{ this.mapGeneratorService.bushPercentage + this.mapGeneratorService.pathPercentage }}%</div>
+                <button (click)="generateMap()" class="generate-button"> {{'pages.edit.generate' | translate}}  </button>
+            </div>
+            
             <button (click)="saveButton()" class="save-button">{{ 'pages.edit.save' | translate }}</button>
             <button (click)="resetButton()" class="reset-button">{{ 'pages.edit.reset' | translate }}</button>
         </div>

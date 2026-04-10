@@ -124,6 +124,7 @@ app-map {
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
+    overflow: scroll;
 }
 
 .editor-right {
@@ -529,4 +530,74 @@ app-warning-confirmation-popup {
 .action-input input {
     cursor: pointer;
     width: 100%;
+}
+
+.generator-section {
+    margin-top: calc($final-side-width * 0.05);
+    padding: calc($final-side-width * 0.04);
+    background: $input-bg-normal;
+    border-radius: calc($final-side-width * 0.015);
+    border: calc($final-side-width * 0.0085) solid rgba(255, 255, 255, 0.3);
+}
+
+.generator-input {
+    margin-bottom: calc($final-side-width * 0.04);
+}
+
+.generator-input label {
+    display: block;
+    font-size: calc($final-side-width * 0.08);
+    margin-bottom: calc($final-side-width * 0.02);
+}
+
+.generator-input input {
+    width: 100%;
+    height: calc($final-side-width * 0.12);
+    padding: calc($final-side-width * 0.02);
+    border-radius: calc($final-side-width * 0.01);
+    background: $input-bg-normal;
+    border: calc($final-side-width * 0.0085) solid transparent;
+    color: $text-color;
+    font-family: 'pixel';
+    font-size: calc($final-side-width * 0.08);
+    cursor: text;
+}
+
+.generator-input input:hover {
+    border-color: $input-border-color;
+}
+
+.generator-input input:focus {
+    background: $input-bg-active;
+    border-color: $input-border-color;
+    outline: none;
+}
+
+.generate-button {
+    display: block;
+    width: 100%;
+    height: calc($final-side-width * 0.13);
+    border-radius: calc($final-side-width * 0.015);
+    background: hsl(136, 100%, 38%);
+    color: $text-color;
+    font-family: 'pixel';
+    border: calc($final-side-width * 0.0085) solid transparent;
+    cursor: pointer;
+    font-size: calc($final-side-width * 0.085);
+    letter-spacing: calc($final-side-width * 0.0003);
+    transition: all 0.2s ease;
+}
+
+.generate-button:hover {
+    border-color: $input-border-color;
+    background: hsl(136, 100%, 42%);
+}
+
+.generate-button:active {
+    background: hsl(136, 100%, 35%);
+}
+
+.generate-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
