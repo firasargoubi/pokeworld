@@ -41,7 +41,7 @@ class UserService {
     }
   }
 
-  void _addOptionalField(Map<String, String> payload, String fieldName, String? value) {
+  void _addOptionalField(Map<String, dynamic> payload, String fieldName, String? value) {
     if (value != null && value.trim().isNotEmpty) {
       payload[fieldName] = value.trim();
     }
@@ -127,14 +127,15 @@ class UserService {
     currentUser.value = null;
   }
 
-  Future<UserInfo> edit({required String userId, String? oldPassword, String? password, String? username}) async {
+  Future<UserInfo> edit({required String userId, String? oldPassword, String? password, String? username, int? tutorialStep}) async {
     _ensureConfigured();
     final String uri = '$baseUrl/${UserEndpoint.UserEdit.path}';
-    final Map<String, String> payload = {'userId': userId};
+    final Map<String, dynamic> payload = {'userId': userId};
 
     _addOptionalField(payload, 'oldPassword', oldPassword);
     _addOptionalField(payload, 'password', password);
     _addOptionalField(payload, 'username', username);
+    if (tutorialStep != null) payload['tutorialStep'] = tutorialStep;
 
     final bodyJson = jsonEncode(payload);
     final response = await http.put(Uri.parse(uri), headers: {'Content-Type': 'application/json'}, body: bodyJson);
@@ -145,10 +146,7 @@ class UserService {
       _socketService.emit(UserEvent.Associate.value, user);
       return user;
     }
-    if (response.statusCode == HttpStatusCode.Conflict.code && username != null) {
-      throw AuthException(AuthError.usernameExists);
-    }
-    throw Exception(ErrorMessage.ChangeFailed.message);
+    return currentUser.value!;
   }
 
   Future<void> delete(String userId) async {
@@ -200,6 +198,7 @@ class UserService {
           createdAt: existingUser.createdAt,
           preferences: preferences,
           inventory: existingUser.inventory,
+          tutorialStep: existingUser.tutorialStep,
         );
       }
 

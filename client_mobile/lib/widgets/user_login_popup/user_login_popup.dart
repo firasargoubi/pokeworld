@@ -21,6 +21,7 @@ import 'package:client_mobile/utils/profile_image_provider.dart';
 import 'package:client_mobile/widgets/cut_corner_container/cut_corner_container.dart';
 import 'package:client_mobile/widgets/edge_body_button/edge_body_button.dart';
 import 'package:client_mobile/widgets/stat_container/stat_container.dart';
+import 'package:client_mobile/widgets/tutorial_popup/tutorial_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -151,6 +152,7 @@ class _UserLoginPopupState extends State<UserLoginPopup> with SingleTickerProvid
                   onAction: () => _controller.handleAction(
                     onSuccess: () {
                       if (mounted) Navigator.of(context).pop();
+                      if (_controller.isRegister) showTutorialPopup(context);
                     },
                   ),
                 ),

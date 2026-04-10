@@ -21,6 +21,7 @@ describe('BalanceController', () => {
         balance: 4000,
         inventory: [],
         preferences: DEFAULT_PREFERENCES,
+        tutorialStep: 0,
     };
 
     beforeEach(async () => {

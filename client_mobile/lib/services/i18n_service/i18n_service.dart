@@ -17,6 +17,8 @@ class I18nService {
   Future<void>? _pendingLoad;
   AppLanguage? _pendingLanguage;
 
+  AppLanguage get currentLanguage => _currentLanguage;
+
   Future<void> initialize(AppLanguage language) async {
     await use(language);
   }

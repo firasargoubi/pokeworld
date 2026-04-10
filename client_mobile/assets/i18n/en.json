@@ -402,7 +402,9 @@
             "languageFr": "FR",
             "languageEn": "EN",
             "themeDefault": "Default",
-            "themeDark": "Dark"
+            "themeDark": "Dark",
+            "tutorial": "Tutorial",
+            "resetTutorial": "Reset tutorial"
         },
         "warningConfirmation": {
             "close": "Close",
@@ -443,6 +445,159 @@
                 "item3": "Item 3",
                 "item4": "Item 4",
                 "item5": "Item 5"
+            }
+        },
+        "tutorial": {
+            "title": "TUTORIAL",
+            "resetTutorialConfirmation": "Do you want to reset the tutorial progress?",
+            "resetTutorial": "Reset",
+            "welcome": {
+                "title": "Welcome",
+                "first": {
+                    "subTitleLabel": "Welcome to PokeWorld!",
+                    "description": "- Welcome, I am Professor Oak.<br/>- This tutorial introduces you to the <essential features> to get you started.<br/>- You can proceed, <close it at any time>, and resume it later."
+                }
+            },
+            "userProfile": {
+                "title": "User Profile",
+                "first": {
+                    "subTitleLabel": "Open your user menu",
+                    "description": "Here, you open your <user menu>. It is your <quick access> to everything related to your account."
+                },
+                "second": {
+                    "subTitleLabel": "View your account info",
+                    "description": "- You can see your <email>, your <username>, your <profile picture>, and your <Pokédollar ($) balance>.<br/>- This is also where you can <log out> or <replay this tutorial>."
+                },
+                "third": {
+                    "subTitleLabel": "Manage your account settings",
+                    "description": "From the <profile settings>, you can:<br/>- <Modify your username><br/>- <Change your password><br/>- <Delete your account>, which erases all your <data> <permanently> and <irrecoverably>"
+                }
+            },
+            "friends": {
+                "title": "Friends",
+                "first": {
+                    "subTitleLabel": "Open the friends menu",
+                    "description": "Here, you will find everything related to your <social interactions>. The tabs allow you to navigate between <search>, your <friends>, your <inbox>, and <blocked people>."
+                },
+                "second": {
+                    "subTitleLabel": "Use the search tab",
+                    "description": "In this tab, you can search through <all users> in the system. You can then <send a friend request> or <block> a user."
+                },
+                "third": {
+                    "subTitleLabel": "View the friends tab",
+                    "description": "In this tab, you can see your <friends list>. You can also <remove> a friend or <block> them."
+                },
+                "fourth": {
+                    "subTitleLabel": "Check your inbox",
+                    "description": "Here, you can view <received friend requests>. You can <accept>, <decline>, or <block> them."
+                },
+                "fifth": {
+                    "subTitleLabel": "Manage the blocked tab",
+                    "description": "In this tab, you will find <blocked people>. You can view this list and <unblock> someone whenever you wish."
+                },
+                "sixth": {
+                    "subTitleLabel": "Understand the effect of blocking",
+                    "description": "Blocking a user changes several things:<br/>- You can no longer see each other's <new messages><br/>- This person can no longer <join a match> if you are already in it<br/>- If they are already in a <lobby>, you are <warned> before entering"
+                }
+            },
+            "appSettings": {
+                "title": "App Settings",
+                "first": {
+                    "subTitleLabel": "Open the application settings",
+                    "description": "- From this menu, you can open the <application settings>.<br/>- You can configure <audio settings> and set your <language> and <theme> preferences."
+                }
+            },
+            "chat": {
+                "title": "Chat",
+                "first": {
+                    "subTitleLabel": "Open the chat",
+                    "description": "- Your <chat> is accessible <everywhere> in the application. You can open or collapse it whenever you want.<br/>- At all times, you also have access to a <general channel> shared with other connected users."
+                },
+                "second": {
+                    "subTitleLabel": "Chat in a match",
+                    "description": "When you enter a <lobby> or a <match>, you also join a <private match channel>."
+                },
+                "third": {
+                    "subTitleLabel": "Spot unread messages",
+                    "description": "If you are not on the right channel, a <visual indicator> shows you that there are <unread messages>."
+                },
+                "fourth": {
+                    "subTitleLabel": "Receive notifications",
+                    "description": "When a new message arrives, you can receive a <notification> so you don't miss anything. If the app is in the background, you can also receive a <system notification>."
+                }
+            },
+            "gameModes": {
+                "title": "Game Modes",
+                "first": {
+                    "subTitleLabel": "Discover game modes",
+                    "description": "Two <game modes> are available: <Free-For-All (FFA) mode> and <Capture The Flag (CTF) mode>. The mode depends on the <game> you choose."
+                },
+                "second": {
+                    "subTitleLabel": "Play in FFA mode",
+                    "description": "In <FFA mode>, everyone plays <for themselves>. The first player to reach <3 won battles> wins the match."
+                },
+                "third": {
+                    "subTitleLabel": "Play in CTF mode",
+                    "description": "- In <CTF mode>, you play in <teams>. Bring the <flag> back to your <starting point> to make <your entire team> win.<br/>- In this mode, you can only battle <opposing players>."
+                }
+            },
+            "shop": {
+                "title": "Shop",
+                "first": {
+                    "subTitleLabel": "Open the shop",
+                    "description": "- Here, you can spend your <Pokedollars ($)> to get new content.<br/>- You can find <exclusive Pokemon> as well as other <cosmetic items>, visual or audio."
+                },
+                "second": {
+                    "subTitleLabel": "Buy an item",
+                    "description": "When you like an item, you can <buy> it with your Pokedollars ($):<br/>- An item can only be <purchased once><br/>- An item <cannot be resold>"
+                },
+                "third": {
+                    "subTitleLabel": "Check your inventory",
+                    "description": "In your <inventory>, you will find all the items you already own. You can also choose which items to <activate> or <deactivate>."
+                },
+                "fourth": {
+                    "subTitleLabel": "Earn Pokedollars ($)",
+                    "description": "- You earn <Pokedollars ($)> mainly at the end of matches. The winner receives a larger <reward> than other players.<br/>- Some matches also feature <challenges> or an <entry fee>, which can modify the rewards."
+                }
+            },
+            "gameCreation": {
+                "title": "Match Creation",
+                "first": {
+                    "subTitleLabel": "Choose a game",
+                    "description": "Here, you choose the <game> you want to use to launch a new match."
+                },
+                "second": {
+                    "subTitleLabel": "Choose access and entry fee",
+                    "description": "- You can decide if the match is <open to all> or <friends only>.<br/>- You can also set an <entry fee> in Pokedollars to join the match."
+                },
+                "third": {
+                    "subTitleLabel": "Prepare your character",
+                    "description": "Before entering a match, you must <prepare your character>:<br/>- Choose a <Pokemon> from those available<br/>- Distribute your <bonus points> and <dice>."
+                },
+                "fourth": {
+                    "subTitleLabel": "Enter the lobby",
+                    "description": "- After character selection, you arrive in a <lobby>.<br/>- You can <interact with other players> and view the <access code>, visible to <everyone>."
+                },
+                "fifth": {
+                    "subTitleLabel": "Manage the lobby",
+                    "description": "If you are the <organizer>, you can <lock or unlock> the match, <kick> a player, <add virtual players> with an <aggressive> or <defensive> profile, and <start the match> when everything is ready."
+                },
+                "sixth": {
+                    "subTitleLabel": "Choose match options",
+                    "description": "- Before launching, the <organizer> can activate several <match options>.<br/>- These options are <stackable>, so several can be active at the same time."
+                },
+                "seventh": {
+                    "subTitleLabel": "Drop-in / Drop-out Option",
+                    "description": "- This option allows players to <leave> a match in progress and <rejoin later>.<br/>- It also allows <new players> to enter during the match if a slot is free."
+                },
+                "eighth": {
+                    "subTitleLabel": "Quick Elimination Option",
+                    "description": "With this option, a player defeated in battle is <eliminated for the rest of the match> and becomes an <observer>."
+                },
+                "ninth": {
+                    "subTitleLabel": "Elemental Mode Option",
+                    "description": "- With this option, the <elemental type> of the Pokemon is used during battles.<br/>- Depending on the opponent, this can provide an <advantage> or a <disadvantage>."
+                }
             }
         }
     }

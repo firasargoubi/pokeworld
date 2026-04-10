@@ -21,6 +21,7 @@ describe('UserController', () => {
         balance: 0,
         inventory: [],
         preferences: DEFAULT_PREFERENCES,
+        tutorialStep: 0,
     };
 
     beforeEach(async () => {

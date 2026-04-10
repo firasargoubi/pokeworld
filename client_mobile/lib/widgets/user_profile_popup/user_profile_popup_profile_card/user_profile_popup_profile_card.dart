@@ -58,6 +58,62 @@ class _ProfileCardFace extends StatelessWidget {
                         children: [
                           _CardInfoRow(label: I18nService().translate(EMAIL_LABEL), value: email, baseSize: baseSize),
                           _CardInfoRow(label: I18nService().translate(BALANCE_LABEL), value: '$balance \$', baseSize: baseSize),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: baseSize * 0.08,
+                                width: baseSize * 0.26,
+                                child: EdgeBodyButton(
+                                  leftEdgePath: ASSET_BUTTON_EDGE_1,
+                                  rightEdgePath: ASSET_BUTTON_EDGE_2,
+                                  bodyPath: ASSET_BUTTON_BODY,
+                                  onAction: () => _controller.showTutorial(context),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(I18nService().translate(TUTORIAL_LABEL).toUpperCase(), style: BUTTON_TEXT_STYLE(baseSize * 0.04)),
+                                      SizedBox(width: baseSize * 0.01),
+                                      Image.asset(
+                                        height: baseSize * 0.04,
+                                        TUTORIAL_ICON_ASSET,
+                                        fit: BoxFit.contain,
+                                        filterQuality: FilterQuality.none,
+                                        color: Colors.white,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: baseSize * 0.08,
+                                width: baseSize * 0.37,
+                                child: EdgeBodyButton(
+                                  leftEdgePath: ASSET_DELETE_BUTTON_EDGE_1,
+                                  rightEdgePath: ASSET_DELETE_BUTTON_EDGE_2,
+                                  bodyPath: ASSET_DELETE_BUTTON_BODY,
+                                  onAction: _controller.resetTutorial,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(I18nService().translate(TUTORIAL_RESET_LABEL).toUpperCase(), style: BUTTON_TEXT_STYLE(baseSize * 0.04)),
+                                      SizedBox(width: baseSize * 0.01),
+                                      Image.asset(
+                                        height: baseSize * 0.04,
+                                        RESET_ICON_ASSET,
+                                        fit: BoxFit.contain,
+                                        filterQuality: FilterQuality.none,
+                                        color: Colors.white,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -96,7 +152,7 @@ class _ProfileCardFace extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text(I18nService().translate(USER_POPUP_LOGOUT), style: BUTTON_TEXT_STYLE(baseSize * 0.035)),
+                                  Text(I18nService().translate(USER_POPUP_LOGOUT).toUpperCase(), style: BUTTON_TEXT_STYLE(baseSize * 0.035)),
                                   SizedBox(width: baseSize * 0.01),
                                   Image.asset(
                                     height: baseSize * 0.04,
