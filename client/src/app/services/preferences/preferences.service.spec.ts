@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
+import { ChatService } from '@app/services/chat/chat.service';
 import { I18nService } from '@app/services/i18n/i18n.service';
 import { UserService } from '@app/services/user/user.service';
 import { AppLanguage, AppTheme, DEFAULT_PREFERENCES } from '@common/interfaces/preferences';
@@ -11,6 +12,7 @@ describe('PreferencesService', () => {
     let service: PreferencesService;
     let userSubject: BehaviorSubject<UserInfo | null>;
     let userServiceSpy: jasmine.SpyObj<UserService>;
+    let chatServiceSpy: jasmine.SpyObj<ChatService>;
     let i18nServiceSpy: jasmine.SpyObj<I18nService>;
     let testDocument: Document;
 
@@ -23,6 +25,9 @@ describe('PreferencesService', () => {
         userServiceSpy = jasmine.createSpyObj<UserService>('UserService', ['updatePreferences'], {
             user$: userSubject.asObservable(),
         });
+        chatServiceSpy = jasmine.createSpyObj<ChatService>('ChatService', [], {
+            detachedWindow: null,
+        });
         i18nServiceSpy = jasmine.createSpyObj<I18nService>('I18nService', ['initialize', 'use', 'translate']);
         testDocument = document.implementation.createHTMLDocument('test');
 
@@ -30,6 +35,7 @@ describe('PreferencesService', () => {
             providers: [
                 PreferencesService,
                 { provide: UserService, useValue: userServiceSpy },
+                { provide: ChatService, useValue: chatServiceSpy },
                 { provide: I18nService, useValue: i18nServiceSpy },
                 { provide: DOCUMENT, useValue: testDocument },
             ],
@@ -101,5 +107,23 @@ describe('PreferencesService', () => {
 
         expect(service.currentTheme).toBe(AppTheme.Default);
         expect(testDocument.body.classList.contains('app-theme-dark')).toBeFalse();
+    });
+
+    it('should apply theme to detached chat window document', () => {
+        const detachedDocument = document.implementation.createHTMLDocument('detached-chat');
+        const detachedWindow = {
+            closed: false,
+            document: detachedDocument,
+        } as unknown as Window;
+        Object.defineProperty(chatServiceSpy, 'detachedWindow', {
+            value: detachedWindow,
+            writable: true,
+        });
+
+        service.setTheme(AppTheme.Dark);
+        expect(detachedDocument.body.classList.contains('app-theme-dark')).toBeTrue();
+
+        service.setTheme(AppTheme.Default);
+        expect(detachedDocument.body.classList.contains('app-theme-dark')).toBeFalse();
     });
 });

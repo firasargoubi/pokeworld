@@ -4,7 +4,7 @@ $base-size: min(1vh, 1vw);
 $border-size: calc($base-size * 3);
 $font-size: calc($base-size * 3);
 $card-height: calc($base-size * 74);
-$card-width-login: calc($base-size * 62);
+$card-width-login: calc($base-size * 70);
 $card-width-create: calc($base-size * 98);
 
 $img-user-border-left: '../../../assets/images/menu/containers/user-card/user-border-1.png';
@@ -277,6 +277,7 @@ $pixel-corners-clip-path: polygon(
     text-align: center;
     word-break: break-word;
     overflow-wrap: anywhere;
+    text-wrap: wrap;
 }
 
 .avatar-frame {
@@ -467,6 +468,6 @@ $pixel-corners-clip-path: polygon(
     }
 
     .form-panel {
-        max-width: calc($base-size * 42);
+        max-width: calc($base-size * 50);
     }
 }

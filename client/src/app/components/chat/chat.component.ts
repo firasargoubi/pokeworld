@@ -42,6 +42,7 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     private readonly detachedWindowHeight = 760;
     private readonly detachedWindowFeatures = `width=${this.detachedWindowWidth},height=${this.detachedWindowHeight},resizable=yes`;
     private readonly detachedWindowTitleKey = 'components.chat.windowTitle';
+    private readonly darkThemeClassName = 'app-theme-dark';
     private readonly hostElementRef = inject(ElementRef<HTMLElement>);
     private readonly ngZone = inject(NgZone);
     private readonly changeDetectorRef = inject(ChangeDetectorRef);
@@ -240,6 +241,7 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
         popup.document.title = 'PokeWorld - ' + this.i18nService.translate(this.detachedWindowTitleKey);
         popup.document.body.style.margin = '0';
         popup.document.body.style.overflow = 'hidden';
+        this.syncPopupThemeClass(popup.document);
         if (!isReusingPopup) {
             this.copyStylesToPopup(popup.document);
         }
@@ -297,6 +299,11 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
         styleNodes.forEach((node) => {
             targetDocument.head.appendChild(node.cloneNode(true));
         });
+    }
+
+    private syncPopupThemeClass(targetDocument: Document): void {
+        const isDarkMode = document.body.classList.contains(this.darkThemeClassName);
+        targetDocument.body.classList.toggle(this.darkThemeClassName, isDarkMode);
     }
 
     private releaseDetachedWindowBinding(): void {
