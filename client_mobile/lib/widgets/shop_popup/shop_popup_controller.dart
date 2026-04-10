@@ -28,6 +28,20 @@ class ShopPopupController extends ChangeNotifier {
   void init() {
     shopItemsFuture = _balanceService.getShopItems();
     shopItemsFuture2 = _balanceService.getShopItems();
+    _refreshCurrentUser();
+  }
+
+  Future<void> _refreshCurrentUser() async {
+    final String? userId = _userService.currentUser.value?.userId;
+    if (userId == null) {
+      return;
+    }
+
+    try {
+      final user = await _userService.getById(userId);
+      _userService.currentUser.value = user;
+      notifyListeners();
+    } catch (_) {}
   }
 
   void onItemSelected(ShopItem item) {

@@ -55,6 +55,10 @@ const Color ESCAPE_TINT_COLOR = Color(0xFF000000);
 const String FOOTER_LEFT_BORDER_ASSET = 'assets/images/menu/containers/combat/combat-container-left-border.png';
 const String FOOTER_BODY_ASSET = 'assets/images/menu/containers/combat/combat-container-body.png';
 const String FOOTER_SPECTATE_ASSET = 'assets/images/menu/containers/combat/spectate-container.png';
+const String QUIT_BUTTON_LEFT_EDGE_ASSET = 'assets/images/menu/containers/user-card/button-delete-edge-1.png';
+const String QUIT_BUTTON_RIGHT_EDGE_ASSET = 'assets/images/menu/containers/user-card/button-delete-edge-2.png';
+const String QUIT_BUTTON_BODY_ASSET = 'assets/images/menu/containers/user-card/button-delete-body.png';
+const String QUIT_BUTTON_ICON_ASSET = 'assets/images/menu/icons/user-card/logout.png';
 const double FOOTER_BORDER_ASPECT_RATIO = 10 / 88;
 
 const Color HP_EMPTY_COLOR = Color(0xFF727272);

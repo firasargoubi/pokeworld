@@ -74,7 +74,7 @@ MatchData buildMatchData({
   code: 'TEST',
   state: MatchState.TurnStart,
   gameData: buildGameData(mapData),
-  lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0, isDropInEnabled: false, isRapidElimination: false, isFriendOnly: false),
+  lobbyData: LobbyData(isLocked: false, hostPlayerIndex: 0, isDropInEnabled: false, isRapidElimination: false, entryFee: 0, isFriendOnly: false),
   playData: PlayData(
     timeLeft: 60,
     isDebugMode: false,

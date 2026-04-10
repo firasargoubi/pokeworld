@@ -14,7 +14,10 @@ const String TITLE_KEY = 'components.preMatchSettings.title';
 const String ACCESSIBILITY_KEY = 'components.preMatchSettings.accessibility';
 const String OPEN_KEY = 'components.preMatchSettings.open';
 const String FRIEND_ONLY_KEY = 'components.preMatchSettings.friendOnly';
+const String PRICE_KEY = 'components.preMatchSettings.price';
 const String VALIDATE_KEY = 'components.preMatchSettings.validate';
+
+const int ENTRY_FEE_STEP = 500;
 
 const double OVERLAY_ALPHA = 0.5;
 const double BLUR_SIGMA = 2.0;

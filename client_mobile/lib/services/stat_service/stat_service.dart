@@ -42,6 +42,8 @@ class StatService {
 
   num _getPlayerStatValue(StatData player, PlayerStatType statType) {
     switch (statType) {
+      case PlayerStatType.balanceGain:
+        return player.balanceGain;
       case PlayerStatType.discoveredItemsCount:
         return player.discoveredItemsCount;
       case PlayerStatType.visitedTilesRatio:

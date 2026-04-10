@@ -13,6 +13,7 @@ class LobbyCodePanel extends StatelessWidget {
     required this.code,
     required this.isAdmin,
     required this.isLocked,
+    required this.entryFee,
     required this.labelStyle,
     required this.codeStyle,
     required this.onToggleLock,
@@ -25,6 +26,7 @@ class LobbyCodePanel extends StatelessWidget {
   final String code;
   final bool isAdmin;
   final bool isLocked;
+  final int entryFee;
 
   final TextStyle labelStyle;
   final TextStyle codeStyle;
@@ -113,14 +115,33 @@ class LobbyCodePanel extends StatelessWidget {
                         top: 0,
                         child: SizedBox(
                           width: boxWidth,
-                          height: boxHeight * 0.3,
-                          child: Center(
-                            child: Image.asset(
-                              MatchService().matchData!.lobbyData.isFriendOnly ? FRIEND_ONLY_ICON_ASSET : OPEN_ICON_ASSET,
-                              fit: BoxFit.contain,
-                              filterQuality: FilterQuality.none,
-                              color: const Color(0xFFaae7f7),
-                            ),
+                          height: boxHeight,
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: boxHeight * 0.3,
+                                child: Center(
+                                  child: Image.asset(
+                                    MatchService().matchData!.lobbyData.isFriendOnly ? FRIEND_ONLY_ICON_ASSET : OPEN_ICON_ASSET,
+                                    fit: BoxFit.contain,
+                                    filterQuality: FilterQuality.none,
+                                    color: const Color(0xFFaae7f7),
+                                  ),
+                                ),
+                              ),
+                              const Spacer(),
+                              Text(
+                                '$entryFee\$',
+                                style: TextStyle(
+                                  fontFamily: PIXEL_FONT,
+                                  color: const Color(0xFFaae7f7),
+                                  fontSize: baseSize * 0.024,
+                                  height: 1,
+                                  shadows: [Shadow(offset: Offset(baseSize * 0.0025, 0), color: SHADOW_COLOR, blurRadius: 0)],
+                                ),
+                              ),
+                              SizedBox(height: boxHeight * 0.05),
+                            ],
                           ),
                         ),
                       ),

@@ -685,6 +685,18 @@ class CombatSpectatorContent extends StatelessWidget {
   final PlayerData player;
   final PlayerCombatData combatData;
 
+  ImageProvider<Object> _combatProfileImageProvider() {
+    if (player.type == PlayerType.BotAggressive) {
+      return const AssetImage('assets/images/menu/icons/play/bot-aggressive.png');
+    }
+
+    if (player.type == PlayerType.BotDefensive) {
+      return const AssetImage('assets/images/menu/icons/play/bot-defensive.png');
+    }
+
+    return profilePictureImageProvider(player.fullProfilePicture);
+  }
+
   @override
   Widget build(BuildContext context) {
     final i18n = I18nService();
@@ -709,7 +721,7 @@ class CombatSpectatorContent extends StatelessWidget {
               ),
               child: Padding(
                 padding: EdgeInsets.all(baseSize * 0.008),
-                child: Image(image: profilePictureImageProvider(player.fullProfilePicture), fit: BoxFit.contain, filterQuality: FilterQuality.none),
+                child: Image(image: _combatProfileImageProvider(), fit: BoxFit.contain, filterQuality: FilterQuality.none),
               ),
             ),
           ),

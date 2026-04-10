@@ -61,6 +61,6 @@ class TotalTiles {
   int bridge = 0;
 }
 
-enum PlayerStatType { discoveredItemsCount, visitedTilesRatio, combats, victories, defeats, escapes, hpInflicted, hpLost }
+enum PlayerStatType { balanceGain, discoveredItemsCount, visitedTilesRatio, combats, victories, defeats, escapes, hpInflicted, hpLost }
 
 enum SortOrder { ascending, descending }

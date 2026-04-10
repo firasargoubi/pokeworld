@@ -38,6 +38,7 @@ class _LobbyPageState extends State<LobbyPage> {
   String code = MatchService().matchData?.code ?? 'ABCD1234';
   bool isAdmin = MatchService().isPlayerHost(MatchService().selfId);
   bool isLocked = MatchService().matchData?.lobbyData.isLocked ?? false;
+  int entryFee = MatchService().matchData?.lobbyData.entryFee ?? 0;
 
   final mapSize = MatchService().matchData?.gameData.mapData.size;
   late final maxPlayers = MAP_SIZE_PLAYER_COUNT[mapSize] ?? MAP_SIZE_PLAYER_COUNT[MapSize.Small]!;
@@ -66,6 +67,7 @@ class _LobbyPageState extends State<LobbyPage> {
     code = md?.code ?? 'ABCD1234';
     isAdmin = MatchService().isPlayerHost(MatchService().selfId);
     isLocked = md?.lobbyData.isLocked ?? false;
+    entryFee = md?.lobbyData.entryFee ?? 0;
     players = List<PlayerData>.from(_list(md));
 
     _sub = MatchService().matchUpdates.listen((md) {
@@ -74,6 +76,7 @@ class _LobbyPageState extends State<LobbyPage> {
         code = md.code;
         isAdmin = MatchService().isPlayerHost(MatchService().selfId);
         isLocked = md.lobbyData.isLocked;
+        entryFee = md.lobbyData.entryFee;
         players = List<PlayerData>.from(_list(md));
       });
     });
@@ -221,6 +224,7 @@ class _LobbyPageState extends State<LobbyPage> {
                                                 code: code,
                                                 isAdmin: isAdmin,
                                                 isLocked: isLocked,
+                                                entryFee: entryFee,
                                                 labelStyle: labelStyle,
                                                 codeStyle: codeStyle,
                                                 onToggleLock: _toggleLock,

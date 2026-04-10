@@ -10,6 +10,7 @@ const String STAT_PLAYERS_TITLE_KEY = 'pages.stat.playersStats';
 const String STAT_GAME_TITLE_KEY = 'pages.stat.matchStats';
 
 const String STAT_ITEMS_LABEL_KEY = 'pages.stat.playerColumns.items';
+const String STAT_GAIN_COLUMN_LABEL_KEY = 'pages.stat.playerColumns.gain';
 const String STAT_TILES_LABEL_KEY = 'pages.stat.playerColumns.tiles';
 const String STAT_COMBATS_LABEL_KEY = 'pages.stat.playerColumns.combats';
 const String STAT_VICTORIES_LABEL_KEY = 'pages.stat.playerColumns.victories';
@@ -33,6 +34,7 @@ const Color STAT_HEADER_BACKGROUND_COLOR = Color(0xFF68a0d8);
 const Color STAT_COLUMN_BORDER_COLOR = Color(0xFF606070);
 const Color STAT_TITLE_COLOR = Color(0xFFf0d088);
 const Color STAT_COLUMN_TITLE_COLOR = Color(0xFF344d83);
+const Color STAT_BALANCE_GAIN_COLOR = Color(0xFF1E8A4C);
 const Color STAT_SELF_HIGHLIGHT_COLOR = Color.fromARGB(173, 255, 198, 93);
 const Color STAT_TEAM_RED_COLOR = Color.fromARGB(160, 224, 112, 112);
 const Color STAT_TEAM_BLUE_COLOR = Color.fromARGB(160, 112, 144, 224);

@@ -15,6 +15,7 @@ import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/play_service/play_service.dart';
 import 'package:client_mobile/services/popup_service/popup_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
+import 'package:client_mobile/widgets/edge_body_button/edge_body_button.dart';
 import 'package:client_mobile/widgets/stripe_painter/stripe_painter.dart';
 import 'package:flutter/material.dart';
 
@@ -281,6 +282,41 @@ class _CombatPageState extends State<CombatPage> {
     }
   }
 
+  void _showQuitConfirmationPopup() {
+    PopupService().showPopup(
+      PopupMessage(
+        message: I18nService().translate(PopupMessages.Surrender.messageKey),
+        isConfirmation: true,
+        action: () => MatchService().leaveMatch(),
+      ),
+    );
+  }
+
+  Widget _buildQuitButton(double baseSize) {
+    return SizedBox(
+      height: baseSize * 0.07,
+      width: baseSize * 0.11,
+      child: EdgeBodyButton(
+        leftEdgePath: QUIT_BUTTON_LEFT_EDGE_ASSET,
+        rightEdgePath: QUIT_BUTTON_RIGHT_EDGE_ASSET,
+        bodyPath: QUIT_BUTTON_BODY_ASSET,
+        onAction: _showQuitConfirmationPopup,
+        child: Center(
+          child: Transform.flip(
+            flipX: true,
+            child: Image.asset(
+              QUIT_BUTTON_ICON_ASSET,
+              height: baseSize * 0.035,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.none,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final i18n = I18nService();
@@ -369,6 +405,7 @@ class _CombatPageState extends State<CombatPage> {
                   ),
                 ),
               ),
+              Positioned(top: MediaQuery.of(context).padding.top + baseSize * 0.02, left: baseSize * 0.02, child: _buildQuitButton(baseSize)),
               Builder(
                 builder: (context) {
                   final keyboardHeight = MediaQuery.of(context).viewInsets.bottom + baseSize * 0.02;

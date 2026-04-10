@@ -113,11 +113,12 @@ class StatSectionHeader extends StatelessWidget {
 }
 
 class StatValueCell extends StatelessWidget {
-  const StatValueCell({super.key, required this.text, required this.baseSize, this.backgroundColor});
+  const StatValueCell({super.key, required this.text, required this.baseSize, this.backgroundColor, this.textColor});
 
   final String text;
   final double baseSize;
   final Color? backgroundColor;
+  final Color? textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +129,7 @@ class StatValueCell extends StatelessWidget {
         child: Container(
           color: backgroundColor ?? Colors.transparent,
           alignment: Alignment.center,
-          child: Text(text, style: pixelLineStyle(baseSize * STAT_LINE_FONT_FACTOR)),
+          child: Text(text, style: pixelLineStyle(baseSize * STAT_LINE_FONT_FACTOR).copyWith(color: textColor)),
         ),
       ),
     );
@@ -165,6 +166,7 @@ class StatColumn extends StatelessWidget {
     required this.baseSize,
     required this.isSorting,
     required this.isAscending,
+    this.valueTextColor,
     this.onTap,
   });
 
@@ -174,6 +176,7 @@ class StatColumn extends StatelessWidget {
   final double baseSize;
   final bool isSorting;
   final bool isAscending;
+  final Color? valueTextColor;
   final VoidCallback? onTap;
 
   @override
@@ -216,8 +219,12 @@ class StatColumn extends StatelessWidget {
             baseSize: baseSize,
             children: List.generate(
               values.length,
-              (index) =>
-                  StatValueCell(text: values[index], baseSize: baseSize, backgroundColor: isSelfList[index] ? STAT_SELF_HIGHLIGHT_COLOR : null),
+              (index) => StatValueCell(
+                text: values[index],
+                baseSize: baseSize,
+                backgroundColor: isSelfList[index] ? STAT_SELF_HIGHLIGHT_COLOR : null,
+                textColor: valueTextColor,
+              ),
             ),
           ),
         ],
@@ -291,7 +298,6 @@ class GameStatsPanel extends StatelessWidget {
     required this.winner,
     required this.formatDuration,
     required this.formatRatio,
-    required this.formattedBalanceGain,
   });
 
   final double baseSize;
@@ -299,7 +305,6 @@ class GameStatsPanel extends StatelessWidget {
   final WinnerVisualData? winner;
   final String Function(int ms) formatDuration;
   final String Function(double ratio) formatRatio;
-  final String formattedBalanceGain;
 
   String _winnerDisplayName() {
     final winnerName = winner?.name ?? '';
@@ -361,7 +366,6 @@ class GameStatsPanel extends StatelessWidget {
                               value: stats.flagHoldersCount.toString(),
                               baseSize: baseSize,
                             ),
-                          StatLine(label: I18nService().translate(STAT_BALANCE_GAIN_LABEL_KEY), value: formattedBalanceGain, baseSize: baseSize),
                         ],
                       ),
                     ),
