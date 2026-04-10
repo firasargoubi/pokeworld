@@ -40,6 +40,15 @@ export class MovementService {
         });
     }
 
+    posToKey(p: Position): string {
+        return `${p.x}-${p.y}`;
+    }
+
+    keyToPos(key: string): Position {
+        const [x, y] = key.split('-').map(Number);
+        return { x, y };
+    }
+
     private hasEnemyPlayer(matchData: MatchData, position: Position): boolean {
         let hasEnemyPlayer = false;
         const player = matchData.players.find((p) => p.position.x === position.x && p.position.y === position.y);
@@ -150,14 +159,5 @@ export class MovementService {
 
     private getMovementCost(matchData: MatchData, position: Position): number {
         return TILE_COST[matchData.gameData.mapData.tiles[position.x][position.y]];
-    }
-
-    private posToKey(p: Position): string {
-        return `${p.x}-${p.y}`;
-    }
-
-    private keyToPos(key: string): Position {
-        const [x, y] = key.split('-').map(Number);
-        return { x, y };
     }
 }

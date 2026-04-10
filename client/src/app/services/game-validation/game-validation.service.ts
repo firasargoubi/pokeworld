@@ -10,7 +10,6 @@ import {
     ValidationResult,
     ValidationStatus,
 } from '@app/interfaces/game-validation';
-import { MAX_ITEM_COUNT } from '@common/consts/item-data.const';
 import { PERCENTAGE_FACTOR } from '@common/consts/track-data.const';
 import { GameData } from '@common/interfaces/game-data';
 import { ItemType } from '@common/interfaces/item-type.enum';
@@ -19,6 +18,7 @@ import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { I18nService } from '@app/services/i18n/i18n.service';
 import { BRIDGE_TYPES, MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH, MIN_TERRAIN_RATIO } from './game-validation.const';
+import { MAX_ITEM_COUNT } from '@common/consts/item-data.const';
 
 @Injectable({
     providedIn: 'root',
@@ -70,28 +70,18 @@ export class GameValidationService {
         return errors.length ? `${invalidMapMessage}\n${errors.join('\n')}` : noErrorsMessage;
     }
 
-    private validateName(gameName: string): ValidationStatus {
-        return this.validateField(gameName, MAX_NAME_LENGTH);
-    }
+    validateBridge(position: Position, map: MapData): BridgeValidationError | null {
+        let error: BridgeValidationError | null = null;
 
-    private validateDescription(gameDescription: string): ValidationStatus {
-        return this.validateField(gameDescription, MAX_DESCRIPTION_LENGTH);
-    }
-
-    private validateField(value: string, maxLength: number): ValidationStatus {
-        const validationStatus: ValidationStatus = { isValid: true, errorMessage: null };
-
-        if (!value || !value.trim()) {
-            validationStatus.isValid = false;
-            validationStatus.errorMessage = ErrorMessage.Empty;
-        } else if (value.length > maxLength) {
-            validationStatus.isValid = false;
-            validationStatus.errorMessage = ErrorMessage.TooLong;
+        if (this.isOnMapEdge(position, map)) {
+            error = { x: position.x, y: position.y, errorMessage: ErrorMessage.BridgeAtEdge };
+        } else if (!this.isCorrectlyPlacedBridge(position, map)) {
+            error = { x: position.x, y: position.y, errorMessage: ErrorMessage.BridgeNotBetweenWalls };
         }
-        return validationStatus;
+        return error;
     }
 
-    private validateMap(map: MapData): ValidationResult {
+    validateMap(map: MapData): ValidationResult {
         const bridgeStatus = { isValid: true, errors: [] };
         const tilesCount: TilesCount = {
             nbWater: 0,
@@ -122,6 +112,27 @@ export class GameValidationService {
         return mapValidationResult;
     }
 
+    private validateName(gameName: string): ValidationStatus {
+        return this.validateField(gameName, MAX_NAME_LENGTH);
+    }
+
+    private validateDescription(gameDescription: string): ValidationStatus {
+        return this.validateField(gameDescription, MAX_DESCRIPTION_LENGTH);
+    }
+
+    private validateField(value: string, maxLength: number): ValidationStatus {
+        const validationStatus: ValidationStatus = { isValid: true, errorMessage: null };
+
+        if (!value || !value.trim()) {
+            validationStatus.isValid = false;
+            validationStatus.errorMessage = ErrorMessage.Empty;
+        } else if (value.length > maxLength) {
+            validationStatus.isValid = false;
+            validationStatus.errorMessage = ErrorMessage.TooLong;
+        }
+        return validationStatus;
+    }
+
     private handleTile(tileHandler: TileHandler) {
         const { position, map, tilesCount, bridgeStatus } = tileHandler;
         const tileType = map.tiles[position.x][position.y];
@@ -140,17 +151,6 @@ export class GameValidationService {
         } else if (isTerrainTile) {
             tilesCount.nbTerrain++;
         }
-    }
-
-    private validateBridge(position: Position, map: MapData): BridgeValidationError | null {
-        let error: BridgeValidationError | null = null;
-
-        if (this.isOnMapEdge(position, map)) {
-            error = { x: position.x, y: position.y, errorMessage: ErrorMessage.BridgeAtEdge };
-        } else if (!this.isCorrectlyPlacedBridge(position, map)) {
-            error = { x: position.x, y: position.y, errorMessage: ErrorMessage.BridgeNotBetweenWalls };
-        }
-        return error;
     }
 
     private isOnMapEdge(position: Position, map: MapData): boolean {

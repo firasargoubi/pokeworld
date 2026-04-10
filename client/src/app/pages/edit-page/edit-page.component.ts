@@ -17,6 +17,10 @@ import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { EditorService } from '@app/services/editor/editor.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
+import { GameValidationService } from '@app/services/game-validation/game-validation.service';
+import { DEFAULT_BUSH_RATIO, DEFAULT_PATH_RATIO } from '@app/services/map-generator/map-generator.const';
+import { MapGeneratorService } from '@app/services/map-generator/map-generator.service';
+import { MapItemPlacerService } from '@app/services/map-item-placer/map-item-placer.service';
 import { MapService } from '@app/services/map/map.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { OUTSIDE_OF_MAP } from '@common/consts/map-data.const';
@@ -36,19 +40,24 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class EditPageComponent {
     gameDataService: GameDataService = inject(GameDataService);
+    gameValidationService: GameValidationService = inject(GameValidationService);
     editorVisualData: EditorVisualData = structuredClone(DEFAULT_EDITOR_DATA);
     gameState = [GameState.PUBLIC, GameState.PRIVATE_SHARED, GameState.PRIVATE];
     gameStateKeys = GAME_STATE_KEYS;
+    mapGeneratorService: MapGeneratorService = inject(MapGeneratorService);
     readonly audioService: AudioService = inject(AudioService);
     readonly clickValue = SoundEffect.Click;
     private editorService: EditorService = inject(EditorService);
     private popupService: PopupService = inject(PopupService);
     private mapService: MapService = inject(MapService);
     private router: Router = inject(Router);
+    private mapItemPlacerService: MapItemPlacerService = inject(MapItemPlacerService);
     private initialGameData: GameData = structuredClone(this.gameDataService.gameData);
 
     constructor() {
         if (this.gameDataService.isMapValid()) {
+            this.mapGeneratorService.bushPercentage = DEFAULT_BUSH_RATIO;
+            this.mapGeneratorService.pathPercentage = DEFAULT_PATH_RATIO;
             this.mapService.clearOverlays();
             this.mapService.setPlayers([]);
             this.gameDataService.itemUpdate.subscribe(this.updateItems.bind(this));
@@ -148,6 +157,41 @@ export class EditPageComponent {
         }
     }
 
+    generateMap() {
+        this.audioService.playEffect(SoundEffect.Click);
+        let isMapValid;
+        let isMapUnique;
+        do {
+            isMapUnique = true;
+            const mapData = this.gameDataService.gameData.mapData;
+
+            const { tiles, structures } = this.mapGeneratorService.generateGrid(
+                mapData.size,
+                mapData.gameMode,
+                this.mapGeneratorService.bushPercentage,
+                this.mapGeneratorService.pathPercentage,
+            );
+
+            mapData.tiles = tiles;
+
+            this.mapItemPlacerService.placeItems(tiles, mapData.size, mapData.gameMode, structures);
+
+            isMapUnique = !this.mapGeneratorService.isCompleteMapIdentical(mapData);
+
+            if (isMapUnique) {
+                const validationResult = this.gameValidationService.validateMap(mapData);
+                isMapValid = Object.values(validationResult).every((field) => field?.isValid === true);
+                if (isMapValid) {
+                    this.mapGeneratorService.updateLastGeneratedMapData(mapData);
+                }
+            }
+        } while (!isMapValid || !isMapUnique);
+
+        this.gameDataService.mapUpdate.next(null);
+        this.gameDataService.itemUpdate.next(null);
+        this.updateItems();
+    }
+
     private dropItem(editorEvent: EditorEvent) {
         const item = this.editorVisualData.dragItem as ItemType;
         this.setActiveItem(null, editorEvent);
@@ -176,6 +220,8 @@ export class EditPageComponent {
 
     private resetGameData() {
         this.gameDataService.setGameData(structuredClone(this.initialGameData));
+        this.mapGeneratorService.bushPercentage = DEFAULT_BUSH_RATIO;
+        this.mapGeneratorService.pathPercentage = DEFAULT_PATH_RATIO;
     }
 
     private onClick(event: MouseEvent, isLeftClick: boolean) {

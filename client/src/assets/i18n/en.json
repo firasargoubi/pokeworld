@@ -188,7 +188,11 @@
             "public": "Public",
             "private": "Private",
             "privateShared": "Private/Shared",
-            "actions": "Actions"
+            "actions": "Actions",
+            "generator": "Generator",
+            "bush": "Bush / Terrain",
+            "path": "Path / Terrain",
+            "generate": "Generate"
         },
         "admin": {
             "title": "EDIT GAME",
