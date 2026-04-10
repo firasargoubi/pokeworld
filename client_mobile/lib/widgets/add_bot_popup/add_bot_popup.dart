@@ -88,8 +88,8 @@ class _AddBotPopupState extends State<AddBotPopup> {
             behavior: HitTestBehavior.opaque,
             onTap: widget.onClose,
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: BLUR_SIGMA * 4, sigmaY: BLUR_SIGMA * 4),
-              child: Container(color: Colors.black.withValues(alpha: OVERLAY_ALPHA)),
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+              child: Container(color: const Color.fromARGB(80, 0, 0, 0)),
             ),
           ),
         ),
@@ -103,7 +103,7 @@ class _AddBotPopupState extends State<AddBotPopup> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  DefaultContainer(baseSize: baseSize, config: GRAY_CONTAINER_CONFIG),
+                  DefaultContainer(baseSize: baseSize, config: GRAY_CONTAINER_CONFIG, onClose: () => widget.onClose()),
                   Padding(
                     padding: EdgeInsets.all(contentPadding),
                     child: Column(

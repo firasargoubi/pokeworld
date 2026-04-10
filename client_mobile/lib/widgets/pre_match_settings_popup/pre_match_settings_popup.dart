@@ -114,7 +114,7 @@ class _PreMatchSettingsPopupState extends State<PreMatchSettingsPopup> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  DefaultContainer(baseSize: baseSize, config: GRAY_CONTAINER_CONFIG),
+                  DefaultContainer(baseSize: baseSize, config: GRAY_CONTAINER_CONFIG, onClose: () => Navigator.of(context).pop()),
                   Padding(
                     padding: EdgeInsets.all(contentPadding),
                     child: Column(
@@ -173,7 +173,7 @@ class _PreMatchSettingsPopupState extends State<PreMatchSettingsPopup> {
                             child: SizedBox(
                               width: baseSize * 0.40,
                               height: baseSize * 0.15,
-                              child: PokeButton(text: i18n.translate(VALIDATE_KEY), onTap: submit),
+                              child: PokeButton(text: i18n.translate(VALIDATE_KEY).toUpperCase(), onTap: submit),
                             ),
                           ),
                         ),

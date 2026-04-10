@@ -26,9 +26,6 @@ const String THEME_LABEL = 'components.appSettings.theme';
 const String THEME_DEFAULT_LABEL = 'components.appSettings.themeDefault';
 const String THEME_DARK_LABEL = 'components.appSettings.themeDark';
 
-const double OVERLAY_ALPHA = 0.5;
-const double BLUR_SIGMA = 2.0;
-
 // Slider constants
 const Color SLIDER_TRACK_COLOR = Color(0xFF606060);
 const Color SLIDER_FILL_COLOR = Color(0xFF68a0d8);
@@ -49,10 +46,13 @@ const CONTAINER_CONFIG = DefaultContainerConfig(
   borderWidthFactor: 0.025,
   innerBorderWidthFactor: 0.015,
   separatorHeightFactor: 0.015,
-  backgroundRatio: 0.116,
+  backgroundRatio: 0.12,
   borderColor: Color(0xFF484860),
   innerBorderBottomRightColor: Color(0xFF616161),
   innerBorderTopLeftColor: Color(0xFFacacac),
   backgroundTopColor: Color(0xFF888888),
   backgroundBottomColor: Color(0xFFacacac),
+  closeButtonFactor: 0.055,
+  closeButtonTopFactor: 1.1,
+  closeButtonRightFactor: 1.1,
 );

@@ -213,12 +213,12 @@ class _SettingsPopupState extends State<SettingsPopup> {
     final baseSize = _computeBaseSize(MediaQuery.of(context).size);
 
     final dialogHeight = baseSize * 0.75;
-    final dialogWidth = dialogHeight * 9 / 10;
+    final dialogWidth = baseSize * 0.9;
     final contentPadding = baseSize * 0.055;
 
     final titleStyle = _pixelTextStyle(baseSize * 0.05);
     final labelStyle = _pixelTextStyle(baseSize * 0.035);
-    final tabStyle = _pixelTextStyle(baseSize * 0.025);
+    final tabStyle = _pixelTextStyle(baseSize * 0.035);
     final optionStyle = _pixelTextStyle(baseSize * 0.025);
 
     final sliderWidth = dialogWidth * 0.6;
@@ -231,8 +231,8 @@ class _SettingsPopupState extends State<SettingsPopup> {
             behavior: HitTestBehavior.opaque,
             onTap: widget.onClose,
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: BLUR_SIGMA, sigmaY: BLUR_SIGMA),
-              child: Container(color: Colors.black.withValues(alpha: OVERLAY_ALPHA)),
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+              child: Container(color: Colors.black54),
             ),
           ),
         ),
@@ -246,7 +246,7 @@ class _SettingsPopupState extends State<SettingsPopup> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  DefaultContainer(baseSize: baseSize, config: CONTAINER_CONFIG),
+                  DefaultContainer(baseSize: baseSize, config: CONTAINER_CONFIG, onClose: () => widget.onClose()),
                   Padding(
                     padding: EdgeInsets.all(contentPadding),
                     child: Column(

@@ -25,6 +25,10 @@ const String ASSET_TUTORIAL_ARROW_RESET = 'assets/images/menu/icons/user-card/re
 const String ASSET_TUTORIAL_CLOSE = 'assets/images/menu/icons/tutorial/close.png';
 const String ASSET_PROFESSOR_CHEN = 'assets/images/menu/tutorial/professeur-chen.png';
 
+const String RED_BUTTON_EDGE_LEFT_ASSET_PATH = 'assets/images/menu/containers/user-card/button-delete-edge-1.png';
+const String RED_BUTTON_EDGE_RIGHT_ASSET_PATH = 'assets/images/menu/containers/user-card/button-delete-edge-2.png';
+const String RED_BUTTON_BODY_ASSET_PATH = 'assets/images/menu/containers/user-card/button-delete-body.png';
+
 const Color DIALOG_BARRIER_COLOR = Colors.black54;
 
 const Color IMAGE_INPUT_BG_COLOR = Color.fromARGB(71, 255, 255, 255);

@@ -1,21 +1,22 @@
 part of 'user_profile_popup.dart';
 
 class _CardActionButton extends StatelessWidget {
-  const _CardActionButton({required this.icon, required this.onPressed, required this.assetPath, required this.baseSize});
+  const _CardActionButton({required this.icon, required this.onPressed, required this.assetPath, required this.baseSize, this.isCloseButton = false});
 
   final IconData icon;
   final VoidCallback onPressed;
   final String assetPath;
   final double baseSize;
+  final bool? isCloseButton;
 
   @override
   Widget build(BuildContext context) => SizedBox(
     width: baseSize * 0.1,
     height: baseSize * 0.1,
     child: EdgeBodyButton(
-      leftEdgePath: ASSET_BUTTON_EDGE_1,
-      rightEdgePath: ASSET_BUTTON_EDGE_2,
-      bodyPath: ASSET_BUTTON_BODY,
+      leftEdgePath: isCloseButton == true ? ASSET_DELETE_BUTTON_EDGE_1 : ASSET_BUTTON_EDGE_1,
+      rightEdgePath: isCloseButton == true ? ASSET_DELETE_BUTTON_EDGE_2 : ASSET_BUTTON_EDGE_2,
+      bodyPath: isCloseButton == true ? ASSET_DELETE_BUTTON_BODY : ASSET_BUTTON_BODY,
       onAction: () => onPressed(),
       child: SizedBox.square(
         dimension: baseSize * 0.06,
@@ -36,23 +37,11 @@ class _CardTitleRow extends StatelessWidget {
     mainAxisAlignment: MainAxisAlignment.start,
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
-      Image.asset(
-        ASSET_TITLE_ICON,
-        width: baseSize * 0.07,
-        height: baseSize * 0.07,
-        fit: BoxFit.contain,
-        filterQuality: FilterQuality.none,
-      ),
+      Image.asset(ASSET_TITLE_ICON, width: baseSize * 0.07, height: baseSize * 0.07, fit: BoxFit.contain, filterQuality: FilterQuality.none),
       SizedBox(width: baseSize * 0.02),
       Text(title, style: TITLE_TEXT_STYLE(baseSize * 0.07)),
       SizedBox(width: baseSize * 0.02),
-      Image.asset(
-        ASSET_TITLE_ICON,
-        width: baseSize * 0.07,
-        height: baseSize * 0.07,
-        fit: BoxFit.contain,
-        filterQuality: FilterQuality.none,
-      ),
+      Image.asset(ASSET_TITLE_ICON, width: baseSize * 0.07, height: baseSize * 0.07, fit: BoxFit.contain, filterQuality: FilterQuality.none),
     ],
   );
 }
@@ -199,11 +188,7 @@ class _CardBadgeSlot extends StatelessWidget {
     height: baseSize * 0.08,
     width: baseSize * 0.08,
     decoration: const BoxDecoration(
-      image: DecorationImage(
-        image: AssetImage(ASSET_BADGE_CONTAINER),
-        fit: BoxFit.fill,
-        filterQuality: FilterQuality.none,
-      ),
+      image: DecorationImage(image: AssetImage(ASSET_BADGE_CONTAINER), fit: BoxFit.fill, filterQuality: FilterQuality.none),
     ),
   );
 }

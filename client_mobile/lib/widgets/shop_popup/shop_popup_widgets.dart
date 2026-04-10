@@ -1,5 +1,6 @@
 import 'package:client_mobile/models/shop.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
+import 'package:client_mobile/widgets/edge_body_button/edge_body_button.dart';
 import 'package:client_mobile/widgets/shop_popup/shop_popup_const.dart';
 import 'package:flutter/material.dart';
 
@@ -21,6 +22,21 @@ class ShopPopupTitle extends StatelessWidget {
         Text(I18nService().translate(SHOP_TITLE_TEXT), style: buildTitleTextStyle(fontSize)),
         SizedBox(width: spacing),
         Image.asset(TITLE_ICON_ASSET_PATH, width: iconSize, height: iconSize, fit: BoxFit.contain, filterQuality: FilterQuality.none),
+        Expanded(flex: 1, child: Container()),
+        SizedBox(
+          width: iconSize * 1.2,
+          height: iconSize * 1.2,
+          child: EdgeBodyButton(
+            leftEdgePath: RED_BUTTON_EDGE_LEFT_ASSET_PATH,
+            rightEdgePath: RED_BUTTON_EDGE_RIGHT_ASSET_PATH,
+            bodyPath: RED_BUTTON_BODY_ASSET_PATH,
+            onAction: () => Navigator.of(context).pop(),
+            child: SizedBox.square(
+              dimension: iconSize * 0.6,
+              child: Image.asset(ASSET_ICON_CLOSE, fit: BoxFit.contain, color: Colors.white, filterQuality: FilterQuality.none),
+            ),
+          ),
+        ),
       ],
     );
   }

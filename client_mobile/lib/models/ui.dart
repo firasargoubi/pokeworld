@@ -15,6 +15,9 @@ class DefaultContainerConfig {
     this.innerBorderTopLeftColor,
     this.backgroundTopColor,
     this.backgroundBottomColor,
+    this.closeButtonFactor = 0.05,
+    this.closeButtonTopFactor,
+    this.closeButtonRightFactor,
   });
 
   final double borderWidthFactor;
@@ -26,4 +29,7 @@ class DefaultContainerConfig {
   final Color? innerBorderTopLeftColor;
   final Color? backgroundTopColor;
   final Color? backgroundBottomColor;
+  final double? closeButtonFactor;
+  final double? closeButtonTopFactor;
+  final double? closeButtonRightFactor;
 }

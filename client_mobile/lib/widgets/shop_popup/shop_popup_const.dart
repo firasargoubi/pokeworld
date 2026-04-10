@@ -13,9 +13,16 @@ const String ITEM_CONTAINER_ASSET_PATH = 'assets/images/menu/containers/shop/ite
 const String ITEM_CONTAINER_ACTIVE_ASSET_PATH = 'assets/images/menu/containers/shop/item-container-active.png';
 const String MAIN_ITEM_CONTAINER_ASSET_PATH = 'assets/images/menu/containers/shop/main-item-container.png';
 const String ITEM_PLACEHOLDER_ASSET_PATH = 'assets/images/menu/containers/shop/item1.png';
+
 const String BUTTON_EDGE_LEFT_ASSET_PATH = 'assets/images/menu/containers/shop/button-container-edge-1.png';
 const String BUTTON_EDGE_RIGHT_ASSET_PATH = 'assets/images/menu/containers/shop/button-container-edge-2.png';
 const String BUTTON_BODY_ASSET_PATH = 'assets/images/menu/containers/shop/button-container-body.png';
+
+const String RED_BUTTON_EDGE_LEFT_ASSET_PATH = 'assets/images/menu/containers/user-card/button-delete-edge-1.png';
+const String RED_BUTTON_EDGE_RIGHT_ASSET_PATH = 'assets/images/menu/containers/user-card/button-delete-edge-2.png';
+const String RED_BUTTON_BODY_ASSET_PATH = 'assets/images/menu/containers/user-card/button-delete-body.png';
+
+const String ASSET_ICON_CLOSE = 'assets/images/menu/icons/close/close.png';
 
 const String SHOP_TITLE_TEXT = 'components.shopPopup.title';
 const String DESCRIPTION_TEXT = 'components.shopPopup.description';

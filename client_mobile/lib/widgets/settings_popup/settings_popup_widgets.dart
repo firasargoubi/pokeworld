@@ -157,6 +157,7 @@ class SettingsTabBar extends StatelessWidget {
           style: tabStyle,
           baseSize: baseSize,
         ),
+        SizedBox(width: baseSize * 0.02),
       ],
     );
   }

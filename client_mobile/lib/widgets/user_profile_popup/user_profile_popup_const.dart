@@ -85,12 +85,14 @@ const String ASSET_ICON_SETTINGS = 'assets/images/menu/icons/user-card/settings-
 const String ASSET_ICON_BACK_ARROW = 'assets/images/menu/icons/user-card/back-arrow.png';
 const String ASSET_ICON_LOGOUT = 'assets/images/menu/icons/user-card/logout.png';
 const String ASSET_ICON_TRASH = 'assets/images/menu/icons/user-card/trash.png';
+const String ASSET_ICON_CLOSE = 'assets/images/menu/icons/close/close.png';
 
 const double FRIENDS_TAB_BUTTON_SIZE_FACTOR = 0.1;
 const double FRIENDS_TAB_ICON_SIZE_FACTOR = 0.055;
 const double FRIENDS_TAB_GAP_FACTOR = 0.0;
 const double FRIENDS_TAB_ACTIVE_SCALE = 0.7;
-const double FRIENDS_TAB_ACTIVE_OPACITY = 0.8;
+const double FRIENDS_TAB_ACTIVE_OPACITY = 0.6;
+const double FRIENDS_TAB_INACTIVE_DARKEN = 0.5;
 const Duration FRIENDS_TAB_ANIMATION_DURATION = Duration(milliseconds: 120);
 const Color FRIENDS_TAB_ASSET_ICON_COLOR = Colors.white;
 const Color FRIENDS_BLOCKED_TAB_ICON_COLOR = Color(0xFFd85b5b);

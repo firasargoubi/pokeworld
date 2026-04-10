@@ -115,9 +115,9 @@ class _TutorialPopupState extends State<TutorialPopup> {
                           height: baseSize * 0.08,
                           width: baseSize * 0.1,
                           child: EdgeBodyButton(
-                            leftEdgePath: ASSET_BUTTON_EDGE_1,
-                            rightEdgePath: ASSET_BUTTON_EDGE_2,
-                            bodyPath: ASSET_BUTTON_BODY,
+                            leftEdgePath: RED_BUTTON_EDGE_LEFT_ASSET_PATH,
+                            rightEdgePath: RED_BUTTON_EDGE_RIGHT_ASSET_PATH,
+                            bodyPath: RED_BUTTON_BODY_ASSET_PATH,
                             onAction: () => Navigator.of(context).pop(),
                             child: SizedBox.square(
                               dimension: baseSize * 0.06,
