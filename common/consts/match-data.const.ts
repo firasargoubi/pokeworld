@@ -28,7 +28,7 @@ export const DEFAULT_PLAY_DATA: PlayData = {
     timeLeft: TURN_WAIT_DURATION,
     activePlayerIndex: 0,
     isDebugMode: false,
-    hasAction: false,
+    actionsLeft: 0,
     movementLeft: 0,
     isElementalMode: false,
 };

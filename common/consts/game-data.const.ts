@@ -6,7 +6,7 @@ import { GameMode, MapSize } from '../interfaces/map-data';
 export const DEFAULT_GAME_DATA: GameData = {
     _id: '',
     name: '',
-    owner: {userId : '', userName : ''},
+    owner: { userId: '', userName: '' },
     gameState: GameState.PUBLIC,
     description: '',
     lastEdited: new Date(),
@@ -25,5 +25,6 @@ export const DEFAULT_GAME_DATA: GameData = {
         tiles: [],
         size: MapSize.Small,
         gameMode: GameMode.FFA,
+        maxActions: 1,
     },
 };

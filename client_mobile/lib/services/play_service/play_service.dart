@@ -44,7 +44,7 @@ class PlayService {
   }
 
   bool canAct() {
-    return MatchService().isActivePlayer() && MatchService().isState(MatchState.TurnWait) && MatchService().matchData!.playData.hasAction;
+    return MatchService().isActivePlayer() && MatchService().isState(MatchState.TurnWait) && MatchService().matchData!.playData.actionsLeft > 0;
   }
 
   bool canEndTurn() {

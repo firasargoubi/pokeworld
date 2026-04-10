@@ -2,12 +2,13 @@ import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/tile_type.dart';
 
 class MapData {
-  MapData({required this.tiles, required this.items, required this.size, required this.gameMode});
+  MapData({required this.tiles, required this.items, required this.size, required this.gameMode, this.maxActions = 1});
 
   final List<List<TileType>> tiles;
   final Map<ItemType, List<Position>> items;
   final MapSize size;
   final GameMode gameMode;
+  final int maxActions;
 
   factory MapData.fromJson(Map<String, dynamic> json) {
     return MapData(
@@ -15,6 +16,7 @@ class MapData {
       items: _parseItems(json['items']),
       size: MapSize.values.firstWhere((e) => e.value == (json['size'] as num).toInt(), orElse: () => MapSize.Small),
       gameMode: GameMode.values.firstWhere((e) => e.value == json['gameMode'] as String, orElse: () => GameMode.FFA),
+      maxActions: (json['maxActions'] as num?)?.toInt() ?? 1,
     );
   }
 
@@ -26,6 +28,7 @@ class MapData {
       }),
       'size': size.value,
       'gameMode': gameMode.value,
+      'maxActions': maxActions,
     };
   }
 

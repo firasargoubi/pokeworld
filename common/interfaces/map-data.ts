@@ -7,6 +7,7 @@ export interface MapData {
     items: Record<ItemType, Position[]>;
     size: MapSize;
     gameMode: GameMode;
+    maxActions?: number;
 }
 
 export enum MapSize {

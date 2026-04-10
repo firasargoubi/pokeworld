@@ -97,7 +97,7 @@ describe('PlayService', () => {
     });
 
     it('action should execute action if valid', () => {
-        mockMatch.data.playData.hasAction = true;
+        mockMatch.data.playData.actionsLeft = 1;
         mockMatch.isActivePlayer.returns(true);
         mockMatch.isState.withArgs([MatchState.TurnWait]).returns(true);
         mockMapService.getActions.returns([{ x: 1, y: 1 }]);
@@ -106,7 +106,7 @@ describe('PlayService', () => {
 
         service.action(mockMatch, 'player1', { x: 1, y: 1 });
 
-        expect(mockMatch.data.playData.hasAction).toBe(false);
+        expect(mockMatch.data.playData.actionsLeft).toBe(0);
         expect(executeActionStub.calledWith(mockMatch, 'player1', { x: 1, y: 1 })).toBe(true);
     });
 
@@ -159,7 +159,7 @@ describe('PlayService', () => {
 
     it('can player act should return true if actions available', () => {
         mockMapService.getActions.returns([{ x: 1, y: 1 }]);
-        mockMatch.data.playData.hasAction = false;
+        mockMatch.data.playData.actionsLeft = 0;
         mockMapService.getPossibleMoves.returns([{ x: 1, y: 1 }]);
 
         const result = service['canPlayerAct'](mockMatch);

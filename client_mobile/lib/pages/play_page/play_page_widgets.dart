@@ -609,7 +609,8 @@ class BottomButtons extends StatelessWidget {
         imageButton(
           asset: actionAsset,
           activeAsset: actionActiveAsset,
-          text: I18nService().translate(ACTION_KEY),
+          text:
+              '${I18nService().translate(ACTION_KEY)} ${MatchService().matchData!.playData.actionsLeft}/${MatchService().matchData!.gameData.mapData.maxActions}',
           onTap: () {
             if (isSelfTurn && hasAction) {
               PlayService().displayActions();

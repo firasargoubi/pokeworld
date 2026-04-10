@@ -9,7 +9,7 @@ export interface GameData {
     lastEdited: Date;
     mapData: MapData;
     thumbnail?: string;
-    owner : Owner ;
-    gameState : GameState;
-    isVisible?: boolean // temp
+    owner: Owner;
+    gameState: GameState;
+    isVisible?: boolean; // temp
 }

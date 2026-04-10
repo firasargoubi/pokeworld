@@ -21,7 +21,7 @@ export const MOCK_PLAY_DATA: PlayData = {
     timeLeft: structuredClone(TURN_WAIT_DURATION),
     isDebugMode: false,
     activePlayerIndex: 0,
-    hasAction: true,
+    actionsLeft: 1,
     movementLeft: 6,
     isElementalMode: false,
 };

@@ -16,7 +16,7 @@ MatchData GET_DEFAULT_MATCH_DATA() {
       timeLeft: TURN_WAIT_DURATION,
       activePlayerIndex: 0,
       isDebugMode: false,
-      hasAction: false,
+      actionsLeft: 0,
       movementLeft: 0,
       isElementalMode: false,
     ),

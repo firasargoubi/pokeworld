@@ -118,7 +118,7 @@ void main() {
       final match = buildMatchData(
         mapData: buildMapData(),
         players: [buildPlayer()],
-        hasAction: false,
+        actionsLeft: 0,
       );
       expect(service.getActions(match), isEmpty);
     });
@@ -130,7 +130,7 @@ void main() {
           buildPlayer(position: const Position(x: 0, y: 0)),
           buildPlayer(position: const Position(x: 1, y: 0)),
         ],
-        hasAction: true,
+        actionsLeft: 1,
       );
       final actions = service.getActions(match);
       expect(actions.any((p) => p.x == 1 && p.y == 0), isTrue);
@@ -146,7 +146,7 @@ void main() {
           buildPlayer(position: const Position(x: 0, y: 0), team: Team.Red),
           buildPlayer(position: const Position(x: 1, y: 0), team: Team.Red),
         ],
-        hasAction: true,
+        actionsLeft: 1,
       );
       final actions = service.getActions(match);
       expect(actions.any((p) => p.x == 1 && p.y == 0), isFalse);
@@ -162,7 +162,7 @@ void main() {
           buildPlayer(position: const Position(x: 0, y: 0), team: Team.Red),
           buildPlayer(position: const Position(x: 1, y: 0), team: Team.Blue),
         ],
-        hasAction: true,
+        actionsLeft: 1,
       );
       final actions = service.getActions(match);
       expect(actions.any((p) => p.x == 1 && p.y == 0), isTrue);
@@ -174,7 +174,7 @@ void main() {
       final match = buildMatchData(
         mapData: buildMapData(tiles: tiles),
         players: [buildPlayer(position: const Position(x: 0, y: 0))],
-        hasAction: true,
+        actionsLeft: 1,
       );
       final actions = service.getActions(match);
       expect(actions.any((p) => p.x == 0 && p.y == 1), isTrue);
@@ -186,7 +186,7 @@ void main() {
       final match = buildMatchData(
         mapData: buildMapData(tiles: tiles),
         players: [buildPlayer(position: const Position(x: 0, y: 0))],
-        hasAction: true,
+        actionsLeft: 1,
       );
       final actions = service.getActions(match);
       expect(actions.any((p) => p.x == 1 && p.y == 0), isTrue);
@@ -203,7 +203,7 @@ void main() {
           },
         ),
         players: [buildPlayer(position: const Position(x: 0, y: 0))],
-        hasAction: true,
+        actionsLeft: 1,
       );
       final actions = service.getActions(match);
       expect(actions.any((p) => p.x == 0 && p.y == 1), isFalse);

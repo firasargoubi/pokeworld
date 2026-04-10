@@ -55,10 +55,10 @@ export class PlayService {
     }
 
     action(match: Match, playerId: string, position: Position) {
-        if (match.data.playData.hasAction && match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
+        if (match.data.playData.actionsLeft > 0 && match.isActivePlayer(playerId) && match.isState([MatchState.TurnWait])) {
             const actions = this.mapService.getActions(match.data);
             if (actions.some((a) => a.x === position.x && a.y === position.y)) {
-                match.data.playData.hasAction = false;
+                match.data.playData.actionsLeft--;
                 this.executeAction(match, playerId, position);
             }
         }
@@ -87,7 +87,7 @@ export class PlayService {
 
     startNextTurn(match: Match) {
         match.data.state = MatchState.TurnStart;
-        match.data.playData.hasAction = false;
+        match.data.playData.actionsLeft = 0;
         match.data.playData.movementLeft = 0;
         match.data.playData.timeLeft = TURN_WAIT_DURATION;
         match.data.playData.activePlayerIndex = this.getNextPlayerIndex(match);
@@ -123,7 +123,7 @@ export class PlayService {
 
     private canPlayerAct(match: Match): boolean {
         const hasPossibleActions = this.mapService.getActions(match.data).length > 0;
-        const canUseAction = hasPossibleActions && match.data.playData.hasAction;
+        const canUseAction = hasPossibleActions && match.data.playData.actionsLeft > 0;
         const canMove = this.mapService.getPossibleMoves(match.data).length > 0;
         const canAct = canUseAction || canMove;
         const isConnected = match.data.players[match.data.playData.activePlayerIndex].isConnected;
@@ -211,7 +211,7 @@ export class PlayService {
 
     private startTurnWait(match: Match) {
         match.data.state = MatchState.TurnWait;
-        match.data.playData.hasAction = true;
+        match.data.playData.actionsLeft = match.data.gameData.mapData.maxActions ?? 1;
         match.data.playData.movementLeft = match.data.players[match.data.playData.activePlayerIndex].speed;
         match.sendUpdate();
         match.setTimeout(this.startNextTurn.bind(this, match), TURN_WAIT_DURATION);

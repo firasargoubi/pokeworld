@@ -25,6 +25,10 @@ export class MapData {
     @ApiProperty({ enum: GameMode })
     @Prop({ required: true })
     gameMode: GameMode;
+
+    @ApiProperty({ required: false, default: 1 })
+    @Prop({ default: 1 })
+    maxActions?: number;
 }
 
 export class Owner {

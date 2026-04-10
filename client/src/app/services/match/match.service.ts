@@ -101,7 +101,7 @@ export class MatchService {
     }
 
     canUseAction(): boolean {
-        return this.isActivePlayer() && this.isState([MatchState.TurnWait]) && this.data.playData.hasAction;
+        return this.isActivePlayer() && this.isState([MatchState.TurnWait]) && this.data.playData.actionsLeft > 0;
     }
 
     canEndTurn(): boolean {
