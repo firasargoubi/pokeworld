@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { inject, Injectable } from '@angular/core';
+import { ChatService } from '@app/services/chat/chat.service';
 import { I18nService } from '@app/services/i18n/i18n.service';
 import { UserService } from '@app/services/user/user.service';
 import { AppLanguage, AppTheme, DEFAULT_PREFERENCES, UserPreferences } from '@common/interfaces/preferences';
@@ -9,6 +10,7 @@ import { AppLanguage, AppTheme, DEFAULT_PREFERENCES, UserPreferences } from '@co
 })
 export class PreferencesService {
     private readonly document: Document = inject(DOCUMENT);
+    private readonly chatService: ChatService = inject(ChatService);
     private readonly i18nService: I18nService = inject(I18nService);
     private readonly userService: UserService = inject(UserService);
     private currentPreferences: UserPreferences = { ...DEFAULT_PREFERENCES };
@@ -136,7 +138,16 @@ export class PreferencesService {
     }
 
     private applyTheme(theme: AppTheme): void {
-        const body = this.document.body;
+        this.applyThemeToDocument(this.document, theme);
+
+        const detachedWindow = this.chatService.detachedWindow;
+        if (detachedWindow && !detachedWindow.closed) {
+            this.applyThemeToDocument(detachedWindow.document, theme);
+        }
+    }
+
+    private applyThemeToDocument(targetDocument: Document, theme: AppTheme): void {
+        const body = targetDocument.body;
 
         if (theme === AppTheme.Dark) {
             body.classList.add(this.darkThemeClassName);
