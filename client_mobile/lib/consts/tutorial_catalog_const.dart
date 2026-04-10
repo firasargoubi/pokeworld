@@ -121,7 +121,7 @@ final List<TutorialStepDefinition> TUTORIAL_STEPS = [
     mainTitle: TutorialMainTitle.Chat,
     subTitle: TutorialSubTitle.ChatFourth,
     imagePathFr: 'assets/images/menu/tutorial/fr/chat-4.jpg',
-    imagePathEn: 'assets/images/menu/tutorial/en/user-4.jpg',
+    imagePathEn: 'assets/images/menu/tutorial/en/chat-4.jpg',
     description: 'components.tutorial.chat.fourth.description',
     displayProfessorLeft: false,
   ),
