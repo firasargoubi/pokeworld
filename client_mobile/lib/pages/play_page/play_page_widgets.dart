@@ -353,7 +353,7 @@ class InfoPanel extends StatelessWidget {
                   style: pixelLineStyle(lineFontSize),
                 ),
                 Text(
-                  '${I18nService().translate(PLAYER_COUNT_LABEL_KEY)}${MatchService().matchData!.players.length} / ${MAP_SIZE_PLAYER_COUNT[gameData.mapData.size]}',
+                  '${I18nService().translate(PLAYER_COUNT_LABEL_KEY)}${MatchService().matchData!.players.where((p) => p.isConnected).length} / ${MAP_SIZE_PLAYER_COUNT[gameData.mapData.size]}',
                   style: pixelLineStyle(lineFontSize),
                 ),
                 const Spacer(),

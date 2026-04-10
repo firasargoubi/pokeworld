@@ -5,17 +5,17 @@ import { Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { AudioService } from '@app/services/audio/audio.service';
-import { UserService } from '@app/services/user/user.service';
+import { ChatService } from '@app/services/chat/chat.service';
 import { LobbyService } from '@app/services/lobby/lobby.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { UserService } from '@app/services/user/user.service';
 import { Avatar } from '@common/interfaces/player-data';
 import { MOCK_MATCH_DATAS } from '@common/test-consts/mock-matches';
 import { MOCK_PLAYER_DATAS } from '@common/test-consts/mock-players';
-import { CharacterPageComponent } from './character-page.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
-import { ChatService } from '@app/services/chat/chat.service';
+import { CharacterPageComponent } from './character-page.component';
 
 @Component({
     selector: 'app-chat',
@@ -36,11 +36,15 @@ describe('CharacterPageComponent', () => {
     let mockChatService: jasmine.SpyObj<ChatService>;
 
     beforeEach(async () => {
-        mockMatchService = jasmine.createSpyObj('MatchService', ['isInMatch', 'leaveMatch', 'selfPlayer', 'selfIndex', 'matchUpdate'], {
-            data: structuredClone(MOCK_MATCH_DATAS[0]),
-            selfPlayer: structuredClone(MOCK_PLAYER_DATAS[0]),
-            matchUpdate: { pipe: () => ({ subscribe: () => ({}) }) },
-        });
+        mockMatchService = jasmine.createSpyObj(
+            'MatchService',
+            ['isInMatch', 'leaveMatch', 'selfPlayer', 'selfIndex', 'matchUpdate', 'getLockedAvatars'],
+            {
+                data: structuredClone(MOCK_MATCH_DATAS[0]),
+                selfPlayer: structuredClone(MOCK_PLAYER_DATAS[0]),
+                matchUpdate: { pipe: () => ({ subscribe: () => ({}) }) },
+            },
+        );
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage']);
         mockPopupService = jasmine.createSpyObj('PopupService', ['showPopup']);
         mockLobbyService = jasmine.createSpyObj('LobbyService', ['joinLobby', 'changeAvatar']);
@@ -80,6 +84,7 @@ describe('CharacterPageComponent', () => {
     it('should update avatar list on construction', () => {
         fixture.destroy();
         mockMatchService.isInMatch.and.returnValue(true);
+        mockMatchService.getLockedAvatars.and.returnValue([]);
         fixture = TestBed.createComponent(CharacterPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
@@ -105,6 +110,7 @@ describe('CharacterPageComponent', () => {
     });
 
     it('should call lobbyService.changeAvatar if avatar is not locked', () => {
+        mockMatchService.getLockedAvatars.and.returnValue([Avatar.Avatar1, Avatar.Avatar2]);
         component.changeAvatar(Avatar.Avatar7);
         expect(mockLobbyService.changeAvatar).toHaveBeenCalledWith(Avatar.Avatar7);
     });
