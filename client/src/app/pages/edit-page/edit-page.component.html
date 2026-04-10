@@ -42,8 +42,8 @@
             </fieldset>
             }
             <div class="action-input">
-                <div class="left-label-small">{{ 'pages.edit.actions' | translate }}: 1</div>
-                <input id="actions" type="range" min="0" max="5" />
+                <div class="left-label-small">{{ 'pages.edit.actions' | translate }}: {{ gameDataService.gameData.mapData.maxActions }}</div>
+                <input id="actions" type="range" min="1" max="5" [(ngModel)]="gameDataService.gameData.mapData.maxActions" />
             </div>
             <div class="left-label-medium">{{ 'pages.edit.size' | translate }} : {{ gameDataService.getMapSizeString() }}</div>
             <div class="left-label-medium">{{ 'pages.edit.mode' | translate }} : {{ gameDataService.getGameModeString() }}</div>

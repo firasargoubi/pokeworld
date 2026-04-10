@@ -30,7 +30,7 @@ export interface PlayData {
     timeLeft: number;
     isDebugMode: boolean;
     activePlayerIndex: number;
-    hasAction: boolean;
+    actionsLeft: number;
     movementLeft: number;
     isElementalMode: boolean;
 }

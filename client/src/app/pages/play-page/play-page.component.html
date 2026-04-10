@@ -139,7 +139,8 @@
                     </div>
                 </div>
                 <div (click)="actionButton()" class="action-button" [class.active]="visualData.canUseAction">
-                    {{ 'pages.play.action' | translate }}
+                    {{ 'pages.play.action' | translate }} {{ matchService.data.playData.actionsLeft }} /
+                    {{ matchService.data.gameData.mapData.maxActions }}
                 </div>
                 <div (click)="endTurnButton()" class="endturn-button" [class.active]="visualData.canEndTurn">
                     {{ 'pages.play.endTurn' | translate }}

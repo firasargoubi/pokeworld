@@ -3,7 +3,7 @@ import { GameMode, MapSize } from '@common/interfaces/map-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsObject, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
+import { IsEnum, IsNumber, IsObject, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { GAME_DESCRIPTION_MAX_LENGTH, GAME_NAME_MAX_LENGTH } from './game.dto.constants';
 import { GameState } from '@common/interfaces/game-state.enum';
 
@@ -23,6 +23,11 @@ export class MapData {
     @ApiProperty({ enum: GameMode })
     @IsEnum(GameMode)
     gameMode: GameMode;
+
+    @ApiProperty({ required: false, default: 1 })
+    @IsOptional()
+    @IsNumber()
+    maxActions?: number;
 }
 
 export class Owner {

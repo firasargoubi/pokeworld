@@ -79,7 +79,7 @@ class PlayData {
   final int timeLeft;
   final bool isDebugMode;
   final int activePlayerIndex;
-  final bool hasAction;
+  final int actionsLeft;
   final int movementLeft;
   final bool isElementalMode;
 
@@ -87,7 +87,7 @@ class PlayData {
     required this.timeLeft,
     required this.isDebugMode,
     required this.activePlayerIndex,
-    required this.hasAction,
+    required this.actionsLeft,
     required this.movementLeft,
     required this.isElementalMode,
   });
@@ -97,7 +97,7 @@ class PlayData {
       timeLeft: (json['timeLeft'] as num).toInt(),
       isDebugMode: json['isDebugMode'] as bool,
       activePlayerIndex: (json['activePlayerIndex'] as num).toInt(),
-      hasAction: json['hasAction'] as bool,
+      actionsLeft: (json['actionsLeft'] as num).toInt(),
       movementLeft: (json['movementLeft'] as num).toInt(),
       isElementalMode: json['isElementalMode'] as bool,
     );

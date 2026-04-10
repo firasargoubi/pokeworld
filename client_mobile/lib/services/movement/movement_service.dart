@@ -27,7 +27,7 @@ class MovementService {
   }
 
   List<Position> getActions(MatchData matchData) {
-    if (!matchData.playData.hasAction) {
+    if (matchData.playData.actionsLeft <= 0) {
       return [];
     }
     final playerPosition = matchData.players[matchData.playData.activePlayerIndex].position;

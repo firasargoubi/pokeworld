@@ -228,7 +228,7 @@ export class BotService {
     private getBestAction(possibleActions: Position[], match: Match): Position | null {
         let bestAttack = null;
         if (possibleActions.length > 0) {
-            if (match.data.playData.hasAction) {
+            if (match.data.playData.actionsLeft > 0) {
                 bestAttack = possibleActions[0];
             } else {
                 bestAttack = match.data.players[match.data.playData.activePlayerIndex].position;

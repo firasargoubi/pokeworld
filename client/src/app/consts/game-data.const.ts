@@ -25,6 +25,7 @@ export const DEFAULT_GAME_DATA: GameData = {
         tiles: [],
         size: MapSize.Small,
         gameMode: GameMode.FFA,
+        maxActions: 1,
     },
 };
 

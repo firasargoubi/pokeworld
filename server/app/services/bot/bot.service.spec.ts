@@ -165,7 +165,7 @@ describe('BotService', () => {
     });
 
     it('get best bridge action should return correct position', () => {
-        mockMatch.data.playData.hasAction = true;
+        mockMatch.data.playData.actionsLeft = 1;
         const bridgePosition = { x: 1, y: 7 };
         mockMatch.data.gameData.mapData.tiles[bridgePosition.x][bridgePosition.y] = TileType.BrokenBridge;
         mockMapService.getActions.returns([bridgePosition]);
@@ -174,7 +174,7 @@ describe('BotService', () => {
     });
 
     it('get best bridge action should return self position', () => {
-        mockMatch.data.playData.hasAction = false;
+        mockMatch.data.playData.actionsLeft = 0;
         const bridgePosition = { x: 1, y: 7 };
         mockMatch.data.gameData.mapData.tiles[bridgePosition.x][bridgePosition.y] = TileType.BrokenBridge;
         mockMapService.getActions.returns([bridgePosition]);
@@ -251,7 +251,7 @@ describe('BotService', () => {
         sandbox.stub(service as any, 'getBestAction').returns({ x: 4, y: 1 });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'getEnemyPlayers').returns([{ ...structuredClone(mockMatch.data.players[1]), position: { x: 4, y: 1 } }]);
-        mockMatch.data.playData.hasAction = true;
+        mockMatch.data.playData.actionsLeft = 1;
         mockMapService.getActions.returns([{ x: 4, y: 1 }]);
         const result = service['getBestAttack'](mockMatch);
         expect(result).toEqual({ x: 4, y: 1 });

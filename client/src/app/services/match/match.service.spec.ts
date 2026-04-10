@@ -136,7 +136,7 @@ describe('MatchService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         spyOn<any>(service, 'isActivePlayer').and.returnValue(true);
         service.data.state = MatchState.TurnWait;
-        service.data.playData.hasAction = true;
+        service.data.playData.actionsLeft = 1;
         const result = service.canUseAction();
         expect(result).toBeTrue();
     });

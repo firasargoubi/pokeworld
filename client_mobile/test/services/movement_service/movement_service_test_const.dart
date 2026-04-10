@@ -69,7 +69,7 @@ MatchData buildMatchData({
   required List<PlayerData> players,
   int movementLeft = 3,
   int activePlayerIndex = 0,
-  bool hasAction = true,
+  int actionsLeft = 1,
 }) => MatchData(
   code: 'TEST',
   state: MatchState.TurnStart,
@@ -79,7 +79,7 @@ MatchData buildMatchData({
     timeLeft: 60,
     isDebugMode: false,
     activePlayerIndex: activePlayerIndex,
-    hasAction: hasAction,
+    actionsLeft: actionsLeft,
     movementLeft: movementLeft,
     isElementalMode: false,
   ),
