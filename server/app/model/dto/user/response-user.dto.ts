@@ -29,4 +29,7 @@ export class UserResponseDto {
 
     @ApiProperty()
     preferences: UserPreferences;
+
+    @ApiProperty()
+    tutorialStep: number;
 }

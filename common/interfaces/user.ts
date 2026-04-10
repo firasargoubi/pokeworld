@@ -11,4 +11,5 @@ export interface UserInfo {
     inventory: InventoryItem[];
     createdAt: Date;
     preferences: UserPreferences;
+    tutorialStep?: number;
 }

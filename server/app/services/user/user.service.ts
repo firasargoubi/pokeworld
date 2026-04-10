@@ -104,6 +104,7 @@ export class UserService {
             userId,
             isLoggedIn: true,
             preferences: createUserDto.preferences ?? DEFAULT_PREFERENCES,
+            tutorialStep: 0,
         });
 
         const savedUser = await newUser.save();
@@ -192,6 +193,13 @@ export class UserService {
             }
         }
 
+        if (editUserDto.tutorialStep !== undefined) {
+            if (editUserDto.tutorialStep !== user.tutorialStep) {
+                user.tutorialStep = editUserDto.tutorialStep;
+                hasChanges = true;
+            }
+        }
+
         if (!hasChanges) {
             throw new BadRequestException('No changes provided');
         }
@@ -259,6 +267,7 @@ export class UserService {
             inventory: user.inventory ?? [],
             isLoggedIn: user.isLoggedIn,
             preferences,
+            tutorialStep: user.tutorialStep || 0,
         };
     }
 }

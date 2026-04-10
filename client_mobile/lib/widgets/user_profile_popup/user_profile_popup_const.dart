@@ -16,6 +16,12 @@ const String BALANCE_LABEL = 'components.userPopup.balanceLabel';
 const String UPDATE_BUTTON_LABEL = 'components.userPopup.update';
 const String DELETE_ACCOUNT_BUTTON_LABEL = 'components.userPopup.deleteAccount';
 
+const String TUTORIAL_LABEL = 'components.userPopup.tutorial';
+const String TUTORIAL_RESET_LABEL = 'components.userPopup.resetTutorial';
+
+const String TUTORIAL_ICON_ASSET = 'assets/images/menu/icons/user-card/tuto.png';
+const String RESET_ICON_ASSET = 'assets/images/menu/icons/user-card/reset.png';
+
 const String USER_POPUP_UNKNOWN_USER = 'components.userPopup.unknownUser';
 const String USER_POPUP_UNKNOWN_EMAIL = 'components.userPopup.unknownEmail';
 const String USER_POPUP_OLD_PASSWORD_LABEL = 'components.userPopup.oldPassword';

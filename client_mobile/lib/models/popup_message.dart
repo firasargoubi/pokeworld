@@ -38,7 +38,8 @@ enum PopupMessages {
   UsernameTaken('popup.usernameTaken'),
   AccountConnected('popup.accountConnected'),
   ChangeConfirmed('popup.changeConfirmed'),
-  ConfirmAccountCreation('components.authPopup.confirmAccountCreation');
+  ConfirmAccountCreation('components.authPopup.confirmAccountCreation'),
+  ResetTutorialConfirmation('components.tutorial.resetTutorialConfirmation');
 
   const PopupMessages(this.messageKey);
 

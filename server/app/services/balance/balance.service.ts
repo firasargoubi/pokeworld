@@ -150,6 +150,7 @@ export class BalanceService {
             inventory: user.inventory || [],
             isLoggedIn: user.isLoggedIn,
             preferences,
+            tutorialStep: user.tutorialStep || 0,
         };
     }
 }

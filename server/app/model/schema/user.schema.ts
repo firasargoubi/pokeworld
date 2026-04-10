@@ -58,6 +58,9 @@ export class User {
 
     @Prop({ type: UserPreferencesSchema, default: () => ({ theme: AppTheme.Default, language: AppLanguage.French }) })
     preferences: UserPreferencesSchema;
+
+    @Prop({ default: 0 })
+    tutorialStep: number;
 }
 
 export const userSchema = SchemaFactory.createForClass(User);

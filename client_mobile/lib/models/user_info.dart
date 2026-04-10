@@ -12,6 +12,7 @@ class UserInfo {
     required this.inventory,
     required this.createdAt,
     required this.preferences,
+    required this.tutorialStep,
   });
 
   String username;
@@ -23,6 +24,7 @@ class UserInfo {
   List<InventoryItem> inventory;
   DateTime? createdAt;
   UserPreferences preferences;
+  int tutorialStep;
 
   factory UserInfo.fromJson(Map<String, dynamic> json) {
     return UserInfo(
@@ -35,6 +37,7 @@ class UserInfo {
       inventory: (json['inventory'] as List<dynamic>?)?.map((item) => InventoryItem.fromJson(item as Map<String, dynamic>)).toList() ?? [],
       createdAt: json['createdAt'] == null ? null : DateTime.tryParse(json['createdAt'].toString()),
       preferences: UserPreferences.fromJson(json['preferences'] as Map<String, dynamic>?),
+      tutorialStep: (json['tutorialStep'] ?? 0) as int,
     );
   }
 
@@ -49,6 +52,7 @@ class UserInfo {
       'inventory': inventory.map((item) => item.toJson()).toList(),
       'createdAt': createdAt?.toIso8601String(),
       'preferences': preferences.toJson(),
+      'tutorialStep': tutorialStep,
     };
   }
 }

@@ -9,6 +9,10 @@ import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/popup_service/popup_service.dart';
 import 'package:client_mobile/services/preferences_service/preferences_service.dart';
 import 'package:client_mobile/services/user_service/user_service.dart';
+import 'package:client_mobile/widgets/tutorial_popup/tutorial_popup.dart';
+import 'package:client_mobile/widgets/tutorial_popup/tutorial_popup_controller.dart';
+// ignore: implementation_imports
+import 'package:flutter/src/widgets/framework.dart';
 
 class ProfileController {
   String _translateError(Object error) {
@@ -56,6 +60,21 @@ class ProfileController {
         hasCloseButton: true,
         isConfirmation: true,
         action: () => _handleLogout(),
+      ),
+    );
+  }
+
+  void showTutorial(BuildContext context) {
+    showTutorialPopup(context);
+  }
+
+  void resetTutorial() {
+    PopupService().showPopup(
+      PopupMessage(
+        message: I18nService().translate(PopupMessages.ResetTutorialConfirmation.messageKey),
+        hasCloseButton: true,
+        isConfirmation: true,
+        action: () => TutorialPopupController().goToStep(0),
       ),
     );
   }

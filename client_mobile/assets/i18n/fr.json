@@ -402,7 +402,9 @@
             "languageFr": "FR",
             "languageEn": "EN",
             "themeDefault": "Défaut",
-            "themeDark": "Sombre"
+            "themeDark": "Sombre",
+            "tutorial": "Tutoriel",
+            "resetTutorial": "Réinit tutoriel"
         },
         "warningConfirmation": {
             "close": "Fermer",
@@ -443,6 +445,159 @@
                 "item3": "Item 3",
                 "item4": "Item 4",
                 "item5": "Item 5"
+            }
+        },
+        "tutorial": {
+            "title": "TUTORIEL",
+            "resetTutorialConfirmation": "Voulez-vous réinitialiser la progression du tutoriel ?",
+            "resetTutorial": "Réinitialiser",
+            "welcome": {
+                "title": "Bienvenue",
+                "first": {
+                    "subTitleLabel": "Bienvenue dans PokeWorld !",
+                    "description": "- Bienvenue, je suis le professeur Chen.<br/>- Ce tutoriel te présente les <fonctionnalités essentielles> pour bien commencer.<br/>- Tu peux avancer le <fermer à tout moment> et le reprendre plus tard."
+                }
+            },
+            "userProfile": {
+                "title": "Profil utilisateur",
+                "first": {
+                    "subTitleLabel": "Ouvre ton menu utilisateur",
+                    "description": "Ici, tu ouvres ton <menu utilisateur>. C'est ton <accès rapide> à tout ce qui concerne ton compte."
+                },
+                "second": {
+                    "subTitleLabel": "Consulte les infos de ton compte",
+                    "description": "- Tu peux y voir ton <courriel>, ton <nom d'utilisateur>, ta <photo de profil> et ton <solde de Pokédollars ($)>.<br/>- C'est aussi ici que tu peux <te déconnecter> ou <reconsulter ce tutoriel>."
+                },
+                "third": {
+                    "subTitleLabel": "Gère les paramètres de ton compte",
+                    "description": "Depuis les <paramètres du profil>, tu peux :<br/>- <Modifier ton nom d'utilisateur><br/>- <Changer ton mot de passe><br/>- <Supprimer ton compte>, ce qui efface toutes tes <données> de façon <définitive> et <non récupérable>"
+                }
+            },
+            "friends": {
+                "title": "Amis",
+                "first": {
+                    "subTitleLabel": "Ouvre le menu des amis",
+                    "description": "Ici, tu retrouves tout ce qui concerne tes <interactions sociales>. Les onglets te permettent de naviguer entre la <recherche>, tes <amis>, ta <boîte de réception> et les <personnes bloquées>."
+                },
+                "second": {
+                    "subTitleLabel": "Utilise l'onglet recherche",
+                    "description": "Dans cet onglet, tu peux chercher parmi <tous les utilisateurs> du système. Tu peux ensuite <envoyer une demande d'ami> ou <bloquer> un utilisateur."
+                },
+                "third": {
+                    "subTitleLabel": "Consulte l'onglet amis",
+                    "description": "Dans cet onglet, tu peux voir ta <liste d'amis>. Tu peux aussi <retirer> un ami ou le <bloquer>."
+                },
+                "fourth": {
+                    "subTitleLabel": "Vérifie ta boîte de réception",
+                    "description": "Ici, tu consultes les <demandes d'ami reçues>. Tu peux les <accepter>, les <refuser> ou les <bloquer>."
+                },
+                "fifth": {
+                    "subTitleLabel": "Gère l'onglet bloqués",
+                    "description": "Dans cet onglet, tu retrouves les <personnes bloquées>. Tu peux consulter cette liste et <débloquer> quelqu'un quand tu le souhaites."
+                },
+                "sixth": {
+                    "subTitleLabel": "Comprends l'effet du blocage",
+                    "description": "Bloquer un utilisateur change plusieurs choses :<br/>- Vous ne voyez plus vos <nouveaux messages> respectifs<br/>- Cette personne ne peut plus <rejoindre une partie> si tu t'y trouves déjà<br/>- Si elle est déjà dans une <salle d'attente>, tu es <averti> avant d'entrer"
+                }
+            },
+            "appSettings": {
+                "title": "Paramètres d'application",
+                "first": {
+                    "subTitleLabel": "Ouvre les paramètres de l'application",
+                    "description": "- Depuis ce menu, tu peux ouvrir les <paramètres de l'application>.<br/>- Tu peux y configurer les <paramètres audio> et définir tes préférences de <langue> et de <thème>."
+                }
+            },
+            "chat": {
+                "title": "Clavardage",
+                "first": {
+                    "subTitleLabel": "Ouvre le clavardage",
+                    "description": "- Ton <clavardage> est accessible <partout> dans l'application. Tu peux l'ouvrir ou le replier quand tu veux.<br/>- En tout temps, tu as aussi accès à un <canal général> partagé avec les autres utilisateurs connectés."
+                },
+                "second": {
+                    "subTitleLabel": "Discute dans une partie",
+                    "description": "Quand tu entres dans une <salle d'attente> ou dans une <partie>, tu rejoins aussi un <canal privé de partie>."
+                },
+                "third": {
+                    "subTitleLabel": "Repère les messages non lus",
+                    "description": "Si tu n'es pas sur le bon canal, une <indication visuelle> te montre qu'il y a des <messages non lus>."
+                },
+                "fourth": {
+                    "subTitleLabel": "Reçois des notifications",
+                    "description": "Quand un nouveau message arrive, tu peux recevoir une <notification> pour ne rien manquer. Si l'application est en arrière-plan, tu peux aussi recevoir une <notification système>."
+                }
+            },
+            "gameModes": {
+                "title": "Modes de jeu",
+                "first": {
+                    "subTitleLabel": "Découvre les modes de jeu",
+                    "description": "Deux <modes de jeu> sont disponibles : le <mode chacun pour soi (FFA)> et le <mode capture de drapeau (CTF)>. Le mode dépend du <jeu> que tu choisis."
+                },
+                "second": {
+                    "subTitleLabel": "Joue en mode FFA",
+                    "description": "En <mode FFA>, chacun joue <pour soi>. Le premier joueur à atteindre <3 combats gagnés> remporte la partie."
+                },
+                "third": {
+                    "subTitleLabel": "Joue en mode CTF",
+                    "description": "- En <mode CTF>, tu joues en <équipe>. Ramène le <drapeau> jusqu'à ton <point de départ> pour faire gagner <toute ton équipe>.<br/>- Dans ce mode, tu peux combattre seulement les <joueurs adverses>."
+                }
+            },
+            "shop": {
+                "title": "Boutique",
+                "first": {
+                    "subTitleLabel": "Ouvre la boutique",
+                    "description": "- Ici, tu peux dépenser tes <Pokédollars ($)> pour obtenir du nouveau contenu.<br/>- Tu peux y trouver des <Pokémon exclusifs> ainsi que d'autres <éléments cosmétiques>, visuels ou sonores."
+                },
+                "second": {
+                    "subTitleLabel": "Achète un objet",
+                    "description": "Quand un objet te plaît, tu peux l'<acheter> avec tes Pokédollars ($):<br/>- Un objet ne peut être <acheté qu'une seule fois><br/>- Un objet <ne peut pas être revendu>"
+                },
+                "third": {
+                    "subTitleLabel": "Consulte ton inventaire",
+                    "description": "Dans ton <inventaire>, tu retrouves tous les objets que tu possèdes déjà. Tu peux aussi choisir quels objets <activer> ou <désactiver>."
+                },
+                "fourth": {
+                    "subTitleLabel": "Gagne des Pokédollars ($)",
+                    "description": "- Tu gagnes des <Pokédollars ($)> surtout à la fin des parties. Le gagnant reçoit une plus grande <récompense> que les autres joueurs.<br/>- Certaines parties proposent aussi des <défis> ou un <prix d'entrée>, ce qui peut modifier les récompenses."
+                }
+            },
+            "gameCreation": {
+                "title": "Création de partie",
+                "first": {
+                    "subTitleLabel": "Choisis un jeu",
+                    "description": "Ici, tu choisis le <jeu> que tu veux utiliser pour lancer une nouvelle partie."
+                },
+                "second": {
+                    "subTitleLabel": "Choisis l'accès et le prix d'entrée",
+                    "description": "- Tu peux décider si la partie est <ouverte à tous> ou <réservée à tes amis>.<br/>- Tu peux aussi définir un <prix d'entrée> en Pokédollars pour rejoindre la partie."
+                },
+                "third": {
+                    "subTitleLabel": "Prépare ton personnage",
+                    "description": "Avant d'entrer dans une partie, tu dois <préparer ton personnage> :<br/>- Tu choisis un <Pokémon> parmi ceux qui sont disponibles<br/>- Tu répartis tes <points de bonus> ainsi que les <dés>."
+                },
+                "fourth": {
+                    "subTitleLabel": "Entre dans la salle d'attente",
+                    "description": "- Après la sélection du personnage, tu arrives dans une <salle d'attente>.<br/>- Tu peux y <interagir avec les autres joueurs> et consulter le <code d'accès>, visible par <tout le monde>."
+                },
+                "fifth": {
+                    "subTitleLabel": "Gère la salle d'attente",
+                    "description": "Si tu es l'<organisateur>, tu peux <verrouiller ou déverrouiller> la partie, <exclure> un joueur, <ajouter des joueurs virtuels> avec un profil <agressif> ou <défensif>, puis <lancer la partie> quand tout est prêt."
+                },
+                "sixth": {
+                    "subTitleLabel": "Choisis les options de partie",
+                    "description": "- Avant le lancement, l'<organisateur> peut activer plusieurs <options de partie>.<br/>- Ces options sont <cumulables>, donc plusieurs peuvent être actives en même temps."
+                },
+                "seventh": {
+                    "subTitleLabel": "Option Drop-in / Drop-out",
+                    "description": "- Cette option permet à des joueurs de <quitter> une partie en cours puis de la <rejoindre plus tard>.<br/>- Elle permet aussi à de <nouveaux joueurs> d'entrer en cours de partie si une place est libre."
+                },
+                "eighth": {
+                    "subTitleLabel": "Option Élimination rapide",
+                    "description": "Avec cette option, un joueur vaincu en combat est <éliminé pour le reste de la partie> et devient <observateur>."
+                },
+                "ninth": {
+                    "subTitleLabel": "Option mode élémentaire",
+                    "description": "- Avec cette option, le <type élémentaire> des Pokémon est utilisé pendant les combats.<br/>- Selon l'adversaire, cela peut donner un <avantage> ou un <désavantage>."
+                }
             }
         }
     }

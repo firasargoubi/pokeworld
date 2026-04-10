@@ -63,7 +63,7 @@ class _CombatPageState extends State<CombatPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _readyForAnimations = true;
       AudioService().playBackgroundMusic(BackgroundMusic.Combat.path);
-      AudioService().playAvatarSounds([AVATAR_SOUNDS[selfPlayer.avatar]!, AVATAR_SOUNDS[enemyPlayer.avatar]!]);
+      AudioService().playAvatarSounds([AVATAR_SOUNDS[selfPlayer.avatar]!, AVATAR_SOUNDS[enemyPlayer.avatar]!]).catchError((_) {});
     });
 
     PlayService().startListeningToMotion();
