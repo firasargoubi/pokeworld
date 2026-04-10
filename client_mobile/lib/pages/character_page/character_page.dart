@@ -68,7 +68,11 @@ class _CharacterPageState extends State<CharacterPage> {
     setState(() {
       selectedAvatar = selfPlayer.avatar;
 
-      lockedAvatars = matchData.players.where((p) => p.id != selfPlayer.id).map((p) => p.avatar).toList();
+      lockedAvatars = matchData.players.where((player) => player.avatar != selfPlayer.avatar).map((player) {
+        final playerAvatar = player.avatar;
+        final baseAvatarValue = RegExp(r'^avatar\d+').firstMatch(playerAvatar.value)?.group(0) ?? playerAvatar.value;
+        return Avatar.fromValue(baseAvatarValue);
+      }).toList();
     });
   }
 

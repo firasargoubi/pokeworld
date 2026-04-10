@@ -311,6 +311,7 @@ describe('MapService', () => {
                 visitedQueue.visited[validPos.x][validPos.y] = true;
             });
 
+        mockMatchData.gameData.mapData.items.Spawn = [validPos];
         const result = service.getNearestItemDropSpot(mockMatchData, currentPos);
 
         expect(result).toEqual(validPos);

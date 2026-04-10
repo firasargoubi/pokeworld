@@ -19,7 +19,7 @@ import { GameData } from '@common/interfaces/game-data';
 import { MatchData, MatchSettings, MatchState } from '@common/interfaces/match-data';
 import { MessageFromServer } from '@common/interfaces/message-from-server';
 import { Message } from '@common/interfaces/message.enum';
-import { PlayerData } from '@common/interfaces/player-data';
+import { Avatar, PlayerData } from '@common/interfaces/player-data';
 import { MatchEvent } from '@common/interfaces/socket-event.enum';
 import { Subject } from 'rxjs';
 
@@ -121,6 +121,18 @@ export class MatchService {
         const socketId = this.socketService.selfId;
 
         return [currentUserId, socketId].some((candidateId) => !!candidateId && (player.id === candidateId || player.userId === candidateId));
+    }
+
+    getLockedAvatars(): Avatar[] {
+        const lockedAvatars: Avatar[] = [];
+        this.data.players.forEach((player) => {
+            if (player.avatar && player.avatar !== this.selfPlayer.avatar) {
+                const playerAvatar: Avatar = player.avatar;
+                const basePlayerAvatar: Avatar = (playerAvatar.match(/^avatar\d+/)?.[0] as Avatar) || playerAvatar;
+                lockedAvatars.push(basePlayerAvatar);
+            }
+        });
+        return lockedAvatars;
     }
 
     private onNavigationUpdate(event: RouterEvent) {

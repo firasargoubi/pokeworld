@@ -98,7 +98,7 @@ export class CharacterPageComponent {
 
     changeAvatar(avatar: Avatar) {
         this.audioService.playEffect(SoundEffect.Click);
-        const lockedAvatars = this.getLockedAvatars();
+        const lockedAvatars = this.matchService.getLockedAvatars();
         if (!lockedAvatars.includes(avatar)) {
             this.lobbyService.changeAvatar(avatar);
         }
@@ -106,7 +106,7 @@ export class CharacterPageComponent {
 
     private updateAvatarList() {
         const selfAvatar = this.matchService.selfPlayer.avatar;
-        const lockedAvatars = this.getLockedAvatars();
+        const lockedAvatars = this.matchService.getLockedAvatars();
 
         this.visualData.selfAvatarimage = AVATAR_DATA[selfAvatar].image;
         this.visualData.isAvatarSelected = selfAvatar !== Avatar.Default;
@@ -119,10 +119,6 @@ export class CharacterPageComponent {
                 isLocked: lockedAvatars.includes(avatar),
                 isSelected: selfAvatar === avatar,
             }));
-    }
-
-    private getLockedAvatars(): Avatar[] {
-        return this.matchService.data.players.filter((_, i) => i !== this.matchService.selfIndex).map((p) => p.avatar);
     }
 
     private getPlayerData(): PlayerData {

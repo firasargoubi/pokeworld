@@ -291,6 +291,14 @@ export class LobbyService {
         updatedPlayer.combatsWon = storedVictories ?? existingPlayer.combatsWon;
         updatedPlayer.isObserver = existingPlayer.isObserver;
         match.data.players[existingIndex] = updatedPlayer;
+
+        const insertionIndex = this.getDropInInsertIndex(match, updatedPlayer.speed);
+        if (existingIndex !== insertionIndex) {
+            match.data.players.splice(existingIndex, 1);
+            match.data.players.splice(insertionIndex, 0, updatedPlayer);
+            this.updateIndexesAfterDropIn(match, Math.min(existingIndex, insertionIndex));
+        }
+
         this.registerTrackingPlayer(match, playerId, updatedPlayer);
         match.sendUpdate();
         return true;

@@ -76,7 +76,7 @@ export class MapService {
         visited[currentPos.x][currentPos.y] = true;
         while (queue.length > 0) {
             const pos = queue.shift() as Position;
-            if (this.isTileValidForMovement(matchData, pos)) {
+            if (this.isTileValidForMovement(matchData, pos) && !this.isTileOccupiedByObject(matchData, pos)) {
                 return pos;
             }
             this.enqueueValidNeighbors(matchData, pos, { visited, queue });
@@ -85,10 +85,6 @@ export class MapService {
     }
 
     getNearestItemDropSpot(matchData: MatchData, currentPos: Position): Position {
-        if (this.hasNoItems(matchData, currentPos)) {
-            return currentPos;
-        }
-
         const size = matchData.gameData.mapData.size;
         const visited: boolean[][] = Array.from({ length: size }, () => Array(size).fill(false));
         const queue: Position[] = [];
@@ -132,14 +128,15 @@ export class MapService {
 
     private isValidForDrop(matchData: MatchData, position: Position): boolean {
         const tile = matchData.gameData.mapData.tiles[position.x][position.y];
-        const isWater = tile !== TileType.Water;
+        const isWater = tile === TileType.Water;
 
         const hasNoItems = this.hasNoItems(matchData, position);
         const hasNoPlayers = !matchData.players.some(
             (player) => !player.isObserver && player.position.x === position.x && player.position.y === position.y,
         );
+        const isSpawnPoint = this.isTilePotentialSpawnPoint(matchData, position);
 
-        return isWater && hasNoItems && hasNoPlayers;
+        return !isWater && hasNoItems && hasNoPlayers && !isSpawnPoint;
     }
 
     private hasNoItems(matchData: MatchData, position: Position): boolean {
@@ -311,5 +308,14 @@ export class MapService {
             }
         }
         return path;
+    }
+
+    private isTilePotentialSpawnPoint(matchData: MatchData, position: Position): boolean {
+        matchData.gameData.mapData.items.Spawn.forEach((spawnPoint) => {
+            if (spawnPoint.x === position.x && spawnPoint.y === position.y) {
+                return true;
+            }
+        });
+        return false;
     }
 }
