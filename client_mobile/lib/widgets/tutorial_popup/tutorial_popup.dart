@@ -108,7 +108,7 @@ class _TutorialPopupState extends State<TutorialPopup> {
                       children: [
                         CardTitleRow(
                           title:
-                              '${I18nService().translate(TITLE_LABEL)} ${_controller.currentTutorialStep?.mainProgressText ?? ''} : ${I18nService().translate(_controller.currentTutorialStep!.mainTitleLabel).toUpperCase()} ${_controller.currentTutorialStep?.absoluteStepIndex.toString()}',
+                              '${I18nService().translate(TITLE_LABEL)} ${_controller.currentTutorialStep?.mainProgressText ?? ''} : ${I18nService().translate(_controller.currentTutorialStep!.mainTitleLabel).toUpperCase()}',
                           baseSize: baseSize * 0.8,
                         ),
                         SizedBox(
