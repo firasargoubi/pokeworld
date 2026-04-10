@@ -440,6 +440,6 @@ class _CardButton extends StatelessWidget {
             width: baseSize * 0.04,
             child: const CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
           )
-        : Text(label, style: BUTTON_TEXT_STYLE(baseSize * 0.04)),
+        : Text(label.toUpperCase(), style: BUTTON_TEXT_STYLE(baseSize * 0.04)),
   );
 }

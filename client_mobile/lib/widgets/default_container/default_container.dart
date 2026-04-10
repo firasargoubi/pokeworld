@@ -4,14 +4,16 @@ import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 
 import '../cut_corner_container/cut_corner_container.dart';
+import 'default_container_const.dart';
 
 class DefaultContainer extends StatefulWidget {
-  const DefaultContainer({super.key, required this.baseSize, this.config = const DefaultContainerConfig(), this.child, this.onTap});
+  const DefaultContainer({super.key, required this.baseSize, this.config = const DefaultContainerConfig(), this.child, this.onTap, this.onClose});
 
   final double baseSize;
   final DefaultContainerConfig config;
   final Widget? child;
   final VoidCallback? onTap;
+  final VoidCallback? onClose;
 
   @override
   State<DefaultContainer> createState() => _DefaultContainerState();
@@ -19,6 +21,7 @@ class DefaultContainer extends StatefulWidget {
 
 class _DefaultContainerState extends State<DefaultContainer> {
   bool _pressed = false;
+  bool _closePressed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -120,6 +123,30 @@ class _DefaultContainerState extends State<DefaultContainer> {
             ),
           ),
           if (widget.child != null) Positioned.fill(child: widget.child!),
+          if (widget.onClose != null)
+            Positioned(
+              top: (innerBorderWidth + borderWidth) * (cfg.closeButtonTopFactor ?? 1.0),
+              right: (innerBorderWidth + borderWidth) * (cfg.closeButtonRightFactor ?? 1.0),
+              child: GestureDetector(
+                onTapDown: (_) => setState(() => _closePressed = true),
+                onTapUp: (_) {
+                  setState(() => _closePressed = false);
+                  widget.onClose!();
+                },
+                onTapCancel: () => setState(() => _closePressed = false),
+                child: Opacity(
+                  opacity: _closePressed ? 1.0 : 0.5,
+                  child: Image.asset(
+                    CLOSE_ICON_ASSET,
+                    width: widget.baseSize * cfg.closeButtonFactor!,
+                    height: widget.baseSize * cfg.closeButtonFactor!,
+                    fit: BoxFit.cover,
+                    filterQuality: FilterQuality.none,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

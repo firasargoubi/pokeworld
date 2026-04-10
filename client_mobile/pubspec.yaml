@@ -124,6 +124,7 @@ flutter:
         - assets/images/menu/icons/user-card/
         - assets/images/menu/containers/settings/
         - assets/images/menu/containers/shop/
+        - assets/images/menu/icons/close/
         - assets/images/menu/icons/tutorial/
         - assets/images/menu/tutorial/
         - assets/images/menu/tutorial/fr/

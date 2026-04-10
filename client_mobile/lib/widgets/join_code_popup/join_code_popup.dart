@@ -2,6 +2,9 @@ import 'dart:ui';
 
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
+import 'package:client_mobile/widgets/default_container/default_container.dart';
+import 'package:client_mobile/widgets/match_settings_popup/match_settings_popup_const.dart';
+import 'package:client_mobile/widgets/poke_button/poke_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -28,6 +31,11 @@ class JoinCodePopup extends StatelessWidget {
 
     final titleStyle = _labelStyle(baseSize * 0.05, baseSize * 0.005);
 
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final availableHeight = screenHeight - keyboardHeight;
+    final scale = (dialogHeight > availableHeight * 0.9) ? (availableHeight * 0.9 / dialogHeight).clamp(0.0, 1.0) : 1.0;
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onClose,
@@ -37,34 +45,60 @@ class JoinCodePopup extends StatelessWidget {
             filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
             child: Container(color: Colors.black.withValues(alpha: 0.5)),
           ),
-          Center(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {},
-              child: SizedBox(
-                height: dialogHeight,
-                width: dialogWidth,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.asset(JOIN_CODE_POPUP_CONTAINER_ASSET, fit: BoxFit.fill, filterQuality: FilterQuality.none),
-                    Padding(
-                      padding: EdgeInsets.all(padding),
-                      child: Column(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Center(child: Text(i18n.translate(JOIN_CODE_POPUP_TITLE_TEXT), style: titleStyle)),
+          AnimatedPadding(
+            padding: EdgeInsets.only(bottom: keyboardHeight),
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            child: Center(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {},
+                child: AnimatedScale(
+                  scale: scale,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOut,
+                  child: SizedBox(
+                    height: dialogHeight,
+                    width: dialogWidth,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        DefaultContainer(baseSize: baseSize, config: BLUE_CONTAINER_CONFIG, onClose: () => onClose()),
+                        Padding(
+                          padding: EdgeInsets.all(padding),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Center(child: Text(i18n.translate(JOIN_CODE_POPUP_TITLE_TEXT), style: titleStyle)),
+                              ),
+                              _OverlayCodeInput(baseSize: baseSize, controller: controller),
+                              Expanded(
+                                flex: 1,
+                                child: Padding(
+                                  padding: EdgeInsets.only(top: baseSize * 0.02),
+                                  child: Center(
+                                    child: SizedBox(
+                                      width: baseSize * 0.35,
+                                      height: baseSize * 0.16,
+                                      child: PokeButton(
+                                        text: i18n.translate(APPLY_BUTTON_KEY).toUpperCase(),
+                                        onTap: () {
+                                          if (controller.text.isNotEmpty) {
+                                            MatchService().joinMatch(controller.text);
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          _OverlayCodeInput(baseSize: baseSize, controller: controller),
-                          Expanded(
-                            flex: 1,
-                            child: Center(child: Text(i18n.translate(JOIN_CODE_POPUP_HINT_TEXT), style: titleStyle)),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),

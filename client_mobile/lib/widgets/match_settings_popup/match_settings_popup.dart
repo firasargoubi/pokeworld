@@ -115,8 +115,8 @@ class _MatchSettingsPopupState extends State<MatchSettingsPopup> {
             behavior: HitTestBehavior.opaque,
             onTap: widget.onClose,
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: BLUR_SIGMA * 4, sigmaY: BLUR_SIGMA * 4),
-              child: Container(color: Colors.black.withValues(alpha: OVERLAY_ALPHA)),
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+              child: Container(color: Colors.black54),
             ),
           ),
         ),
@@ -130,7 +130,7 @@ class _MatchSettingsPopupState extends State<MatchSettingsPopup> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  DefaultContainer(baseSize: baseSize, config: GRAY_CONTAINER_CONFIG),
+                  DefaultContainer(baseSize: baseSize, config: GRAY_CONTAINER_CONFIG, onClose: () => widget.onClose()),
                   Padding(
                     padding: EdgeInsets.all(contentPadding),
                     child: Column(
@@ -201,7 +201,7 @@ class _MatchSettingsPopupState extends State<MatchSettingsPopup> {
                             child: SizedBox(
                               width: baseSize * 0.40,
                               height: baseSize * 0.15,
-                              child: PokeButton(text: i18n.translate(APPLY_BUTTON_KEY), onTap: submit),
+                              child: PokeButton(text: i18n.translate(APPLY_BUTTON_KEY).toUpperCase(), onTap: submit),
                             ),
                           ),
                         ),

@@ -240,7 +240,15 @@ class _FrontCardFace extends StatelessWidget {
             left: -baseSize * 0.019,
             child: Image.asset(ASSET_CARD_ICON_BG, height: baseSize * 0.6, fit: BoxFit.contain, filterQuality: FilterQuality.none),
           ),
-          _ProfileCardFace(baseSize: baseSize, onShowSettings: onShowSettings, onShowFriends: onShowFriends, onShowInventory: onShowInventory),
+          Transform.translate(
+            offset: Offset(0, -baseSize * 0.025),
+            child: _ProfileCardFace(
+              baseSize: baseSize,
+              onShowSettings: onShowSettings,
+              onShowFriends: onShowFriends,
+              onShowInventory: onShowInventory,
+            ),
+          ),
         ],
       ),
     );
@@ -268,13 +276,16 @@ class _BackCardFace extends StatelessWidget {
             left: -baseSize * 0.019,
             child: Image.asset(ASSET_CARD_ICON_BG, height: baseSize * 0.6, fit: BoxFit.contain, filterQuality: FilterQuality.none),
           ),
-          Center(
-            child: switch (view) {
-              UserCardView.settings => settingsCard,
-              UserCardView.friends => _FriendsCardFace(baseSize: baseSize, onBackToFront: onBackToFront),
-              UserCardView.inventory => _InventoryCardFace(baseSize: baseSize, onBackToFront: onBackToFront),
-              UserCardView.front => Container(),
-            },
+          Transform.translate(
+            offset: Offset(0, -baseSize * 0.025),
+            child: Center(
+              child: switch (view) {
+                UserCardView.settings => settingsCard,
+                UserCardView.friends => _FriendsCardFace(baseSize: baseSize, onBackToFront: onBackToFront),
+                UserCardView.inventory => _InventoryCardFace(baseSize: baseSize, onBackToFront: onBackToFront),
+                UserCardView.front => Container(),
+              },
+            ),
           ),
         ],
       ),

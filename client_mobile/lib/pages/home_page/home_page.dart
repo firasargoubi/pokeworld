@@ -37,6 +37,8 @@ class _HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       barrierDismissible: true,
+      useSafeArea: false,
+      barrierColor: Colors.transparent,
       builder: (context) => SettingsPopup(onClose: () => Navigator.of(context).pop()),
     );
   }

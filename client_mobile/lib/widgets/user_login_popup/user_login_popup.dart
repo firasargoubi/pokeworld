@@ -115,8 +115,12 @@ class _UserLoginPopupState extends State<UserLoginPopup> with SingleTickerProvid
           baseHeight = baseWidth / ASPECT_RATIO;
         }
 
-        final double baseSize = math.min(baseWidth, baseHeight);
-        final double cardHeight = baseSize * 0.9;
+        final bool isKeyboardVisible = keyboardHeight > 0;
+        final bool isLoginMode = _controller.currentView == LoginPopupView.login;
+        final bool shouldCompact = isKeyboardVisible && isLoginMode;
+        final double heightFactor = shouldCompact ? 0.7 : 0.9;
+        final double baseSize = math.min(baseWidth, baseHeight) * (shouldCompact ? 1.3 : 1.0);
+        final double cardHeight = baseSize * heightFactor;
         final double verticalBleed = baseSize * 0.03;
 
         return Padding(

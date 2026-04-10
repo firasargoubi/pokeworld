@@ -94,6 +94,8 @@ class _LobbyPageState extends State<LobbyPage> {
     showDialog(
       context: context,
       barrierDismissible: true,
+      useSafeArea: false,
+      barrierColor: Colors.transparent,
       builder: (context) => DefaultTextStyle(
         style: const TextStyle(decoration: TextDecoration.none),
         child: MatchSettingsPopup(onClose: () => Navigator.of(context).pop()),

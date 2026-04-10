@@ -27,4 +27,7 @@ const GRAY_CONTAINER_CONFIG = DefaultContainerConfig(
   innerBorderTopLeftColor: Color(0xFFacacac),
   backgroundTopColor: Color(0xFF888888),
   backgroundBottomColor: Color(0xFFacacac),
+  closeButtonFactor: 0.055,
+  closeButtonTopFactor: 1.1,
+  closeButtonRightFactor: 1.1,
 );

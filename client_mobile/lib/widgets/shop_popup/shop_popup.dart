@@ -75,7 +75,7 @@ class _ShopPopupState extends State<ShopPopup> {
         }
 
         final double baseSize = math.min(popupReferenceWidth, popupReferenceHeight);
-        final double popupHeight = baseSize * 0.8;
+        final double popupHeight = baseSize * 0.9;
         final double popupWidth = baseSize * 1.1;
         final double frameBaseSize = baseSize * 0.09;
         final double backgroundIconTop = baseSize * -0.022;
@@ -269,6 +269,7 @@ class _ShopPopupState extends State<ShopPopup> {
                                       Text(
                                         '${I18nService().translate(BALANCE_TEXT)} ${_controller.currentBalance} \$',
                                         style: buildDefaultTextStyle(baseSize * 0.035),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ],
                                   ),

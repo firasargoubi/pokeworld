@@ -326,19 +326,27 @@ class _FriendsTabButton extends StatelessWidget {
           )
         : Icon(icon, size: baseSize * FRIENDS_TAB_ICON_SIZE_FACTOR, color: Colors.white);
 
-    return AnimatedScale(
+    final double darkenFactor = isActive ? 1.0 : 1.0 - FRIENDS_TAB_INACTIVE_DARKEN;
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween(end: darkenFactor),
       duration: FRIENDS_TAB_ANIMATION_DURATION,
-      scale: isActive ? 1 : FRIENDS_TAB_ACTIVE_SCALE,
-      child: SizedBox(
-        width: baseSize * FRIENDS_TAB_BUTTON_SIZE_FACTOR,
-        height: baseSize * FRIENDS_TAB_BUTTON_SIZE_FACTOR,
-        child: EdgeBodyButton(
-          leftEdgePath: ASSET_BUTTON_EDGE_1,
-          rightEdgePath: ASSET_BUTTON_EDGE_2,
-          bodyPath: ASSET_BUTTON_BODY,
-          opacity: isActive ? null : FRIENDS_TAB_ACTIVE_OPACITY,
-          onAction: isActive ? null : onPressed,
-          child: iconWidget,
+      builder: (_, factor, child) =>
+          ColorFiltered(colorFilter: ColorFilter.matrix([factor, 0, 0, 0, 0, 0, factor, 0, 0, 0, 0, 0, factor, 0, 0, 0, 0, 0, 1, 0]), child: child),
+      child: AnimatedScale(
+        duration: FRIENDS_TAB_ANIMATION_DURATION,
+        scale: isActive ? 1 : FRIENDS_TAB_ACTIVE_SCALE,
+        child: SizedBox(
+          width: baseSize * FRIENDS_TAB_BUTTON_SIZE_FACTOR,
+          height: baseSize * FRIENDS_TAB_BUTTON_SIZE_FACTOR,
+          child: EdgeBodyButton(
+            leftEdgePath: ASSET_BUTTON_EDGE_1,
+            rightEdgePath: ASSET_BUTTON_EDGE_2,
+            bodyPath: ASSET_BUTTON_BODY,
+            opacity: isActive ? null : FRIENDS_TAB_ACTIVE_OPACITY,
+            onAction: isActive ? null : onPressed,
+            child: isActive ? iconWidget : Opacity(opacity: FRIENDS_TAB_ACTIVE_OPACITY, child: iconWidget),
+          ),
         ),
       ),
     );
