@@ -59,7 +59,8 @@ export class BalanceService {
 
             const reward = this.getRewardForPlayer(match, trackingPlayer.id, trackingPlayer.team);
             const entryFeeReward = entryFeeRewards.get(trackingPlayer.id) ?? 0;
-            const totalReward = reward + entryFeeReward;
+            const challengeReward = trackingPlayer.challenge?.isCompleted ? trackingPlayer.challenge.cashGain ?? 0 : 0;
+            const totalReward = reward + entryFeeReward + challengeReward;
 
             user.balance = (user.balance || 0) + totalReward;
             await user.save();
@@ -148,6 +149,7 @@ export class BalanceService {
             fullProfilePicture: user.fullProfilePicture || user.profilePicture,
             balance: user.balance || 0,
             inventory: user.inventory || [],
+            challenges: user.challenges || [],
             isLoggedIn: user.isLoggedIn,
             preferences,
             tutorialStep: user.tutorialStep || 0,

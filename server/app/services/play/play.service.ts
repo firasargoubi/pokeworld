@@ -1,6 +1,7 @@
 import { Match } from '@app/classes/match/match';
 import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { BalanceService } from '@app/services/balance/balance.service';
+import { ChallengeService } from '@app/services/challenge/challenge.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { CombatService } from '@app/services/combat/combat.service';
 import { ItemService } from '@app/services/item/item.service';
@@ -30,6 +31,7 @@ export class PlayService {
     @Inject(forwardRef(() => ItemService)) private readonly itemService: ItemService;
     @Inject(forwardRef(() => CombatService)) private readonly combatService: CombatService;
     @Inject(forwardRef(() => ChatService)) private readonly chatService: ChatService;
+    @Inject(forwardRef(() => ChallengeService)) private readonly challengeService: ChallengeService;
     @Inject(forwardRef(() => MatchGateway)) private readonly matchGateway: MatchGateway;
 
     endTurn(match: Match, playerId: string) {
@@ -184,6 +186,7 @@ export class PlayService {
         match.data.state = MatchState.Statistics;
         this.trackingService.stopTrackingMatch(match);
         await this.balanceService.applyMatchRewards(match);
+        await this.challengeService.updateChallenges(match);
         this.chatService.logEndMatch(match);
         match.sendUpdate();
         match.clearTimeout();
@@ -226,7 +229,7 @@ export class PlayService {
             this.chatService.logCombatStart(match, player.name, targetPlayer.name);
         } else {
             this.toggleBridgeTile(match, position);
-            this.trackingService.updateToggledBridges(match, position);
+            this.trackingService.updateToggledBridges(match, position, playerId);
             this.chatService.logBridgeToggled(match, player.name, position);
             this.continueTurn(match);
         }

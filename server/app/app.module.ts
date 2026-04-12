@@ -16,6 +16,7 @@ import { UserRelationships, userRelationshipsSchema } from './model/schema/user-
 import { User, userSchema } from './model/schema/user.schema';
 import { BalanceService } from './services/balance/balance.service';
 import { BotService } from './services/bot/bot.service';
+import { ChallengeService } from './services/challenge/challenge.service';
 import { ChatService } from './services/chat/chat.service';
 import { CombatService } from './services/combat/combat.service';
 import { GameService } from './services/game/game.service';
@@ -50,6 +51,7 @@ import { SocialService } from './services/social/social.service';
         Logger,
 
         BalanceService,
+        ChallengeService,
         GameService,
         MatchService,
         LobbyService,

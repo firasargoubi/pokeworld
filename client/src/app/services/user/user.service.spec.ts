@@ -26,6 +26,7 @@ describe('UserService', () => {
         fullProfilePicture: 'fullPic',
         balance: 100,
         inventory: [],
+        challenges: [],
         createdAt: new Date(),
         preferences: DEFAULT_PREFERENCES,
     };

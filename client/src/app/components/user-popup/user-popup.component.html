@@ -43,8 +43,8 @@
                                 <span class="value">{{ currentUser?.balance || 0 }} $</span>
                             </div>
                             <div class="info-row">
-                                <span class="label">{{ 'components.userPopup.emailLabel' | translate }}</span>
-                                <span class="value">{{ currentUser?.email || ('components.userPopup.noneValue' | translate) }}</span>
+                                <span class="label">{{ 'components.userPopup.challenges' | translate }}</span>
+                                <span class="value">{{ numberOfChallenges || ('components.userPopup.noneValue' | translate) }}</span>
                             </div>
                         </div>
                         <div class="right-container">
@@ -230,20 +230,14 @@
                                         >
                                             <div class="button-icon"></div>
                                         </div>
-                                        <div
-                                            class="block-button button button-container"
-                                            (click)="socialService.blockUser(relationship.user.userId)"
-                                        >
+                                        <div class="block-button button button-container" (click)="socialService.blockUser(relationship.user.userId)">
                                             <div class="button-icon"></div>
                                         </div>
                                         } @case (relationshipType.PendingSent) {
                                         <div class="pending-button button button-container" button-container>
                                             <div class="button-icon"></div>
                                         </div>
-                                        <div
-                                            class="block-button button button-container"
-                                            (click)="socialService.blockUser(relationship.user.userId)"
-                                        >
+                                        <div class="block-button button button-container" (click)="socialService.blockUser(relationship.user.userId)">
                                             <div class="button-icon"></div>
                                         </div>
                                         } @case (relationshipType.PendingReceived) {
@@ -259,10 +253,7 @@
                                         >
                                             <div class="button-icon"></div>
                                         </div>
-                                        <div
-                                            class="block-button button button-container"
-                                            (click)="socialService.blockUser(relationship.user.userId)"
-                                        >
+                                        <div class="block-button button button-container" (click)="socialService.blockUser(relationship.user.userId)">
                                             <div class="button-icon"></div>
                                         </div>
                                         } @case (relationshipType.Friend) {
@@ -272,10 +263,7 @@
                                         >
                                             <div class="button-icon"></div>
                                         </div>
-                                        <div
-                                            class="block-button button button-container"
-                                            (click)="socialService.blockUser(relationship.user.userId)"
-                                        >
+                                        <div class="block-button button button-container" (click)="socialService.blockUser(relationship.user.userId)">
                                             <div class="button-icon"></div>
                                         </div>
                                         } @case (relationshipType.Blocked) {

@@ -1,3 +1,4 @@
+import { PlayerChallengeData } from './challenge-data';
 import { ItemType } from './item-type.enum';
 import { Position } from './position';
 import { Avatar, Team } from './player-data';
@@ -17,6 +18,8 @@ export interface TrackingPlayerData {
     hpLost: number;
     balanceGain: number;
     currentBalance: number;
+    challenge: PlayerChallengeData | null;
+    toggledBridgesCount: number;
 }
 
 export interface WinnerData {

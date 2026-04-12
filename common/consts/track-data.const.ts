@@ -38,4 +38,6 @@ export const DEFAULT_PLAYER_TRACKING_DATA: TrackingPlayerData = {
     coveredGroundTiles: [],
     balanceGain: 0,
     currentBalance: 0,
+    challenge: null,
+    toggledBridgesCount: 0,
 };

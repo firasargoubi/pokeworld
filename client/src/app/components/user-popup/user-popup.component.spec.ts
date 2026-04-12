@@ -49,6 +49,7 @@ describe('UserPopupComponent', () => {
         createdAt: new Date(),
         preferences: {} as UserPreferences,
         inventory: [],
+        challenges: [],
     };
 
     beforeEach(async () => {

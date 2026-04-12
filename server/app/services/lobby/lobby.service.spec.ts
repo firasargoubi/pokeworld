@@ -1,5 +1,6 @@
 import { Match } from '@app/classes/match/match';
 import { BotService } from '@app/services/bot/bot.service';
+import { ChallengeService } from '@app/services/challenge/challenge.service';
 import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
@@ -26,6 +27,7 @@ describe('LobbyService', () => {
     let mocktrackingService: SinonStubbedInstance<TrackingService>;
     let mockMapService: SinonStubbedInstance<MapService>;
     let mockUserService: SinonStubbedInstance<UserService>;
+    let mockChallengeService: SinonStubbedInstance<ChallengeService>;
 
     beforeAll(async () => {
         sandbox = createSandbox();
@@ -35,6 +37,7 @@ describe('LobbyService', () => {
         mockMatch = createStubInstance<Match>(Match);
         mocktrackingService = createStubInstance<TrackingService>(TrackingService);
         mockMapService = createStubInstance<MapService>(MapService);
+        mockChallengeService = createStubInstance<ChallengeService>(ChallengeService);
         mockUserService = createStubInstance<UserService>(UserService);
 
         const module: TestingModule = await Test.createTestingModule({
@@ -45,6 +48,8 @@ describe('LobbyService', () => {
                 { provide: BotService, useValue: mockBotService },
                 { provide: TrackingService, useValue: mocktrackingService },
                 { provide: MapService, useValue: mockMapService },
+                { provide: UserService, useValue: mockUserService },
+                { provide: ChallengeService, useValue: mockChallengeService },
                 { provide: UserService, useValue: mockUserService },
             ],
         }).compile();

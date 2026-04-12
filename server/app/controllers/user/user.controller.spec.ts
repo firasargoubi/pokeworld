@@ -20,6 +20,7 @@ describe('UserController', () => {
         fullProfilePicture: '',
         balance: 0,
         inventory: [],
+        challenges: [],
         preferences: DEFAULT_PREFERENCES,
         tutorialStep: 0,
     };

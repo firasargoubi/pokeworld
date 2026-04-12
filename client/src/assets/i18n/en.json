@@ -268,6 +268,26 @@
             }
         }
     },
+    "challenges": {
+        "title": "CHALLENGE",
+        "buttonTooltip": "View your challenge",
+        "progress": "Progress",
+        "completed": "CHALLENGE COMPLETED!",
+        "names": {
+            "explorer": "Explorer",
+            "invincible": "Invincible",
+            "collector": "Collector",
+            "bridgeWalker": "Bridge Walker",
+            "duelist": "Duelist"
+        },
+        "descriptions": {
+            "explorer": "Travel {{ target }} unique ground tiles during the match.",
+            "invincible": "Participate in at least 1 combat without losing any.",
+            "collector": "Pick up at least 2 different items during the match.",
+            "bridgeWalker": "Toggle at least 1 bridge during the match.",
+            "duelist": "Win a combat with 3 or more HP."
+        }
+    },
     "components": {
         "appSettings": {
             "title": "Settings",
@@ -398,6 +418,7 @@
             "avatarAlt": "Full avatar image",
             "searchPlaceholder": "Search for a user",
             "friends": "FRIENDS",
+            "challenges": "CHALLENGES",
             "noUsersFound": "No users found"
         },
         "shopPopup": {

@@ -1,5 +1,6 @@
 import { Match } from '@app/classes/match/match';
 import { BotService } from '@app/services/bot/bot.service';
+import { ChallengeService } from '@app/services/challenge/challenge.service';
 import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
@@ -24,6 +25,7 @@ export class LobbyService {
     @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
     @Inject(MapService) private readonly mapService: MapService;
     @Inject(forwardRef(() => UserService)) private readonly userService: UserService;
+    @Inject(ChallengeService) private readonly challengeService: ChallengeService;
 
     kickPlayer(match: Match, playerId: string, targetPlayerId: string) {
         if (!match.isHost(playerId) || playerId === targetPlayerId) return;
@@ -337,6 +339,7 @@ export class LobbyService {
             name: playerData.name,
             team: playerData.team,
             coveredGroundTiles: hasSpawnPoint ? [playerData.spawnPoint] : structuredClone(DEFAULT_PLAYER_TRACKING_DATA.coveredGroundTiles),
+            challenge: this.challengeService.assignChallenge(match.data.gameData.mapData),
         });
     }
 

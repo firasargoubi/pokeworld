@@ -1,6 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { UserChallengeData } from '@common/interfaces/challenge-data';
 import { UserPreferences } from '@common/interfaces/preferences';
 import { InventoryItem } from '@common/interfaces/shop';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UserResponseDto {
     @ApiProperty()
@@ -23,6 +24,9 @@ export class UserResponseDto {
 
     @ApiProperty()
     inventory: InventoryItem[];
+
+    @ApiProperty()
+    challenges: UserChallengeData[];
 
     @ApiProperty()
     isLoggedIn: boolean;

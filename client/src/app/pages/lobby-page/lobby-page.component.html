@@ -4,51 +4,67 @@
     </div>
     <div id="lobby-border">
         <div id="lobby-body">
-            <div class="access-code-container">
-                <p class="access-title">{{ 'pages.lobby.accessCode' | translate }}</p>
-                <div class="access-code">
-                    <div class="match-mode-icon">
-                        <div class="mode-icon drop-icon" [class.visible]="this.matchService.data.lobbyData.isDropInEnabled"></div>
-                        <div class="mode-icon elemental-icon" [class.visible]="this.matchService.data.playData.isElementalMode"></div>
-                        <div class="mode-icon re-icon" [class.visible]="this.matchService.data.lobbyData.isRapidElimination"></div>
-                    </div>
-                    {{ matchService.data.code }}
-                    <div class="match-accessibility-icons">
-                        <div
-                            class="mode-icon visible"
-                            [class.open-icon]="!this.matchService.data.lobbyData.isFriendOnly"
-                            [class.friend-only-icon]="this.matchService.data.lobbyData.isFriendOnly"
-                        ></div>
-                        <p>{{ visualData.entryFee }}$</p>
-                    </div>
-                </div>
-                <div class="spacer"></div>
-                <div class="access-interactions">
-                    <div class="button-container lock" [class.disabled]="!visualData.isSelfHost" (click)="toggleLockRoom()">
-                        <div class="button-edge"></div>
-                        <div class="button-body">
-                            @if (this.matchService.data.lobbyData.isLocked) {
-                            <div class="icon lock-icon"></div>
-                            } @else {
-                            <div class="icon unlock-icon"></div>
-                            }
+            <div class="left-body">
+                <div class="access-code-container">
+                    <p class="access-title">{{ 'pages.lobby.accessCode' | translate }}</p>
+                    <div class="access-code">
+                        <div class="match-mode-icon">
+                            <div class="mode-icon drop-icon" [class.visible]="this.matchService.data.lobbyData.isDropInEnabled"></div>
+                            <div class="mode-icon elemental-icon" [class.visible]="this.matchService.data.playData.isElementalMode"></div>
+                            <div class="mode-icon re-icon" [class.visible]="this.matchService.data.lobbyData.isRapidElimination"></div>
                         </div>
-                        <div class="button-edge"></div>
+                        {{ matchService.data.code }}
+                        <div class="match-accessibility-icons">
+                            <div
+                                class="mode-icon visible"
+                                [class.open-icon]="!this.matchService.data.lobbyData.isFriendOnly"
+                                [class.friend-only-icon]="this.matchService.data.lobbyData.isFriendOnly"
+                            ></div>
+                            <p>{{ visualData.entryFee }}$</p>
+                        </div>
                     </div>
-                    @if(visualData.isSelfHost) {
-                    <div class="button-container settings" (click)="this.showMatchSettingsPopup()">
-                        <div class="button-edge"></div>
-                        <div class="button-body"><div class="icon settings-icon"></div></div>
-                        <div class="button-edge"></div>
-                    </div>
-                    }
+                    <div class="spacer"></div>
+                    <div class="access-interactions">
+                        <div class="button-container lock" [class.disabled]="!visualData.isSelfHost" (click)="toggleLockRoom()">
+                            <div class="button-edge"></div>
+                            <div class="button-body">
+                                @if (this.matchService.data.lobbyData.isLocked) {
+                                <div class="icon lock-icon"></div>
+                                } @else {
+                                <div class="icon unlock-icon"></div>
+                                }
+                            </div>
+                            <div class="button-edge"></div>
+                        </div>
+                        @if(visualData.isSelfHost) {
+                        <div class="button-container settings" (click)="this.showMatchSettingsPopup()">
+                            <div class="button-edge"></div>
+                            <div class="button-body"><div class="icon settings-icon"></div></div>
+                            <div class="button-edge"></div>
+                        </div>
+                        }
 
-                    <div class="button-container copy" (click)="this.copyMatchCode()">
-                        <div class="button-edge"></div>
-                        <div class="button-body"><div class="icon copy-icon"></div></div>
-                        <div class="button-edge"></div>
+                        <div class="button-container copy" (click)="this.copyMatchCode()">
+                            <div class="button-edge"></div>
+                            <div class="button-body"><div class="icon copy-icon"></div></div>
+                            <div class="button-edge"></div>
+                        </div>
                     </div>
                 </div>
+                @if (selfChallenge) {
+                <div class="challenge-container">
+                    <span class="challenge-section-header">
+                        <p class="challenge-section-title">{{ 'challenges.title' | translate }}:</p>
+                        <p class="challenge-section-name">
+                            {{ 'challenges.names.' + selfChallenge.type | translate }}
+                            <span class="challenge-cash-gain">+{{ selfChallenge.cashGain | number }}$</span>
+                        </p>
+                    </span>
+                    <p class="challenge-section-desc">
+                        {{ 'challenges.descriptions.' + selfChallenge.type | translate: { target: selfChallenge.target } }}
+                    </p>
+                </div>
+                }
             </div>
 
             <div id="players-list">
