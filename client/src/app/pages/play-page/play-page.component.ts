@@ -19,6 +19,7 @@ import { PlayService } from '@app/services/play/play.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { TileDescriptionService } from '@app/services/tile-description/tile-description.service';
+import { PlayerChallengeData } from '@common/interfaces/challenge-data';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { MAX_PLAYERS } from '@common/consts/player-data.const';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
@@ -59,6 +60,12 @@ export class PlayPageComponent {
         }
         this.audioService.preloadEffectsForPage(PLAY_PAGE_EFFECT);
         this.audioService.playBackgroundMusic(BackgroundMusic.Play);
+    }
+
+    get selfChallenge(): PlayerChallengeData | null {
+        const self = this.matchService.selfPlayer;
+        const tracking = this.matchService.data.trackingData.players.find((p) => p.id === self.userId || p.id === self.id);
+        return tracking?.challenge ?? null;
     }
 
     @HostListener('document:keydown', ['$event'])

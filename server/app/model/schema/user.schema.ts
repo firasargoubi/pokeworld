@@ -1,4 +1,5 @@
 import { INITIAL_USER_BALANCE } from '@common/consts/shop.const';
+import { UserChallengeData } from '@common/interfaces/challenge-data';
 import { AppLanguage, AppTheme } from '@common/interfaces/preferences';
 import { InventoryItem } from '@common/interfaces/shop';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
@@ -13,6 +14,14 @@ export class InventoryItemSchema implements InventoryItem {
 
     @Prop({ required: true })
     price: number;
+}
+
+export class ChallengeSchema implements UserChallengeData {
+    @Prop({ required: true })
+    challenge: string;
+
+    @Prop({ required: true })
+    completed: number;
 }
 
 export class UserPreferencesSchema {
@@ -46,6 +55,9 @@ export class User {
 
     @Prop({ type: [InventoryItemSchema], default: [] })
     inventory: InventoryItemSchema[];
+
+    @Prop({ type: [ChallengeSchema], default: [] })
+    challenges: ChallengeSchema[];
 
     @Prop({ required: true, default: false })
     isLoggedIn: boolean;

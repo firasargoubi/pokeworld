@@ -1,3 +1,4 @@
+import { UserChallengeData } from './challenge-data';
 import { UserPreferences } from './preferences';
 import { InventoryItem } from './shop';
 
@@ -9,6 +10,7 @@ export interface UserInfo {
     fullProfilePicture: string;
     balance: number;
     inventory: InventoryItem[];
+    challenges: UserChallengeData[];
     createdAt: Date;
     preferences: UserPreferences;
     tutorialStep?: number;

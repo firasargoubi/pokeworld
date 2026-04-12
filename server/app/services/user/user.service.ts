@@ -7,6 +7,7 @@ import { User, UserDocument } from '@app/model/schema/user.schema';
 import { GameService } from '@app/services/game/game.service';
 import { MatchService } from '@app/services/match/match.service';
 import { INITIAL_USER_BALANCE } from '@common/consts/shop.const';
+import { PlayerChallengeData } from '@common/interfaces/challenge-data';
 import { AppLanguage, AppTheme, DEFAULT_PREFERENCES, UserPreferences } from '@common/interfaces/preferences';
 import { BadRequestException, ConflictException, forwardRef, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -212,6 +213,22 @@ export class UserService {
         return this.toUserResponse(user);
     }
 
+    async updateUserChallenge(userId: string, challengeData: PlayerChallengeData): Promise<void> {
+        const user = await this.userModel.findOne({ userId, isLoggedIn: true }).exec();
+        if (!user) {
+            return;
+        }
+        const challengeIndex = user.challenges.findIndex((c) => c.challenge === challengeData.type);
+        if (challengeIndex >= 0) {
+            const temp = user.challenges[challengeIndex];
+            temp.completed += 1;
+            user.challenges[challengeIndex] = temp;
+        } else {
+            user.challenges.push({ challenge: challengeData.type, completed: 1 });
+        }
+        await user.save();
+    }
+
     async updatePreferences(userId: string, dto: UpdatePreferencesDto): Promise<UserPreferences> {
         const user = await this.userModel.findOne({ userId, deleted: false }).exec();
         if (!user) {
@@ -265,6 +282,7 @@ export class UserService {
             fullProfilePicture: user.fullProfilePicture ?? user.profilePicture,
             balance: user.balance || 0,
             inventory: user.inventory ?? [],
+            challenges: user.challenges ?? [],
             isLoggedIn: user.isLoggedIn,
             preferences,
             tutorialStep: user.tutorialStep || 0,

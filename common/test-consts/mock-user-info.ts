@@ -11,6 +11,7 @@ export const MOCK_USER_INFO: UserInfo[] = [
         createdAt: new Date(),
         preferences: { language: AppLanguage.English, theme: AppTheme.Dark },
         inventory: [],
+        challenges: [],
         email: '',
     },
     {
@@ -22,6 +23,7 @@ export const MOCK_USER_INFO: UserInfo[] = [
         createdAt: new Date(),
         preferences: { language: AppLanguage.French, theme: AppTheme.Default },
         inventory: [],
+        challenges: [],
         email: '',
     },
 ];

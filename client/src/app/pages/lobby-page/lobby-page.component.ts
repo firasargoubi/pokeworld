@@ -18,6 +18,7 @@ import { MatchService } from '@app/services/match/match.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { MAX_PLAYERS } from '@common/consts/player-data.const';
+import { PlayerChallengeData } from '@common/interfaces/challenge-data';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { MatchSettings } from '@common/interfaces/match-data';
 import { PlayerType } from '@common/interfaces/player-data';
@@ -58,6 +59,13 @@ export class LobbyPageComponent {
         }
         this.updateVisual();
         this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.updateVisual.bind(this));
+    }
+
+    get selfChallenge(): PlayerChallengeData | null {
+        const self = this.matchService.selfPlayer;
+        if (!self) return null;
+        const tracking = this.matchService.data.trackingData.players.find((p) => p.id === self.userId || p.id === self.id);
+        return tracking?.challenge ?? null;
     }
 
     @HostListener('document:keydown.escape')

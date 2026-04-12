@@ -20,6 +20,7 @@ describe('BalanceController', () => {
         fullProfilePicture: '',
         balance: 4000,
         inventory: [],
+        challenges: [],
         preferences: DEFAULT_PREFERENCES,
         tutorialStep: 0,
     };

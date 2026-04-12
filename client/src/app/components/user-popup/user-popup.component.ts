@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, Input, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PopupMessage } from '@app/consts/popup-message.const';
+import { DEBOUNCE_TIME_MS } from '@app/consts/social.const';
 import { PopupColor } from '@app/interfaces/popup';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { UserCardType } from '@app/interfaces/user';
@@ -16,7 +17,6 @@ import { UserInfo } from '@common/interfaces/user';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { DEBOUNCE_TIME_MS } from '@app/consts/social.const';
 
 @Component({
     selector: 'app-user-popup',
@@ -76,6 +76,14 @@ export class UserPopupComponent implements OnDestroy {
 
     get avatarToDisplay(): string {
         return this.currentUser?.fullProfilePicture || this.currentUser?.profilePicture || this.avatarImage;
+    }
+
+    get numberOfChallenges(): number {
+        let total = 0;
+        this.currentUser?.challenges.forEach((challenge) => {
+            total += challenge.completed;
+        });
+        return total;
     }
 
     onSearchInput(value: string): void {

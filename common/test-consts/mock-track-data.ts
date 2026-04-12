@@ -18,6 +18,8 @@ export const MOCK_TRACKING_PLAYER_DATAS: TrackingPlayerData[] = [
         hpLost: 0,
         balanceGain: 0,
         currentBalance: 0,
+        challenge: null,
+        toggledBridgesCount: 0,
     },
     {
         id: MOCK_PLAYER_DATAS[1].id,
@@ -32,6 +34,8 @@ export const MOCK_TRACKING_PLAYER_DATAS: TrackingPlayerData[] = [
         hpLost: 0,
         balanceGain: 0,
         currentBalance: 0,
+        challenge: null,
+        toggledBridgesCount: 0,
     },
     {
         id: MOCK_PLAYER_DATAS[2].id,
@@ -46,6 +50,8 @@ export const MOCK_TRACKING_PLAYER_DATAS: TrackingPlayerData[] = [
         hpLost: 0,
         balanceGain: 0,
         currentBalance: 0,
+        challenge: null,
+        toggledBridgesCount: 0,
     },
 ];
 
@@ -63,4 +69,21 @@ export const MOCK_TRACKING_DATA: TrackingData = {
         tile: TileType.Grass,
     },
     players: structuredClone(MOCK_TRACKING_PLAYER_DATAS),
+};
+
+export const NULL_TRACKING_PLAYER_DATA: TrackingPlayerData = {
+    id: '',
+    name: '',
+    pickedUpItems: [],
+    coveredGroundTiles: [],
+    combats: 0,
+    victories: 0,
+    defeats: 0,
+    escapes: 0,
+    hpInflicted: 0,
+    hpLost: 0,
+    balanceGain: 0,
+    currentBalance: 0,
+    challenge: null,
+    toggledBridgesCount: 0,
 };

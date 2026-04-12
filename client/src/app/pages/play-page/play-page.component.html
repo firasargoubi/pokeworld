@@ -138,6 +138,27 @@
                         </div>
                     </div>
                 </div>
+                @if (selfChallenge) {
+                <div class="challenge-card" [class.completed]="selfChallenge.isCompleted">
+                    <span class="challenge-card-header">
+                        <div class="challenge-card-title">{{ 'challenges.title' | translate }}</div>
+                        <div class="challenge-card-name">
+                            {{ 'challenges.names.' + selfChallenge.type | translate }}
+                            <span class="challenge-cash-gain">+{{ selfChallenge.cashGain | number }}$</span>
+                        </div>
+                    </span>
+                    <div class="challenge-card-desc">
+                        {{ 'challenges.descriptions.' + selfChallenge.type | translate: { target: selfChallenge.target } }}
+                    </div>
+                    <div class="challenge-progress-row">
+                        <div class="challenge-progress-bar" [ngStyle]="{ '--cur-prog': selfChallenge.progress, '--max-prog': selfChallenge.target }">
+                            <div class="challenge-progress-fill" [class.completed]="selfChallenge.isCompleted"></div>
+                            <div class="challenge-progress-mid"></div>
+                        </div>
+                        <div class="challenge-progress-label">{{ selfChallenge.progress }}/{{ selfChallenge.target }}</div>
+                    </div>
+                </div>
+                }
                 <div (click)="actionButton()" class="action-button" [class.active]="visualData.canUseAction">
                     {{ 'pages.play.action' | translate }} {{ matchService.data.playData.actionsLeft }} /
                     {{ matchService.data.gameData.mapData.maxActions }}
