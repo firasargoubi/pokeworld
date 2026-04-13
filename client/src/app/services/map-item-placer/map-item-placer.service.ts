@@ -61,20 +61,21 @@ export class MapItemPlacerService {
     }
 
     private placeRemainingItems(tiles: TileType[][], gridSize: number, placedPositions: Set<string>, structures: Structure[]): void {
-        for (const itemType of this.getAvailableItemTypes()) {
-            while (this.editorService.getRemainingItemCount(itemType, null) > 0) {
-                const x = Math.floor(Math.random() * gridSize);
-                const y = Math.floor(Math.random() * gridSize);
-                const key = this.positionUtils.positionToKey({ x, y });
-                if (
-                    !placedPositions.has(key) &&
-                    this.isValidItemPosition(tiles, x, y, structures) &&
-                    !this.isPositionInStructureInterior(x, y, structures)
-                ) {
-                    this.editorService.placeItem(itemType, { x, y });
-                    placedPositions.add(key);
-                }
+        let itemTypes = this.getAvailableItemTypes();
+        while (itemTypes.length > 0) {
+            const x = Math.floor(Math.random() * gridSize);
+            const y = Math.floor(Math.random() * gridSize);
+            const key = this.positionUtils.positionToKey({ x, y });
+            const itemType = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+            if (
+                !placedPositions.has(key) &&
+                this.isValidItemPosition(tiles, x, y, structures) &&
+                !this.isPositionInStructureInterior(x, y, structures)
+            ) {
+                this.editorService.placeItem(itemType, { x, y });
+                placedPositions.add(key);
             }
+            itemTypes = this.getAvailableItemTypes();
         }
     }
 
@@ -150,7 +151,7 @@ export class MapItemPlacerService {
 
     private getAvailableItemTypes(): ItemType[] {
         let itemTypes = Object.values(ItemType);
-        itemTypes = itemTypes.filter((itemType) => itemType !== ItemType.Spawn);
+        itemTypes = itemTypes.filter((itemType) => itemType !== ItemType.Spawn && this.editorService.getRemainingItemCount(itemType, null) > 0);
         if (this.gameDataService.getGameMode() !== GameMode.CTF) {
             itemTypes = itemTypes.filter((itemType) => itemType !== ItemType.Flag);
         }

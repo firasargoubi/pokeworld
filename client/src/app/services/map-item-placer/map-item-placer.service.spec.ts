@@ -251,31 +251,60 @@ describe('MapItemPlacerService', () => {
             expect(result).toBeFalse();
         });
     });
-
     describe('getAvailableItemTypes', () => {
-        it('should return all item types except Spawn and Flag', () => {
-            gameDataServiceSpy.getGameMode.and.returnValue(GameMode.FFA);
+        const REMAINING_ITEM_COUNT = 5;
+        const ZERO_ITEM_COUNT = 0;
 
-            const result = (service as any).getAvailableItemTypes();
-
-            expect(result).toContain(ItemType.Random);
-            expect(result).not.toContain(ItemType.Spawn);
-        });
-
-        it('should exclude Flag if not CTF mode', () => {
-            gameDataServiceSpy.getGameMode.and.returnValue(GameMode.FFA);
-
-            const result = (service as any).getAvailableItemTypes();
-
-            expect(result).not.toContain(ItemType.Flag);
-        });
-
-        it('should include Flag if CTF mode', () => {
+        it('should return all item types except Spawn when game mode is CTF and items have remaining count', () => {
             gameDataServiceSpy.getGameMode.and.returnValue(GameMode.CTF);
+            editorServiceSpy.getRemainingItemCount.and.returnValue(REMAINING_ITEM_COUNT);
 
             const result = (service as any).getAvailableItemTypes();
 
             expect(result).toContain(ItemType.Flag);
+            expect(result).toContain(ItemType.Random);
+            expect(result).not.toContain(ItemType.Spawn);
+        });
+
+        it('should exclude Flag when game mode is not CTF', () => {
+            gameDataServiceSpy.getGameMode.and.returnValue(GameMode.FFA);
+            editorServiceSpy.getRemainingItemCount.and.returnValue(REMAINING_ITEM_COUNT);
+
+            const result = (service as any).getAvailableItemTypes();
+
+            expect(result).not.toContain(ItemType.Flag);
+            expect(result).not.toContain(ItemType.Spawn);
+            expect(result).toContain(ItemType.Random);
+        });
+
+        it('should exclude items with zero remaining count', () => {
+            gameDataServiceSpy.getGameMode.and.returnValue(GameMode.CTF);
+            editorServiceSpy.getRemainingItemCount.and.callFake((itemType: ItemType) => {
+                return itemType === ItemType.Random ? ZERO_ITEM_COUNT : REMAINING_ITEM_COUNT;
+            });
+
+            const result = (service as any).getAvailableItemTypes();
+
+            expect(result).not.toContain(ItemType.Random);
+            expect(result).toContain(ItemType.Flag);
+        });
+
+        it('should return empty array when no items have remaining count', () => {
+            gameDataServiceSpy.getGameMode.and.returnValue(GameMode.CTF);
+            editorServiceSpy.getRemainingItemCount.and.returnValue(ZERO_ITEM_COUNT);
+
+            const result = (service as any).getAvailableItemTypes();
+
+            expect(result).toEqual([]);
+        });
+
+        it('should always exclude Spawn item type', () => {
+            gameDataServiceSpy.getGameMode.and.returnValue(GameMode.CTF);
+            editorServiceSpy.getRemainingItemCount.and.returnValue(REMAINING_ITEM_COUNT);
+
+            const result = (service as any).getAvailableItemTypes();
+
+            expect(result).not.toContain(ItemType.Spawn);
         });
     });
 });
