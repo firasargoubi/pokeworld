@@ -10,6 +10,10 @@ class _ProfileCardFace extends StatelessWidget {
 
   final ProfileController _controller = ProfileController();
 
+  int numberOfChallenges(UserInfo? user) {
+    return user?.challenges.fold<int>(0, (total, challenge) => total + challenge.completed) ?? 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<UserInfo?>(
@@ -18,6 +22,8 @@ class _ProfileCardFace extends StatelessWidget {
         final username = user?.username ?? I18nService().translate(USER_POPUP_UNKNOWN_USER);
         final email = user?.email ?? I18nService().translate(USER_POPUP_UNKNOWN_EMAIL);
         final balance = user?.balance.toStringAsFixed(0) ?? '0';
+        final challengesCount = numberOfChallenges(user);
+        final challengesValue = challengesCount == 0 ? I18nService().translate('components.userPopup.noneValue') : '$challengesCount';
         final avatar = profilePictureImageProvider(user?.fullProfilePicture, fallback: const AssetImage(ASSET_DEFAULT_AVATAR));
 
         return Column(
@@ -66,6 +72,7 @@ class _ProfileCardFace extends StatelessWidget {
                         children: [
                           _CardInfoRow(label: I18nService().translate(EMAIL_LABEL), value: email, baseSize: baseSize),
                           _CardInfoRow(label: I18nService().translate(BALANCE_LABEL), value: '$balance \$', baseSize: baseSize),
+                          _CardInfoRow(label: I18nService().translate('components.userPopup.challenges'), value: challengesValue, baseSize: baseSize),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,

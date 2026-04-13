@@ -262,6 +262,27 @@
             }
         }
     },
+    
+    "challenges": {
+        "title": "DÉFI",
+        "buttonTooltip": "Voir votre défi",
+        "progress": "Progression",
+        "completed": "DÉFI ACCOMPLI !",
+        "names": {
+            "explorer": "Explorateur",
+            "invincible": "Invincible",
+            "collector": "Collectionneur",
+            "bridgeWalker": "Marcheur de Pont",
+            "duelist": "Duelliste"
+        },
+        "descriptions": {
+            "explorer": "Parcourez {{target}} tuiles terrestres uniques durant la partie.",
+            "invincible": "Participez à au moins 1 combat sans en perdre aucun.",
+            "collector": "Ramassez au moins 2 objets différents durant la partie.",
+            "bridgeWalker": "Actionnez au moins 1 pont durant la partie.",
+            "duelist": "Remportez un combat avec 3 PV ou plus."
+        }
+    },
     "components": {
         "appSettings": {
             "title": "Paramètres",
@@ -409,7 +430,8 @@
             "themeDefault": "Défaut",
             "themeDark": "Sombre",
             "tutorial": "Tutoriel",
-            "resetTutorial": "Réinit tutoriel"
+            "resetTutorial": "Réinit tutoriel",
+            "challenges": "DÉFIS"
         },
         "warningConfirmation": {
             "close": "Fermer",

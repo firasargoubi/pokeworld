@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:client_mobile/consts/player_data_const.dart';
 import 'package:client_mobile/models/audio.dart';
+import 'package:client_mobile/models/challenge_data.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/match_data.dart';
@@ -44,6 +45,19 @@ class _PlayPageState extends State<PlayPage> {
   }
 
   PlayerData get selfPlayer => MatchService().selfPlayer!;
+
+  PlayerChallengeData? get selfChallenge {
+    final self = MatchService().selfPlayer;
+    if (self == null) return null;
+
+    for (final trackingPlayer in MatchService().matchData!.trackingData.players) {
+      if (trackingPlayer.id == self.userId || trackingPlayer.id == self.id) {
+        return trackingPlayer.challenge;
+      }
+    }
+
+    return null;
+  }
 
   bool get isSelfTurn => MatchService().isActivePlayer();
   bool get hasAction => PlayService().canAct();
@@ -219,6 +233,7 @@ class _PlayPageState extends State<PlayPage> {
                                               panelGapY: panelGapY,
                                               gameData: gameData,
                                               selfPlayer: selfPlayer,
+                                              selfChallenge: selfChallenge,
                                               isSelfTurn: isSelfTurn,
                                               hasAction: hasAction,
                                               canEndTurn: canEndTurn,

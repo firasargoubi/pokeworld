@@ -1,3 +1,4 @@
+import 'package:client_mobile/models/challenge_data.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/widgets/cut_out_button/cut_out_button.dart';
@@ -256,6 +257,87 @@ class PressableOptionBox extends StatelessWidget {
             child: displayBackground
                 ? CutOutButton(darkColor: darkColor, lightColor: lightColor, mainColor: mainColor, onAction: onTap, child: icon)
                 : GestureDetector(onTap: onTap, behavior: HitTestBehavior.opaque, child: icon),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LobbyChallengePanel extends StatelessWidget {
+  const LobbyChallengePanel({super.key, required this.baseSize, required this.challenge});
+
+  final double baseSize;
+  final PlayerChallengeData challenge;
+
+  @override
+  Widget build(BuildContext context) {
+    final i18n = I18nService();
+
+    String formatThousands(int value) {
+      final isNegative = value < 0;
+      final raw = value.abs().toString();
+      final groups = <String>[];
+      for (int i = raw.length; i > 0; i -= 3) {
+        var start = i - 3;
+        if (start < 0) start = 0;
+        groups.insert(0, raw.substring(start, i));
+      }
+      final formatted = groups.join(',');
+      return isNegative ? '-$formatted' : formatted;
+    }
+
+    final baseStyle = TextStyle(
+      fontFamily: PIXEL_FONT,
+      fontSize: baseSize * 0.025,
+      height: 1,
+      shadows: [Shadow(offset: Offset(baseSize * 0.003, 0), color: SHADOW_COLOR, blurRadius: 0)],
+    );
+
+    final challengeTitle = i18n.translate(CHALLENGE_TITLE_KEY).toUpperCase();
+    final challengeName = i18n.translate('challenges.names.${challenge.type.value}').toUpperCase();
+
+    return AspectRatio(
+      aspectRatio: 16 / 6,
+      child: DefaultContainer(
+        baseSize: baseSize,
+        config: GREEN_CONTAINER_CONFIG,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: baseSize * 0.05, vertical: baseSize * 0.037),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    '$challengeTitle:',
+                    style: baseStyle.copyWith(color: const Color(0xFFF5C842), letterSpacing: baseSize * 0.0015),
+                  ),
+                  SizedBox(width: baseSize * 0.008),
+                  Expanded(
+                    child: Text(
+                      challengeName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: baseStyle.copyWith(color: const Color(0xFFEBFFF0), letterSpacing: baseSize * 0.001),
+                    ),
+                  ),
+                  Text(
+                    '+${formatThousands(challenge.cashGain)}${String.fromCharCode(36)}',
+                    style: baseStyle.copyWith(color: const Color(0xFF4CAF50)),
+                  ),
+                ],
+              ),
+              SizedBox(height: baseSize * 0.035),
+              Expanded(
+                child: Text(
+                  i18n.translate('challenges.descriptions.${challenge.type.value}', params: {'target': challenge.target}),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: baseStyle.copyWith(color: const Color(0xFFEBFFF0), fontSize: baseSize * 0.022),
+                ),
+              ),
+            ],
           ),
         ),
       ),

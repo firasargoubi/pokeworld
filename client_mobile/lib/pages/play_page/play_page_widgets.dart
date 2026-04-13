@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:client_mobile/consts/avatar_data_const.dart';
 import 'package:client_mobile/consts/match_data_const.dart';
 import 'package:client_mobile/consts/ui.dart';
+import 'package:client_mobile/models/challenge_data.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/item_type.dart';
 import 'package:client_mobile/models/map_data.dart';
@@ -39,6 +40,22 @@ TextStyle pixelLineStyle(double fontSize) => TextStyle(
   height: 1.1,
   shadows: [Shadow(offset: Offset(fontSize * 0.05, 0), color: PIXEL_SHADOW_COLOR, blurRadius: 0)],
 );
+
+String formatThousands(int value) {
+  final isNegative = value < 0;
+  final raw = value.abs().toString();
+  final buffer = StringBuffer();
+
+  for (int index = 0; index < raw.length; index++) {
+    final remaining = raw.length - index;
+    buffer.write(raw[index]);
+    if (remaining > 1 && remaining % 3 == 1) {
+      buffer.write(',');
+    }
+  }
+
+  return isNegative ? '-${buffer.toString()}' : buffer.toString();
+}
 
 class LeftPanel extends StatelessWidget {
   const LeftPanel({super.key, required this.baseBodySize, required this.players, required this.activePlayerIndex});
@@ -273,6 +290,7 @@ class RightPanel extends StatelessWidget {
     required this.panelGapY,
     required this.gameData,
     required this.selfPlayer,
+    required this.selfChallenge,
     required this.isSelfTurn,
     required this.hasAction,
     required this.canEndTurn,
@@ -284,6 +302,7 @@ class RightPanel extends StatelessWidget {
 
   final GameData gameData;
   final PlayerData selfPlayer;
+  final PlayerChallengeData? selfChallenge;
 
   final bool isSelfTurn;
   final bool hasAction;
@@ -298,20 +317,148 @@ class RightPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           AspectRatio(
-            aspectRatio: 380 / 230,
+            aspectRatio: 380 / 175,
             child: InfoPanel(baseBodySize: baseBodySize, gameData: gameData, onSurrender: onSurrender),
           ),
           SizedBox(height: panelGapY),
           AspectRatio(
-            aspectRatio: 380 / 350,
+            aspectRatio: 380 / 280,
             child: SelfPanel(baseBodySize: baseBodySize, selfPlayer: selfPlayer, isSelfTurn: isSelfTurn),
           ),
+          if (selfChallenge != null) ...[
+            SizedBox(height: panelGapY),
+            AspectRatio(
+              aspectRatio: 380 / 155,
+              child: ChallengePanel(baseBodySize: baseBodySize, challenge: selfChallenge!),
+            ),
+          ],
           SizedBox(height: panelGapY),
           Expanded(
             child: BottomButtons(baseBodySize: baseBodySize, isSelfTurn: isSelfTurn, hasAction: hasAction, canEndTurn: canEndTurn),
           ),
         ],
       ),
+    );
+  }
+}
+
+class ChallengePanel extends StatelessWidget {
+  const ChallengePanel({super.key, required this.baseBodySize, required this.challenge});
+
+  final double baseBodySize;
+  final PlayerChallengeData challenge;
+
+  @override
+  Widget build(BuildContext context) {
+    final titleSize = baseBodySize * 0.027;
+    final nameSize = baseBodySize * 0.025;
+    final descSize = baseBodySize * 0.022;
+    final progressSize = baseBodySize * 0.020;
+    final challengeGrayColor = const Color(0xFF585851);
+    final challengeGreenColor = const Color(0xFF1E8A4C);
+    final rewardText = formatThousands(challenge.cashGain);
+
+    final maxTarget = max(1, challenge.target);
+    final rawProgress = max(0, challenge.progress);
+    final progressRatio = (rawProgress / maxTarget).clamp(0.0, 1.0);
+
+    final i18n = I18nService();
+
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(challenge.isCompleted ? CHALLENGE_GREEN_CONTAINER_ASSET : CHALLENGE_CONTAINER_ASSET),
+          fit: BoxFit.fill,
+          filterQuality: FilterQuality.none,
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: baseBodySize * 0.035, vertical: baseBodySize * 0.02),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(i18n.translate(CHALLENGE_TITLE_KEY), style: pixelLineStyle(titleSize).copyWith(color: challengeGrayColor)),
+                SizedBox(width: baseBodySize * 0.006),
+                SizedBox(
+                  child: Text(
+                    i18n.translate('challenges.names.${challenge.type.value}'),
+                    style: pixelLineStyle(nameSize),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const Spacer(),
+                Text('+$rewardText${String.fromCharCode(36)}', style: pixelLineStyle(nameSize).copyWith(color: challengeGreenColor)),
+              ],
+            ),
+            SizedBox(height: baseBodySize * 0.006),
+            SizedBox(height: baseBodySize * 0.004),
+            Text(
+              i18n.translate('challenges.descriptions.${challenge.type.value}', params: {'target': challenge.target}),
+              style: pixelLineStyle(descSize).copyWith(color: challengeGrayColor),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const Spacer(),
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    width: baseBodySize * 0.4,
+                    child: AspectRatio(
+                      aspectRatio: 97 / 9,
+                      child: ChallengeProgressBar(progressRatio: progressRatio, isCompleted: challenge.isCompleted),
+                    ),
+                  ),
+                ),
+                SizedBox(width: baseBodySize * 0.01),
+                Text('$rawProgress/$maxTarget', style: pixelLineStyle(progressSize).copyWith(color: challengeGrayColor)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ChallengeProgressBar extends StatelessWidget {
+  const ChallengeProgressBar({super.key, required this.progressRatio, required this.isCompleted});
+
+  final double progressRatio;
+  final bool isCompleted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Container(color: Colors.grey),
+        FractionallySizedBox(
+          alignment: Alignment.centerLeft,
+          widthFactor: progressRatio,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: isCompleted
+                  ? const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFF2D9D48), Color(0xFF2D9D48), Color(0xFF269440), Color(0xFF269440), Color(0xFF1E7A35), Color(0xFF1E7A35)],
+                      stops: [0.0, 0.35, 0.35, 0.65, 0.65, 1.0],
+                    )
+                  : const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFF3E73F9), Color(0xFF3E73F9), Color(0xFF3064EF), Color(0xFF3064EF), Color(0xFF2957C9), Color(0xFF2957C9)],
+                      stops: [0.0, 0.35, 0.35, 0.65, 0.65, 1.0],
+                    ),
+            ),
+          ),
+        ),
+        Image.asset(MOVEMENT_BAR_ASSET, fit: BoxFit.fill, filterQuality: FilterQuality.none),
+      ],
     );
   }
 }
@@ -340,7 +487,7 @@ class InfoPanel extends StatelessWidget {
           final surrenderButtonHeight = baseBodySize * 0.065;
 
           return Padding(
-            padding: EdgeInsets.symmetric(horizontal: panelWidth * 0.08, vertical: panelHeight * 0.12),
+            padding: EdgeInsets.symmetric(horizontal: panelWidth * 0.08, vertical: panelHeight * 0.1),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -595,7 +742,7 @@ class BottomButtons extends StatelessWidget {
       );
     }
 
-    final gap = baseBodySize * 0.02;
+    final gap = baseBodySize * 0.01;
 
     final actionAsset = hasAction ? ACTION_BUTTON_ASSET : DISABLED_BUTTON_ASSET;
     final actionActiveAsset = hasAction ? ACTION_BUTTON_ACTIVE_ASSET : DISABLED_BUTTON_ASSET;

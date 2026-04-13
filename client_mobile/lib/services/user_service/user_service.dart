@@ -211,6 +211,7 @@ class UserService {
           createdAt: existingUser.createdAt,
           preferences: preferences,
           inventory: existingUser.inventory,
+          challenges: existingUser.challenges,
           tutorialStep: existingUser.tutorialStep,
         );
       }

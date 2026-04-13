@@ -9,6 +9,7 @@ const String HEADER_KEY = 'pages.lobby.title';
 const String LAUNCH_KEY = 'pages.lobby.start';
 const String CODE_LABEL_KEY = 'pages.lobby.accessCode';
 const String ENTRY_FEE_LABEL_KEY = 'pages.lobby.entryFee';
+const String CHALLENGE_TITLE_KEY = 'challenges.title';
 
 // Colors
 const Color OUTER_BORDER_COLOR = Color(0xFF636776);
@@ -53,4 +54,16 @@ const DefaultContainerConfig BLUE_CONTAINER_CONFIG = DefaultContainerConfig(
   innerBorderTopLeftColor: Color(0xFF80c0d8),
   backgroundTopColor: Color(0xFF3890d8),
   backgroundBottomColor: Color(0xFF80c0d8),
+);
+
+const DefaultContainerConfig GREEN_CONTAINER_CONFIG = DefaultContainerConfig(
+  borderWidthFactor: 0.02,
+  innerBorderWidthFactor: 0.01,
+  separatorHeightFactor: 0.01,
+  backgroundRatio: 0.40,
+  borderColor: Color(0xFF48485F),
+  innerBorderBottomRightColor: Color(0xFF255D38),
+  innerBorderTopLeftColor: Color(0xFF48805B),
+  backgroundTopColor: Color(0xFF2B6440),
+  backgroundBottomColor: Color(0xFF48805B),
 );
