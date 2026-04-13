@@ -1,4 +1,5 @@
 import 'package:client_mobile/models/avatar_data.dart';
+import 'package:client_mobile/models/challenge_data.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
@@ -45,6 +46,8 @@ TrackingPlayerData _buildTrackingPlayer({
   int hpLost = 0,
   int balanceGain = 0,
   int currentBalance = 0,
+  PlayerChallengeData? challenge,
+  int toggledBridgesCount = 0,
 }) => TrackingPlayerData(
   id: id,
   name: name,
@@ -59,6 +62,8 @@ TrackingPlayerData _buildTrackingPlayer({
   hpLost: hpLost,
   balanceGain: balanceGain,
   currentBalance: currentBalance,
+  challenge: challenge,
+  toggledBridgesCount: toggledBridgesCount,
 );
 
 TrackingData _buildTrackingData({

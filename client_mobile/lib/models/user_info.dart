@@ -1,3 +1,4 @@
+import 'package:client_mobile/models/challenge_data.dart';
 import 'package:client_mobile/models/shop.dart';
 import 'package:client_mobile/models/user_preferences.dart';
 
@@ -10,6 +11,7 @@ class UserInfo {
     required this.fullProfilePicture,
     required this.balance,
     required this.inventory,
+    required this.challenges,
     required this.createdAt,
     required this.preferences,
     required this.tutorialStep,
@@ -22,6 +24,7 @@ class UserInfo {
   String fullProfilePicture;
   num balance;
   List<InventoryItem> inventory;
+  List<UserChallengeData> challenges;
   DateTime? createdAt;
   UserPreferences preferences;
   int tutorialStep;
@@ -35,6 +38,7 @@ class UserInfo {
       fullProfilePicture: (json['fullProfilePicture'] ?? '').toString(),
       balance: (json['balance'] ?? 0) as num,
       inventory: (json['inventory'] as List<dynamic>?)?.map((item) => InventoryItem.fromJson(item as Map<String, dynamic>)).toList() ?? [],
+      challenges: (json['challenges'] as List<dynamic>?)?.map((item) => UserChallengeData.fromJson(item as Map<String, dynamic>)).toList() ?? [],
       createdAt: json['createdAt'] == null ? null : DateTime.tryParse(json['createdAt'].toString()),
       preferences: UserPreferences.fromJson(json['preferences'] as Map<String, dynamic>?),
       tutorialStep: (json['tutorialStep'] ?? 0) as int,
@@ -50,6 +54,7 @@ class UserInfo {
       'fullProfilePicture': fullProfilePicture,
       'balance': balance,
       'inventory': inventory.map((item) => item.toJson()).toList(),
+      'challenges': challenges.map((challenge) => challenge.toJson()).toList(),
       'createdAt': createdAt?.toIso8601String(),
       'preferences': preferences.toJson(),
       'tutorialStep': tutorialStep,

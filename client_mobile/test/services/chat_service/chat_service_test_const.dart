@@ -34,6 +34,7 @@ UserInfo buildUserInfo() => UserInfo(
   fullProfilePicture: '',
   balance: 0,
   createdAt: null,
+  challenges: [],
   preferences: UserPreferences.defaults,
   inventory: [],
   tutorialStep: 0,

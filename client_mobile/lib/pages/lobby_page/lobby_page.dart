@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:client_mobile/consts/match_data_const.dart';
 import 'package:client_mobile/consts/player_data_const.dart';
 import 'package:client_mobile/models/audio.dart';
+import 'package:client_mobile/models/challenge_data.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/player_data.dart';
@@ -45,6 +46,19 @@ class _LobbyPageState extends State<LobbyPage> {
   late List<PlayerData> players;
 
   StreamSubscription<MatchData>? _sub;
+
+  PlayerChallengeData? get selfChallenge {
+    final self = MatchService().selfPlayer;
+    if (self == null) return null;
+
+    for (final trackingPlayer in MatchService().matchData?.trackingData.players ?? const <TrackingPlayerData>[]) {
+      if (trackingPlayer.id == self.userId || trackingPlayer.id == self.id) {
+        return trackingPlayer.challenge;
+      }
+    }
+
+    return null;
+  }
 
   List<PlayerData> _list(MatchData? md) {
     final next = (md?.players ?? const <PlayerData>[]).where((p) => p.isConnected).toList(growable: true);
@@ -231,6 +245,10 @@ class _LobbyPageState extends State<LobbyPage> {
                                                 onCopy: _copyCodeToClipboard,
                                                 onSettings: _showSettingsPopup,
                                               ),
+                                              if (selfChallenge != null) ...[
+                                                SizedBox(height: b * 0.02),
+                                                LobbyChallengePanel(baseSize: b, challenge: selfChallenge!),
+                                              ],
                                             ],
                                           ),
                                         ),

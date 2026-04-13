@@ -1,4 +1,5 @@
 import 'package:client_mobile/models/audio.dart';
+import 'package:client_mobile/models/challenge_data.dart';
 import 'package:client_mobile/models/chat_message.dart';
 import 'package:client_mobile/models/game_data.dart';
 import 'package:client_mobile/models/map_data.dart';
@@ -227,6 +228,8 @@ class TrackingPlayerData {
   final int hpLost;
   final int balanceGain;
   final int currentBalance;
+  final PlayerChallengeData? challenge;
+  final int toggledBridgesCount;
 
   TrackingPlayerData({
     required this.id,
@@ -242,6 +245,8 @@ class TrackingPlayerData {
     required this.hpLost,
     required this.balanceGain,
     required this.currentBalance,
+    required this.challenge,
+    required this.toggledBridgesCount,
   });
 
   factory TrackingPlayerData.fromJson(Map<String, dynamic> json) {
@@ -263,6 +268,8 @@ class TrackingPlayerData {
       hpLost: (json['hpLost'] as num).toInt(),
       balanceGain: (json['balanceGain'] as num).toInt(),
       currentBalance: (json['currentBalance'] as num).toInt(),
+      challenge: json['challenge'] == null ? null : PlayerChallengeData.fromJson((json['challenge'] as Map).cast<String, dynamic>()),
+      toggledBridgesCount: (json['toggledBridgesCount'] as num?)?.toInt() ?? 0,
     );
   }
 }
@@ -273,7 +280,13 @@ class MatchSettings {
   final bool isRapidElimination;
   final int entryFee;
   final bool isFriendOnly;
-  const MatchSettings({required this.isElementalMode, required this.isDropInEnabled, required this.isRapidElimination, required this.entryFee, required this.isFriendOnly});
+  const MatchSettings({
+    required this.isElementalMode,
+    required this.isDropInEnabled,
+    required this.isRapidElimination,
+    required this.entryFee,
+    required this.isFriendOnly,
+  });
 
   factory MatchSettings.fromJson(Map<String, dynamic> json) {
     return MatchSettings(
