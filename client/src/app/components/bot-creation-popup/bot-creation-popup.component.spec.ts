@@ -1,4 +1,5 @@
 import { NgClass } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { AudioService } from '@app/services/audio/audio.service';
@@ -16,7 +17,10 @@ describe('CreateBotPopupComponent', () => {
 
         await TestBed.configureTestingModule({
             imports: [CreateBotPopupComponent, NgClass, PokeballButtonComponent, TranslateModule.forRoot()],
-            providers: [{ provide: AudioService, useValue: mockAudioService }],
+            providers: [
+                { provide: AudioService, useValue: mockAudioService },
+                { provide: HttpClient, useValue: HttpClient },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(CreateBotPopupComponent);

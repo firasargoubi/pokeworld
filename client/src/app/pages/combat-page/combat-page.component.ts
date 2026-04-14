@@ -11,6 +11,7 @@ import { PopupColor } from '@app/interfaces/popup';
 import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
 import { COMBAT_PAGE_EFFECTS } from '@app/services/audio/audio.const';
 import { AudioService } from '@app/services/audio/audio.service';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { CombatService } from '@app/services/combat/combat.service';
 import { I18nService } from '@app/services/i18n/i18n.service';
 import { MatchService } from '@app/services/match/match.service';
@@ -42,6 +43,7 @@ export class CombatPageComponent implements OnDestroy {
 
     readonly audioService: AudioService = inject(AudioService);
     readonly clickValue = SoundEffect.Click;
+    private readonly preferencesService: PreferencesService = inject(PreferencesService);
 
     private readonly botAggressiveImage = './assets/images/menu/icons/bot-aggressive.png';
     private readonly botDefensiveImage = './assets/images/menu/icons/bot-defensive.png';
@@ -79,7 +81,7 @@ export class CombatPageComponent implements OnDestroy {
     }
 
     ngOnDestroy() {
-        this.audioService.playBackgroundMusic(BackgroundMusic.Home);
+        this.audioService.playBackgroundMusic(this.preferencesService.getHomeMenuTrack());
     }
 
     attackButton() {

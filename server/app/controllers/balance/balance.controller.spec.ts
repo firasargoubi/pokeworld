@@ -41,7 +41,7 @@ describe('BalanceController', () => {
 
     describe('purchaseItem', () => {
         const userId = 'user123';
-        const dto: PurchaseItemDto = { itemId: 'shop-item-1' };
+        const dto: PurchaseItemDto = { itemId: 'party-ball' };
 
         it('should purchase an item for a user', async () => {
             balanceService.purchaseItem.resolves(fakeUserResponse);

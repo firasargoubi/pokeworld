@@ -1,4 +1,4 @@
-import { AppLanguage, AppTheme } from '@common/interfaces/preferences';
+import { AppLanguage, AppTheme, PartyBallVariant } from '@common/interfaces/preferences';
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
@@ -12,6 +12,11 @@ class UserPreferencesDto {
     @ApiProperty({ description: 'Application language', enum: AppLanguage, example: AppLanguage.French })
     @IsEnum(AppLanguage)
     language: AppLanguage;
+
+    @ApiProperty({ description: 'Selected party ball variant', enum: PartyBallVariant, example: PartyBallVariant.Zero, required: false })
+    @IsOptional()
+    @IsEnum(PartyBallVariant)
+    partyBall?: PartyBallVariant;
 }
 
 export class CreateUserDto extends PartialType(LoginUserDto) {

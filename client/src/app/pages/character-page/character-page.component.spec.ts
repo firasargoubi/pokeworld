@@ -34,6 +34,23 @@ describe('CharacterPageComponent', () => {
     let mockAudioService: jasmine.SpyObj<AudioService>;
     let mockUserService: jasmine.SpyObj<UserService>;
     let mockChatService: jasmine.SpyObj<ChatService>;
+    const mockUser = {
+        userId: 'user-1',
+        username: 'TEST-USER',
+        email: 'user@test.com',
+        profilePicture: 'pic.png',
+        fullProfilePicture: 'full-pic.png',
+        balance: 100,
+        inventory: [],
+        createdAt: new Date(),
+        preferences: {
+            language: 'fr',
+            theme: 'default',
+            partyBall: '0',
+            menuMusic: '0',
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
 
     beforeEach(async () => {
         mockMatchService = jasmine.createSpyObj(
@@ -49,9 +66,11 @@ describe('CharacterPageComponent', () => {
         mockPopupService = jasmine.createSpyObj('PopupService', ['showPopup']);
         mockLobbyService = jasmine.createSpyObj('LobbyService', ['joinLobby', 'changeAvatar']);
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-        mockUserService = jasmine.createSpyObj('UserService', [], {
-            user$: of({ username: 'test-user' }),
+        mockUserService = jasmine.createSpyObj('UserService', ['getUserById', 'setUser'], {
+            user$: of(mockUser),
+            currentUser: mockUser,
         });
+        mockUserService.getUserById.and.returnValue(of(mockUser));
         mockChatService = jasmine.createSpyObj('ChatService', ['isComponentVisible']);
 
         await TestBed.configureTestingModule({
@@ -89,6 +108,11 @@ describe('CharacterPageComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
         expect(component).toBeTruthy();
+    });
+
+    it('should refresh the current user on construction', () => {
+        expect(mockUserService.getUserById).toHaveBeenCalledWith(mockUser.userId);
+        expect(mockUserService.setUser).toHaveBeenCalledWith(mockUser);
     });
 
     it('should show popup with confirmation and bind leaveMatch', () => {

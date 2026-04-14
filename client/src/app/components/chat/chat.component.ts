@@ -7,6 +7,7 @@ import { AudioService } from '@app/services/audio/audio.service';
 import { ChatService } from '@app/services/chat/chat.service';
 import { I18nService } from '@app/services/i18n/i18n.service';
 import { MatchService } from '@app/services/match/match.service';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
 import { TranslateModule } from '@ngx-translate/core';
@@ -48,8 +49,13 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     private readonly changeDetectorRef = inject(ChangeDetectorRef);
     private readonly matchService: MatchService = inject(MatchService);
     private readonly i18nService: I18nService = inject(I18nService);
+    private readonly preferencesService: PreferencesService = inject(PreferencesService);
+
     private shouldRestoreDetachedMode = false;
     private detachedWindowCloseHandler: (() => void) | null = null;
+    get partyBallImage(): string {
+        return `url(${this.preferencesService.getPartyBallAsset()})`;
+    }
 
     get filteredChannels() {
         const filter = this.searchBarValue.trim().toLowerCase();

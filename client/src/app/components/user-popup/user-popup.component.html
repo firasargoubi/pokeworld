@@ -284,24 +284,118 @@
                     <div class="title-container">
                         <div class="title-label">
                             <div class="icon-wrapper"></div>
-                            <p class="title">INVENTORY</p>
+                            <p class="title">{{ 'components.shopPopup.inventoryTitle' | translate }}</p>
                             <div class="icon-wrapper"></div>
                         </div>
                         <div class="button-container back-button" (click)="goToFront()">
                             <div class="button-icon"></div>
                         </div>
                     </div>
-                    <div class="card-infos-container">
-                        <div class="items-grid">
-                            @for(item of currentUser?.inventory; track $index) {
-                            <button class="shop-item" type="button">
-                                <span class="item-edge"></span>
-                                <span class="item-body">
-                                    <span class="item-name">{{ item.itemId }} </span>
-                                </span>
-                                <span class="item-edge"></span>
+                    <div class="card-infos-container inv-body">
+                        <div class="inv-items-panel">
+                            <div class="inv-items-scroll">
+                                @if (ownedButtonItems.length === 0 && ownedMusicItems.length === 0 && ownedPokemonItems.length === 0) {
+                                <p class="inv-empty-label">{{ 'components.shopPopup.emptyInventory' | translate }}</p>
+                                } @if (ownedButtonItems.length > 0) {
+                                <p class="inv-section-label">{{ 'components.shopPopup.typeButton' | translate }}</p>
+                                <div class="inv-items-grid">
+                                    @for (item of ownedButtonItems; track item.id) {
+                                    <button
+                                        class="inv-item"
+                                        type="button"
+                                        [class.selected]="selectedInventoryItem?.id === item.id"
+                                        [class.equipped]="isInventoryItemEquipped(item)"
+                                        (click)="selectInventoryItem(item)"
+                                    >
+                                        <img class="inv-item-thumb" [src]="getInventoryItemPreview(item)" [alt]="item.nameKey | translate" />
+                                        <span class="inv-item-name">{{ item.nameKey | translate }}</span>
+                                        @if (isInventoryItemEquipped(item)) {
+                                        <span class="inv-item-equipped">{{ 'components.shopPopup.equipped' | translate }}</span>
+                                        }
+                                    </button>
+                                    }
+                                </div>
+                                } @if (ownedMusicItems.length > 0) { @if (ownedButtonItems.length > 0) {
+                                <div class="inv-section-divider"></div>
+                                }
+                                <p class="inv-section-label">{{ 'components.shopPopup.typeMusic' | translate }}</p>
+                                <div class="inv-items-grid">
+                                    @for (item of ownedMusicItems; track item.id) {
+                                    <button
+                                        class="inv-item"
+                                        type="button"
+                                        [class.selected]="selectedInventoryItem?.id === item.id"
+                                        [class.equipped]="isInventoryItemEquipped(item)"
+                                        (click)="selectInventoryItem(item)"
+                                    >
+                                        <span class="inv-item-name">{{ item.nameKey | translate }}</span>
+                                        @if (isInventoryItemEquipped(item)) {
+                                        <span class="inv-item-equipped">{{ 'components.shopPopup.equipped' | translate }}</span>
+                                        }
+                                    </button>
+                                    }
+                                </div>
+                                } @if (ownedPokemonItems.length > 0) { @if (ownedButtonItems.length > 0 || ownedMusicItems.length > 0) {
+                                <div class="inv-section-divider"></div>
+                                }
+                                <p class="inv-section-label">{{ 'components.shopPopup.typePokemon' | translate }}</p>
+                                <div class="inv-items-grid">
+                                    @for (item of ownedPokemonItems; track item.id) {
+                                    <button
+                                        class="inv-item"
+                                        type="button"
+                                        [class.selected]="selectedInventoryItem?.id === item.id"
+                                        (click)="selectInventoryItem(item)"
+                                    >
+                                        <img class="inv-item-thumb" [src]="getInventoryItemPreview(item)" [alt]="item.nameKey | translate" />
+                                        <span class="inv-item-name">{{ item.nameKey | translate }}</span>
+                                    </button>
+                                    }
+                                </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="inv-detail-panel">
+                            @if (selectedInventoryItem) {
+                            <div class="inv-detail-preview">
+                                @if (selectedInventoryItem.type === shopItemType.Button) {
+                                <img
+                                    class="inv-detail-image"
+                                    [src]="getInventoryItemPreview(selectedInventoryItem)"
+                                    [alt]="selectedInventoryItem.nameKey | translate"
+                                />
+                                } @else if (selectedInventoryItem.type === shopItemType.Music) {
+                                <div class="inv-music-preview">
+                                    <div class="inv-music-note">♪</div>
+                                    <span class="inv-music-track-label"
+                                        >{{ 'components.shopPopup.track' | translate }} {{ getMusicTrackNumber(selectedInventoryItem) }}</span
+                                    >
+                                </div>
+                                } @else if (selectedInventoryItem.type === shopItemType.Pokemon) {
+                                <img
+                                    class="inv-detail-image"
+                                    [src]="getInventoryItemPreview(selectedInventoryItem)"
+                                    [alt]="selectedInventoryItem.nameKey | translate"
+                                />
+                                }
+                            </div>
+                            <div class="inv-detail-name">{{ selectedInventoryItem.nameKey | translate }}</div>
+                            @if (selectedInventoryItem.type !== shopItemType.Pokemon) {
+                            <button
+                                class="equip-button"
+                                type="button"
+                                [disabled]="isInventoryItemEquipped(selectedInventoryItem)"
+                                (click)="equipInventoryItem(selectedInventoryItem)"
+                            >
+                                @if (isInventoryItemEquipped(selectedInventoryItem)) {
+                                {{ 'components.shopPopup.equipped' | translate }}
+                                } @else {
+                                {{ 'components.shopPopup.equip' | translate }}
+                                }
                             </button>
-                            }
+                            } @else {
+                            <p class="inv-pokemon-hint">{{ 'components.shopPopup.pokemonCharacterHint' | translate }}</p>
+                            } }
                         </div>
                     </div>
                     }

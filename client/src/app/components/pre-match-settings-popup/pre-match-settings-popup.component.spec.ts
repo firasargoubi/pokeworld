@@ -1,10 +1,13 @@
+import { HttpClient } from '@angular/common/http';
 import { SimpleChange } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { MatchService } from '@app/services/match/match.service';
 import { UserService } from '@app/services/user/user.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { EMPTY, of } from 'rxjs';
 import { PreMatchSettingsPopupComponent } from './pre-match-settings-popup.component';
 
 describe('PreMatchSettingsPopupComponent', () => {
@@ -19,6 +22,7 @@ describe('PreMatchSettingsPopupComponent', () => {
     };
     let userServiceMock: {
         currentUser: { balance: number } | null;
+        user$: unknown;
     };
 
     beforeEach(async () => {
@@ -30,6 +34,7 @@ describe('PreMatchSettingsPopupComponent', () => {
         };
         userServiceMock = {
             currentUser: { balance: 10 },
+            user$: of(null),
         };
 
         await TestBed.configureTestingModule({
@@ -38,6 +43,8 @@ describe('PreMatchSettingsPopupComponent', () => {
                 { provide: AudioService, useValue: audioServiceSpy },
                 { provide: MatchService, useValue: matchServiceMock },
                 { provide: UserService, useValue: userServiceMock },
+                { provide: HttpClient, useValue: HttpClient },
+                { provide: Router, useValue: { navigate: jasmine.createSpy('navigate'), events: EMPTY } },
             ],
         }).compileComponents();
 

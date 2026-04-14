@@ -1,4 +1,5 @@
 // eslint-disable-next-line max-classes-per-file -- To have 3 mocked components classes
+import { HttpClient } from '@angular/common/http';
 import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -92,6 +93,7 @@ describe('PlayPageComponent', () => {
                 { provide: MapService, useValue: mockMapService },
                 { provide: Router, useValue: mockRouter },
                 { provide: AudioService, useValue: mockAudioService },
+                { provide: HttpClient, useValue: HttpClient },
             ],
         }).compileComponents();
 

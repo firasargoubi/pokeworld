@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -45,7 +45,7 @@ describe('AdminPageComponent', () => {
     beforeEach(async () => {
         gameSaveServiceSpy = jasmine.createSpyObj<GameSaveService>('GameSaveService', ['getAllGames', 'getGame', 'deleteGame']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
-        i18nServiceSpy = jasmine.createSpyObj('I18nService', ['translate']);
+        i18nServiceSpy = jasmine.createSpyObj('I18nService', ['translate', 'initialize']);
         i18nServiceSpy.translate.and.callFake((message: string) => message);
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage', 'playBackgroundMusic']);
         chatServiceSpy = jasmine.createSpyObj('ChatService', ['sendMessage', 'sendGeneralMessage']);
@@ -66,6 +66,7 @@ describe('AdminPageComponent', () => {
                 { provide: ChatService, useValue: chatServiceSpy },
                 { provide: GameDataService, useValue: gameDataService },
                 { provide: I18nService, useValue: i18nServiceSpy },
+                { provide: HttpClient, useValue: HttpClient },
             ],
         }).compileComponents();
 

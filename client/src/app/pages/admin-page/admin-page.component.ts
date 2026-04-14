@@ -8,8 +8,9 @@ import { GameCardComponent } from '@app/components/game-card/game-card.component
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { PopupMessage } from '@app/consts/popup-message.const';
-import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
+import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { I18nService } from '@app/services/i18n/i18n.service';
@@ -29,6 +30,7 @@ export class AdminPageComponent implements OnInit {
     games: GameData[] = [];
     isCreationMode: boolean = false;
     private readonly audioService: AudioService = inject(AudioService);
+    private readonly preferencesService: PreferencesService = inject(PreferencesService);
     private readonly router: Router = inject(Router);
     private readonly gameSaveService: GameSaveService = inject(GameSaveService);
     private readonly i18nService: I18nService = inject(I18nService);
@@ -49,7 +51,7 @@ export class AdminPageComponent implements OnInit {
 
     ngOnInit() {
         this.loadGames();
-        this.audioService.playBackgroundMusic(BackgroundMusic.Home);
+        this.audioService.playBackgroundMusic(this.preferencesService.getHomeMenuTrack());
     }
 
     editGame(id: string) {

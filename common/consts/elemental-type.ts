@@ -17,6 +17,9 @@ export const AVATAR_ELEMENT_TYPE_MAP: Record<Avatar, ElementalType> = {
     [Avatar.Avatar10]: ElementalType.Water,
     [Avatar.Avatar11]: ElementalType.Dragon,
     [Avatar.Avatar12]: ElementalType.Psychic,
+    [Avatar.Avatar13]: ElementalType.Psychic,
+    [Avatar.Avatar14]: ElementalType.Normal,
+    [Avatar.Avatar15]: ElementalType.Water,
 
     [Avatar.Avatar1Shiny]: ElementalType.Grass,
     [Avatar.Avatar2Shiny]: ElementalType.Water,
@@ -30,6 +33,9 @@ export const AVATAR_ELEMENT_TYPE_MAP: Record<Avatar, ElementalType> = {
     [Avatar.Avatar10Shiny]: ElementalType.Water,
     [Avatar.Avatar11Shiny]: ElementalType.Dragon,
     [Avatar.Avatar12Shiny]: ElementalType.Psychic,
+    [Avatar.Avatar13Shiny]: ElementalType.Psychic,
+    [Avatar.Avatar14Shiny]: ElementalType.Normal,
+    [Avatar.Avatar15Shiny]: ElementalType.Water,
 
     [Avatar.Avatar1Evolved]: ElementalType.Grass,
     [Avatar.Avatar2Evolved]: ElementalType.Water,
@@ -43,6 +49,9 @@ export const AVATAR_ELEMENT_TYPE_MAP: Record<Avatar, ElementalType> = {
     [Avatar.Avatar10Evolved]: ElementalType.Water,
     [Avatar.Avatar11Evolved]: ElementalType.Dragon,
     [Avatar.Avatar12Evolved]: ElementalType.Psychic,
+    [Avatar.Avatar13Evolved]: ElementalType.Psychic,
+    [Avatar.Avatar14Evolved]: ElementalType.Normal,
+    [Avatar.Avatar15Evolved]: ElementalType.Water,
 
     [Avatar.Avatar1EvolvedShiny]: ElementalType.Grass,
     [Avatar.Avatar2EvolvedShiny]: ElementalType.Water,
@@ -56,6 +65,9 @@ export const AVATAR_ELEMENT_TYPE_MAP: Record<Avatar, ElementalType> = {
     [Avatar.Avatar10EvolvedShiny]: ElementalType.Water,
     [Avatar.Avatar11EvolvedShiny]: ElementalType.Dragon,
     [Avatar.Avatar12EvolvedShiny]: ElementalType.Psychic,
+    [Avatar.Avatar13EvolvedShiny]: ElementalType.Psychic,
+    [Avatar.Avatar14EvolvedShiny]: ElementalType.Normal,
+    [Avatar.Avatar15EvolvedShiny]: ElementalType.Water,
 
     [Avatar.MissingNo]: ElementalType.Normal,
 };

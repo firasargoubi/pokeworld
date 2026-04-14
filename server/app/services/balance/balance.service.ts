@@ -5,7 +5,7 @@ import { ENTRY_FEE_WINNER_DIVISOR } from '@common/consts/match-data.const';
 import { MATCH_BALANCE_REWARDS, SHOP_ITEMS } from '@common/consts/shop.const';
 import { GameMode } from '@common/interfaces/map-data';
 import { PlayerData, PlayerType } from '@common/interfaces/player-data';
-import { AppLanguage, AppTheme, DEFAULT_PREFERENCES, UserPreferences } from '@common/interfaces/preferences';
+import { DEFAULT_PREFERENCES, UserPreferences } from '@common/interfaces/preferences';
 import { InventoryItem, ShopItem } from '@common/interfaces/shop';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -136,11 +136,16 @@ export class BalanceService {
         return winner.id === trackingPlayerId ? MATCH_BALANCE_REWARDS.win : MATCH_BALANCE_REWARDS.loss;
     }
 
-    private toUserResponse(user: UserDocument): UserResponseDto {
-        const preferences: UserPreferences = user.preferences
-            ? { theme: user.preferences.theme as AppTheme, language: user.preferences.language as AppLanguage }
-            : { ...DEFAULT_PREFERENCES };
+    private normalizePreferences(preferences?: Partial<UserPreferences> | null): UserPreferences {
+        return {
+            theme: preferences?.theme ?? DEFAULT_PREFERENCES.theme,
+            language: preferences?.language ?? DEFAULT_PREFERENCES.language,
+            partyBall: preferences?.partyBall ?? DEFAULT_PREFERENCES.partyBall,
+            menuMusic: preferences?.menuMusic ?? DEFAULT_PREFERENCES.menuMusic,
+        };
+    }
 
+    private toUserResponse(user: UserDocument): UserResponseDto {
         return {
             userId: user.userId,
             username: user.username,
@@ -151,7 +156,7 @@ export class BalanceService {
             inventory: user.inventory || [],
             challenges: user.challenges || [],
             isLoggedIn: user.isLoggedIn,
-            preferences,
+            preferences: this.normalizePreferences(user.preferences),
             tutorialStep: user.tutorialStep || 0,
         };
     }

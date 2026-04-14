@@ -70,6 +70,15 @@ export class AudioService {
         this.currentTrack = music;
     }
 
+    stopBackgroundMusic(): void {
+        if (this.backgroundMusic) {
+            this.backgroundMusic.pause();
+            this.backgroundMusic.currentTime = 0;
+            this.backgroundMusic = null;
+        }
+        this.currentTrack = null;
+    }
+
     playEffect(effect: SoundEffect): void {
         const audioEffect = this.effects.get(effect);
         if (audioEffect) {

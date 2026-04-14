@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -80,6 +80,7 @@ describe('CreatePageComponent', () => {
                 { provide: PopupService, useValue: popupServiceSpy },
                 { provide: AudioService, useValue: mockAudioService },
                 { provide: GameDataService, useValue: gameDataService },
+                { provide: HttpClient, useValue: HttpClient },
             ],
         }).compileComponents();
 

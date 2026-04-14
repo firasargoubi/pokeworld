@@ -5,7 +5,8 @@ import { LoginUserDto } from '@app/model/dto/user/login-user.dto';
 import { User, UserDocument, userSchema } from '@app/model/schema/user.schema';
 import { GameService } from '@app/services/game/game.service';
 import { MatchService } from '@app/services/match/match.service';
-import { AppLanguage, AppTheme, DEFAULT_PREFERENCES } from '@common/interfaces/preferences';
+import { PARTY_BALL_SHOP_ITEM_ID } from '@common/consts/shop.const';
+import { AppLanguage, AppTheme, DEFAULT_PREFERENCES, MenuMusicVariant, PartyBallVariant } from '@common/interfaces/preferences';
 import { BadRequestException, ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -187,6 +188,24 @@ describe('UserService', () => {
             expect(result.isLoggedIn).toBe(true);
             expect(result.preferences).toEqual(DEFAULT_PREFERENCES);
             expect(result).not.toHaveProperty('passwordHash');
+        });
+
+        it('should always initialize party ball to the default variant on account creation', async () => {
+            const createUserDto: CreateUserDto = {
+                username: 'partyBallDefaultUser',
+                password: 'password123',
+                email: 'partyballdefault@example.com',
+                profilePicture: '',
+                preferences: {
+                    theme: AppTheme.Dark,
+                    language: AppLanguage.English,
+                    partyBall: PartyBallVariant.One,
+                },
+            };
+
+            const result = await service.createUser(createUserDto);
+
+            expect(result.preferences.partyBall).toBe(PartyBallVariant.Zero);
         });
 
         it('should throw ConflictException if username exists', async () => {
@@ -556,6 +575,7 @@ describe('UserService', () => {
                 preferences: {
                     theme: AppTheme.Dark,
                     language: AppLanguage.French,
+                    partyBall: PartyBallVariant.Zero,
                 },
             });
 
@@ -564,15 +584,61 @@ describe('UserService', () => {
             expect(updated).toEqual({
                 theme: AppTheme.Dark,
                 language: AppLanguage.English,
+                partyBall: PartyBallVariant.Zero,
+                menuMusic: MenuMusicVariant.Zero,
             });
 
             const userInDb = await userModel.findOne({ userId: user.userId }).exec();
             expect(userInDb.preferences.theme).toBe(AppTheme.Dark);
             expect(userInDb.preferences.language).toBe(AppLanguage.English);
+            expect(userInDb.preferences.partyBall).toBe(PartyBallVariant.Zero);
+        });
+
+        it('should update selected party ball and preserve other preferences', async () => {
+            const user = await service.createUser({
+                username: 'partyBallUser',
+                password: 'password123',
+                email: 'party@ball.com',
+                profilePicture: '',
+                preferences: {
+                    theme: AppTheme.Dark,
+                    language: AppLanguage.English,
+                    partyBall: PartyBallVariant.Zero,
+                },
+            });
+            await userModel.updateOne(
+                { userId: user.userId },
+                {
+                    $set: {
+                        inventory: [{ itemId: PARTY_BALL_SHOP_ITEM_ID, price: 1000 }],
+                    },
+                },
+            );
+
+            const updated = await service.updatePreferences(user.userId, { partyBall: PartyBallVariant.One });
+
+            expect(updated).toEqual({
+                theme: AppTheme.Dark,
+                language: AppLanguage.English,
+                partyBall: PartyBallVariant.One,
+                menuMusic: MenuMusicVariant.Zero,
+            });
         });
 
         it('should throw NotFoundException when user does not exist', async () => {
             await expect(service.updatePreferences('missing-user', { theme: AppTheme.Dark })).rejects.toThrow(NotFoundException);
+        });
+
+        it('should reject party ball variant 1 when the item is not owned', async () => {
+            const user = await service.createUser({
+                username: 'lockedPartyBallUser',
+                password: 'password123',
+                email: 'locked@partyball.com',
+                profilePicture: '',
+            });
+
+            await expect(service.updatePreferences(user.userId, { partyBall: PartyBallVariant.One })).rejects.toThrow(BadRequestException);
+            await expect(service.updatePreferences(user.userId, { partyBall: PartyBallVariant.One })).rejects.toThrow('partyBall.error.notOwned');
         });
     });
 });

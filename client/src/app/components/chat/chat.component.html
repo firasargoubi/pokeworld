@@ -4,6 +4,7 @@
     [class.hide-labels]="hideLabels"
     [style.--scale-factor]="scaleFactor"
     [style.--detached-scale-factor]="isDetachedWindow ? 2 : 1"
+    [style.--party-ball-image]="partyBallImage"
 >
     @if (!isDetachedWindow) {
     <div class="chat-toggle-button" (click)="switchVisibility()"></div>

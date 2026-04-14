@@ -1,8 +1,8 @@
 import { CreateUserDto } from '@app/model/dto/user/create-user.dto';
 import { EditUserDto } from '@app/model/dto/user/edit-user.dto';
 import { LoginUserDto } from '@app/model/dto/user/login-user.dto';
-import { UpdatePreferencesDto } from '@app/model/dto/user/update-preferences.dto';
 import { UserResponseDto } from '@app/model/dto/user/response-user.dto';
+import { UpdatePreferencesDto } from '@app/model/dto/user/update-preferences.dto';
 import { UserService } from '@app/services/user/user.service';
 import { UserPreferences } from '@common/interfaces/preferences';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Put, Query } from '@nestjs/common';

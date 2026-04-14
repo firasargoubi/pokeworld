@@ -1,5 +1,6 @@
 <div
     class="player-component"
+    [style.--party-ball-image]="partyBallImage"
     [ngClass]="{
         'is-bot': player.playerType !== 'player',
         'is-self-player-card': player.isSelf,

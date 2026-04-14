@@ -1,11 +1,13 @@
+import { HttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { AudioService } from '@app/services/audio/audio.service';
+import { GameDataService } from '@app/services/game-data/game-data.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameMode, MapSize } from '@common/interfaces/map-data';
 import { TranslateModule } from '@ngx-translate/core';
+import { EMPTY } from 'rxjs';
 import { CreateGamePopupComponent } from './create-game-popup.component';
-import { GameDataService } from '@app/services/game-data/game-data.service';
 
 describe('CreateGamePopupComponent', () => {
     let component: CreateGamePopupComponent;
@@ -15,7 +17,7 @@ describe('CreateGamePopupComponent', () => {
     let gameDataService: jasmine.SpyObj<GameDataService>;
 
     beforeEach(async () => {
-        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+        routerSpy = jasmine.createSpyObj('Router', ['navigate'], { events: EMPTY });
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage']);
         gameDataService = jasmine.createSpyObj('GameDataService', ['createNewGame']);
 
@@ -25,6 +27,7 @@ describe('CreateGamePopupComponent', () => {
                 { provide: Router, useValue: routerSpy },
                 { provide: AudioService, useValue: mockAudioService },
                 { provide: GameDataService, useValue: gameDataService },
+                { provide: HttpClient, useValue: HttpClient },
             ],
         }).compileComponents();
 

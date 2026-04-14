@@ -245,7 +245,7 @@ $shadow-inner-gray:
     position: relative;
     overflow: visible;
 
-    background-image: url($img-avatar-frame);
+    background-image: var(--party-ball-image);
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -296,7 +296,7 @@ $shadow-inner-gray:
     left: 0;
     height: 100%;
     width: 100%;
-    background-image: url($img-avatar-frame);
+    background-image: var(--party-ball-image);
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;

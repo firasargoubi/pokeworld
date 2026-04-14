@@ -116,6 +116,12 @@ $shop-button-background: linear-gradient(
     background: transparent;
 }
 
+.user-popup,
+.user-popup * {
+    box-sizing: border-box;
+    min-width: 0;
+}
+
 .user-card {
     position: relative;
     display: flex;
@@ -300,9 +306,9 @@ $shop-button-background: linear-gradient(
     font-family: $font-family;
     font-size: calc($font-size * 0.9);
     text-shadow: #2860a8 calc($font-size * 0.12) 0 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .friend-item .profile-picture-container {
@@ -450,6 +456,12 @@ $shop-button-background: linear-gradient(
     color: #fff;
     text-shadow: #2860a8 calc($font-size * 0.2) 0 0;
     letter-spacing: calc($font-size * 0.1);
+    margin: 0;
+    max-width: 100%;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .card-body .title-container .header-buttons {
@@ -611,6 +623,10 @@ $shop-button-background: linear-gradient(
         color: $text-color;
         text-shadow: $text-shadow-color calc($font-size * 0.1) 0 0;
         letter-spacing: calc($font-size * 0.1);
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
     }
 }
 
@@ -641,6 +657,8 @@ $shop-button-background: linear-gradient(
 .avatar-container .full-avatar {
     width: 80%;
     height: 80%;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
     filter: drop-shadow(calc($base-size * 0.4) calc($base-size * 0.4) calc($base-size * 0.4) rgba(0, 0, 0, 0.3));
 }
@@ -709,6 +727,12 @@ $shop-button-background: linear-gradient(
         text-shadow: $text-shadow-color calc($font-size * 0.1) 0 0;
         letter-spacing: calc($font-size * 0.1);
         user-select: none;
+        margin: 0;
+        max-width: 100%;
+        text-align: center;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
     }
 }
 
@@ -865,6 +889,267 @@ $shop-button-background: linear-gradient(
     text-align: center;
     white-space: normal;
     overflow: visible;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+// ── Inventory two-panel layout ────────────────────────────────────
+.card-back .card-infos-container.inv-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) calc($base-size * 16);
+    gap: calc($base-size * 1.5);
+    align-items: stretch;
+    justify-items: stretch;
+    width: 95%;
+    max-width: 95%;
+    height: 100%;
+    flex: 1;
+    margin-top: 0;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.inv-items-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    min-width: 0;
+    min-height: 0;
+}
+
+.inv-items-scroll {
+    display: flex;
+    flex-direction: column;
+    gap: calc($base-size * 1);
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    padding-right: calc($base-size * 0.5);
+    min-height: 0;
+}
+
+.inv-section-label {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.88);
+    font-family: $font-family;
+    font-size: calc($font-size * 0.8);
+    letter-spacing: calc($font-size * 0.05);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.inv-section-divider {
+    width: 100%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.25);
+    margin: calc($base-size * 0.5) 0;
+}
+
+.inv-empty-label {
+    margin: auto;
+    color: $text-color;
+    font-family: $font-family;
+    font-size: calc($font-size * 0.85);
+    text-align: center;
+    opacity: 0.7;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.inv-items-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: calc($base-size * 1);
+}
+
+.inv-item {
+    border: 3px solid rgba(255, 255, 255, 0.15);
+    padding: calc($base-size * 1.2);
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc($base-size * 0.4);
+    cursor: pointer;
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease;
+    position: relative;
+    clip-path: $pixel-corners-clip-path;
+    width: 100%;
+    overflow: hidden;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-1px);
+    }
+
+    &.selected {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: #fff;
+    }
+
+    &.equipped {
+        border-color: #90c890;
+    }
+}
+
+.inv-item-thumb {
+    width: calc($base-size * 7);
+    height: calc($base-size * 7);
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.inv-music-icon {
+    font-size: calc($font-size * 2);
+    line-height: 1;
+    color: $text-color;
+    height: calc($base-size * 5);
+    display: flex;
+    align-items: center;
+}
+
+.inv-item-name {
+    color: #fff;
+    font-family: $font-family;
+    font-size: calc($font-size * 0.6);
+    text-align: center;
+    line-height: 1.2;
+    width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.inv-item-equipped {
+    color: rgba(255, 255, 255, 0.7);
+    font-family: $font-family;
+    font-size: calc($font-size * 0.55);
+    text-align: center;
+    width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.inv-detail-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: calc($base-size * 1);
+    height: 100%;
+    width: 100%;
+    min-width: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    padding: calc($base-size * 0.5) calc($base-size * 0.3) 0;
+}
+
+.inv-detail-preview {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1 / 1;
+    background: rgba(0, 0, 0, 0.2);
+    clip-path: $pixel-corners-clip-path;
+}
+
+.inv-detail-image {
+    width: 80%;
+    height: 80%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.inv-music-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc($base-size * 0.5);
+}
+
+.inv-music-note {
+    font-size: calc($font-size * 4);
+    color: #fff;
+    line-height: 1;
+}
+
+.inv-music-track-label {
+    color: #fff;
+    font-family: $font-family;
+    font-size: calc($font-size * 0.65);
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.inv-detail-name {
+    width: 100%;
+    padding: calc($base-size * 0.8) calc($base-size * 1.2);
+    color: #fff;
+    font-family: $font-family;
+    font-size: calc($font-size * 0.8);
+    text-align: center;
+    letter-spacing: calc($font-size * 0.05);
+    background: rgba(0, 0, 0, 0.2);
+    clip-path: $pixel-corners-clip-path;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.equip-button {
+    width: 100%;
+    padding: calc($base-size * 0.8) calc($base-size * 0.5);
+    border: 3px solid #1a6a2a;
+    background: $shop-button-background;
+    color: #fff;
+    font-family: $font-family;
+    font-size: calc($font-size * 0.75);
+    cursor: pointer;
+    letter-spacing: calc($font-size * 0.05);
+    transition:
+        filter 0.15s ease,
+        transform 0.15s ease;
+    clip-path: $pixel-corners-clip-path;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+
+    &:hover:not(:disabled) {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+    }
+
+    &:disabled {
+        filter: grayscale(0.5);
+        cursor: default;
+        opacity: 0.8;
+    }
+}
+
+.inv-pokemon-hint {
+    width: 100%;
+    color: rgba(255, 255, 255, 0.8);
+    font-family: $font-family;
+    font-size: calc($font-size * 0.65);
+    text-align: center;
+    padding: calc($base-size * 0.5);
+    white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
 }

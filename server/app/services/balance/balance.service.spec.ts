@@ -47,8 +47,8 @@ describe('BalanceService', () => {
 
     describe('purchaseItem', () => {
         it('should throw NotFoundException when the user does not exist', async () => {
-            await expect(service.purchaseItem('missing-user', 'shop-item-1')).rejects.toThrow(NotFoundException);
-            await expect(service.purchaseItem('missing-user', 'shop-item-1')).rejects.toThrow('purchase.error.userNotFound');
+            await expect(service.purchaseItem('missing-user', 'party-ball')).rejects.toThrow(NotFoundException);
+            await expect(service.purchaseItem('missing-user', 'party-ball')).rejects.toThrow('purchase.error.userNotFound');
         });
 
         it('should throw BadRequestException when the balance is insufficient', async () => {

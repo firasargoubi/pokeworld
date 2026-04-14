@@ -6,8 +6,9 @@ import { GameCardComponent } from '@app/components/game-card/game-card.component
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PreMatchSettingsPopupComponent } from '@app/components/pre-match-settings-popup/pre-match-settings-popup.component';
 import { PopupMessage } from '@app/consts/popup-message.const';
-import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
+import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { MatchService } from '@app/services/match/match.service';
@@ -29,6 +30,7 @@ export class CreatePageComponent implements OnInit {
     isSettingsPopupVisible = false;
     pendingGame: GameData | null = null;
     private readonly audioService: AudioService = inject(AudioService);
+    private readonly preferencesService: PreferencesService = inject(PreferencesService);
     private isCreatingMatch = false;
     private router: Router = inject(Router);
     private gameSaveService: GameSaveService = inject(GameSaveService);
@@ -43,7 +45,7 @@ export class CreatePageComponent implements OnInit {
 
     ngOnInit() {
         this.loadGames();
-        this.audioService.playBackgroundMusic(BackgroundMusic.Home);
+        this.audioService.playBackgroundMusic(this.preferencesService.getHomeMenuTrack());
     }
 
     openSettings(gameData: GameData) {

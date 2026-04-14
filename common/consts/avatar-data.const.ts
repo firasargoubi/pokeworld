@@ -1,7 +1,7 @@
 import { Avatar } from '../interfaces/player-data';
 
 export const MIN_SELECTABLE_AVATAR_INDEX = 1;
-export const MAX_SELECTABLE_AVATAR_INDEX = 13;
+export const MAX_SELECTABLE_AVATAR_INDEX = 16;
 
 export const AVATAR_DATA = {
     [Avatar.Default]: {
@@ -395,6 +395,102 @@ export const AVATAR_DATA = {
         imageCentered: './assets/images/game/avatars/centered/evolved-shiny/mewtwo-shiny.png',
         frontGif: './assets/images/game/avatars-gifs/evolved-shiny/mewtwo-shiny.gif',
         backGif: './assets/images/game/avatars-gifs/evolved-shiny/mewtwo-shiny-back.gif',
+    },
+    [Avatar.Avatar13]: {
+        name: 'Riolu',
+        image: './assets/images/game/avatars/riolu.png',
+        imageFace: './assets/images/game/avatars/face/riolu.png',
+        imageCentered: './assets/images/game/avatars/centered/riolu.png',
+        frontGif: './assets/images/game/avatars-gifs/riolu.gif',
+        backGif: './assets/images/game/avatars-gifs/riolu-back.gif',
+    },
+    [Avatar.Avatar14]: {
+        name: 'Étourmi',
+        image: './assets/images/game/avatars/starly.png',
+        imageFace: './assets/images/game/avatars/starly.png',
+        imageCentered: './assets/images/game/avatars/centered/starly.png',
+        frontGif: './assets/images/game/avatars-gifs/starly.gif',
+        backGif: './assets/images/game/avatars-gifs/starly-back.gif',
+    },
+    [Avatar.Avatar15]: {
+        name: 'Grenousse',
+        image: './assets/images/game/avatars/froakie.png',
+        imageFace: './assets/images/game/avatars/face/froakie.png',
+        imageCentered: './assets/images/game/avatars/centered/froakie.png',
+        frontGif: './assets/images/game/avatars-gifs/froakie.gif',
+        backGif: './assets/images/game/avatars-gifs/froakie-back.gif',
+    },
+    [Avatar.Avatar13Shiny]: {
+        name: 'Riolu',
+        image: './assets/images/game/avatars/centered/shiny/riolu-shiny.png',
+        imageFace: './assets/images/game/avatars/face/shiny/riolu-shiny.png',
+        imageCentered: './assets/images/game/avatars/centered/shiny/riolu-shiny.png',
+        frontGif: './assets/images/game/avatars-gifs/shiny/riolu-shiny.gif',
+        backGif: './assets/images/game/avatars-gifs/shiny/riolu-shiny-back.gif',
+    },
+    [Avatar.Avatar14Shiny]: {
+        name: 'Étourmi',
+        image: './assets/images/game/avatars/centered/shiny/starly-shiny.png',
+        imageFace: './assets/images/game/avatars/centered/shiny/starly-shiny.png',
+        imageCentered: './assets/images/game/avatars/centered/shiny/starly-shiny.png',
+        frontGif: './assets/images/game/avatars-gifs/shiny/starly-shiny.gif',
+        backGif: './assets/images/game/avatars-gifs/shiny/starly-shiny-back.gif',
+    },
+    [Avatar.Avatar15Shiny]: {
+        name: 'Grenousse',
+        image: './assets/images/game/avatars/centered/shiny/froakie-shiny.png',
+        imageFace: './assets/images/game/avatars/face/shiny/froakie-shiny.png',
+        imageCentered: './assets/images/game/avatars/centered/shiny/froakie-shiny.png',
+        frontGif: './assets/images/game/avatars-gifs/shiny/froakie-shiny.gif',
+        backGif: './assets/images/game/avatars-gifs/shiny/froakie-shiny-back.gif',
+    },
+    [Avatar.Avatar13Evolved]: {
+        name: 'Lucario',
+        image: './assets/images/game/avatars/centered/evolved/lucario.png',
+        imageFace: './assets/images/game/avatars/face/evolved/lucario.png',
+        imageCentered: './assets/images/game/avatars/centered/evolved/lucario.png',
+        frontGif: './assets/images/game/avatars-gifs/evolved/lucario.gif',
+        backGif: './assets/images/game/avatars-gifs/evolved/lucario-back.gif',
+    },
+    [Avatar.Avatar14Evolved]: {
+        name: 'Étouraptor',
+        image: './assets/images/game/avatars/centered/evolved/staraptor.png',
+        imageFace: './assets/images/game/avatars/centered/evolved/staraptor.png',
+        imageCentered: './assets/images/game/avatars/centered/evolved/staraptor.png',
+        frontGif: './assets/images/game/avatars-gifs/evolved/staraptor.gif',
+        backGif: './assets/images/game/avatars-gifs/evolved/staraptor-back.gif',
+    },
+    [Avatar.Avatar15Evolved]: {
+        name: 'Amphinobi',
+        image: './assets/images/game/avatars/centered/evolved/greninja.png',
+        imageFace: './assets/images/game/avatars/face/evolved/greninja.png',
+        imageCentered: './assets/images/game/avatars/centered/evolved/greninja.png',
+        frontGif: './assets/images/game/avatars-gifs/evolved/greninja.gif',
+        backGif: './assets/images/game/avatars-gifs/evolved/greninja-back.gif',
+    },
+    [Avatar.Avatar13EvolvedShiny]: {
+        name: 'Lucario',
+        image: './assets/images/game/avatars/centered/evolved-shiny/lucario-shiny.png',
+        imageFace: './assets/images/game/avatars/face/evolved-shiny/lucario-shiny.png',
+        imageCentered: './assets/images/game/avatars/centered/evolved-shiny/lucario-shiny.png',
+        frontGif: './assets/images/game/avatars-gifs/evolved-shiny/lucario-shiny.gif',
+        backGif: './assets/images/game/avatars-gifs/evolved-shiny/lucario-shiny-back.gif',
+    },
+    [Avatar.Avatar14EvolvedShiny]: {
+        name: 'Étouraptor',
+        image: './assets/images/game/avatars/centered/evolved-shiny/staraptor-shiny.png',
+        imageFace: './assets/images/game/avatars/centered/evolved-shiny/staraptor-shiny.png',
+        imageCentered: './assets/images/game/avatars/centered/evolved-shiny/staraptor-shiny.png',
+        frontGif: './assets/images/game/avatars-gifs/evolved-shiny/staraptor-shiny.gif',
+        backGif: './assets/images/game/avatars-gifs/evolved-shiny/staraptor-shiny-back.gif',
+    },
+    [Avatar.Avatar15EvolvedShiny]: {
+        name: 'Amphinobi',
+        image: './assets/images/game/avatars/centered/evolved-shiny/greninja-shiny.png',
+        imageFace: './assets/images/game/avatars/face/evolved-shiny/greninja-shiny.png',
+        imageCentered: './assets/images/game/avatars/centered/evolved-shiny/greninja-shiny.png',
+        frontGif: './assets/images/game/avatars-gifs/evolved-shiny/greninja-shiny.gif',
+        backGif: './assets/images/game/avatars-gifs/evolved-shiny/greninja-shiny-back.gif',
     },
     [Avatar.MissingNo]: {
         name: 'MissingNo',

@@ -4,6 +4,7 @@ import { ItemComponent } from '@app/components/item/item.component';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { MatchService } from '@app/services/match/match.service';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -21,5 +22,10 @@ export class PlayerInfoPopupComponent {
     readonly clickValue = SoundEffect.Click;
     avatarData = AVATAR_DATA;
     matchService: MatchService = inject(MatchService);
+    private readonly preferencesService: PreferencesService = inject(PreferencesService);
+
+    get partyBallImage(): string {
+        return `url(${this.preferencesService.getPartyBallAsset()})`;
+    }
     @Input() closeButton: () => void = () => ({});
 }

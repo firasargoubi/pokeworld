@@ -11,7 +11,12 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { SocialService } from '@app/services/social/social.service';
 import { UserService } from '@app/services/user/user.service';
+import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/player-data.const';
+import { SHOP_ITEMS } from '@common/consts/shop.const';
+import { Avatar } from '@common/interfaces/player-data';
+import { MenuMusicVariant, PartyBallVariant } from '@common/interfaces/preferences';
+import { InventoryItem, ShopItem, ShopItemType } from '@common/interfaces/shop';
 import { RelationshipType, SocialListTab } from '@common/interfaces/social';
 import { UserInfo } from '@common/interfaces/user';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -28,8 +33,10 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 export class UserPopupComponent implements OnDestroy {
     @Input() avatarImage: string = 'assets/images/menu/fullAvatars/fullAvatar0.png';
     readonly maxNameLength = MAX_NAME_LENGTH;
+    selectedInventoryItem: ShopItem | null = null;
     userService: UserService = inject(UserService);
     currentUser: UserInfo | null = null;
+    readonly shopItemType = ShopItemType;
     userCardType = UserCardType;
     activeCard: UserCardType = UserCardType.Front;
     animationsEnabled = false;
@@ -47,6 +54,11 @@ export class UserPopupComponent implements OnDestroy {
     private readonly searchDebounceMs = DEBOUNCE_TIME_MS;
     private readonly searchSubject: Subject<string> = new Subject<string>();
     private searchSub?: Subscription;
+    private readonly inventoryNameKeys = new Map(SHOP_ITEMS.map((item) => [item.id, item.nameKey]));
+    private readonly defaultInventoryItems: ShopItem[] = [
+        { id: 'party-ball-0', nameKey: 'components.shopPopup.items.partyBall0', price: 0, type: ShopItemType.Button, variant: PartyBallVariant.Zero },
+        { id: 'menu-music-0', nameKey: 'components.shopPopup.items.menuMusic0', price: 0, type: ShopItemType.Music, variant: MenuMusicVariant.Zero },
+    ];
     private popupService: PopupService = inject(PopupService);
     private readonly preferencesService: PreferencesService = inject(PreferencesService);
     private readonly translateService: TranslateService = inject(TranslateService);
@@ -60,6 +72,7 @@ export class UserPopupComponent implements OnDestroy {
             } else {
                 this.resetForms();
             }
+            this.syncSelectedInventoryItem();
         });
 
         const userId = this.userService.currentUser?.userId;
@@ -78,12 +91,79 @@ export class UserPopupComponent implements OnDestroy {
         return this.currentUser?.fullProfilePicture || this.currentUser?.profilePicture || this.avatarImage;
     }
 
+    get inventoryItems(): InventoryItem[] {
+        return this.currentUser?.inventory ?? [];
+    }
+
+    get ownedButtonItems(): ShopItem[] {
+        return this.defaultInventoryItems
+            .filter((item) => item.type === ShopItemType.Button)
+            .concat(SHOP_ITEMS.filter((item) => item.type === ShopItemType.Button && this.hasInventoryItem(item.id)));
+    }
+
+    get ownedMusicItems(): ShopItem[] {
+        return this.defaultInventoryItems
+            .filter((item) => item.type === ShopItemType.Music)
+            .concat(SHOP_ITEMS.filter((item) => item.type === ShopItemType.Music && this.hasInventoryItem(item.id)));
+    }
+
+    get ownedPokemonItems(): ShopItem[] {
+        return SHOP_ITEMS.filter((item) => item.type === ShopItemType.Pokemon && this.hasInventoryItem(item.id));
+    }
+
     get numberOfChallenges(): number {
         let total = 0;
         this.currentUser?.challenges.forEach((challenge) => {
             total += challenge.completed;
         });
         return total;
+    }
+
+    selectInventoryItem(item: ShopItem): void {
+        this.selectedInventoryItem = item;
+    }
+
+    getInventoryItemPreview(item: ShopItem): string {
+        if (item.type === ShopItemType.Button) {
+            return this.preferencesService.getPartyBallAssetForVariant(item.variant as PartyBallVariant, false);
+        }
+        if (item.type === ShopItemType.Pokemon) {
+            return AVATAR_DATA[item.variant as Avatar]?.imageCentered ?? '';
+        }
+        return '';
+    }
+
+    getMusicTrackNumber(item: ShopItem): string {
+        return (item.variant as MenuMusicVariant) ?? '?';
+    }
+
+    isInventoryItemEquipped(item: ShopItem): boolean {
+        if (item.type === ShopItemType.Button) {
+            return this.preferencesService.currentPartyBall === (item.variant as PartyBallVariant);
+        }
+        if (item.type === ShopItemType.Music) {
+            return this.preferencesService.currentMenuMusic === (item.variant as MenuMusicVariant);
+        }
+        return false;
+    }
+
+    equipInventoryItem(item: ShopItem | null): void {
+        if (!item || !this.currentUser) return;
+        this.audioService.playEffect(SoundEffect.Click);
+
+        if (item.type === ShopItemType.Button) {
+            const variant = item.variant as PartyBallVariant;
+            if (variant) this.preferencesService.setPartyBall(variant);
+            return;
+        }
+
+        if (item.type === ShopItemType.Music) {
+            const variant = item.variant as MenuMusicVariant;
+            if (variant) {
+                this.preferencesService.setMenuMusic(variant);
+                this.audioService.playBackgroundMusic(this.preferencesService.getHomeMenuTrack());
+            }
+        }
     }
 
     onSearchInput(value: string): void {
@@ -107,6 +187,9 @@ export class UserPopupComponent implements OnDestroy {
 
         if (card === UserCardType.Friends && this.currentUser) {
             this.socialService.initialize(this.currentUser.userId);
+        }
+        if (card === UserCardType.Inventory) {
+            this.syncSelectedInventoryItem();
         }
 
         this.usernameError = '';
@@ -210,6 +293,10 @@ export class UserPopupComponent implements OnDestroy {
         });
     }
 
+    getInventoryItemNameKey(itemId: string): string {
+        return this.inventoryNameKeys.get(itemId) ?? 'components.shopPopup.unknownItem';
+    }
+
     private confirmUsernameUpdate(sanitizedUsername: string): void {
         if (!this.currentUser) return;
         this.isUpdatingUsername = true;
@@ -230,6 +317,28 @@ export class UserPopupComponent implements OnDestroy {
                 this.isUpdatingUsername = false;
             },
         });
+    }
+
+    private hasInventoryItem(itemId: string): boolean {
+        return this.inventoryItems.some((item) => item.itemId === itemId);
+    }
+
+    private syncSelectedInventoryItem(): void {
+        const ownedItems = this.getOwnedInventoryShopItems();
+        if (ownedItems.length === 0) {
+            this.selectedInventoryItem = null;
+            return;
+        }
+
+        if (this.selectedInventoryItem && ownedItems.some((item) => item.id === this.selectedInventoryItem?.id)) {
+            return;
+        }
+
+        this.selectedInventoryItem = ownedItems[0];
+    }
+
+    private getOwnedInventoryShopItems(): ShopItem[] {
+        return this.defaultInventoryItems.concat(SHOP_ITEMS.filter((item) => this.hasInventoryItem(item.id)));
     }
 
     private resetForms(): void {

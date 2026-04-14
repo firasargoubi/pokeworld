@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +9,7 @@ import { AudioService } from '@app/services/audio/audio.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { TranslateModule } from '@ngx-translate/core';
+import { EMPTY } from 'rxjs';
 import { JoinPageComponent } from './join-page.component';
 
 @Component({
@@ -25,7 +27,7 @@ describe('JoinPageComponent', () => {
     let mockAudioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
-        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+        routerSpy = jasmine.createSpyObj('Router', ['navigate'], { events: EMPTY });
         matchServiceSpy = jasmine.createSpyObj('MatchService', ['joinMatch']);
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic', 'preloadEffectsForPage', 'playCombatEffect']);
 
@@ -35,6 +37,7 @@ describe('JoinPageComponent', () => {
                 { provide: Router, useValue: routerSpy },
                 { provide: MatchService, useValue: matchServiceSpy },
                 { provide: AudioService, useValue: mockAudioService },
+                { provide: HttpClient, useValue: HttpClient },
             ],
         }).compileComponents();
 

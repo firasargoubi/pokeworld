@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
@@ -17,6 +18,15 @@ export class MenuButtonComponent {
 
     isActive: boolean = false;
     private router: Router = inject(Router);
+    private readonly preferencesService = inject(PreferencesService);
+
+    get inactivePartyBallAsset(): string {
+        return this.preferencesService.getPartyBallAsset();
+    }
+
+    get activePartyBallAsset(): string {
+        return this.preferencesService.getPartyBallAsset(true);
+    }
 
     navigateWithDelay() {
         this.isActive = true;

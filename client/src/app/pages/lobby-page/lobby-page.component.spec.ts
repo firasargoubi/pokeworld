@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -52,6 +53,7 @@ describe('LobbyPageComponent', () => {
                 { provide: LobbyService, useValue: lobbyServiceSpy },
                 { provide: MatchService, useValue: matchServiceSpy },
                 { provide: AudioService, useValue: mockAudioService },
+                { provide: HttpClient, useValue: HttpClient },
             ],
         }).compileComponents();
 

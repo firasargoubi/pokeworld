@@ -66,6 +66,19 @@ describe('UserService', () => {
         req.flush([mockUser]);
     });
 
+    it('should get a user by id', () => {
+        service.getUserById(mockUser.userId).subscribe({
+            next: (user) => {
+                expect(user).toEqual(mockUser);
+            },
+            error: fail,
+        });
+
+        const req = httpMock.expectOne(`${baseUrl}/${ApiEndpoint.User}/${mockUser.userId}`);
+        expect(req.request.method).toBe('GET');
+        req.flush(mockUser);
+    });
+
     it('should login user', () => {
         service.login('testuser', 'password').subscribe({
             next: (user) => {

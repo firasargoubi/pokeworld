@@ -7,8 +7,8 @@
     (mouseleave)="onMouseLeave()"
 >
     <div class="button-icon">
-        <img class="active-icon" src="./assets/images/menu/buttons/poke-button/party-ball-sel.png" />
-        <img class="inactive-icon" src="./assets/images/menu/buttons/poke-button/party-ball.png" />
+        <img class="active-icon" [src]="activePartyBallAsset" />
+        <img class="inactive-icon" [src]="inactivePartyBallAsset" />
     </div>
     <div class="pokeball-button">
         <div class="pokeball-button-body">
