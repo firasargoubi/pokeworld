@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { POKE_BUTTON_DEFAULT_SCALE } from '@app/consts/ui.const';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
 
 @Component({
     selector: 'app-pokeball-button',
@@ -16,6 +17,15 @@ export class PokeballButtonComponent {
     @Input() scale: number = POKE_BUTTON_DEFAULT_SCALE;
 
     isActive: boolean = false;
+    private readonly preferencesService = inject(PreferencesService);
+
+    get inactivePartyBallAsset(): string {
+        return this.preferencesService.getPartyBallAsset();
+    }
+
+    get activePartyBallAsset(): string {
+        return this.preferencesService.getPartyBallAsset(true);
+    }
 
     onMouseDown(event: MouseEvent) {
         this.isActive = true;

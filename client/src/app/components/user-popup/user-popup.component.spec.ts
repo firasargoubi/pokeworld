@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -14,7 +15,8 @@ import { PopupService } from '@app/services/popup/popup.service';
 import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { SocialService } from '@app/services/social/social.service';
 import { UserService } from '@app/services/user/user.service';
-import { UserPreferences } from '@common/interfaces/preferences';
+import { DEFAULT_PREFERENCES, MenuMusicVariant, PartyBallVariant, UserPreferences } from '@common/interfaces/preferences';
+import { ShopItemType } from '@common/interfaces/shop';
 import { SocialListTab } from '@common/interfaces/social';
 import { UserInfo } from '@common/interfaces/user';
 import { TranslateService } from '@ngx-translate/core';
@@ -47,7 +49,7 @@ describe('UserPopupComponent', () => {
         fullProfilePicture: 'full.png',
         balance: 100,
         createdAt: new Date(),
-        preferences: {} as UserPreferences,
+        preferences: { ...DEFAULT_PREFERENCES } as UserPreferences,
         inventory: [],
         challenges: [],
     };
@@ -57,14 +59,20 @@ describe('UserPopupComponent', () => {
         userServiceSpy = jasmine.createSpyObj('UserService', ['edit', 'logout', 'delete', 'setUser'], { user$: mockUserSubject.asObservable() });
         socialServiceSpy = jasmine.createSpyObj('SocialService', ['initialize', 'setActiveTab', 'setSearchQuery']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
-        preferencesServiceSpy = jasmine.createSpyObj('PreferencesService', ['resetPreferences']);
-        audioServiceSpy = jasmine.createSpyObj('AudioService', ['playEffect']);
+        preferencesServiceSpy = jasmine.createSpyObj(
+            'PreferencesService',
+            ['resetPreferences', 'setPartyBall', 'setMenuMusic', 'getPartyBallAssetForVariant', 'getHomeMenuTrack'],
+            { currentPartyBall: PartyBallVariant.Zero, currentMenuMusic: MenuMusicVariant.Zero },
+        );
+        audioServiceSpy = jasmine.createSpyObj('AudioService', ['playEffect', 'playBackgroundMusic']);
         translateServiceSpy = jasmine.createSpyObj('TranslateService', ['instant', 'get', 'stream']);
 
         translateServiceSpy.instant.and.callFake((key: string) => key);
         translateServiceSpy.get.and.callFake((key) => of(key));
         translateServiceSpy.stream.and.callFake((key) => of(key));
         (translateServiceSpy as any).onLangChange = of(null);
+        preferencesServiceSpy.getPartyBallAssetForVariant.and.returnValue('./assets/images/menu/buttons/poke-button/party-ball-0.png');
+        preferencesServiceSpy.getHomeMenuTrack.and.returnValue('menu' as any);
         userServiceSpy.edit.and.returnValue(of(mockUser));
         userServiceSpy.logout.and.returnValue(of(void 0));
         userServiceSpy.delete.and.returnValue(of(void 0));
@@ -179,6 +187,77 @@ describe('UserPopupComponent', () => {
         expect(audioServiceSpy.playEffect).toHaveBeenCalledWith(SoundEffect.Click);
         expect(component.activeCard).toBe(UserCardType.Front);
         expect(component['resetForms']).toHaveBeenCalled();
+    });
+
+    it('should equip an owned party ball from inventory', () => {
+        component.currentUser = {
+            ...mockUser,
+            inventory: [{ itemId: 'party-ball', price: 1000 }],
+        };
+        const inventoryItem = {
+            id: 'party-ball',
+            nameKey: 'components.shopPopup.items.partyBall1',
+            price: 1000,
+            type: ShopItemType.Button,
+            variant: PartyBallVariant.One,
+        };
+
+        component.equipInventoryItem(inventoryItem);
+
+        expect(audioServiceSpy.playEffect).toHaveBeenCalledWith(SoundEffect.Click);
+        expect(preferencesServiceSpy.setPartyBall).toHaveBeenCalledWith(PartyBallVariant.One);
+    });
+
+    it('should use the normal party ball asset in inventory previews', () => {
+        const inventoryItem = {
+            id: 'party-ball',
+            nameKey: 'components.shopPopup.items.partyBall1',
+            price: 1000,
+            type: ShopItemType.Button,
+            variant: PartyBallVariant.One,
+        };
+
+        component.getInventoryItemPreview(inventoryItem);
+
+        expect(preferencesServiceSpy.getPartyBallAssetForVariant).toHaveBeenCalledWith(PartyBallVariant.One, false);
+    });
+
+    it('should include the default party ball in inventory items', () => {
+        expect(component.ownedButtonItems.some((item) => item.id === 'party-ball-0')).toBeTrue();
+    });
+
+    it('should include the default menu music in inventory items', () => {
+        expect(component.ownedMusicItems.some((item) => item.id === 'menu-music-0')).toBeTrue();
+    });
+
+    it('should equip the default party ball from inventory', () => {
+        const inventoryItem = {
+            id: 'party-ball-0',
+            nameKey: 'components.shopPopup.items.partyBall0',
+            price: 0,
+            type: ShopItemType.Button,
+            variant: PartyBallVariant.Zero,
+        };
+
+        component.currentUser = mockUser;
+        component.equipInventoryItem(inventoryItem);
+
+        expect(preferencesServiceSpy.setPartyBall).toHaveBeenCalledWith(PartyBallVariant.Zero);
+    });
+
+    it('should equip the default menu music from inventory', () => {
+        const inventoryItem = {
+            id: 'menu-music-0',
+            nameKey: 'components.shopPopup.items.menuMusic0',
+            price: 0,
+            type: ShopItemType.Music,
+            variant: MenuMusicVariant.Zero,
+        };
+
+        component.currentUser = mockUser;
+        component.equipInventoryItem(inventoryItem);
+
+        expect(preferencesServiceSpy.setMenuMusic).toHaveBeenCalledWith(MenuMusicVariant.Zero);
     });
 
     it('should show error if new username is empty', () => {

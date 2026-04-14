@@ -7,8 +7,9 @@ import { ChatComponent } from '@app/components/chat/chat.component';
 import { MenuButtonComponent } from '@app/components/menu-button/menu-button.component';
 import { ShopPopupComponent } from '@app/components/shop-popup/shop-popup.component';
 import { UserPopupComponent } from '@app/components/user-popup/user-popup.component';
-import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
+import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { UserService } from '@app/services/user/user.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { UserInfo } from '@common/interfaces/user';
@@ -32,32 +33,31 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class MenuPageComponent {
     pageEndpoint = PageEndpoint;
-    readonly audioService: AudioService = inject(AudioService);
-    readonly userService: UserService = inject(UserService);
-    readonly clickValue = SoundEffect.Click;
-    isFirstTime = true;
     isAudioSettingsVisible = false;
     isShopPopupVisible = false;
     isUserPopupVisible = false;
     currentUser: UserInfo | null = null;
+    readonly audioService: AudioService = inject(AudioService);
+    readonly userService: UserService = inject(UserService);
+    readonly clickValue = SoundEffect.Click;
+    private readonly preferencesService: PreferencesService = inject(PreferencesService);
 
     constructor() {
         this.userService.user$.subscribe((u) => {
+            const wasLoggedIn = !!this.currentUser;
             this.currentUser = u;
             if (!u) {
                 this.isShopPopupVisible = false;
                 this.isUserPopupVisible = false;
+                if (wasLoggedIn) {
+                    this.audioService.stopBackgroundMusic();
+                }
+            } else if (!wasLoggedIn) {
+                this.audioService.playBackgroundMusic(this.preferencesService.getHomeMenuTrack());
+                this.audioService.setBackgroundMusicVolume();
+                this.audioService.setEffectsVolume();
             }
         });
-    }
-
-    onMouseDown() {
-        if (this.isFirstTime) {
-            this.audioService.playBackgroundMusic(BackgroundMusic.Home);
-            this.audioService.setBackgroundMusicVolume();
-            this.audioService.setEffectsVolume();
-            this.isFirstTime = false;
-        }
     }
 
     toggleAudioSettings() {

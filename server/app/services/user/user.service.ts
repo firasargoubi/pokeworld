@@ -6,9 +6,9 @@ import { UpdatePreferencesDto } from '@app/model/dto/user/update-preferences.dto
 import { User, UserDocument } from '@app/model/schema/user.schema';
 import { GameService } from '@app/services/game/game.service';
 import { MatchService } from '@app/services/match/match.service';
-import { INITIAL_USER_BALANCE } from '@common/consts/shop.const';
+import { INITIAL_USER_BALANCE, PARTY_BALL_SHOP_ITEM_ID } from '@common/consts/shop.const';
 import { PlayerChallengeData } from '@common/interfaces/challenge-data';
-import { AppLanguage, AppTheme, DEFAULT_PREFERENCES, UserPreferences } from '@common/interfaces/preferences';
+import { DEFAULT_PREFERENCES, PartyBallVariant, UserPreferences } from '@common/interfaces/preferences';
 import { BadRequestException, ConflictException, forwardRef, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as crypto from 'crypto';
@@ -104,7 +104,10 @@ export class UserService {
             inventory: [],
             userId,
             isLoggedIn: true,
-            preferences: createUserDto.preferences ?? DEFAULT_PREFERENCES,
+            preferences: this.normalizePreferences({
+                ...createUserDto.preferences,
+                partyBall: DEFAULT_PREFERENCES.partyBall,
+            }),
             tutorialStep: 0,
         });
 
@@ -235,12 +238,11 @@ export class UserService {
             throw new NotFoundException(`User ${userId} not found`);
         }
 
-        const currentPreferences: UserPreferences = user.preferences
-            ? {
-                  theme: user.preferences.theme as AppTheme,
-                  language: user.preferences.language as AppLanguage,
-              }
-            : { ...DEFAULT_PREFERENCES };
+        const currentPreferences = this.normalizePreferences(user.preferences);
+
+        if (dto.partyBall === PartyBallVariant.One && !(user.inventory ?? []).some((item) => item.itemId === PARTY_BALL_SHOP_ITEM_ID)) {
+            throw new BadRequestException('partyBall.error.notOwned');
+        }
 
         const nextPreferences: UserPreferences = {
             ...currentPreferences,
@@ -269,11 +271,16 @@ export class UserService {
         return crypto.createHmac('sha256', this.passkey).update(password).digest('hex');
     }
 
-    private toUserResponse(user: UserDocument): UserResponseDto {
-        const preferences: UserPreferences = user.preferences
-            ? { theme: user.preferences.theme as AppTheme, language: user.preferences.language as AppLanguage }
-            : { ...DEFAULT_PREFERENCES };
+    private normalizePreferences(preferences?: Partial<UserPreferences> | null): UserPreferences {
+        return {
+            theme: preferences?.theme ?? DEFAULT_PREFERENCES.theme,
+            language: preferences?.language ?? DEFAULT_PREFERENCES.language,
+            partyBall: preferences?.partyBall ?? DEFAULT_PREFERENCES.partyBall,
+            menuMusic: preferences?.menuMusic ?? DEFAULT_PREFERENCES.menuMusic,
+        };
+    }
 
+    private toUserResponse(user: UserDocument): UserResponseDto {
         return {
             userId: user.userId,
             username: user.username,
@@ -284,7 +291,7 @@ export class UserService {
             inventory: user.inventory ?? [],
             challenges: user.challenges ?? [],
             isLoggedIn: user.isLoggedIn,
-            preferences,
+            preferences: this.normalizePreferences(user.preferences),
             tutorialStep: user.tutorialStep || 0,
         };
     }

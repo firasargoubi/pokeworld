@@ -72,7 +72,7 @@ describe('CombatPageComponent', () => {
             'playAvatarsSounds',
         ]);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup', 'keepMessages']);
-        mockI18nService = jasmine.createSpyObj('I18nService', ['translate']);
+        mockI18nService = jasmine.createSpyObj('I18nService', ['translate', 'initialize', 'use']);
         mockI18nService.translate.and.callFake((key: string) => key);
         mockUserService = { user$: of(null) };
 

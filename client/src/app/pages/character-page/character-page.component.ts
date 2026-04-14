@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, inject } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -44,15 +44,22 @@ export class CharacterPageComponent {
     private userService: UserService = inject(UserService);
     private i18nService: I18nService = inject(I18nService);
     private readonly chatService: ChatService = inject(ChatService);
+    private readonly destroyRef: DestroyRef = inject(DestroyRef);
     private router: Router = inject(Router);
 
     constructor() {
         this.userService.user$.subscribe((user: UserInfo | null) => {
             this.user = user;
         });
+
+        const currentUser = this.userService.currentUser;
+        if (currentUser) {
+            this.refreshCurrentUser(currentUser.userId);
+        }
+
         if (this.matchService.isInMatch()) {
             this.updateAvatarList();
-            this.matchService.matchUpdate.pipe(takeUntilDestroyed()).subscribe(this.updateAvatarList.bind(this));
+            this.matchService.matchUpdate.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(this.updateAvatarList.bind(this));
         } else {
             this.router.navigate([PageEndpoint.Menu]);
         }
@@ -112,6 +119,7 @@ export class CharacterPageComponent {
         this.visualData.isAvatarSelected = selfAvatar !== Avatar.Default;
         this.visualData.avatarList = Object.values(Avatar)
             .slice(MIN_SELECTABLE_AVATAR_INDEX, MAX_SELECTABLE_AVATAR_INDEX)
+            .filter((avatar) => this.isAvatarVisible(avatar))
             .map((avatar) => ({
                 avatar,
                 name: AVATAR_DATA[avatar].name,
@@ -119,6 +127,14 @@ export class CharacterPageComponent {
                 isLocked: lockedAvatars.includes(avatar),
                 isSelected: selfAvatar === avatar,
             }));
+    }
+
+    private isAvatarVisible(avatar: Avatar): boolean {
+        const premiumAvatarIds: Avatar[] = [Avatar.Avatar13, Avatar.Avatar14, Avatar.Avatar15];
+        if (premiumAvatarIds.includes(avatar)) {
+            return (this.user?.inventory ?? []).some((item) => item.itemId === avatar);
+        }
+        return true;
     }
 
     private getPlayerData(): PlayerData {
@@ -140,5 +156,16 @@ export class CharacterPageComponent {
             warningList.push(`- ${this.i18nService.translate('pages.character.chooseAvatarWarning')}`);
         }
         return warningList;
+    }
+
+    private refreshCurrentUser(userId: string): void {
+        this.userService
+            .getUserById(userId)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((user) => {
+                this.user = user;
+                this.userService.setUser(user);
+                this.updateAvatarList();
+            });
     }
 }

@@ -17,11 +17,12 @@ import { MapService } from '@app/services/map/map.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PlayService } from '@app/services/play/play.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { ThumbnailService } from '@app/services/thumbnail/thumbnail.service';
 import { TileDescriptionService } from '@app/services/tile-description/tile-description.service';
-import { PlayerChallengeData } from '@common/interfaces/challenge-data';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { MAX_PLAYERS } from '@common/consts/player-data.const';
+import { PlayerChallengeData } from '@common/interfaces/challenge-data';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { ItemType } from '@common/interfaces/item-type.enum';
 import { MatchState } from '@common/interfaces/match-data';
@@ -47,6 +48,8 @@ export class PlayPageComponent {
     private mapService: MapService = inject(MapService);
     private router: Router = inject(Router);
     private readonly audioService: AudioService = inject(AudioService);
+    private readonly preferencesService: PreferencesService = inject(PreferencesService);
+
     private previousItems: ItemType[] = [];
     private previousActivePlayerIndex: number = -1;
 
@@ -60,6 +63,9 @@ export class PlayPageComponent {
         }
         this.audioService.preloadEffectsForPage(PLAY_PAGE_EFFECT);
         this.audioService.playBackgroundMusic(BackgroundMusic.Play);
+    }
+    get partyBallImage(): string {
+        return `url(${this.preferencesService.getPartyBallAsset()})`;
     }
 
     get selfChallenge(): PlayerChallengeData | null {

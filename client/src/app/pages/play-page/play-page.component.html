@@ -3,7 +3,8 @@
     [ngStyle]="{
         '--player-count': visualData.players.length,
         '--current-player-turn': visualData.activePlayerArrowIndex,
-        '--bg-url': 'url(' + visualData.thumbnailUrl + ')'
+        '--bg-url': 'url(' + visualData.thumbnailUrl + ')',
+        '--party-ball-image': partyBallImage
     }"
     (click)="hideTileDescription()"
 >

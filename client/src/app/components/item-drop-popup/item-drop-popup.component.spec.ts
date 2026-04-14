@@ -1,8 +1,9 @@
+import { HttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ItemType } from '@common/interfaces/item-type.enum';
-import { ItemDropPopupComponent } from './item-drop-popup.component';
 import { PlayService } from '@app/services/play/play.service';
+import { ItemType } from '@common/interfaces/item-type.enum';
 import { TranslateModule } from '@ngx-translate/core';
+import { ItemDropPopupComponent } from './item-drop-popup.component';
 
 describe('ItemDropPopupComponent', () => {
     let component: ItemDropPopupComponent;
@@ -14,7 +15,10 @@ describe('ItemDropPopupComponent', () => {
 
         TestBed.configureTestingModule({
             imports: [TranslateModule.forRoot()],
-            providers: [{ provide: PlayService, useValue: playServiceMock }],
+            providers: [
+                { provide: PlayService, useValue: playServiceMock },
+                { provide: HttpClient, useValue: HttpClient },
+            ],
         });
 
         fixture = TestBed.createComponent(ItemDropPopupComponent);

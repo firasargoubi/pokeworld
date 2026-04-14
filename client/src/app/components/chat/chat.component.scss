@@ -705,7 +705,7 @@ $stylized-small-padding-size: calc($pixel-size * 5);
     left: 0;
     height: 100%;
     width: 100%;
-    background-image: url($img-avatar-frame);
+    background-image: var(--party-ball-image);
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;

@@ -1,4 +1,4 @@
-import { AppLanguage, AppTheme } from '../interfaces/preferences';
+import { AppLanguage, AppTheme, MenuMusicVariant, PartyBallVariant } from '../interfaces/preferences';
 import { UserInfo } from '../interfaces/user';
 
 export const MOCK_USER_INFO: UserInfo[] = [
@@ -9,7 +9,7 @@ export const MOCK_USER_INFO: UserInfo[] = [
         fullProfilePicture: 'full-profile.jpg',
         balance: 100,
         createdAt: new Date(),
-        preferences: { language: AppLanguage.English, theme: AppTheme.Dark },
+        preferences: { language: AppLanguage.French, theme: AppTheme.Default, partyBall: PartyBallVariant.Zero, menuMusic: MenuMusicVariant.Zero },
         inventory: [],
         challenges: [],
         email: '',
@@ -21,7 +21,7 @@ export const MOCK_USER_INFO: UserInfo[] = [
         fullProfilePicture: 'full-profile2.jpg',
         balance: 150,
         createdAt: new Date(),
-        preferences: { language: AppLanguage.French, theme: AppTheme.Default },
+        preferences: { language: AppLanguage.French, theme: AppTheme.Default, partyBall: PartyBallVariant.Zero, menuMusic: MenuMusicVariant.Zero },
         inventory: [],
         challenges: [],
         email: '',

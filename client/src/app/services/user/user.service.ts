@@ -31,6 +31,10 @@ export class UserService {
         return this.http.get<UserInfo[]>(`${this.baseUrl}/${ApiEndpoint.User}`);
     }
 
+    getUserById(userId: string): Observable<UserInfo> {
+        return this.http.get<UserInfo>(`${this.baseUrl}/${ApiEndpoint.User}/${userId}`);
+    }
+
     login(username: string, password: string): Observable<UserInfo> {
         return this.http.post<UserInfo>(`${this.baseUrl}/${ApiEndpoint.User}/login`, { username, password });
     }

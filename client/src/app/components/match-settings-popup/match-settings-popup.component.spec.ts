@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { SimpleChange } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SoundEffect } from '@app/interfaces/sound-service';
@@ -32,6 +33,7 @@ describe('MatchSettingsPopupComponent', () => {
             providers: [
                 { provide: AudioService, useValue: audioServiceSpy },
                 { provide: MatchService, useValue: matchServiceMock },
+                { provide: HttpClient, useValue: HttpClient },
             ],
         }).compileComponents();
 

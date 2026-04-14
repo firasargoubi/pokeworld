@@ -10,7 +10,10 @@ export enum SoundEffect {
 }
 
 export enum BackgroundMusic {
-    Home = 'menu.mp3',
+    Home = 'menu0.mp3',
+    Home1 = 'menu1.mp3',
+    Home2 = 'menu2.mp3',
+    Home3 = 'menu3.mp3',
     Play = 'play.mp3',
     Combat = 'combat.mp3',
     Edit = 'edit.mp3',

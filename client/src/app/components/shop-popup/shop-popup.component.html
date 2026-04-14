@@ -1,28 +1,117 @@
 <div class="shop-popup">
-    <div class="shop-card">
-        <div class="shop-content">
-            <div class="header-row">
-                <p class="title">{{ 'components.shopPopup.title' | translate }}</p>
-                <div class="balance-pill">{{ currentUser?.balance ?? 0 }} $</div>
+    <div class="shop-card-shell">
+        <div class="shop-card">
+            <div class="shop-header">
+                <div class="shop-title-icon"></div>
+                <p class="shop-title">{{ 'components.shopPopup.title' | translate }}</p>
+                <div class="shop-title-icon"></div>
             </div>
 
-            <div class="items-grid">
-                @for(item of shopItems; track item.id) {
-                <button
-                    class="shop-item"
-                    type="button"
-                    [class.owned]="isOwned(item.id)"
-                    (click)="purchaseItem(item)"
-                    [disabled]="!currentUser || isLoading || isOwned(item.id)"
-                >
-                    <span class="item-edge"></span>
-                    <span class="item-body">
-                        <span class="item-name">{{ item.nameKey | translate }}</span>
-                        <span class="item-price">{{ item.price }} $</span>
-                    </span>
-                    <span class="item-edge"></span>
-                </button>
-                }
+            <div class="shop-body">
+                <div class="items-panel">
+                    <div class="items-scroll">
+                        @if (buttonItems.length > 0) {
+                        <p class="section-label">{{ 'components.shopPopup.typeButton' | translate }}</p>
+                        <div class="items-grid">
+                            @for (item of buttonItems; track item.id) {
+                            <button
+                                class="shop-item"
+                                type="button"
+                                [class.owned]="isOwned(item.id)"
+                                [class.selected]="selectedItem?.id === item.id"
+                                (click)="selectItem(item)"
+                            >
+                                <img class="item-thumb" [src]="getItemPreview(item)" [alt]="item.nameKey | translate" />
+                                <span class="item-name">{{ item.nameKey | translate }}</span>
+                                @if (isOwned(item.id)) {
+                                <span class="item-status owned-label">{{ 'components.shopPopup.owned' | translate }}</span>
+                                } @else {
+                                <span class="item-status item-price">{{ item.price }} $</span>
+                                }
+                            </button>
+                            }
+                        </div>
+                        } @if (musicItems.length > 0) {
+                        <div class="section-divider"></div>
+                        <p class="section-label">{{ 'components.shopPopup.typeMusic' | translate }}</p>
+                        <div class="items-grid">
+                            @for (item of musicItems; track item.id) {
+                            <button
+                                class="shop-item"
+                                type="button"
+                                [class.owned]="isOwned(item.id)"
+                                [class.selected]="selectedItem?.id === item.id"
+                                (click)="selectItem(item)"
+                            >
+                                <span class="item-name">{{ item.nameKey | translate }}</span>
+                                @if (isOwned(item.id)) {
+                                <span class="item-status owned-label">{{ 'components.shopPopup.owned' | translate }}</span>
+                                } @else {
+                                <span class="item-status item-price">{{ item.price }} $</span>
+                                }
+                            </button>
+                            }
+                        </div>
+                        } @if (pokemonItems.length > 0) {
+                        <div class="section-divider"></div>
+                        <p class="section-label">{{ 'components.shopPopup.typePokemon' | translate }}</p>
+                        <div class="items-grid">
+                            @for (item of pokemonItems; track item.id) {
+                            <button
+                                class="shop-item"
+                                type="button"
+                                [class.owned]="isOwned(item.id)"
+                                [class.selected]="selectedItem?.id === item.id"
+                                (click)="selectItem(item)"
+                            >
+                                <img class="item-thumb" [src]="getPokemonPreview(item)" [alt]="item.nameKey | translate" />
+                                <span class="item-name">{{ item.nameKey | translate }}</span>
+                                @if (isOwned(item.id)) {
+                                <span class="item-status owned-label">{{ 'components.shopPopup.owned' | translate }}</span>
+                                } @else {
+                                <span class="item-status item-price">{{ item.price }} $</span>
+                                }
+                            </button>
+                            }
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="detail-panel">
+                    @if (selectedItem) {
+                    <div class="detail-preview">
+                        @if (isButtonItem(selectedItem)) {
+                        <img class="detail-image" [src]="getItemPreview(selectedItem)" [alt]="selectedItem.nameKey | translate" />
+                        } @else if (isMusicItem(selectedItem)) {
+                        <div class="music-preview">
+                            <div class="music-note">&#9834;</div>
+                            <span class="music-track-label"
+                                >{{ 'components.shopPopup.track' | translate }} {{ getMusicTrackNumber(selectedItem) }}</span
+                            >
+                        </div>
+                        } @else if (isPokemonItem(selectedItem)) {
+                        <img class="detail-image" [src]="getPokemonPreview(selectedItem)" [alt]="selectedItem.nameKey | translate" />
+                        }
+                    </div>
+                    <div class="detail-name">{{ selectedItem.nameKey | translate }}</div>
+                    <button
+                        class="buy-button"
+                        type="button"
+                        [disabled]="!currentUser || isLoading || isOwned(selectedItem.id)"
+                        (click)="purchaseItem(selectedItem)"
+                    >
+                        @if (isOwned(selectedItem.id)) {
+                        {{ 'components.shopPopup.owned' | translate }}
+                        } @else {
+                        {{ 'components.shopPopup.buy' | translate }} - {{ selectedItem.price }} $ }
+                    </button>
+                    }
+                </div>
+            </div>
+
+            <div class="shop-footer">
+                <span class="balance-label">{{ 'components.shopPopup.balance' | translate }}: {{ currentUser?.balance ?? 0 }} $</span>
             </div>
         </div>
     </div>

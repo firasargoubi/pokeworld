@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { ElementRef, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
@@ -53,7 +54,7 @@ describe('ChatComponent', () => {
             },
         });
         mockAudioService = jasmine.createSpyObj('AudioService', ['playEffect', 'preloadEffectsForPage']);
-        i18nServiceSpy = jasmine.createSpyObj('I18nService', ['translate']);
+        i18nServiceSpy = jasmine.createSpyObj('I18nService', ['translate', 'initialize']);
         i18nServiceSpy.translate.and.callFake((message: string) => message);
 
         await TestBed.configureTestingModule({
@@ -63,6 +64,7 @@ describe('ChatComponent', () => {
                 { provide: MatchService, useValue: matchServiceSpy },
                 { provide: AudioService, useValue: mockAudioService },
                 { provide: I18nService, useValue: i18nServiceSpy },
+                { provide: HttpClient, useValue: HttpClient },
             ],
         }).compileComponents();
 

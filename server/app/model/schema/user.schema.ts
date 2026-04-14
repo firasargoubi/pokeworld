@@ -1,6 +1,6 @@
 import { INITIAL_USER_BALANCE } from '@common/consts/shop.const';
 import { UserChallengeData } from '@common/interfaces/challenge-data';
-import { AppLanguage, AppTheme } from '@common/interfaces/preferences';
+import { AppLanguage, AppTheme, DEFAULT_PREFERENCES, MenuMusicVariant, PartyBallVariant } from '@common/interfaces/preferences';
 import { InventoryItem } from '@common/interfaces/shop';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger/dist/decorators/api-property.decorator';
@@ -30,6 +30,12 @@ export class UserPreferencesSchema {
 
     @Prop({ type: String, enum: Object.values(AppLanguage), default: AppLanguage.French })
     language: AppLanguage;
+
+    @Prop({ type: String, enum: Object.values(PartyBallVariant), default: PartyBallVariant.Zero })
+    partyBall: PartyBallVariant;
+
+    @Prop({ type: String, enum: Object.values(MenuMusicVariant), default: MenuMusicVariant.Zero })
+    menuMusic: MenuMusicVariant;
 }
 
 @Schema()
@@ -68,7 +74,7 @@ export class User {
     @Prop({ required: true, default: false })
     deleted: boolean;
 
-    @Prop({ type: UserPreferencesSchema, default: () => ({ theme: AppTheme.Default, language: AppLanguage.French }) })
+    @Prop({ type: UserPreferencesSchema, default: () => ({ ...DEFAULT_PREFERENCES }) })
     preferences: UserPreferencesSchema;
 
     @Prop({ default: 0 })

@@ -321,7 +321,7 @@ $player-card-width: calc($base-size * 70);
     transition: filter 0.2s ease-in-out;
 }
 
-.button-container:hover *:not(.icon) {
+.button-container:hover * {
     filter: brightness(1.1);
 }
 

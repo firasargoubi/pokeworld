@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ChatService } from '@app/services/chat/chat.service';
 import { I18nService } from '@app/services/i18n/i18n.service';
 import { UserService } from '@app/services/user/user.service';
-import { AppLanguage, AppTheme, DEFAULT_PREFERENCES } from '@common/interfaces/preferences';
+import { AppLanguage, AppTheme, DEFAULT_PREFERENCES, MenuMusicVariant, PartyBallVariant } from '@common/interfaces/preferences';
 import { UserInfo } from '@common/interfaces/user';
 import { BehaviorSubject, of } from 'rxjs';
 import { PreferencesService } from './preferences.service';
@@ -61,10 +61,16 @@ describe('PreferencesService', () => {
     });
 
     it('should sync preferences after login', () => {
-        service.syncAfterLogin('user-1', { theme: AppTheme.Dark, language: AppLanguage.English });
+        service.syncAfterLogin('user-1', {
+            theme: AppTheme.Dark,
+            language: AppLanguage.English,
+            partyBall: PartyBallVariant.One,
+            menuMusic: MenuMusicVariant.Zero,
+        });
 
         expect(service.currentTheme).toBe(AppTheme.Dark);
         expect(service.currentLanguage).toBe(AppLanguage.English);
+        expect(service.currentPartyBall).toBe(PartyBallVariant.One);
         expect(testDocument.body.classList.contains('app-theme-dark')).toBeTrue();
         expect(i18nServiceSpy.use).toHaveBeenCalledWith(AppLanguage.English);
     });
@@ -75,6 +81,8 @@ describe('PreferencesService', () => {
             of({
                 theme: AppTheme.Dark,
                 language: AppLanguage.French,
+                partyBall: PartyBallVariant.Zero,
+                menuMusic: MenuMusicVariant.Zero,
             }),
         );
 
@@ -90,6 +98,8 @@ describe('PreferencesService', () => {
             of({
                 theme: AppTheme.Default,
                 language: AppLanguage.English,
+                partyBall: PartyBallVariant.Zero,
+                menuMusic: MenuMusicVariant.Zero,
             }),
         );
 
@@ -100,12 +110,35 @@ describe('PreferencesService', () => {
         expect(i18nServiceSpy.use).toHaveBeenCalledWith(AppLanguage.English);
     });
 
+    it('should patch party ball when user is connected', () => {
+        service.syncAfterLogin('user-5', { ...DEFAULT_PREFERENCES });
+        userServiceSpy.updatePreferences.and.returnValue(
+            of({
+                theme: AppTheme.Default,
+                language: AppLanguage.French,
+                partyBall: PartyBallVariant.One,
+                menuMusic: MenuMusicVariant.Zero,
+            }),
+        );
+
+        service.setPartyBall(PartyBallVariant.One);
+
+        expect(userServiceSpy.updatePreferences).toHaveBeenCalledWith('user-5', { partyBall: PartyBallVariant.One });
+        expect(service.currentPartyBall).toBe(PartyBallVariant.One);
+    });
+
     it('should reset preferences and remove dark theme on logout reset', () => {
-        service.syncAfterLogin('user-4', { theme: AppTheme.Dark, language: AppLanguage.English });
+        service.syncAfterLogin('user-4', {
+            theme: AppTheme.Dark,
+            language: AppLanguage.English,
+            partyBall: PartyBallVariant.One,
+            menuMusic: MenuMusicVariant.Zero,
+        });
 
         service.resetPreferences();
 
         expect(service.currentTheme).toBe(AppTheme.Default);
+        expect(service.currentPartyBall).toBe(PartyBallVariant.Zero);
         expect(testDocument.body.classList.contains('app-theme-dark')).toBeFalse();
     });
 

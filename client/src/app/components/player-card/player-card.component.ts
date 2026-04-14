@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { LobbyPlayerVisualData } from '@app/interfaces/lobby-visual-data';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -14,6 +15,11 @@ export class PlayerCardComponent {
     @Input() displayKickButton: boolean = false;
     @Input() onClick: () => void;
     @Output() addBot = new EventEmitter<void>();
+    private readonly preferencesService: PreferencesService = inject(PreferencesService);
+
+    get partyBallImage(): string {
+        return `url(${this.preferencesService.getPartyBallAsset()})`;
+    }
 
     onAddBot() {
         this.addBot.emit();

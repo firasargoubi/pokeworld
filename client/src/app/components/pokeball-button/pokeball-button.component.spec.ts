@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { PokeballButtonComponent } from './pokeball-button.component';
 
 @Component({
@@ -17,10 +18,17 @@ class TestHostComponent {
 describe('PokeballButtonComponent', () => {
     let component: PokeballButtonComponent;
     let fixture: ComponentFixture<TestHostComponent>;
+    let preferencesServiceSpy: jasmine.SpyObj<PreferencesService>;
 
     beforeEach(async () => {
+        preferencesServiceSpy = jasmine.createSpyObj('PreferencesService', ['getPartyBallAsset']);
+        preferencesServiceSpy.getPartyBallAsset.and.callFake((isActive?: boolean) =>
+            isActive ? './assets/images/menu/buttons/poke-button/party-ball-sel-0.png' : './assets/images/menu/buttons/poke-button/party-ball-0.png',
+        );
+
         await TestBed.configureTestingModule({
             imports: [PokeballButtonComponent, TestHostComponent],
+            providers: [{ provide: PreferencesService, useValue: preferencesServiceSpy }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(TestHostComponent);
@@ -40,6 +48,11 @@ describe('PokeballButtonComponent', () => {
 
     it('should display Test Button as the button content', () => {
         expect(component.buttonContent).toBe('Test Button');
+    });
+
+    it('should expose party ball assets from preferences', () => {
+        expect(component.inactivePartyBallAsset).toContain('party-ball-0.png');
+        expect(component.activePartyBallAsset).toContain('party-ball-sel-0.png');
     });
 
     it('should set isActive to true on mouse down', () => {

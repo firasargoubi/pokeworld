@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EMPTY_IMAGE } from '@app/consts/images.const';
 import { TranslateModule } from '@ngx-translate/core';
@@ -10,6 +11,7 @@ describe('PlayerCardComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [PlayerCardComponent, TranslateModule.forRoot()],
+            providers: [{ provide: HttpClient, useValue: HttpClient }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(PlayerCardComponent);

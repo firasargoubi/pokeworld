@@ -3,7 +3,8 @@ import { inject, Injectable } from '@angular/core';
 import { ChatService } from '@app/services/chat/chat.service';
 import { I18nService } from '@app/services/i18n/i18n.service';
 import { UserService } from '@app/services/user/user.service';
-import { AppLanguage, AppTheme, DEFAULT_PREFERENCES, UserPreferences } from '@common/interfaces/preferences';
+import { AppLanguage, AppTheme, DEFAULT_PREFERENCES, MenuMusicVariant, PartyBallVariant, UserPreferences } from '@common/interfaces/preferences';
+import { BackgroundMusic } from '@app/interfaces/sound-service';
 
 @Injectable({
     providedIn: 'root',
@@ -30,7 +31,7 @@ export class PreferencesService {
         this.userService.user$.subscribe((user) => {
             if (user) {
                 this.currentUserId = user.userId;
-                this.currentPreferences = user.preferences ?? { ...DEFAULT_PREFERENCES };
+                this.currentPreferences = this.normalizePreferences(user.preferences);
                 this.applyTheme(this.currentPreferences.theme);
                 this.applyLanguage(this.currentPreferences.language);
                 return;
@@ -38,7 +39,7 @@ export class PreferencesService {
 
             this.currentUserId = null;
             this.currentPreferences = {
-                theme: AppTheme.Default,
+                ...DEFAULT_PREFERENCES,
                 language: this.preAuthLanguage,
             };
             this.applyTheme(this.currentPreferences.theme);
@@ -52,6 +53,14 @@ export class PreferencesService {
 
     get currentLanguage(): AppLanguage {
         return this.currentPreferences.language;
+    }
+
+    get currentPartyBall(): PartyBallVariant {
+        return this.currentPreferences.partyBall;
+    }
+
+    get currentMenuMusic(): MenuMusicVariant {
+        return this.currentPreferences.menuMusic ?? MenuMusicVariant.Zero;
     }
 
     setLanguageBeforeAuth(language: AppLanguage): void {
@@ -70,7 +79,7 @@ export class PreferencesService {
 
     syncAfterLogin(userId: string, preferences: UserPreferences): void {
         this.currentUserId = userId;
-        this.currentPreferences = preferences ?? { ...DEFAULT_PREFERENCES };
+        this.currentPreferences = this.normalizePreferences(preferences);
         this.applyTheme(this.currentPreferences.theme);
         this.applyLanguage(this.currentPreferences.language);
     }
@@ -86,8 +95,8 @@ export class PreferencesService {
 
         this.userService.updatePreferences(this.currentUserId, { theme }).subscribe({
             next: (preferences) => {
-                this.currentPreferences = preferences;
-                this.applyTheme(preferences.theme);
+                this.currentPreferences = this.normalizePreferences(preferences);
+                this.applyTheme(this.currentPreferences.theme);
             },
             error: () => {
                 this.currentPreferences = previousPreferences;
@@ -108,8 +117,8 @@ export class PreferencesService {
 
         this.userService.updatePreferences(this.currentUserId, { language }).subscribe({
             next: (preferences) => {
-                this.currentPreferences = preferences;
-                this.applyLanguage(preferences.language);
+                this.currentPreferences = this.normalizePreferences(preferences);
+                this.applyLanguage(this.currentPreferences.language);
             },
             error: () => {
                 this.currentPreferences = previousPreferences;
@@ -118,10 +127,65 @@ export class PreferencesService {
         });
     }
 
+    setMenuMusic(menuMusic: MenuMusicVariant): void {
+        const previousPreferences = { ...this.currentPreferences };
+        this.currentPreferences = { ...this.currentPreferences, menuMusic };
+
+        if (!this.currentUserId) {
+            return;
+        }
+
+        this.userService.updatePreferences(this.currentUserId, { menuMusic }).subscribe({
+            next: (preferences) => {
+                this.currentPreferences = this.normalizePreferences(preferences);
+            },
+            error: () => {
+                this.currentPreferences = previousPreferences;
+            },
+        });
+    }
+
+    getHomeMenuTrack(): BackgroundMusic {
+        const variantMap: Record<MenuMusicVariant, BackgroundMusic> = {
+            [MenuMusicVariant.Zero]: BackgroundMusic.Home,
+            [MenuMusicVariant.One]: BackgroundMusic.Home1,
+            [MenuMusicVariant.Two]: BackgroundMusic.Home2,
+            [MenuMusicVariant.Three]: BackgroundMusic.Home3,
+        };
+        return variantMap[this.currentMenuMusic] ?? BackgroundMusic.Home;
+    }
+
+    setPartyBall(partyBall: PartyBallVariant): void {
+        const previousPreferences = { ...this.currentPreferences };
+        this.currentPreferences = { ...this.currentPreferences, partyBall };
+
+        if (!this.currentUserId) {
+            return;
+        }
+
+        this.userService.updatePreferences(this.currentUserId, { partyBall }).subscribe({
+            next: (preferences) => {
+                this.currentPreferences = this.normalizePreferences(preferences);
+            },
+            error: () => {
+                this.currentPreferences = previousPreferences;
+            },
+        });
+    }
+
+    getPartyBallAsset(isActive = false): string {
+        return this.getPartyBallAssetForVariant(this.currentPartyBall, isActive);
+    }
+
+    getPartyBallAssetForVariant(variant: PartyBallVariant, isActive = false): string {
+        const selectedSuffix = isActive ? '-sel' : '';
+        return `./assets/images/menu/buttons/poke-button/party-ball${selectedSuffix}-${variant}.png`;
+    }
+
     resetPreferences(): void {
         this.currentUserId = null;
         this.currentPreferences = {
-            theme: AppTheme.Default,
+            ...DEFAULT_PREFERENCES,
             language: this.preAuthLanguage,
         };
         this.applyTheme(this.currentPreferences.theme);
@@ -135,6 +199,15 @@ export class PreferencesService {
         }
 
         return DEFAULT_PREFERENCES.language;
+    }
+
+    private normalizePreferences(preferences?: Partial<UserPreferences> | null): UserPreferences {
+        return {
+            theme: preferences?.theme ?? DEFAULT_PREFERENCES.theme,
+            language: preferences?.language ?? DEFAULT_PREFERENCES.language,
+            partyBall: preferences?.partyBall ?? DEFAULT_PREFERENCES.partyBall,
+            menuMusic: preferences?.menuMusic ?? DEFAULT_PREFERENCES.menuMusic,
+        };
     }
 
     private applyTheme(theme: AppTheme): void {

@@ -5,8 +5,9 @@ import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
-import { BackgroundMusic, SoundEffect } from '@app/interfaces/sound-service';
+import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { MatchService } from '@app/services/match/match.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { MATCH_CODE_LENGTH } from '@common/consts/match-data.const';
@@ -29,6 +30,7 @@ export class JoinPageComponent implements OnInit, OnDestroy {
     readonly audioService: AudioService = inject(AudioService);
     readonly clickValue = SoundEffect.Click;
     private isJoiningMatch = false;
+    private readonly preferencesService: PreferencesService = inject(PreferencesService);
     private router: Router = inject(Router);
     private matchService: MatchService = inject(MatchService);
     private readonly socketService: SocketService = inject(SocketService);
@@ -38,7 +40,7 @@ export class JoinPageComponent implements OnInit, OnDestroy {
         this.socketService.on(JoinPageEvent.UpdateMatchList, (matches: MatchData[]) => {
             this.availableMaches = matches;
         });
-        this.audioService.playBackgroundMusic(BackgroundMusic.Home);
+        this.audioService.playBackgroundMusic(this.preferencesService.getHomeMenuTrack());
     }
 
     async joinMatch(matchCode: string) {

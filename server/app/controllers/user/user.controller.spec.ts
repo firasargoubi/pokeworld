@@ -3,7 +3,7 @@ import { LoginUserDto } from '@app/model/dto/user/login-user.dto';
 import { UserResponseDto } from '@app/model/dto/user/response-user.dto';
 import { UpdatePreferencesDto } from '@app/model/dto/user/update-preferences.dto';
 import { UserService } from '@app/services/user/user.service';
-import { AppLanguage, AppTheme, DEFAULT_PREFERENCES } from '@common/interfaces/preferences';
+import { AppLanguage, AppTheme, DEFAULT_PREFERENCES, MenuMusicVariant, PartyBallVariant } from '@common/interfaces/preferences';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { UserController } from './user.controller';
@@ -84,6 +84,18 @@ describe('UserController', () => {
         });
     });
 
+    describe('getUserById', () => {
+        it('should return a user by id', async () => {
+            const userId = 'user123';
+            userService.getUserResponseById.resolves(fakeUserResponse);
+
+            const res = await controller.getUserById(userId);
+
+            expect(res).toBe(fakeUserResponse);
+            expect(userService.getUserResponseById.calledWith(userId)).toBeTruthy();
+        });
+    });
+
     describe('register', () => {
         it('should create a new user', async () => {
             const createUserDto: CreateUserDto = {
@@ -142,7 +154,12 @@ describe('UserController', () => {
         it('should update preferences successfully', async () => {
             const userId = 'user123';
             const dto: UpdatePreferencesDto = { language: AppLanguage.English };
-            const updated = { theme: AppTheme.Default, language: AppLanguage.English };
+            const updated = {
+                theme: AppTheme.Default,
+                language: AppLanguage.English,
+                partyBall: PartyBallVariant.Zero,
+                menuMusic: MenuMusicVariant.Zero,
+            };
 
             userService.updatePreferences.resolves(updated);
 
