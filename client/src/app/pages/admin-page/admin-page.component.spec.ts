@@ -7,6 +7,7 @@ import { GameCardComponent } from '@app/components/game-card/game-card.component
 import { PopupMessage } from '@app/consts/popup-message.const';
 import { AudioService } from '@app/services/audio/audio.service';
 import { ChatService } from '@app/services/chat/chat.service';
+import { EditorService } from '@app/services/editor/editor.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { I18nService } from '@app/services/i18n/i18n.service';
@@ -41,9 +42,11 @@ describe('AdminPageComponent', () => {
     let mockAudioService: jasmine.SpyObj<AudioService>;
     let i18nServiceSpy: jasmine.SpyObj<I18nService>;
     let gameDataService: jasmine.SpyObj<GameDataService>;
+    let editorServiceSpy: jasmine.SpyObj<EditorService>;
 
     beforeEach(async () => {
         gameSaveServiceSpy = jasmine.createSpyObj<GameSaveService>('GameSaveService', ['getAllGames', 'getGame', 'deleteGame']);
+        editorServiceSpy = jasmine.createSpyObj('EditorService', ['']);
         popupServiceSpy = jasmine.createSpyObj('PopupService', ['showPopup']);
         i18nServiceSpy = jasmine.createSpyObj('I18nService', ['translate', 'initialize']);
         i18nServiceSpy.translate.and.callFake((message: string) => message);
@@ -66,6 +69,7 @@ describe('AdminPageComponent', () => {
                 { provide: ChatService, useValue: chatServiceSpy },
                 { provide: GameDataService, useValue: gameDataService },
                 { provide: I18nService, useValue: i18nServiceSpy },
+                { provide: EditorService, useValue: editorServiceSpy },
                 { provide: HttpClient, useValue: HttpClient },
             ],
         }).compileComponents();

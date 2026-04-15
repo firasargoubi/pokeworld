@@ -11,10 +11,10 @@
     <div class="game-card">
         <div class="card-body">
             <div class="game-thumbnail" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
-                <p class="game-name">
-                    {{ game.name }}<br />
+                <div class="game-name" title="{{ game.name }}">
+                    <p class="game-label">{{ game.name }}</p>
                     <span class="game-owner">{{ 'components.gameCard.owner' | translate }} {{ game.owner ? game.owner.userName : 'Unknown' }}</span>
-                </p>
+                </div>
                 <p class="size-info">{{ game.mapData.size }}x{{ game.mapData.size }}</p>
                 @if(matchData){
                 <div class="match-state-container">
@@ -46,11 +46,17 @@
                         </div>
                         <div class="button-edge"></div>
                     </div>
-
                     <div class="admin-button-container delete-button" (click)="onDelete()">
                         <div class="button-edge"></div>
                         <div class="button-body">
                             <img src="./assets/images/menu/buttons/admin-button/bin.png" class="button-icon" />
+                        </div>
+                        <div class="button-edge"></div>
+                    </div>
+                    <div class="admin-button-container duplicate-button" (click)="onDuplicate()">
+                        <div class="button-edge"></div>
+                        <div class="button-body">
+                            <img src="./assets/images/menu/buttons/admin-button/duplicate.png" class="button-icon" />
                         </div>
                         <div class="button-edge"></div>
                     </div>

@@ -1,8 +1,10 @@
 export enum PopupMessage {
     DeleteGame = 'popup.deleteGame',
+    DuplicateGame = 'popup.duplicateGame',
     Quit = 'popup.quit',
     QuitEditPage = 'popup.quitEditPage',
     SuccessfulSave = 'popup.successfulSave',
+    SuccessfulDuplication = 'popup.successfulDuplication',
     CancelModification = 'popup.cancelModification',
     GameDoesNotExist = 'popup.gameDoesNotExist',
     ErrorFetchingGame = 'popup.errorFetchingGame',

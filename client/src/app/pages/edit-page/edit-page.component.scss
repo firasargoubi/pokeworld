@@ -118,13 +118,42 @@ app-map {
     margin-bottom: $final-margin-bot;
     margin-left: $final-margin-left;
     margin-right: $final-margin-right;
-    padding: calc($final-side-width * 0.058) calc($final-side-width * 0.075);
+    padding: calc($final-side-width * 0.058) calc($final-side-width * 0.012) calc($final-side-width * 0.058) calc($final-side-width * 0.075);
 
     background-image: url($gray-box-rectangle);
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
-    overflow: scroll;
+    overflow-y: overlay;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+
+    &::-webkit-scrollbar {
+        width: calc($final-side-width * 0.012);
+        margin-right: calc($final-side-width * 0.008);
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+        margin: calc($final-side-width * 0.012) 0;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.15);
+        border-radius: calc($final-side-width * 0.012);
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+    }
+}
+
+.editor-left-body {
+    height: 98%;
+    width: 100%;
+    padding-right: calc($final-side-width * 0.012);
+    overflow-y: scroll;
 }
 
 .editor-right {

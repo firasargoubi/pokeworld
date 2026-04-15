@@ -8,13 +8,15 @@ import { GameCardComponent } from '@app/components/game-card/game-card.component
 import { HeaderComponent } from '@app/components/header/header.component';
 import { PokeballButtonComponent } from '@app/components/pokeball-button/pokeball-button.component';
 import { PopupMessage } from '@app/consts/popup-message.const';
+import { PopupColor } from '@app/interfaces/popup';
 import { SoundEffect } from '@app/interfaces/sound-service';
 import { AudioService } from '@app/services/audio/audio.service';
-import { PreferencesService } from '@app/services/preferences/preferences.service';
+import { EditorService } from '@app/services/editor/editor.service';
 import { GameDataService } from '@app/services/game-data/game-data.service';
 import { GameSaveService } from '@app/services/game-save/game-save.service';
 import { I18nService } from '@app/services/i18n/i18n.service';
 import { PopupService } from '@app/services/popup/popup.service';
+import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { PageEndpoint } from '@common/interfaces/endpoint.enum';
 import { GameData } from '@common/interfaces/game-data';
 import { GameState } from '@common/interfaces/game-state.enum';
@@ -33,6 +35,7 @@ export class AdminPageComponent implements OnInit {
     private readonly preferencesService: PreferencesService = inject(PreferencesService);
     private readonly router: Router = inject(Router);
     private readonly gameSaveService: GameSaveService = inject(GameSaveService);
+    private readonly editorService: EditorService = inject(EditorService);
     private readonly i18nService: I18nService = inject(I18nService);
     private readonly popupService: PopupService = inject(PopupService);
     private readonly gameDataService: GameDataService = inject(GameDataService);
@@ -88,6 +91,26 @@ export class AdminPageComponent implements OnInit {
         });
     }
 
+    duplicateGame(id: string) {
+        this.gameSaveService.getGame(id).subscribe({
+            next: (game: GameData) => {
+                if (!this.isGameAccessible(game)) {
+                    this.handleUnauthorizedAccess();
+                    return;
+                }
+                this.popupService.showPopup({
+                    message: `${this.i18nService.translate(PopupMessage.DuplicateGame)}\n\t - ${game.name}`,
+                    hasCloseButton: true,
+                    isConfirmation: true,
+                    action: async () => await this.confirmDuplicateGame(game),
+                });
+            },
+            error: (error: HttpErrorResponse) => {
+                this.handleNotFoundError(error);
+            },
+        });
+    }
+
     onCreateGame() {
         this.isCreationMode = !this.isCreationMode;
         this.audioService.playEffect(SoundEffect.Click);
@@ -102,6 +125,20 @@ export class AdminPageComponent implements OnInit {
                 this.popupService.showPopup({ message: PopupMessage.ErrorLoadingGames, hasCloseButton: true, isConfirmation: false });
             },
         });
+    }
+
+    private async confirmDuplicateGame(game: GameData) {
+        await this.gameDataService.duplicateGame(game);
+        const isGameSaved = await this.editorService.saveGameOnServer();
+        if (isGameSaved) {
+            this.loadGames();
+            this.popupService.showPopup({
+                message: PopupMessage.SuccessfulDuplication,
+                hasCloseButton: true,
+                isConfirmation: false,
+                popupColor: PopupColor.Green,
+            });
+        }
     }
 
     private confirmDeleteGame(id: string) {

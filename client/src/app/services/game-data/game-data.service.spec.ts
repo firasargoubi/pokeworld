@@ -7,17 +7,23 @@ import { GameDataService } from './game-data.service';
 import { UserService } from '@app/services/user/user.service';
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
+import { GameSaveService } from '@app/services/game-save/game-save.service';
 
 describe('GameDataService', () => {
     let service: GameDataService;
+    let gameSaveServiceSpy: jasmine.SpyObj<GameSaveService>;
 
     beforeEach(() => {
         const userServiceStub: Partial<UserService> = {
             user$: of(null),
         };
-
+        gameSaveServiceSpy = jasmine.createSpyObj('GameSaveService', ['isNameUnique', 'saveGame']);
         TestBed.configureTestingModule({
-            providers: [GameDataService, { provide: UserService, useValue: userServiceStub }],
+            providers: [
+                GameDataService,
+                { provide: UserService, useValue: userServiceStub },
+                { provide: GameSaveService, useValue: gameSaveServiceSpy },
+            ],
         });
         service = TestBed.inject(GameDataService);
 

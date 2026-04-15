@@ -13,71 +13,79 @@
 
     <main>
         <div class="editor-left">
-            <div class="left-label">{{ 'pages.edit.name' | translate }}</div>
-            <input
-                class="input-name"
-                type="text"
-                autocomplete="false"
-                maxlength="20"
-                [(ngModel)]="gameDataService.gameData.name"
-                (click)="this.audioService.playEffect(this.clickValue)"
-            />
-            <div class="left-label-small">{{ 'pages.edit.description' | translate }}</div>
-            <textarea
-                class="input-description"
-                autocomplete="false"
-                maxlength="350"
-                spellcheck="false"
-                [(ngModel)]="gameDataService.gameData.description"
-                (click)="this.audioService.playEffect(this.clickValue)"
-            ></textarea>
-            @if (gameDataService.isOwner(this.gameDataService.gameData.owner)) {
-            <fieldset class="gamestates-form">
-                @for (state of gameState; track state) {
-                <div class="gamestate-option" [class.active]="gameDataService.gameData.gameState === state">
-                    <input type="radio" [id]="state" [value]="state" [(ngModel)]="gameDataService.gameData.gameState" name="gameStates" />
-                    <label [for]="state">{{ gameStateKeys[state] | translate }}</label>
-                </div>
+            <div class="editor-left-body">
+                <div class="left-label">{{ 'pages.edit.name' | translate }}</div>
+                <input
+                    class="input-name"
+                    type="text"
+                    autocomplete="false"
+                    maxlength="20"
+                    [(ngModel)]="gameDataService.gameData.name"
+                    (click)="this.audioService.playEffect(this.clickValue)"
+                />
+                <div class="left-label-small">{{ 'pages.edit.description' | translate }}</div>
+                <textarea
+                    class="input-description"
+                    autocomplete="false"
+                    maxlength="350"
+                    spellcheck="false"
+                    [(ngModel)]="gameDataService.gameData.description"
+                    (click)="this.audioService.playEffect(this.clickValue)"
+                ></textarea>
+                @if (gameDataService.isOwner(this.gameDataService.gameData.owner)) {
+                <fieldset class="gamestates-form">
+                    @for (state of gameState; track state) {
+                    <div class="gamestate-option" [class.active]="gameDataService.gameData.gameState === state">
+                        <input type="radio" [id]="state" [value]="state" [(ngModel)]="gameDataService.gameData.gameState" name="gameStates" />
+                        <label [for]="state">{{ gameStateKeys[state] | translate }}</label>
+                    </div>
+                    }
+                </fieldset>
                 }
-            </fieldset>
-            }
-            <div class="action-input">
-                <div class="left-label-small">{{ 'pages.edit.actions' | translate }}: {{ gameDataService.gameData.mapData.maxActions }}</div>
-                <input id="actions" type="range" min="1" max="5" [(ngModel)]="gameDataService.gameData.mapData.maxActions" />
-            </div>
-            <div class="left-label-medium">{{ 'pages.edit.size' | translate }} : {{ gameDataService.getMapSizeString() }}</div>
-            <div class="left-label-medium">{{ 'pages.edit.mode' | translate }} : {{ gameDataService.getGameModeString() }}</div>
-            
-            <div class="generator-section">
-                <div class="left-label-medium"> {{ 'pages.edit.generator' | translate }} </div>
-                <div class="generator-input">
-                    <label for="bushPercentage" class="left-label-small"> {{ 'pages.edit.bush' | translate }}: {{ this.mapGeneratorService.bushPercentage }}%</label>
-                    <input 
-                        id="bushPercentage" 
-                        type="range" 
-                        min="0" 
-                        max="100" 
-                        [value]="this.mapGeneratorService.bushPercentage"
-                        (input)="this.mapGeneratorService.onBushPercentageChange($any($event).target.value)"
-                    />
+                <div class="action-input">
+                    <div class="left-label-small">{{ 'pages.edit.actions' | translate }}: {{ gameDataService.gameData.mapData.maxActions }}</div>
+                    <input id="actions" type="range" min="1" max="5" [(ngModel)]="gameDataService.gameData.mapData.maxActions" />
                 </div>
-                <div class="generator-input">
-                    <label for="pathPercentage" class="left-label-small">{{'pages.edit.path' | translate }} : {{ this.mapGeneratorService.pathPercentage }}%</label>
-                    <input 
-                        id="pathPercentage" 
-                        type="range" 
-                        min="0" 
-                        max="100" 
-                        [value]="this.mapGeneratorService.pathPercentage"
-                        (input)="this.mapGeneratorService.onPathPercentageChange($any($event).target.value)"
-                    />
+                <div class="left-label-medium">{{ 'pages.edit.size' | translate }} : {{ gameDataService.getMapSizeString() }}</div>
+                <div class="left-label-medium">{{ 'pages.edit.mode' | translate }} : {{ gameDataService.getGameModeString() }}</div>
+
+                <div class="generator-section">
+                    <div class="left-label-medium">{{ 'pages.edit.generator' | translate }}</div>
+                    <div class="generator-input">
+                        <label for="bushPercentage" class="left-label-small">
+                            {{ 'pages.edit.bush' | translate }}: {{ this.mapGeneratorService.bushPercentage }}%</label
+                        >
+                        <input
+                            id="bushPercentage"
+                            type="range"
+                            min="0"
+                            max="100"
+                            [value]="this.mapGeneratorService.bushPercentage"
+                            (input)="this.mapGeneratorService.onBushPercentageChange($any($event).target.value)"
+                        />
+                    </div>
+                    <div class="generator-input">
+                        <label for="pathPercentage" class="left-label-small"
+                            >{{ 'pages.edit.path' | translate }} : {{ this.mapGeneratorService.pathPercentage }}%</label
+                        >
+                        <input
+                            id="pathPercentage"
+                            type="range"
+                            min="0"
+                            max="100"
+                            [value]="this.mapGeneratorService.pathPercentage"
+                            (input)="this.mapGeneratorService.onPathPercentageChange($any($event).target.value)"
+                        />
+                    </div>
+                    <div class="left-label-small">
+                        Total: {{ this.mapGeneratorService.bushPercentage + this.mapGeneratorService.pathPercentage }}%
+                    </div>
+                    <button (click)="generateMap()" class="generate-button">{{ 'pages.edit.generate' | translate }}</button>
                 </div>
-                <div class="left-label-small">Total: {{ this.mapGeneratorService.bushPercentage + this.mapGeneratorService.pathPercentage }}%</div>
-                <button (click)="generateMap()" class="generate-button"> {{'pages.edit.generate' | translate}}  </button>
+
+                <button (click)="saveButton()" class="save-button">{{ 'pages.edit.save' | translate }}</button>
+                <button (click)="resetButton()" class="reset-button">{{ 'pages.edit.reset' | translate }}</button>
             </div>
-            
-            <button (click)="saveButton()" class="save-button">{{ 'pages.edit.save' | translate }}</button>
-            <button (click)="resetButton()" class="reset-button">{{ 'pages.edit.reset' | translate }}</button>
         </div>
         <div class="editor-center">
             <app-map [isEditor]="true"></app-map>
