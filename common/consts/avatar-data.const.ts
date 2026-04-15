@@ -407,7 +407,7 @@ export const AVATAR_DATA = {
     [Avatar.Avatar14]: {
         name: 'Étourmi',
         image: './assets/images/game/avatars/starly.png',
-        imageFace: './assets/images/game/avatars/starly.png',
+        imageFace: './assets/images/game/avatars/face/starly.png',
         imageCentered: './assets/images/game/avatars/centered/starly.png',
         frontGif: './assets/images/game/avatars-gifs/starly.gif',
         backGif: './assets/images/game/avatars-gifs/starly-back.gif',
@@ -431,7 +431,7 @@ export const AVATAR_DATA = {
     [Avatar.Avatar14Shiny]: {
         name: 'Étourmi',
         image: './assets/images/game/avatars/centered/shiny/starly-shiny.png',
-        imageFace: './assets/images/game/avatars/centered/shiny/starly-shiny.png',
+        imageFace: './assets/images/game/avatars/face/shiny/starly-shiny.png',
         imageCentered: './assets/images/game/avatars/centered/shiny/starly-shiny.png',
         frontGif: './assets/images/game/avatars-gifs/shiny/starly-shiny.gif',
         backGif: './assets/images/game/avatars-gifs/shiny/starly-shiny-back.gif',
@@ -455,7 +455,7 @@ export const AVATAR_DATA = {
     [Avatar.Avatar14Evolved]: {
         name: 'Étouraptor',
         image: './assets/images/game/avatars/centered/evolved/staraptor.png',
-        imageFace: './assets/images/game/avatars/centered/evolved/staraptor.png',
+        imageFace: './assets/images/game/avatars/face/evolved/staraptor.png',
         imageCentered: './assets/images/game/avatars/centered/evolved/staraptor.png',
         frontGif: './assets/images/game/avatars-gifs/evolved/staraptor.gif',
         backGif: './assets/images/game/avatars-gifs/evolved/staraptor-back.gif',
@@ -479,7 +479,7 @@ export const AVATAR_DATA = {
     [Avatar.Avatar14EvolvedShiny]: {
         name: 'Étouraptor',
         image: './assets/images/game/avatars/centered/evolved-shiny/staraptor-shiny.png',
-        imageFace: './assets/images/game/avatars/centered/evolved-shiny/staraptor-shiny.png',
+        imageFace: './assets/images/game/avatars/face/evolved-shiny/staraptor-shiny.png',
         imageCentered: './assets/images/game/avatars/centered/evolved-shiny/staraptor-shiny.png',
         frontGif: './assets/images/game/avatars-gifs/evolved-shiny/staraptor-shiny.gif',
         backGif: './assets/images/game/avatars-gifs/evolved-shiny/staraptor-shiny-back.gif',

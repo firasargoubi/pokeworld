@@ -1,10 +1,14 @@
 <div class="shop-popup">
-    <div class="shop-card-shell">
-        <div class="shop-card">
-            <div class="shop-header">
-                <div class="shop-title-icon"></div>
-                <p class="shop-title">{{ 'components.shopPopup.title' | translate }}</p>
-                <div class="shop-title-icon"></div>
+    <div class="card-container">
+        <div class="card-icon-background"></div>
+        <div class="card-main-border"></div>
+        <div class="card-body">
+            <div class="title-container">
+                <div class="title-label">
+                    <div class="icon-wrapper"></div>
+                    <p class="title">{{ ('components.shopPopup.title' | translate).toUpperCase() }}</p>
+                    <div class="icon-wrapper"></div>
+                </div>
             </div>
 
             <div class="shop-body">
@@ -43,6 +47,7 @@
                                 [class.selected]="selectedItem?.id === item.id"
                                 (click)="selectItem(item)"
                             >
+                                <img class="item-thumb" [src]="getItemPreview(item)" [alt]="item.nameKey | translate" />
                                 <span class="item-name">{{ item.nameKey | translate }}</span>
                                 @if (isOwned(item.id)) {
                                 <span class="item-status owned-label">{{ 'components.shopPopup.owned' | translate }}</span>
@@ -84,17 +89,12 @@
                         @if (isButtonItem(selectedItem)) {
                         <img class="detail-image" [src]="getItemPreview(selectedItem)" [alt]="selectedItem.nameKey | translate" />
                         } @else if (isMusicItem(selectedItem)) {
-                        <div class="music-preview">
-                            <div class="music-note">&#9834;</div>
-                            <span class="music-track-label"
-                                >{{ 'components.shopPopup.track' | translate }} {{ getMusicTrackNumber(selectedItem) }}</span
-                            >
-                        </div>
+                        <img class="detail-image" [src]="getItemPreview(selectedItem)" [alt]="selectedItem.nameKey | translate" />
                         } @else if (isPokemonItem(selectedItem)) {
                         <img class="detail-image" [src]="getPokemonPreview(selectedItem)" [alt]="selectedItem.nameKey | translate" />
                         }
                     </div>
-                    <div class="detail-name">{{ selectedItem.nameKey | translate }}</div>
+                    <div class="detail-name">{{ getItemDescription(selectedItem) | translate }}</div>
                     <button
                         class="buy-button"
                         type="button"
@@ -114,5 +114,6 @@
                 <span class="balance-label">{{ 'components.shopPopup.balance' | translate }}: {{ currentUser?.balance ?? 0 }} $</span>
             </div>
         </div>
+        <div class="card-main-border"></div>
     </div>
 </div>

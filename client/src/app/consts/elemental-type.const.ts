@@ -56,6 +56,18 @@ export const ELEMENTAL_TYPE_LABEL_CONFIG: Record<ElementalType, ElementalTypeLab
         darkColor: '#807870',
         textKey: 'pages.character.elementalType.water',
     },
+    [ElementalType.Flying]: {
+        mainColor: '#a890f0',
+        lightColor: '#c8c0f8',
+        darkColor: '#705898',
+        textKey: 'pages.character.elementalType.flying',
+    },
+    [ElementalType.Fight]: {
+        mainColor: '#c03028',
+        lightColor: '#e56e2e',
+        darkColor: '#404040',
+        textKey: 'pages.character.elementalType.fight',
+    },
 };
 
 export const ELEMENTAL_TYPE_ICONS: Record<ElementalType, string> = {
@@ -68,4 +80,6 @@ export const ELEMENTAL_TYPE_ICONS: Record<ElementalType, string> = {
     [ElementalType.Normal]: './assets/images/game/elemental-icons/normal.png',
     [ElementalType.Psychic]: './assets/images/game/elemental-icons/psychic.png',
     [ElementalType.Water]: './assets/images/game/elemental-icons/water.png',
+    [ElementalType.Flying]: './assets/images/game/elemental-icons/flying.png',
+    [ElementalType.Fight]: './assets/images/game/elemental-icons/fight.png',
 };

@@ -105,6 +105,30 @@ const Map<Avatar, AvatarData> AVATAR_DATA = {
     backGif: 'assets/images/game/avatars-gifs/mew-back.gif',
   ),
 
+  Avatar.Avatar13: AvatarData(
+    name: 'Riolu',
+    image: 'assets/images/game/avatars/riolu.png',
+    imageFace: 'assets/images/game/avatars-faces/riolu.png',
+    frontGif: 'assets/images/game/avatars-gifs/riolu.gif',
+    backGif: 'assets/images/game/avatars-gifs/riolu-back.gif',
+  ),
+
+  Avatar.Avatar14: AvatarData(
+    name: 'Étourmi',
+    image: 'assets/images/game/avatars/starly.png',
+    imageFace: 'assets/images/game/avatars-faces/starly.png',
+    frontGif: 'assets/images/game/avatars-gifs/starly.gif',
+    backGif: 'assets/images/game/avatars-gifs/starly-back.gif',
+  ),
+
+  Avatar.Avatar15: AvatarData(
+    name: 'Grenousse',
+    image: 'assets/images/game/avatars/froakie.png',
+    imageFace: 'assets/images/game/avatars-faces/froakie.png',
+    frontGif: 'assets/images/game/avatars-gifs/froakie.gif',
+    backGif: 'assets/images/game/avatars-gifs/froakie-back.gif',
+  ),
+
   // SHINY
   Avatar.Avatar1Shiny: AvatarData(
     name: 'Bulbizarre',
@@ -189,6 +213,28 @@ const Map<Avatar, AvatarData> AVATAR_DATA = {
     imageFace: 'assets/images/game/avatars-faces/shiny/mew-shiny.png',
     frontGif: 'assets/images/game/avatars-gifs/shiny/mew-shiny.gif',
     backGif: 'assets/images/game/avatars-gifs/shiny/mew-shiny-back.gif',
+  ),
+
+  Avatar.Avatar13Shiny: AvatarData(
+    name: 'Riolu',
+    image: 'assets/images/game/avatars/shiny/riolu-shiny.png',
+    imageFace: 'assets/images/game/avatars-faces/shiny/riolu-shiny.png',
+    frontGif: 'assets/images/game/avatars-gifs/shiny/riolu-shiny.gif',
+    backGif: 'assets/images/game/avatars-gifs/shiny/riolu-shiny-back.gif',
+  ),
+  Avatar.Avatar14Shiny: AvatarData(
+    name: 'Étourmi',
+    image: 'assets/images/game/avatars/shiny/starly-shiny.png',
+    imageFace: 'assets/images/game/avatars-faces/shiny/starly-shiny.png',
+    frontGif: 'assets/images/game/avatars-gifs/shiny/starly-shiny.gif',
+    backGif: 'assets/images/game/avatars-gifs/shiny/starly-shiny-back.gif',
+  ),
+  Avatar.Avatar15Shiny: AvatarData(
+    name: 'Grenousse',
+    image: 'assets/images/game/avatars/shiny/froakie-shiny.png',
+    imageFace: 'assets/images/game/avatars-faces/shiny/froakie-shiny.png',
+    frontGif: 'assets/images/game/avatars-gifs/shiny/froakie-shiny.gif',
+    backGif: 'assets/images/game/avatars-gifs/shiny/froakie-shiny-back.gif',
   ),
 
   // EVOLVED
@@ -277,6 +323,28 @@ const Map<Avatar, AvatarData> AVATAR_DATA = {
     backGif: 'assets/images/game/avatars-gifs/evolved/mewtwo-back.gif',
   ),
 
+  Avatar.Avatar13Evolved: AvatarData(
+    name: 'Lucario',
+    image: 'assets/images/game/avatars/evolved/lucario.png',
+    imageFace: 'assets/images/game/avatars-faces/evolved/lucario.png',
+    frontGif: 'assets/images/game/avatars-gifs/evolved/lucario.gif',
+    backGif: 'assets/images/game/avatars-gifs/evolved/lucario-back.gif',
+  ),
+  Avatar.Avatar14Evolved: AvatarData(
+    name: 'Étouraptor',
+    image: 'assets/images/game/avatars/evolved/staraptor.png',
+    imageFace: 'assets/images/game/avatars-faces/evolved/staraptor.png',
+    frontGif: 'assets/images/game/avatars-gifs/evolved/staraptor.gif',
+    backGif: 'assets/images/game/avatars-gifs/evolved/staraptor-back.gif',
+  ),
+  Avatar.Avatar15Evolved: AvatarData(
+    name: 'Amphinobi',
+    image: 'assets/images/game/avatars/evolved/greninja.png',
+    imageFace: 'assets/images/game/avatars-faces/evolved/greninja.png',
+    frontGif: 'assets/images/game/avatars-gifs/evolved/greninja.gif',
+    backGif: 'assets/images/game/avatars-gifs/evolved/greninja-back.gif',
+  ),
+
   // EVOLVED SHINY
   Avatar.Avatar1EvolvedShiny: AvatarData(
     name: 'Florizarre',
@@ -363,6 +431,28 @@ const Map<Avatar, AvatarData> AVATAR_DATA = {
     backGif: 'assets/images/game/avatars-gifs/evolved-shiny/mewtwo-shiny-back.gif',
   ),
 
+  Avatar.Avatar13EvolvedShiny: AvatarData(
+    name: 'Lucario',
+    image: 'assets/images/game/avatars/evolved-shiny/lucario-shiny.png',
+    imageFace: 'assets/images/game/avatars-faces/evolved-shiny/lucario-shiny.png',
+    frontGif: 'assets/images/game/avatars-gifs/evolved-shiny/lucario-shiny.gif',
+    backGif: 'assets/images/game/avatars-gifs/evolved-shiny/lucario-shiny-back.gif',
+  ),
+  Avatar.Avatar14EvolvedShiny: AvatarData(
+    name: 'Étouraptor',
+    image: 'assets/images/game/avatars/evolved-shiny/staraptor-shiny.png',
+    imageFace: 'assets/images/game/avatars-faces/evolved-shiny/staraptor-shiny.png',
+    frontGif: 'assets/images/game/avatars-gifs/evolved-shiny/staraptor-shiny.gif',
+    backGif: 'assets/images/game/avatars-gifs/evolved-shiny/staraptor-shiny-back.gif',
+  ),
+  Avatar.Avatar15EvolvedShiny: AvatarData(
+    name: 'Amphinobi',
+    image: 'assets/images/game/avatars/evolved-shiny/greninja-shiny.png',
+    imageFace: 'assets/images/game/avatars-faces/evolved-shiny/greninja-shiny.png',
+    frontGif: 'assets/images/game/avatars-gifs/evolved-shiny/greninja-shiny.gif',
+    backGif: 'assets/images/game/avatars-gifs/evolved-shiny/greninja-shiny-back.gif',
+  ),
+
   // MISSINGNO
   Avatar.MissingNo: AvatarData(
     name: 'MissingNo',
@@ -387,6 +477,9 @@ const Map<Avatar, String> AVATAR_SOUNDS = {
   Avatar.Avatar10: 'audio/avatars/Magikarp.wav',
   Avatar.Avatar11: 'audio/avatars/Dragonair.wav',
   Avatar.Avatar12: 'audio/avatars/Mew.wav',
+  Avatar.Avatar13: 'audio/avatars/Riolu.wav',
+  Avatar.Avatar14: 'audio/avatars/Starly.wav',
+  Avatar.Avatar15: 'audio/avatars/Froakie.wav',
   Avatar.Avatar1Shiny: 'audio/avatars/Bulbasaur.wav',
   Avatar.Avatar2Shiny: 'audio/avatars/Squirtle.wav',
   Avatar.Avatar3Shiny: 'audio/avatars/Charmander.wav',
@@ -399,6 +492,9 @@ const Map<Avatar, String> AVATAR_SOUNDS = {
   Avatar.Avatar10Shiny: 'audio/avatars/Magikarp.wav',
   Avatar.Avatar11Shiny: 'audio/avatars/Dragonair.wav',
   Avatar.Avatar12Shiny: 'audio/avatars/Mew.wav',
+  Avatar.Avatar13Shiny: 'audio/avatars/Riolu.wav',
+  Avatar.Avatar14Shiny: 'audio/avatars/Starly.wav',
+  Avatar.Avatar15Shiny: 'audio/avatars/Froakie.wav',
   Avatar.Avatar1Evolved: 'audio/avatars/Venusaur.wav',
   Avatar.Avatar2Evolved: 'audio/avatars/Blastoise.wav',
   Avatar.Avatar3Evolved: 'audio/avatars/Charizard.wav',
@@ -411,6 +507,9 @@ const Map<Avatar, String> AVATAR_SOUNDS = {
   Avatar.Avatar10Evolved: 'audio/avatars/Gyarados.wav',
   Avatar.Avatar11Evolved: 'audio/avatars/Dragonite.wav',
   Avatar.Avatar12Evolved: 'audio/avatars/Mewtwo.wav',
+  Avatar.Avatar13Evolved: 'audio/avatars/Lucario.wav',
+  Avatar.Avatar14Evolved: 'audio/avatars/Staraptor.wav',
+  Avatar.Avatar15Evolved: 'audio/avatars/Greninja.wav',
   Avatar.Avatar1EvolvedShiny: 'audio/avatars/Venusaur.wav',
   Avatar.Avatar2EvolvedShiny: 'audio/avatars/Blastoise.wav',
   Avatar.Avatar3EvolvedShiny: 'audio/avatars/Charizard.wav',
@@ -423,5 +522,8 @@ const Map<Avatar, String> AVATAR_SOUNDS = {
   Avatar.Avatar10EvolvedShiny: 'audio/avatars/Gyarados.wav',
   Avatar.Avatar11EvolvedShiny: 'audio/avatars/Dragonite.wav',
   Avatar.Avatar12EvolvedShiny: 'audio/avatars/Mewtwo.wav',
+  Avatar.Avatar13EvolvedShiny: 'audio/avatars/Lucario.wav',
+  Avatar.Avatar14EvolvedShiny: 'audio/avatars/Staraptor.wav',
+  Avatar.Avatar15EvolvedShiny: 'audio/avatars/Greninja.wav',
   Avatar.MissingNo: 'audio/avatars/MissingNo.wav',
 };

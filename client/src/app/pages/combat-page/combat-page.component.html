@@ -1,5 +1,8 @@
 <div id="combat-page">
     <div id="combat-container" [ngClass]="{ 'not-current-turn': !visualData.isSelfTurn || matchService.data.state !== 'combatWait' }">
+        <div class="leave-button button-container" (click)="leaveButton()">
+            <div class="button-icon"></div>
+        </div>
         <div id="timer">
             @if(this.matchService.data.playData.isDebugMode){ <span class="debug-info">{{ 'pages.play.debug' | translate }}</span> }
             {{ combatService.timer.currentTimeRounded + 1 }}/{{ combatService.timer.maxTime }}

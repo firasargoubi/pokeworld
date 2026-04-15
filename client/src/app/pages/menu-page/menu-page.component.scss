@@ -11,7 +11,7 @@ $icon-vulpix: '../../../assets/images/menu/pokemons/chibi/vulpix.png';
 $icon-poliwag: '../../../assets/images/menu/pokemons/chibi/poliwag.png';
 $icon-cubone: '../../../assets/images/menu/pokemons/chibi/cubone.png';
 $icon-settings: '../../../assets/images/menu/icons/settings/settings.svg';
-$icon-shop: '../../../assets/images/menu/icons/crown.png';
+$icon-shop: '../../../assets/images/menu/icons/shop/shopping-cart.svg';
 $icon-user-card: '../../../assets/images/menu/icons/menu/user.svg';
 $gray-box-rectangle: '../../../assets/images/menu/containers/gray/rectangle.png';
 $user-button-color: hsl(194, 86%, 66%);
@@ -223,15 +223,6 @@ app-menu-button {
     background-image: url($icon-cubone);
 }
 
-.icon-shop {
-    width: 64%;
-    height: 64%;
-    background-image: url($icon-shop);
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
 $inner-border-width: calc(0.6 * $base-size);
 
 $border-color2: #48485f;
@@ -312,6 +303,10 @@ $clip-path: polygon(
 
 .user-button .icon-container {
     background-image: url($icon-user-card);
+}
+
+.shop-button .icon-container {
+    background-image: url($icon-shop);
 }
 
 .user-button.disabled {
@@ -397,24 +392,6 @@ $clip-path: polygon(
     opacity: 0;
     transform: scale(0.96);
     animation: audio-overlay-in 0.2s forwards ease-in-out;
-}
-
-.shop-button {
-    background: hsl(45, 93%, 62%);
-    box-shadow:
-        inset $inner-border-width 0 0 0 hsl(47, 100%, 84%),
-        inset calc(-1 * $inner-border-width) 0 0 0 hsl(35, 83%, 44%),
-        inset 0 $inner-border-width 0 0 hsl(47, 100%, 84%),
-        inset 0 calc(-1 * $inner-border-width) 0 0 hsl(35, 83%, 44%);
-
-    &:active {
-        filter: brightness(0.9);
-        box-shadow:
-            inset $inner-border-width 0 0 0 hsl(35, 83%, 44%),
-            inset calc(-1 * $inner-border-width) 0 0 0 hsl(47, 100%, 84%),
-            inset 0 $inner-border-width 0 0 hsl(35, 83%, 44%),
-            inset 0 calc(-1 * $inner-border-width) 0 0 hsl(47, 100%, 84%);
-    }
 }
 
 .shop-button.disabled,

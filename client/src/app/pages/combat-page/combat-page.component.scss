@@ -34,6 +34,11 @@ $color-nerf: #ff0000;
 
 $img-clock: '../../../assets/images/menu/icons/clock-icon.png';
 
+$img-delete-container-edge-left: '../../../assets/images/menu/containers/user-card/button-delete-edge-1.png';
+$img-delete-container-edge-right: '../../../assets/images/menu/containers/user-card/button-delete-edge-2.png';
+$img-delete-container-body: '../../../assets/images/menu/containers/user-card/button-delete-body.png';
+$img-logout-icon: '../../../assets/images/menu/icons/user-card/logout.png';
+
 $img-hp-container: '../../../assets/images/menu/containers/description/battle-player-safari-rotated.png';
 $img-hp-container-enemy: '../../../assets/images/menu/containers/description/battle-player-safari-rotated-mirorded.png';
 $img-hp-bar: '../../../assets/images/menu/stat-bar/hp-bar.png';
@@ -94,6 +99,50 @@ $pixel-corners-clip-path: polygon(
         0 0;
 
     animation: fall 3s linear infinite;
+}
+
+.leave-button.button-container {
+    position: absolute;
+    top: calc($base-size * 1);
+    left: calc($base-size * 1);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc($base-size * 10);
+    aspect-ratio: 1 / 1;
+    cursor: pointer;
+    background-image: url($img-delete-container-edge-left), url($img-delete-container-body), url($img-delete-container-edge-right);
+    background-repeat: no-repeat, space, no-repeat;
+    background-position:
+        left top,
+        center top,
+        right top;
+    background-size:
+        auto 100%,
+        70% 100%,
+        auto 100%;
+    transition: all 0.3s ease;
+
+    &:hover {
+        filter: brightness(1.1);
+        scale: 1.05;
+    }
+
+    &:active {
+        filter: brightness(0.9);
+        scale: 0.95;
+    }
+
+    .button-icon {
+        height: 80%;
+        aspect-ratio: 9 / 14;
+        background-image: url($img-logout-icon);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        filter: invert(1);
+    }
 }
 
 @keyframes fall {

@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { DEFAULT_COMBAT_VISUAL_DATA } from '@app/consts/combat-data.const';
+import { PopupMessage } from '@app/consts/popup-message.const';
 import { ELEMENTAL_TYPE_ICONS } from '@app/consts/elemental-type.const';
 import { BATTLE_PLATFORM_IMAGES } from '@app/consts/images.const';
 import { CombatVisualData } from '@app/interfaces/combat-visual-data';
@@ -92,6 +93,16 @@ export class CombatPageComponent implements OnDestroy {
     escapeButon() {
         this.audioService.playEffect(SoundEffect.Click);
         this.combatService.escape();
+    }
+
+    leaveButton() {
+        this.audioService.playEffect(SoundEffect.Click);
+        this.popupService.showPopup({
+            message: PopupMessage.Surrender,
+            hasCloseButton: true,
+            isConfirmation: true,
+            action: this.matchService.leaveMatch.bind(this.matchService),
+        });
     }
 
     private updateImages() {

@@ -34,7 +34,7 @@
                     </div>
                     <div class="card-infos-container">
                         <div class="left-container">
-                            <div class="info-row">
+                            <div class="info-row" title="{{ currentUser?.email }}">
                                 <span class="label">{{ 'components.userPopup.emailLabel' | translate }}</span>
                                 <span class="value">{{ currentUser?.email || ('components.userPopup.noneValue' | translate) }}</span>
                             </div>
@@ -107,21 +107,11 @@
                         <div class="update-container update-password-container">
                             <div class="info-row">
                                 <span class="label">{{ 'components.userPopup.oldPassword' | translate }}</span>
-                                <input
-                                    type="password"
-                                    [(ngModel)]="oldPassword"
-                                    class="text-input pixel-placeholder"
-                                    [placeholder]="'components.userPopup.oldPassword' | translate"
-                                />
+                                <input type="password" [(ngModel)]="oldPassword" class="text-input pixel-placeholder" [placeholder]="'......'" />
                             </div>
                             <div class="info-row">
                                 <span class="label">{{ 'components.userPopup.newPassword' | translate }}</span>
-                                <input
-                                    type="password"
-                                    [(ngModel)]="newPassword"
-                                    class="text-input pixel-placeholder"
-                                    [placeholder]="'components.userPopup.newPassword' | translate"
-                                />
+                                <input type="password" [(ngModel)]="newPassword" class="text-input pixel-placeholder" [placeholder]="'......'" />
                             </div>
                             <div class="info-row">
                                 <span class="label">{{ 'components.userPopup.confirmPasswordPlaceholder' | translate }}</span>
@@ -129,7 +119,7 @@
                                     type="password"
                                     [(ngModel)]="confirmNewPassword"
                                     class="text-input pixel-placeholder"
-                                    [placeholder]="'components.userPopup.confirmPasswordPlaceholder' | translate"
+                                    [placeholder]="'......'"
                                 />
                             </div>
 
@@ -310,7 +300,7 @@
                                         <img class="inv-item-thumb" [src]="getInventoryItemPreview(item)" [alt]="item.nameKey | translate" />
                                         <span class="inv-item-name">{{ item.nameKey | translate }}</span>
                                         @if (isInventoryItemEquipped(item)) {
-                                        <span class="inv-item-equipped">{{ 'components.shopPopup.equipped' | translate }}</span>
+                                        <div class="inv-equipped-icon"></div>
                                         }
                                     </button>
                                     }
@@ -328,9 +318,10 @@
                                         [class.equipped]="isInventoryItemEquipped(item)"
                                         (click)="selectInventoryItem(item)"
                                     >
+                                        <img class="inv-item-thumb" [src]="getInventoryItemPreview(item)" [alt]="item.nameKey | translate" />
                                         <span class="inv-item-name">{{ item.nameKey | translate }}</span>
                                         @if (isInventoryItemEquipped(item)) {
-                                        <span class="inv-item-equipped">{{ 'components.shopPopup.equipped' | translate }}</span>
+                                        <div class="inv-equipped-icon"></div>
                                         }
                                     </button>
                                     }
@@ -365,12 +356,11 @@
                                     [alt]="selectedInventoryItem.nameKey | translate"
                                 />
                                 } @else if (selectedInventoryItem.type === shopItemType.Music) {
-                                <div class="inv-music-preview">
-                                    <div class="inv-music-note">♪</div>
-                                    <span class="inv-music-track-label"
-                                        >{{ 'components.shopPopup.track' | translate }} {{ getMusicTrackNumber(selectedInventoryItem) }}</span
-                                    >
-                                </div>
+                                <img
+                                    class="inv-detail-image"
+                                    [src]="getInventoryItemPreview(selectedInventoryItem)"
+                                    [alt]="selectedInventoryItem.nameKey | translate"
+                                />
                                 } @else if (selectedInventoryItem.type === shopItemType.Pokemon) {
                                 <img
                                     class="inv-detail-image"
@@ -379,7 +369,7 @@
                                 />
                                 }
                             </div>
-                            <div class="inv-detail-name">{{ selectedInventoryItem.nameKey | translate }}</div>
+                            <div class="inv-detail-name">{{ getItemDescription(selectedInventoryItem) | translate }}</div>
                             @if (selectedInventoryItem.type !== shopItemType.Pokemon) {
                             <button
                                 class="equip-button"

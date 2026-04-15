@@ -213,7 +213,9 @@
                 "ground": "SOL",
                 "normal": "NORMAL",
                 "psychic": "PSY",
-                "water": "EAU"
+                "water": "EAU",
+                "flying": "VOL",
+                "fight": "COMBAT"
             }
         },
         "play": {

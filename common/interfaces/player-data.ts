@@ -120,4 +120,6 @@ export enum ElementalType {
     Ground = 'ground',
     Dragon = 'dragon',
     Psychic = 'psychic',
+    Flying = 'flying',
+    Fight = 'fight',
 }
