@@ -359,20 +359,20 @@ describe('MapService', () => {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasNoItems').returns(true);
-        const validResult = service['isValidForDrop'](mockMatchData, { x: 0, y: 0 });
+        const validResult = service['isValidForDrop'](mockMatchData, { x: 0, y: 0 }, { x: 3, y: 3 });
         expect(validResult).toBe(true);
 
-        const waterResult = service['isValidForDrop'](mockMatchData, { x: 1, y: 1 });
+        const waterResult = service['isValidForDrop'](mockMatchData, { x: 1, y: 1 }, { x: 3, y: 3 });
         expect(waterResult).toBe(false);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         (service as any).hasNoItems.restore();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- private method
         sandbox.stub(service as any, 'hasNoItems').returns(false);
-        const withItemsResult = service['isValidForDrop'](mockMatchData, { x: 0, y: 0 });
+        const withItemsResult = service['isValidForDrop'](mockMatchData, { x: 0, y: 0 }, { x: 3, y: 3 });
         expect(withItemsResult).toBe(false);
 
-        const withPlayerResult = service['isValidForDrop'](mockMatchData, { x: 2, y: 2 });
+        const withPlayerResult = service['isValidForDrop'](mockMatchData, { x: 2, y: 2 }, { x: 3, y: 3 });
         expect(withPlayerResult).toBe(false);
     });
 
