@@ -1,13 +1,9 @@
 $font-family: 'pixel';
 
-$input-border-color: rgba(255, 255, 255, 0.82);
-$input-bg-normal: hsla(231, 12%, 45%, 0.7);
-$input-bg-active: hsla(231, 12%, 45%, 0.6);
-
 $base-size: min(1vh, 1vw);
 $border-size: calc($base-size * 3);
 
-$card-width: calc($base-size * 75);
+$card-width: calc($base-size * 90);
 $card-height: calc($base-size * 65);
 $font-size: calc($base-size * 3);
 
@@ -78,10 +74,6 @@ $flip-vertical-bleed: calc($base-size * 7);
 
 $corner-unit: calc($base-size * 0.5);
 $border-color: #a7dcff;
-$background-color: #ffffff;
-$button-cutout-size: 8px;
-$pixel-corner-size: 8px;
-$pixel-shadow-size: 4px;
 
 $pixel-corners-clip-path: polygon(
     0 #{$corner-unit},
@@ -97,16 +89,6 @@ $pixel-corners-clip-path: polygon(
     #{$corner-unit} calc(100% - #{$corner-unit}),
     0 calc(100% - #{$corner-unit})
 );
-$shop-button-background: linear-gradient(
-    to bottom,
-    #d0f0d0 0,
-    #d0f0d0 $button-cutout-size,
-    #90c890 $button-cutout-size,
-    #90c890 calc(100% - $button-cutout-size),
-    #407540 calc(100% - $button-cutout-size),
-    #407540 100%
-);
-
 .user-popup {
     display: flex;
     justify-content: center;
@@ -399,6 +381,7 @@ $shop-button-background: linear-gradient(
         #{$border-size} 100%;
 
     &:last-child {
+        margin-top: calc($base-size * -0.1);
         transform: rotate(180deg);
     }
 }
@@ -613,7 +596,7 @@ $shop-button-background: linear-gradient(
         background-size:
             auto 100%,
             auto 100%,
-            96% 100%;
+            97% 100%;
     }
 
     > * {
@@ -623,10 +606,19 @@ $shop-button-background: linear-gradient(
         color: $text-color;
         text-shadow: $text-shadow-color calc($font-size * 0.1) 0 0;
         letter-spacing: calc($font-size * 0.1);
-        max-width: 100%;
-        white-space: normal;
-        overflow-wrap: anywhere;
-        word-break: break-word;
+    }
+
+    > .label {
+        flex-shrink: 0;
+        white-space: nowrap;
+        margin: 0 calc($font-size) 0 0;
+    }
+
+    > .value {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
     }
 }
 
@@ -671,6 +663,7 @@ $shop-button-background: linear-gradient(
     width: 100%;
     height: 12%;
     background: $gray-background-color;
+    z-index: 2;
 }
 
 .badges-container .badge-container {
@@ -687,7 +680,7 @@ $shop-button-background: linear-gradient(
     height: 15%;
     background-size:
         auto 100%,
-        92% 100%,
+        95% 100%,
         auto 100%;
 }
 
@@ -894,58 +887,50 @@ $shop-button-background: linear-gradient(
 }
 
 // ── Inventory two-panel layout ────────────────────────────────────
+// ── Inventory layout (shop-style) ─────────────────────────────
 .card-back .card-infos-container.inv-body {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) calc($base-size * 16);
-    gap: calc($base-size * 1.5);
+    display: flex;
+    flex-direction: row;
     align-items: stretch;
-    justify-items: stretch;
-    width: 95%;
-    max-width: 95%;
-    height: 100%;
+    padding: 0 calc($base-size * 1.8);
+    gap: calc($base-size * 1.8);
     flex: 1;
-    margin-top: 0;
-    overflow: hidden;
     min-height: 0;
+    width: 100%;
+    z-index: 1;
 }
 
 .inv-items-panel {
+    flex: 3.2;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    overflow: hidden;
-    min-width: 0;
     min-height: 0;
 }
 
 .inv-items-scroll {
-    display: flex;
-    flex-direction: column;
-    gap: calc($base-size * 1);
-    height: 100%;
     overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: thin;
     padding-right: calc($base-size * 0.5);
+    flex: 1;
     min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.6) transparent;
 }
 
 .inv-section-label {
-    margin: 0;
-    color: rgba(255, 255, 255, 0.88);
+    color: rgb(255, 255, 255);
+    text-shadow: #2860a8 calc($font-size * 0.1) 0 0;
     font-family: $font-family;
     font-size: calc($font-size * 0.8);
     letter-spacing: calc($font-size * 0.05);
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    margin: 0 0 calc($base-size * 2) 0;
+    user-select: none;
 }
 
 .inv-section-divider {
-    width: 100%;
-    height: 2px;
+    height: calc($base-size * 0.5);
     background: rgba(255, 255, 255, 0.25);
-    margin: calc($base-size * 0.5) 0;
+    margin: calc($base-size * 2) 0 calc($base-size * 1);
 }
 
 .inv-empty-label {
@@ -961,107 +946,89 @@ $shop-button-background: linear-gradient(
 }
 
 .inv-items-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
     gap: calc($base-size * 1);
+    margin-bottom: calc($base-size * 0.8);
 }
 
 .inv-item {
-    border: 3px solid rgba(255, 255, 255, 0.15);
-    padding: calc($base-size * 1.2);
-    background: rgba(0, 0, 0, 0.2);
+    position: relative;
+    background: rgba(255, 255, 255, 0.2);
+    border: calc($base-size * 0.6) solid rgba(255, 255, 255, 0.15);
+    clip-path: $pixel-corners-clip-path;
+    padding: calc($base-size * 1) calc($base-size * 0.8) calc($base-size * 0.8);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: calc($base-size * 0.4);
+    align-items: space-between;
     cursor: pointer;
-    transition:
-        transform 0.15s ease,
-        background 0.15s ease;
-    position: relative;
-    clip-path: $pixel-corners-clip-path;
-    width: 100%;
+    transition: filter 0.1s ease;
+    font-family: $font-family;
+    font-size: calc($font-size * 0.8);
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    width: calc($base-size * 18);
+    height: calc($base-size * 15);
     overflow: hidden;
 
-    &:hover {
-        background: rgba(255, 255, 255, 0.12);
-        transform: translateY(-1px);
+    &:hover:not(:disabled) {
+        filter: brightness(1.15);
     }
 
     &.selected {
-        background: rgba(255, 255, 255, 0.12);
         border-color: #fff;
-    }
-
-    &.equipped {
-        border-color: #90c890;
+        background: rgba(255, 255, 255, 0.12);
     }
 }
 
 .inv-item-thumb {
-    width: calc($base-size * 7);
-    height: calc($base-size * 7);
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    flex: 1;
     object-fit: contain;
     image-rendering: pixelated;
-}
-
-.inv-music-icon {
-    font-size: calc($font-size * 2);
-    line-height: 1;
-    color: $text-color;
-    height: calc($base-size * 5);
-    display: flex;
-    align-items: center;
+    user-select: none;
+    pointer-events: none;
 }
 
 .inv-item-name {
-    color: #fff;
-    font-family: $font-family;
-    font-size: calc($font-size * 0.6);
-    text-align: center;
-    line-height: 1.2;
-    width: 100%;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    user-select: none;
 }
 
-.inv-item-equipped {
-    color: rgba(255, 255, 255, 0.7);
-    font-family: $font-family;
-    font-size: calc($font-size * 0.55);
-    text-align: center;
-    width: 100%;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+.inv-equipped-icon {
+    position: absolute;
+    top: calc($base-size * 0.5);
+    right: calc($base-size * 0.5);
+    width: calc($base-size * 3);
+    height: calc($base-size * 3);
+    background-image: url('../../../assets/images/menu/icons/shop/item-selected.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
 }
 
+// ── Inventory detail panel ────────────────────────────────────
 .inv-detail-panel {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    gap: calc($base-size * 1);
-    height: 100%;
-    width: 100%;
-    min-width: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: thin;
-    padding: calc($base-size * 0.5) calc($base-size * 0.3) 0;
+    gap: calc($base-size * 1.2);
+    min-height: 0;
+    overflow: visible;
 }
 
 .inv-detail-preview {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    aspect-ratio: 1 / 1;
     background: rgba(0, 0, 0, 0.2);
     clip-path: $pixel-corners-clip-path;
+    width: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .inv-detail-image {
@@ -1071,72 +1038,67 @@ $shop-button-background: linear-gradient(
     max-height: 100%;
     object-fit: contain;
     image-rendering: pixelated;
-}
-
-.inv-music-preview {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: calc($base-size * 0.5);
-}
-
-.inv-music-note {
-    font-size: calc($font-size * 4);
-    color: #fff;
-    line-height: 1;
-}
-
-.inv-music-track-label {
-    color: #fff;
-    font-family: $font-family;
-    font-size: calc($font-size * 0.65);
-    text-align: center;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    user-select: none;
+    pointer-events: none;
 }
 
 .inv-detail-name {
-    width: 100%;
-    padding: calc($base-size * 0.8) calc($base-size * 1.2);
-    color: #fff;
+    color: white;
     font-family: $font-family;
-    font-size: calc($font-size * 0.8);
-    text-align: center;
-    letter-spacing: calc($font-size * 0.05);
+    font-size: calc($font-size * 0.7);
     background: rgba(0, 0, 0, 0.2);
     clip-path: $pixel-corners-clip-path;
+    padding: calc($base-size * 1) calc($base-size * 1.6);
+    width: 100%;
+    flex: 1;
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
+    user-select: none;
 }
 
 .equip-button {
     width: 100%;
-    padding: calc($base-size * 0.8) calc($base-size * 0.5);
-    border: 3px solid #1a6a2a;
-    background: $shop-button-background;
+    height: calc($base-size * 6);
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background-image: url($img-button-container-edge-left), url($img-button-container-body), url($img-button-container-edge-right);
+    background-repeat: no-repeat, space, no-repeat;
+    background-position:
+        left top,
+        center top,
+        right top;
+    background-size:
+        auto 100%,
+        92% 100%,
+        auto 100%;
+    background-color: transparent;
     color: #fff;
     font-family: $font-family;
-    font-size: calc($font-size * 0.75);
-    cursor: pointer;
-    letter-spacing: calc($font-size * 0.05);
-    transition:
-        filter 0.15s ease,
-        transform 0.15s ease;
-    clip-path: $pixel-corners-clip-path;
-    text-align: center;
+    font-size: calc($font-size * 0.9);
+    text-shadow: $text-shadow-color calc($font-size * 0.1) 0 0;
+    letter-spacing: calc($font-size * 0.1);
+    user-select: none;
+    transition: all 0.3s ease;
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
 
     &:hover:not(:disabled) {
         filter: brightness(1.1);
-        transform: translateY(-1px);
+        scale: 1.02;
+    }
+
+    &:active:not(:disabled) {
+        filter: brightness(0.9);
+        scale: 0.95;
     }
 
     &:disabled {
-        filter: grayscale(0.5);
+        filter: grayscale(1);
         cursor: default;
         opacity: 0.8;
     }
@@ -1152,53 +1114,4 @@ $shop-button-background: linear-gradient(
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
-}
-
-.items-grid {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 12px;
-}
-
-.shop-item {
-    min-height: 148px;
-    border: none;
-    padding: 0;
-    background: transparent;
-    display: grid;
-    grid-template-columns: $button-cutout-size 1fr $button-cutout-size;
-    cursor: pointer;
-    transition:
-        transform 0.15s ease,
-        filter 0.15s ease;
-}
-
-.shop-item .item-edge,
-.shop-item .item-body {
-    background: $shop-button-background;
-}
-
-.shop-item .item-edge {
-    width: 100%;
-    height: calc(100% - $button-cutout-size * 2);
-    align-self: center;
-}
-
-.shop-item .item-edge:first-child {
-    margin-right: calc($button-cutout-size * -0.2);
-}
-
-.shop-item .item-edge:last-child {
-    margin-left: calc($button-cutout-size * -0.2);
-}
-
-.shop-item .item-body {
-    width: 100%;
-    height: 100%;
-    padding: 14px 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
 }

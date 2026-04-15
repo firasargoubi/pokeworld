@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
+import { PopupColor } from '@app/interfaces/popup';
+import { SoundEffect } from '@app/interfaces/sound-service';
+import { AudioService } from '@app/services/audio/audio.service';
 import { BalanceService } from '@app/services/balance/balance.service';
 import { PopupService } from '@app/services/popup/popup.service';
 import { PreferencesService } from '@app/services/preferences/preferences.service';
 import { UserService } from '@app/services/user/user.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
-import { SHOP_ITEMS } from '@common/consts/shop.const';
+import { AVATAR_DESCRIPTIONS, MUSIC_DESCRIPTIONS, PARTY_BALL_DESCRIPTIONS, SHOP_ITEMS } from '@common/consts/shop.const';
 import { Avatar } from '@common/interfaces/player-data';
 import { MenuMusicVariant, PartyBallVariant } from '@common/interfaces/preferences';
 import { ShopItem, ShopItemType } from '@common/interfaces/shop';
@@ -19,11 +22,12 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     templateUrl: './shop-popup.component.html',
     styleUrls: ['./shop-popup.component.scss'],
 })
-export class ShopPopupComponent {
+export class ShopPopupComponent implements OnDestroy {
     currentUser: UserInfo | null = null;
     shopItems: ShopItem[] = structuredClone(SHOP_ITEMS);
     selectedItem: ShopItem | null = null;
     isLoading = false;
+    private readonly audioService = inject(AudioService);
     private readonly balanceService = inject(BalanceService);
     private readonly popupService = inject(PopupService);
     private readonly preferencesService = inject(PreferencesService);
@@ -54,6 +58,9 @@ export class ShopPopupComponent {
         if (this.shopItems.length > 0) {
             this.selectedItem = this.shopItems[0];
         }
+
+        const musicTracks = Object.values(MenuMusicVariant).map((variant) => this.preferencesService.getHomeMenuTrack(variant));
+        this.audioService.preloadBackgroundMusic(musicTracks);
     }
 
     get buttonItems(): ShopItem[] {
@@ -72,17 +79,27 @@ export class ShopPopupComponent {
     }
 
     selectItem(item: ShopItem): void {
+        this.audioService.playEffect(SoundEffect.Click);
         this.selectedItem = item;
+        if (item.type === ShopItemType.Music) {
+            const variant = item.variant as MenuMusicVariant;
+            this.audioService.playBackgroundMusic(this.preferencesService.getHomeMenuTrack(variant));
+        } else {
+            this.restorePreferenceMusic();
+        }
     }
 
     getItemPreview(item: ShopItem): string {
-        if (item.type === ShopItemType.Button) {
-            return this.preferencesService.getPartyBallAssetForVariant(item.variant as PartyBallVariant, false);
+        switch (item.type) {
+            case ShopItemType.Button:
+                return this.preferencesService.getPartyBallAssetForVariant(item.variant as PartyBallVariant, false);
+            case ShopItemType.Pokemon:
+                return this.getPokemonPreview(item);
+            case ShopItemType.Music:
+                return `/assets/images/menu/shop-items/tm-${item.variant}.png`;
+            default:
+                return '';
         }
-        if (item.type === ShopItemType.Pokemon) {
-            return this.getPokemonPreview(item);
-        }
-        return '';
     }
 
     getPokemonPreview(item: ShopItem): string {
@@ -99,6 +116,7 @@ export class ShopPopupComponent {
     }
 
     purchaseItem(item: ShopItem | null): void {
+        this.audioService.playEffect(SoundEffect.Click);
         if (!item || !this.currentUser || this.isLoading) {
             return;
         }
@@ -127,6 +145,7 @@ export class ShopPopupComponent {
                     }),
                     hasCloseButton: true,
                     isConfirmation: false,
+                    popupColor: PopupColor.Green,
                 });
             },
             error: (err) => {
@@ -149,5 +168,26 @@ export class ShopPopupComponent {
 
     isButtonItem(item: ShopItem | null): boolean {
         return item?.type === ShopItemType.Button;
+    }
+
+    getItemDescription(item: ShopItem): string {
+        switch (item.type) {
+            case ShopItemType.Button:
+                return PARTY_BALL_DESCRIPTIONS[item.variant as PartyBallVariant] ?? '';
+            case ShopItemType.Music:
+                return MUSIC_DESCRIPTIONS[item.variant as MenuMusicVariant] ?? '';
+            case ShopItemType.Pokemon:
+                return AVATAR_DESCRIPTIONS[item.variant as Avatar] ?? '';
+            default:
+                return '';
+        }
+    }
+
+    ngOnDestroy(): void {
+        this.restorePreferenceMusic();
+    }
+
+    private restorePreferenceMusic(): void {
+        this.audioService.playBackgroundMusic(this.preferencesService.getHomeMenuTrack());
     }
 }

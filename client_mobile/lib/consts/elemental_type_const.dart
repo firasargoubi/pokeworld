@@ -18,6 +18,9 @@ const Map<Avatar, ElementalType> AVATAR_ELEMENT_TYPE_MAP = {
   Avatar.Avatar10: ElementalType.Water,
   Avatar.Avatar11: ElementalType.Dragon,
   Avatar.Avatar12: ElementalType.Psychic,
+  Avatar.Avatar13: ElementalType.Fight,
+  Avatar.Avatar14: ElementalType.Flying,
+  Avatar.Avatar15: ElementalType.Water,
 
   Avatar.Avatar1Shiny: ElementalType.Grass,
   Avatar.Avatar2Shiny: ElementalType.Water,
@@ -31,6 +34,9 @@ const Map<Avatar, ElementalType> AVATAR_ELEMENT_TYPE_MAP = {
   Avatar.Avatar10Shiny: ElementalType.Water,
   Avatar.Avatar11Shiny: ElementalType.Dragon,
   Avatar.Avatar12Shiny: ElementalType.Psychic,
+  Avatar.Avatar13Shiny: ElementalType.Fight,
+  Avatar.Avatar14Shiny: ElementalType.Flying,
+  Avatar.Avatar15Shiny: ElementalType.Water,
 
   Avatar.Avatar1Evolved: ElementalType.Grass,
   Avatar.Avatar2Evolved: ElementalType.Water,
@@ -44,6 +50,9 @@ const Map<Avatar, ElementalType> AVATAR_ELEMENT_TYPE_MAP = {
   Avatar.Avatar10Evolved: ElementalType.Water,
   Avatar.Avatar11Evolved: ElementalType.Dragon,
   Avatar.Avatar12Evolved: ElementalType.Psychic,
+  Avatar.Avatar13Evolved: ElementalType.Fight,
+  Avatar.Avatar14Evolved: ElementalType.Flying,
+  Avatar.Avatar15Evolved: ElementalType.Water,
 
   Avatar.Avatar1EvolvedShiny: ElementalType.Grass,
   Avatar.Avatar2EvolvedShiny: ElementalType.Water,
@@ -57,6 +66,9 @@ const Map<Avatar, ElementalType> AVATAR_ELEMENT_TYPE_MAP = {
   Avatar.Avatar10EvolvedShiny: ElementalType.Water,
   Avatar.Avatar11EvolvedShiny: ElementalType.Dragon,
   Avatar.Avatar12EvolvedShiny: ElementalType.Psychic,
+  Avatar.Avatar13EvolvedShiny: ElementalType.Fight,
+  Avatar.Avatar14EvolvedShiny: ElementalType.Flying,
+  Avatar.Avatar15EvolvedShiny: ElementalType.Water,
 
   Avatar.MissingNo: ElementalType.Normal,
 };
@@ -65,12 +77,14 @@ const Map<ElementalType, List<ElementalType>> ELEMENT_TYPE_ADVANTAGES = {
   ElementalType.Grass: [ElementalType.Water, ElementalType.Ground],
   ElementalType.Water: [ElementalType.Fire, ElementalType.Ground],
   ElementalType.Fire: [ElementalType.Grass, ElementalType.Fairy],
-  ElementalType.Electric: [ElementalType.Water],
+  ElementalType.Electric: [ElementalType.Water, ElementalType.Flying],
   ElementalType.Normal: [],
-  ElementalType.Fairy: [ElementalType.Dragon],
+  ElementalType.Fairy: [ElementalType.Dragon, ElementalType.Fight],
   ElementalType.Ground: [ElementalType.Fire, ElementalType.Electric],
   ElementalType.Dragon: [ElementalType.Dragon],
-  ElementalType.Psychic: [],
+  ElementalType.Psychic: [ElementalType.Fight],
+  ElementalType.Flying: [ElementalType.Grass, ElementalType.Fight],
+  ElementalType.Fight: [ElementalType.Normal],
 };
 
 const Map<ElementalType, ElementalTypeLabelConfig> ELEMENTAL_TYPE_LABEL_CONFIG = {
@@ -128,6 +142,18 @@ const Map<ElementalType, ElementalTypeLabelConfig> ELEMENTAL_TYPE_LABEL_CONFIG =
     darkColor: Color(0xFF807870),
     textKey: 'pages.character.elementalType.water',
   ),
+  ElementalType.Flying: ElementalTypeLabelConfig(
+    mainColor: Color(0xFFA890F0),
+    lightColor: Color(0xFFC8C0F8),
+    darkColor: Color(0xFF705898),
+    textKey: 'pages.character.elementalType.flying',
+  ),
+  ElementalType.Fight: ElementalTypeLabelConfig(
+    mainColor: Color(0xFFC03028),
+    lightColor: Color(0xFFE56E2E),
+    darkColor: Color(0xFF404040),
+    textKey: 'pages.character.elementalType.fight',
+  ),
 };
 
 const Map<ElementalType, String> ELEMENTAL_TYPE_ICONS = {
@@ -140,4 +166,6 @@ const Map<ElementalType, String> ELEMENTAL_TYPE_ICONS = {
   ElementalType.Normal: 'assets/images/game/elemental-icons/normal.png',
   ElementalType.Psychic: 'assets/images/game/elemental-icons/psychic.png',
   ElementalType.Water: 'assets/images/game/elemental-icons/water.png',
+  ElementalType.Flying: 'assets/images/game/elemental-icons/flying.png',
+  ElementalType.Fight: 'assets/images/game/elemental-icons/fight.png',
 };

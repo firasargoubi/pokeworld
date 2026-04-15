@@ -145,14 +145,14 @@ export class PreferencesService {
         });
     }
 
-    getHomeMenuTrack(): BackgroundMusic {
+    getHomeMenuTrack(variant?: MenuMusicVariant): BackgroundMusic {
         const variantMap: Record<MenuMusicVariant, BackgroundMusic> = {
             [MenuMusicVariant.Zero]: BackgroundMusic.Home,
             [MenuMusicVariant.One]: BackgroundMusic.Home1,
             [MenuMusicVariant.Two]: BackgroundMusic.Home2,
             [MenuMusicVariant.Three]: BackgroundMusic.Home3,
         };
-        return variantMap[this.currentMenuMusic] ?? BackgroundMusic.Home;
+        return variantMap[variant ?? this.currentMenuMusic] ?? BackgroundMusic.Home;
     }
 
     setPartyBall(partyBall: PartyBallVariant): void {

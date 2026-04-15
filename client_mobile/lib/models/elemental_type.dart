@@ -9,7 +9,9 @@ enum ElementalType {
   Fairy('fairy'),
   Ground('ground'),
   Dragon('dragon'),
-  Psychic('psychic');
+  Psychic('psychic'),
+  Flying('flying'),
+  Fight('fight');
 
   final dynamic value;
   const ElementalType(this.value);

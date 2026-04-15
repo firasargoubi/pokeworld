@@ -217,7 +217,9 @@
                 "ground": "GROUND",
                 "normal": "NORMAL",
                 "psychic": "PSYCHIC",
-                "water": "WATER"
+                "water": "WATER",
+                "flying": "FLYING",
+                "fight": "FIGHT"
             }
         },
         "play": {
@@ -452,12 +454,12 @@
                 "item3": "Item 3",
                 "item4": "Item 4",
                 "item5": "Item 5",
-                "partyBall0": "Party Ball 0",
-                "partyBall": "Party Ball",
-                "partyBall1": "Party Ball 1",
-                "partyBall2": "Party Ball 2",
-                "partyBall3": "Party Ball 3",
-                "partyBall4": "Party Ball 4",
+                "partyBall0": "Poké Ball",
+                "partyBall": "Poké Ball",
+                "partyBall1": "Great Ball",
+                "partyBall2": "Master Ball",
+                "partyBall3": "Premier Ball",
+                "partyBall4": "Ultra Ball",
                 "menuMusic0": "Music Track 0",
                 "menuMusic1": "Music Track 1",
                 "menuMusic2": "Music Track 2",
@@ -465,6 +467,20 @@
                 "avatar13": "Riolu",
                 "avatar14": "Starly",
                 "avatar15": "Froakie"
+            },
+            "descriptions": {
+                "partyBall0": "The classic Poké Ball, simple and effective. Changes the appearance of several elements throughout the game.",
+                "partyBall1": "The Great Ball, more powerful than the Poké Ball. Changes the appearance of several elements throughout the game.",
+                "partyBall2": "The Master Ball, the most powerful of all. Changes the appearance of several elements throughout the game.",
+                "partyBall3": "The Premier Ball, elegant and refined. Changes the appearance of several elements throughout the game.",
+                "partyBall4": "The Ultra Ball, formidable and coveted. Changes the appearance of several elements throughout the game.",
+                "menuMusic0": "The original main menu melody. Will be played in the main menus of the game.",
+                "menuMusic1": "An alternative track with an upbeat rhythm. Will be played in the main menus of the game.",
+                "menuMusic2": "A soft and soothing melody. Will be played in the main menus of the game.",
+                "menuMusic3": "An epic and grand theme. Will be played in the main menus of the game.",
+                "avatar13": "Riolu, the Emanation Pokémon. Fighting type.",
+                "avatar14": "Starly, the Starling Pokémon. Flying type.",
+                "avatar15": "Froakie, the Bubble Frog Pokémon. Water type."
             }
         },
         "warningConfirmation": {

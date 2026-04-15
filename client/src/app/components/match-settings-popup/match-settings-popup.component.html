@@ -4,16 +4,19 @@
     <div class="options">
         <div class="option" (click)="toggleDropInDropOut()">
             <div class="check-box" [ngClass]="{ selected: matchSettings.isDropInEnabled }"></div>
+            <div class="option-icon drop-icon"></div>
             <p>{{ 'components.matchSettings.dropInDropOut' | translate }}</p>
         </div>
 
         <div class="option" (click)="toggleElementalMode()">
             <div class="check-box" [ngClass]="{ selected: matchSettings.isElementalMode }"></div>
+            <div class="option-icon elemental-icon"></div>
             <p>{{ 'components.matchSettings.elementalMode' | translate }}</p>
         </div>
 
         <div class="option" (click)="toggleRapidElimination()">
             <div class="check-box" [ngClass]="{ selected: matchSettings.isRapidElimination }"></div>
+            <div class="option-icon re-icon"></div>
             <p>{{ 'components.matchSettings.rapidElimination' | translate }}</p>
         </div>
     </div>

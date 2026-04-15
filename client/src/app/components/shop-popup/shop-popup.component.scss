@@ -1,38 +1,70 @@
 $font-family: 'pixel';
-$text-color: #0f1f3d;
-$card-bg: #3a8a5a;
-$item-bg: #5aaa7a;
-$item-owned-bg: #7a7a7a;
-$item-selected-border: #ffffff;
-$detail-bg: #4a9a6a;
-$pixel-corner-size: 8px;
-$pixel-shadow-size: 4px;
 
-$pixel-clip-path: polygon(
-    $pixel-corner-size 0%,
-    calc(100% - #{$pixel-corner-size}) 0%,
-    calc(100% - #{$pixel-corner-size}) $pixel-corner-size,
-    100% $pixel-corner-size,
-    100% calc(100% - #{$pixel-corner-size}),
-    calc(100% - #{$pixel-corner-size}) calc(100% - #{$pixel-corner-size}),
-    calc(100% - #{$pixel-corner-size}) 100%,
-    $pixel-corner-size 100%,
-    $pixel-corner-size calc(100% - #{$pixel-corner-size}),
-    0% calc(100% - #{$pixel-corner-size}),
-    0% $pixel-corner-size,
-    $pixel-corner-size $pixel-corner-size
+// ── Responsive base units (same system as user-popup) ──────────
+$base-size: min(1vh, 1vw);
+$border-size: calc($base-size * 3);
+$font-size: calc($base-size * 3);
+$card-width: calc($base-size * 95);
+$card-height: calc($base-size * 75);
+
+// ── Container border images (user-card style) ──────────────────
+$img-user-border-left: '../../../assets/images/menu/containers/shop/shop-border-1.png';
+$img-user-border-center: '../../../assets/images/menu/containers/shop/shop-edge-1.png';
+$img-user-border-right: '../../../assets/images/menu/containers/shop/shop-border-2.png';
+
+$img-user-edge-left: '../../../assets/images/menu/containers/shop/shop-edge-2.png';
+$img-user-edge-right: '../../../assets/images/menu/containers/shop/shop-edge-3.png';
+
+$img-card-icon-bg: '../../../assets/images/menu/containers/shop/shop-card-icon-bg.png';
+$img-title-icon: '../../../assets/images/menu/containers/shop/green-title-icon.png';
+
+$img-button-container-edge-left: '../../../assets/images/menu/containers/shop/green-button-container-edge-1.png';
+$img-button-container-edge-right: '../../../assets/images/menu/containers/shop/green-button-container-edge-2.png';
+$img-button-container-body: '../../../assets/images/menu/containers/shop/green-button-container-body.png';
+
+// ── Colors ─────────────────────────────────────────────────────
+$text-color: #484848;
+$text-shadow-color: #a0a0a0;
+
+// ── Pixel-corner clip path (responsive) ────────────────────────
+$corner-unit: calc($base-size * 0.5);
+$pixel-corners-clip-path: polygon(
+    0 #{$corner-unit},
+    #{$corner-unit} #{$corner-unit},
+    #{$corner-unit} 0,
+    calc(100% - #{$corner-unit}) 0,
+    calc(100% - #{$corner-unit}) #{$corner-unit},
+    100% #{$corner-unit},
+    100% calc(100% - #{$corner-unit}),
+    calc(100% - #{$corner-unit}) calc(100% - #{$corner-unit}),
+    calc(100% - #{$corner-unit}) 100%,
+    #{$corner-unit} 100%,
+    #{$corner-unit} calc(100% - #{$corner-unit}),
+    0 calc(100% - #{$corner-unit})
 );
 
+// ── Button gradient ────────────────────────────────────────────
+$button-cutout-size: calc($base-size * 0.8);
+$shop-button-background: linear-gradient(
+    to bottom,
+    #d0f0d0 0,
+    #d0f0d0 $button-cutout-size,
+    #90c890 $button-cutout-size,
+    #90c890 calc(100% - $button-cutout-size),
+    #407540 calc(100% - $button-cutout-size),
+    #407540 100%
+);
+
+// ═══════════════════════════════════════════════════════════════
+// Layout
+// ═══════════════════════════════════════════════════════════════
+
 .shop-popup {
-    --shop-scale: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
     height: 100%;
-    padding: 24px;
-    box-sizing: border-box;
-    overflow: auto;
 }
 
 .shop-popup,
@@ -41,83 +73,141 @@ $pixel-clip-path: polygon(
     min-width: 0;
 }
 
-.shop-card-shell {
-    width: calc(980px * var(--shop-scale));
-    height: calc(680px * var(--shop-scale));
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 0 0 auto;
+// ── Decorative background icon ─────────────────────────────────
+.card-icon-background {
+    position: absolute;
+    top: calc($border-size * 0.47);
+    left: calc($border-size * 0.45);
+    width: 65%;
+    aspect-ratio: 1 / 1;
+    background-image: url($img-card-icon-bg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    z-index: 1;
 }
 
-.shop-card {
-    width: 980px;
-    height: 680px;
-    background-image: url('../../../assets/images/menu/containers/user-container-back.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    padding: 26px 30px 20px;
+// ── Card container (same frame as user-popup) ──────────────────
+.card-container {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    min-height: 680px;
-    transform: scale(var(--shop-scale));
-    transform-origin: center center;
-    flex: 0 0 auto;
+    justify-content: space-between;
+    width: $card-width;
+    height: $card-height;
 }
 
-.shop-header {
+.card-container .card-main-border {
+    width: 100%;
+    height: $border-size;
+    background-image: url($img-user-border-left), url($img-user-border-center), url($img-user-border-right);
+    background-repeat: no-repeat, no-repeat, no-repeat;
+    background-position:
+        left top,
+        center top,
+        right top;
+    background-size:
+        #{$border-size} 100%,
+        calc(100% - (1.9 * #{$border-size})) 100%,
+        #{$border-size} 100%;
+
+    &:last-child {
+        margin-top: calc($base-size * -0.1);
+        transform: rotate(180deg);
+    }
+}
+
+.card-container .card-body {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+    padding: 0 2%;
+    gap: calc($base-size * 1.2);
+    background-image: url($img-user-edge-left), url($img-user-edge-right);
+    background-repeat: no-repeat, no-repeat;
+    background-position:
+        left top,
+        right top;
+    background-size:
+        $border-size 100%,
+        $border-size 100%;
+    background-color: #288d67;
+}
+
+// ── Title container (same pattern as user-popup) ──────────────
+.title-container {
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    width: 100%;
+    height: 12%;
+    margin: 0 0 0 calc($base-size * 1.5);
+    z-index: 2;
+    user-select: none;
+}
+
+.title-label {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: $base-size;
+    height: 100%;
 }
 
-.shop-title {
-    margin: 0;
-    color: white;
+.icon-wrapper {
+    height: 60%;
+    aspect-ratio: 1 / 1;
+    background-image: url($img-title-icon);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.title {
     font-family: $font-family;
-    font-size: 20px;
-    letter-spacing: 0.06em;
+    font-size: calc($font-size * 1.8);
+    color: #fff;
+    text-shadow: #03492d calc($font-size * 0.2) 0 0;
+    letter-spacing: calc($font-size * 0.1);
+    margin: 0;
+    max-width: 100%;
     text-align: center;
+    white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
 }
 
-.shop-title-icon {
-    width: 28px;
-    height: 28px;
-    background-image: url('../../../assets/images/menu/buttons/poke-button/party-ball-0.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    image-rendering: pixelated;
-}
-
+// ── Shop body (two-panel grid) ─────────────────────────────────
 .shop-body {
-    display: grid;
-    grid-template-columns: 1fr 260px;
-    gap: 18px;
+    display: flex;
+    padding: 0 calc($base-size * 1.8);
+    gap: calc($base-size * 1.8);
     flex: 1;
     min-height: 0;
+    z-index: 1;
 }
 
+// ── Items panel (left side) ────────────────────────────────────
 .items-panel {
+    flex: 2.5;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    min-height: 0;
 }
 
 .items-scroll {
     overflow-y: auto;
-    padding-right: 4px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    height: 100%;
+    padding-right: calc($base-size * 0.5);
+    flex: 1;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.6) transparent;
 
     &::-webkit-scrollbar {
-        width: 6px;
+        width: calc($base-size * 0.6);
     }
 
     &::-webkit-scrollbar-track {
@@ -130,41 +220,50 @@ $pixel-clip-path: polygon(
 }
 
 .section-label {
-    margin: 0 0 4px 0;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgb(255, 255, 255);
+    text-shadow: #03492d calc($font-size * 0.1) 0 0;
     font-family: $font-family;
-    font-size: 13px;
-    letter-spacing: 0.05em;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    font-size: calc($font-size * 0.8);
+    letter-spacing: calc($font-size * 0.05);
+    margin: 0 0 calc($base-size * 2) 0;
+    user-select: none;
 }
 
 .section-divider {
-    height: 2px;
+    height: calc($base-size * 0.5);
     background: rgba(255, 255, 255, 0.25);
-    margin: 4px 0;
+    margin: calc($base-size * 2) 0 calc($base-size * 1);
 }
 
 .items-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: calc($base-size * 1);
+    margin-bottom: calc($base-size * 0.8);
 }
 
 .shop-item {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.2);
     border: 3px solid rgba(255, 255, 255, 0.15);
-    clip-path: $pixel-clip-path;
-    padding: 10px 8px 8px;
+    clip-path: $pixel-corners-clip-path;
+    padding: calc($base-size * 1) calc($base-size * 0.8) calc($base-size * 0.8);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 6px;
+    align-items: space-between;
     cursor: pointer;
     transition: filter 0.1s ease;
     font-family: $font-family;
-    width: 100%;
+    width: calc($base-size * 18);
+    height: calc($base-size * 15);
     overflow: hidden;
+
+    font-family: $font-family;
+    font-size: calc($font-size * 0.8);
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 
     &:hover:not(:disabled) {
         filter: brightness(1.15);
@@ -173,78 +272,56 @@ $pixel-clip-path: polygon(
     &.owned {
         background: rgba(0, 0, 0, 0.35);
         border-color: rgba(255, 255, 255, 0.08);
+
+        * {
+            filter: grayscale(1) brightness(0.6);
+        }
     }
 
     &.selected {
-        border-color: $item-selected-border;
+        border-color: #fff;
         background: rgba(255, 255, 255, 0.12);
+
+        &.owned {
+            background: rgba(0, 0, 0, 0.35);
+        }
     }
 }
 
 .item-thumb {
-    width: 56px;
-    height: 56px;
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    flex: 1;
     object-fit: contain;
-    image-rendering: pixelated;
-}
-
-.music-icon {
-    width: 56px;
-    min-height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    line-height: 0.9;
-    padding: 4px 0;
-    color: white;
-    opacity: 0.9;
+    user-select: none;
+    pointer-events: none;
 }
 
 .item-name {
-    color: white;
-    font-family: $font-family;
-    font-size: 12px;
-    text-align: center;
-    line-height: 1.2;
-    width: 100%;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    user-select: none;
 }
 
 .item-status {
-    font-family: $font-family;
-    font-size: 11px;
-    text-align: center;
-    width: 100%;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-}
-
-.item-price {
-    color: #ffe070;
+    user-select: none;
 }
 
 .owned-label {
     color: rgba(255, 255, 255, 0.6);
 }
 
-// Detail panel (right side)
+// ── Detail panel (right side) ──────────────────────────────────
 .detail-panel {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: calc($base-size * 1.2);
     min-height: 0;
+    overflow: visible;
 }
 
 .detail-preview {
     background: rgba(0, 0, 0, 0.2);
-    clip-path: $pixel-clip-path;
+    clip-path: $pixel-corners-clip-path;
     width: 100%;
     aspect-ratio: 1;
     display: flex;
@@ -259,103 +336,109 @@ $pixel-clip-path: polygon(
     max-height: 100%;
     object-fit: contain;
     image-rendering: pixelated;
-}
-
-.music-preview {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-}
-
-.music-note {
-    width: 100%;
-    min-height: 96px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 56px;
-    line-height: 0.9;
-    padding: 6px 0;
-    color: white;
-    opacity: 0.85;
-}
-
-.music-track-label {
-    color: white;
-    font-family: $font-family;
-    font-size: 13px;
-    text-align: center;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    user-select: none;
+    pointer-events: none;
 }
 
 .detail-name {
     color: white;
     font-family: $font-family;
-    font-size: 14px;
-    text-align: center;
+    font-size: calc($font-size * 0.7);
     background: rgba(0, 0, 0, 0.2);
-    clip-path: $pixel-clip-path;
-    padding: 10px 16px;
+    clip-path: $pixel-corners-clip-path;
+    padding: calc($base-size * 1) calc($base-size * 1.6);
     width: 100%;
+    flex: 1;
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
+    user-select: none;
 }
 
 .buy-button {
     width: 100%;
-    padding: 12px 0;
-    background: #2a8a3a;
-    border: 3px solid #1a6a2a;
-    clip-path: $pixel-clip-path;
-    color: white;
-    font-family: $font-family;
-    font-size: 16px;
-    letter-spacing: 0.06em;
+    height: calc($base-size * 7);
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
-    transition: filter 0.1s ease;
-    text-align: center;
+    background-image: url($img-button-container-edge-left), url($img-button-container-body), url($img-button-container-edge-right);
+    background-repeat: no-repeat, space, no-repeat;
+    background-position:
+        left top,
+        center top,
+        right top;
+    background-size:
+        auto 100%,
+        92% 100%,
+        auto 100%;
+    background-color: transparent;
+    color: #fff;
+    font-family: $font-family;
+    font-size: calc($font-size * 0.9);
+    text-shadow: $text-shadow-color calc($font-size * 0.1) 0 0;
+    letter-spacing: calc($font-size * 0.1);
+    user-select: none;
+    transition: all 0.3s ease;
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
 
     &:hover:not(:disabled) {
-        filter: brightness(1.2);
+        filter: brightness(1.1);
+        scale: 1.02;
+    }
+
+    &:active:not(:disabled) {
+        filter: brightness(0.9);
+        scale: 0.95;
     }
 
     &:disabled {
-        background: rgba(0, 0, 0, 0.3);
-        border-color: rgba(255, 255, 255, 0.1);
+        filter: grayscale(1);
         cursor: default;
-        color: rgba(255, 255, 255, 0.5);
+        opacity: 0.8;
     }
 }
 
-// Footer
+// ── Footer ─────────────────────────────────────────────────────
 .shop-footer {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    padding-top: 4px;
-    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    z-index: 1;
+    background-image: url('../../../assets/images/menu/containers/shop/green-badges-container.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+    width: 101%;
+    align-self: center;
 }
 
 .balance-label {
+    background-color: #64be8c;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: calc($base-size * 0.8) calc($base-size * 1.5);
     color: white;
     font-family: $font-family;
-    font-size: 22px;
-    letter-spacing: 0.05em;
-    line-height: 1;
-    padding: 12px 18px;
-    background: rgba(0, 0, 0, 0.24);
-    clip-path: $pixel-clip-path;
-    text-shadow: 2px 0 0 rgba(20, 40, 90, 0.45);
+    font-size: calc($font-size * 1.2);
+    letter-spacing: calc($font-size * 0.05);
+    text-shadow: $text-shadow-color calc($font-size * 0.1) 0 0;
     max-width: 100%;
     text-align: center;
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
+    user-select: none;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        opacity: 0.3;
+    }
 }

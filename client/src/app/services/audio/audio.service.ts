@@ -46,6 +46,13 @@ export class AudioService {
         });
     }
 
+    preloadBackgroundMusic(tracks: BackgroundMusic[]): void {
+        tracks.forEach((track) => {
+            const audio = new Audio(`assets/audio/music/${track}`);
+            audio.load();
+        });
+    }
+
     playBackgroundMusic(music: BackgroundMusic): void {
         this.previousLogSize = 0;
         if (this.currentTrack === music && this.backgroundMusic && !this.backgroundMusic.paused) {

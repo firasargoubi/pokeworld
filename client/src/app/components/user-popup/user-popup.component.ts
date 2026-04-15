@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -13,7 +14,7 @@ import { SocialService } from '@app/services/social/social.service';
 import { UserService } from '@app/services/user/user.service';
 import { AVATAR_DATA } from '@common/consts/avatar-data.const';
 import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@common/consts/player-data.const';
-import { SHOP_ITEMS } from '@common/consts/shop.const';
+import { AVATAR_DESCRIPTIONS, MUSIC_DESCRIPTIONS, PARTY_BALL_DESCRIPTIONS, SHOP_ITEMS } from '@common/consts/shop.const';
 import { Avatar } from '@common/interfaces/player-data';
 import { MenuMusicVariant, PartyBallVariant } from '@common/interfaces/preferences';
 import { InventoryItem, ShopItem, ShopItemType } from '@common/interfaces/shop';
@@ -120,7 +121,14 @@ export class UserPopupComponent implements OnDestroy {
     }
 
     selectInventoryItem(item: ShopItem): void {
+        this.audioService.playEffect(SoundEffect.Click);
         this.selectedInventoryItem = item;
+        if (item.type === ShopItemType.Music) {
+            const variant = item.variant as MenuMusicVariant;
+            this.audioService.playBackgroundMusic(this.preferencesService.getHomeMenuTrack(variant));
+        } else {
+            this.audioService.playBackgroundMusic(this.preferencesService.getHomeMenuTrack());
+        }
     }
 
     getInventoryItemPreview(item: ShopItem): string {
@@ -130,11 +138,27 @@ export class UserPopupComponent implements OnDestroy {
         if (item.type === ShopItemType.Pokemon) {
             return AVATAR_DATA[item.variant as Avatar]?.imageCentered ?? '';
         }
+        if (item.type === ShopItemType.Music) {
+            return `/assets/images/menu/shop-items/tm-${item.variant}.png`;
+        }
         return '';
     }
 
     getMusicTrackNumber(item: ShopItem): string {
         return (item.variant as MenuMusicVariant) ?? '?';
+    }
+
+    getItemDescription(item: ShopItem): string {
+        switch (item.type) {
+            case ShopItemType.Button:
+                return PARTY_BALL_DESCRIPTIONS[item.variant as PartyBallVariant] ?? '';
+            case ShopItemType.Music:
+                return MUSIC_DESCRIPTIONS[item.variant as MenuMusicVariant] ?? '';
+            case ShopItemType.Pokemon:
+                return AVATAR_DESCRIPTIONS[item.variant as Avatar] ?? '';
+            default:
+                return '';
+        }
     }
 
     isInventoryItemEquipped(item: ShopItem): boolean {
@@ -171,6 +195,7 @@ export class UserPopupComponent implements OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.audioService.playBackgroundMusic(this.preferencesService.getHomeMenuTrack());
         this.searchSub?.unsubscribe();
         this.searchSubject.complete();
     }
@@ -203,6 +228,7 @@ export class UserPopupComponent implements OnDestroy {
 
     goToFront(): void {
         this.audioService.playEffect(SoundEffect.Click);
+        this.audioService.playBackgroundMusic(this.preferencesService.getHomeMenuTrack());
         this.activeCard = UserCardType.Front;
         this.resetForms();
     }

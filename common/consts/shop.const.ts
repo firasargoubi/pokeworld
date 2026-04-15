@@ -23,3 +23,24 @@ export const SHOP_ITEMS: ShopItem[] = [
     { id: 'avatar14', nameKey: 'components.shopPopup.items.avatar14', price: 5000, type: ShopItemType.Pokemon, variant: Avatar.Avatar14 },
     { id: 'avatar15', nameKey: 'components.shopPopup.items.avatar15', price: 5000, type: ShopItemType.Pokemon, variant: Avatar.Avatar15 },
 ];
+
+export const PARTY_BALL_DESCRIPTIONS: Record<PartyBallVariant, string> = {
+    [PartyBallVariant.Zero]: 'components.shopPopup.descriptions.partyBall0',
+    [PartyBallVariant.One]: 'components.shopPopup.descriptions.partyBall1',
+    [PartyBallVariant.Two]: 'components.shopPopup.descriptions.partyBall2',
+    [PartyBallVariant.Three]: 'components.shopPopup.descriptions.partyBall3',
+    [PartyBallVariant.Four]: 'components.shopPopup.descriptions.partyBall4',
+};
+
+export const MUSIC_DESCRIPTIONS: Record<MenuMusicVariant, string> = {
+    [MenuMusicVariant.Zero]: 'components.shopPopup.descriptions.menuMusic0',
+    [MenuMusicVariant.One]: 'components.shopPopup.descriptions.menuMusic1',
+    [MenuMusicVariant.Two]: 'components.shopPopup.descriptions.menuMusic2',
+    [MenuMusicVariant.Three]: 'components.shopPopup.descriptions.menuMusic3',
+};
+
+export const AVATAR_DESCRIPTIONS: Partial<Record<Avatar, string>> = {
+    [Avatar.Avatar13]: 'components.shopPopup.descriptions.avatar13',
+    [Avatar.Avatar14]: 'components.shopPopup.descriptions.avatar14',
+    [Avatar.Avatar15]: 'components.shopPopup.descriptions.avatar15',
+};

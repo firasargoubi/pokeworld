@@ -213,7 +213,9 @@
                 "ground": "GROUND",
                 "normal": "NORMAL",
                 "psychic": "PSYCHIC",
-                "water": "WATER"
+                "water": "WATER",
+                "flying": "FLYING",
+                "fight": "FIGHT"
             }
         },
         "play": {

@@ -9,6 +9,10 @@ $background-image: '../../../assets/images/menu/containers/gray/gray-scrare-body
 $open-button-image: '../../../assets/images/menu/icons/match-mode/open.svg';
 $friend-only-button-image: '../../../assets/images/menu/icons/user-card/friends.png';
 
+$elemental-icon: '../../../assets/images/menu/icons/match-mode/elemental.png';
+$drop-icon: '../../../assets/images/menu/icons/match-mode/drop.png';
+$re-icon: '../../../assets/images/menu/icons/match-mode/skull.png';
+
 .pop-up {
     position: absolute;
     top: 50%;
@@ -78,6 +82,27 @@ $friend-only-button-image: '../../../assets/images/menu/icons/user-card/friends.
     align-items: center;
     justify-content: left;
     cursor: pointer;
+}
+
+.option-icon {
+    width: calc($clip-size * 4.3);
+    height: calc($clip-size * 4.3);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: invert(1);
+}
+
+.drop-icon {
+    background-image: url($drop-icon);
+}
+
+.elemental-icon {
+    background-image: url($elemental-icon);
+}
+
+.re-icon {
+    background-image: url($re-icon);
 }
 
 .check-box {
