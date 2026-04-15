@@ -88,6 +88,18 @@ export class EditorService {
         return maxItemCount - currentItemCount;
     }
 
+    async saveGameOnServer(): Promise<boolean> {
+        this.gameDataService.gameData.lastEdited = new Date();
+        this.gameDataService.gameData.thumbnail = await this.thumbnailService.getThumbnail(this.gameDataService.gameData.mapData, true);
+        try {
+            await firstValueFrom(this.gameSaveService.saveGame(this.gameDataService.gameData));
+        } catch {
+            this.popupService.showPopup({ message: PopupMessage.ConnectionError, hasCloseButton: true, isConfirmation: false });
+            return false;
+        }
+        return true;
+    }
+
     private getMaxItemCount(item: ItemType, activeItem: ItemType | null): number {
         if (item === ItemType.Flag) {
             return this.gameDataService.getGameMode() === GameMode.CTF ? 1 : 0;
@@ -122,19 +134,5 @@ export class EditorService {
         }
 
         return itemCount;
-    }
-
-    private async saveGameOnServer(): Promise<boolean> {
-        this.gameDataService.gameData.lastEdited = new Date();
-        this.gameDataService.gameData.thumbnail = await this.thumbnailService.getThumbnail(this.gameDataService.gameData.mapData, true);
-
-        try {
-            await firstValueFrom(this.gameSaveService.saveGame(this.gameDataService.gameData));
-        } catch {
-            this.popupService.showPopup({ message: PopupMessage.ConnectionError, hasCloseButton: true, isConfirmation: false });
-            return false;
-        }
-
-        return true;
     }
 }

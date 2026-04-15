@@ -1,9 +1,11 @@
 {
     "popup": {
         "deleteGame": "Êtes-vous sûr de vouloir supprimer le jeu :",
+        "duplicateGame": "Êtes-vous sûr de vouloir dupliquer le jeu :",
         "quit": "Voulez-vous vraiment quitter ?",
         "quitEditPage": "Voulez-vous vraiment quitter la page? Les modifications non sauvegardées seront perdues.",
         "successfulSave": "Jeu sauvegardé avec succès",
+        "successfulDuplication": "Jeu dupliqué avec succès",
         "cancelModification": "Voulez-vous vraiment annuler les modifications?",
         "gameDoesNotExist": "Le jeu n'existe pas !",
         "errorFetchingGame": "Erreur lors de la récupération du jeu !",

@@ -24,6 +24,7 @@ export class GameCardComponent {
     @Input() index: number = 0;
     @Output() edit = new EventEmitter<string>();
     @Output() delete = new EventEmitter<string>();
+    @Output() duplicate = new EventEmitter<string>();
     @Output() join = new EventEmitter<string>();
 
     isHovered: boolean = false;
@@ -62,9 +63,15 @@ export class GameCardComponent {
         this.gameDataService.setGameData(this.game);
         this.edit.emit(this.game._id);
     }
+
     onDelete() {
         this.audioService.playEffect(SoundEffect.Click);
         this.delete.emit(this.game._id);
+    }
+
+    onDuplicate() {
+        this.audioService.playEffect(SoundEffect.Click);
+        this.duplicate.emit(this.game._id);
     }
 
     onJoin() {

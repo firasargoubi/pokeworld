@@ -5,9 +5,11 @@ import { ItemType } from '@common/interfaces/item-type.enum';
 import { GameMode, MapSize } from '@common/interfaces/map-data';
 import { Position } from '@common/interfaces/position';
 import { TileType } from '@common/interfaces/tile-type.enum';
-import { Subject } from 'rxjs';
+import { firstValueFrom, Subject } from 'rxjs';
 import { UserService } from '@app/services/user/user.service';
 import { Owner } from '@common/interfaces/owner';
+import { GameState } from '@common/interfaces/game-state.enum';
+import { GameSaveService } from '@app/services/game-save/game-save.service';
 
 @Injectable({
     providedIn: 'root',
@@ -17,6 +19,7 @@ export class GameDataService {
     mapUpdate: Subject<Position | null> = new Subject();
     itemUpdate: Subject<ItemType | null> = new Subject();
     private readonly userService = inject(UserService);
+    private readonly gameSaveService = inject(GameSaveService);
 
     isOwner(owner: Owner) {
         if (!owner) {
@@ -35,12 +38,36 @@ export class GameDataService {
         newGameData.mapData.tiles = Array.from({ length: size }, () => {
             return Array.from({ length: size }, () => TileType.Grass);
         });
+        this.setGameOwner(newGameData);
+        this.setGameData(newGameData);
+    }
+
+    async duplicateGame(game: GameData) {
+        const duplicateGame = structuredClone(game);
+        duplicateGame._id = '';
+        duplicateGame.name = await this.getNewGameName(game.name);
+        this.setGameOwner(duplicateGame);
+        duplicateGame.gameState = GameState.PRIVATE;
+        this.setGameData(duplicateGame);
+    }
+
+    async getNewGameName(gameName: string) {
+        let i = 0;
+        const prefixName = `${gameName}_copie`;
+        gameName = prefixName;
+        while (!(await firstValueFrom(this.gameSaveService.isNameUnique(gameName)))) {
+            gameName = `${prefixName}${i}`;
+            i++;
+        }
+        return gameName;
+    }
+
+    setGameOwner(game: GameData) {
         this.userService.user$.subscribe((user) => {
             if (user != null) {
-                newGameData.owner = { userId: user.userId, userName: user.username };
+                game.owner = { userId: user.userId, userName: user.username };
             }
         });
-        this.setGameData(newGameData);
     }
 
     setGameData(gameData: GameData) {

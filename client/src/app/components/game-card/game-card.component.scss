@@ -16,7 +16,7 @@ $card-border-width: calc($base-size * 0.7);
 $corner-square-size: calc($base-size * 0.7);
 $description-width: calc(var(--base-size) * 17);
 
-$button-cutout-size: calc(var(--base-size) * 0.3);
+$button-cutout-size: calc(var(--base-size) * 0.34);
 
 $color-gray-border: #636776;
 $color-card-border: rgb(246, 119, 56);
@@ -40,6 +40,7 @@ $color-blue-shadow-dark: #4ba6c6;
 $color-green-shadow-dark: #7a9765;
 $color-pink-shadow-dark: #e7a383;
 
+$color-btn-blue-top: #7bcee6;
 $color-btn-blue-mid: #4ba6c6;
 $color-btn-blue-dark: #2a7a99;
 
@@ -98,8 +99,8 @@ $bg-card-pink: linear-gradient(to right, $color-pink-sub, $color-pink-shadow-dar
 
 $bg-btn-blue: linear-gradient(
     to bottom,
-    $color-blue-main 0,
-    $color-blue-main $button-cutout-size,
+    $color-btn-blue-top 0,
+    $color-btn-blue-top $button-cutout-size,
     $color-btn-blue-mid $button-cutout-size,
     $color-btn-blue-mid calc(100% - $button-cutout-size),
     $color-btn-blue-dark calc(100% - $button-cutout-size),
@@ -228,6 +229,7 @@ $bg-btn-red: linear-gradient(
     left: 5%;
     top: 2%;
     width: 94%;
+    max-height: 50%;
 
     white-space: normal;
     word-wrap: break-word;
@@ -239,6 +241,18 @@ $bg-btn-red: linear-gradient(
     font-size: calc(var(--base-size) * 3.5);
     line-height: calc(var(--base-size) * 3);
     text-shadow: calc($base-size * 0.35) 0 0 $color-shadow-text-strong;
+}
+
+.game-label {
+    width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    white-space: normal;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
 }
 
 .game-owner {
@@ -346,7 +360,7 @@ $bg-btn-red: linear-gradient(
 }
 
 .game-info {
-    height: $big-stripe-size;
+    height: calc($big-stripe-size * 0.9);
     display: grid;
     grid-template-columns: 40% 60%;
     grid-template-rows: 50% 50%;
@@ -415,7 +429,7 @@ $bg-btn-red: linear-gradient(
 .game-interaction {
     display: flex;
     flex-direction: row;
-    gap: min(1vw, 1vh);
+    gap: calc($base-size * 0.5);
     justify-content: center;
     align-items: center;
     height: 40%;
@@ -423,7 +437,7 @@ $bg-btn-red: linear-gradient(
 }
 
 .main-button-container {
-    height: 80%;
+    height: 90%;
     aspect-ratio: 25/9;
     display: grid;
     place-items: center;
@@ -517,11 +531,15 @@ $bg-btn-red: linear-gradient(
 }
 
 .game-interaction .edit-button div {
-    background: $bg-btn-green;
+    background: $bg-btn-blue;
 }
 
 .game-interaction .delete-button div {
     background: $bg-btn-red;
+}
+
+.game-interaction .duplicate-button div {
+    background: $bg-btn-green;
 }
 
 .card-description {

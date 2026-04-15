@@ -157,18 +157,20 @@ class GameCard extends StatelessWidget {
                   Positioned(
                     left: cardWidth * 0.02,
                     top: cardWidth * 0.02,
-                    width: cardWidth * 0.9,
-                    child: Text(nameText, style: cornerLabelStyle(cardWidth), softWrap: true),
-                  ),
-                  Positioned(
-                    left: cardWidth * 0.02,
-                    top: cardWidth * 0.15,
-                    width: cardWidth * 0.9,
-                    child: Text(
-                      game.owner != null ? '${i18n.translate(GAME_CARD_OWNER_LABEL_KEY)} ${game.owner!.userName}' : '',
-                      style: ownerStyle(cardWidth * 0.8),
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
+                    width: cardWidth * 0.75,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(nameText, style: cornerLabelStyle(cardWidth), softWrap: true, maxLines: 2, overflow: TextOverflow.ellipsis),
+                        if (game.owner != null)
+                          Text(
+                            '${i18n.translate(GAME_CARD_OWNER_LABEL_KEY)} ${game.owner!.userName}',
+                            style: ownerStyle(cardWidth * 0.8),
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                      ],
                     ),
                   ),
                   Positioned(
