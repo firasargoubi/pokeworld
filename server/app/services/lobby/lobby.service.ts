@@ -270,7 +270,7 @@ export class LobbyService {
         }
 
         playerData.spawnPoint = structuredClone(spawnPoint);
-        const nearestAvailableTile = this.mapService.getNearestEmptyTile(match.data, playerData.spawnPoint);
+        const nearestAvailableTile = this.mapService.getNearestEmptyTile(match.data, playerData.spawnPoint, true);
         playerData.position = structuredClone(nearestAvailableTile);
         this.assignDropInTeam(match, playerData);
 

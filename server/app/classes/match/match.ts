@@ -160,6 +160,10 @@ export class Match {
         return this.availableSpawnPoints.length > 0;
     }
 
+    getAvailableSpawnPoints(): Position[] {
+        return this.availableSpawnPoints;
+    }
+
     getNextAvailableSpawnPoint(): Position | null {
         return this.availableSpawnPoints.length ? this.availableSpawnPoints.shift() ?? null : null;
     }

@@ -84,7 +84,7 @@ export class CombatService {
         this.itemService.dropItems(match, player.id, player.items);
 
         if (player.spawnPoint !== player.position) {
-            player.position = this.mapService.getNearestEmptyTile(match.data, player.spawnPoint);
+            player.position = this.mapService.getNearestEmptyTile(match.data, player.spawnPoint, true);
         }
     }
 

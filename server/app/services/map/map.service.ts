@@ -65,7 +65,7 @@ export class MapService {
         return tiles;
     }
 
-    getNearestEmptyTile(matchData: MatchData, currentPos: Position): Position {
+    getNearestEmptyTile(matchData: MatchData, currentPos: Position, ignoreSpawnPoints: boolean = false): Position {
         if (this.isOutOfBounds(matchData, currentPos)) {
             return currentPos;
         }
@@ -76,7 +76,7 @@ export class MapService {
         visited[currentPos.x][currentPos.y] = true;
         while (queue.length > 0) {
             const pos = queue.shift() as Position;
-            if (this.isTileValidForMovement(matchData, pos) && !this.isTileOccupiedByObject(matchData, pos)) {
+            if (this.isTileValidForMovement(matchData, pos) && !this.isTileOccupiedByObject(matchData, pos, ignoreSpawnPoints)) {
                 return pos;
             }
             this.enqueueValidNeighbors(matchData, pos, { visited, queue });
@@ -84,7 +84,7 @@ export class MapService {
         return currentPos;
     }
 
-    getNearestItemDropSpot(matchData: MatchData, currentPos: Position): Position {
+    getNearestItemDropSpot(matchData: MatchData, currentPos: Position, extraSpawnPoints: Position[] = []): Position {
         const size = matchData.gameData.mapData.size;
         const visited: boolean[][] = Array.from({ length: size }, () => Array(size).fill(false));
         const queue: Position[] = [];
@@ -92,7 +92,7 @@ export class MapService {
         visited[currentPos.x][currentPos.y] = true;
         while (queue.length > 0) {
             const pos = queue.shift() as Position;
-            if (this.isValidForDrop(matchData, pos)) {
+            if (this.isValidForDrop(matchData, pos, currentPos, extraSpawnPoints)) {
                 return pos;
             }
             this.enqueueValidNeighbors(matchData, pos, { visited, queue });
@@ -126,17 +126,18 @@ export class MapService {
         return hasEnemyPlayer;
     }
 
-    private isValidForDrop(matchData: MatchData, position: Position): boolean {
+    private isValidForDrop(matchData: MatchData, position: Position, playerPosition: Position, extraSpawnPoints: Position[] = []): boolean {
         const tile = matchData.gameData.mapData.tiles[position.x][position.y];
         const isWater = tile === TileType.Water;
 
         const hasNoItems = this.hasNoItems(matchData, position);
+        const isSelfPosition = position.x === playerPosition.x && position.y === playerPosition.y;
         const hasNoPlayers = !matchData.players.some(
             (player) => !player.isObserver && player.position.x === position.x && player.position.y === position.y,
         );
-        const isSpawnPoint = this.isTilePotentialSpawnPoint(matchData, position);
+        const isSpawnPoint = this.isTilePotentialSpawnPoint(matchData, position, extraSpawnPoints);
 
-        return !isWater && hasNoItems && hasNoPlayers && !isSpawnPoint;
+        return !isWater && hasNoItems && (hasNoPlayers || isSelfPosition) && !isSpawnPoint;
     }
 
     private hasNoItems(matchData: MatchData, position: Position): boolean {
@@ -249,13 +250,13 @@ export class MapService {
         return matchData.players.some((p) => !p.isObserver && p.position.x === position.x && p.position.y === position.y);
     }
 
-    private isTileOccupiedByObject(matchData: MatchData, position: Position, ignoreSpawnpoints: boolean = false): boolean {
+    private isTileOccupiedByObject(matchData: MatchData, position: Position, ignoreSpawnPoints: boolean = false): boolean {
         const curentPlayer = matchData.players[matchData.playData.activePlayerIndex];
         for (const [itemType, items] of Object.entries(matchData.gameData.mapData.items)) {
             const isCurentPlayerSpawnpoint = curentPlayer.spawnPoint.x === position.x && curentPlayer.spawnPoint.y === position.y;
             const isCapturingFlag = isCurentPlayerSpawnpoint && curentPlayer.items.includes(ItemType.Flag);
 
-            if (ignoreSpawnpoints && itemType === ItemType.Spawn && !isCapturingFlag) {
+            if (ignoreSpawnPoints && itemType === ItemType.Spawn && !isCapturingFlag) {
                 continue;
             }
 
@@ -310,12 +311,8 @@ export class MapService {
         return path;
     }
 
-    private isTilePotentialSpawnPoint(matchData: MatchData, position: Position): boolean {
-        matchData.gameData.mapData.items.Spawn.forEach((spawnPoint) => {
-            if (spawnPoint.x === position.x && spawnPoint.y === position.y) {
-                return true;
-            }
-        });
-        return false;
+    private isTilePotentialSpawnPoint(matchData: MatchData, position: Position, extraSpawnPoints: Position[] = []): boolean {
+        const allSpawns = [...matchData.gameData.mapData.items.Spawn, ...extraSpawnPoints];
+        return allSpawns.some((spawnPoint) => spawnPoint.x === position.x && spawnPoint.y === position.y);
     }
 }
