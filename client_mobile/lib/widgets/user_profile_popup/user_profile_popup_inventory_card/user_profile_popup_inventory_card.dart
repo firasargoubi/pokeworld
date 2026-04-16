@@ -13,27 +13,106 @@ class _InventoryCardFace extends StatefulWidget {
 class _InventoryCardFaceState extends State<_InventoryCardFace> {
   final BalanceService _balanceService = BalanceService();
   final UserService _userService = UserService();
+  final PreferencesService _preferencesService = PreferencesService();
 
-  late Future<List<ShopItem>> _inventoryItemsFuture;
+  late Future<List<ShopItem>> _musicItemsFuture;
+  late Future<List<ShopItem>> _buttonItemsFuture;
+  late Future<List<ShopItem>> _pokemonItemsFuture;
   ShopItem? _selectedItem;
 
   @override
   void initState() {
     super.initState();
-    _inventoryItemsFuture = _loadInventoryItems();
+    _musicItemsFuture = _loadInventoryItemsByType(ShopItemType.music);
+    _buttonItemsFuture = _loadInventoryItemsByType(ShopItemType.button);
+    _pokemonItemsFuture = _loadInventoryItemsByType(ShopItemType.pokemon);
+    _buttonItemsFuture.then((items) {
+      if (_selectedItem == null && items.isNotEmpty) {
+        _onItemSelected(items.first);
+      }
+    });
   }
 
-  Future<List<ShopItem>> _loadInventoryItems() async {
+  @override
+  void dispose() {
+    AudioService().playBackgroundMusic(_preferencesService.getEquippedMenuMusicPath());
+    super.dispose();
+  }
+
+  Future<List<ShopItem>> _loadInventoryItemsByType(ShopItemType type) async {
     final allShopItems = await _balanceService.getShopItems();
     final inventory = _userService.currentUser.value?.inventory ?? [];
     final ownedIds = inventory.map((item) => item.itemId).toSet();
-    return allShopItems.where((item) => ownedIds.contains(item.id)).toList();
+    List<ShopItem> ownedItems = allShopItems.where((item) => ownedIds.contains(item.id) && item.type == type).toList();
+    if (type == ShopItemType.music) {
+      const defaultMusicItem = ShopItem(
+        id: DEFAULT_MUSIC_ITEM_ID,
+        nameKey: 'components.shopPopup.items.menuMusic0',
+        price: 0,
+        type: ShopItemType.music,
+        variant: '0',
+      );
+      ownedItems = [defaultMusicItem, ...ownedItems];
+    }
+    if (type == ShopItemType.button) {
+      const defaultButtonItem = ShopItem(
+        id: 'poke-button-0',
+        nameKey: 'components.shopPopup.items.partyBall0',
+        price: 0,
+        type: ShopItemType.button,
+        variant: '0',
+      );
+      if (!ownedItems.any((item) => item.id == 'poke-button-0')) {
+        ownedItems = [defaultButtonItem, ...ownedItems];
+      }
+    }
+    return ownedItems;
   }
 
   void _onItemSelected(ShopItem item) {
     setState(() {
       _selectedItem = item;
     });
+    if (item.type == ShopItemType.music) {
+      final musicPath = MUSIC_ITEM_TO_PATH[item.id];
+      if (musicPath != null) {
+        AudioService().playBackgroundMusic(musicPath);
+      }
+    } else {
+      AudioService().playBackgroundMusic(_preferencesService.getEquippedMenuMusicPath());
+    }
+  }
+
+  Future<void> _onEquip(ShopItem item) async {
+    if (item.type == ShopItemType.music) {
+      final newId = item.id == DEFAULT_MUSIC_ITEM_ID ? null : item.id;
+      await _preferencesService.setEquippedMusic(newId);
+      final audioService = AudioService();
+      await audioService.stopAllAudio();
+      final musicPath = _preferencesService.getEquippedMenuMusicPath();
+      await audioService.playBackgroundMusic(musicPath, transitionDuration: Duration.zero);
+    } else if (item.type == ShopItemType.button) {
+      final newId = item.id == 'poke-button-0' ? null : item.id;
+      await _preferencesService.setEquippedButton(newId);
+    }
+    if (mounted) setState(() {});
+  }
+
+  bool _isEquipped(ShopItem item) {
+    if (item.type == ShopItemType.music) {
+      if (item.id == DEFAULT_MUSIC_ITEM_ID) return _preferencesService.equippedMusicId == null;
+      return _preferencesService.equippedMusicId == item.id;
+    }
+    if (item.type == ShopItemType.button) {
+      if (item.id == 'poke-button-0') return _preferencesService.equippedButtonId == null;
+      return _preferencesService.equippedButtonId == item.id;
+    }
+    return false;
+  }
+
+  String _getActionLabel(ShopItem item) {
+    if (item.type == ShopItemType.pokemon) return I18nService().translate(INVENTORY_POKEMON_HINT_KEY);
+    return _isEquipped(item) ? I18nService().translate(INVENTORY_EQUIPPED_KEY) : I18nService().translate(INVENTORY_EQUIP_KEY);
   }
 
   @override
@@ -74,19 +153,30 @@ class _InventoryCardFaceState extends State<_InventoryCardFace> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: baseSize * 0.02,
                       children: [
                         _InventoryItems(
                           baseSize: baseSize,
-                          itemsFuture: _inventoryItemsFuture,
+                          itemsFuture: _buttonItemsFuture,
                           selectedItem: _selectedItem,
                           onItemSelected: _onItemSelected,
+                          isEquipped: _isEquipped,
+                          sectionLabel: shop_popup.TYPE_BUTTON_LABEL_TEXT,
                         ),
                         _InventoryItems(
                           baseSize: baseSize,
-                          itemsFuture: _inventoryItemsFuture,
+                          itemsFuture: _musicItemsFuture,
                           selectedItem: _selectedItem,
                           onItemSelected: _onItemSelected,
+                          isEquipped: _isEquipped,
+                          sectionLabel: shop_popup.TYPE_MUSIC_LABEL_TEXT,
+                        ),
+                        _InventoryItems(
+                          baseSize: baseSize,
+                          itemsFuture: _pokemonItemsFuture,
+                          selectedItem: _selectedItem,
+                          onItemSelected: _onItemSelected,
+                          isEquipped: _isEquipped,
+                          sectionLabel: shop_popup.TYPE_POKEMON_LABEL_TEXT,
                         ),
                       ],
                     ),
@@ -108,21 +198,7 @@ class _InventoryCardFaceState extends State<_InventoryCardFace> {
                       children: [
                         SizedBox(
                           width: baseSize * 0.25,
-                          height: baseSize * 0.25,
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(ASSET_INVENTORY_MAIN_ITEM_CONTAINER),
-                                fit: BoxFit.contain,
-                                filterQuality: FilterQuality.none,
-                              ),
-                            ),
-                            child: Image.asset(ASSET_INVENTORY_ITEM_PLACEHOLDER, fit: BoxFit.contain, filterQuality: FilterQuality.none),
-                          ),
-                        ),
-                        SizedBox(
-                          width: baseSize * 0.25,
-                          height: baseSize * 0.17,
+                          height: baseSize * 0.22,
                           child: Container(
                             decoration: const BoxDecoration(
                               image: DecorationImage(
@@ -131,17 +207,62 @@ class _InventoryCardFaceState extends State<_InventoryCardFace> {
                                 filterQuality: FilterQuality.none,
                               ),
                             ),
-                            child: Center(
+                            child: Image.asset(
+                              _selectedItem != null ? shop_popup.getShopItemImagePath(_selectedItem!) : ASSET_INVENTORY_ITEM_PLACEHOLDER,
+                              fit: BoxFit.contain,
+                              filterQuality: FilterQuality.none,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: baseSize * 0.25,
+                          height: baseSize * 0.23,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(ASSET_INVENTORY_MAIN_ITEM_CONTAINER),
+                                fit: BoxFit.fill,
+                                filterQuality: FilterQuality.none,
+                              ),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(baseSize * 0.02),
                               child: Text(
-                                _selectedItem != null
-                                    ? '${I18nService().translate(_selectedItem!.nameKey)}\n${_selectedItem!.price}$INVENTORY_PRICE_SUFFIX'
-                                    : I18nService().translate(INVENTORY_DISPLAY_TITLE),
-                                style: INVENTORY_DEFAULT_TEXT_STYLE(baseSize * 0.04),
-                                textAlign: TextAlign.center,
+                                _selectedItem != null ? I18nService().translate(shop_popup.getItemDescriptionKey(_selectedItem!)) : '',
+                                style: INVENTORY_DESCRIPTION_TEXT_STYLE(baseSize * 0.022),
                               ),
                             ),
                           ),
                         ),
+                        if (_selectedItem != null)
+                          SizedBox(
+                            width: baseSize * 0.25,
+                            height: baseSize * 0.08,
+                            child: _selectedItem!.type == ShopItemType.pokemon
+                                ? Center(
+                                    child: Text(
+                                      I18nService().translate(INVENTORY_POKEMON_HINT_KEY),
+                                      style: TextStyle(
+                                        color: INVENTORY_DEFAULT_TEXT_COLOR,
+                                        fontSize: baseSize * 0.022,
+                                        fontFamily: INVENTORY_PIXEL_FONT_FAMILY,
+                                        height: 1,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  )
+                                : EdgeBodyButton(
+                                    leftEdgePath: ASSET_BUTTON_EDGE_1,
+                                    rightEdgePath: ASSET_BUTTON_EDGE_2,
+                                    bodyPath: ASSET_BUTTON_BODY,
+                                    onAction: () => _onEquip(_selectedItem!),
+                                    child: Text(
+                                      _getActionLabel(_selectedItem!),
+                                      style: INVENTORY_DEFAULT_TEXT_STYLE(baseSize * 0.04),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                          ),
                       ],
                     ),
                   ),
@@ -165,19 +286,21 @@ class _InventoryCardFaceState extends State<_InventoryCardFace> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
-                      width: baseSize * 0.32,
                       height: double.infinity,
                       child: ColoredBox(
                         color: INVENTORY_BALANCE_BACKGROUND_COLOR,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              '${I18nService().translate(BALANCE_LABEL)} ${_userService.currentUser.value?.balance ?? 0}$INVENTORY_PRICE_SUFFIX',
-                              style: INVENTORY_DEFAULT_TEXT_STYLE(baseSize * 0.035),
-                            ),
-                          ],
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: baseSize * 0.02),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                '${I18nService().translate(BALANCE_LABEL)} ${_userService.currentUser.value?.balance ?? 0}$INVENTORY_PRICE_SUFFIX',
+                                style: INVENTORY_DEFAULT_TEXT_STYLE(baseSize * 0.035),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -193,12 +316,21 @@ class _InventoryCardFaceState extends State<_InventoryCardFace> {
 }
 
 class _InventoryItems extends StatelessWidget {
-  const _InventoryItems({required this.baseSize, required this.itemsFuture, required this.selectedItem, required this.onItemSelected});
+  const _InventoryItems({
+    required this.baseSize,
+    required this.itemsFuture,
+    required this.selectedItem,
+    required this.onItemSelected,
+    required this.isEquipped,
+    required this.sectionLabel,
+  });
 
   final Future<List<ShopItem>> itemsFuture;
   final double baseSize;
   final ShopItem? selectedItem;
   final ValueChanged<ShopItem> onItemSelected;
+  final bool Function(ShopItem) isEquipped;
+  final String sectionLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -220,8 +352,16 @@ class _InventoryItems extends StatelessWidget {
         }
 
         return Column(
-          spacing: baseSize * 0.02,
+          spacing: baseSize * 0.01,
           children: [
+            Padding(
+              padding: EdgeInsets.only(left: baseSize * 0.01),
+              child: Align(
+                heightFactor: 0.6,
+                alignment: Alignment.centerLeft,
+                child: Text(I18nService().translate(sectionLabel), style: INVENTORY_DEFAULT_TEXT_STYLE(baseSize * 0.045)),
+              ),
+            ),
             Padding(
               padding: EdgeInsets.only(right: baseSize * 0.03),
               child: SizedBox(
@@ -236,6 +376,7 @@ class _InventoryItems extends StatelessWidget {
                           baseSize: baseSize,
                           shopItem: item,
                           isSelected: selectedItem?.id == item.id,
+                          isEquipped: isEquipped(item),
                           onTap: () => onItemSelected(item),
                         ),
                       )
@@ -258,11 +399,12 @@ class _InventoryItems extends StatelessWidget {
 }
 
 class _InventoryItemTile extends StatelessWidget {
-  const _InventoryItemTile({required this.baseSize, required this.shopItem, required this.isSelected, this.onTap});
+  const _InventoryItemTile({required this.baseSize, required this.shopItem, required this.isSelected, required this.isEquipped, this.onTap});
 
   final ShopItem shopItem;
   final double baseSize;
   final bool isSelected;
+  final bool isEquipped;
   final VoidCallback? onTap;
 
   @override
@@ -294,51 +436,30 @@ class _InventoryItemTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    flex: 3,
+                    flex: 4,
                     child: Padding(
-                      padding: EdgeInsets.only(top: tileSize * 0.02),
+                      padding: EdgeInsets.only(top: tileSize * 0.12),
                       child: SizedBox.expand(
-                        child: Image.asset(ASSET_INVENTORY_ITEM_PLACEHOLDER, fit: BoxFit.contain, filterQuality: FilterQuality.none),
+                        child: Image.asset(shop_popup.getShopItemImagePath(shopItem), fit: BoxFit.contain, filterQuality: FilterQuality.none),
                       ),
                     ),
                   ),
                   Expanded(
-                    flex: 3,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    flex: 2,
+                    child: Stack(
+                      alignment: Alignment.topCenter,
                       children: [
-                        Stack(
-                          alignment: Alignment.topCenter,
-                          children: [
-                            Text(
-                              I18nService().translate(shopItem.nameKey),
-                              style: INVENTORY_OUTLINE_TEXT_STYLE(tileSize * 0.14),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              I18nService().translate(shopItem.nameKey),
-                              style: INVENTORY_DEFAULT_TEXT_STYLE(tileSize * 0.14),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+                        Text(
+                          I18nService().translate(shopItem.nameKey),
+                          style: INVENTORY_OUTLINE_TEXT_STYLE(tileSize * 0.12),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Text(
-                              '${shopItem.price}$INVENTORY_PRICE_SUFFIX',
-                              style: INVENTORY_OUTLINE_TEXT_STYLE(tileSize * 0.12),
-                              textAlign: TextAlign.center,
-                            ),
-                            Text(
-                              '${shopItem.price}$INVENTORY_PRICE_SUFFIX',
-                              style: INVENTORY_DEFAULT_TEXT_STYLE(tileSize * 0.12),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                        Text(
+                          I18nService().translate(shopItem.nameKey),
+                          style: INVENTORY_DEFAULT_TEXT_STYLE(tileSize * 0.12),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -346,6 +467,14 @@ class _InventoryItemTile extends StatelessWidget {
                 ],
               ),
             ),
+            if (isEquipped)
+              Positioned(
+                top: tileSize * 0.08,
+                right: tileSize * 0.08,
+                width: tileSize * 0.22,
+                height: tileSize * 0.22,
+                child: Image.asset(ASSET_INVENTORY_ITEM_EQUIPPED_ICON, fit: BoxFit.contain, filterQuality: FilterQuality.none),
+              ),
           ],
         ),
       ),

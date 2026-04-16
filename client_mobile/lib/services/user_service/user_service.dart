@@ -172,7 +172,7 @@ class UserService {
     currentUser.value = null;
   }
 
-  Future<UserPreferences> updatePreferences(String userId, {AppLanguage? language, AppTheme? theme}) async {
+  Future<UserPreferences> updatePreferences(String userId, {AppLanguage? language, AppTheme? theme, String? partyBall, String? menuMusic}) async {
     _ensureConfigured();
     final patchBody = <String, String>{};
 
@@ -182,6 +182,14 @@ class UserService {
 
     if (theme != null) {
       patchBody['theme'] = theme.code;
+    }
+
+    if (partyBall != null) {
+      patchBody['partyBall'] = partyBall;
+    }
+
+    if (menuMusic != null) {
+      patchBody['menuMusic'] = menuMusic;
     }
 
     if (patchBody.isEmpty) {

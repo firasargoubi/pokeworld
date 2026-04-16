@@ -69,7 +69,6 @@ const Map<Avatar, ElementalType> AVATAR_ELEMENT_TYPE_MAP = {
   Avatar.Avatar13EvolvedShiny: ElementalType.Fight,
   Avatar.Avatar14EvolvedShiny: ElementalType.Flying,
   Avatar.Avatar15EvolvedShiny: ElementalType.Water,
-
   Avatar.MissingNo: ElementalType.Normal,
 };
 

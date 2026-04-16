@@ -9,8 +9,8 @@ const String POKE_BUTTON_BORDER_ACTIVE_ASSET = 'assets/images/menu/buttons/poke-
 const String POKE_BUTTON_CONTAINER_ASSET = 'assets/images/menu/buttons/poke-button/button-container.png';
 const String POKE_BUTTON_CONTAINER_ACTIVE_ASSET = 'assets/images/menu/buttons/poke-button/button-container-active.png';
 
-const String POKE_BUTTON_BALL_ASSET = 'assets/images/menu/buttons/poke-button/party-ball.png';
-const String POKE_BUTTON_BALL_ACTIVE_ASSET = 'assets/images/menu/buttons/poke-button/party-ball-sel.png';
+const String POKE_BUTTON_BALL_ASSET = 'assets/images/menu/buttons/poke-button/party-ball-0.png';
+const String POKE_BUTTON_BALL_ACTIVE_ASSET = 'assets/images/menu/buttons/poke-button/party-ball-sel-0.png';
 
 const String POKE_BUTTON_FONT_FAMILY = 'Pixel';
 const Color POKE_BUTTON_SHADOW_COLOR = Color(0xFF787878);

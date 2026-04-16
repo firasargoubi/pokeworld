@@ -31,8 +31,8 @@ class GameCard extends StatelessWidget {
   static TextStyle cornerLabelStyle(double cardWidth) => TextStyle(
     fontFamily: GAME_CARD_PIXEL_FONT,
     color: Colors.white,
-    fontSize: cardWidth * 0.13,
-    height: 0.8,
+    fontSize: cardWidth * 0.12,
+    height: 1.05,
     shadows: pixelShadow(cardWidth, 0.012),
   );
 
@@ -156,7 +156,7 @@ class GameCard extends StatelessWidget {
                   ),
                   Positioned(
                     left: cardWidth * 0.02,
-                    top: cardWidth * 0.02,
+                    top: cardWidth * 0.01,
                     width: cardWidth * 0.75,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

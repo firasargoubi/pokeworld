@@ -133,21 +133,30 @@ class _ShopPopupState extends State<ShopPopup> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                spacing: baseSize * 0.02,
                                 children: [
                                   ShopItems(
                                     baseSize: baseSize,
-                                    shopItemsFuture: _controller.shopItemsFuture,
+                                    shopItemsFuture: _controller.shopItemsButtonFuture,
                                     selectedItem: _controller.selectedItem,
                                     onItemSelected: _controller.onItemSelected,
                                     ownedItemIds: _controller.ownedItemIds,
+                                    sectionLabel: TYPE_BUTTON_LABEL_TEXT,
                                   ),
                                   ShopItems(
                                     baseSize: baseSize,
-                                    shopItemsFuture: _controller.shopItemsFuture,
+                                    shopItemsFuture: _controller.shopItemsMusicFuture,
                                     selectedItem: _controller.selectedItem,
                                     onItemSelected: _controller.onItemSelected,
                                     ownedItemIds: _controller.ownedItemIds,
+                                    sectionLabel: TYPE_MUSIC_LABEL_TEXT,
+                                  ),
+                                  ShopItems(
+                                    baseSize: baseSize,
+                                    shopItemsFuture: _controller.shopItemsPokemonFuture,
+                                    selectedItem: _controller.selectedItem,
+                                    onItemSelected: _controller.onItemSelected,
+                                    ownedItemIds: _controller.ownedItemIds,
+                                    sectionLabel: TYPE_POKEMON_LABEL_TEXT,
                                   ),
                                 ],
                               ),
@@ -178,12 +187,18 @@ class _ShopPopupState extends State<ShopPopup> {
                                           filterQuality: FilterQuality.none,
                                         ),
                                       ),
-                                      child: Image.asset(ITEM_PLACEHOLDER_ASSET_PATH, fit: BoxFit.contain, filterQuality: FilterQuality.none),
+                                      child: Image.asset(
+                                        _controller.selectedItem != null
+                                            ? getShopItemImagePath(_controller.selectedItem!)
+                                            : ITEM_PLACEHOLDER_ASSET_PATH,
+                                        fit: BoxFit.contain,
+                                        filterQuality: FilterQuality.none,
+                                      ),
                                     ),
                                   ),
                                   SizedBox(
                                     width: baseSize * 0.25,
-                                    height: baseSize * 0.17,
+                                    height: baseSize * 0.25,
                                     child: Container(
                                       decoration: const BoxDecoration(
                                         image: DecorationImage(
@@ -192,12 +207,13 @@ class _ShopPopupState extends State<ShopPopup> {
                                           filterQuality: FilterQuality.none,
                                         ),
                                       ),
-                                      child: Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(baseSize * 0.02),
                                         child: Text(
                                           _controller.selectedItem != null
-                                              ? I18nService().translate(_controller.selectedItem!.nameKey)
+                                              ? I18nService().translate(getItemDescriptionKey(_controller.selectedItem!))
                                               : I18nService().translate(DESCRIPTION_TEXT),
-                                          style: buildDefaultTextStyle(baseSize * 0.05),
+                                          style: buildDefaultTextStyle(baseSize * 0.024),
                                         ),
                                       ),
                                     ),
@@ -258,20 +274,22 @@ class _ShopPopupState extends State<ShopPopup> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               SizedBox(
-                                width: baseSize * 0.32,
                                 height: double.infinity,
                                 child: ColoredBox(
                                   color: BALANCE_BACKGROUND_COLOR,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '${I18nService().translate(BALANCE_TEXT)} ${_controller.currentBalance} \$',
-                                        style: buildDefaultTextStyle(baseSize * 0.035),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: baseSize * 0.02),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          '${I18nService().translate(BALANCE_TEXT)} ${_controller.currentBalance} \$',
+                                          style: buildDefaultTextStyle(baseSize * 0.035),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),

@@ -14,6 +14,10 @@ const String ELEMENTAL_KEY = 'components.matchSettings.elementalMode';
 const String RAPID_ELIMINATION_KEY = 'components.matchSettings.rapidElimination';
 const String APPLY_BUTTON_KEY = 'components.matchSettings.validate';
 
+const String DROP_ICON_ASSET = 'assets/images/menu/icons/lobby/drop.png';
+const String ELEMENTAL_ICON_ASSET = 'assets/images/menu/icons/lobby/elemental.png';
+const String RAPID_ELIMINATION_ICON_ASSET = 'assets/images/menu/icons/lobby/skull.png';
+
 const double OVERLAY_ALPHA = 0.5;
 const double BLUR_SIGMA = 2.0;
 

@@ -1,13 +1,14 @@
 import 'dart:math';
 
-import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/match_data.dart';
 import 'package:client_mobile/models/socket_event.dart';
 import 'package:client_mobile/pages/home_page/home_page.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/navigation_service/navigation_service.dart';
+import 'package:client_mobile/services/preferences_service/preferences_service.dart';
 import 'package:client_mobile/services/socket_service/socket_service.dart';
+import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/game_cards_shell/game_cards_shell.dart';
 import 'package:client_mobile/widgets/header/header.dart';
@@ -54,7 +55,9 @@ class _JoinPageState extends State<JoinPage> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      AudioService().playBackgroundMusic(BackgroundMusic.Menu.path);
+      if (UserService().currentUser.value != null) {
+        AudioService().playBackgroundMusic(PreferencesService().getEquippedMenuMusicPath());
+      }
     });
   }
 

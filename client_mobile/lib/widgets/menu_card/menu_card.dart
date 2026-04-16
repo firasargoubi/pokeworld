@@ -3,6 +3,7 @@ import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/menu_config.dart';
 import 'package:client_mobile/models/ui.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/services/preferences_service/preferences_service.dart';
 import 'package:client_mobile/widgets/default_container/default_container.dart';
 import 'package:flutter/material.dart';
 
@@ -16,15 +17,7 @@ class MenuCard extends StatefulWidget {
   final String? buttonImageActive;
   final VoidCallback? onTap;
 
-  const MenuCard({
-    super.key,
-    required this.size,
-    required this.color,
-    required this.title,
-    this.buttonImage = MENU_CARD_DEFAULT_BUTTON_IMAGE,
-    this.buttonImageActive = MENU_CARD_DEFAULT_BUTTON_IMAGE_ACTIVE,
-    this.onTap,
-  });
+  const MenuCard({super.key, required this.size, required this.color, required this.title, this.buttonImage, this.buttonImageActive, this.onTap});
 
   @override
   State<MenuCard> createState() => _MenuCardState();
@@ -32,6 +25,25 @@ class MenuCard extends StatefulWidget {
 
 class _MenuCardState extends State<MenuCard> {
   bool _isPressed = false;
+  late final PreferencesService _preferencesService;
+
+  @override
+  void initState() {
+    super.initState();
+    _preferencesService = PreferencesService();
+    _preferencesService.equippedButtonNotifier.addListener(_handleEquippedButtonChange);
+  }
+
+  @override
+  void dispose() {
+    _preferencesService.equippedButtonNotifier.removeListener(_handleEquippedButtonChange);
+    super.dispose();
+  }
+
+  void _handleEquippedButtonChange() {
+    if (!mounted) return;
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +53,9 @@ class _MenuCardState extends State<MenuCard> {
     final pokemonImage = config.pokemonImage;
     final pokemonWidthFactor = config.pokemonWidthFactor;
     final pokemonHeightFactor = config.pokemonHeightFactor;
-    final currentButtonImage = _isPressed ? widget.buttonImageActive : widget.buttonImage;
+    final currentButtonImage = _isPressed
+        ? (widget.buttonImageActive ?? _preferencesService.getEquippedBallAsset(active: true))
+        : (widget.buttonImage ?? _preferencesService.getEquippedBallAsset(active: false));
 
     return GestureDetector(
       onTapDown: (_) => {setState(() => _isPressed = true), AudioService().playSoundEffect(SoundEffect.Select.path)},
@@ -83,23 +97,22 @@ class _MenuCardState extends State<MenuCard> {
                   ),
                 ),
               ),
-              if (currentButtonImage != null)
-                Positioned(
-                  bottom: widget.size * MENU_CARD_BUTTON_BOTTOM_FACTOR,
-                  left: widget.size * MENU_CARD_BUTTON_LEFT_FACTOR,
-                  child: Container(
-                    width: widget.size * MENU_CARD_BUTTON_SIZE_FACTOR,
-                    height: widget.size * MENU_CARD_BUTTON_SIZE_FACTOR,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(currentButtonImage),
-                        fit: BoxFit.contain,
-                        alignment: Alignment.center,
-                        filterQuality: FilterQuality.none,
-                      ),
+              Positioned(
+                bottom: widget.size * MENU_CARD_BUTTON_BOTTOM_FACTOR,
+                left: widget.size * MENU_CARD_BUTTON_LEFT_FACTOR,
+                child: Container(
+                  width: widget.size * MENU_CARD_BUTTON_SIZE_FACTOR,
+                  height: widget.size * MENU_CARD_BUTTON_SIZE_FACTOR,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(currentButtonImage),
+                      fit: BoxFit.contain,
+                      alignment: Alignment.center,
+                      filterQuality: FilterQuality.none,
                     ),
                   ),
                 ),
+              ),
               Positioned(
                 bottom: 0,
                 right: -widget.size * MENU_CARD_POKEMON_RIGHT_FACTOR,

@@ -1,3 +1,8 @@
+import 'package:client_mobile/consts/avatar_data_const.dart';
+import 'package:client_mobile/consts/preferences_const.dart';
+import 'package:client_mobile/consts/shop_const.dart';
+import 'package:client_mobile/models/avatar_data.dart';
+import 'package:client_mobile/models/shop.dart';
 import 'package:flutter/material.dart';
 
 const double ASPECT_RATIO = 16 / 9;
@@ -31,6 +36,9 @@ const String BALANCE_TEXT = 'components.shopPopup.balance';
 const String ERROR_TEXT_PREFIX = 'Error: ';
 const String PRICE_SUFFIX_TEXT = ' \$';
 const String OWNED_TEXT = 'components.shopPopup.owned';
+const String TYPE_BUTTON_LABEL_TEXT = 'components.shopPopup.typeButton';
+const String TYPE_MUSIC_LABEL_TEXT = 'components.shopPopup.typeMusic';
+const String TYPE_POKEMON_LABEL_TEXT = 'components.shopPopup.typePokemon';
 const String INSUFFICIENT_FUNDS_TEXT = 'components.shopPopup.insufficientFunds';
 const String PURCHASE_SUCCESS_TEXT = 'components.shopPopup.purchaseSuccess';
 
@@ -90,7 +98,7 @@ TextStyle buildTitleTextStyle(double fontSize) {
 }
 
 TextStyle buildDefaultTextStyle(double fontSize) {
-  return TextStyle(color: DEFAULT_TEXT_COLOR, fontSize: fontSize, fontFamily: PIXEL_FONT_FAMILY);
+  return TextStyle(color: DEFAULT_TEXT_COLOR, fontSize: fontSize, fontFamily: PIXEL_FONT_FAMILY, height: fontSize * 1.1 / fontSize);
 }
 
 TextStyle buildOutlineTextStyle(double fontSize, {TextDecoration decoration = TextDecoration.none}) {
@@ -107,4 +115,44 @@ TextStyle buildOutlineTextStyle(double fontSize, {TextDecoration decoration = Te
 
 TextStyle buildTileTextStyle(double fontSize, {TextDecoration decoration = TextDecoration.none}) {
   return TextStyle(color: DEFAULT_TEXT_COLOR, fontSize: fontSize, fontFamily: PIXEL_FONT_FAMILY, decoration: decoration);
+}
+
+String getShopItemImagePath(ShopItem item) {
+  if (item.type == ShopItemType.button) {
+    if (item.id == 'poke-button-0') return 'assets/images/menu/buttons/poke-button/party-ball-0.png';
+    return BUTTON_ITEM_TO_BALL_ASSET[item.id] ?? ITEM_PLACEHOLDER_ASSET_PATH;
+  }
+  if (item.type == ShopItemType.music) {
+    final variant = MenuMusicVariant.fromValue(item.variant);
+    return variant != null ? MUSIC_VARIANT_TO_IMAGE[variant]! : ITEM_PLACEHOLDER_ASSET_PATH;
+  }
+  if (item.type == ShopItemType.pokemon) {
+    try {
+      final avatar = Avatar.values.firstWhere((a) => a.value == item.id);
+      return AVATAR_DATA[avatar]?.image ?? ITEM_PLACEHOLDER_ASSET_PATH;
+    } catch (_) {
+      return ITEM_PLACEHOLDER_ASSET_PATH;
+    }
+  }
+  return ITEM_PLACEHOLDER_ASSET_PATH;
+}
+
+String getItemDescriptionKey(ShopItem item) {
+  if (item.type == ShopItemType.music) {
+    final variant = MenuMusicVariant.fromValue(item.variant);
+    return variant != null ? MUSIC_VARIANT_TO_DESCRIPTION[variant]! : '';
+  }
+  if (item.type == ShopItemType.button) {
+    final variant = PartyBallVariant.fromValue(item.variant);
+    return variant != null ? BALL_VARIANT_TO_DESCRIPTION[variant]! : '';
+  }
+  if (item.type == ShopItemType.pokemon) {
+    try {
+      final avatar = Avatar.values.firstWhere((a) => a.value == item.id);
+      return AVATAR_TO_DESCRIPTION[avatar] ?? '';
+    } catch (_) {
+      return '';
+    }
+  }
+  return '';
 }

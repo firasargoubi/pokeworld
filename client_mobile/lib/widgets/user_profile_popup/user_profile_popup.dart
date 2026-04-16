@@ -2,17 +2,21 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:client_mobile/consts/login_const.dart';
+import 'package:client_mobile/consts/preferences_const.dart';
 import 'package:client_mobile/models/menu_config.dart';
 import 'package:client_mobile/models/shop.dart';
 import 'package:client_mobile/models/social.dart';
 import 'package:client_mobile/models/ui.dart';
 import 'package:client_mobile/models/user_info.dart';
+import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/balance/balance_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
+import 'package:client_mobile/services/preferences_service/preferences_service.dart';
 import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:client_mobile/utils/profile_image_provider.dart';
 import 'package:client_mobile/widgets/cut_corner_container/cut_corner_container.dart';
 import 'package:client_mobile/widgets/edge_body_button/edge_body_button.dart';
+import 'package:client_mobile/widgets/shop_popup/shop_popup_const.dart' as shop_popup;
 import 'package:client_mobile/widgets/stat_container/stat_container.dart';
 import 'package:client_mobile/widgets/user_profile_popup/user_profile_popup_friends_card/user_profile_popup_friends_controller.dart';
 import 'package:client_mobile/widgets/user_profile_popup/user_profile_popup_profile_card/user_profile_popup_profile_controller.dart';
@@ -89,8 +93,7 @@ class _UserCardState extends State<UserCard> with SingleTickerProviderStateMixin
         return;
       }
       _userService.currentUser.value = user;
-    } catch (_) {
-    }
+    } catch (_) {}
   }
 
   @override

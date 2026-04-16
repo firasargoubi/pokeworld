@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:client_mobile/consts/avatar_data_const.dart';
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/match_data.dart';
+import 'package:client_mobile/services/preferences_service/preferences_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -190,7 +191,10 @@ class AudioService {
       return;
     }
 
-    await playBackgroundMusic(expectedBackgroundMusic.path, transitionDuration: Duration.zero);
+    final expectedMusicPath =
+        expectedBackgroundMusic == BackgroundMusic.Menu ? PreferencesService().getEquippedMenuMusicPath() : expectedBackgroundMusic.path;
+
+    await playBackgroundMusic(expectedMusicPath, transitionDuration: Duration.zero);
   }
 
   Future<AudioPlayer> _getAvailableSoundEffectPlayer() async {

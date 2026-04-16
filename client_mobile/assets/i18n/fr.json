@@ -264,7 +264,6 @@
             }
         }
     },
-    
     "challenges": {
         "title": "DÉFI",
         "buttonTooltip": "Voir votre défi",
@@ -461,20 +460,53 @@
             "title": "POKE-BOUTIQUE",
             "description": "Description",
             "buy": "ACHETER",
+            "equip": "ÉQUIPER",
+            "equipped": "ÉQUIPÉ",
             "balance": "Solde:",
             "owned": "POSSÉDÉ",
+            "typeButton": "Skins de bouton",
+            "typeMusic": "Pistes musicales",
+            "typePokemon": "Personnages",
             "inventoryTitle": "Historique d'achats",
             "emptyInventory": "Aucun achat pour le moment",
             "insufficientFunds": "Vous n'avez pas assez d'argent pour cet achat.",
             "purchaseSuccess": "{{itemName}} a été ajouté à votre inventaire.",
             "purchaseError": "L'achat n'a pas pu être complété.",
             "unknownItem": "Objet inconnu",
+            "pokemonCharacterHint": "Disponible dans la sélection de personnage",
             "items": {
                 "item1": "Item 1",
                 "item2": "Item 2",
                 "item3": "Item 3",
                 "item4": "Item 4",
-                "item5": "Item 5"
+                "item5": "Item 5",
+                "partyBall0": "Poké Ball",
+                "partyBall": "Poké Ball",
+                "partyBall1": "Super Ball",
+                "partyBall2": "Master Ball",
+                "partyBall3": "Honor Ball",
+                "partyBall4": "Hyper Ball",
+                "menuMusic0": "Piste musicale 0",
+                "menuMusic1": "Piste musicale 1",
+                "menuMusic2": "Piste musicale 2",
+                "menuMusic3": "Piste musicale 3",
+                "avatar13": "Riolu",
+                "avatar14": "Étourmi",
+                "avatar15": "Grenousse"
+            },
+            "descriptions": {
+                "partyBall0": "La Poké Ball classique, simple et efficace. Change l'apparence de plusieurs éléments à travers le jeu.",
+                "partyBall1": "La Super Ball, plus performante que la Poké Ball. Change l'apparence de plusieurs éléments à travers le jeu.",
+                "partyBall2": "La Master Ball, la plus puissante de toutes. Change l'apparence de plusieurs éléments à travers le jeu.",
+                "partyBall3": "La Honor Ball, élégante et raffinée. Change l'apparence de plusieurs éléments à travers le jeu.",
+                "partyBall4": "La Hyper Ball, redoutable et prisée. Change l'apparence de plusieurs éléments à travers le jeu.",
+                "menuMusic0": "La mélodie originale du menu principal. Sera jouée dans les menus principaux du jeu.",
+                "menuMusic1": "Une piste alternative au rythme entraînant. Sera jouée dans les menus principaux du jeu.",
+                "menuMusic2": "Une mélodie douce et apaisante. Sera jouée dans les menus principaux du jeu.",
+                "menuMusic3": "Un thème épique et grandiose. Sera jouée dans les menus principaux du jeu.",
+                "avatar13": "Riolu, le Pokémon Émanation de type Combat.",
+                "avatar14": "Étourmi, le Pokémon Étourneau de type Vol.",
+                "avatar15": "Grenousse, le Pokémon Crapobulle de type Eau."
             }
         },
         "tutorial": {

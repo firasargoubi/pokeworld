@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/services/preferences_service/preferences_service.dart';
 import 'package:flutter/material.dart';
 
 import 'poke_button_const.dart';
@@ -20,6 +21,25 @@ class PokeButton extends StatefulWidget {
 
 class _PokeButtonState extends State<PokeButton> {
   bool _isPressed = false;
+  late final PreferencesService _preferencesService;
+
+  @override
+  void initState() {
+    super.initState();
+    _preferencesService = PreferencesService();
+    _preferencesService.equippedButtonNotifier.addListener(_handleEquippedButtonChange);
+  }
+
+  @override
+  void dispose() {
+    _preferencesService.equippedButtonNotifier.removeListener(_handleEquippedButtonChange);
+    super.dispose();
+  }
+
+  void _handleEquippedButtonChange() {
+    if (!mounted) return;
+    setState(() {});
+  }
 
   void _setPressed(bool value) {
     if (_isPressed == value) return;
@@ -30,7 +50,7 @@ class _PokeButtonState extends State<PokeButton> {
   Widget build(BuildContext context) {
     final borderAsset = _isPressed ? POKE_BUTTON_BORDER_ACTIVE_ASSET : POKE_BUTTON_BORDER_ASSET;
     final containerAsset = _isPressed ? POKE_BUTTON_CONTAINER_ACTIVE_ASSET : POKE_BUTTON_CONTAINER_ASSET;
-    final ballAsset = _isPressed ? POKE_BUTTON_BALL_ACTIVE_ASSET : POKE_BUTTON_BALL_ASSET;
+    final ballAsset = _preferencesService.getEquippedBallAsset(active: _isPressed);
 
     Widget content = LayoutBuilder(
       builder: (context, constraints) {

@@ -1,3 +1,4 @@
+import 'package:client_mobile/models/avatar_data.dart';
 import 'package:client_mobile/models/ui.dart';
 import 'package:flutter/material.dart';
 
@@ -60,7 +61,7 @@ const double DISABLED_AVATAR_OPACITY = 0.45;
 const double INACTIVE_STAT_OPACITY = 0.55;
 
 const int AVATAR_SELECTION_GRID_COLS = 3;
-const int AVATAR_SELECTION_ITEM_COUNT = 12;
+const int AVATAR_SELECTION_ITEM_COUNT = 15;
 
 const double BORDER_WIDTH_FACTOR = 0.075;
 const double INNER_BORDER_WIDTH_FACTOR = 0.045;
@@ -114,3 +115,36 @@ const DefaultContainerConfig BLUE_CONTAINER_CONFIG = DefaultContainerConfig(
   backgroundTopColor: Color(0xFF3890d8),
   backgroundBottomColor: Color(0xFF80c0d8),
 );
+
+const List<Avatar> PREMIUM_AVATARS = [
+  Avatar.Avatar13,
+  Avatar.Avatar13Shiny,
+  Avatar.Avatar13Evolved,
+  Avatar.Avatar13EvolvedShiny,
+  Avatar.Avatar14,
+  Avatar.Avatar14Shiny,
+  Avatar.Avatar14Evolved,
+  Avatar.Avatar14EvolvedShiny,
+  Avatar.Avatar15,
+  Avatar.Avatar15Shiny,
+  Avatar.Avatar15Evolved,
+  Avatar.Avatar15EvolvedShiny,
+];
+
+const List<Avatar> SELECTABLE_AVATARS = [
+  Avatar.Avatar1,
+  Avatar.Avatar2,
+  Avatar.Avatar3,
+  Avatar.Avatar4,
+  Avatar.Avatar5,
+  Avatar.Avatar6,
+  Avatar.Avatar7,
+  Avatar.Avatar8,
+  Avatar.Avatar9,
+  Avatar.Avatar10,
+  Avatar.Avatar11,
+  Avatar.Avatar12,
+  Avatar.Avatar13,
+  Avatar.Avatar14,
+  Avatar.Avatar15,
+];

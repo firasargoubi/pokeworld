@@ -63,9 +63,13 @@ const String ASSET_INVENTORY_ITEM_CONTAINER = 'assets/images/menu/containers/sho
 const String ASSET_INVENTORY_ITEM_CONTAINER_ACTIVE = 'assets/images/menu/containers/shop/item-container-active.png';
 const String ASSET_INVENTORY_MAIN_ITEM_CONTAINER = 'assets/images/menu/containers/shop/main-item-container.png';
 const String ASSET_INVENTORY_ITEM_PLACEHOLDER = 'assets/images/menu/containers/shop/item1.png';
+const String ASSET_INVENTORY_ITEM_EQUIPPED_ICON = 'assets/images/menu/icons/user-card/item-selected.png';
 
 const String INVENTORY_PRICE_SUFFIX = ' \$';
 const String INVENTORY_ERROR_PREFIX = 'Error: ';
+const String INVENTORY_EQUIP_KEY = 'components.shopPopup.equip';
+const String INVENTORY_EQUIPPED_KEY = 'components.shopPopup.equipped';
+const String INVENTORY_POKEMON_HINT_KEY = 'components.shopPopup.pokemonCharacterHint';
 const Color INVENTORY_BALANCE_BACKGROUND_COLOR = Color(0xFF80b0e8);
 const Color INVENTORY_CENTER_DIVIDER_COLOR = Color.fromARGB(100, 255, 255, 255);
 const String INVENTORY_PIXEL_FONT_FAMILY = 'Pixel';
@@ -156,6 +160,10 @@ TextStyle LABEL_TEXT_STYLE(double fontSize) => TextStyle(
 // ignore: non_constant_identifier_names
 TextStyle INVENTORY_DEFAULT_TEXT_STYLE(double fontSize) =>
     TextStyle(color: INVENTORY_DEFAULT_TEXT_COLOR, fontSize: fontSize, fontFamily: INVENTORY_PIXEL_FONT_FAMILY);
+
+// ignore: non_constant_identifier_names
+TextStyle INVENTORY_DESCRIPTION_TEXT_STYLE(double fontSize) =>
+    TextStyle(color: INVENTORY_DEFAULT_TEXT_COLOR, fontSize: fontSize, fontFamily: INVENTORY_PIXEL_FONT_FAMILY, height: fontSize * 1.1 / fontSize);
 
 // ignore: non_constant_identifier_names
 TextStyle INVENTORY_OUTLINE_TEXT_STYLE(double fontSize) => TextStyle(

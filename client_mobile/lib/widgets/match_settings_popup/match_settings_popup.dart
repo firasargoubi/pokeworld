@@ -35,8 +35,13 @@ class _MatchSettingsPopupState extends State<MatchSettingsPopup> {
   late bool _isRapidElimination;
   late bool _isFriendOnly;
   late int _entryFee;
-  MatchSettings get matchSettings =>
-      MatchSettings(isDropInEnabled: _isDropIn, isElementalMode: _isElemental, isRapidElimination: _isRapidElimination, entryFee: _entryFee, isFriendOnly: _isFriendOnly);
+  MatchSettings get matchSettings => MatchSettings(
+    isDropInEnabled: _isDropIn,
+    isElementalMode: _isElemental,
+    isRapidElimination: _isRapidElimination,
+    entryFee: _entryFee,
+    isFriendOnly: _isFriendOnly,
+  );
 
   @override
   void initState() {
@@ -104,7 +109,7 @@ class _MatchSettingsPopupState extends State<MatchSettingsPopup> {
     final baseSize = _computeBaseSize(MediaQuery.of(context).size);
 
     final dialogHeight = baseSize * 0.8;
-    final dialogWidth = dialogHeight * 9 / 10;
+    final dialogWidth = dialogHeight * 11 / 10;
     final contentPadding = baseSize * 0.055;
 
     final titleStyle = _pixelTextStyle(baseSize * 0.05);
@@ -165,6 +170,7 @@ class _MatchSettingsPopupState extends State<MatchSettingsPopup> {
                                   children: [
                                     MatchSettingOption(
                                       text: i18n.translate(DROPIN_KEY),
+                                      iconAsset: DROP_ICON_ASSET,
                                       selected: _isDropIn,
                                       checkboxSize: checkboxSize,
                                       checkboxInnerPadding: checkboxInnerPadding,
@@ -175,6 +181,7 @@ class _MatchSettingsPopupState extends State<MatchSettingsPopup> {
                                     SizedBox(height: optionsGap),
                                     MatchSettingOption(
                                       text: i18n.translate(ELEMENTAL_KEY),
+                                      iconAsset: ELEMENTAL_ICON_ASSET,
                                       selected: _isElemental,
                                       checkboxSize: checkboxSize,
                                       checkboxInnerPadding: checkboxInnerPadding,
@@ -185,6 +192,7 @@ class _MatchSettingsPopupState extends State<MatchSettingsPopup> {
                                     SizedBox(height: optionsGap),
                                     MatchSettingOption(
                                       text: i18n.translate(RAPID_ELIMINATION_KEY),
+                                      iconAsset: RAPID_ELIMINATION_ICON_ASSET,
                                       selected: _isRapidElimination,
                                       checkboxSize: checkboxSize,
                                       checkboxInnerPadding: checkboxInnerPadding,

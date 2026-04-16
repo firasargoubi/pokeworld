@@ -11,6 +11,8 @@ import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/popup_service/popup_service.dart';
+import 'package:client_mobile/services/preferences_service/preferences_service.dart';
+import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/cut_out_button/cut_out_button.dart';
 import 'package:client_mobile/widgets/header/header.dart';
@@ -30,9 +32,12 @@ class CharacterPage extends StatefulWidget {
 class _CharacterPageState extends State<CharacterPage> {
   Avatar? selectedAvatar;
   List<Avatar> lockedAvatars = [];
+  Set<String> _ownedItemIds = {};
   final MatchService _matchService = MatchService();
   final PopupService _popupService = PopupService();
   final CharacterController _controller = CharacterController();
+  final UserService _userService = UserService();
+  final PreferencesService _preferencesService = PreferencesService();
   StreamSubscription<MatchData>? _matchUpdateSubscription;
 
   bool isHpBonusActive = true;
@@ -41,11 +46,29 @@ class _CharacterPageState extends State<CharacterPage> {
   @override
   void initState() {
     super.initState();
-    _updateAvatarList();
+    _refreshUserAndUpdateAvatars();
     _matchUpdateSubscription = _matchService.matchUpdates.listen(_onMatchUpdate);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      AudioService().playBackgroundMusic(BackgroundMusic.Menu.path);
+      if (_userService.currentUser.value != null) {
+        AudioService().playBackgroundMusic(_preferencesService.getEquippedMenuMusicPath());
+      }
     });
+  }
+
+  Future<void> _refreshUserAndUpdateAvatars() async {
+    final userId = _userService.currentUser.value?.userId;
+    if (userId != null) {
+      try {
+        final user = await _userService.getById(userId);
+        _userService.currentUser.value = user;
+        if (mounted) {
+          setState(() {
+            _ownedItemIds = user.inventory.map((item) => item.itemId).toSet();
+          });
+        }
+      } catch (_) {}
+    }
+    _updateAvatarList();
   }
 
   @override
@@ -77,6 +100,14 @@ class _CharacterPageState extends State<CharacterPage> {
   }
 
   bool isAvatarLocked(Avatar avatar) => lockedAvatars.contains(avatar);
+
+  bool _isAvatarVisible(Avatar avatar) {
+    if (PREMIUM_AVATARS.contains(avatar)) {
+      final baseId = RegExp(r'^avatar\d+').firstMatch(avatar.value)?.group(0) ?? avatar.value;
+      return _ownedItemIds.contains(baseId);
+    }
+    return true;
+  }
 
   void selectAvatar(Avatar avatar) {
     AudioService().playSoundEffect(SoundEffect.Select.path);
@@ -133,7 +164,7 @@ class _CharacterPageState extends State<CharacterPage> {
     final outerBorderWidth = baseSize * 0.015;
     final innerBorderWidth = baseSize * 0.015;
 
-    final avatarDatas = AVATAR_DATA.values.toList();
+    final avatarEntries = SELECTABLE_AVATARS.where(_isAvatarVisible).map((avatar) => MapEntry(avatar, AVATAR_DATA[avatar]!)).toList();
 
     final hpOpacity = isHpBonusActive ? 1.0 : INACTIVE_STAT_OPACITY;
     final vitOpacity = isHpBonusActive ? INACTIVE_STAT_OPACITY : 1.0;
@@ -156,8 +187,9 @@ class _CharacterPageState extends State<CharacterPage> {
                 height: baseSize * 0.1,
                 width: double.infinity,
                 child: AppHeader(
-                  index: 1,
+                  index: 2,
                   text: i18n.translate(HEADER_KEY),
+                  textSizeFactor: 0.40,
                   onTap: () {
                     _popupService.showPopup(
                       PopupMessage(
@@ -300,7 +332,7 @@ class _CharacterPageState extends State<CharacterPage> {
                             painter: StripePainter(stripeSize: baseSize * 0.02, color1: RIGHT_STRIPE_COLOR_1, color2: RIGHT_STRIPE_COLOR_2),
                             child: CharacterAvatarGrid(
                               baseSize: baseSize,
-                              avatarDatas: avatarDatas,
+                              avatarEntries: avatarEntries,
                               selectedAvatar: selectedAvatar,
                               isAvatarLocked: isAvatarLocked,
                               onSelectAvatar: selectAvatar,
