@@ -75,7 +75,7 @@ class _StatPageState extends State<StatPage> {
     return '$minutes:$seconds';
   }
 
-  String _formatRatio(double ratio) => '${ratio.toStringAsFixed(0)}%';
+  String _formatRatio(double ratio) => '${ratio.toStringAsFixed(2)}%';
 
   String _formatGain(int value) {
     return '${value >= 0 ? '+' : ''}$value \$';
@@ -176,7 +176,7 @@ class _StatPageState extends State<StatPage> {
                                       ),
                                       _buildStatColumn(
                                         I18nService().translate(STAT_TILES_LABEL_KEY),
-                                        _statService.playerStats.map((player) => '${player.visitedTilesRatio}%').toList(),
+                                        _statService.playerStats.map((player) => '${player.visitedTilesRatio}').toList(),
                                         isSelfList,
                                         baseSize,
                                         statType: PlayerStatType.visitedTilesRatio,

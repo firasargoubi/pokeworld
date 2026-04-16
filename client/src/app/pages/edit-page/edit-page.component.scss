@@ -42,6 +42,16 @@ $tool-normal-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0)
 $tool-hover-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0.7);
 $tool-active-border: calc($final-side-width * 0.01) solid rgba(255, 255, 255, 0);
 
+$slider-height: calc($final-side-width * 0.1);
+$slider-track-height: calc($final-side-width * 0.06);
+$slider-track-border-width: calc($final-side-width * 0.003);
+$slider-notch-width: calc($final-side-width * 0.02);
+$slider-thumb-width: calc($final-side-width * 0.06);
+$slider-thumb-height: calc($final-side-width * 0.12);
+$slider-thumb-offset-y: calc($final-side-width * -0.035);
+$slider-thumb-border-width: calc($final-side-width * 0.0045);
+$slider-thumb-color: hsl(203, 100%, 38%);
+
 $gray-box-square: '../../../assets/images/menu/containers/gray/square.png';
 $gray-box-rectangle: '../../../assets/images/menu/containers/gray/rectangle.png';
 
@@ -554,6 +564,7 @@ app-warning-confirmation-popup {
 
 .action-input {
     width: 100%;
+    overflow: visible;
 }
 
 .action-input input {
@@ -571,6 +582,7 @@ app-warning-confirmation-popup {
 
 .generator-input {
     margin-bottom: calc($final-side-width * 0.04);
+    overflow: visible;
 }
 
 .generator-input label {
@@ -579,27 +591,68 @@ app-warning-confirmation-popup {
     margin-bottom: calc($final-side-width * 0.02);
 }
 
-.generator-input input {
+.editor-page input[type='range'] {
     width: 100%;
-    height: calc($final-side-width * 0.12);
-    padding: calc($final-side-width * 0.02);
+    height: $slider-height;
+    overflow: visible;
+    padding: 0;
     border-radius: calc($final-side-width * 0.01);
     background: $input-bg-normal;
-    border: calc($final-side-width * 0.0085) solid transparent;
     color: $text-color;
     font-family: 'pixel';
     font-size: calc($final-side-width * 0.08);
-    cursor: text;
+    cursor: pointer;
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
-.generator-input input:hover {
-    border-color: $input-border-color;
+.editor-page input[type='range']::-webkit-slider-runnable-track {
+    height: $slider-track-height;
+    border-radius: 0;
+    border: $slider-track-border-width solid rgba(255, 255, 255, 0.55);
+    background: repeating-linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.2) 0,
+            rgba(255, 255, 255, 0.2) $slider-notch-width,
+            rgba(0, 0, 0, 0.15) $slider-notch-width,
+            rgba(0, 0, 0, 0.15) calc($slider-notch-width * 2)
+        ),
+        $input-bg-active;
 }
 
-.generator-input input:focus {
-    background: $input-bg-active;
-    border-color: $input-border-color;
-    outline: none;
+.editor-page input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: $slider-thumb-width;
+    height: $slider-thumb-height;
+    margin-top: $slider-thumb-offset-y;
+    border-radius: 0;
+    border: $slider-thumb-border-width solid rgba(255, 255, 255, 0.9);
+    box-shadow: calc($final-side-width * 0.005) calc($final-side-width * 0.005) 0 rgba(0, 0, 0, 0.35);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 0 30%, rgba(0, 0, 0, 0.15) 30% 100%), $slider-thumb-color;
+}
+
+.editor-page input[type='range']::-moz-range-track {
+    height: $slider-track-height;
+    border-radius: 0;
+    border: $slider-track-border-width solid rgba(255, 255, 255, 0.55);
+    background: repeating-linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.2) 0,
+            rgba(255, 255, 255, 0.2) $slider-notch-width,
+            rgba(0, 0, 0, 0.15) $slider-notch-width,
+            rgba(0, 0, 0, 0.15) calc($slider-notch-width * 2)
+        ),
+        $input-bg-active;
+}
+
+.editor-page input[type='range']::-moz-range-thumb {
+    width: $slider-thumb-width;
+    height: $slider-thumb-height;
+    border-radius: 0;
+    border: $slider-thumb-border-width solid rgba(255, 255, 255, 0.9);
+    box-shadow: calc($final-side-width * 0.005) calc($final-side-width * 0.005) 0 rgba(0, 0, 0, 0.35);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 0 30%, rgba(0, 0, 0, 0.15) 30% 100%), $slider-thumb-color;
 }
 
 .generate-button {

@@ -454,7 +454,8 @@
             "friendOnly": "Friend-only",
             "open": "Open to all",
             "price": "Price :",
-            "validate": "Validate"
+            "validate": "Validate",
+            "notEnoughFunds": "Funds insufficient"
         },
         "shopPopup": {
             "title": "POKE-SHOP",

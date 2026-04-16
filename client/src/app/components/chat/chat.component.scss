@@ -48,8 +48,9 @@ $img-chat-body: '#{$img-base}/containers/chat/chat-body.png';
 
 $img-icon-toggle: '#{$img-base}/icons/mail.png';
 $img-icon-messages: '#{$img-base}/icons/chat/messages.svg';
-$img-icon-general-messages: '#{$img-base}/icons/chat/canaux.svg';
-$img-icon-channels: '#{$img-base}/icons/chat/canal.svg';
+$img-icon-general-messages: '#{$img-base}/icons/chat/general.png';
+$img-icon-channel: '#{$img-base}/icons/chat/canal.svg';
+$img-icon-channels: '#{$img-base}/icons/chat/channels.png';
 $img-icon-add: '#{$img-base}/icons/chat/add.svg';
 $img-icon-journal: '#{$img-base}/icons/chat/journal.svg';
 $img-icon-filter: '#{$img-base}/icons/chat/filter.svg';
@@ -530,7 +531,7 @@ $stylized-small-padding-size: calc($pixel-size * 5);
 .channel-icon {
     width: calc($chat-base-size * 3);
     aspect-ratio: 1 / 1;
-    background-image: url($img-icon-channels);
+    background-image: url($img-icon-channel);
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -566,12 +567,17 @@ $stylized-small-padding-size: calc($pixel-size * 5);
     filter: invert(1);
 }
 
+.channel-messages-button .icon {
+    background-image: url($img-icon-channels);
+}
+
 .messages-button .icon {
     background-image: url($img-icon-messages);
 }
 
 .general-messages-button .icon {
     background-image: url($img-icon-general-messages);
+    filter: invert(0) !important    ;
 }
 
 .journal-button .icon {

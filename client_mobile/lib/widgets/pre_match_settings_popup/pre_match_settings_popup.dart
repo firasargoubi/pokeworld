@@ -148,6 +148,7 @@ class _PreMatchSettingsPopupState extends State<PreMatchSettingsPopup> {
         final labelStyle = _pixelTextStyle(baseSize * 0.035);
         final optionStyle = _pixelTextStyle(baseSize * 0.035);
         final inputStyle = _pixelTextStyle(baseSize * 0.03);
+        final isEntryFeeUnavailable = _maxEntryFee == 0;
 
         final i18n = I18nService();
 
@@ -227,43 +228,54 @@ class _PreMatchSettingsPopupState extends State<PreMatchSettingsPopup> {
                                                 Text(i18n.translate(PRICE_KEY), style: labelStyle),
                                                 SizedBox(width: sectionHeight * 0.10),
                                                 Expanded(
-                                                  child: Row(
-                                                    children: [
-                                                      _FeeButton(text: '-', style: optionStyle, onTap: _decrementEntryFee),
-                                                      SizedBox(width: sectionHeight * 0.03),
-                                                      SizedBox(
-                                                        width: sectionHeight * 0.30,
-                                                        child: Container(
-                                                          padding: EdgeInsets.symmetric(horizontal: sectionHeight * 0.03),
-                                                          decoration: BoxDecoration(
-                                                            border: Border.all(
-                                                              color: Colors.white,
-                                                              width: max(1, (optionStyle.fontSize ?? 1) * 0.08),
-                                                            ),
-                                                          ),
-                                                          child: Material(
-                                                            type: MaterialType.transparency,
-                                                            child: TextField(
-                                                              controller: _entryFeeController,
-                                                              keyboardType: TextInputType.number,
-                                                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                                              style: inputStyle,
-                                                              onChanged: _setEntryFee,
-                                                              textAlign: TextAlign.center,
-                                                              decoration: const InputDecoration(
-                                                                border: InputBorder.none,
-                                                                isDense: true,
-                                                                contentPadding: EdgeInsets.symmetric(vertical: 8),
+                                                  child: Opacity(
+                                                    opacity: isEntryFeeUnavailable ? 0.4 : 1,
+                                                    child: IgnorePointer(
+                                                      ignoring: isEntryFeeUnavailable,
+                                                      child: Row(
+                                                        children: [
+                                                          _FeeButton(text: '-', style: optionStyle, onTap: _decrementEntryFee),
+                                                          SizedBox(width: sectionHeight * 0.03),
+                                                          SizedBox(
+                                                            width: sectionHeight * 0.50,
+                                                            child: Container(
+                                                              padding: EdgeInsets.symmetric(horizontal: sectionHeight * 0.03),
+                                                              decoration: BoxDecoration(
+                                                                border: Border.all(
+                                                                  color: Colors.white,
+                                                                  width: max(1, (optionStyle.fontSize ?? 1) * 0.08),
+                                                                ),
+                                                              ),
+                                                              child: Material(
+                                                                type: MaterialType.transparency,
+                                                                child: TextField(
+                                                                  controller: _entryFeeController,
+                                                                  enabled: !isEntryFeeUnavailable,
+                                                                  keyboardType: TextInputType.number,
+                                                                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                                                  style: inputStyle,
+                                                                  onChanged: _setEntryFee,
+                                                                  textAlign: TextAlign.center,
+                                                                  decoration: const InputDecoration(
+                                                                    border: InputBorder.none,
+                                                                    isDense: true,
+                                                                    contentPadding: EdgeInsets.symmetric(vertical: 8),
+                                                                  ),
+                                                                ),
                                                               ),
                                                             ),
                                                           ),
-                                                        ),
+                                                          SizedBox(width: sectionHeight * 0.03),
+                                                          _FeeButton(text: '+', style: optionStyle, onTap: _incrementEntryFee),
+                                                        ],
                                                       ),
-                                                      SizedBox(width: sectionHeight * 0.03),
-                                                      _FeeButton(text: '+', style: optionStyle, onTap: _incrementEntryFee),
-                                                    ],
+                                                    ),
                                                   ),
                                                 ),
+                                                if (isEntryFeeUnavailable) ...[
+                                                  SizedBox(height: sectionHeight * 0.04),
+                                                  Text(i18n.translate(NOT_ENOUGH_FUNDS_KEY), style: optionStyle),
+                                                ],
                                               ],
                                             ),
                                           ],

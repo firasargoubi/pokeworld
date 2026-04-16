@@ -317,11 +317,11 @@ $section-stripe-step: calc($section-stripe-size * 2);
 
 .sort-icon.ascending {
     background-image: url($img-sort-asc);
-    rotate: 180deg;
 }
 
 .sort-icon.descending {
     background-image: url($img-sort-asc);
+    rotate: 180deg;
 }
 
 .stat-container {
@@ -389,7 +389,6 @@ $section-stripe-step: calc($section-stripe-size * 2);
 
     display: flex;
     align-items: stretch;
-    gap: calc($base-size-2 * 1.5);
 }
 
 .header {

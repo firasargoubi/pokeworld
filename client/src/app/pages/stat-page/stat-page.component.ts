@@ -1,4 +1,4 @@
-import { DatePipe, UpperCasePipe } from '@angular/common';
+import { DatePipe, DecimalPipe, UpperCasePipe } from '@angular/common';
 import { Component, computed, inject, signal, Signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatComponent } from '@app/components/chat/chat.component';
@@ -16,7 +16,7 @@ import { TranslateModule } from '@ngx-translate/core';
     selector: 'app-stat-page',
     templateUrl: './stat-page.component.html',
     styleUrls: ['./stat-page.component.scss'],
-    imports: [HeaderComponent, FormsModule, ChatComponent, DatePipe, UpperCasePipe, TranslateModule],
+    imports: [HeaderComponent, FormsModule, ChatComponent, DatePipe, UpperCasePipe, TranslateModule, DecimalPipe],
 })
 export class StatPageComponent {
     sortingOrder: WritableSignal<Order> = signal(Order.Ascending);

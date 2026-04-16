@@ -49,7 +49,6 @@ $img-surrender-button-hover: '../../../assets/images/menu/buttons/play/surrender
 $img-surrender-button-click: '../../../assets/images/menu/buttons/play/surrender-button-click.png';
 
 $img-movement-bar: '../../../assets/images/menu/stat-bar/movement-bar.png';
-$img-movement-icon: '../../../assets/images/menu/icons/movement.png';
 
 $img-item-container: '../../../assets/images/menu/containers/item/item-container.png';
 $img-info-button: '../../../assets/images/menu/icons/info.png';
@@ -617,13 +616,6 @@ $player-card-gap: calc($base-size * 0.8);
     align-items: center;
     flex-direction: row;
     gap: calc(0.01 * $map-size);
-}
-
-.movement-text-left .movement-icon {
-    height: 80%;
-    aspect-ratio: 1 / 1;
-    background-size: contain;
-    background-image: url($img-movement-icon);
 }
 
 .movement-container .movement-bar {

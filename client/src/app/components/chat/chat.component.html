@@ -16,12 +16,14 @@
         <div class="chat-interactions-container">
             <div class="categories-container">
                 <div
-                    class="category-button general-messages-button"
+                    class="category-button channel-messages-button"
                     [class.active]="chatService.chatState().activeTab === chatTab.Channels"
                     (click)="switchTab(chatTab.Channels)"
                 >
                     <div class="icon"></div>
+                    @if(chatService.chatState().activeTab === chatTab.Channels) {
                     <p>{{ 'components.chat.channels' | translate }}</p>
+                    }
                 </div>
                 <div
                     class="category-button general-messages-button"
@@ -29,7 +31,9 @@
                     (click)="switchTab(chatTab.General)"
                 >
                     <div class="icon"></div>
+                    @if(chatService.chatState().activeTab === chatTab.General) {
                     <p>{{ 'components.chat.general' | translate }}</p>
+                    }
                 </div>
                 @if (isInGame) {
                 <div
@@ -38,7 +42,9 @@
                     (click)="switchTab(chatTab.Match)"
                 >
                     <div class="icon"></div>
+                    @if(chatService.chatState().activeTab === chatTab.Match) {
                     <p>{{ 'components.chat.messages' | translate }}</p>
+                    }
                 </div>
                 <div
                     class="category-button journal-button"
@@ -46,7 +52,9 @@
                     (click)="switchTab(chatTab.Journal)"
                 >
                     <div class="icon"></div>
+                    @if(chatService.chatState().activeTab === chatTab.Journal) {
                     <p>{{ 'components.chat.journal' | translate }}</p>
+                    }
                 </div>
                 }
             </div>

@@ -15,6 +15,7 @@ const String ACCESSIBILITY_KEY = 'components.preMatchSettings.accessibility';
 const String OPEN_KEY = 'components.preMatchSettings.open';
 const String FRIEND_ONLY_KEY = 'components.preMatchSettings.friendOnly';
 const String PRICE_KEY = 'components.preMatchSettings.price';
+const String NOT_ENOUGH_FUNDS_KEY = 'components.preMatchSettings.notEnoughFunds';
 const String VALIDATE_KEY = 'components.preMatchSettings.validate';
 
 const int ENTRY_FEE_STEP = 500;
