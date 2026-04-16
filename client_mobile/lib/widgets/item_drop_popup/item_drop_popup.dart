@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/item_type.dart';
+import 'package:client_mobile/pages/play_page/play_page_widgets.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
@@ -24,8 +25,26 @@ class ItemDropPopup extends StatefulWidget {
 }
 
 class _ItemDropPopupState extends State<ItemDropPopup> {
+  static const _slotCount = 3;
+
   List<ItemType> get items => MatchService().selfPlayer!.items;
   int selectedIndex = 2;
+
+  final List<OverlayPortalController> _tooltipControllers = List.generate(_slotCount, (_) => OverlayPortalController());
+  final List<LayerLink> _tooltipLinks = List.generate(_slotCount, (_) => LayerLink());
+  final List<Object> _tooltipGroupIds = List.generate(_slotCount, (_) => Object());
+
+  void _showTooltip(int index) {
+    for (var i = 0; i < _tooltipControllers.length; i++) {
+      if (i == index) continue;
+      if (_tooltipControllers[i].isShowing) _tooltipControllers[i].hide();
+    }
+    if (!_tooltipControllers[index].isShowing) _tooltipControllers[index].show();
+  }
+
+  void _hideTooltip(int index) {
+    if (_tooltipControllers[index].isShowing) _tooltipControllers[index].hide();
+  }
 
   TextStyle _pixelTextStyle(double fontSize) => TextStyle(
     fontFamily: FONT_FAMILY,
@@ -110,38 +129,63 @@ class _ItemDropPopupState extends State<ItemDropPopup> {
                               return Center(
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
-                                  children: List.generate(
-                                    3,
-                                    (index) => GestureDetector(
-                                      behavior: HitTestBehavior.opaque,
-                                      onTap: () => _select(index),
-                                      child: Container(
-                                        width: squareSize,
-                                        height: squareSize,
-                                        margin: EdgeInsets.symmetric(horizontal: squareSize * 0.3),
-                                        child: Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            if (index == selectedIndex)
-                                              Image.asset(
-                                                SELECTION_ASSET,
-                                                width: squareSize,
-                                                height: squareSize,
-                                                fit: BoxFit.contain,
-                                                filterQuality: FilterQuality.none,
-                                              ),
+                                  children: List.generate(3, (index) {
+                                    final slot = Container(
+                                      width: squareSize,
+                                      height: squareSize,
+                                      margin: EdgeInsets.symmetric(horizontal: squareSize * 0.3),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          if (index == selectedIndex)
                                             Image.asset(
-                                              items[index].assetPath,
-                                              width: squareSize * 0.8,
-                                              height: squareSize * 0.8,
+                                              SELECTION_ASSET,
+                                              width: squareSize,
+                                              height: squareSize,
                                               fit: BoxFit.contain,
                                               filterQuality: FilterQuality.none,
                                             ),
-                                          ],
+                                          Image.asset(
+                                            items[index].assetPath,
+                                            width: squareSize * 0.8,
+                                            height: squareSize * 0.8,
+                                            fit: BoxFit.contain,
+                                            filterQuality: FilterQuality.none,
+                                          ),
+                                        ],
+                                      ),
+                                    );
+
+                                    return OverlayPortal(
+                                      controller: _tooltipControllers[index],
+                                      overlayChildBuilder: (context) {
+                                        return Positioned(
+                                          left: 0,
+                                          top: 0,
+                                          child: CompositedTransformFollower(
+                                            link: _tooltipLinks[index],
+                                            targetAnchor: Alignment.topCenter,
+                                            followerAnchor: Alignment.bottomCenter,
+                                            offset: Offset(0, -baseSize * 0.01),
+                                            child: TapRegion(
+                                              groupId: _tooltipGroupIds[index],
+                                              onTapOutside: (_) => _hideTooltip(index),
+                                              child: ItemDescriptionTooltip(baseBodySize: baseSize, item: items[index]),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: TapRegion(
+                                        groupId: _tooltipGroupIds[index],
+                                        child: GestureDetector(
+                                          behavior: HitTestBehavior.opaque,
+                                          onTap: () => _select(index),
+                                          onLongPress: () => _showTooltip(index),
+                                          child: CompositedTransformTarget(link: _tooltipLinks[index], child: slot),
                                         ),
                                       ),
-                                    ),
-                                  ),
+                                    );
+                                  }),
                                 ),
                               );
                             },
