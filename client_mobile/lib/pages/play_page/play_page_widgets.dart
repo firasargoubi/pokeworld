@@ -668,18 +668,45 @@ class MovementBar extends StatelessWidget {
   }
 }
 
-class ItemsSection extends StatelessWidget {
+class ItemsSection extends StatefulWidget {
   const ItemsSection({super.key, required this.baseBodySize});
 
   final double baseBodySize;
 
   @override
-  Widget build(BuildContext context) {
-    final gap = baseBodySize * 0.02;
-    final iconSize = baseBodySize * 0.12;
+  State<ItemsSection> createState() => _ItemsSectionState();
+}
 
-    Widget itemSlot(ItemType? item) {
-      return AspectRatio(
+class _ItemsSectionState extends State<ItemsSection> {
+  static const _slotCount = 2;
+
+  final List<OverlayPortalController> _controllers = List.generate(_slotCount, (_) => OverlayPortalController());
+  final List<LayerLink> _links = List.generate(_slotCount, (_) => LayerLink());
+  final List<Object> _groupIds = List.generate(_slotCount, (_) => Object());
+
+  void _toggleTooltip(int index) {
+    for (var i = 0; i < _controllers.length; i++) {
+      if (i == index) continue;
+      if (_controllers[i].isShowing) _controllers[i].hide();
+    }
+    if (_controllers[index].isShowing) {
+      _controllers[index].hide();
+    } else {
+      _controllers[index].show();
+    }
+  }
+
+  void _hideTooltip(int index) {
+    if (_controllers[index].isShowing) _controllers[index].hide();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final gap = widget.baseBodySize * 0.02;
+    final iconSize = widget.baseBodySize * 0.12;
+
+    Widget itemSlot(int index, ItemType? item) {
+      final slot = AspectRatio(
         aspectRatio: 1,
         child: DecoratedBox(
           decoration: const BoxDecoration(
@@ -702,17 +729,108 @@ class ItemsSection extends StatelessWidget {
           ),
         ),
       );
+
+      final target = CompositedTransformTarget(link: _links[index], child: slot);
+
+      if (item == null) return target;
+
+      return OverlayPortal(
+        controller: _controllers[index],
+        overlayChildBuilder: (context) {
+          return Positioned(
+            left: 0,
+            top: 0,
+            child: CompositedTransformFollower(
+              link: _links[index],
+              targetAnchor: Alignment.topCenter,
+              followerAnchor: Alignment.bottomCenter,
+              offset: Offset(0, -widget.baseBodySize * 0.01),
+              child: TapRegion(
+                groupId: _groupIds[index],
+                onTapOutside: (_) => _hideTooltip(index),
+                child: ItemDescriptionTooltip(baseBodySize: widget.baseBodySize, item: item),
+              ),
+            ),
+          );
+        },
+        child: TapRegion(
+          groupId: _groupIds[index],
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => _toggleTooltip(index),
+            child: target,
+          ),
+        ),
+      );
     }
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        itemSlot(PlayService().getItem(MatchService().selfPlayer!.id, 0)),
+        itemSlot(0, PlayService().getItem(MatchService().selfPlayer!.id, 0)),
         SizedBox(width: gap),
-        itemSlot(PlayService().getItem(MatchService().selfPlayer!.id, 1)),
+        itemSlot(1, PlayService().getItem(MatchService().selfPlayer!.id, 1)),
       ],
     );
   }
+}
+
+class ItemDescriptionTooltip extends StatelessWidget {
+  const ItemDescriptionTooltip({super.key, required this.baseBodySize, required this.item});
+
+  final double baseBodySize;
+  final ItemType item;
+
+  @override
+  Widget build(BuildContext context) {
+    final fontSize = baseBodySize * 0.022;
+    final width = baseBodySize * 0.45;
+
+    return Material(
+      type: MaterialType.transparency,
+      child: SizedBox(
+        width: width,
+        child: DecoratedBox(
+          decoration: const BoxDecoration(
+            image: DecorationImage(image: AssetImage(INFO_CONTAINER_ASSET), fit: BoxFit.fill, filterQuality: FilterQuality.none),
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: baseBodySize * 0.03, vertical: baseBodySize * 0.025),
+            child: RichText(
+              textAlign: TextAlign.center,
+              text: _buildItemDescriptionSpan(
+                item: item,
+                baseStyle: pixelLineStyle(fontSize),
+                boldStyle: pixelLineStyle(fontSize).copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+TextSpan _buildItemDescriptionSpan({required ItemType item, required TextStyle baseStyle, required TextStyle boldStyle}) {
+  final key = 'items.rightClick.${item.name.toLowerCase()}';
+  final raw = I18nService().translate(key);
+  final normalized = raw.replaceAll('<br/>', '\n').replaceAll('<br>', '\n');
+
+  final spans = <TextSpan>[];
+  final boldRegex = RegExp(r'<b>(.*?)</b>');
+  int cursor = 0;
+  for (final match in boldRegex.allMatches(normalized)) {
+    if (match.start > cursor) {
+      spans.add(TextSpan(text: normalized.substring(cursor, match.start), style: baseStyle));
+    }
+    spans.add(TextSpan(text: match.group(1), style: boldStyle));
+    cursor = match.end;
+  }
+  if (cursor < normalized.length) {
+    spans.add(TextSpan(text: normalized.substring(cursor), style: baseStyle));
+  }
+
+  return TextSpan(children: spans);
 }
 
 class BottomButtons extends StatelessWidget {
