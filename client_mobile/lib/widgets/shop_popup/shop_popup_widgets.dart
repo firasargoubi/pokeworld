@@ -50,6 +50,7 @@ class ShopItems extends StatelessWidget {
     required this.selectedItem,
     required this.onItemSelected,
     required this.ownedItemIds,
+    required this.sectionLabel,
   });
 
   final Future<List<ShopItem>> shopItemsFuture;
@@ -57,6 +58,7 @@ class ShopItems extends StatelessWidget {
   final ShopItem? selectedItem;
   final ValueChanged<ShopItem> onItemSelected;
   final Set<String> ownedItemIds;
+  final String sectionLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -74,8 +76,16 @@ class ShopItems extends StatelessWidget {
         final List<ShopItem> displayedShopItems = snapshot.data!;
 
         return Column(
-          spacing: baseSize * 0.02,
+          spacing: baseSize * 0.01,
           children: [
+            Padding(
+              padding: EdgeInsets.only(left: baseSize * 0.01),
+              child: Align(
+                heightFactor: 0.8,
+                alignment: Alignment.centerLeft,
+                child: Text(I18nService().translate(sectionLabel), style: buildDefaultTextStyle(baseSize * 0.045)),
+              ),
+            ),
             Padding(
               padding: EdgeInsets.only(right: baseSize * 0.03),
               child: SizedBox(
@@ -98,6 +108,7 @@ class ShopItems extends StatelessWidget {
                 ),
               ),
             ),
+            SizedBox(height: baseSize * 0.01),
             FractionallySizedBox(
               widthFactor: 0.9,
               child: SizedBox(
@@ -105,6 +116,7 @@ class ShopItems extends StatelessWidget {
                 child: const ColoredBox(color: CENTER_DIVIDER_COLOR),
               ),
             ),
+            SizedBox(height: baseSize * 0.0),
           ],
         );
       },
@@ -155,11 +167,11 @@ class ShopItemTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: Padding(
-                    padding: EdgeInsets.only(top: tileSize * 0.02),
+                    padding: EdgeInsets.only(top: tileSize * 0.1),
                     child: SizedBox.expand(
-                      child: Image.asset(ITEM_PLACEHOLDER_ASSET_PATH, fit: BoxFit.contain, filterQuality: FilterQuality.none),
+                      child: Image.asset(getShopItemImagePath(shopItem), fit: BoxFit.contain, filterQuality: FilterQuality.none),
                     ),
                   ),
                 ),
@@ -174,13 +186,13 @@ class ShopItemTile extends StatelessWidget {
                         children: [
                           Text(
                             I18nService().translate(shopItem.nameKey),
-                            style: buildOutlineTextStyle(tileSize * 0.14, decoration: textDecoration),
+                            style: buildOutlineTextStyle(tileSize * 0.12, decoration: textDecoration),
                             textAlign: TextAlign.center,
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
                             I18nService().translate(shopItem.nameKey),
-                            style: buildTileTextStyle(tileSize * 0.14, decoration: textDecoration),
+                            style: buildTileTextStyle(tileSize * 0.12, decoration: textDecoration),
                             textAlign: TextAlign.center,
                             overflow: TextOverflow.ellipsis,
                           ),

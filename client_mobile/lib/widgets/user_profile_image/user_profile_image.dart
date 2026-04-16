@@ -1,10 +1,11 @@
+import 'package:client_mobile/services/preferences_service/preferences_service.dart';
 import 'package:flutter/material.dart';
 
 class LayeredProfileImage extends StatelessWidget {
-  const LayeredProfileImage({super.key, required this.foregroundImage});
+  LayeredProfileImage({super.key, required this.foregroundImage});
 
   final ImageProvider foregroundImage;
-  final String backgroundImage = 'assets/images/menu/buttons/poke-button/party-ball.png';
+  final String backgroundImage = PreferencesService().getEquippedBallAsset(active: false);
 
   @override
   Widget build(BuildContext context) {

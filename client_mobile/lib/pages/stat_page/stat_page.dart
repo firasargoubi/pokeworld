@@ -5,7 +5,9 @@ import 'package:client_mobile/models/stat_data.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
+import 'package:client_mobile/services/preferences_service/preferences_service.dart';
 import 'package:client_mobile/services/stat_service/stat_service.dart';
+import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:client_mobile/widgets/header/header.dart';
 import 'package:client_mobile/widgets/stat_container/stat_container.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +40,9 @@ class _StatPageState extends State<StatPage> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      AudioService().playBackgroundMusic(BackgroundMusic.Menu.path);
+      if (UserService().currentUser.value != null) {
+        AudioService().playBackgroundMusic(PreferencesService().getEquippedMenuMusicPath());
+      }
     });
 
     _statService.initializeData();

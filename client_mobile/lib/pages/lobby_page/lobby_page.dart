@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:client_mobile/consts/match_data_const.dart';
 import 'package:client_mobile/consts/player_data_const.dart';
-import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/models/challenge_data.dart';
 import 'package:client_mobile/models/map_data.dart';
 import 'package:client_mobile/models/match_data.dart';
@@ -14,6 +13,8 @@ import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
 import 'package:client_mobile/services/popup_service/popup_service.dart';
+import 'package:client_mobile/services/preferences_service/preferences_service.dart';
+import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:client_mobile/widgets/add_bot_popup/add_bot_popup.dart';
 import 'package:client_mobile/widgets/chat/chat.dart';
 import 'package:client_mobile/widgets/header/header.dart';
@@ -74,7 +75,9 @@ class _LobbyPageState extends State<LobbyPage> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      AudioService().playBackgroundMusic(BackgroundMusic.Menu.path);
+      if (UserService().currentUser.value != null) {
+        AudioService().playBackgroundMusic(PreferencesService().getEquippedMenuMusicPath());
+      }
     });
 
     final md = MatchService().matchData;
@@ -185,7 +188,7 @@ class _LobbyPageState extends State<LobbyPage> {
             height: b * 0.1,
             width: double.infinity,
             child: AppHeader(
-              index: 1,
+              index: 3,
               text: I18nService().translate(HEADER_KEY),
               onTap: () {
                 _popupService.showPopup(

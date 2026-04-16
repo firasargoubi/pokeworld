@@ -45,6 +45,7 @@ class ProfileController {
   Future<void> _handleLogout() async {
     try {
       await UserService().logout();
+      await AudioService().stopAllAudio();
       await PreferencesService().setThemeBeforeAuth(AppTheme.DefaultTheme);
       ChatService().clearChatHistory();
     } catch (e) {

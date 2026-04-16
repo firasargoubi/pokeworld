@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-const String MENU_CARD_DEFAULT_BUTTON_IMAGE = 'assets/images/menu/buttons/poke-button/party-ball.png';
-const String MENU_CARD_DEFAULT_BUTTON_IMAGE_ACTIVE = 'assets/images/menu/buttons/poke-button/party-ball-sel.png';
+const String MENU_CARD_DEFAULT_BUTTON_IMAGE = 'assets/images/menu/buttons/poke-button/party-ball-0.png';
+const String MENU_CARD_DEFAULT_BUTTON_IMAGE_ACTIVE = 'assets/images/menu/buttons/poke-button/party-ball-sel-0.png';
 
 const String MENU_CARD_FONT_FAMILY = 'Pixel';
 

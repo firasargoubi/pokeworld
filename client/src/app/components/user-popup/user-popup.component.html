@@ -128,9 +128,9 @@
                             </div>
                         </div>
                         <div class="error-container">
-                            @if(usernameError) {
+                            @if (usernameError) {
                             <div class="error">{{ usernameError }}</div>
-                            } @if(passwordError) {
+                            } @if (passwordError) {
                             <div class="error">{{ passwordError }}</div>
                             }
                         </div>
@@ -141,7 +141,7 @@
                             </div>
                         </div>
                     </div>
-                    }@else if (activeCard === userCardType.Friends) {
+                    } @else if (activeCard === userCardType.Friends) {
                     <div class="title-container">
                         <div class="title-label">
                             <div class="icon-wrapper"></div>
@@ -197,7 +197,7 @@
                             </div>
 
                             <div class="friend-list">
-                                @if(this.socialService.isLoading()) {
+                                @if (this.socialService.isLoading()) {
                                 <div class="search-loading">
                                     <div alt="loading" class="pokeball"></div>
                                 </div>

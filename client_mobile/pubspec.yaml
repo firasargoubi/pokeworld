@@ -129,6 +129,7 @@ flutter:
         - assets/images/menu/tutorial/
         - assets/images/menu/tutorial/fr/
         - assets/images/menu/tutorial/en/
+        - assets/images/menu/shop-items/
 
     # The following line ensures that the Material Icons font is
     # included with your application, so that you can use the icons in

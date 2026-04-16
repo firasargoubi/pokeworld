@@ -78,6 +78,7 @@ class _CombatPageState extends State<CombatPage> {
       final prevSelfHealth = selfCombatData.currentHealth;
       final prevEnemyHealth = enemyCombatData.currentHealth;
 
+      if (rawCombat.playersCombatData.length < 2) return;
       final attackerPlayerIndex = rawCombat.playersCombatData[rawCombat.isSecondPlayerTurn ? 0 : 1].playerIndex;
       final bottomPlayerWasAttacker = attackerPlayerIndex == selfCombatData.playerIndex;
 

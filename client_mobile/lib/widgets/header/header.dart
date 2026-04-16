@@ -8,8 +8,9 @@ class AppHeader extends StatefulWidget {
   final int index;
   final String text;
   final VoidCallback onTap;
+  final double textSizeFactor;
 
-  const AppHeader({super.key, required this.index, required this.text, required this.onTap});
+  const AppHeader({super.key, required this.index, required this.text, required this.onTap, this.textSizeFactor = 0.55});
 
   @override
   State<AppHeader> createState() => _AppHeaderState();
@@ -47,7 +48,7 @@ class _AppHeaderState extends State<AppHeader> {
         final headerHeight = constraints.hasBoundedHeight ? constraints.maxHeight : APP_HEADER_FALLBACK_HEIGHT;
 
         final buttonSize = headerHeight * 0.60;
-        final textSize = headerHeight * 0.55;
+        final textSize = headerHeight * widget.textSizeFactor;
         final sidePadding = headerHeight * 0.22;
 
         return SizedBox(

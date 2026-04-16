@@ -233,6 +233,7 @@ class UserLoginController {
   }
 
   void dispose() {
+    _setState = null;
     usernameController.dispose();
     emailController.dispose();
     passwordController.dispose();

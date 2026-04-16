@@ -27,10 +27,12 @@ enum AppTheme {
 }
 
 class UserPreferences {
-  const UserPreferences({required this.language, required this.theme});
+  const UserPreferences({required this.language, required this.theme, this.partyBall, this.menuMusic});
 
   final AppLanguage language;
   final AppTheme theme;
+  final String? partyBall;
+  final String? menuMusic;
 
   static const UserPreferences defaults = UserPreferences(language: AppLanguage.French, theme: AppTheme.DefaultTheme);
 
@@ -39,7 +41,12 @@ class UserPreferences {
       return defaults;
     }
 
-    return UserPreferences(language: AppLanguage.fromCode(json['language']), theme: AppTheme.fromCode(json['theme']));
+    return UserPreferences(
+      language: AppLanguage.fromCode(json['language']),
+      theme: AppTheme.fromCode(json['theme']),
+      partyBall: json['partyBall'] as String?,
+      menuMusic: json['menuMusic'] as String?,
+    );
   }
 
   Map<String, dynamic> toJson() {

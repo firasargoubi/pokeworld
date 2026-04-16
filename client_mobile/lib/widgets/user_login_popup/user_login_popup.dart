@@ -153,12 +153,14 @@ class _UserLoginPopupState extends State<UserLoginPopup> with SingleTickerProvid
                   onCustomAvatarTapped: _controller.onCustomAvatarTapped,
                   isLoading: _controller.isLoading,
                   errorMessage: _controller.errorMessage,
-                  onAction: () => _controller.handleAction(
-                    onSuccess: () {
-                      if (mounted) Navigator.of(context).pop();
-                      if (_controller.isRegister) showTutorialPopup(context);
-                    },
-                  ),
+                  onAction: () => _controller
+                      .handleAction(
+                        onSuccess: () {
+                          if (mounted) Navigator.of(context).pop();
+                          if (_controller.isRegister) showTutorialPopup(context);
+                        },
+                      )
+                      .catchError((_) {}),
                 ),
               ),
             ),

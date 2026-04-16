@@ -1,7 +1,10 @@
 enum BackgroundMusic {
-  Menu('audio/music/menu.mp3'),
+  Menu('audio/music/menu0.mp3'),
   Combat('audio/music/combat.mp3'),
-  Play('audio/music/play.mp3');
+  Play('audio/music/play.mp3'),
+  MenuMusic1('audio/music/menu1.mp3'),
+  MenuMusic2('audio/music/menu2.mp3'),
+  MenuMusic3('audio/music/menu3.mp3');
 
   final String path;
   const BackgroundMusic(this.path);

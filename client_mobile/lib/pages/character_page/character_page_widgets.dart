@@ -252,7 +252,7 @@ class CharacterAvatarGrid extends StatelessWidget {
   const CharacterAvatarGrid({
     super.key,
     required this.baseSize,
-    required this.avatarDatas,
+    required this.avatarEntries,
     required this.selectedAvatar,
     required this.isAvatarLocked,
     required this.onSelectAvatar,
@@ -262,7 +262,7 @@ class CharacterAvatarGrid extends StatelessWidget {
   });
 
   final double baseSize;
-  final List<AvatarData> avatarDatas;
+  final List<MapEntry<Avatar, AvatarData>> avatarEntries;
 
   final Avatar? selectedAvatar;
   final bool Function(Avatar) isAvatarLocked;
@@ -277,7 +277,7 @@ class CharacterAvatarGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         const int cols = AVATAR_SELECTION_GRID_COLS;
-        const int itemCount = AVATAR_SELECTION_ITEM_COUNT;
+        final int itemCount = avatarEntries.length;
         final rows = (itemCount / cols).ceil();
 
         final padding = baseSize * 0.01;
@@ -315,12 +315,12 @@ class CharacterAvatarGrid extends StatelessWidget {
                   childAspectRatio: 1.0,
                 ),
                 itemBuilder: (context, index) {
-                  final avatar = Avatar.values[index + 1];
+                  final avatar = avatarEntries[index].key;
                   final isSelected = selectedAvatar == avatar;
                   final isLocked = isAvatarLocked(avatar);
 
                   final avatarImage = Image.asset(
-                    avatarDatas[index + 1].image,
+                    avatarEntries[index].value.image,
                     width: cell * 0.55,
                     height: cell * 0.55,
                     fit: BoxFit.cover,

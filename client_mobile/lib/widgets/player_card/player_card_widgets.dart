@@ -189,7 +189,10 @@ class PlayerCardBody extends StatelessWidget {
                     SizedBox(
                       width: iconSize * 1.3,
                       height: iconSize * 1.3,
-                      child: LayeredProfileImage(foregroundImage: profilePictureImageProvider(userProfilePicture)),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [LayeredProfileImage(foregroundImage: profilePictureImageProvider(userProfilePicture))],
+                      ),
                     ),
                   ],
                 ],

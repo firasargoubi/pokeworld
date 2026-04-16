@@ -134,12 +134,10 @@ export class UserService {
     }
 
     async logout(userId: string): Promise<void> {
+        this.userSocketMap.delete(userId);
         const user = await this.userModel.findOneAndUpdate({ userId, isLoggedIn: true }, { $set: { isLoggedIn: false } }, { new: true }).exec();
         if (!user) {
             throw new UnauthorizedException('Invalid user or not currently connected');
-        }
-        if (this.userSocketMap.has(userId)) {
-            this.userSocketMap.delete(userId);
         }
     }
 

@@ -8,6 +8,7 @@ import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/lobby_service/lobby_service.dart';
 import 'package:client_mobile/services/match_service/match_service.dart';
+import 'package:client_mobile/services/preferences_service/preferences_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -37,6 +38,7 @@ class _PlayerCardState extends State<PlayerCard> {
   late bool isViewerHost;
   late bool isInactive;
   late String inactiveLabel;
+  late final PreferencesService _preferencesService;
 
   bool _isInactivePressed = false;
   bool _isActionPressed = false;
@@ -59,7 +61,20 @@ class _PlayerCardState extends State<PlayerCard> {
   @override
   void initState() {
     super.initState();
+    _preferencesService = PreferencesService();
+    _preferencesService.equippedButtonNotifier.addListener(_handleEquippedButtonChange);
     _initFromPlayerData();
+  }
+
+  @override
+  void dispose() {
+    _preferencesService.equippedButtonNotifier.removeListener(_handleEquippedButtonChange);
+    super.dispose();
+  }
+
+  void _handleEquippedButtonChange() {
+    if (!mounted) return;
+    setState(() {});
   }
 
   @override
@@ -159,6 +174,8 @@ class _PlayerCardState extends State<PlayerCard> {
 
         final bodyWidth = max(0.0, cardWidth - leftMargin - rightMargin - actionButtonWidth - trailingRightMargin);
 
+        final String pokeBallAsset = _preferencesService.getEquippedBallAsset(active: false);
+
         final contentRow = Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -215,10 +232,16 @@ class _PlayerCardState extends State<PlayerCard> {
                   children: [
                     Positioned.fill(
                       child: pokeBallFilter == null
-                          ? Image.asset(POKE_BALL_ASSET, fit: BoxFit.contain, filterQuality: FilterQuality.none)
+                          ? Transform.scale(
+                              scale: 1.1,
+                              child: Image.asset(pokeBallAsset, fit: BoxFit.fitWidth, filterQuality: FilterQuality.none),
+                            )
                           : ColorFiltered(
                               colorFilter: pokeBallFilter,
-                              child: Image.asset(POKE_BALL_ASSET, fit: BoxFit.contain, filterQuality: FilterQuality.none),
+                              child: Transform.scale(
+                                scale: 1.1,
+                                child: Image.asset(pokeBallAsset, fit: BoxFit.fitWidth, filterQuality: FilterQuality.none),
+                              ),
                             ),
                     ),
 

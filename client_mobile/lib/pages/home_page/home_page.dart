@@ -1,8 +1,9 @@
 import 'dart:math';
 
 import 'package:client_mobile/consts/ui.dart';
-import 'package:client_mobile/models/audio.dart';
 import 'package:client_mobile/services/audio_service/audio_service.dart';
+import 'package:client_mobile/services/preferences_service/preferences_service.dart';
+import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:client_mobile/widgets/settings_popup/settings_popup.dart';
 import 'package:client_mobile/widgets/shop_popup/shop_popup.dart';
 import 'package:client_mobile/widgets/user_profile_popup/user_profile_popup.dart';
@@ -18,13 +19,35 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final UserService _userService = UserService();
+  final PreferencesService _preferencesService = PreferencesService();
+
   @override
   void initState() {
     super.initState();
+    _userService.currentUser.addListener(_onUserChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      AudioService().playBackgroundMusic(BackgroundMusic.Menu.path);
+      if (_userService.currentUser.value != null) {
+        AudioService().playBackgroundMusic(_preferencesService.getEquippedMenuMusicPath());
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    _userService.currentUser.removeListener(_onUserChanged);
+    super.dispose();
+  }
+
+  void _onUserChanged() {
+    if (!mounted) return;
+    if (_userService.currentUser.value != null) {
+      AudioService().playBackgroundMusic(_preferencesService.getEquippedMenuMusicPath());
+      return;
+    }
+
+    AudioService().stopAllAudio();
   }
 
   void _showUserPopup() {
