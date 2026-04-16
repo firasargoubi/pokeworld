@@ -32,7 +32,7 @@
                             <div class="stat-container">
                                 @for(player of playerStatList() ; track player.id){
                                 <div class="stat-value" [class.self]="isSelfPlayer(player.id)" [class.balance-gain]="isBalanceGainColumn(statType)">
-                                    {{ isBalanceGainColumn(statType) ? formatGain(player[statType]) : player[statType] }}
+                                    {{ isBalanceGainColumn(statType) ? formatGain(player[statType]) : (player[statType] | number: '1.2-2') }}
                                 </div>
                                 }
                                 <div class="stat-separator"></div>
@@ -65,15 +65,14 @@
                                 </div>
                                 <div class="stat-row">
                                     <div class="label">{{ 'pages.stat.visitedTiles' | translate }}</div>
-                                    <div class="value">{{ statService.globalStats.visitedTilesRatio }} %</div>
+                                    <div class="value">{{ statService.globalStats.visitedTilesRatio | number: '1.2-2' }} %</div>
                                 </div>
                                 @if(statService.globalStats.toggledBridgesRatio !== 0){
                                 <div class="stat-row">
                                     <div class="label">{{ 'pages.stat.manipulatedDoors' | translate }}</div>
-                                    <div class="value">{{ statService.globalStats.toggledBridgesRatio }} %</div>
+                                    <div class="value">{{ statService.globalStats.toggledBridgesRatio | number: '1.2-2' }} %</div>
                                 </div>
-                                }
-                                @if(isModeCTF()){
+                                } @if(isModeCTF()){
                                 <div class="stat-row">
                                     <div class="label">{{ 'pages.stat.flagCarriers' | translate }}</div>
                                     <div class="value">{{ statService.globalStats.flagHoldersCount }}</div>
@@ -88,8 +87,8 @@
                                             (statService.winnerData.name === 'rouge' || statService.winnerData.name === 'red'
                                                 ? ('teams.red' | translate)
                                                 : statService.winnerData.name === 'bleu' || statService.winnerData.name === 'blue'
-                                                  ? ('teams.blue' | translate)
-                                                  : statService.winnerData.name
+                                                ? ('teams.blue' | translate)
+                                                : statService.winnerData.name
                                             ) | uppercase
                                         }}&nbsp;
                                     </div>

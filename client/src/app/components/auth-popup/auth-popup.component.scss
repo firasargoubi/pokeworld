@@ -281,6 +281,9 @@ $pixel-corners-clip-path: polygon(
     color: #c62828;
     font-size: calc($font-size * 0.8);
     text-align: center;
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
     word-break: break-word;
     overflow-wrap: anywhere;
     text-wrap: wrap;

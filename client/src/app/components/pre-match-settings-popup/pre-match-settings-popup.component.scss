@@ -89,7 +89,6 @@ $bg-button-gray: linear-gradient(
     align-items: center;
     justify-content: start;
     gap: calc($clip-size * 2);
-    cursor: pointer;
 }
 
 .option-label {
@@ -164,7 +163,7 @@ $bg-button-gray: linear-gradient(
 
 .input-option input {
     all: unset;
-    width: 30%;
+    width: 50%;
     height: calc($clip-size * 3);
     border: calc($clip-size * 0.54) solid white;
     padding: calc($clip-size * 0.47);
@@ -262,4 +261,10 @@ $bg-button-gray: linear-gradient(
     height: calc($scale * 0.17);
     width: calc($scale * 0.48);
     overflow: visible;
+}
+
+.unavailable {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: default;
 }

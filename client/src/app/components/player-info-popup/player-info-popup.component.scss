@@ -30,7 +30,6 @@ $movement-bar: '../../../assets/images/menu/stat-bar/movement-bar-large.png';
 $movement-bar-full: '../../../assets/images/menu/stat-bar/movement-bar-full.png';
 $movement-bar-full-hp: '../../../assets/images/menu/stat-bar/movement-bar-full-hp.png';
 $movement-bar-empty: '../../../assets/images/menu/stat-bar/movement-bar-empty.png';
-$movement-icon: '../../../assets/images/menu/icons/movement.png';
 $hp-icon: '../../../assets/images/menu/icons/hp.png';
 $item-container: '../../../assets/images/menu/containers/item/item-container.png';
 $x-button: '../../../assets/images/menu/buttons/play/x-button.png';
@@ -225,20 +224,6 @@ button.close-button:active {
     line-height: calc(0.045 * $map-size);
     padding-right: calc(0.005 * $map-size);
     text-align: right;
-}
-
-.pop-up .movement-icon {
-    display: inline-block;
-    vertical-align: top;
-    margin-top: calc(-0.005 * $map-size);
-    height: calc(0.055 * $map-size);
-    width: calc(0.055 * $map-size);
-    background-size: contain;
-    background-image: url($movement-icon);
-}
-
-.pop-up .hp .movement-icon {
-    background-image: url($hp-icon);
 }
 
 .items-container {

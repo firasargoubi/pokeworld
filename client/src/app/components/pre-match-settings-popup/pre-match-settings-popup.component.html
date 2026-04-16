@@ -21,14 +21,13 @@
         <span class="option-row price-row">
             <p class="option-label">{{ 'components.preMatchSettings.price' | translate }}</p>
 
-            <div class="input-option">
+            <div class="input-option" [class.unavailable]="this.maxEntryFee === 0">
                 <div class="button-container" (click)="decrementEntryFee()">
                     <div class="button-edge"></div>
                     <div class="button-body"><p>-</p></div>
                     <div class="button-edge"></div>
                 </div>
                 <input
-                    class="price-input"
                     type="number"
                     placeholder="0 $"
                     min="0"
@@ -43,6 +42,9 @@
                     <div class="button-edge"></div>
                 </div>
             </div>
+            @if (this.maxEntryFee === 0) {
+            <p class="unavailable-text">{{ 'components.preMatchSettings.notEnoughFunds' | translate }}</p>
+            }
         </span>
     </div>
     <div class="spacer"></div>

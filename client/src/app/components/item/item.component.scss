@@ -43,8 +43,7 @@ $map-size: calc(41.25vh + min(min((100vw - 82.5vh) * 0.5 - 6.72vh, 39.15vh) * 2 
     min-height: 0.5vh;
 
     bottom: 120%;
-    left: 50%;
-    transform: translate(-50%, 0%);
+    right: calc($map-size * -0.03);
 
     font-size: calc($map-size * 0.029);
     padding: calc($map-size * 0.04);

@@ -25,9 +25,9 @@ import { LobbyService } from './services/lobby/lobby.service';
 import { MapService } from './services/map/map.service';
 import { MatchService } from './services/match/match.service';
 import { PlayService } from './services/play/play.service';
+import { SocialService } from './services/social/social.service';
 import { TrackingService } from './services/tracking/tracking.service';
 import { UserService } from './services/user/user.service';
-import { SocialService } from './services/social/social.service';
 
 @Module({
     imports: [
