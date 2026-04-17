@@ -213,7 +213,11 @@ export class CombatService {
     }
 
     private rollAttack(match: Match): number {
-        let dice = match.data.players[this.getActivePlayerData(match).playerIndex].attackDice;
+        const activePlayerIndex = this.getActivePlayerData(match).playerIndex;
+        if (activePlayerIndex < 0 || activePlayerIndex >= match.data.players.length) {
+            return 1;
+        }
+        let dice = match.data.players[activePlayerIndex].attackDice;
         if (!match.data.playData.isDebugMode) {
             dice = Math.floor(Math.random() * dice) + 1;
         }

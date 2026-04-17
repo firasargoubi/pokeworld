@@ -100,7 +100,7 @@ class ChatService {
   void createChannel(String channelName, {bool isDedicatedChannel = false}) {
     final userName = _currentUserName;
     if (userName == null) return;
-    final channelUser = ChannelUser(userName: userName, channelName: channelName, isDedicatedChannel: isDedicatedChannel);
+    final channelUser = ChannelUser(channelName: channelName, isDedicatedChannel: isDedicatedChannel);
     _socketService.emit(ChatEvent.CreateChannel.value, channelUser.toJson());
   }
 

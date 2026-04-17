@@ -126,9 +126,6 @@ flutter:
         - assets/images/menu/containers/shop/
         - assets/images/menu/icons/close/
         - assets/images/menu/icons/tutorial/
-        - assets/images/menu/tutorial/
-        - assets/images/menu/tutorial/fr/
-        - assets/images/menu/tutorial/en/
         - assets/images/menu/shop-items/
 
     # The following line ensures that the Material Icons font is

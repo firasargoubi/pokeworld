@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui';
 
@@ -12,6 +13,7 @@ import 'package:client_mobile/services/audio_service/audio_service.dart';
 import 'package:client_mobile/services/balance/balance_service.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
 import 'package:client_mobile/services/preferences_service/preferences_service.dart';
+import 'package:client_mobile/services/tutorial_image_service/tutorial_image_service.dart';
 import 'package:client_mobile/services/user_service/user_service.dart';
 import 'package:client_mobile/utils/profile_image_provider.dart';
 import 'package:client_mobile/widgets/cut_corner_container/cut_corner_container.dart';
@@ -34,6 +36,9 @@ part 'user_profile_popup_settings_card/user_profile_popup_settings_card.dart';
 part 'user_profile_popup_widgets.dart';
 
 Future<void> showUserCardPopup(BuildContext context) {
+  final currentTutorialStep = UserService().currentUser.value?.tutorialStep ?? 0;
+  unawaited(TutorialImageService().prefetchTutorialWindow(currentTutorialStep, I18nService().currentLanguage));
+
   return showDialog(
     context: context,
     barrierDismissible: true,

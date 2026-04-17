@@ -1,4 +1,4 @@
-enum AuthError { invalidCredentials, userNotFound, alreadyConnected, usernameExists }
+enum AuthError { invalidCredentials, userNotFound, alreadyConnected, usernameExists, wrongPassword }
 
 class AuthException implements Exception {
   final AuthError error;
