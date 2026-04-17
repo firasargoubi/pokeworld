@@ -244,7 +244,11 @@ export class Match {
             }
             this.kickPlayer(connectedPlayers[0].id, Message.LastPlayerRemaining);
         } else {
-            if (this.isActivePlayer(player.id) && this.isState([MatchState.TurnWait])) {
+            const connectedActivePlayersCount = this.data.players.filter((p) => p.isConnected && !p.isObserver).length;
+            if (
+                this.isState([MatchState.TurnWait]) &&
+                (this.isActivePlayer(player.id) || (this.data.lobbyData.isRapidElimination && connectedActivePlayersCount === 1))
+            ) {
                 this.matchService.startNextTurn(this);
             }
             player.spawnPoint = structuredClone(OUTSIDE_OF_MAP);
