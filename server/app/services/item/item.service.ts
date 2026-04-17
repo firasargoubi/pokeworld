@@ -57,8 +57,12 @@ export class ItemService {
     private dropItemsFromData(match: Match, player: PlayerData, items: ItemType[]) {
         for (const item of items) {
             const position = this.mapService.getNearestItemDropSpot(match.data, player.position, match.getAvailableSpawnPoints());
-            match.data.gameData.mapData.items[item].push(position);
+            const playerHasItem = player.items.includes(item);
+            if (!position || !playerHasItem) {
+                continue;
+            }
             player.items = player.items.filter((i) => i !== item);
+            match.data.gameData.mapData.items[item].push(position);
         }
         this.computeItems(player);
     }

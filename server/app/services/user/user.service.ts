@@ -117,28 +117,25 @@ export class UserService {
 
     async login(loginUserDto: LoginUserDto): Promise<UserResponseDto> {
         const passwordHash = this.hashPassword(loginUserDto.password);
-        const user = await this.userModel.findOne({ username: loginUserDto.username, passwordHash, deleted: false }).exec();
+        const user = await this.userModel
+            .findOneAndUpdate({ username: loginUserDto.username, passwordHash, deleted: false }, { $set: { isLoggedIn: true } }, { new: true })
+            .exec();
 
-        if (!user) {
+        const userNotLoggedIn = user && !this.userSocketMap.has(user.userId);
+        if (userNotLoggedIn) {
+            return this.toUserResponse(user);
+        }
+
+        const existing = await this.userModel.findOne({ username: loginUserDto.username, passwordHash, deleted: false }).exec();
+        if (!existing) {
             throw new NotFoundException('User not found');
         }
-
-        if (this.userSocketMap.has(user.userId)) {
-            throw new ConflictException('User is already connected');
-        }
-
-        user.isLoggedIn = true;
-        await user.save();
-
-        return this.toUserResponse(user);
+        throw new ConflictException('User is already connected');
     }
 
     async logout(userId: string): Promise<void> {
         this.userSocketMap.delete(userId);
-        const user = await this.userModel.findOneAndUpdate({ userId, isLoggedIn: true }, { $set: { isLoggedIn: false } }, { new: true }).exec();
-        if (!user) {
-            throw new UnauthorizedException('Invalid user or not currently connected');
-        }
+        await this.userModel.updateOne({ userId }, { $set: { isLoggedIn: false } }).exec();
     }
 
     async deleteUser(userId: string): Promise<void> {
