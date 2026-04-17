@@ -107,6 +107,10 @@ export class PlayService {
 
     continueTurn(match: Match) {
         const curentPlayer = match.data.players[match.data.playData.activePlayerIndex];
+        if (!curentPlayer) {
+            this.startNextTurn(match);
+            return;
+        }
         if (this.checkWinCondition(match)) {
             match.setTimeout(this.endMatch.bind(this, match), MATCH_END_DURATION);
         } else {
