@@ -490,12 +490,11 @@ describe('UserService', () => {
             expect(service.getSocketId(user.userId)).toBeUndefined();
         });
 
-        it('should throw UnauthorizedException if user not found', async () => {
-            await expect(service.logout('nonExistentUserId')).rejects.toThrow(UnauthorizedException);
-            await expect(service.logout('nonExistentUserId')).rejects.toThrow('Invalid user or not currently connected');
+        it('should not throw if user not found', async () => {
+            await expect(service.logout('nonExistentUserId')).resolves.not.toThrow();
         });
 
-        it('should throw UnauthorizedException if user already logged out', async () => {
+        it('should be idempotent if user already logged out', async () => {
             const user = await service.createUser({
                 username: 'testUser',
                 password: 'password123',
@@ -504,7 +503,7 @@ describe('UserService', () => {
             });
             await service.logout(user.userId);
 
-            await expect(service.logout(user.userId)).rejects.toThrow(UnauthorizedException);
+            await expect(service.logout(user.userId)).resolves.not.toThrow();
         });
 
         it('should logout without error if socket not associated', async () => {

@@ -189,13 +189,12 @@ describe('MatchService', () => {
         expect(mockMatch.leave.calledWith(hostPlayerId)).toBe(true);
     });
 
-    it('disconnect player should remove player from map and disconnect', () => {
+    it('disconnect player should delegate to gateway', () => {
         const playerId = 'player1';
         service['playerToMatchCode'].set(playerId, '1234');
 
         service['disconnectPlayer'](playerId);
 
-        expect(service['playerToMatchCode'].has(playerId)).toBe(false);
         expect(mockMatchGateway.disconnectPlayer.calledWith(playerId)).toBe(true);
     });
 

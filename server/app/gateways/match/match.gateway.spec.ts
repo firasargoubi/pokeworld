@@ -131,6 +131,10 @@ describe('MatchGateway', () => {
     it('should disconnect player from match', () => {
         const playerId = 'player1';
         const matchCode = '1234';
+        Object.defineProperty(mockMatch, 'data', {
+            writable: true,
+            value: { code: matchCode },
+        });
         Object.defineProperty(mockSocket, 'rooms', {
             writable: true,
             value: [matchCode],

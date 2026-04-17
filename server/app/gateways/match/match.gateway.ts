@@ -78,10 +78,10 @@ export class MatchGateway {
     }
     handleDisconnect(socket: Socket) {
         const userId = this.userService.getUserId(socket.id);
+        this.leaveMatch(socket);
         if (userId) {
             this.userService.logout(userId);
         }
-        this.leaveMatch(socket);
     }
 
     connectPlayer(playerId: string, matchCode: string) {
@@ -95,11 +95,11 @@ export class MatchGateway {
     disconnectPlayer(playerId: string) {
         const socketId = this.userService.getSocketId(playerId);
         const socket = this.server.sockets.sockets.get(socketId);
-        if (socket) {
-            socket.rooms.forEach((room) => {
-                socket.leave(room);
-            });
+        const playerMatch = this.matchService.getMatchFromPlayerId(playerId);
+        if (socket && playerMatch) {
+            socket.leave(playerMatch.data.code);
         }
+        this.matchService.removePlayerFromMatchCode(playerId);
     }
 
     emitUpdate(matchCode: string, matchData: MatchData) {

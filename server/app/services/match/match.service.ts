@@ -82,7 +82,16 @@ export class MatchService {
     }
 
     addPlayerToMatchCode(playerId: string, matchCode: string) {
+        if (this.playerToMatchCode.has(playerId)) {
+            this.removePlayerFromMatchCode(playerId);
+        }
         this.playerToMatchCode.set(playerId, matchCode);
+    }
+
+    removePlayerFromMatchCode(playerId: string) {
+        while (this.playerToMatchCode.has(playerId)) {
+            this.playerToMatchCode.delete(playerId);
+        }
     }
 
     remapPlayerSocketId(oldPlayerId: string, newPlayerId: string, matchCode?: string) {
@@ -107,28 +116,26 @@ export class MatchService {
 
     leaveMatch(playerId: string) {
         const match = this.getMatchFromPlayerId(playerId);
-        if (match && match.isState([MatchState.Lobby])) {
+        if (!match) {
+            return;
+        }
+        if (match.isState([MatchState.Lobby])) {
             this.refundEntryFeeIfPaid(match, playerId);
             if (match.isHost(playerId)) {
                 match.data.players.filter((p) => p.id !== playerId && p.isConnected).forEach(async (p) => this.refundEntryFeeIfPaid(match, p.id));
             }
         }
         this.disconnectPlayer(playerId);
-        if (match) {
-            if (match.isHost(playerId) && match.data.playData.isDebugMode) {
-                this.playService.changeDebugMode(match, playerId, false);
-            }
-            this.chatService.logPlayerLeft(match, playerId);
-            match.leave(playerId);
-            if (match.getConnectedPlayerCount() === 0) {
-                match.data.players.forEach((player) => {
-                    match.kickPlayer(player.id, Message.LastPlayerRemaining);
-                });
-                match.clearTimeout();
-                match.clearBotTimeout();
-                this.matches.delete(match.data.code);
-                this.chatService.deleteChannel(match.data.code);
-            }
+        if (match.isHost(playerId) && match.data.playData.isDebugMode) {
+            this.playService.changeDebugMode(match, playerId, false);
+        }
+        this.chatService.logPlayerLeft(match, playerId);
+        match.leave(playerId);
+        if (match.getConnectedPlayerCount() === 0) {
+            match.clearTimeout();
+            match.clearBotTimeout();
+            this.matches.delete(match.data.code);
+            this.chatService.deleteChannel(match.data.code);
         }
         this.matchGateway.broadcastMatchListUpdate();
     }
@@ -238,7 +245,6 @@ export class MatchService {
     }
 
     private disconnectPlayer(playerId: string) {
-        this.playerToMatchCode.delete(playerId);
         this.matchGateway.disconnectPlayer(playerId);
         this.matchGateway.broadcastMatchListUpdate();
     }
@@ -250,6 +256,7 @@ export class MatchService {
         }
 
         if (this.hasPlayerId(playerId)) {
+            this.leaveMatch(playerId);
             this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch, true);
             return false;
         }
@@ -345,6 +352,7 @@ export class MatchService {
         const game: Game = await this.gameService.findGame(gameData._id);
         let canCreateMatch = true;
         if (this.hasPlayerId(playerId)) {
+            this.leaveMatch(playerId);
             this.matchGateway.emitMessage(playerId, Message.AlreadyInMatch, true);
             canCreateMatch = false;
         } else if (!game) {
