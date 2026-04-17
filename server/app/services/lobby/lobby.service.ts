@@ -330,9 +330,11 @@ export class LobbyService {
             ) {
                 trackingPlayer.coveredGroundTiles.push(structuredClone(playerData.position));
             }
+            if (match.isState([MatchState.Lobby])) {
+                trackingPlayer.challenge = this.challengeService.assignChallenge(match.data.gameData.mapData);
+            }
             return;
         }
-
         match.data.trackingData.players.push({
             ...structuredClone(DEFAULT_PLAYER_TRACKING_DATA),
             id: trackingPlayerId,
