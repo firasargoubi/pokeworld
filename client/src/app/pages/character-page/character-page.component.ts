@@ -38,6 +38,7 @@ export class CharacterPageComponent {
     avatarToElementalTypeMap = structuredClone(AVATAR_ELEMENT_TYPE_MAP);
     readonly audioService: AudioService = inject(AudioService);
     readonly clickValue = SoundEffect.Click;
+    private isJoiningLobby = false;
     private matchService: MatchService = inject(MatchService);
     private popupService: PopupService = inject(PopupService);
     private lobbyService: LobbyService = inject(LobbyService);
@@ -89,6 +90,7 @@ export class CharacterPageComponent {
     }
 
     joinLobby() {
+        if (this.isJoiningLobby) return;
         this.audioService.playEffect(SoundEffect.Click);
         const warnings = this.getWarnings();
         if (warnings.length > 0) {
@@ -100,6 +102,7 @@ export class CharacterPageComponent {
         } else {
             const playerData = this.getPlayerData();
             this.lobbyService.joinLobby(playerData);
+            this.isJoiningLobby = true;
         }
     }
 

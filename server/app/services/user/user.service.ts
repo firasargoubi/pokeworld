@@ -16,12 +16,16 @@ import { Model } from 'mongoose';
 import { Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 
+const PENDING_LOGIN_TIMEOUT_MS = 30_000;
+const PENDING_LOGIN_PLACEHOLDER = '';
+
 @Injectable()
 export class UserService {
     @Inject(GameService) private readonly gameService: GameService;
     @Inject(forwardRef(() => MatchService)) private readonly matchService: MatchService;
     private readonly passkey: string;
     private userSocketMap: Map<string, string> = new Map<string, string>();
+    private pendingLoginTimeouts: Map<string, NodeJS.Timeout> = new Map();
 
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {
         this.passkey = process.env.PASSWORD_PASSKEY;
@@ -33,6 +37,7 @@ export class UserService {
 
     associateSocket(userId: string, socketId: string) {
         this.disassociateSocketBySocketId(socketId);
+        this.clearPendingLogin(userId);
         this.userSocketMap.set(userId, socketId);
     }
 
@@ -117,23 +122,31 @@ export class UserService {
 
     async login(loginUserDto: LoginUserDto): Promise<UserResponseDto> {
         const passwordHash = this.hashPassword(loginUserDto.password);
-        const user = await this.userModel
-            .findOneAndUpdate({ username: loginUserDto.username, passwordHash, deleted: false }, { $set: { isLoggedIn: true } }, { new: true })
-            .exec();
+        const user = await this.userModel.findOne({ username: loginUserDto.username, passwordHash, deleted: false }).exec();
 
-        const userNotLoggedIn = user && !this.userSocketMap.has(user.userId);
-        if (userNotLoggedIn) {
-            return this.toUserResponse(user);
-        }
-
-        const existing = await this.userModel.findOne({ username: loginUserDto.username, passwordHash, deleted: false }).exec();
-        if (!existing) {
+        if (!user) {
             throw new NotFoundException('User not found');
         }
-        throw new ConflictException('User is already connected');
+
+        if (this.userSocketMap.has(user.userId)) {
+            throw new ConflictException('User is already connected');
+        }
+        this.reservePendingLogin(user.userId);
+
+        try {
+            user.isLoggedIn = true;
+            await user.save();
+        } catch (err) {
+            this.clearPendingLogin(user.userId);
+            this.userSocketMap.delete(user.userId);
+            throw err;
+        }
+
+        return this.toUserResponse(user);
     }
 
     async logout(userId: string): Promise<void> {
+        this.clearPendingLogin(userId);
         this.userSocketMap.delete(userId);
         await this.userModel.updateOne({ userId }, { $set: { isLoggedIn: false } }).exec();
     }
@@ -151,6 +164,7 @@ export class UserService {
         user.passwordHash = 'None';
         user.deleted = true;
         await user.save();
+        this.clearPendingLogin(userId);
         if (this.userSocketMap.has(userId)) {
             this.userSocketMap.delete(userId);
         }
@@ -264,6 +278,25 @@ export class UserService {
 
     private hashPassword(password: string): string {
         return crypto.createHmac('sha256', this.passkey).update(password).digest('hex');
+    }
+
+    private reservePendingLogin(userId: string) {
+        this.userSocketMap.set(userId, PENDING_LOGIN_PLACEHOLDER);
+        const timeout = setTimeout(() => {
+            if (this.userSocketMap.get(userId) === PENDING_LOGIN_PLACEHOLDER) {
+                this.userSocketMap.delete(userId);
+            }
+            this.pendingLoginTimeouts.delete(userId);
+        }, PENDING_LOGIN_TIMEOUT_MS);
+        this.pendingLoginTimeouts.set(userId, timeout);
+    }
+
+    private clearPendingLogin(userId: string) {
+        const timeout = this.pendingLoginTimeouts.get(userId);
+        if (timeout) {
+            clearTimeout(timeout);
+            this.pendingLoginTimeouts.delete(userId);
+        }
     }
 
     private normalizePreferences(preferences?: Partial<UserPreferences> | null): UserPreferences {

@@ -42,6 +42,7 @@ class _CharacterPageState extends State<CharacterPage> {
 
   bool isHpBonusActive = true;
   bool isAttD6Active = true;
+  bool _isJoiningLobby = false;
 
   @override
   void initState() {
@@ -129,8 +130,9 @@ class _CharacterPageState extends State<CharacterPage> {
   }
 
   void joinLobby() {
+    if (_isJoiningLobby) return;
     AudioService().playSoundEffect(SoundEffect.Select.path);
-    _controller.joinLobby(
+    final joined = _controller.joinLobby(
       isHpBonusActive: isHpBonusActive,
       isAttD6Active: isAttD6Active,
       selectedAvatar: selectedAvatar,
@@ -139,6 +141,7 @@ class _CharacterPageState extends State<CharacterPage> {
         _popupService.showPopup(PopupMessage(message: translatedWarnings, hasCloseButton: true, isConfirmation: false));
       },
     );
+    if (joined) _isJoiningLobby = true;
   }
 
   @override

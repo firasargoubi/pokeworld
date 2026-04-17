@@ -143,10 +143,15 @@ class _TutorialPopupState extends State<TutorialPopup> {
                                     : _controller.currentTutorialStep?.imagePathEn ?? '';
 
                                 if (assetPath.isNotEmpty) {
+                                  final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+                                  final int decodeWidth = (popupWidth * devicePixelRatio).round();
+                                  final int decodeHeight = (baseSize * 0.37 * devicePixelRatio).round();
                                   return Image.asset(
                                     assetPath,
                                     fit: BoxFit.fill,
                                     filterQuality: FilterQuality.none,
+                                    cacheWidth: decodeWidth > 0 ? decodeWidth : null,
+                                    cacheHeight: decodeHeight > 0 ? decodeHeight : null,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Center(child: Text(assetPath));
                                     },
