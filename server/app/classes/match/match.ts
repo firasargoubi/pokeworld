@@ -101,7 +101,8 @@ export class Match {
                 return this.playerLeaveStats(playerId);
             case MatchState.CombatAnimation:
             case MatchState.CombatWait:
-                this.playerLeaveCombat(playerId);
+                if (this.playerLeaveCombat(playerId)) return;
+                break;
         }
         return this.playerLeaveMatch(playerId);
     }
@@ -204,14 +205,17 @@ export class Match {
         this.sendUpdate();
     }
 
-    private playerLeaveCombat(playerId: string) {
+    private playerLeaveCombat(playerId: string): boolean {
         const playerIndex = this.getPlayerIndex(playerId);
         if (this.data.combatData.playersCombatData[0].playerIndex === playerIndex) {
             this.data.combatData.isSecondPlayerTurn = false;
         } else if (this.data.combatData.playersCombatData[1].playerIndex === playerIndex) {
             this.data.combatData.isSecondPlayerTurn = true;
+        } else {
+            return false;
         }
         this.matchService.killPlayerCombat(this);
+        return true;
     }
 
     private playerLeaveStats(playerId: string) {
