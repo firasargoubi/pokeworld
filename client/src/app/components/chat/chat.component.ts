@@ -8,8 +8,10 @@ import { ChatService } from '@app/services/chat/chat.service';
 import { I18nService } from '@app/services/i18n/i18n.service';
 import { MatchService } from '@app/services/match/match.service';
 import { PreferencesService } from '@app/services/preferences/preferences.service';
+import { UserService } from '@app/services/user/user.service';
 import { MAX_MESSAGE_LENGTH } from '@common/consts/chat-message.const';
 import { ChatLog, ChatMessage } from '@common/interfaces/chat-message';
+import { UserInfo } from '@common/interfaces/user';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -31,6 +33,7 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     logs: ChatLog[] = [];
     searchBarValue: string = '';
     readonly chatTab = ChatTab;
+    currentUser: UserInfo | null = null;
     readonly clickValue = SoundEffect.Click;
     readonly audioService: AudioService = inject(AudioService);
     readonly chatService: ChatService = inject(ChatService);
@@ -50,6 +53,7 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     private readonly matchService: MatchService = inject(MatchService);
     private readonly i18nService: I18nService = inject(I18nService);
     private readonly preferencesService: PreferencesService = inject(PreferencesService);
+    private readonly userService = inject(UserService);
 
     private shouldRestoreDetachedMode = false;
     private detachedWindowCloseHandler: (() => void) | null = null;
@@ -78,6 +82,9 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
         });
         this.matchService.matchUpdate.subscribe(() => {
             this.updateChatData();
+        });
+        this.userService.user$.subscribe((user) => {
+            this.currentUser = user;
         });
     }
 
@@ -145,6 +152,10 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
             this.chatService.createChannel(name);
             this.searchBarValue = '';
         }
+    }
+
+    isSelfSent(message: ChatMessage): boolean {
+        return !!message.senderId && message.senderId === this.currentUser?.userId;
     }
 
     toggleFilter(): void {

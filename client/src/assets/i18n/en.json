@@ -20,6 +20,7 @@
         "usernameSpaces": "Username must not start or end with spaces",
         "usernameLength": "Username must contain between 3 and 10 characters",
         "invalidCredentials": "Username or password is invalid",
+        "wrongPassword": "Wrong password",
         "usernameTaken": "Username is already taken",
         "accountConnected": "This account is already connected on another platform",
         "changeConfirmed": "Change applied successfully!",

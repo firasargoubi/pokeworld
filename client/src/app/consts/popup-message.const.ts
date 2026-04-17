@@ -19,6 +19,7 @@ export enum PopupMessage {
     UsernameSpaces = 'popup.usernameSpaces',
     UsernameLength = 'popup.usernameLength',
     InvalidCredentials = 'popup.invalidCredentials',
+    WrongPassword = 'popup.wrongPassword',
     UsernameTaken = 'popup.usernameTaken',
     AccountConnected = 'popup.accountConnected',
     ChangeConfirmed = 'popup.changeConfirmed',

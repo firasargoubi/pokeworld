@@ -22,6 +22,8 @@ class ProfileController {
           return I18nService().translate(ErrorMessage.UsernameExists.message);
         case AuthError.invalidCredentials:
           return I18nService().translate(ErrorMessage.InvalidCredentials.message);
+        case AuthError.wrongPassword:
+          return I18nService().translate(ErrorMessage.WrongPassword.message);
         case AuthError.userNotFound:
           return I18nService().translate(ErrorMessage.UserNotFound.message);
         case AuthError.alreadyConnected:

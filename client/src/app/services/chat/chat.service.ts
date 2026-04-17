@@ -76,10 +76,10 @@ export class ChatService {
     }
 
     isInChannel(channelName: string): boolean {
-        const username = this.user?.username;
-        if (!username) return false;
+        const userId = this.user?.userId;
+        if (!userId) return false;
         const channel = this.channels().find((c) => c.name === channelName);
-        return !!channel && channel.membersUsernames.includes(username);
+        return !!channel && channel.membersUsernames.includes(userId);
     }
 
     setActiveMatchCode(matchCode: string | undefined): void {
@@ -120,7 +120,7 @@ export class ChatService {
             this.popupService.showWarningPopup(PopupMessage.NameAlreadyExists);
             return;
         }
-        const channelUser: ChannelUser = { channelName, userName: username, isDedicatedChannel };
+        const channelUser: ChannelUser = { channelName, isDedicatedChannel };
         this.socketService.emit(ChatEvent.CreateChannel, channelUser, (channel: Channel) => {
             if (channel) {
                 this.openChannel(channel.name);
@@ -131,7 +131,7 @@ export class ChatService {
     joinChannel(channelName: string): void {
         const username = this.user?.username;
         if (!username) return;
-        this.socketService.emit(ChatEvent.JoinChannel, { channelName, userName: username } as ChannelUser);
+        this.socketService.emit(ChatEvent.JoinChannel, { channelName } as ChannelUser);
     }
 
     leaveChannel(channelName: string): void {
@@ -143,14 +143,14 @@ export class ChatService {
             delete updated[channelName];
             return updated;
         });
-        this.socketService.emit(ChatEvent.LeaveChannel, { channelName, userName: username } as ChannelUser);
+        this.socketService.emit(ChatEvent.LeaveChannel, { channelName } as ChannelUser);
     }
 
     deleteChannel(channelName: string): void {
         const username = this.user?.username;
         if (!username) return;
         if (this.chatState().activeChannelName === channelName) this.showChannelList();
-        this.socketService.emit(ChatEvent.DeleteChannel, { channelName, userName: username } as ChannelUser);
+        this.socketService.emit(ChatEvent.DeleteChannel, { channelName } as ChannelUser);
     }
 
     sendMessage(message: string): void {

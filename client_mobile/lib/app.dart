@@ -89,10 +89,26 @@ class _PokeWorldAppState extends State<PokeWorldApp> with WidgetsBindingObserver
   }
 
   void _showLoginPopup() {
-    final context = NavigationService.navigatorKey.currentState?.context;
-    if (context != null && context.mounted) {
-      showUserLoginPopup(context);
-    }
+    final nav = NavigationService.navigatorKey.currentState;
+    if (nav == null) return;
+
+    nav.pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const HomePage()),
+      (r) => false,
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = NavigationService.navigatorKey.currentState?.context;
+      if (context == null || !context.mounted) return;
+      showUserLoginPopup(context).whenComplete(() {
+        if (_userService.currentUser.value == null) return;
+        final navAfter = NavigationService.navigatorKey.currentState;
+        navAfter?.pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomePage()),
+          (r) => false,
+        );
+      });
+    });
   }
 
   @override

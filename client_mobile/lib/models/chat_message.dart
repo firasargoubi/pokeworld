@@ -8,10 +8,7 @@ class Channel {
 
   factory Channel.fromJson(Map<String, dynamic> json) {
     final membersRaw = json['membersUsernames'] as List<dynamic>? ?? [];
-    return Channel(
-      name: (json['name'] ?? '').toString(),
-      membersUsernames: membersRaw.map((e) => e.toString()).toList(),
-    );
+    return Channel(name: (json['name'] ?? '').toString(), membersUsernames: membersRaw.map((e) => e.toString()).toList());
   }
 }
 
@@ -30,32 +27,29 @@ class ChannelMessage {
 }
 
 class ChannelUser {
-  final String userName;
   final String channelName;
   final bool isDedicatedChannel;
 
-  ChannelUser({required this.userName, required this.channelName, this.isDedicatedChannel = false});
+  ChannelUser({required this.channelName, this.isDedicatedChannel = false});
 
   Map<String, dynamic> toJson() {
-    return {
-      'userName': userName,
-      'channelName': channelName,
-      if (isDedicatedChannel) 'isDedicatedChannel': isDedicatedChannel,
-    };
+    return {'channelName': channelName, if (isDedicatedChannel) 'isDedicatedChannel': isDedicatedChannel};
   }
 }
 
 class ChatMessage {
   final String? sender;
+  final String? senderId;
   final String? profilePicture;
   final String content;
   final DateTime timestamp;
 
-  ChatMessage({this.sender, this.profilePicture, required this.content, required this.timestamp});
+  ChatMessage({this.sender, this.senderId, this.profilePicture, required this.content, required this.timestamp});
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
     return ChatMessage(
       sender: json['sender']?.toString(),
+      senderId: json['senderId']?.toString(),
       profilePicture: json.containsKey('profilePicture') ? (json['profilePicture'] as String?) : null,
       content: (json['content'] ?? '').toString(),
       timestamp: DateTime.tryParse((json['timestamp'] ?? '').toString()) ?? DateTime.now(),
@@ -75,7 +69,14 @@ class ChatMessage {
 class ChatLog extends ChatMessage {
   final List<String> concernedPlayersNamesList;
 
-  ChatLog({super.sender, super.profilePicture, required super.content, required super.timestamp, required this.concernedPlayersNamesList});
+  ChatLog({
+    super.sender,
+    super.senderId,
+    super.profilePicture,
+    required super.content,
+    required super.timestamp,
+    required this.concernedPlayersNamesList,
+  });
 
   factory ChatLog.fromJson(Map<String, dynamic> json) {
     final base = ChatMessage.fromJson(json);
@@ -83,6 +84,7 @@ class ChatLog extends ChatMessage {
     final list = listRaw.map((e) => e.toString()).toList();
     return ChatLog(
       sender: base.sender,
+      senderId: base.senderId,
       profilePicture: base.profilePicture,
       content: base.content,
       timestamp: base.timestamp,

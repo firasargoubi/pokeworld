@@ -21,6 +21,7 @@ export class ChatGateway {
     async generalMessage(socket: Socket, chatMessage: ChatMessage) {
         const chatMessageToSend: ChatMessage = {
             sender: chatMessage.sender,
+            senderId: this.userService.getUserId(socket.id),
             content: chatMessage.content,
             profilePicture: chatMessage.profilePicture || null,
             timestamp: new Date(),
@@ -32,9 +33,9 @@ export class ChatGateway {
     @SubscribeMessage(ChatEvent.CreateChannel)
     async createChannel(socket: Socket, channelUser: ChannelUser): Promise<Channel> {
         const channelName = channelUser.channelName;
-        const userName = channelUser.userName;
+        const userId = this.userService.getUserId(socket.id);
         const isDedicatedChannel = channelUser.isDedicatedChannel;
-        const channel = await this.chatService.createChannel(channelName, userName, isDedicatedChannel);
+        const channel = await this.chatService.createChannel(channelName, userId, isDedicatedChannel);
         if (!channel) {
             return null;
         }
@@ -46,8 +47,8 @@ export class ChatGateway {
     @SubscribeMessage(ChatEvent.JoinChannel)
     async joinChannel(socket: Socket, channelUser: ChannelUser): Promise<void> {
         const channelName = channelUser.channelName;
-        const userName = channelUser.userName;
-        await this.chatService.joinChannel(channelName, userName);
+        const userId = this.userService.getUserId(socket.id);
+        await this.chatService.joinChannel(channelName, userId);
         socket.join(channelName);
         this.server.emit(ChatEvent.ChannelUpdate, await this.chatService.getChannels());
     }
@@ -55,8 +56,8 @@ export class ChatGateway {
     @SubscribeMessage(ChatEvent.LeaveChannel)
     async leaveChannel(socket: Socket, channelUser: ChannelUser): Promise<void> {
         const channelName = channelUser.channelName;
-        const userName = channelUser.userName;
-        await this.chatService.leaveChannel(channelName, userName);
+        const userId = this.userService.getUserId(socket.id);
+        await this.chatService.leaveChannel(channelName, userId);
         socket.leave(channelName);
         this.server.emit(ChatEvent.ChannelUpdate, await this.chatService.getChannels());
     }
@@ -64,8 +65,8 @@ export class ChatGateway {
     @SubscribeMessage(ChatEvent.DeleteChannel)
     async deleteChannel(socket: Socket, channelUser: ChannelUser): Promise<void> {
         const channelName = channelUser.channelName;
-        const userName = channelUser.userName;
-        const isUserInChannel = await this.chatService.isUserInChannel(channelName, userName);
+        const userId = this.userService.getUserId(socket.id);
+        const isUserInChannel = await this.chatService.isUserInChannel(channelName, userId);
         if (!isUserInChannel) {
             return;
         }
@@ -77,6 +78,7 @@ export class ChatGateway {
     @SubscribeMessage(ChatEvent.ChannelMessage)
     async channelMessage(socket: Socket, data: ChannelMessage): Promise<void> {
         if (data.message.content.trim().length > MAX_MESSAGE_LENGTH) return;
+        data.message.senderId = this.userService.getUserId(socket.id);
         await this.emitWithBlockFilter(socket.id, ChatEvent.ChannelMessage, data, data.channelName);
     }
 
