@@ -217,6 +217,8 @@ class UserLoginController {
           return _translateError(ErrorMessage.UsernameExists.message);
         case AuthError.invalidCredentials:
           return _translateError(ErrorMessage.InvalidCredentials.message);
+        case AuthError.wrongPassword:
+          return _translateError(ErrorMessage.WrongPassword.message);
         case AuthError.userNotFound:
           return _translateError(ErrorMessage.UserNotFound.message);
         case AuthError.alreadyConnected:

@@ -310,10 +310,10 @@ describe('UserPopupComponent', () => {
 
     it('should handle error during username update', () => {
         component.currentUser = mockUser;
-        userServiceSpy.edit.and.returnValue(throwError(() => ({ error: { message: 'API_ERROR' } })));
+        userServiceSpy.edit.and.returnValue(throwError(() => ({ error: { message: 'components.userPopup.usernameUpdateError' } })));
         component['confirmUsernameUpdate']('NEWNAME');
         expect(component.isUpdatingUsername).toBeFalse();
-        expect(component.usernameError).toBe('API_ERROR');
+        expect(component.usernameError).toBe('components.userPopup.usernameUpdateError');
     });
 
     it('should handle error without message during username update', () => {
@@ -374,10 +374,10 @@ describe('UserPopupComponent', () => {
         component.oldPassword = 'old';
         component.newPassword = 'new';
         component.confirmNewPassword = 'new';
-        userServiceSpy.edit.and.returnValue(throwError(() => ({ error: { message: 'PWD_ERROR' } })));
+        userServiceSpy.edit.and.returnValue(throwError(() => ({ error: { message: 'components.userPopup.passwordChangeError' } })));
 
         component.editPassword();
-        expect(component.passwordError).toBe('PWD_ERROR');
+        expect(component.passwordError).toBe('components.userPopup.passwordChangeError');
         expect(component.isUpdatingPassword).toBeFalse();
     });
 

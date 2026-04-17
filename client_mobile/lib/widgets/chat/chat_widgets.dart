@@ -195,7 +195,7 @@ class ChatMessagesList extends StatelessWidget {
         itemCount: messages.length,
         itemBuilder: (context, index) {
           final message = messages[index];
-          final isSelfSent = message.sender == UserService().currentUser.value?.username;
+          final isSelfSent = message.senderId == UserService().currentUser.value?.userId;
 
           return Padding(
             padding: EdgeInsets.only(left: baseSize * 0.1, bottom: baseSize * 0.03),

@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { CommonModule } from '@angular/common';
+import { HttpStatusCode } from '@angular/common/http';
 import { Component, inject, Input, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PopupMessage } from '@app/consts/popup-message.const';
@@ -293,7 +294,7 @@ export class UserPopupComponent implements OnDestroy {
                 });
             },
             error: (err) => {
-                this.passwordError = err?.error?.message || this.translateService.instant('components.userPopup.passwordChangeError');
+                this.passwordError = this.translateEditError(err, 'components.userPopup.passwordChangeError');
                 this.isUpdatingPassword = false;
             },
         });
@@ -339,10 +340,16 @@ export class UserPopupComponent implements OnDestroy {
                 });
             },
             error: (err) => {
-                this.usernameError = err?.error?.message || this.translateService.instant('components.userPopup.usernameUpdateError');
+                this.usernameError = this.translateEditError(err, 'components.userPopup.usernameUpdateError');
                 this.isUpdatingUsername = false;
             },
         });
+    }
+
+    private translateEditError(err: { status?: number }, fallbackKey: string): string {
+        if (err?.status === HttpStatusCode.Conflict) return this.translateService.instant(PopupMessage.UsernameTaken);
+        if (err?.status === HttpStatusCode.Unauthorized) return this.translateService.instant(PopupMessage.WrongPassword);
+        return this.translateService.instant(fallbackKey);
     }
 
     private hasInventoryItem(itemId: string): boolean {

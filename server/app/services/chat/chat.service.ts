@@ -19,7 +19,7 @@ export class ChatService {
         this.channelModel.deleteMany({ name: { $regex: '^\\d{4}$' } }).exec();
     }
 
-    async createChannel(channelName: string, userName: string, isDedicatedChannel: boolean = false): Promise<Channel | null> {
+    async createChannel(channelName: string, userId: string, isDedicatedChannel: boolean = false): Promise<Channel | null> {
         if (!channelName) return null;
 
         channelName = channelName.trim();
@@ -28,17 +28,17 @@ export class ChatService {
         const forbiddenCharactersRegex = /^\d{4}$/.test(channelName);
         if (isNameTaken || ((channelNameIsNotAllowed || forbiddenCharactersRegex) && !isDedicatedChannel)) return null;
 
-        const newChannel = new this.channelModel({ name: channelName, membersUsernames: [userName], isDedicatedChannel });
+        const newChannel = new this.channelModel({ name: channelName, membersUsernames: [userId], isDedicatedChannel });
         const savedChannel = await newChannel.save();
         return { name: savedChannel.name, membersUsernames: savedChannel.membersUsernames };
     }
 
-    async joinChannel(channelName: string, userName: string): Promise<void> {
-        await this.channelModel.updateOne({ name: channelName, membersUsernames: { $ne: userName } }, { $push: { membersUsernames: userName } });
+    async joinChannel(channelName: string, userId: string): Promise<void> {
+        await this.channelModel.updateOne({ name: channelName, membersUsernames: { $ne: userId } }, { $push: { membersUsernames: userId } });
     }
 
-    async leaveChannel(channelName: string, userName: string): Promise<void> {
-        const channel = await this.channelModel.findOneAndUpdate({ name: channelName }, { $pull: { membersUsernames: userName } }, { new: true });
+    async leaveChannel(channelName: string, userId: string): Promise<void> {
+        const channel = await this.channelModel.findOneAndUpdate({ name: channelName }, { $pull: { membersUsernames: userId } }, { new: true });
         if (!channel) return;
 
         const hasNoMembers = channel.membersUsernames.length === 0;
@@ -51,9 +51,9 @@ export class ChatService {
         await this.channelModel.deleteOne({ name: channelName });
     }
 
-    async isUserInChannel(channelName: string, userName: string): Promise<boolean> {
-        if (!channelName || !userName) return false;
-        const exists = await this.channelModel.exists({ name: channelName, membersUsernames: userName });
+    async isUserInChannel(channelName: string, userId: string): Promise<boolean> {
+        if (!channelName || !userId) return false;
+        const exists = await this.channelModel.exists({ name: channelName, membersUsernames: userId });
         return exists !== null;
     }
 

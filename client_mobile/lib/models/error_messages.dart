@@ -7,6 +7,7 @@ enum ErrorMessage {
   ImageTooLarge('components.authPopup.imageTooLarge'),
   UsernameExists('popup.usernameTaken'),
   InvalidCredentials('popup.invalidCredentials'),
+  WrongPassword('popup.wrongPassword'),
   UserNotFound('popup.userNotFound'),
   AlreadyConnected('popup.accountConnected'),
   RegistrationFailed('popup.registrationFailed'),

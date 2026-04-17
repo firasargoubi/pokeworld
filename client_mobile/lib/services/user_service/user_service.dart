@@ -158,8 +158,13 @@ class UserService {
       currentUser.value = user;
       _socketService.emit(UserEvent.Associate.value, user);
       return user;
+    } else if (response.statusCode == HttpStatusCode.Conflict.code) {
+      throw AuthException(AuthError.usernameExists);
+    } else if (response.statusCode == HttpStatusCode.Unauthorized.code) {
+      throw AuthException(AuthError.wrongPassword);
+    } else {
+      throw Exception('Failed to edit user: ${response.body}');
     }
-    return currentUser.value!;
   }
 
   Future<void> delete(String userId) async {

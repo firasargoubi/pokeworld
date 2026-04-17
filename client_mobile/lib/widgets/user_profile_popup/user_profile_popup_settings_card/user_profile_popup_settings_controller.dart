@@ -53,6 +53,8 @@ class SettingsController extends ChangeNotifier {
           return I18nService().translate(ErrorMessage.UsernameExists.message);
         case AuthError.invalidCredentials:
           return I18nService().translate(ErrorMessage.InvalidCredentials.message);
+        case AuthError.wrongPassword:
+          return I18nService().translate(ErrorMessage.WrongPassword.message);
         case AuthError.userNotFound:
           return I18nService().translate(ErrorMessage.UserNotFound.message);
         case AuthError.alreadyConnected:
@@ -110,7 +112,12 @@ class SettingsController extends ChangeNotifier {
       _isUpdatingUsername = false;
       notifyListeners();
       PopupService().showPopup(
-        PopupMessage(message: I18nService().translate(PopupMessages.ChangeConfirmed.messageKey), hasCloseButton: true, isConfirmation: false),
+        PopupMessage(
+          message: I18nService().translate(PopupMessages.ChangeConfirmed.messageKey),
+          hasCloseButton: true,
+          isConfirmation: false,
+          popupColor: PopupColor.Green,
+        ),
       );
     } catch (e) {
       _usernameError = _translateError(e);
@@ -193,7 +200,12 @@ class SettingsController extends ChangeNotifier {
       _isUpdatingPassword = false;
       notifyListeners();
       PopupService().showPopup(
-        PopupMessage(message: I18nService().translate(PopupMessages.ChangeConfirmed.messageKey), hasCloseButton: true, isConfirmation: false),
+        PopupMessage(
+          message: I18nService().translate(PopupMessages.ChangeConfirmed.messageKey),
+          hasCloseButton: true,
+          isConfirmation: false,
+          popupColor: PopupColor.Green,
+        ),
       );
     } catch (e) {
       _passwordError = _translateError(e);
