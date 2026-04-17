@@ -33,8 +33,8 @@
                     <div class="player-arrow-container">
                         <div
                             class="player-arrow"
-                            [class.active-red]="matchService.data.players[matchService.data.playData.activePlayerIndex].team === 'rouge'"
-                            [class.active-blue]="matchService.data.players[matchService.data.playData.activePlayerIndex].team === 'bleu'"
+                            [class.active-red]="matchService.data.players[matchService.data.playData.activePlayerIndex]?.team === 'rouge'"
+                            [class.active-blue]="matchService.data.players[matchService.data.playData.activePlayerIndex]?.team === 'bleu'"
                             [class.is-hidden]="visualData.activePlayerArrowIndex === -1"
                         ></div>
                     </div>

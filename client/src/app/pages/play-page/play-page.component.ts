@@ -137,6 +137,7 @@ export class PlayPageComponent {
     }
 
     private onMatchUpdate() {
+        if (!this.matchService.isInMatch()) return;
         this.computeItemSFX();
         this.updateVisual();
         this.checkForRedirect();
@@ -193,9 +194,10 @@ export class PlayPageComponent {
 
     private computeItemSFX() {
         const activePlayerIndex = this.matchService.data.playData.activePlayerIndex;
-        if (activePlayerIndex < 0) return;
+        const players = this.matchService.data.players;
+        if (activePlayerIndex < 0 || activePlayerIndex >= players.length) return;
 
-        const currentItems = this.matchService.data.players[activePlayerIndex].items;
+        const currentItems = players[activePlayerIndex].items;
 
         if (activePlayerIndex !== this.previousActivePlayerIndex) {
             this.previousItems = [...currentItems];
