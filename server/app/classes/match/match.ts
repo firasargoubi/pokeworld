@@ -225,6 +225,7 @@ export class Match {
         if (!player) {
             return;
         }
+        const playerIndex = this.getPlayerIndex(playerId);
         player.isConnected = false;
         player.avatar = Avatar.Default;
         player.id = player.userId ?? player.id;
@@ -247,13 +248,33 @@ export class Match {
             const connectedActivePlayersCount = this.data.players.filter((p) => p.isConnected && !p.isObserver).length;
             if (
                 this.isState([MatchState.TurnWait]) &&
-                (this.isActivePlayer(player.id) || (this.data.lobbyData.isRapidElimination && connectedActivePlayersCount === 1))
+                (playerIndex === this.data.playData.activePlayerIndex ||
+                    (this.data.lobbyData.isRapidElimination && connectedActivePlayersCount === 1))
             ) {
                 this.matchService.startNextTurn(this);
             }
-            player.spawnPoint = structuredClone(OUTSIDE_OF_MAP);
-            this.matchService.respawnPlayer(this, player);
+            if (this.data.lobbyData.isDropInEnabled) {
+                this.data.players = this.data.players.filter((p) => p.id !== player.id);
+                this.updateIndexesAfterDropOut(playerIndex);
+            } else {
+                player.spawnPoint = structuredClone(OUTSIDE_OF_MAP);
+                this.matchService.respawnPlayer(this, player);
+            }
             this.sendMessage(Message.PlayerLeftMatch, { playerName: player.name });
         }
+    }
+
+    private updateIndexesAfterDropOut(removedIndex: number) {
+        if (this.data.lobbyData.hostPlayerIndex > removedIndex) {
+            this.data.lobbyData.hostPlayerIndex--;
+        }
+        if (this.data.playData.activePlayerIndex > removedIndex && this.data.playData.activePlayerIndex !== -1) {
+            this.data.playData.activePlayerIndex--;
+        }
+        this.data.combatData.playersCombatData.forEach((playerCombatData) => {
+            if (playerCombatData.playerIndex > removedIndex) {
+                playerCombatData.playerIndex--;
+            }
+        });
     }
 }

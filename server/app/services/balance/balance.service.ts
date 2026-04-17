@@ -48,7 +48,7 @@ export class BalanceService {
         for (const trackingPlayer of match.data.trackingData.players) {
             trackingPlayer.balanceGain = 0;
             const matchUser = match.data.players.find((player) => player.id === trackingPlayer.id);
-            if (!matchUser.isConnected) {
+            if (!matchUser || !matchUser.isConnected) {
                 continue;
             }
             const user = await this.userModel.findOne({ userId: trackingPlayer.id, deleted: false }).exec();
