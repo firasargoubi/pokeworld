@@ -100,7 +100,6 @@ export class BotService {
     private executeBotAction(player: PlayerData, match: Match): void {
         for (const botAction of BOT_TURN_PRIORITIES.get(match.data.gameData.mapData.gameMode).get(player.type)) {
             const targetPosition = this.getBotAction(botAction, match);
-            console.log('Bot action:', botAction, 'Target position:', targetPosition);
             if (targetPosition) {
                 if (targetPosition.x === player.position.x && targetPosition.y === player.position.y) {
                     return this.playGateway.endTurn({ id: player.id } as Socket);
