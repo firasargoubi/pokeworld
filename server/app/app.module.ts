@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BalanceController } from './controllers/balance/balance.controller';
 import { GameController } from './controllers/game/game.controller';
 import { SocialController } from './controllers/social/social.controller';
+import { TutorialImagesController } from './controllers/tutorial-images/tutorial-images.controller';
 import { UserController } from './controllers/user/user.controller';
 import { ChatGateway } from './gateways/chat/chat.gateway';
 import { CombatGateway } from './gateways/combat/combat.gateway';
@@ -27,6 +28,7 @@ import { MatchService } from './services/match/match.service';
 import { PlayService } from './services/play/play.service';
 import { SocialService } from './services/social/social.service';
 import { TrackingService } from './services/tracking/tracking.service';
+import { TutorialImagesService } from './services/tutorial-images/tutorial-images.service';
 import { UserService } from './services/user/user.service';
 
 @Module({
@@ -46,7 +48,7 @@ import { UserService } from './services/user/user.service';
             { name: UserRelationships.name, schema: userRelationshipsSchema },
         ]),
     ],
-    controllers: [GameController, UserController, BalanceController, SocialController],
+    controllers: [GameController, UserController, BalanceController, SocialController, TutorialImagesController],
     providers: [
         Logger,
 
@@ -63,6 +65,7 @@ import { UserService } from './services/user/user.service';
         ItemService,
         UserService,
         SocialService,
+        TutorialImagesService,
 
         MatchGateway,
         LobbyGateway,

@@ -1,8 +1,10 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:client_mobile/models/user_preferences.dart';
 import 'package:client_mobile/services/i18n_service/i18n_service.dart';
+import 'package:client_mobile/services/tutorial_image_service/tutorial_image_service.dart';
 import 'package:client_mobile/widgets/cut_corner_container/cut_corner_container.dart';
 import 'package:client_mobile/widgets/edge_body_button/edge_body_button.dart';
 import 'package:client_mobile/widgets/stat_container/stat_container.dart';
@@ -34,14 +36,47 @@ class TutorialPopup extends StatefulWidget {
 }
 
 class _TutorialPopupState extends State<TutorialPopup> {
+  final TutorialImageService _tutorialImageService = TutorialImageService();
   final TutorialPopupController _controller = TutorialPopupController();
   final ScrollController _scrollController = ScrollController();
+  Future<void>? _imageWindowPrefetchFuture;
+  int? _prefetchedStepIndex;
+
+  Uint8List? _getTutorialImageBytes(String assetPath) {
+    return _tutorialImageService.getCachedImageBytes(assetPath);
+  }
+
+  Future<void> _prefetchForCurrentStep() {
+    final currentStep = _controller.currentTutorialStep;
+    final currentStepIndex = currentStep?.absoluteStepIndex;
+
+    if (currentStepIndex == null) {
+      return Future<void>.value();
+    }
+
+    if (_prefetchedStepIndex == currentStepIndex && _imageWindowPrefetchFuture != null) {
+      return _imageWindowPrefetchFuture!;
+    }
+
+    _prefetchedStepIndex = currentStepIndex;
+    _imageWindowPrefetchFuture = _tutorialImageService.prefetchTutorialWindow(currentStepIndex, I18nService().currentLanguage);
+
+    _imageWindowPrefetchFuture!.then((_) {
+      final activeStepIndex = _controller.currentTutorialStep?.absoluteStepIndex;
+      if (mounted && activeStepIndex == currentStepIndex) {
+        setState(() {});
+      }
+    });
+
+    return _imageWindowPrefetchFuture!;
+  }
 
   @override
   void initState() {
     super.initState();
     _controller.init();
     _controller.addListener(_onControllerChange);
+    _prefetchForCurrentStep();
   }
 
   @override
@@ -53,6 +88,11 @@ class _TutorialPopupState extends State<TutorialPopup> {
   }
 
   void _onControllerChange() {
+    final currentStepIndex = _controller.currentTutorialStep?.absoluteStepIndex;
+    if (currentStepIndex != _prefetchedStepIndex) {
+      _prefetchForCurrentStep();
+    }
+
     if (mounted) setState(() {});
   }
 
@@ -142,25 +182,32 @@ class _TutorialPopupState extends State<TutorialPopup> {
                                     ? _controller.currentTutorialStep?.imagePathFr ?? ''
                                     : _controller.currentTutorialStep?.imagePathEn ?? '';
 
-                                if (assetPath.isNotEmpty) {
-                                  final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-                                  final int decodeWidth = (popupWidth * devicePixelRatio).round();
-                                  final int decodeHeight = (baseSize * 0.37 * devicePixelRatio).round();
-                                  return Image.asset(
-                                    assetPath,
-                                    fit: BoxFit.fill,
-                                    filterQuality: FilterQuality.none,
-                                    cacheWidth: decodeWidth > 0 ? decodeWidth : null,
-                                    cacheHeight: decodeHeight > 0 ? decodeHeight : null,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Center(child: Text(assetPath));
-                                    },
-                                  );
-                                } else {
+                                if (assetPath.isEmpty) {
                                   return Center(
                                     child: Text(I18nService().translate('tutorial_no_image'), style: const TextStyle(color: Colors.white)),
                                   );
                                 }
+
+                                final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+                                final int decodeWidth = (popupWidth * devicePixelRatio).round();
+                                final int decodeHeight = (baseSize * 0.37 * devicePixelRatio).round();
+
+                                final imageBytes = _getTutorialImageBytes(assetPath);
+                                if (imageBytes == null || imageBytes.isEmpty) {
+                                  return Center(child: _TutorialImageLoadingIndicator(baseSize: baseSize));
+                                }
+
+                                return Image.memory(
+                                  imageBytes,
+                                  fit: BoxFit.fill,
+                                  filterQuality: FilterQuality.none,
+                                  cacheWidth: decodeWidth > 0 ? decodeWidth : null,
+                                  cacheHeight: decodeHeight > 0 ? decodeHeight : null,
+                                  gaplessPlayback: true,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Center(child: _TutorialImageLoadingIndicator(baseSize: baseSize));
+                                  },
+                                );
                               },
                             ),
                           ),
@@ -170,17 +217,35 @@ class _TutorialPopupState extends State<TutorialPopup> {
                               if (step?.displayProfessorLeft == null) return const SizedBox.shrink();
                               final isLeft = step!.displayProfessorLeft!;
                               final hOffset = baseSize * (step.professorOffset ?? 0.0);
+                              final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+                              final int professorWidth = (baseSize * 0.23 * devicePixelRatio).round();
+                              final int professorHeight = (baseSize * 0.35 * devicePixelRatio).round();
                               return Positioned(
                                 bottom: 0,
                                 left: isLeft ? hOffset : null,
                                 right: isLeft ? null : hOffset,
                                 child: Transform.scale(
                                   scaleX: isLeft ? -1 : 1,
-                                  child: Image.asset(
-                                    ASSET_PROFESSOR_CHEN,
-                                    width: baseSize * 0.23,
-                                    fit: BoxFit.contain,
-                                    filterQuality: FilterQuality.none,
+                                  child: Builder(
+                                    builder: (context) {
+                                      final imageBytes = _getTutorialImageBytes(ASSET_PROFESSOR_CHEN);
+                                      if (imageBytes == null || imageBytes.isEmpty) {
+                                        return const SizedBox.shrink();
+                                      }
+
+                                      return Image.memory(
+                                        imageBytes,
+                                        width: baseSize * 0.23,
+                                        fit: BoxFit.contain,
+                                        filterQuality: FilterQuality.none,
+                                        cacheWidth: professorWidth > 0 ? professorWidth : null,
+                                        cacheHeight: professorHeight > 0 ? professorHeight : null,
+                                        gaplessPlayback: true,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return const SizedBox.shrink();
+                                        },
+                                      );
+                                    },
                                   ),
                                 ),
                               );
@@ -331,6 +396,47 @@ class _TutorialPopupState extends State<TutorialPopup> {
           ),
         );
       },
+    );
+  }
+}
+
+class _TutorialImageLoadingIndicator extends StatefulWidget {
+  const _TutorialImageLoadingIndicator({required this.baseSize});
+
+  final double baseSize;
+
+  @override
+  State<_TutorialImageLoadingIndicator> createState() => _TutorialImageLoadingIndicatorState();
+}
+
+class _TutorialImageLoadingIndicatorState extends State<_TutorialImageLoadingIndicator> with SingleTickerProviderStateMixin {
+  late final AnimationController _spinController;
+
+  @override
+  void initState() {
+    super.initState();
+    _spinController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat();
+  }
+
+  @override
+  void dispose() {
+    _spinController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final double spinnerSize = widget.baseSize * 0.08;
+    return SizedBox(
+      width: spinnerSize,
+      height: spinnerSize,
+      child: AnimatedBuilder(
+        animation: _spinController,
+        child: Image.asset(ASSET_TITLE_ICON, fit: BoxFit.contain, filterQuality: FilterQuality.none),
+        builder: (BuildContext context, Widget? child) {
+          return Transform.rotate(angle: _spinController.value * math.pi, child: child);
+        },
+      ),
     );
   }
 }

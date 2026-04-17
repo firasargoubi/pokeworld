@@ -23,7 +23,7 @@ const String ASSET_TUTORIAL_ARROW_LEFT = 'assets/images/menu/icons/tutorial/arro
 const String ASSET_TUTORIAL_ARROW_RIGHT = 'assets/images/menu/icons/tutorial/arrow-big-2.png';
 const String ASSET_TUTORIAL_ARROW_RESET = 'assets/images/menu/icons/user-card/reset.png';
 const String ASSET_TUTORIAL_CLOSE = 'assets/images/menu/icons/tutorial/close.png';
-const String ASSET_PROFESSOR_CHEN = 'assets/images/menu/tutorial/professeur-chen.png';
+const String ASSET_PROFESSOR_CHEN = 'shared/professeur-chen.png';
 
 const String RED_BUTTON_EDGE_LEFT_ASSET_PATH = 'assets/images/menu/containers/user-card/button-delete-edge-1.png';
 const String RED_BUTTON_EDGE_RIGHT_ASSET_PATH = 'assets/images/menu/containers/user-card/button-delete-edge-2.png';
