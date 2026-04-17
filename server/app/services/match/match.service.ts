@@ -117,6 +117,7 @@ export class MatchService {
     leaveMatch(playerId: string) {
         const match = this.getMatchFromPlayerId(playerId);
         if (!match) {
+            this.removePlayerFromMatchCode(playerId);
             return;
         }
         if (match.isState([MatchState.Lobby])) {
