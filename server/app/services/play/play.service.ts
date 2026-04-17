@@ -215,7 +215,9 @@ export class PlayService {
     private startTurnWait(match: Match) {
         match.data.state = MatchState.TurnWait;
         match.data.playData.actionsLeft = match.data.gameData.mapData.maxActions ?? 1;
-        match.data.playData.movementLeft = match.data.players[match.data.playData.activePlayerIndex].speed;
+        if (match.data.playData.activePlayerIndex > 0 && match.data.playData.activePlayerIndex < match.data.players.length) {
+            match.data.playData.movementLeft = match.data.players[match.data.playData.activePlayerIndex].speed;
+        }
         match.sendUpdate();
         match.setTimeout(this.startNextTurn.bind(this, match), TURN_WAIT_DURATION);
     }

@@ -233,7 +233,7 @@ describe('PlayService', () => {
     });
 
     it('start turn wait should update state and movement', () => {
-        const movement = 5;
+        const movement = 6;
         mockMatch.data.players[0].speed = movement;
         mockMatch.data.playData.activePlayerIndex = 0;
 
