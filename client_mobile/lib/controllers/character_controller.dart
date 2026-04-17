@@ -15,7 +15,7 @@ class CharacterController {
     _lobbyService.changeAvatar(avatar);
   }
 
-  void joinLobby({
+  bool joinLobby({
     required bool isHpBonusActive,
     required bool isAttD6Active,
     required Avatar? selectedAvatar,
@@ -24,11 +24,12 @@ class CharacterController {
     final warnings = _getWarnings(selectedAvatar);
     if (warnings.isNotEmpty) {
       onWarnings(warnings);
-      return;
+      return false;
     }
 
     final playerData = _getPlayerData(isHpBonusActive: isHpBonusActive, isAttD6Active: isAttD6Active);
     _lobbyService.joinLobby(playerData);
+    return true;
   }
 
   PlayerData _getPlayerData({required bool isHpBonusActive, required bool isAttD6Active}) {

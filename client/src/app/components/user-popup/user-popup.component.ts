@@ -139,7 +139,7 @@ export class UserPopupComponent implements OnDestroy {
             return AVATAR_DATA[item.variant as Avatar]?.imageCentered ?? '';
         }
         if (item.type === ShopItemType.Music) {
-            return `/assets/images/menu/shop-items/tm-${item.variant}.png`;
+            return `./assets/images/menu/shop-items/tm-${item.variant}.png`;
         }
         return '';
     }

@@ -31,9 +31,11 @@ class _JoinPageState extends State<JoinPage> {
 
   final TextEditingController codeController = TextEditingController();
 
+  static List<MatchData> _cachedMatches = const [];
+
   String matchCode = '';
   bool isCodeInputDisplayed = false;
-  List<MatchData> availableMatches = const [];
+  List<MatchData> availableMatches = _cachedMatches;
 
   void _openOverlay() => setState(() => isCodeInputDisplayed = true);
 
@@ -46,6 +48,7 @@ class _JoinPageState extends State<JoinPage> {
     socketService.emit(JoinPageEvent.JoinRoom.value);
     socketService.socket.on(JoinPageEvent.UpdateMatchList.value, (payload) {
       final matches = ((payload as List?) ?? const []).cast<Map>().map((e) => MatchData.fromJson(e.cast<String, dynamic>())).toList();
+      _cachedMatches = matches;
       if (!mounted) {
         return;
       }

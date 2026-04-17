@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:ui' as ui;
 
 import 'package:client_mobile/models/audio.dart';
@@ -8,7 +9,31 @@ import 'package:flutter/services.dart';
 
 import 'cut_out_button_const.dart';
 
-final Map<String, ui.Image> imageCache = {};
+const int _IMAGE_CACHE_MAX_ENTRIES = 32;
+
+class _LruImageCache {
+  final LinkedHashMap<String, ui.Image> _entries = LinkedHashMap<String, ui.Image>();
+
+  ui.Image? operator [](String key) {
+    final image = _entries.remove(key);
+    if (image != null) {
+      _entries[key] = image;
+    }
+    return image;
+  }
+
+  void operator []=(String key, ui.Image image) {
+    _entries.remove(key);
+    _entries[key] = image;
+    while (_entries.length > _IMAGE_CACHE_MAX_ENTRIES) {
+      _entries.remove(_entries.keys.first);
+    }
+  }
+
+  bool containsKey(String key) => _entries.containsKey(key);
+}
+
+final _LruImageCache _imageCache = _LruImageCache();
 
 int colorToRedChannel(Color color) => (color.r * 255.0).round().clamp(0, 255);
 int colorToGreenChannel(Color color) => (color.g * 255.0).round().clamp(0, 255);
@@ -23,8 +48,8 @@ bool pixelMatchesColor(int red, int green, int blue, Color targetColor) {
 Future<ui.Image> remapImageColors(String assetPath, Color remappedBlackColor, Color remappedWhiteColor, Color remappedOtherColor) async {
   final String cacheKey = '${assetPath}_${remappedBlackColor.toARGB32()}_${remappedWhiteColor.toARGB32()}_${remappedOtherColor.toARGB32()}';
 
-  if (imageCache.containsKey(cacheKey)) {
-    return imageCache[cacheKey]!;
+  if (_imageCache.containsKey(cacheKey)) {
+    return _imageCache[cacheKey]!;
   }
 
   final ByteData imageData = await rootBundle.load(assetPath);
@@ -63,7 +88,7 @@ Future<ui.Image> remapImageColors(String assetPath, Color remappedBlackColor, Co
   ui.decodeImageFromPixels(remappedBytes, originalImage.width, originalImage.height, ui.PixelFormat.rgba8888, imageCompleter.complete);
 
   final ui.Image remappedImage = await imageCompleter.future;
-  imageCache[cacheKey] = remappedImage;
+  _imageCache[cacheKey] = remappedImage;
   return remappedImage;
 }
 

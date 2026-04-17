@@ -96,7 +96,7 @@ export class ShopPopupComponent implements OnDestroy {
             case ShopItemType.Pokemon:
                 return this.getPokemonPreview(item);
             case ShopItemType.Music:
-                return `/assets/images/menu/shop-items/tm-${item.variant}.png`;
+                return `./assets/images/menu/shop-items/tm-${item.variant}.png`;
             default:
                 return '';
         }

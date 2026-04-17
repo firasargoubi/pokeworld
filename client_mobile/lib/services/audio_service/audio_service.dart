@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:client_mobile/consts/avatar_data_const.dart';
 import 'package:client_mobile/models/audio.dart';
@@ -117,9 +119,11 @@ class AudioService {
 
     _activeSoundEffectPlayers.add(player);
 
-    player.onPlayerComplete.listen((_) {
+    late final StreamSubscription<void> completionSubscription;
+    completionSubscription = player.onPlayerComplete.listen((_) {
       _activeSoundEffectPlayers.remove(player);
       _availableSoundEffectPlayers.add(player);
+      completionSubscription.cancel();
     });
   }
 
