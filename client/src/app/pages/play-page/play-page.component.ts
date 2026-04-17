@@ -137,6 +137,7 @@ export class PlayPageComponent {
     }
 
     private onMatchUpdate() {
+        if (!this.matchService.isInMatch()) return;
         this.computeItemSFX();
         this.updateVisual();
         this.checkForRedirect();

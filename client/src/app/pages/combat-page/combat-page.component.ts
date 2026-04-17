@@ -128,6 +128,7 @@ export class CombatPageComponent implements OnDestroy {
     }
 
     private onMatchUpdate(oldMatchData: MatchData) {
+        if (!this.matchService.isInMatch()) return;
         this.checkForRedirect();
         this.updatePlayersCombatData(oldMatchData);
         this.checkHealingAnimation(oldMatchData);
